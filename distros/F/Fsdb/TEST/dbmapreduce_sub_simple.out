@@ -1,0 +1,5 @@
+#fsdb experiment n
+ufs_mab_sys	2
+ufs_rcp_real	2
+# test trailing comment
+#   | dbmapreduce -k experiment -f TEST/dbmapreduce_sub_simple.pl -C simple_reducer

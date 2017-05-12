@@ -1,0 +1,7 @@
+Changes
+CounterFile.pm
+MANIFEST
+Makefile.PL
+README
+t/basic.t
+t/race.t

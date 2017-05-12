@@ -1,0 +1,25 @@
+NAME
+    Finance::Bank::SK::SLSP::Notification - parse email notifications
+
+SYNOPSIS
+        my $slsp = Finance::Bank::SK::SLSP::Notification->from_email($email_str);
+
+        say $slsp->header_obj->header('From');
+        say $slsp->attached_files;
+        say $slsp->has_transactions;
+
+        say $slsp->transactions->[0]->type;
+        say $slsp->transactions->[0]->account_number;
+        say $slsp->transactions->[0]->vs;
+        say $slsp->transactions->[0]->ks;
+        say $slsp->transactions->[0]->ss;
+
+DESCRIPTION
+PROPERTIES
+METHODS
+  new()
+    Object constructor.
+
+AUTHOR
+    Jozef Kutej
+

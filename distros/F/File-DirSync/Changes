@@ -1,0 +1,98 @@
+Revision history for Perl extension File::DirSync.
+
+1.22  Wed Aug 15 15:30:00 2007
+	- Allow gentleness to pause even right in the
+	  middle of a chewing copy since that can be
+	  very painful to the drive.
+
+1.21  Thu Aug 09 22:00:00 2007
+	- Tweak minimum thresholds for autoincrease
+	  in order to provide more granular throttling.
+	- Fix initial gentle_ops boundary checking.
+	- Clear up a few warnings.
+
+1.20  Wed Aug 08 15:05:00 2007
+	- Stable release
+	- Just bug fixes from v1.16.
+	- More accurate gentle throttling computation
+	  w/ on-the-fly auto-adjust disk ops feature.
+	- Versions v1.17 - v1.19 were beta tests.
+
+1.16  Sat Aug 04 02:00:00 2007
+	- Disable operation tracking by default.
+	- Add a proctitle feature for progress monitioring.
+	- Moved rmtree and copy routines directly into this
+	  module for performance purposes.
+	- Add "gentle" feature to allow dirsync to throttle
+	  back the IO on the disks if this is desired.
+
+1.15  Fri Jul 14 09:58:00 2006
+	- Avoid forcing directory timestamp to match a
+	  more future mtime of a symlink within it.
+	  This allows to cleanly detect and revert any
+	  changes made on the destination by simply
+	  running a rebuild on it (as well as the source)
+	  prior to executing the dirsync operation.
+	  Altering a symlink in any way will ALWAYS
+	  update the mtime of the containing directory
+	  inode, so this is most correct anyway.
+
+1.14  Tue Apr 18 17:46:00 2006
+	- Add maxskew feature to avoid cache corruption.
+	- Add t/110_behave.t tester.
+
+1.12  Tue Mar 23 17:00:00 2004
+	- Autoflush STDOUT if verbose is enabled.
+	- Force chmod to match for directories too.
+	- Reference the commandline utility in SEE ALSO.
+	- Rid the spec since cpan2rpm handles is fine.
+
+1.11  Thu Jul 03 18:00:00 2003
+	- Add methods for tracking purposes
+	  Patch by chris@cwinters.com (Chris Winters)
+
+1.10  Mon Apr 28 15:00:00 2003
+	- Okay, it's too hard to taint everything.
+	- At least now it functions.
+
+1.09  Wed Apr 16 13:00:00 2003
+	- More taint clean fixes for security reasons.
+
+1.08  Sat Apr 12 23:45:00 2003
+	- More taint clean fixes for security reasons.
+
+1.07  Thu Oct 03 10:00:00 2002
+	- More tests to the suite.
+	- Add src() and dst() methods.
+	  Patch by gcmccone@raytheon.com (George McCone).
+	- Mention Win32 directory-not-update bug.
+	  Also spotted by George.
+
+1.06  Wed Jul 31 12:00:00 2002
+	- Win32 compatibility changes.
+	  Spot by markmc@tisimaging.com (Mark McConnell).
+	  Also spotted by livshits@cloud9.net (Gene Livshits).
+
+1.05  Thu Jul 18 23:00:00 2002
+	- More standard layout.
+	- Taint cleaner
+
+1.04  Mon Dec 24 11:26:00 2001
+	- Fix destination directory precheck bug.
+	  Spot by rhet@turnbull.net (Rhet Turnbull).
+	- Fix rebuild() bug in the case where only() is never called.
+
+1.03  Tue Dec 12 09:42:00 2001
+	- Documentation changes.
+	- Added man page for dirsync.
+	- Added File-DirSync.spec for easy rpm creation:
+	  $ rpm -ta File-DirSync-*.tar.gz
+
+1.02  Tue Dec 11 09:42:00 2001
+	- Initial release to CPAN
+	- Ported from standalone script to a
+	  wrapper using objects in a module.
+
+0.01  Tue Nov 20 15:39:16 2001
+	- original version; created by h2xs 1.20 with options
+		-X File::DirSync

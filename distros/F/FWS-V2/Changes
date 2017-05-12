@@ -1,0 +1,89 @@
+Revision history for FWS-V2
+1.1305 2013-09-09
+ - FULL WEB RELEASE! You can now run FWS web renderings from FWS::V2
+ - Added formMap methods as part of core release
+ - Minor change to prevent a bug with tinymce
+ - $fws->{GMTOffset} is now configured in site settings
+ - Stored hash libraries added: saveHash(), deleteHash(), and hashArray()
+ - Added Cache libary base methods
+ - Added backup and restore methods as well as a generic unpack file method
+ - Many updates to code formatting
+ - Add Geo.pm methods
+ - Add Display.pm methods
+ - Add Admin.pm methods
+ - Bootstrap 2 Support
+ - siteFriendly update that extends support for pageFriendlyURLs
+ - Major update to move more admin modules into the FWS admin package
+ - Many minor bug fixes
+ - Version of FWS udpated to match  web distro version
+ - regesterPlugins() now run all plugins via the developer admin
+ - Sub element AJAX wrappers are now present for delete calls on nested elements
+ - Added postFlushWebCache hook
+
+0.009 2012-10-16
+ - Add an ease of use method for date comparing: dateDiff()
+ - Plugins using friendlyURL table fields in thier schema are now added to the friendly URL look up query automatically
+ - Required table to be present before altering tables when doing DBUpdate()
+ - Corrected an issue with postText for truncateContent()
+ - Added numberTime to dateTime function as a possible input format
+ - setCacheIndex() will now only save to the site if the index has changed
+ - formatDate() is now the new name for dateTime(), the latter is still present as a legacy subroutine
+ - HTTPRequest() can now be passed what agent it is using
+ - Added 'force install' option to the plugin installer
+ - Added safeXML() method to Safety.pm
+ - Added shortDate to dateTime() MMM DD YYYY (where MMM is the three letter acronym of the month)
+ - _deleteOrphanedData utility now can be passed a unique DBH
+ - Made connectDBH() capable of being used outside the context of the FWS for other functions by passing a hash of its requirements
+ - Other minor formatting and documentation updates
+
+0.008 2012-07-16
+ - Minor bug fixes
+ - Added safeURL method
+ - Added SQLDate method
+ - Added stateDropDown method
+ - GUID based inate friendly URLs now can use ignored extensions
+ - Implented core language selection hash support
+ - New method applyLanguage to transform a hash into its correct language
+ - Ported phone formatting methods
+ - Modified language() to always return upper case
+ - Date control now support French language
+ - Update friendlyURL\pageFriendlyURL support for non page element page renderings
+ - Upgraded to 3.5.x tinyMCE + ported out inline tinyMCE js to be part of the tinyMCE init js
+
+0.007 2012-05-03
+ - Added removeHTML() and formatCurrency()
+ - Added adminUserArray(),adminPageHeader()
+ - Added dayMod to the dateTime method
+ - Minor bug in session creation fixed causing short session ids
+ - newDBCheck() added
+ - 2.1 Plugin Implemented
+ - CSVExport added
+ - Removed plugin specific methods added before plugin implementation
+
+0.006 2012-03-16
+ - Corrected document formatting error
+ - Change to the create homeGUID session code to ensure a blank parent
+
+0.005 2012-03-14
+ - Added dataDelete()
+ - Added an option for dateTime() to change set the default date separator
+ - Added new parameter sessionCookieName to allow unique cookie names for sessions
+ - Added default image manipulation methods 
+ - Minor bug fixes
+
+0.004 2012-02-08 
+ - Basic data table and caching mechanics added
+ - Most of the site wide settings installed for general testing
+ - Added securityHash to constructor
+ - Autorunning updateDatabase on failed SQL
+ - Added many legacy methods
+
+0.003 2012-02-28
+ - Added updateDatabase
+
+0.002 2012-02-26
+ - Updated test plan with new modules added
+
+0.001 2012-02-26
+ - Initial Release
+

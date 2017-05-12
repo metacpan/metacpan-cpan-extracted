@@ -1,0 +1,28 @@
+Revision history for Perl extension File-Find-Upwards
+
+1.102030  2010-07-22 15:36:22 Europe/Vienna
+    - functions now take a list of filenames
+
+1.100860  2010-03-27 11:15:47 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04 Mon 2009.12.07 00:58:16 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - added find_containing_dir_upwards()
+    - reduced dependencies using author tests
+    - better dist engineering (INSTALL, README, README.mkdn etc.)
+
+0.03  Tue Dec 16 13:20:03 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Now based on Path::Class instead of File::Spec::Functions - trying to
+      cleanly avoid a bug where it hanged on Windows because rootdir() there
+      returned '\'
+
+0.02 Sat Nov  1 09:17:35 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.01  Thu, 29 May 2008 12:04:55 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version
+    - .shipit: fixed svk.tagpattern and commit.header
+    - Makefile.PL: added requirements
+    - t/01_misc.t: added tests

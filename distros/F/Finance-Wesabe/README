@@ -1,0 +1,72 @@
+NAME
+    Finance::Wesabe - Access your wesabe.com account information
+
+SYNOPSIS
+        my $w = Finance::Wesabe->new( {
+            username => $u,
+            password => $p,
+        } );
+    
+        printf "%s: %s\n", $_->name, $_->pretty_balance for $w->accounts;
+
+DESCRIPTION
+        Wesabe is part money management tool, part community.
+
+    This module provides access to your basic account info via the wesabe
+    API. It currently supports a subset of the 1.0.0 API.
+
+WESABE.COM SHUTDOWN / OPEN SOURCE "MESABE"
+    On July 31st, 2010, the wesabe.com service shut its doors. Subsequently,
+    parts of the application have been released as open source code on the
+    wesabe github account (<http://www.github.com/wesabe>).
+
+    Of particular interest are the instructions to get a local copy of the
+    wesabe web app running locally (known as "mesabe"):
+    <http://github.com/wesabe/mesabe/wiki>.
+
+    At the time of this writing, it is unclear if this module will interface
+    with a locally run version of the app, however, the base URL is
+    configurable as follows:
+
+        my $w = Finance::Wesabe->new( {
+            url      => 'http://localhost:3000/', # change as required
+            username => $u,
+            password => $p,
+        } );
+
+ACCESSORS
+    *   agent - A useragent for all requests
+
+    *   url - Base URI for all requests
+
+    *   username - your wesabe.com username
+
+    *   password - your wesabe.com password
+
+METHODS
+  accounts( )
+    Returns Finance::Wesabe::Account objects for each of your accounts.
+
+  account( $index )
+    Returns a Finance::Wesabe::Account object for the given <$index>.
+
+    NB: Accounts have no specific numeric id, so 1 means the first account,
+    and so on.
+
+  profile( )
+    Returns a Finance::Wesabe::Profile with your profile information.
+
+SEE ALSO
+    *   <http://www.wesabe.com>
+
+    *   <http://github.com/wesabe/mesabe/wiki>
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2009-2010 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

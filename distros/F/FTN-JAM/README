@@ -1,0 +1,47 @@
+ftn-jam
+
+This module can be used for operations related to JAM messagebases,
+including the following:  creating or removing a messagebase, listing
+the contents of a messagebase, adding a message to a messagebase, reading
+a message in a messagebase, changing a message in a messagebase, or finding
+a user in a messagebase.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc FTN::JAM
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=ftn-jam
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/ftn-jam
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/ftn-jam
+
+    Search CPAN
+        http://search.cpan.org/dist/ftn-jam
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2012 Robert James Clay
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

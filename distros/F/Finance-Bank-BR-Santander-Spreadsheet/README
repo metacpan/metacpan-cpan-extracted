@@ -1,0 +1,6 @@
+Finance::Bank::BR::Santander is a module that allows users to get their balance
+and statements from Brazilian branch of Santander.
+
+Finance::Bank::BR::Santander::Spreadsheet parses spreadsheets exported by their
+Internet Banking.
+

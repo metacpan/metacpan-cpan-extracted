@@ -1,0 +1,39 @@
+Revision history for Perl extension Finnigan.
+
+0.0206 Fri May 12 17:28:16 BST 2011
+        - added support for v.60 (Orbitrap Velos)
+        - added precursor intensity search to Finnigan::Scan::CentroidList
+        - proper handling of empty scans
+
+0.0205 Sun 19 Jun 2011 18:03:04 BST
+        - API changes required to accommodate the 64-bit file pointers in the v.64 file format
+
+0.0204 Sun 17 Apr 2011 11:19:07 BST
+        - forced all platform-dependent unpack templates to
+          little-endian
+        - minor POD edits
+
+0.0203 Tue 12 Apr 2011 14:21:45 BST
+        - bug fix in Finnigan::Decoder: localtime -> gmtime
+        - replaced the non-portable unpack template Q with VV
+        - POD formatting
+
+0.0201 Sun 10 Apr 2011 01:05:26 BST
+        - bug fixes in Finnigan::Scan::Profile
+        - removed Data::Format::WindowsFileTime dependency
+        - added $VERSION to all submodules to make PAUSE happy
+        - more robust numeric tests in Finnigan.t
+        - better POD in Finnigan.pm
+
+0.02  Mon 14 Feb 2011 14:43:37 MSK
+        - optimisations for speed in all decoder objects
+        - new object, Finnigan::Scan, provides a lightweight
+          decoder for scan data that takes just two file reads to
+          decode the profile and the centroid list.
+        - more test coverage; the most essential manoeuvres
+          for reading scan data are now represented.
+        - complete documentation of all modules
+
+0.01  Sat Mar  6 23:58:43 2010
+        - original version; created by h2xs 1.23 with options
+                -X -n Finnigan

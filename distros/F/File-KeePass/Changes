@@ -1,0 +1,41 @@
+2.03
+    2012-09-15
+        * Generated kdbx files now actually open up with KeePass2
+        * Cleanup uuid management (compatible with both v1 and v2)
+        * Add HeaderHash generation and checking
+        * Fix the file version numbers
+        * Add deleted objects support
+        * Fix bug in chunksum
+        * Add a top level group node when writing a v2 database if there are more than 1 root level group - auto remove on load
+        * Better default times
+
+2.02
+    2012-09-13
+        * Update dependency list and tests
+        * Fix some warnings on older perls
+
+2.01
+    2012-09-13
+        * Fix generation of v1 databases with "unknown" fields
+        * A few other cleanups
+
+2.00
+    2012-08-30
+        * Add ability to work with kdbx (version 2) reading and writing.
+        * Allow for using a password, a key file, or a password and a key file.
+        * Other major bug fixes and refactoring
+        * API change - allow for auto parsing of Auto-Type in version 1 databases to match version 2
+        * API change - allow for binary to be a hashref since version 2 supports multiple binaries
+
+0.03
+    2010-12-06
+        * Further corrections on parse_groups bug that was further pointed out by Lester Hightower with a correct fix offered Brian De Wolf.
+
+0.02
+    2010-12-03
+        * Correct parse_groups bug that was pointed out by Lester Hightower.
+        * Add parsing/writing of dates on groups.
+
+0.01
+    2010-06-28
+        * First release

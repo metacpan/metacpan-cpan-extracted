@@ -1,0 +1,25 @@
+---
+abstract: 'Efficiently count the number of line breaks in a file'
+author:
+  - 'Moritz Lenz'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-CountLines
+provides:
+  File::CountLines:
+    file: lib/File/CountLines.pm
+    version: v0.0.3
+requires:
+  Carp: 0
+  Exporter: 5.57
+  charnames: 1.01
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.3

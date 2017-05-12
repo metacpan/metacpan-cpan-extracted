@@ -1,0 +1,14 @@
+Changes	            - revision history
+MANIFEST            - this file
+Build.PL            - "perl Makefile.PL" to get things started
+README              - read this first
+lib/Sys/CpuLoadX.pm
+contrib/CpuLoad.xs
+contrib/CpuUsage.xs
+contrib/foo.xs
+include/ppport.h
+lib/xs/foo          - placeholder
+t/00-load.t
+t/01-get_cpu_load.t
+bundle.pl
+META.yml

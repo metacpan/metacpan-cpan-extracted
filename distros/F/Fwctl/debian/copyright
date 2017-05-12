@@ -1,0 +1,12 @@
+This package was debianized by Bernd Eckenfels <ecki@debian.org> on
+Sat, 25 Sep 1999 02:53:32 +0200.
+
+It was downloaded from http://indev.insu.com/Fwctl/fwctl.html
+
+Upstream Author(s): Francis J. Lacoste <francis.lacoste@iNsu.COM>
+
+Copyright:
+ Copyright (c) 1999 Francis J. Lacoste and iNsu Innovations. inc.
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms same terms as perl itself.

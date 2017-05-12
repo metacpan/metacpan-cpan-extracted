@@ -1,0 +1,15 @@
+# Testing File::RandomLine  
+
+use Test::More tests => 3;
+use Test::MockRandom 'File::RandomLine';
+use File::RandomLine;
+
+my $rl = File::RandomLine->new("t/testdata.txt");
+isa_ok( $rl, "File::RandomLine" );
+
+srand( 0 );
+is( $rl->next, "line two", "Testing with srand( 0 )" );
+
+srand( oneish() );
+is( $rl->next, "line one", "Testing with srand( oneish() )" );
+

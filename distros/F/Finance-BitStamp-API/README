@@ -1,0 +1,26 @@
+Finance-BitStamp-API version 0.01
+===============================
+
+This module allows object oriented access to the BitStamp API calls.
+It supports both public and private calls as well
+as IPN handling.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   CGI, JSON, LWP::UserAgent, URI, Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+   Copyright (C) 2014 by Jeff Anderson
+
+   see included file: LICENSE
+

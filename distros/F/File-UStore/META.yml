@@ -1,0 +1,55 @@
+---
+abstract: 'UUID based File Storage Module.'
+author:
+  - 'Shantanu Bhadoria <shantanu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  blib: 1.01
+  lib: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.006
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-UStore
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  File::UStore:
+    file: lib/File/UStore.pm
+    version: 0.16
+requires:
+  AutoLoader: 0
+  Exporter: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Spec: 0
+  UUID: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-file-ustore/issues
+  homepage: https://metacpan.org/release/File-UStore
+  repository: git://github.com/shantanubhadoria/perl-file-ustore.git
+version: 0.16
+x_contributors:
+  - 'Shantanu Bhadoria <shantanu.bhadoria@gmail.com>'
+  - 'Shantanu Bhadoria <shantanu@shantanu-M14xR2.(none)>'

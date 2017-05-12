@@ -1,0 +1,12 @@
+Changes
+lib/File/SharedNFSLock.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-load.t
+t/01-basic.t
+t/02-lock.t
+t/03-race.t
+t/File-SharedNFSLock.t
+META.json                                Module JSON meta-data (added by MakeMaker)

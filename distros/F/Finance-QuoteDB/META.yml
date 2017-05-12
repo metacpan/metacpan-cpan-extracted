@@ -1,0 +1,39 @@
+---
+abstract: 'User database tools based on Finance::Quote'
+author:
+  - 'Erik Colson <eco@ecocode.net>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-QuoteDB
+no_index:
+  directory:
+    - examples
+requires:
+  Config::IniFiles: '0'
+  DBIx::Class: '0'
+  DBIx::Class::Schema: '0'
+  Exporter: '0'
+  Finance::Quote: '0'
+  Finance::QuoteHist: '0'
+  Getopt::Long: '0'
+  HTML::TableExtract: '0'
+  LWP::UserAgent: '0'
+  Log::Log4perl: '0'
+  Pod::Usage: '0'
+  base: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Finance-QuoteDB
+  homepage: http://fqdb.tuxfamily.org/
+  repository: git://github.com/ecocode/finance-quotedb
+version: '0.18'

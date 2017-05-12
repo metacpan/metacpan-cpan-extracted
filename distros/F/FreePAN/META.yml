@@ -1,0 +1,14 @@
+name: FreePAN
+version: 0.10
+abstract: FreePAN Framework
+author: Brian Ingerson <ingy@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.8.3
+  Spoon: 0.21
+  Storable: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,13 @@
+^RCS/
+/RCS/
+\.SKIP$
+\.tar\.gz$
+^\.svn/
+/\.svn/
+~$
+^MYMETA\.
+^_build/
+^Build$
+^blib/
+^Kwalitee/
+^script/

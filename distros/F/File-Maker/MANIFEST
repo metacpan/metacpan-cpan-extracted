@@ -1,0 +1,14 @@
+lib/Docs/Site_SVD/File_Maker.pm
+MANIFEST
+Makefile.PL
+README
+lib/File/Maker.pm
+t/File/Maker.d
+t/File/Maker.pm
+t/File/Maker.t
+t/File/_Maker_/MakerDB.pm
+t/File/File/Package.pm
+t/File/File/SmartNL.pm
+t/File/Test/Tech.pm
+t/File/Data/Secs2.pm
+t/File/Data/SecsPack.pm

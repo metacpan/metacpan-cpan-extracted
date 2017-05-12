@@ -1,0 +1,33 @@
+Revision history for Finance-Bank-ID-BPRKS
+
+0.05    2015-12-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.04    2015-08-17 (PERLANCAR)
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.03    2015-04-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Split CLIs to its own dist: App-IndonesianBankingUtils to reduce
+	  deps.
+
+
+0.02    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.01    2012-06-12 (SHARYANTO)
+
+        - First, early release. Only parsing of statement page has been
+          implemented.

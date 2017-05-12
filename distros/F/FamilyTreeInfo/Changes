@@ -1,0 +1,176 @@
+Revision history for Ftree
+
+2.3.41  2016-04-24 17:00:46 MSK
+           * intermediate release
+           * I don't know how improve it
+2.3.40  2016-04-24 03:01:36 MSK
+           * clean and refactor project
+2.3.39  2016-04-22 18:10:29 MSK
+           * improve doc
+2.3.38  2016-04-22 17:59:05 MSK
+           * add plack test
+           * remove Switch at all
+
+2.3.37  2016-04-22 13:17:34 MSK
+           * fix some error
+           * remove Switch module
+2.3.36  2016-04-21 17:43:21 MSK
+
+           * fix bug converting
+           * https://github.com/mishin/Ftree-cpan/issues/3
+           * from GEDCOM format to XLS
+2.3.35  2016-04-21 17:08:43 MSK
+
+           * refactoring
+2.3.34  2016-04-21 17:06:32 MSK
+           * improve Readme and ftree.bat
+
+2.3.33  2016-04-21 13:35:42 MSK
+           * remove script directory
+
+2.3.32  2016-04-21 13:13:32 MSK
+           * fix export, fix all bugs, it works now
+
+2.3.31  2015-10-15 07:37:21 MSK
+
+           * add export get_reverse_name
+2.3.30  2015-10-15 07:21:44 MSK
+
+           * correct path to Ftree::Picture
+2.3.29  2015-10-15 07:17:41 MSK
+
+           * correct use base, add Ftree::
+2.3.28  2015-10-15 07:07:31 MSK
+
+           * correct version and use strict
+2.3.27  2015-10-14 06:52:51 MSK
+
+           * change Perl6::Export::Attrs -> Sub::Exporter
+2.3.26  2015-09-24 01:55:10 MSK
+           * clear distribution from big unnesesaries files
+2.3.25  2015-09-24 01:36:20 MSK
+           * move module to namespace Ftree
+	   * due to fix Don't use Person.pm and other toplevel namespaces #2
+	   * https://github.com/mishin/Ftree-cpan/issues/2
+2.3.24  2015-09-17 02:16:22 MSK
+           * add ExcelxExporter
+	   * to convert from xlsx to ser format
+	   * perl convertFormat.pl tree.xlsx tree.ser
+	   * works too
+2.3.23  2015-09-16 04:59:37 MSK
+           * add xlsx adaptor support
+2.3.22  2015-09-14 03:22:27 MSK
+           * I tune to deploy my app from github(https://github.com/mishin/Ftree-cpan) to
+           * https://www.heroku.com/home
+           * #heroku is fantastic!
+2.3.21  2015-09-12 09:05:48 MSK
+           * add installer for windows7
+2.3.20  2015-09-11 07:15:41 MSK
+           * put app to heroku!
+           * https://still-lowlands-7377.herokuapp.com/ftree?type=;passwd=;lang=gb
+2.3.19  2015-09-10 04:51:43 MSK
+           * Correct unicode bug in Excel
+           * Correct empty password not init bug
+2.3.18  2015-09-09 13:21:22 MSK
+           * correct some Use of uninitialized value error
+		   * add Nikolay Mishin to copyrigth
+2.3.17  2015-09-09 01:17:23 MSK
+           * add install instruction
+2.3.16  2015-09-09 01:06:08 MSK
+           * corrected an error routing
+2.3.15  2015-09-09 00:47:04 MSK
+           * Change error with form,  it works, simple!!
+2.3.14  2015-09-09 00:04:02 MSK
+
+           * Move distribution to plack
+2.3.13  2015-09-07 01:54:27 MSK
+           * Put config to file c:\Users\TOSH\Documents\GitHub\Ftree-cpan\cgi-bin\ftree.config
+           * Add Prayer_for_the_living
+           * Add Prayer_for_the_departed
+
+2.3.12  2015-09-06 09:15:07 MSK
+           * Improve pod
+
+2.3.11  2015-09-06 03:05:27 MSK
+           * Initial version
+
+NEW IN VERSION 2.3.11:
+* bug fixes
+* serializing in platform independent way
+
+NEW IN VERSION 2.3.10:
+* bug fixes
+
+NEW IN VERSION 2.3.9:
+* language Russian added
+
+NEW IN VERSION 2.3.8:
+* no zoom-out button if there are no more generations
+* border color of the image depends on the existence of the member (black for dead relative). See class dead and alive in style sheet
+* gender-dependent picture for unknown persons
+* proper UTF-8 and excel encoding (big endian) handling
+* bug fixes (e.g. in language switching)
+* config file change (see option encoding for csv format)
+
+NEW IN VERSION 2.3.7:
+* language Romanian is added
+* cleaner code
+
+NEW IN VERSION 2.3.6:
+* decoupling style from XHTML output by employing style sheet
+
+NEW IN VERSION 2.3.5:
+* bug fixes
+* proper error handling (warning occurs during data file parsing are sent to browser as HTML comments)
+
+NEW IN VERSION 2.3.4:
+* bug fixes
+* little improvements in efficiency
+
+NEW IN VERSION 2.3.3:
+* bug fixes
+* code refactoring (usage of Class::Std module)
+* config file change
+* read data from database (not tested yet!)
+
+NEW IN VERSION 2.3.2:
+* Italian support
+
+NEW IN VERSION 2.3.1:
+* proper date display with custom format option (date_format option in PerlSettingsImporter.pm)
+* a bug fix
+
+NEW IN VERSION 2.3:
+* handling GEDCOM files
+* handling serialized files
+* introducing photo_url as a setting option to allow decoupling the perl scripts and the photo files.
+
+NEW IN VERSION 2.2:
+* handling additional information (like place of birth, nickname, jobs, etc.) about the people
+* new input file format: excel spreadsheet
+* new language: polish
+* new picture type: tif
+* some configuration change, see PerlSettingsImporter.pm
+* code refactoring
+
+NEW IN VERSION 2.1:
+* French support is added
+* improved page (info about half siblings, spouses) when displayed generation is 0
+* some bug fix
+* code refactoring
+
+NEW IN VERSION 2.0:
+
+* Object-oriented programming style (with design patterns)
+* valid XHTML output
+* using CPAN cgi module
+* heavy use of CPAN modules
+* Improved and simplified script configuration
+* Improved formatting of Index page
+* Bug on Index page fixed (affected multiple entries with same name)
+* Unicode support
+* png support
+* Facehall
+* Surname page
+
+Version 2.0 is fully backwards compatible - the data file format just slightly changed.

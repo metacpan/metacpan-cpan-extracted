@@ -1,0 +1,140 @@
+H1 {
+	line-height: 20pt;
+	text-align: center;
+	color: #777777;
+	margin-bottom : 20px;
+	margin-top : 40px;
+	font : 23pt  Helvetica, Arial, sans-serif;
+}
+
+H2 {
+	line-height: 20pt;
+	text-align: center;
+	color: #ca5483;
+	margin-top : 20px;
+	margin-bottom : 20px;
+	margin-left : 30px;
+	margin-right : 30px;
+	background : url(headerblue.gif);
+	background-color: rgb(204, 204, 255);
+	font : bold 18pt Helvetica, Arial, sans-serif;
+}
+
+H3 {
+	text-align: left;
+	color: Gray;
+	margin-top : 40px;
+	margin-bottom : -5px;
+	margin-left : 30px;
+	margin-right : 30px;
+	font : bold 15pt/normal Helvetica, Arial, sans-serif;
+}
+
+H4 {
+	text-align: left;
+	color: #888888;
+	margin-top : 40px;
+	margin-bottom : 0px;
+	margin-left : 30px;
+	margin-right : 30px;
+	font : 12pt/normal Helvetica, Arial, sans-serif;
+}
+
+
+BODY {
+	text-align: left;
+	color: rgb(204, 204, 255);
+	background : #0e0459;
+}
+
+.footer{
+	font: 8pt / 8pt Arial, Helvetica, Sans-Serif;
+	text-align: center;
+	color: #000000;
+	margin-top : 100px;
+}
+
+A:HOVER {
+	text-decoration : underline;
+	color : Navy;
+}
+
+A:LINK {
+	text-decoration : underlined;
+	color : #ceeeee;
+}
+
+A:VISITED {
+	text-decoration : underlined;
+	color : #F6FB54;
+}
+
+UL {
+	margin-bottom : 20px;
+	margin-top : 5px;
+	margin-left : 70px;
+	font: 11pt  Arial, Helvetica, sans-serif;
+}
+
+UL LI {
+	list-style : decimal;
+	font : 11pt Arial, Helvetica, sans-serif;
+}
+
+OL {
+	margin-bottom : 20px;
+	margin-top : 5px;
+	margin-left : 70px;
+	font: 11pt  Arial, Helvetica, sans-serif;
+}
+
+OL LI {
+	list-style : square;
+	font : 11pt Arial, Helvetica, sans-serif;
+}
+
+P {
+	text-align : justify;
+	margin-left : 30px;
+	margin-right : 30px;
+	font : 11pt/14pt Arial, Helvetica, sans-serif;
+}
+TABLE THEAD TR TH {
+	font: 16pt  Arial, Helvetica, sans-serif;
+	background-color: rgb(204, 204, 105);
+	color : Gray;
+}
+TABLE.FLAGS {
+
+}
+.man {
+	background-color : #a4a4ff;
+}
+.woman {
+	background-color : #DAA3AC;
+}
+.unknown {
+	background-color : #ffffff;
+}
+
+.dead {
+	border-color: #000000;
+}
+.alive {
+	border-color: #ffffff;
+}
+
+PRE {
+	margin-left : 40px;
+	margin-right : 40px;
+}
+.picture{
+	margin-top : 50px;
+	margin-bottom : 50px;
+}
+
+.changelink{
+	margin-top : 50px;
+	margin-bottom : -65px;
+	text-align:right;
+}

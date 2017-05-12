@@ -1,0 +1,738 @@
+Revision history for Perl extension File::Util.pm
+
+4.161950 2016-07-12
+  - This release fixes a critical bug in the list_dir() method, detailed at
+    https://rt.cpan.org/Public/Bug/Display.html?id=115511
+  - Regression test added to catch the failure condition
+  - NOTE: No major code or featureset changes included as part of this release,
+    therefore it is still deemed "stable", as no significant changes to the code
+    have been made beyond a two line bugfix that remedies the problem that
+    caused the list_dir() method to fail under certain conditions.
+
+4.161200 2016-04-29
+  - The previous TRIAL release passes muster by cpantesters.  This is
+    now released as a STABLE dist, although more features are planned in
+    coming releases.  See also: TODO
+
+4.160630 2016-03-03
+ - TRIAL RELEASE
+ - Fix for bug https://rt.cpan.org/Ticket/Display.html?id=106771
+ - Added tests
+ - Added documentation regarding the bug fix, namely the now-unsupported
+   (because Perl 5.23 deprecates) the combination of sysread/write/seek
+   on filehandles in :utf8 binmode.
+ - Added the ability for users to specify their own IO layers via the
+   { binmode => ':layerspec' } option to ::load_file(), ::write_file(),
+   and ::open_handle()
+
+4.131591 2013-06-07
+ - POD (documentation) corrections.
+
+4.131570 2013-06-06
+ - Since Sat Mar 2 01:13:46 CST 2013, there has been an unofficial code
+   freeze in effect, during which time 580 test runs from the CPAN smoke
+   testers have had a 100% complete PASS rate.
+
+ - So I'm pleased to announce that I'm releasing this code as-is, under
+   the "STABLE"/"MATURE" designation.
+
+ - There are important bug fixes since the last STABLE release, particularly
+   in making the File::Util::max_dives() method behave as documented.  See
+   also https://rt.cpan.org/Ticket/Display.html?id=85141
+
+ - Near future plans are laid out in the TODO documentation file also
+   included with this documentation.
+
+4.130610 2013-03-02
+ - TRIAL version, much polish on the quality of the distribution itself,
+   including extensive POD checks, fixes in documentation quality, and
+   overall tidiness.  Reorganized the test suite so it remains correct to
+   "t" and "xt" test division conventions.  Included a list of contributors.
+
+4.130590 2013-02-27
+ - TRIAL version, probably the final trial before release as a mature distro
+   in the 4.x series (the 3.x series is already "mature" status).
+
+ - This release introduces unicode support via UTF-8 strict.  Naturally
+   the test suite and coverage had to be expanded to cover the new feature
+   set.  Documentation has also been updated to include explanation of
+   how to make use UTF-8 encoding in File::Util.
+
+ - Minor bug fixes and polish.
+
+4.130560 2013-02-25
+ - TRIAL version, seventh trial in 4.x series.  I am just about confident
+   enough to release this current code as an offical stable release to the
+   CPAN, but first I wanted to include the optimizations in this release.
+
+ - This release represents a vast number of optimizations that greatly
+   increase the performance of recursive calls.
+
+ - This release fixes some windows-specific bugs that have to deal with
+   recursively listing directories from a root volume, such as "C:\" for
+   example.
+
+ - Added performance measurement scripts that allow users to both benchmark
+   and profile File::Util, with Devel::NYTProf being a prerequisite to such
+   activities.
+
+4.130510 2013-02-19
+ - TRIAL version, sixth trial in 4.x series prior to first official release;
+   we're being very careful.
+
+ - Removed dependency for Exception::Handler and stole/improved code from it
+   so now there's no external dependencies whatsoever.
+
+ - Tests and documentation adjusted to reflect the change
+
+4.130500 2013-02-18
+ - TRIAL version, fifth trial in 4.x series prior to first official release;
+   we're being very careful.
+
+ - This release features mainly performance optimizations, and many
+   windows-specific bug-fixes for those new optimizations which were caught
+   during thorough testing.
+
+ - This new version features a "max_depth" option for list_dir, which works
+   the same as the -max_depth flag for GNU find.
+
+ - the max_dives() method has been renamed to abort_depth(), with back-compat
+   fully preserved; this is to avoid confusion with the new max_depth
+   option for list_dir()
+
+ - Documentation updated to show examples of the new feature.
+
+ - For operating systems that support it, list_dir() now keeps track of the
+   filesystem inodes it sees while walking directories to detect and avoid
+   filesystem loops.  Sadly, Windows does not support the native stat/lstat
+   calls in Perl, and therefore this is feature is silently disabled on
+   any platform where it is detected that the stat/lstat calls don't work.
+
+ - New example script added to examples/ directory and to the Cookbook.
+
+ - Main perldoc manpage for File::Util updated
+
+4.130483 2013-02-16
+ - TRIAL version, fourth trial in the 4.x series.
+
+ - Tidied up documentation for main man page (perldoc).
+
+ - Increased test coverage, Devel::Cover scores are very much higher
+
+ - Fixed some bugs discovered while expanding test coverage and writing
+   new tests - this is the best way to find and fix bugs.
+
+4.130460 2013-02-14
+ - TRIAL version.  The third trial release of the 4.x series.  Removed a
+   few bits of code from the test suite that were causing false failures
+   in CPAN tester results.  More importantly, this version includes
+   optimizations to the list_dir() regex pattern matching when recursing
+   through directory trees.  Namely, the "pattern gathering" has been
+   memo-ized and stashed into the options passed to recursive calls.
+
+4.130425 2013-02-11
+ - TRIAL version.  Released to CPAN after taking into account some changes
+   recommended by a few of the good folks at perlmonks, namely some method
+   name changes.  The old method names still work fine and are completely
+   supported.  The changes are shown below:
+     +-----------+-------------+
+     | OLD NAME  | NEW NAME    |
+     +-----------+-------------+
+     | can_read  | is_readable |
+     | can_write | is_writable |
+     | readlimit | read_limit  |
+     | isbin     | is_bin      |
+     +-----------+-------------+
+
+ - Some changes to the POD documentation have been made as well, both to
+   reflect the name changes as well as to clean things up even more in
+   terms of clarity and better formatting.
+
+ - Some test updates were needed to reflect the use of the new method names
+
+4.130420 2013-02-10
+ - TRIAL version. Released to CPAN for those who may want to test drive
+   it.  The enhancements, improvements, feature additions, and bug fixes
+   in this release are far to great to be enumerated here in the changes
+   file.  A git repository was set up for File::Util last December, and
+   the commit logs will tell the full story of all changes.
+
+ - The commit log can be read here:
+   https://github.com/tommybutler/file-util/commits/master
+
+ - A summary of new things would include the newer, more modern-style
+   call syntax, user-definable custom error handlers, list_dir()
+   callbacks plus advanced regular expression filtering features, much
+   more comprehensive documentation including a manual and a cookbook,
+   performance optimizations, the ability to enable/disable the
+   verbose diagnostics that have hitherto been the default error
+   mechanism, and much more.  The quality of the distribution has also
+   been greatly improved.
+
+ - All new features are covered at length in the documentation, so
+   anything you don't see here will be mentioned and throughly covered
+   there.  Full backward-compatibility with the 3.x series feature-set
+   and syntax has been preserved
+
+3.39 2013-01-06
+ - Significant improvements in test suite, but most importantly
+   eliminated a bug found in make_dir() where absolute paths caused
+   problems on some platforms.
+
+ - Fixed a bug that caused testing to fail on Solaris
+
+3.38 2013-01-04
+ - Have to abandon AutoLoader.  It is simply causing too many problems
+   to continue using it on any level.
+
+4.37 2013-01-03
+ - Renamed atomize() to atomize_path() before anyone starts to use it;
+   the original name is not ideal and not descriptive of what it does.
+
+3.36 2013-01-03
+ - breakfix, Dist::Zilla failed to detect long-time prereq
+   Exception::Handler.  This unfortunate problem broke v3.33 thru 3.35
+   which were taken down in short order.
+
+3.33 2012-12-31
+ - Moves everything out of autoloader that was previously in autoloader,
+   with the exception of the assisted error handling.  In light of modern
+   computing, the optimizations are so minimal as to be negligible now.
+   There's more benefit to be had by having all methods available
+   at compile time.
+
+ - Documentation updates.
+
+ - Code cleanups.  Package cleanup.  Preparations to add new features.
+
+ - Working to make the distribution compliant with Fedora and Debian
+   packaging standards.  File::Util already has a maintained package for
+   Ubuntu.
+
+3.32 2012-11-28
+ - Emergency break fix for abs paths on *nix which came about as a
+   regression bug introduced when abs paths were fixed for windows
+   platforms.
+
+3.31 2012-11-20
+ - Adds new method: File::Util::atomize() which explodes a fully-qualified
+   filename into it's root, path, and filename... which was necessary
+   to squish the long-standing bug in fully-qualified file names on
+   MS Windows... Also, the '--rpattern=^pat$' flag should works recursively
+   for you in File::Util::list_dir(), in order to provide you with patterns
+   that are applied at every level in your file tree, while preserving the
+   current behavior of the '--pattern=^pat$' flag, which is not applied
+   recursively.  Another bug bites the dust.
+
+ - Fixes CPAN RT# 46368 and 64775, respectively
+
+ - Lots of code cleanup, and more documentation forthcoming in next release
+   will be here very soon, primarily to document the small additions here
+   and also to clean up the documentation itslef (particularly the code
+   examples which need style-fixes).  This is a stable release.
+
+3.30_003 2012-11-15
+ - Development release.  BETA.  Do not use for production!  This release
+   introduces new code optimizations and extensive cleanup.  The previously
+   required module Class::OOorNO has been removed from the prerequisites
+   and any methods that it exported are no longer available for import to
+   your namespace(s).  This shouldn't be a problem though, because that
+   module was almost never used at all, and no one ever even knew you
+   could get its methods from File::Util anyway.  Onward and upward, we're
+   inching slowly but surely toward 3.31 final.
+
+ - There's been a lot of code refactoring and regex optimization.  A lot
+   of planning and work will be going into 3.30, and this is the first
+   release candidate.
+
+3.30_001 2012-11-12
+ - Development release.  BETA.  Do not use for production!  This release
+   attempts to fix MS Windows-related problems, and introduces bugfixes
+   for CPAN RT# 46368 and 67399.  As a result, the test suite has been
+   slightly improved (and will continue to improve).
+
+ - There's been a lot of code refactoring and regex optimization.  A lot
+   of planning and work will be going into 3.30, and this is the first
+   release candidate.
+
+2.29 2012-10-17
+ - Fixed bug where list_dir() did not continue to recurse if it encountered
+   an error while running with the --fatals-as-warning flag.  If running
+   in default mode, it is normal behavior for File::Util to abort execution
+   on error, but when running with --fatals-as-warning flag, such errors
+   should not have caused recursion to fail.  (CPAN RT# 52319)
+
+ - Changed the brackets surrounding error messages to "<<" and ">>" so that
+   the glyphs display in most terminals.
+
+ - Modified/updated documentation and test suite to accomodate these new
+   changes.
+
+2.28 2012-09-29
+ - Adding a patch to fix breakage under Perl 5.17 (CPAN RT#31013)
+
+ - Fix spelling error in documentation and code comments (CPAN RT# #64854)
+
+2.27 2008-12-06
+ - Fixed a bug that caused root directories using Micro$oft filesystem
+   notation to be mis-read when using the '--dirs-only' flag for
+   File::Util::list_dir()
+
+3.26 2008-12-02
+ - Added to test suite in order to avoid errant test failures
+   when flock'ing on solaris.  This is a big deal, since the point of
+   File::Util is to be easy, and portable!
+
+ - Added some yet more extra examples in the documentation.
+
+3.25 2008-12-01
+ - Fixed a bug in File::Util::touch()
+
+ - Added some extra examples and corrected one minor error in the
+   documentation.
+
+3.24 2007-05-23
+ - Added method File::Util::last_changed (get inode change time for a file)
+
+ - Added method File::Util::touch (works like *nix touch command)
+
+ - Both touch and last_changed are autoloaded methods
+
+ - Applied patch from S. Muskiewicz that fixes the File::Util::last_modified
+   method that was using a similar but incorrect "-" file test operator.
+
+3.23 2008-02-15
+ - No major code changes.  Small bug fixes--
+
+ - Corrected syntax on package makefile that causes warnings to be
+   generated in cases of older Perl versions. Also corrected a problem
+   in the documentation where the section "Get the path preceeding a
+   file name" was showing incorrect information.
+
+3.22 2007-05-23
+ - Fixed windows-specific bugs associated with the handling of newlines
+   and directory path separators.  Now compatible with Strawberry Perl
+   and once again Active$tate Perl for MSWin*.
+
+3.21 2007-05-21
+ - Fixed solaris-specific bug in test suite causing a simple regular
+   expression to fail.  Previous changes up to this point merit a public
+   release, pending the fixing of afforementioned bug, hence this release.
+
+3.20_2 2007-05-21
+ - Fixed small but important incompatibility with some versions of
+   Exception::Handler
+
+3.20_1 2007-05-18
+ - Improved error handling mechanism even more, and created 31 new test
+   scenarios to make sure that any failure events are handled correctly.
+
+ - Fixed some small latent bugs, for example, corrected file handle
+   reference verification error handling--checking for validity of
+   file handle references.
+
+3.19 2007-05-16
+ - Documentation.  Documentation.  Documentation.  Small corrections and
+   several enhancements.  More examples.
+
+ - Improved error-handling mechanism by adding cascading logic to prioritize
+   fatality-handling rules of failed calls over the rules of the File::Util
+   object, whether they be defaults or manually set up via File::Util::new()
+
+3.18 2007-02-27
+ - Finished documentation for ALL methods.  Whew!  That was a lot of
+   writing.  The documentation will continue to evolve.
+
+ - Implemented the --use-sysopen flag for File::Util::open_handle()
+   and thereafter the following extra open modes for it (only valid if
+   the --use-sysopen flag is used):
+      rwcreate
+      rwupdate
+      rwclobber
+      rwappend
+
+   (See the documentation for more details about this new feature).
+
+ - Added new method File::Util::release_open_file() for the purpose
+   of releasing file locks placed on file handles by the
+   File::Util::open_file() method, that is, when file locking is
+   NOT turned off.  If file locking is disabled by the user, this new
+   method has no effect.
+
+3.17 2007-02-26
+ - Developer's releases (testing); not released to the public.
+
+3.16 2007-02-20
+ - Fixed problem with method File::Util::make_dir() when used with
+   absolute pathnames (path names starting with "/", for example).
+
+ - Fixed documentation error concerning the File::Util::list_dir method,
+   specifically regarding the "--pattern" option flag.
+
+ - Method File::Util::make_dir() now enforces the policy of failing when
+   asked to create a directory that already exists as a file of any kind.
+   Use the "--if-not-exists" flag if you are counting on the old behavior
+   or if you want to create directories which could possibly exist already.
+
+ - More documentation added.
+
+3.15 2006-12-22
+ - Fixed broken test suite that was causing `make test` to fail falsely.
+
+ - Revisited documentation, adding a little, and various small improvements.
+
+3.14_8 2006-12-14
+ - Fixed some error messages to be more clear.  Tweaked the
+   File::Util::readlimit() method to provide better error messages if
+   called incorrectly.  Modified File::Util::make_dir() to include
+   the --if-not-exists option.
+
+ - More documentation added for various methods whose documentation had
+   yet to be written.
+
+ - Fixed a broken test case in "make test" that was causing it to fail
+   falsely.
+
+ - Releasing this version as an official release and NOT a developer's
+   release only.
+
+3.14_7 2004-01-31
+ - Changes to method File::Util::flock_rules() to output helpful error
+   message if specification of invalid file locking policy attempted.
+
+ - flock_rules parameter for File::Util::new() constructor method no
+   longer accepted or recognized in the interest of speed and efficiency.
+   If you want to change the default flock rules for the File::Util object,
+   then call File::Util::flock_rules() with your desired ruleset as
+   specified in the documentation for this method.
+
+ - Changed default max_dives number to 1000.  (See documentation for the
+   File::Util::max_dives() method.)
+
+ - Much more documentation added for various methods whose documentation
+   had yet to be written.
+
+3.14_6 2003-09-22
+ - Changes to methods File::Util::list_dir() and
+   File::Util::escape_filename() increase efficiency and fix some bugs.
+   Both methods retain the same interface and return values in the same
+   manner.
+
+ - Added new method File::Util::return_path() (see documentation).
+
+ - Method File::Util::last_mod changed to File::Util::last_modified for
+   clarity, better readability, and consistency with other similar methods
+   in the File::Util namespace. (eg- File::Util::last_access, etc)
+
+ - Added the following methods to @EXPORT_OK
+      File::Util::return_path()
+      File::Util::created()
+      File::Util::last_access()
+      File::Util::last_modified()
+
+ - Much more documentation added.  Test suite revisited to reflect changes
+   to the methods mentioned above.
+
+3.14_2 2003-01-14
+ - Much more documentation added.  Various methods slightly altered to stay
+   in keeping with the docs and with standard conventions.  Test suite
+   revisited somewhat.
+
+3.14_1 2003-01-02
+ - Added a substantial amount of new documentation.  Spelling errors in
+   documentation files corrected.
+
+ - Previously available method, File::Util::os(), has been dropped from the
+   namespace and is no longer part of the module.
+
+ - Method File::Util::file_type() no longer includes the 'tty' keyword among
+   its list of recognized file types, as the native Perl file test for
+   divining a TTY file can only be used on open file handles.
+
+ - The keywords returned by this method are all upper case strings as of
+   version 3.13_9, though the release notes for that version errantly did
+   not include this statement.  The list of keywords otherwise remains
+   unchanged:
+      PLAIN       TEXT
+      BINARY      DIRECTORY
+      SYMLINK     PIPE
+      SOCKET      BLOCK
+      CHARACTER
+
+3.14_0 2002-12-27
+ - File::Util no longer @ISA Handy::Dandy, and no longer includes it
+   as a prerequisite dependency.  Added a little more documentation,
+   but it has a _long_ way to go as yet.
+
+3.13_9 2002-12-23
+ - A few small changes; no longer lists Handy::Dandy::TimeTools as a
+   prerequisite dependency.
+
+3.13_8 2002-12-22
+ - Method File::Util::file_type() now returns a list instead of a single
+   string of concatenated keyword substrings, the file type keywords being:
+      plain       text
+      binary      directory
+      symlink     pipe
+      socket      block
+      character   tty
+
+ - Methods File::Util::load_file() and File::Util::open_handle() both will
+   truly guarantee the uniqueness of the underlying file handle which is
+   auto-generated, whereas before measures to achieve the uniqueness of
+   the file handles were taken, but not verified.
+
+ - POD documentation got a big update.
+
+3.13_7 2002-12-06
+ - Almost ready for CPAN!
+
+ - License changed from the GNU LGPL to Perl's own licensing scheme.
+
+ - Various tweaks to compile-time sequences.
+
+ - Previously subroutines, SL and NL are now constants.  This makes them
+   easier to use when importing them to your main program.  Instead of
+   having to type "print('foo' . NL . NL)", you can type the more intuitive
+   "print('foo' . NL x 2)".  The same applies for SL, though it's not likely
+   you'll be wanting to print out more than one SL character in sequence.
+   This shouldn't break previous usage of these exported names.
+
+ - Small reference material section appended to the general documentation
+   file contained in 'docs-basic.txt' (part of this distribution)
+
+3.13_4 2002-11-14
+ - Got rid of all variables in @EXPORT_OK, namely:
+      $OS
+      $EBCDIC
+      $NL
+      $SL
+
+ - I wanted to export only methods, seeing as exporting variables just isn't
+   right, no matter how convenient it might be.  There are two new methods,
+   and they are both autoloaded, namely:
+      File::Util::os()
+      File::Util::ebcdic()
+
+ - These two methods take no arguments, and return only the value of the
+   previously EXPORT_OK'ed "$OS" and "$EBCDIC"
+
+ - Added more thorough testing to distribution tests lineup, and an
+   additional set of tests in an automated "empty subclass test" of the
+   modules native methods and all those it inherits from its ancestral
+   classes.
+
+ - More flock() related tweaking in private methods that implement
+   File::Util's automatic, transparent file locking mechanism.
+
+3.13_3 2002-11-13
+ - Slightly optimized recursive directory listing features of package method
+   File::Util::list_dir() and moved less-used method File::Util::load_dir()
+   to AUTOLOAD.
+
+ - Got rid of stupid method File::Util::EB which was previously
+   used for error bracketing around dynamic values quoted in error messages;
+   this has nothing to do with file handling -the purpose of this module.
+
+ - Global vars $AUTOLOAD and $ATL are gone, since moving to the use of Perl's
+   native AUTOLOAD extension from the old autoloading mechanism.
+
+ - Added/removed functionality tests in the distribution installer according
+   to these changes.
+
+3.13_1 2002-11-13
+ - Fixed problem that caused File::Util to not recognize its set flock
+   usage policy, and flock failthrough rule set when either was manually
+   set during runtime.  Added more flock tests to distribution test scripts.
+
+3.13_1 2002-11-04
+ - Further preparations made to ready the module for PAUSE upload.
+
+3.13_0 2002-11-01
+ - Method 'list_dir()' now recognizes a new option, '--ignore-case'.  When
+   this option is included among the other arguments you pass in, the list
+   of items returned will be sorted alphabetically from A to Z without
+   respect to character case.
+
+ - Accordingly, when the '--ignore-case' option is used the contents of
+   a directory that would normally appear ordered like the items in
+   Example A would instead appear ordered like the items in the order of
+   Example B.
+
+      Example A. (default list order of directory contents)
+         Changes   COPYING   MANIFEST   Makefile.PL   README   test.pl
+
+
+      Example B. (case insensitive order)
+         COPYING   Changes   Makefile.PL   MANIFEST   README   test.pl
+
+3.12_9 2002-10-27
+ - Various places where warnings were surfacing undesirably have been
+   corrected.  General preparations made to upload File::Util to PAUSE and
+   ultimately be included in the CPAN.
+
+3.12_7 2002-10-02
+ - Method 'list_dir_a()' no longer suffixes directory items with the
+   system path separator by force.
+
+3.12_6 2002-10-04
+ - Fixed serious problem with flock() wrapper which was previously not
+   working at all when global setting '--fatals-as-status' or global
+   setting '--fatals-as-warning' were used.  An upgrade to the present
+   release of File::Util from versions predating this release (3.12_6) is
+   seriously recommended!
+
+3.12_5 2002-10-01
+ - More performance improvements.
+
+ - New argument flags recognized by method 'new':
+      '--fatals-as-warning'   The new File::Util object will CORE::warn()
+                              about otherwise fatal errors instead of
+                              failing and exiting the process.
+
+      '--fatals-as-status'    The new File::Util object will return(undef)
+                              to method calls that would otherwise cause
+                              fatal errors.
+
+ - Method 'write_file' now recognizes the argument flag,
+   '--empty-writes-OK', as an alternative means of allowing the
+   creation of empty files without reaping a nasty fatal error.  Up
+   until now, setting $File::Util::empty_writes to a true value was the
+   only way to accomplish this.
+
+3.12_4 2002-09-23
+ - Fixed 'deep recursion' problem in AUTOLOAD
+
+3.12_3 2002-09-23
+ - Added AUTOLOAD and moved lots of methods away into space.  They get
+   AUTOLOAD-ed when needed, but not compiled as routines in the module.
+   This greatly improves compile-time and run-time performance now.
+
+ - Got rid of methods 'get()' and 'set()'; they're largely useless.
+
+ - Got rid of variable '$File::Util::canhackit'; no longer used.
+
+3.12_2 2002-09-11
+ - Moved to OOorNO interface design in order to provide both an Object-
+   Oriented and a Procedural (non-Object-Oriented) programming style
+   interface to File::Util.
+
+1.10 2002-03-14
+ - Constants are now class attributes independent of the constructor method.
+   File::Util objects should always get these constants regardless.
+
+ - Constants and OS identification extended upon code from CGI.pm v.2.78
+   (go Lincoln, it's your birthday, get busy...) as such, File::Util got path
+   separator help to better support a wider variety of platforms.
+
+ - Additionally, constants contributed to a major overhaul of how File::Util
+   handles newlines.
+
+1.09 2002-03-14
+ - Error messages got their own place as predefined key-value pairs in an
+   anonymous hash independent of any class methods.  eg-they are committed to
+   memory at compile time for speedy destruction of intentionally halted
+   processes.
+
+1.07 2002-02-09
+ - new method: File::Util::open_handle.  This method lets user pass a
+   typeglob reference (eg- *TYPG) and in return the user will get back a new
+   file handle which is opened to the filename of their specifications.
+
+1.06 2002-02-05
+ - Fixed a bug in File::Util::stamp() which made times during the hour of
+   12:00 PM appear with the 'AM' suffix rather than the correct 'PM suffix.
+
+ - Added a new format type to File::Util::stamp() called 'file' or 'filename'
+   which returns a timestamp suitable for placing into the name of a file
+   in order to archive old files or versions of code with a time/date stamp
+   embedded into the filename for easy lookup.
+
+1.05 2001-12-05
+ - Added a few more methods of the same nature as File::Util::size().  Passing
+   in a format keyword argument returns a formatted timestamp.  Format
+   keywords described in detail within the overview entry for previous
+   version 1.02.  Now an overview of new methods:
+
+ - File::Util::created([filename][format])
+
+      returns the creation time of the file in seconds since the epoch.  The
+      value returned is then passed back in the same format as the value
+      returned from a call to Perl's built-in function: time()
+
+      consequently, the value returned is suitable for feeding to
+      localtime, or any private methods and functions expecting the same
+      type of input.
+
+      As such, a call to this method on a file which was created at:
+      Thursday, December 6, 2001,  4:27:57 PM
+   ...would return the value: 1007684877
+
+ - File::Util::last_mod([filename][format])
+
+      Returns the last modified time of the file you pass to it in seconds
+      since the epoch.  Just as with the new created() method described
+      above, the value returned comes in the same format as the value
+      returned from a call to time(), and is therefore suitable for feeding
+      to localtime() or any other private function or method expecting input
+      of the same type.
+
+      As such, a call to this method on a file which was last modified at:
+      Sunday, December 2, 2001, 12:05:21 AM
+   ...would return the value: 1007280321
+
+ - File::Util::last_access([filename][format])
+
+      Same as the two previously described methods, only this method returns
+      the number of seconds since the epoch to the time when the specified
+      file was last accessed.
+
+      As such, a call to this method on a file which was last accessed at:
+      Thursday, December 6, 2001, 12:00:00 AM
+      ...would return the value: 1007625600
+
+1.04 2001-12-05
+ - Fixed some of the checks on files for existence, added the
+   File::Util::file_size([filename]) method which returns the size of the
+   filename you pass as the only argument.
+
+1.03 2001-11-29
+ - Re-visited the time/date methods to work out a bug which was causing file
+   creation and last-modified times to be returned with incorrect values.
+
+1.02 2001-11-27
+ - More directory listing options.  Method File::Util::stamp() now takes
+   optional format keyword argument; it lets you choose between different
+   output formats for the returned time stamp.  Format keywords are thus:
+
+      --short                 5/15/02, 4:22 pm
+      --formal                Saturday, June 15, 2002, 4:22 pm
+      --long                  same as '--formal'
+      --succinct              Sat 5/15/02 16:22:43
+      --ISO                   Sat, 15 Jun 2002 16.22.43 GMT
+      --filename              -June-15-2002-16.22.43
+      --file                  same as '--filename'
+      --mdy                   5/15/02
+      --hm                    4:22 pm
+      --hms                   4:22:43 pm
+      --24hms                 16:22:43
+      --dayofmonth            15
+      --dayofyear             134 (1 - 365)
+      --dayofweek             Saturday
+      --dayofweek, --num      7
+      --month                 June
+      --month, --num          6
+      --year                  2002
+      --shortyear             02
+      --minute                22
+      --hour                  16 (0 - 24)
+      --second                43
+
+1.01 2001-11-21
+ - All methods now include very detailed error messages and a stack trace
+   to help quickly track down mistakes.  You can fix mistakes now without
+   having to decipher some cryptic error message which no one can understand
+   and whose origin one can guess  :o(
+
+1.00 2001-09-23
+ - Initial release of File::Util.pm

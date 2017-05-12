@@ -1,0 +1,8 @@
+#fsdb -R C mean
+mean: 37.25
+
+mean: 271.2
+
+#  | /home/johnh/BIN/DB/dbmultistats experiment duration
+#  | /home/johnh/BIN/DB/dblistize 
+#   | dbcol mean

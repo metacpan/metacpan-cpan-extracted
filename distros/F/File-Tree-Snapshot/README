@@ -1,0 +1,101 @@
+NAME
+    File::Tree::Snapshot - Snapshot files in a git repository
+
+SYNOPSIS
+        use File::Tree::Snapshot;
+
+        my $tree = File::Tree::Snapshot->new(
+            storage_path => '/path/to/tree',
+        );
+
+        $tree->create
+            unless $tree->exists;
+
+        # modify files, see methods below
+
+        $tree->commit;
+        # or
+        $tree->reset;
+
+DESCRIPTION
+    This module manages snapshots of file system trees by wrapping the "git"
+    command line interface. It currently only manages generating the
+    snapshots.
+
+    The directories are standard Git repositories and can be accessed in the
+    usual ways.
+
+ATTRIBUTES
+  storage_path
+    The path to the tree that should hold the files that are snapshot. This
+    attribute is required.
+
+  allow_empty
+    If this attribute is set to true, commits will be created even if no
+    changes were registered.
+
+METHODS
+  new
+        my $tree = File::Tree::Snapshot->new(%attributes);
+
+    Constructor. See "ATTRIBUTES" for possible parameters.
+
+  file
+        my $path = $tree->file(@relative_path_parts_to_file);
+
+    Takes a set of path parts and returns the path to the file inside the
+    storage.
+
+  open
+        my $fh = $tree->open($mode, $file, %options);
+
+    Opens a file within the storage. $mode is passed straight to "open" in
+    perlfunc. The $file is a relative path inside the storage.
+
+    Possible options are:
+
+    *   "is_absolute"
+
+        If set to true the $file will be assumed to already be an absolute
+        path as returned by "file", instead of a path relative to the
+        storage.
+
+    *   "mkpath"
+
+        Create the path to the file if it doesn't already exist.
+
+  create
+        $tree->create;
+
+    Create the directory (if it doesn't exist yet) and initialize it as a
+    Git repository.
+
+  exists
+        my $does_exist = $tree->exists;
+
+    Returns true if the storage is an initialized Git repository.
+
+  commit
+    Will commit the changes made to the tree to the Git repository.
+
+  reset
+    Rolls back the changes since the last snapshot.
+
+AUTHOR
+     phaylon - Robert Sedlacek (cpan:PHAYLON) <r.sedlacek@shadowcat.co.uk>
+
+CONTRIBUTORS
+     mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+SPONSORS
+    The development of this module was sponsored by
+    <http://socialflow.com/>.
+
+COPYRIGHT
+    Copyright (c) 2012 the File::Tree::Snapshot "AUTHOR", "CONTRIBUTORS" and
+    "SPONSORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

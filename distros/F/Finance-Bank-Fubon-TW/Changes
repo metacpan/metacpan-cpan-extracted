@@ -1,0 +1,10 @@
+____________________________________________________________________________
+[  5939] By: autrijus                              on 2003/05/17  22:38:25
+        Log: * this be 0.01, first CPAN release.
+	  +> t/0-signature.t
+	   ! MANIFEST
+____________________________________________________________________________
+[  5938] By: autrijus                              on 2003/05/17  22:34:34
+        Log: * fully changed namespace to Finance::Bank::Fubon::TW.
+	   ! MANIFEST Makefile.PL README
+	   ! lib/Finance/Bank/Fubon/TW.pm t/1-basic.t

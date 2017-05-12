@@ -1,0 +1,11 @@
+Build
+_build
+blib
+.svn
+.git
+Makefile
+mork.pl
+TODO
+.tar.gz
+^MYMETA\.yml$
+^MYMETA\.json$

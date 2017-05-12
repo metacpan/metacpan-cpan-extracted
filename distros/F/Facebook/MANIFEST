@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Facebook.pm
+lib/Facebook/Cookbook.pod
+lib/Facebook/Cookie.pm
+lib/Facebook/Manual.pod
+lib/Facebook/Signed.pm
+t/00-load.t
+t/01-signed.t
+t/release-pod-syntax.t

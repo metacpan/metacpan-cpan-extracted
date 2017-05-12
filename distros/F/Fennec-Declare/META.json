@@ -1,0 +1,55 @@
+{
+   "abstract" : "Declarative interface for Fennec.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Fennec-Declare",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Declare::Parser" : "0.017",
+            "Devel::Declare::Parser::Fennec" : "0.004",
+            "Exporter::Declare" : "0.107",
+            "Exporter::Declare::Magic" : "0.107",
+            "Fennec" : "1.012"
+         }
+      }
+   },
+   "provides" : {
+      "Fennec::Declare" : {
+         "file" : "lib/Fennec/Declare.pm",
+         "version" : "1.002"
+      },
+      "Fennec::Declare::Magic" : {
+         "file" : "lib/Fennec/Declare/Magic.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Fennec-Declare/issues"
+      },
+      "homepage" : "http://open-exodus.net/projects/Fennec-Declare",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Fennec-Declare"
+      }
+   },
+   "version" : "1.002"
+}

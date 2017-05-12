@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+=head1 NAME
+
+rrr-client - continously mirror recent updates
+
+=head1 SYNOPSIS
+
+  rrr-client [options]
+
+  rrr-client --source some.mirror::module/ --target /some/dir/
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--source=s>
+
+Source to mirror from, including the name of the RECENT metadata file.
+For example C<cpan-rsync.perl.org::CPAN/RECENT.recent>.
+
+=item B<--target=s>
+
+Destination directory for the mirror.
+
+=item B<--user=s>
+
+Username if the rsync source requires it.
+
+=item B<--password=s>
+
+Password if the rsync source requires it.  Can also be set by setting
+the environment variable RSYNC_PASSWORD.
+
+=item B<--runstatusfile=s>
+
+Only needed for debugging. Path to the internally used status file.
+Argument is passed through to the File::Rsync::Mirror::Recent object.
+
+=item B<--skip-deletes!>
+
+Defaults to false. If true, skips all delete events in the index files
+which means no files are being deleted that have been deleted upstream.
+
+=item B<--tmpdir=s>
+
+Directory for temporary files; should be on the same file system
+partition as the C<--target> directory.
+
+=item B<--verbose!>
+
+Defaults to false. Note: Older versions of rrr-client defaulted to
+being verbose.
+
+=item B<--verboselog=s>
+
+Path to the logfile to write verbose progress information to.
+
+=back
+
+=head1 DESCRIPTION
+
+Mirror a remote directory based on a set of RECENT* files provided by
+the remote server.
+
+=cut
+
+our %Opt;
+GetOptions
+    (\%Opt,
+     @opt,
+    ) or pod2usage(1);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+pod2usage(1) unless $Opt{source} and $Opt{target};
+
+$ENV{RSYNC_PASSWORD} = $Opt{password} if $Opt{password};
+$Opt{verbose} ||= 0;
+$Opt{"skip-deletes"} ||=0;
+
+use File::Rsync::Mirror::Recent;
+my $rrr = File::Rsync::Mirror::Recent->new
+  (
+   ignore_link_stat_errors => 1,
+   localroot => $Opt{target},
+   ($Opt{tmpdir} ? (tempdir => $Opt{tmpdir}) : ()),
+   remote => ($Opt{user} ? $Opt{user} . '@' : '') . $Opt{source},
+   max_files_per_connection => 20000,
+   rsync_options => {
+                     compress => 1,
+                     links => 1,
+                     'safe-links' => 1,
+                     times => 1,
+                     checksum => 0,
+                     timeout       => 30, # do not allow rsync to hang for too long
+                     ($Opt{tmpdir} ? ('temp-dir' => $Opt{tmpdir}) : ()),
+                    },
+   verbose => $Opt{verbose},
+   ($Opt{verboselog}    ? (verboselog    => $Opt{verboselog})    : ()),
+   ($Opt{runstatusfile} ? (runstatusfile => $Opt{runstatusfile}) : ()),
+   # _logfilefordone => "recent-rmirror-donelog.log",
+  );
+
+$rrr->rmirror ( "skip-deletes" => $Opt{"skip-deletes"}, loop => 1 );

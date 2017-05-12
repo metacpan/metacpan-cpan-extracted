@@ -1,0 +1,27 @@
+ChangeLog
+configure
+configure.in
+configure.readme
+eg/echo.pl
+eg/remote.pl
+eg/threaded.pl
+FCGI.pm
+FCGI.xs
+fcgi_config.h.in
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+test.pl
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+fcgiapp.c
+os_unix.c
+os_win32.c
+fastcgi.h
+fcgiapp.h
+fcgimisc.h
+fcgios.h
+fcgi_config_x86.h

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<frames XMLCreated="Wed Jul 26 14:36:44 PDT 2006">
+  <frame ID="5" name="Frame_ABC" cDate="Wed Feb 07 16:11:40 PST 2001">
+    <definition>Description of the Frame.</definition>
+    <fes>
+      <fe ID="18" name="Agent" abbrev="Agt" cDate="Wed Feb 07 16:11:40 PST 2001" coreType="Core" fgColor="white" bgColor="blue">
+        <definition>The agent of the frame.</definition>
+        <semTypes />
+      </fe>
+      <fe ID="19" name="Patient" abbrev="Pat" cDate="Wed Feb 07 16:11:40 PST 2001" coreType="Core" fgColor="white" bgColor="purple">
+        <definition>The patient of the frame</definition>
+        <semTypes />
+      </fe>
+      <fe ID="20" name="RoleX" abbrev="X" cDate="Wed Feb 07 16:11:40 PST 2001" coreType="Peripheral" fgColor="white" bgColor="red">
+        <definition>A non core frame element.</definition>
+        <semTypes />
+      </fe>
+    </fes>
+    <lexunits>
+      <lexunit ID="2" name="verb.v" pos="V" status="Finished_Initial" cDate="Thu Feb 08 13:27:25 PST 2001" lemmaId="1001">
+        <definition>Definition</definition>
+        <annotation>
+          <annotated>10</annotated>
+          <total>100</total>
+        </annotation>
+        <lexemes>
+          <lexeme ID="1100" pos="V" breakBefore="false" headword="false">verb</lexeme>
+        </lexemes>
+        <semTypes />
+      </lexunit>
+      <lexunit ID="3" name="noun.n" pos="N" status="Finished_Initial" cDate="Thu Feb 08 13:27:25 PST 2001" lemmaId="1002">
+        <definition>Definition</definition>
+        <annotation>
+          <annotated>20</annotated>
+          <total>200</total>
+        </annotation>
+        <lexemes>
+          <lexeme ID="1101" pos="N" breakBefore="false" headword="false">noun</lexeme>
+        </lexemes>
+        <semTypes />
+      </lexunit>
+    
+    </lexunits>
+  </frame>
+</frames>

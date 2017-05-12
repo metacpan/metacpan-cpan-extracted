@@ -1,0 +1,13 @@
+File::Fingerprint::Huge is designed to quickly finger print very large files.
+The idea here is to only read segments of the files rather than the entire file.
+
+This allows us to quickly generate finger prints even with slow I/O. 
+
+Finger prints are not guaranteed to be unique, however your chances of not
+having unique finger prints are billions to one.
+
+This module requires Digest::CRC with functional crc64() routine as well
+as Math::Random::MT to function properly.
+
+-cf
+

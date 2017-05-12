@@ -1,0 +1,16 @@
+MANIFEST
+LICENSE
+README
+Changes
+lib/File/Wildcard.pm
+lib/File/Wildcard/Find.pm
+t/01_basic.t
+t/02_derived.t
+t/03_absolute.t
+t/04_append.t
+t/05_symlink.t
+t/06_fwf.t
+t/pod.t
+t/pod_coverage.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

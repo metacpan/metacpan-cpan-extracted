@@ -1,0 +1,129 @@
+
+======================
+Flickr::API Subclasses
+======================
+
+The Flickr::API has a number of derived subclasses to aid in the
+use of the various sections of Flickr's API as described on
+https://www.flickr.com/services/api/
+
+
+A NOTE ON TESTING
+
+These subclasses rely on an existing OAuth configuration as is used by
+earlier tests. When you test them, you will need to have done the `make test'
+with MAKETEST_OAUTH_CFG=config_file specified.
+
+
+A NOTE ON AUTHENTICATION
+
+Flickr::API subclasses don't use Flickr's original (deprecated) 
+authentication. You will need to use OAuth. On the other hand, 
+some methods don't require authentication, just changing key to 
+consumer_key and secret to consumer_secret should work on these.
+
+
+The Flickr::API is derived from LWP::UserAgent. It adds three main
+keys to the LWP::UserAgent: $self->{flickr}, $self->{oauth} and
+$self->{fauth}. The oauth key contains the key/value pairs needed
+to handle Flickr's OAuth authentication. An OAuth section will look
+something like:
+
+   'oauth' => {
+               'token' => '12345678909876543-b77c2eface79e3d3',
+               'signature_method' => 'HMAC-SHA1',
+               'request_method' => 'GET',
+               'consumer_key' => '123beeffaceade94a0a3611ca1f5a5e0',
+               'access_token' => bless( {
+                                         'token_secret' => 'beefcafe349be12d', 
+                                         'token' => '12345678909876543-b77c2eface79e3d3',
+                                         'extra_params' => {
+                                                            'fullname' => 'ASCII, Character',
+                                                            'user_nsid' => '1234567890@N00',
+                                                            'username' => 'abcdefg'
+                                                            },
+                                         'from_hash' => 1
+                                         }, 'Net::OAuth::AccessTokenResponse' ),
+               'consumer_secret' => '64beefca1f7eecad',
+               'request_url' => 'https://api.flickr.com/services/rest/',
+               'callback' => 'https://127.0.0.1',
+               'nonce' => '3c0f553fa1eba3b1c62cfabf2ee9afaa',
+               'timestamp' => 1438806177,
+               'version' => '1.0',
+               'token_secret' => 'beefcafe349be12d'
+              }
+
+The fauth key contains the key/value pairs needed to handle Flickr's
+(original but deprecated) authentication. An FAuth section will look
+something like:
+
+   'fauth' => {
+               'frob' => '34567890987654321-78faced1b7e8eda3-1234542',
+               'token' => '12345678909876543-42b0ceded01f65f5',
+               'secret' =>  '64beefca1f7eecad',
+               'key' => '123beeffaceade94a0a3611ca1f5a5e0'
+              },
+ 
+The flickr key contains everything else Flickr. This is where values
+used by the various classes derived from Flickr::API will be stored.
+
+
+    'flickr' => {
+                 'status' => {
+                              '_rc' => 0,
+                              'error_code' => 0,
+                              'success' => 1,
+                              'error_message' => ''
+                             }
+                },
+
+
+In addition, and to help maintain continuity with earlier versions,
+the following individual keys are used in the Flickr::API
+
+
+   'api_key' => '123beeffaceade94a0a3611ca1f5a5e0'
+   'api_secret' => '64beefca1f7eecad',
+   'unicode' => 0,
+   'rest_uri' => 'https://api.flickr.com/services/rest/',
+   'auth_uri' => 'https://api.flickr.com/services/auth/',
+   'api_type' => 'oauth',
+
+
+
+
+Flickr::API::Cameras
+====================
+
+Flickr::API::Cameras is a subclass of Flickr::API with some additions
+for using Flickr's flickr.cameras  methods:
+
+brands_list - returns a list of camera brands as an array
+brands_hash - returns a list of camera brands as a hashref
+
+get_cameras - returns a hashref of camera models by the specified
+              brand as a hashref
+
+
+
+Flickr::API::Reflection
+=======================
+
+
+Flickr::API::Reflection is a subclass of Flickr::API with some (hopefully)
+useful additions for using Flickr's flickr.reflection  methods.
+
+
+methods_list - returns a list of Flickr's methods as an array
+methods_hash - returns a list of Flickr's methods as a hashref
+
+get_method - returns the description of a specified method as a
+             hashref
+
+
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 Louis B. Moore <lbmoore@cpan.org>
+License: Perl Artistic License 2.0

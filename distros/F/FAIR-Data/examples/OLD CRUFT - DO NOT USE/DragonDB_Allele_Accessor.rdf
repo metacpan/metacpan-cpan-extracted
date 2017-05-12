@@ -1,0 +1,5 @@
+<http://antirrhinum.net> <http://www.w3.org/2000/01/rdf-schema#label> "The Antirrhinum majus Genetic Database" .
+<http://biordf.org/DataFairPort/DragonDB_Allele_Accessor.rdf> a "https://raw.githubusercontent.com/FAIRDataInitiative/DataFairPort/master/Schema/FAIR-schema.owl#dataAccessorDescriptor" ;
+	<https://raw.githubusercontent.com/FAIRDataInitiative/DataFairPort/master/Schema/FAIR-schema.owl#accessorURL> <http://antirrhinum.net/cgi-bin/LDP/Alleles> ;
+	<https://raw.githubusercontent.com/FAIRDataInitiative/DataFairPort/master/Schema/FAIR-schema.owl#describesAccessorOf> <http://antirrhinum.net> ;
+	<https://raw.githubusercontent.com/FAIRDataInitiative/DataFairPort/master/Schema/FAIR-schema.owl#isLDPServer> "true" .

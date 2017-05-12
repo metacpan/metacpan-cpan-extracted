@@ -1,0 +1,32 @@
+[% WRAPPER 'admin/bar.html' %]
+
+<div class='one'>
+<table align='center'>
+<tr class='title'><td>Ban IP</td></tr>
+<tr><td>
+    <table border='0' style='margin: 2em'>
+    <tr class='title'><td>IP CIDR</td><td>IP Range</td><td>Action</td></tr>
+    [% FOREACH ip IN cidr_ips %]
+    <tr class='misc[% IF loop.count mod 2;'2';ELSE;'1';END; %]'>
+        <td>[% ip.cidr_ip %]</td><td>[% ip.range %]</td><td> <a href='/admin/banip/remove?ip_id=[% ip.ip_id %]'>Remove</a> </td>
+    </tr>
+    [% END %]
+    </table>
+    
+    <p></p>
+    
+    <form action='/admin/banip/add' method='POST'>
+    <table border='0' style='margin: 2em'>
+        <tr class='title'><td> Add a new IP Range </td></tr>
+        <tr>
+            <td> From IP: <input type='text' name='from_ip' /> eg: 222.137.238.1<br />
+                 End &nbsp; IP: <input type='text' name='end_ip' />eg: 222.137.238.255<br />
+                 <input type='submit' />
+            </td>
+        </tr>
+    </table>
+</td></tr>
+</table>
+</div>
+
+[% END %]

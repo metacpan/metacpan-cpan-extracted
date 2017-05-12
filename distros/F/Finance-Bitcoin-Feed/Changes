@@ -1,0 +1,18 @@
+Revision history for Finance-Bitcoin-Feed
+
+0.05  2015-04-13 09:51:25 CST
+        - fix module dependency
+
+0.04  2015-04-08 16:12:09 CST
+        - fix perl critic test error
+
+0.03  2015-01-22 09:25:26 CST
+        - add bitstamp
+
+0.02  2014-12-24 14:24:08 CST
+        - Added site LakeBtc
+        - Added argument sites to customize the sites users want to connect
+        - Added argument output to customize the feed's output behavior
+
+0.01  2014-12-11 16:51:59 CST
+        - Initial release

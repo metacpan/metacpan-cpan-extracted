@@ -1,0 +1,52 @@
+This is the README file for the PERL module File::Scan for Version 1.43
+
+File::Scan - Perl extension for Scanning files for Viruses
+
+This module is designed to allows users to scan files for known viruses.
+The purpose is to provide a perl module to make plataform independent
+virus scanners.
+
+To install File::Scan module type the following:
+  
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+Rpm Packages
+  Platform: SuSE 7.3
+  Author: Pascal Bleser <pascal.bleser@atosorigin.com>
+  Url: http://guru.unixtech.be/rpm/Projects/File-Scan/
+
+  Platform: RedHat 7.2
+  Author: Michael McLagan
+  Url: ftp://ftp.redhat.com/pub/contrib/noarch/noarch/
+
+To get the most recent version:
+
+% examples/latest.pl
+
+File::Scan is supported by:
+
+AMaViS "Next Generation"
+http://sourceforge.net/projects/amavis/
+
+MIMEDefang
+http://www.roaringpenguin.com/mimedefang/
+
+Aegis - a virus scanner for Linux/Unix systems with a simple and
+intuitive user interface.
+http://jodrell.net/projects/aegis
+
+You can access the File::Scan documentation with perldoc File::Scan
+For examples look at examples directory (includes a virus scanner).
+
+For submitting new virus or virus patterns please send a mail to
+hdias@aesbuc.pt (please compress the files if they will have virus).
+
+Questions, bug reports, useful code bits, and suggestions for File::Scan
+hould just be sent to me at hdias@aesbuc.pt
+
+Copyright (c) 2005 Henrique Dias. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

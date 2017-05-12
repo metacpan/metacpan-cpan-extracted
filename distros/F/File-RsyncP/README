@@ -1,0 +1,61 @@
+File::RsyncP
+============
+
+Version 0.74, released 17 Jan 2015.
+
+File::RsyncP is a perl implementation of an Rsync client.  It is
+compatible with Rsync 2.x (protocol versions up to 28).  It can send
+or receive files, either by running rsync on the remote machine, or
+connecting to an rsyncd deamon on the remote machine.
+
+What use is File::RsyncP?  The main purpose is that File::RsyncP
+seperates all file system I/O into a seperate module, which can
+be replaced by any module of your own design.  This allows rsync 
+interfaces to non-filesystem data types (eg: databases) to be
+developed with relative ease.
+
+File::RsyncP was initially written to provide an Rsync interface
+for BackupPC, L<http://backuppc.sourceforge.net>.  See BackupPC
+for programming examples.
+
+File::RsyncP does not yet provide a command-line interface that
+mimics native Rsync.  Instead it provides an API that makes it
+possible to write simple scripts that talk to rsync or rsyncd.
+
+The File::RsyncP::FileIO module contains the default file system access
+functions.  File::RsyncP::FileIO may be subclassed or replaced by a
+custom module to provide access to non-filesystem data types.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Non-rsync code is copyright (C) 2002-2015 Craig Barratt
+<cbarratt@users.sourceforge.net>
+
+Rsync is Copyright (C) 1996-2001 by Andrew Tridgell, 1996 by Paul
+Mackerras, 2001-2002 by Martin Pool, and 2003-2009 by Wayne Davison,
+and others.
+
+MD4 Message-Digest Algorithm is Copyright (C) 1990-2, RSA Data
+Security, Inc.  All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

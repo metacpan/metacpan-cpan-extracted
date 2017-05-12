@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/antee
+dist.ini
+lib/File/Temp/Rename.pm
+t/basics.t

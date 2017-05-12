@@ -1,0 +1,122 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
+#ifdef __cplusplus
+}
+#endif
+
+
+
+MODULE = Filesys::DfPortable	PACKAGE = Filesys::DfPortable
+
+void
+_dfportable(pszDrive)
+	LPCSTR pszDrive
+
+	PREINIT:
+   	__int64 i64FreeBytesToCaller, i64TotalBytes, i64FreeBytes;
+	BOOL fResult;
+	DWORD dwSectPerClust, 
+	      dwBytesPerSect, 
+	      dwFreeClusters, 
+	      dwTotalClusters;
+
+	PPCODE:
+		typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,
+		PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
+
+		PGETDISKFREESPACEEX pGetDiskFreeSpaceEx;
+
+		pGetDiskFreeSpaceEx = (PGETDISKFREESPACEEX) GetProcAddress(GetModuleHandle("kernel32.dll"), "GetDiskFreeSpaceExA");
+
+		EXTEND(sp, 7);
+		if(pGetDiskFreeSpaceEx) {
+			fResult = pGetDiskFreeSpaceEx (pszDrive,
+                 	(PULARGE_INTEGER)&i64FreeBytesToCaller,
+                 	(PULARGE_INTEGER)&i64TotalBytes,
+                 	(PULARGE_INTEGER)&i64FreeBytes);
+
+			if(fResult) {
+				/* XS doesn't have a long long equivalent */
+				/* will need to return a string instead */
+				TCHAR szBuffer[32];
+
+				PUSHs(sv_2mortal(newSVuv(1))); /* frsize on Windows is always 1 */
+
+				_stprintf(szBuffer, TEXT("%I64u"), i64TotalBytes);
+				PUSHs(sv_2mortal(newSVpv((LPTSTR)(szBuffer), 0)));
+
+				_stprintf(szBuffer, TEXT("%I64u"), i64FreeBytes);
+				PUSHs(sv_2mortal(newSVpv((LPTSTR)(szBuffer), 0)));
+
+				_stprintf(szBuffer, TEXT("%I64u"), i64FreeBytesToCaller);
+				PUSHs(sv_2mortal(newSVpv((LPTSTR)(szBuffer), 0)));
+
+				/* No inode values. */
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+      		}
+
+			else {
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+			}
+		}
+
+		else {
+			fResult = GetDiskFreeSpaceA (pszDrive, 
+                 		&dwSectPerClust, 
+                 		&dwBytesPerSect,
+                 		&dwFreeClusters, 
+                 		&dwTotalClusters);
+
+
+			if(fResult) {
+				/* XS doesn't have a long long equivalent */
+				/* will need to return a string instead */
+				TCHAR szBuffer[32];
+				ULARGE_INTEGER ullTemp;
+				DWORD dwClusterSize = dwSectPerClust * dwBytesPerSect;
+
+				PUSHs(sv_2mortal(newSVuv(1))); /* frsize on Windows is always 1 */
+
+				ullTemp.QuadPart = (dwTotalClusters * dwClusterSize);
+				_stprintf(szBuffer, TEXT("%I64u"), ullTemp);
+				PUSHs(sv_2mortal(newSVpv((LPTSTR)(szBuffer), 0)));
+
+				ullTemp.QuadPart = (dwFreeClusters * dwClusterSize);
+				_stprintf(szBuffer, TEXT("%I64u"), ullTemp);
+				PUSHs(sv_2mortal(newSVpv((LPTSTR)(szBuffer), 0)));
+				/* No bavail */
+				PUSHs(sv_2mortal(newSVpv((LPTSTR)(szBuffer), 0)));
+
+				/* No inode values. */
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+      		}
+
+			else {
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+				PUSHs(sv_2mortal(newSVuv(0)));
+			}
+		}

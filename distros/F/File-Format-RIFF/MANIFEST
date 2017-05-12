@@ -1,0 +1,17 @@
+MANIFEST
+README
+LICENSE
+INSTALL
+Changes
+Makefile.PL
+TODO
+lib/File/Format/RIFF.pm
+lib/File/Format/RIFF/Chunk.pm
+lib/File/Format/RIFF/Container.pm
+lib/File/Format/RIFF/List.pm
+t/test.riff
+t/01chunk.t
+t/02list.t
+t/03riff.t
+eg/socketpair.pl
+META.yml                                Module meta-data (added by MakeMaker)

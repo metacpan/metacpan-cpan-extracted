@@ -1,0 +1,7 @@
+#fsdb experiment duration count
+ufs_mab_sys	37.2	0
+ufs_mab_sys	37.3	1
+ufs_rcp_real	264.5	0
+ufs_rcp_real	277.9	1
+# test trailing comment
+#   | dbmapreduce -k experiment -- dbrowenumerate --nolog

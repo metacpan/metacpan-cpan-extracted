@@ -1,0 +1,718 @@
+NAME
+    File::AnySpec - perform operations on foreign (remote) file names
+
+SYNOPSIS
+     ###### 
+     # Subroutine Interface
+     #
+     use File::AnySpec qw(fspec2fspec pm2fspec os2fspec fspec2os fspec_glob fspec2pm);
+
+     $file                                 = fspec2fspec($from_fspec, $to_fspec $fspec_file, [$nofile])
+     $os_file                              = fspec2os($fspec, $file, [$no_file])
+     $fspec_file                           = os2fspec($fspec, $file, [$no_file])
+
+     $pm                                   = fspec2pm($fspec, $require_file)
+     ($abs_file, $inc_path, $require_file) = pm2fspec($fspec, $pm)
+
+     @globed_files                         = fspec_glob($fspec, @files)
+
+     ###### 
+     # Class Interface
+     #
+     use File::AnySpec
+     use vars qw(@ISA)
+     @ISA = qw(File::AnySpec)
+
+     $file                                 = __PACKAGE__->fspec2fspec($from_fspec, $to_fspec $fspec_file, [$nofile])
+     $os_file                              = __PACKAGE__->fspec2os($fspec, $file, [$no_file])
+     $fspec_file                           = __PACKAGE__->os2fspec($fspec, $file, [$no_file])
+
+     $pm                                   = __PACKAGE__->fspec2pm($fspec, $require_file)
+     ($abs_file, $inc_path, $require_file) = __PACKAGE__->pm2fspec($fspec, $pm)
+
+     @globed_files                         = __PACKAGE__->fspec_glob($fspec, @files)
+
+DESCRIPTION
+    Methods in this package, perform operations on file specifications for
+    operating systems other then the current site operating system. The
+    input variable *$fspec* tells the methods in this package the file
+    specification for file names used as input to the methods. Thus, when
+    using methods in this package, the method may load up to two File::Spec
+    submodules methods and neither of them is a submodule for the current
+    site operating system.
+
+    Supported operating system file specifications are as follows:
+
+     MacOS
+     MSWin32
+     os2
+     VMS
+     epoc
+
+    Of course since, the variable *$^O* contains the file specification for
+    the current site operating system, it may be used for the *$fspec*
+    variable.
+
+  fspec_glob method
+      @globed_files = File::AnySpec->fspec_glob($fspec, @files)
+
+    The *fspec_glob* method BSD globs each of the files in *@files* where
+    the file specification for each of the files is *$fspec*.
+
+  fspec2fspec method
+     $to_file = File::AnySpec->fspec2fspec($from_fspec, $to_fspec $from_file, $nofile)
+
+    THe *fspec2fspec* method translate the file specification for
+    *$from_file* from the *$from_fspec* to the *$to_fpsce*. Supplying
+    anything for *$nofile*, tells the *fspec2fspec* method that *$from_file*
+    is a directory tree; otherwise, it is a file.
+
+  fspec2os method
+      $os_file = File::AnySpec->fspec2os($fspec, $file, $no_file)
+
+    The *fspec2os* method translates a file specification, *$file*, from the
+    current operating system file specification to the *$fspec* file
+    specification. Supplying anything for *$nofile*, tells the *fspec2fspec*
+    method that *$from_file* is a directory tree; otherwise, it is a file.
+
+  fspec2pm method
+     $pm_file = File::AnySpec->fspec2pm( $fspec, $relative_file )
+
+    The *fspec2pm* method translates a filespecification *$file* in the
+    *$fspce* format to the Perl module formate.
+
+  os2fspec method
+     $file = File::AnySpec->os2fspec($fspec, $os_file, $no_file)
+
+    The *fspec2os* method translates a file specification, *$file*, from the
+    current operating system file specification to the *$fspec* file
+    specification. Supplying anything for *$nofile*, tells the *fspec2fspec*
+    method that *$from_file* is a directory tree; otherwise, it is a file.
+
+REQUIREMENTS
+    Coming soon.
+
+DEMONSTRATION
+     ~~~~~~ Demonstration overview ~~~~~
+
+    Perl code begins with the prompt
+
+     =>
+
+    The selected results from executing the Perl Code follow on the next
+    lines. For example,
+
+     => 2 + 2
+     4
+
+     ~~~~~~ The demonstration follows ~~~~~
+
+     =>     use File::Spec;
+
+     =>     use File::Package;
+     =>     my $fp = 'File::Package';
+
+     =>     my $as = 'File::AnySpec';
+
+     =>     my $loaded = '';
+     =>     my @drivers;
+     =>     my @files;
+     => my $errors = $fp->load_package( $as)
+     => $errors
+     ''
+
+     => $as->fspec2fspec( 'Unix', 'MSWin32', 'File/FileUtil.pm')
+     'File\FileUtil.pm'
+
+     => $as->os2fspec( 'Unix', ($as->fspec2os( 'Unix', 'File/FileUtil.pm')))
+     'File/FileUtil.pm'
+
+     => $as->os2fspec( 'MSWin32', ($as->fspec2os( 'MSWin32', 'Test\\TestUtil.pm')))
+     'Test\TestUtil.pm'
+
+     => @drivers = sort $as->fspec_glob('Unix','Drivers/G*.pm')
+     => join (', ', @drivers)
+     'Drivers\Generate.pm'
+
+     => $as->fspec2pm('Unix', 'File/AnySpec.pm')
+     'File::AnySpec'
+
+     => $as->pm2fspec( 'Unix', 'File::Basename')
+     '/Perl/lib/File/Basename.pm'
+     '/Perl/lib'
+     'File/Basename.pm'
+
+QUALITY ASSURANCE
+    Running the test script 'AnySpec.t' found in the
+    "File-AnySpec-$VERSION.tar.gz" distribution file verifies the
+    requirements for this module.
+
+    All testing software and documentation stems from the Software Test
+    Description (STD) program module 't::File::AnySpec', found in the
+    distribution file "File-AnySpec-$VERSION.tar.gz".
+
+    The 't::File::AnySpec' STD POD contains a tracebility matix between the
+    requirements established above for this module, and the test steps
+    identified by a 'ok' number from running the 'AnySpec.t' test script.
+
+    The t::File::AnySpec' STD program module '__DATA__' section contains the
+    data to perform the following:
+
+    *   to generate the test script 'AnySpec.t'
+
+    *   generate the tailored STD POD in the 't::File::AnySpec' module,
+
+    *   generate the 'AnySpec.d' demo script,
+
+    *   replace the POD demonstration section herein with the demo script
+        'AnySpec.d' output, and
+
+    *   run the test script using Test::Harness with or without the verbose
+        option,
+
+    To perform all the above, prepare and run the automation software as
+    follows:
+
+    *   Install "Test_STDmaker-$VERSION.tar.gz" from one of the
+        respositories only if it has not been installed:
+
+        *   http://www.softwarediamonds/packages/
+
+        *   http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+
+    *   manually place the script tmake.pl in
+        "Test_STDmaker-$VERSION.tar.gz' in the site operating system
+        executable path only if it is not in the executable path
+
+    *   place the 't::File::AnySpec' at the same level in the directory
+        struture as the directory holding the 'File::AnySpec' module
+
+    *   execute the following in any directory:
+
+         tmake -test_verbose -replace -run -pm=t::File::AnySpec
+
+NOTES
+  FILES
+    The installation of the "File-AnySpec-$VERSION.tar.gz" distribution file
+    installs the 'Docs::Site_SVD::File_AnySpec' SVD program module.
+
+    The __DATA__ data section of the 'Docs::Site_SVD::File_AnySpec' contains
+    all the necessary data to generate the POD section of
+    'Docs::Site_SVD::File_AnySpec' and the "File-AnySpec-$VERSION.tar.gz"
+    distribution file.
+
+    To make use of the 'Docs::Site_SVD::File_AnySpec' SVD program module,
+    perform the following:
+
+    *   install "ExtUtils-SVDmaker-$VERSION.tar.gz" from one of the
+        respositories only if it has not been installed:
+
+        *   http://www.softwarediamonds/packages/
+
+        *   http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+
+    *   manually place the script vmake.pl in
+        "ExtUtils-SVDmaker-$VERSION.tar.gz' in the site operating system
+        executable path only if it is not in the executable path
+
+    *   Make any appropriate changes to the __DATA__ section of the
+        'Docs::Site_SVD::File_AnySpec' module. For example, any changes to
+        'File::AnySpec' will impact the at least 'Changes' field.
+
+    *   Execute the following:
+
+         vmake readme_html all -pm=Docs::Site_SVD::File_AnySpec
+
+  AUTHOR
+    The holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  COPYRIGHT NOTICE
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  BINDING REQUIREMENTS NOTICE
+    Binding requirements are indexed with the pharse 'shall[dd]' where dd is
+    an unique number for each header section. This conforms to standard
+    federal government practices, 490A ("3.2.3.6" in STD490A). In accordance
+    with the License, Software Diamonds is not liable for any requirement,
+    binding or otherwise.
+
+  LICENSE
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    SOFTWARE DIAMONDS, http::www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  SEE_ALSO:
+    File::Spec
+    File::AnySpec
+
+Title Page
+     Software Version Description
+
+     for
+
+      File::AnySpec - Manipulate file specifications for foreign operating systems
+
+     Revision: E
+
+     Version: 0.06
+
+     Date: 2004/04/09
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright © 2003 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+    The system is the Perl programming language software. As established by
+    the Perl referenced documents, program modules, such the "File::AnySpec"
+    module, extend the Perl language.
+
+    The methods in the "File::AnySpec" module manipulate file specifications
+    not only for the current operating system but for foreign operating
+    systems.
+
+  1.3 Document overview.
+    This document releases File::AnySpec version 0.06 providing a
+    description of the inventory, installation instructions and other
+    information necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+    This document releases the file
+
+     File-AnySpec-0.06.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright © 2003 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/File_AnySpec.pm                            0.06    2004/04/09 revised 0.05
+     MANIFEST                                                     0.06    2004/04/09 generated, replaces 0.05
+     Makefile.PL                                                  0.06    2004/04/09 generated, replaces 0.05
+     README                                                       0.06    2004/04/09 generated, replaces 0.05
+     lib/File/AnySpec.pm                                          1.13    2004/04/09 revised 1.12
+     t/File/AnySpec.d                                             0.03    2004/04/09 revised 0.02
+     t/File/AnySpec.pm                                            0.02    2004/04/09 revised 0.01
+     t/File/AnySpec.t                                             0.1     2004/04/09 revised 0.09
+     t/File/Drivers/Driver.pm                                     0.02    2003/07/04 unchanged
+     t/File/Drivers/Generate.pm                                   0.02    2003/07/04 unchanged
+     t/File/Drivers/IO.pm                                         0.02    2003/07/04 unchanged
+     t/File/File/SmartNL.pm                                       1.13    2004/04/09 new
+     t/File/Text/Scrub.pm                                         1.11    2004/04/09 new
+     t/File/Test/Tech.pm                                          1.17    2004/04/09 new
+     t/File/Data/Secs2.pm                                         1.15    2004/04/09 new
+
+  3.3 Changes
+    Changes are as follows:
+
+    Test-TestUtil-0.01
+        Originated
+
+    Test-TestUtil-0.02
+        Correct failure from Josts Smokehouse"
+        <Jost.Krieger+smokeback@ruhr-uni-bochum.de> test run
+
+        t/Test/TestUtil/TestUtil....Bareword "fspec_dirs" not allowed while
+        "strict subs" in use at
+
+          /net/sunu991/disc1/.cpanplus/5.8.0/build/Test-TestUtil-0.01/blib/lib/Test/TestUtil.pm line 56.
+
+        Changed line 56 from
+
+         my @dirs = (fspec_dirs) ? $from_package->splitdir( $fspec_dirs ) : ();
+
+        to
+
+         my @dirs = ($fspec_dirs) ? $from_package->splitdir( $fspec_dirs ) : ();
+
+        This error is troublesome since the test passed on my system using
+        Active Perl under Microsoft NT. It should never have passed. This
+        error is in a core method, *fspec2fspec*, that changes file
+        specifications from one operating system to another operating
+        system. This method has been in service unchanged for some time.
+
+    Test-TestUtil-0.03
+        Correct failure from Josts Smokehouse"
+        <Jost.Krieger+smokeback@ruhr-uni-bochum.de> test run
+
+        PERL_DL_NONLAZY=1 /usr/local/perl/bin/perl "-MExtUtils::Command::MM"
+        "-e" "test_harness(0, 'blib/lib', 'blib/arch')"
+        t/Test/TestUtil/TestUtil.t t/Test/TestUtil/TestUtil....# Test 18
+        got: '$VAR1 = ''; ' (t/Test/TestUtil/TestUtil.t at line 540 fail
+        #17) # Expected: '$VAR1 = '\\=head1 Title Page
+
+        The *pm2datah* method is not returning any data for Test 18. This
+        will also cause the test of *pm2data*, test 19 to fail. The
+        *pm2datah* is searching for the string "\n__DATA__\n".
+
+        The "\n" character on Perl is a logical end of line character
+        sequence. The "\n" end of line is different on Mr. Smokehouse's Unix
+        operating system than on my Windows NT operating system. The test
+        file was created under MSWin32 and uses a MSWin32 "\n". Under UNIX,
+        *pm2datah* method will look for the Unix "\n" and there will not be
+        any.
+
+        Changed "\n__DATA__\n" to /[\012\015]__DATA__/.
+
+        During the clean-up for CPAN, broke the *format_hash_table* method
+        for tables in hash of hash format. Fixed the break, added test 29 to
+        the *t/Test/TestUtil/TestUtil.t* test script for this feature, and
+        added a discusssion of this feature in POD discription for
+        *format_hash_table*
+
+    Test-TestUtil-0.04
+        Our old friend visits again - DOS and UNIX text file incompatibility
+
+        This impacts other modules. We have to examine all modules for this
+        portability defect and correct any found defects.
+
+        Correct failure from Josts Smokehouse"
+        <Jost.Krieger+smokeback@ruhr-uni-bochum.de> and Kingpin
+        <mthurn@carbon> test runs.
+
+        On Mr. Smokehouse's run email the got: VAR1 clearly showed extra
+        white space line that is not present in the expected: VAR1. In Mr.
+        Kingpin's run the got: VAR1 and expected: VAR1 look visually the
+        same. However, the Unix found a difference(s) and failed the test.
+
+        For Mr. Smokehouse's run:
+
+        PERL_DL_NONLAZY=1 /usr/local/bin/perl "-MExtUtils::Command::MM" "-e"
+        "test_harness(0, 'blib/lib', 'blib/arch')"
+        t/Test/TestUtil/TestUtil.t t/Test/TestUtil/TestUtil....NOK 18# Test
+        18 got: '$VAR1 = '\\=head1 Title Page
+
+         Software Version Description
+
+         for
+
+          File::AnySpec - Manipulate file specifications for foreign operating systems
+
+         Revision: E
+
+        [snip]
+
+        (t/Test/TestUtil/TestUtil.t at line 565 fail #17) # Expected: '$VAR1
+        = '\\=head1 Title Page
+
+         Software Version Description
+
+         for
+
+          File::AnySpec - Manipulate file specifications for foreign operating systems
+
+        What we have before, was a totally "failure to communicate." aka
+        Cool Hand Luke. VAR1 was empty. Now VAR1 has something. It is not
+        completely dead. One probable cause is the Unix operating system
+        must be producing two Unix \012 new lines for a Microsoft single
+        newline \015\012. Without being able to examine the test with a
+        debugger, the only way to verify this is to provide the fix and see
+        if the problem goes away when this great group of testers try for
+        the fourth time.
+
+        Revised *fin* method to take a handle, change *pm2datah* method
+        handle, *$fh*, to binary by adding a *binmode $fh* statement, and
+        pass the actual thru the *fin* method for test 18.
+
+        Use *fin($fh)* to read in the data for *pm2data*, test 19 Unit Under
+        Test (UUT), instead of using the raw file handle.
+
+        The *fin* method takes any \015\012 combination and changes it into
+        the logical Perl new line, *"\n"*, for the current operating system.
+
+    File-FileUtil-0.01
+
+        *   At 02:44 AM 6/14/2003 +0200, Max Maischein wrote: A second thing
+            that I would like you to reconsider is the naming of
+            "Test::TestUtil" respectively "Test::Tech" - neither of those is
+            descriptive of what the routines actually do or what the module
+            implements. I would recommend renaming them to something closer
+            to your other modules, maybe "Test::SVDMaker::Util" and
+            "Test::SVDMaker::Tech", as some routines do not seem to be
+            specific to the Test::-suite but rather general
+            (format_array_table). Some parts (the "scrub" routines) might
+            even better live in another module namespace,
+            "Test::Util::ScrubData" or something like that.
+
+            Broke away all the file related methods from Test::TestUtil and
+            created this module File::FileUtil so the module name is more
+            descriptive of the methods within the module.
+
+        *   Broke the smart nl code out of the fin method and made it is own
+            separate method, smart_nl method.
+
+            At 02:44 AM 6/14/2003 +0200, Max Maischein wrote: Perl, as Perl
+            already does smart newline handling, (even though with the
+            advent of 5.8 even Unix-people have to learn the word "binmode"
+            now :-))
+
+            The only place where I see Perl does smart newline handling is
+            the crlf IO displine introduce in Perl 5.6. The File::FileUtil
+            has a use 5.001 so that 5.6 Perl built-ins cannot be used. Added
+            comment to smart_nl that for users with 5.6 Perl that it may be
+            better to use the built-in crlf IO discipline.
+
+        *   For the load_package method that uses a eval "require $package"
+            to load the package, the $@ does not capture all the warnings
+            and error messages, at least not with ActiveState Perl. Added
+            code the captures also the warnings, by temporaily reassigning
+            $SIG(__WARN__), and added these to the $@ error messages.
+
+        *   Added two new tests to verify the NOGO paths for the for the
+            load_package method. One tests for load module failure looking
+            for all the possilbe information on why the module did not load.
+            The other verifies that the vocabulary is present after the
+            loading the module. This information is very helpful when you
+            must remote debug a load failure from CPAN testing whose is
+            running on a different platform.
+
+    File-FileUtil-0.02
+        Added the method *hex_dump*.
+
+    File-FileUtil-0.03
+
+        test_lib2inc
+            Returns to parent directory of the first t directory going up
+            from the test script instead of the t directory.
+
+        find_t_roots
+            Added the function find_t_roots that returns the parent
+            directory of all the directories in @INC
+
+    File-AnySpec-0.01
+        Removed the methods for converting a program module specification to
+        its absolute file from the "File::FileUtil" module to their own
+        module "File::AnySpec" module. The module name is now more
+        descriptive of the routines in the module.
+
+    File-AnySpec-0.02
+        At 08:40 AM 7/14/2003 +0000, Josts Smokehouse wrote:
+
+        [snip]
+
+        PERL_DL_NONLAZY=1 /usr/local/perl/bin/perl "-MExtUtils::Command::MM"
+        "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/File/AnySpec.t
+        t/File/AnySpec....# Test 2 got: 'Cannot load File::AnySpec
+        File/AnySpec.pm did not return a true value at (eval 7) line 1. '
+        (t/File/AnySpec.t at line 121) # Expected: '' FAILED test 2 Failed
+        1/8 tests, 87.50% okay (less 6 skipped tests: 1 okay, 12.50%) Failed
+        Test Stat Wstat Total Fail Failed List of Failed
+        --------------------------------------------------------------------
+        ----------- t/File/AnySpec.t 8 1 12.50% 2 6 subtests skipped. Failed
+        1/1 test scripts, 0.00% okay. 1/8 subtests failed, 87.50% okay.
+        make: *** [test_dynamic] Error 29
+
+        Corrective Action: This module uses the "SelfLoader" module that
+        loads functions from the __DATA__ section. There is a one at the end
+        of the __DATA__ section but not one at the end of the code. Added a
+        1 at the end of the code section in hopes this will cure this error.
+
+        Very pleased the way the File::Package funcstions and the "Test"
+        dual input ok function remotely reported the error messages from
+        loading the "File::AnySpec" module with a require.
+
+    File-AnySpec-0.03
+    File-AnySpec-0.04
+        Change test so that test support program modules resides in
+        distribution directory tlib directory instead of the lib directory.
+        Because they are no longer in the lib directory, test support files
+        will not be installed as a pre-condition for the test of this
+        module. The test of this module will precede immediately. The test
+        support files in the tlib directory will vanish after the
+        installtion.
+
+    File-AnySpec-0.05
+        Added subroutine interfaces.
+
+        Use Archive::TarGzip 0.02 that uses modd 777 for directories instead
+        of 666. Started to get emails from Unix about untar not being able
+        to change to a directory with mod of 666.
+
+    File-AnySpec-0.06
+        Added the 'Data-Secs2' to the 'tlib' test library. Upgraded to the
+        'Test-Tech' module that uses the 'Data-Secs2' module.
+
+        The lastest build of "Test::STDmaker" expects the test library in
+        the same directory as the test script. Coordiated with the lastest
+        Test::STDmaker by moving the test library from tlib to "t/File", the
+        same directory as the test script and deleting the test library
+        File::TestPath program module.
+
+        Changed from the obsolete "File::PM2File" program module to the
+        "File::Where" program module.
+
+  3.4 Adaptation data.
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'File-AnySpec-0.06.tar.gz' and download to a
+        temporary installation directory. Enter the following where $make is
+        'nmake' for microsoft windows; otherwise 'make'.
+
+         gunzip File-AnySpec-0.06.tar.gz
+         tar -xf File-AnySpec-0.06.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         'File::Package' => '1.12',
+         'File::Where' => '0.03',
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/File/AnySpec.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+    There is still much work needed to ensure the quality of this module as
+    follows:
+
+    *   State the functional requirements for each method including not only
+        the GO paths but also what to expect for the NOGO paths
+
+    *   All the tests are GO path tests. Should add NOGO tests.
+
+    *   Add the requirements addressed as *# R: * comment to the tests
+
+    *   Write a program to build a matrix to trace test step to the
+        requirements and vice versa by parsing the *# R: * comments.
+        Automatically insert the matrix in the module POD.
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+    POD Plain Old Documentation
+
+2.0 SEE ALSO
+    File::AnySpec
+    Docs::US_DOD::SVD
+

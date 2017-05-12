@@ -1,0 +1,54 @@
+{
+   "abstract" : "Extensible Fake Data Generator",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Faker",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0.22",
+            "Data::Object" : "0.17",
+            "Extorter" : "0.10",
+            "Function::Parameters" : "1.0603",
+            "Hash::Merge::Simple" : "0.051",
+            "Type::Tiny" : "1.000005",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Faker/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Faker/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Faker.git",
+         "web" : "https://github.com/alnewkirk/Faker"
+      }
+   },
+   "version" : "0.12",
+   "x_authority" : "cpan:AWNCORP"
+}
+

@@ -1,0 +1,10 @@
+Change log for the File::PackageIndexer distribution:
+
+0.02  Sun  4 Jan 2009
+  - Add merge_results_inplace
+  - Add clean_results
+  - Documentation!
+
+0.01  Sat  3 Jan 2009
+  - Initial release
+

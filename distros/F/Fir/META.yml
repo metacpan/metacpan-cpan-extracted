@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Fir
+version:             0.33
+abstract:            a Tree::DAG_Node subclass for menu nagivation
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Moose:                         0
+    Test::More:                    0
+    Tree::DAG_Node:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,85 @@
+------------------------------------------------------------------------
+0.05 | Piotr Roszatycki <dexter@debian.org> | 2008-12-22
+
+Changes:
+
+* Dropped additional attributes for Exception::Fatal and Exception::Argument.
+* Requires Exception::Died.
+
+Fixes:
+
+* Minor fixes for documentation.
+
+------------------------------------------------------------------------
+0.04 | Piotr Roszatycki <dexter@debian.org> | 2008-12-22
+
+New:
+
+* Wrapped functions throw Exception::Fatal if died.
+
+  use Fatal::Exception 'Exception::System' => 'open';
+  eval { open my $fh, '/notfound', 'r' };
+  print ref $@;  # Exception::System
+  eval { open my $fh, '/etc/passwd', 'badmode' };
+  print ref $@;  # Exception::Fatal
+
+Changes:
+
+* Exception::Argument and Exception::Fatal moved to separate package.
+* Build requires Exception::Warning, Exception::Died, Test::Assert.
+
+------------------------------------------------------------------------
+0.0204 | Piotr Roszatycki <dexter@debian.org> | 2008-05-08
+
+Changes:
+
+* Requires Exception::Base >= 0.16.
+
+------------------------------------------------------------------------
+0.0203 | Piotr Roszatycki <dexter@debian.org> | 2008-04-19
+
+Changes:
+
+* Requires Exception::Base >= 0.15.
+* Drop indirect notation is POD and code.
+
+------------------------------------------------------------------------
+0.0202 | Piotr Roszatycki <dexter@debian.org> | 2008-04-13
+
+Changes:
+
+* Requires Exception::Base >= 0.14.
+* Refactored for new Exception::Base.
+
+------------------------------------------------------------------------
+0.0201 | Piotr Roszatycki <dexter@debian.org> | 2007-11-05
+
+Fixes:
+
+* Add Build.PL to MANIFEST.
+* Drop dependency on Exception::System.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@debian.org> | 2007-10-29
+
+Changes:
+
+* Exception::Fatal is an Exception::Base.
+* Ignore one level for exception stack trace.
+* Switched to Module::Build.
+* Requires Exception::Base >= 0.12.
+* Requires Exception::System >= 0.07.
+* Requires Test::Unit::Lite >= 0.07.
+* Use warnings.
+
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@debian.org> | 2007-06-13
+
+* Minor refactoring.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@debian.org> | 2007-05-23
+
+* Initial release.
+
+------------------------------------------------------------------------

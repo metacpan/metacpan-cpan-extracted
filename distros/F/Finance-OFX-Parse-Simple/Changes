@@ -1,0 +1,24 @@
+Revision history for Finance-OFX-Parse-Simple
+
+0.06    1 October 2010
+        Allow the decimal separator to be overridden with the
+        environment variable MON_DECIMAL_POINT
+
+0.05    16 September 2010
+        Minor changes for re-upload to CPAN.
+
+0.04    16 September 2010
+        Added localisation so that the decimal point character is read
+        from the system's locale instead of always a . (RT bug #61358 reported
+        by Conway Allen)
+	Added additional tests with sample OFX data.
+
+0.03    6 April 2010
+        Added parsing of TRNTYPE and CHECKNUM.
+
+0.02    23 January 2009
+        Updated the ACCTID regex for RT bug #42599 reported by wduncan.
+
+0.01    5 January 2009
+        First version.
+

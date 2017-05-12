@@ -1,0 +1,6 @@
+#fsdb -F S account passwd uid gid first_last homedir shell
+johnh  *  2274  134  John_Heidemann  /home/johnh  /bin/bash
+greg  *  2275  134  Greg_Johnson  /home/greg  /bin/bash
+root  *  0  0  Root  /root  /bin/bash
+# this is a simple database
+#   | dbcolrename fullname first_last

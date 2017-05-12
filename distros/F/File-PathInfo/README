@@ -1,0 +1,46 @@
+File::PathInfo - oo access to path variables stat data about a file on disk
+===========================================================================
+
+This provides an object oriented interface to things you want to know about a file, such
+as extension, absolute path, relative path, size, filename (without extension), etc.
+It is a sort of swissarmy knife of file info.
+
+A lot of times you need to know a file's absolute path, it's absolute
+location, maybe it's relative location to something else (like DOCUMENT ROOT),
+then you need to maybe know the relative path and relative location for a file.
+You need to know if a file is a directory, what it's extension is. 
+You can commonly use regexes to do this.
+
+This module provides commonly needed variables.
+
+See doc for full description.
+
+
+
+
+
+INSTALLATION
+============
+
+perl Makefile.PL
+make test
+make install
+
+
+DEPENDENCIES
+============
+   Carp
+   Cwd
+   Exporter
+   Test::Simple
+   Time::Format
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2009 by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+   

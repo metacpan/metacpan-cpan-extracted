@@ -1,0 +1,308 @@
+0.3.2   2017-01-13
+    - Made the version number consistent across the .pm files.
+        - https://bitbucket.org/shlomif/perl-file-find-object/issues/1/wrong-version-number
+        - Thanks to aer0 for the report.
+
+0.3.1   2017-01-09
+    - Fixed an issue with tracking the depth of the inodes when detecting
+    a symlink loop.
+        - Detected by several cygwin reports.
+
+0.3.0   2016-09-11
+    - Converted the build system to Dist-Zilla.
+        - Part of the impetus was removing the warning about
+        Test::TrailingSpace needed for the trailing whitespace tests
+        (which in turn requires this modules) which was reported to us as a
+        problem by someone (despite not being a real issue).
+
+0.2.13  2015-04-07
+    - Clarified the documentation regarding the use/return of array
+    references.
+
+0.2.12  2014-11-28
+    - Made sure no two t/*.t test scripts share temp paths.
+        - This caused failure with HARNESS_OPTIONS="j9".
+        - Thanks to ETHER for the report:
+            - http://www.cpantesters.org/cpan/report/2711a2ec-7401-11e4-8c78-d7697441a48b
+
+0.2.11  2014-03-26
+    - Add $VERSION globally to all packages in lib/.
+        - This was done to silence some warnings from PAUSE.
+    - Add scripts/bump-version-number.pl to update it.
+
+0.2.10  2014-03-26
+    - Correct a misspelling reported by dsteinbrunner.
+        - https://rt.cpan.org/Ticket/Display.html?id=94206
+    - Fix Build.PL by excluding the 'license' URL from the resources.
+        - New versions of Module::Build add it automatically.
+
+0.2.9   2014-01-29
+    - Convert from "use base" to the more modern "use parent".
+    - Minimal version on perl-5.008 (CPANTS Kwalitee).
+    - Add the LICENSE file - CPANTS Kwalitee.
+
+0.2.8   2013-08-17
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=87901
+        - repository metadata duplication.
+
+0.2.7   2013-05-21
+    - Convert this file to t/cpan-changes.t .
+
+0.2.6   2012-11-25
+    - Correct a typo:
+        - see https://rt.cpan.org/Ticket/Display.html?id=81428
+        - Thanks to Xavier Guimard for the report.
+    - Remove trailing space.
+
+0.2.5   2012-07-12
+    - Add the scripts/tag-release.pl script to tag a release in the
+    Mercurial repository.
+        - The problem is that I'm using different conventions for the
+        names of the tags in different repositories and wish to introduce
+        some consistency.
+
+0.2.4   2012-07-12
+    - Update the link to the new repository at bitbucket.org.
+    - Add cleanup for a temporary directory in the tests.
+
+0.2.3   2009-07-30
+    - 0.2.2 seems to have been deleted. Re-uploading.
+        - thanks to lwpetre
+
+0.2.2   2009-06-25
+    - added some META.yml resources.
+        - added META.yml keywords.
+
+0.2.1   2009-06-18
+    - Optimization: removed the _dir field of File::Find::Object::PathComp
+    and its _dir_copy copy-accessor, and replaced them all with passing
+    the $dir_str explicitly. This reduced the code considerably, and
+    eliminated a similar symptom to this one:
+        - http://en.wikipedia.org/wiki/Schlemiel_the_painter%27s_Algorithm
+    - Added the ->is_file() method to ::Result.
+    - Converted ::Result->is_dir() to use -d _
+    - Added ::Result->is_link().
+
+0.2.0   2009-02-22
+    - Optimization: now not checking for the existence of the callback() after
+    every iteration, in case it doesn't exist. Instead, the default_actions
+    is calculated according to its existence when the tree traverser
+    is initialized.
+    - Refactoring/Optimization: avoided having two _set_obj() methds by
+    calling _set_obj() from _run_cb().
+
+0.1.9   2009-02-10
+    - Added use integer to the modules, because they don't make use
+    of floating-point calculation. It may be a minor optimization, but then
+    again it may be not.
+    - Optimization: optimized the loop detection by having a hash lookup
+    of inodes in each path component, that are built incrementally and checked
+    for every subsequent node.
+    - Optimization: replaced the _top_it() of _me_die() with a normal method
+    with a conditional, as it was the only place where _top_it() was still
+    used.
+    - Optimization/Cleanup: _set_inodes() in ::DeepPath.
+    - Clarified the licensing blurbs of the .pm files.
+
+0.1.8   2009-01-19
+    - Optimization/Refactoring: replaced the last call to ->_father with a
+    call to _current_father(). Removed ->_father and optimized
+    _current_father() .
+    - Optimization/Refactoring: refactored _become_default() to remove
+    the execessive use of $father and $father->idx(). Now ->idx() is
+    no longer needed and will be removed next.
+    - Optimization/Refactoring: removed the ->idx() method as it
+    was no longer used and needed.
+    - Optimization: instead of calling File::Find::Object::Result->new()
+    just bless to it.
+    - Optimization: now caching the filesystem device at
+    the top for nocrossfs().
+        - Plus: rearranged the order of the checks in
+        _non_top__check_subdir_helper
+    - Optimization/Refactoring: made the _top_it method names saner,
+    and removed an unused one.
+    - Refactoring: refactored _check_subdir_helper_d() to make
+    the conditions clearer.
+    - Optimization: now compiling the _check_subdir_helper function
+    by eval ""'ing it because it contains many conditions that depend
+    on instance-wide and constant parameters.
+    - Cleanup: moved some POD'ed out functions to under rejects/ .
+    - Optimization: renamed _calc_next_obj() to next_obj(), as next_obj()
+    just called it directly. Cleaned up the rest of the logic in next_obj().
+    - Bug fix: the nocrossfs option was fixed. Previously it used an undefined
+    method.
+
+0.1.7   2009-01-15
+    - Fixed the check-for-link and for directory semantics on Windows
+    and other systems. Converted to "perldoc -f lstat" instead of
+    "perldoc -f stat", and using stat only for symbolic links to check
+    if they are directories. Now added a test for that.
+        - Fixed t/01ffo.t to check for the warning.
+        - Also see: http://www.nntp.perl.org/group/perl.perl5.porters/2009/01/msg143399.html
+    - Small optimization: converted a loop with:
+    while($ptr) { ... } continue { $ptr = $self->_father($ptr); }
+    to List::Util::first.
+    - Added more dependencies to Build.PL / Makefile.PL including
+    List::Util.
+
+0.1.6   2009-01-09
+    - Converted the accessor generator to Class::XSAccessor instead
+    of Class::Accessor. After consulting Devel::NYTProf, it seemed that
+    the majority of the time of a simple File-Find-Object scan was spent
+    in Class::Accessor. Hopefully, this will make F-F-O run faster.
+    - A small optimization - added a flag to $self with whether the stack
+    is full or not. This is used inside _top_it() and _is_top().
+    - A small optimization - implemented _current directly instead of
+    a _top / _non_top version - saved 2.5 seconds of runtime.
+    - A small optimization - got rid of _current_components_copy() (which
+    was useless because _current_components already returns a dynamic
+    reference) and replaced all calls with calls to _current_components().
+    - A small optimization - ->dir() instead of ->_dir_copy() for
+    a function whose return value is dereferenced and flatted.
+    - A small optimization - now caching the results of _current_components
+    inside an accessor and updating it upon every change.
+    - A small optimization - now caching the results of _current_path()
+    upon every modification of _current_components, so File::Spec->catfile()
+    won't be called excessively.
+    - Optimization/Refactoring - changed the actions() handling so instead
+    of having the indices, we calculate an array of master actions at
+    start that correspond with the depth() parameter, and then assign it for
+    each PathComponent object in turn based on $top. This is instead of
+    the indexes and explicit calculations etc., which was both messier
+    and slower.
+    - Optimization/Refactoring - renamed _current_components() to
+    _curr_comps() and _current_path to _curr_path() to make them
+    shorter and faster. Added a comment explaining what they are.
+    - Optimization/Refactoring - optimized _calc_current_item_obj.
+    - Optimization - removed an _is_top() conditional in _recurse() that
+    was likely not to be evaluated, by re-arranging the order of _mystat
+    call. Now _mystat is not an action, but rather called explicitly.
+    _is_top() is now PODded-out because it's not used.
+    - Refactoring - made the top path component-handling object a separate
+    object (::PathTop) instead of $top/$tree . Hopefully, this will later
+    allow caching _current(), and having a unified directory stack.
+    - Refactoring - created a base class for Path-Components (i.e: ::PathTop
+    and ::PathComponent). Most of the methods out of ::Base belong there
+    so they were moved. This class inherits from ::Base, but there's not
+    a lot there anymore.
+    - Refactoring - renamed ::PathComponent as ::DeepPath and ::PathTop
+    as ::TopPath. Otherwise they could be confused with ::PathComp.
+    - Refactoring - made the first ::PathTop component the first element
+    in _dir_stack() so we won't need to keep in a distinct reference. All
+    the other elements moved 1 level down the stack.
+    - Optimization - now caching $top->_dir_stack()->[-1] into
+    $top->_current() as an accessor.
+
+0.1.5   2009-01-03
+    - Unified the two calls to stat() (and several calls to other file
+    operators) in order to reduce the number of system calls/disk accesses
+    issued by File::Find::Object.
+    - Refactored the code from the last change and added
+    File::Find::Object::Result->stat_ret() for the return value of stat().
+
+0.1.4   2008-12-25
+    - Bug fix: made sure ->item_obj() is available on the first call
+    to the callback() and is properly synchronized with it.
+
+0.1.3   2008-11-12
+    - Refactoring: converted _movenext() from pseudo-conditionals
+    to polymorphism by making it a method of ->_current().
+    - Refactoring: extracted the _next_traverse_to() method.
+    - Bug fix (with possible correctness/SECURITY implications):
+        - now correctly handling files and directories whose filenames
+        are false in Perl - most notable "0".
+
+0.1.2   2008-10-26
+    - Corrected the README.
+    - Now checking for inodes that are 0, when checking for cyclical trees,
+    as a fix for stat() calls on systems that do not support them. This should
+    fix Win32 test failures (and bad behaviour in general) like the following:          - http://nntp.x.perl.org/group/perl.cpan.testers/2479582
+
+0.1.1   2008-10-22
+    - Potential Security Fix!!! No longer passing a filename directly to
+    the format in <<printf (STDERR)>> when warning on a loop.
+    - Bug fix - the check for a loop was broken.
+    - New Feature - Added the ->next_obj() and ->item_obj() methods
+    to return a File::Find::Object::Result object instead of a plain
+    path.
+    - Refactoring:
+        - No longer passing $current explicitly from one method to another
+        (hello EEK!). Instead, we reference $self->_current()
+        - Remmed out the DESTROY method as it was empty.
+        - Revamped the _action handling - an array instead of a hash.
+        - Created _top and _non_top methods delegated by _is_top using
+            _top_it()
+        - _current_idx() was eliminated - now it's just $#dir_stack.
+        - Created a _copy methods to create flat copies of array references.
+        - Extracted many methods.
+    - Switched Build.PL to inc/Test/Run/Builder.pm - that gives us:
+        - ./Build runtest
+        - ./Build distruntest
+        - ./Build tags
+
+0.1.0   2008-03-05
+    - Now handling directories that cannot be opendir()'ed in a graceful
+    manner - just not traversing them further.
+
+0.0.9   2008-02-22
+    - Now running canonpath() on the targets in the call to
+      File::Find::Object->new. That way, trailing slashes are omitted in
+      the results.
+    - Allow File::Find::Object to properly accept paths to regular
+      files as input paths. Fixes:
+        http://rt.cpan.org/Public/Bug/Display.html?id=33453
+      Thanks to Sergey V Panteleev for reporting the bug.
+    - TODO : check behavior on traversing non-existant paths.
+        - Done.
+    - Now skipping non-existant files.
+        - Added a test for it in t/03traverse.t
+
+0.0.8   2007-07-31
+    - added the empty PL_FILES key to the Makefile.PL to avoid running
+    Build.PL on older versions of EU::MM.
+
+0.0.7   2007-02-02
+    - moved the tree script under the examples directory.
+    - added the LICENSE section to the POD.
+    - added t/pod.t and t/pod-coverage.t and made sure the module
+      has full POD coverage.
+    - added a Build.PL build script to generate a better META.yml file.
+    - all of these are Kwalitee improvements.
+      ( http://cpants.perl.org/dist/File-Find-Object )
+    - Added some links to the main POD documentation for similar modules
+      and for the Perl Advent article.
+
+0.0.6   2006-11-28
+    - Added the following new interface methods:
+        - set_traverse_to
+        - get_traverse_to
+        - get_current_node_files_list
+        - prune
+    - Some changes to the internals to accomodate for them.
+
+0.0.5   2006-09-03
+    - Eliminated the F-F-O-internal isa F-F-O relationship.
+    - Created accessors for everything - now based on Class::Accessor
+    - F-F-O-internal is now named File::Find::Object::PathComponent
+    - Some smaller refactorings.
+
+0.0.4   2006-08-23
+    - Eliminated circular references. (Hopefully)
+        - Still have an isa relationship between File::Find::Object and
+        File::Find::Object::internal, which is what handles each recursed to
+        directory.
+    - Created some accessor functions instead of direct hash accesses.
+
+0.0.3   2006-07-14
+    - Fixed some language problems in the POD.
+    - Added the Changes file.
+    - Changed the license to GPL/Artistic/Artistic-2.0
+    - Placed the .pm files inside lib.
+    - Added the TreeCreate module under t/lib (with appropriate tests) to test
+    the main module.
+    - Made the default test order lexicographical, and predictable. In the
+    process, eliminated keeping the directory handles, and possibly the fact
+    that they are kept open.
+    - Fixed a bug where circular references prevented the module from being
+    destroyed.
+

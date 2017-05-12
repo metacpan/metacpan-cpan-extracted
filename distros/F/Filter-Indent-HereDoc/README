@@ -1,0 +1,41 @@
+Indent/HereDoc version 0.01
+===========================
+
+Indent::HereDoc - Perl extension to allow here documents 
+                  to be indented within code blocks
+
+SYNOPSIS
+
+  use Indent::HereDoc;
+  {
+    {
+      print <<EOT;
+      Hello, World!
+      EOT
+    }
+  }
+  # This will print "Hello, World!" and stop at EOT
+  # even though the termination string is indented.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Filter::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Jon Allen
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

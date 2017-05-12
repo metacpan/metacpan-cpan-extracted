@@ -1,0 +1,13 @@
+Revision history for Perl extension File::Find::Rule::XPath.
+
+0.03  10-Nov-2003:
+	- removed calls to File::Spec->cwd which has been renamed in the
+          latest release (reported by Jim Cromie)
+
+0.02  16-Dec-2002: first release to CPAN
+	- added support for searching from relative roots
+
+0.01  13-Dec-2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n File::Find::Rule::XPath
+

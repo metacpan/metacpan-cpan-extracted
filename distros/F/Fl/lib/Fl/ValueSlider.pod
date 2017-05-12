@@ -1,0 +1,130 @@
+class 'Fl::ValueSlider';
+isa 'Fl::Slider';
+include 'FL/Fl_Value_Slider.H';
+widget_type 'Fl_Value_Slider';
+
+=pod
+
+=head1 NAME
+
+Fl::ValueSlider - Slider with a Box Displaying the Current Value
+
+=head1 Description
+
+The Fl::ValueSlider draws a widget with a box displaying the current value.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/value_slider.png" /></center>
+
+=head1 Methods
+
+Fl::ValueSlider inherits from Fl::Slider, Fl::Valuator and Fl::Widget. On top
+of that, it exposes the following methods...
+
+=head2 new(...)
+
+    my $val_a = Fl::ValueSlider->new(0, 0, 250, 500, 'Important Stuff');
+    my $val_b = Fl::ValueSlider->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default boxtype is FL_DOWN_BOX.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Value_Slider *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 textcolor(...)
+
+    $val_a->textcolor( FL_RED );
+    my $color = $val_b->textcolor( );
+
+Gets or sets the color of the text in the value box.
+
+=cut
+
+xs {name        => 'textcolor',
+    definitions => [
+            {required => [[qw[Fl_Color s]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Color'}
+    ]
+};
+
+=pod
+
+=head2 textfont(...)
+
+    $val_a->textfont( FL_BOLD );
+    my $font = $val_b->textfont( );
+
+Gets or sets the typeface of the text in the value box.
+
+=cut
+
+xs {name        => 'textfont',
+    definitions => [
+            {required => [[qw[Fl_Font s]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Font'}
+    ]
+};
+
+=pod
+
+=head2 textsize(...)
+
+    $val_a->textsize( 18 );
+    my $size = $val_b->textsize( );
+
+Gets or sets the size of the text in the value box.
+
+=cut
+
+xs {name        => 'textsize',
+    definitions => [
+            {required => [[qw[Fl_Fontsize s]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Fontsize'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

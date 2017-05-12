@@ -1,0 +1,13 @@
+Revision history for Filter::CommaEquals
+
+1.01      2015-01-29 14:39:41-08:00 America/Los_Angeles
+        - Implementing use of Dist::Zilla
+
+0.03      Wed Sep 25 10:00:58 PDT 2014
+        - Some OCD cleanup; addition of Travis and Coveralls
+
+0.02      Sun Aug 10 00:12:00 PDT 201
+        - Code style updating
+
+0.01      Thu Jul 14 15:45:31 2005
+        - Original version

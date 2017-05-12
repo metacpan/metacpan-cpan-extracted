@@ -1,0 +1,380 @@
+Revision history for Forks-Super
+
+0.89    2017-04-06
+        Fix unclosed pipes after each fork issue (reported by jatu@cpan.org)
+        Use /dev/shm for ipc where available
+        Improvements to remote test infrastructure
+
+0.88    2017-02-08
+        'remote' option to run commands in background on remote host
+        improve handling of external commands with special chars
+        Upgrade Sys-CpuAffinity to v1.12
+        Enable poor man's alarm for darwin (RT#118474)
+
+0.87    2016-11-18
+        Rename Forks::Super::Queue to Forks::Super::Deferred. Queue will
+        be reserved for an object queue that works across parent-child calls.
+        Upgrade Signals-XSIG to v0.14
+        Upgrade Sys-CpuAffinity to v1.11_02
+        Fixes for Forks::Super::Sync::IPCSemaphore
+
+0.86    2016-08-25
+        Upgrade Sys-CpuAffinity to v1.09
+        Refactor global destruction
+        Test fixes for MSWin32 and netbsd
+
+0.85    2016-07-25
+        Improvements in running out of open filehandles gracefully
+        Upgrade Sys-CpuAffinity to v1.08
+
+0.84    2016-05-24
+        More attempts to fix emulating with MSWin32 and openbsd
+
+0.83    2016-05-19
+        More attempts to fix SIGCHLD handling with emulation.
+
+0.82    2016-05-09
+        Fix SIGCHLD handling issue with new emulation mode
+
+0.81    2016-05-05
+        Support for "emulation" mode, where jobs still run in foreground
+
+0.80    2015-10-07
+        Lose support for YAML::Tiny as serialization protocol for 'bg_eval'.
+        Further attempt at resolving timeout issues on freebsd.
+        Fix test issue on MSWin32
+
+0.79    2015-10-06
+        Attempt at resolving long standing timeout issues on freebsd systems.
+
+0.78    2015-09-30
+        Test improvements.
+
+0.77    2015-08-13
+        Support assigning code ref to $Forks::Super::MAX_PROC, %MAX_PROC
+        Introducing PREFORK {...}, POSTFORK {...} blocks
+        RT#105814 - get t/66a when there is a user init process running
+
+0.76    2015-06-26
+        fix tests, <=5.10 compatibility that were broken in v0.75
+
+0.75    2015-06-24
+        RT#105310 refactor *.PL files so distro config more likely to succeed
+
+0.74    2015-06-08
+        Support return of blessed objects from 'bg_eval'.
+        Lose support of JSON as a serialization protocol for 'bg_eval'
+        RT#78285 - support $ON_TOO_MANY_OPEN_FILEHANDLES module variable
+        More compensation for Cygwin's buggy flock
+        New Forks::Super::Job::count_queued_processes function
+
+0.73    2014-06-18
+        support corrective measures for too many open file handles
+
+0.72    2013-12-09
+        Support  fork \&code  and  fork \@cmd  syntax.
+        Use 'queue' as default on_busy behavior for jobs with dependencies
+
+0.71    2013-10-10
+        test fixes that should help single CPU systems pass timing tests
+
+0.70    2013-09-18
+        Experimental emulation of process groups in MSWin32 in 
+        waitpid/kill functions.
+        Improved procedures to terminate a process tree in MSWin32.
+
+0.69    2013-08-19
+        Move FS::Tie::BackgroundScalar and BackgroundArray, which are no
+        longer used with 'tie', to FS::LazyEval.
+        Better handling of recalcitrant MSWin32 processes.
+
+0.68    2013-07-01
+        Refactored sync objects - should eliminate race conditions
+        during parent/child startup.
+
+0.67    2013-05-25
+        Support share attribute with a natural fork.
+
+0.66    2013-04-16
+        RT#84548 - re-fix disable overload for Perl <=5.12 too
+
+0.65    2013-04-13
+        RT#84548 - fix disable overload warning with Perl>=v5.16
+        RT#76868 - incorporate Devel::GlobalDestruction if available.
+
+0.64    2013-03-23
+        Improved thread signal processing in Win32
+        Upgraded bundled Sys-CpuAffinity and Signals-XSIG modules.
+        Some Forks::Super::Sync improvements
+
+0.63    2012-03-28
+        refactor FS::Job::OS::get_cpu_load func for robustness, portability
+        remove F::S::Util dependency in SysInfo.pm.PL for openbsd's sake
+
+0.62    2012-03-22
+        Fixed doc bug: max_fork option to F::S:fork should have been max_proc.
+        Implemented configuration files.
+        Implemented dynamic configuration through signals. Not sure how to
+        document it yet.
+
+0.61    2012-03-05
+        Defines constants BG_QX, BG_EVAL as shorthand for tied class names.
+        Miscellaneous fixes specific to freebsd, openbsd, and solaris.
+
+0.60    2012-02-29
+        tie interface to  bg_qx, bg_eval  calls. These calls are equivalent
+        in function if not in implementation:
+             $foo = bg_qx $command, \%options
+             tie $foo, 'Forks::Super::bg_qx', $command, \%options
+        And now supports the clunky list context background evals
+             tie @output, 'Forks::Super::bg_qx', $command, \%options
+             tie %result, 'Forks::Super::bg_eval', sub { ... }, \%options
+        A few more tweaks that make the module friendlier to Perl v<=5.6
+
+0.59    2012-02-22
+        Improved waitall performance where there are many jobs to reap.
+        Improved error handling in sync option Win32 implementations. 
+
+0.58    2011-12-15
+        Added Java-style dump of program information in response to SIGQUIT
+        or other signal. See  Forks::Super::Debug::enable_dump.
+        Minor fixes and test tweaks for solaris and openbsd
+
+0.57    2011-12-09
+        Added sync =>  option for mutexs to coordinate parent and child procs.
+        New getc_XXX methods for interprocess communication.
+        Test fixes and tweaks.
+
+0.56    2011-11-21
+        Fix build process bug introduced in v0.55. Failure to build bundled
+        Sys-CpuAffinity distro now won't break the whole build.
+
+0.55    2011-11-10
+        exec and timeout are now compatible options
+        timeout  now suppored on systems that don't implement  alarm , or
+        where  sleep  and  alarm  are incompatible.
+        Test for -MForks::Super=cleanse
+        block => 1  option now respected with child's STDIN.
+        Upgrade bundled Sys::CpuAffinity to v1.05
+        Create Forks::Super::Debug::parent_dump for JVM style job dumps
+
+0.54    2011-10-07
+        Allows PerlIO layers in  child_fh  spec.
+        Upgraded bundled Signals-XSIG to v0.13, Sys-CpuAffinity to 1.04.
+        More effort backporting to Perl v5.6.
+        kill func can signal procs that were not launched by Forks::Super.
+        Improvements to suspend/resume functions in Cygwin.
+        Fixes for daemon code introduced in v0.53.
+        Perl::Critic-inspired refactoring.
+
+0.53    2011-07-14
+        Introduce  daemon  option to fork.
+        Introduce  share => list-of-refs  option to fork.
+        Introduce  env => \%kvpairs , umask => mask  options to fork.
+        Fixed -MForks::Super=cleanse bug introduced in 0.52
+        Forks::Super::kill on cmd-style job now delivers signal to the external
+        command, not the perl process that called system().
+        Increased initial deferred job id from -100K to -500K.
+        MSWin32 refactoring: fork-to-cmd, fork-to-exec, OS priority code.
+        bg_eval, bg_qx commands now return empty string on failure, never undef.
+        Upgrade Signals::XSIG bundle to v0.12.
+
+0.52    2011-06-21
+        Calling Forks::Super::LazyEval::bg_eval and bg_qx in list context
+        doesn't work and is now disabled.
+        Performance enhancement for fork with file-based IPC.
+        Upgrade Sys-CpuAffinity bundle to v1.01
+        Bug fix in timeout code that hangs BSD (looks like it didn't work)
+        Test fixes.
+
+0.51    2011-04-18
+        Include IPCPipeHandle.pm in manifest (D'oh)
+        Overload <> operator for Forks::Super::Job to read from child stdout.
+        $job->wait(0) now waits with timeout of 0, behaves differently
+        from $job->wait().
+
+0.50    2011-04-17
+        Support  dir => $directory  option to start child in arbitrary dir.
+        Introduced tied F::S::Tie::IPCPipeHandle class for testing/debugging
+        use of pipes.
+        Support  cpu_affinty => [@list]  syntax.
+        Calling exit from a child sub is allowed again.
+
+0.49    2011-04-01
+        Bundle with Signals::XSIG v0.10 and drop Forks::Super::Sighandler.
+        Setting $ENV{IPC_DIR}="undef" to disable file-based IPC now functions
+        except on MSWin32.
+
+0.48    2011-03-16
+        Fix compile error in t/49.
+        Refactoring of some large subroutines.
+
+0.47    2011-03-15
+        Fix for IPC clean up. Removed obsolete files and tests.
+        Revised and reintroduced F::S::Tie::IPCFileHandle, IPCSocketHandle
+        tied classes for debugging. Ultimately these classes will provide
+        a common interface for file- and socket-based IPC.
+        Attach job information to all file handles opened in the module.
+
+0.44    2011-02-12
+        Upgrade Sys-CpuAffinity bundle to 0.99.
+        Can use Proc::ProcessTable to clean up grandchild processes.
+        Introduced reuse, dispose methods in Forks::Super::Job.
+        Fix tied $fh call (deprecated in 5.13.8).
+        Implement -MForks::Super=cleanse for picking up IPC litter off-line.
+
+0.43    2010-11-15
+        API change for bg_eval, bg_qx functions: return value is no longer a
+        reference to a tied variable, but an overloaded object that retrieves
+        its value only when it is used.
+        Support timeout=> option to F::S::J::Ipc::read_stdXXX methods.
+
+0.42    2010-10-17
+        Implemented child_fh => block spec.
+        Moved some functionality checks into %Forks::Super::SysInfo::CONFIG.
+        Getting bg_eval, bg_qx to do the right thing in taint mode.
+        Fixed IPC failures in non-English locales bug (cf. 
+            www.cpantesters.org/cpan/report/8376777)
+        Fix stdin,stdout,stderr options to fork to work better with socket IPC.
+
+0.41    2010-10-10
+        overload behavior from v0.34 more stable, enabled by default.
+        Change name of $Forks::Super::FH_DIR to IPC_DIR and how it is set.
+        META.yml changes so bundled distributions aren't indexed by CPAN.
+        Check if sleep/alarm are compatible before some features can be used.
+
+0.40    2010-09-28
+        Implemented Forks::Super::Sighandler module and enhanced 
+        signal handling. Use with Time::HiRes::setitimer where
+        available to monitor the job queue instead of a separate process.
+
+0.39    2010-09-16
+        Support for YAML::Tiny, Data::Dumper in Forks::Super::LazyEval package.
+        Enable default install for bundled Sys::CpuAffinity, Sys::CpuLoadX mods
+        Some efforts toward backporting to 5.6.
+
+0.38    2010-09-08
+        Removed redundant Forks::Super::Util::Time() call.
+        Testing changes, including checking taint compatibility.
+        Unregister SIGCHLD handler at END{} to fix intermittent errors.
+
+0.37    2010-08-27
+        Support  block=>0|1  option to F::S::J::Ipc::read_stdXXX methods
+        to force blocking/non-blocking IPC I/O.
+        Natural language for timeout/expiration/delay/start_after options
+        (requires DateTime::Format::NaturalLanguage).
+        Support CONFIG{filehandles}=0 to only use sockets & pipes for IPC.
+
+0.36    2010-08-23
+        Test case fixes only.
+
+0.35    2010-08-12
+        New IPC methods F::S::Job::write_stdin, read_stdout, read_stderr;
+        refactored a lot of IPC code.
+        wait, waitpid can return overloaded F::S::Job objects like fork().
+        Documented $Forks::Super::Wait::WAIT_ACTION_ON_SUSPENDED_JOBS.
+        Implemented suspend callback.
+
+0.34    2010-08-10
+        Return value from fork() can be an overloaded Forks::Super::Job
+        object that behaves like its pid in number context.
+
+0.33    2010-07-29
+        Added open2 and open3 convenience methods.
+        Support for JSON v1 in Forks::Super::LazyEval package.
+        If $Forks::Super::SUPPORT_LIST_CONTEXT is non-zero, then
+        fork() in list context returns Forks::Super::Job object to parent.
+
+0.32    2010-05-18
+        New system dependent Forks::Super::SysInfo package.
+        Changes to Ipc.pm for robustness and to ease testing/debugging.
+        Put README.txt file into temporary IPC directories.
+        Improved cleanup of queue monitor.
+
+0.31    2010-05-04
+        Extend socket IPC to cmd/exec-style forks (except MSWin32).
+        Making use of tie behavior to more Forks::Super::Deferred variables.
+
+0.30    2010-04-25
+        Implemented suspend/resume functionality (for Windows, too).
+        Implemented kill/kill_all functions to send signals to jobs.
+        Bundles Sys::CpuAffinity (released) and Sys::CpuLoadX (unreleased)
+        modules, and enables $Forks::Super::MAX_LOAD parameter and
+        max_load option to fork().
+
+0.29    2010-04-13
+        Pipes for IPC. system-limits.PL obtains pipe, socket capacity.
+
+0.28    2010-04-05
+        JSON support for bg_eval call. Improved IPC file cleanup in MSWin32.
+
+0.27    2010-04-03
+        Makefile changes, doc fixes
+
+0.26    2010-03-18
+        Built OS::Win32 and OS::Linux for os-specific system functions.
+        OS::Linux includes first "conditional Inline::C code".
+        Broke up some long running unit tests into small pieces.
+
+0.25    2010-03-10
+        $Forks::Super::LAST_JOB,$Forks::Super::LAST_JOB_ID capture job state in
+        bg_eval/bg_qx calls. Special handling for bg_eval/bg_qx jobs in waitpid
+        Timeout in MSWin32 will now (maybe) kill the grandchildren too.
+
+0.24    2010-03-05
+        Fix cleanup of IPC files.
+
+0.23    2010-02-20
+        Implemented timeouts on wait,waitpid,waitall calls.
+
+0.22    2010-02-19
+        Added bg_qx function
+
+0.21    2010-02-19
+        Decomposed large source file into manageable chunks. 
+        Added stdin, stdout, stderr options to fork call.
+
+0.16    2010-02-16
+        test fixes
+
+0.15    2010-02-13
+        Further improvements using setpgrp with timeout option, cleanup.
+
+0.14    2010-02-11
+        Bug/test fix for setpgrp issue on Linux.
+
+0.13    2010-02-10
+        Added exec and callback options. Added bg_eval function.
+
+0.12    2009-12-31
+        Added name attribute. waitpid, dependencies, and job lookup by job 
+        name. Fixed named subroutine. Impl tied scalars for $ON_BUSY,
+        $QUEUE_INTERRUPT. On child timeout, all child subprocesses are killed.
+
+0.11    2009-12-18
+        Fixes for some tests.
+
+0.10    2009-12-08
+        Added sockets for IPC ; Changed API for accessing child 
+        STDxxx handles.
+
+0.09    2009-12-06
+        Require 5.7.3 for "safe" signals -- see perlipc ; refined some tests
+
+0.08    2009-12-03
+        job-level debugging ; recommended modules to README and META.yml ;
+        os_priority implemented in MSWin32
+
+0.07    2009-12-01
+        implement cpu_affinity option for Cygwin, Win32, Linux
+
+0.06    2009-11-25
+        pod fixes; adding module config to import method (though this isn't
+        documented yet); v5.6 compatibility changes, tested on MSWin32 
+        (AS) v5.6.1; may not pass all CPAN testers, but I expect improvement
+
+0.05    2009-11-19
+        API Change Forks::Super::Job::_get to Forks::Super::Job::get
+
+0.04    2009-11-14
+        Alpha release.

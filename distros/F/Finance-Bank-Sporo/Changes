@@ -1,0 +1,23 @@
+Revision history for Perl extension Bank::Sporo.
+
+0.16  Thu Feb  8 13:19:36 MET 2001
+  - change name to Finance::Bank::Sporo
+
+0.15  Fri Nov 24 10:01:48 MET 2000
+  - parameters default control ..
+
+0.14  Wed Nov 22 10:18:11 MET 2000
+  - protocol changed ( added some parameters )
+
+0.13  Wed Nov 22 07:45:27 MET 2000
+  - new default action URL
+
+0.12  Tue Nov 21 14:20:38 MET 2000
+  - added generic_pay_form ( for POBOX ? ) 
+
+0.11  Tue Nov  7 19:08:46 CET 2000
+	- first version ( derived from Bank::TB )
+
+0.01  Thu May 11 17:58:32 2000
+	- original version; created by h2xs 1.19
+

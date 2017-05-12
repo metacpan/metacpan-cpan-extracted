@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 a418ce3729217780ac106a1d2468eee73920ae81 Changes
+SHA1 6e100fe825f9ff384e87eb9fc70a1e987eb57b77 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 f61d101729af72bb311cfe35cd99654f0eae3933 META.json
+SHA1 570043acb21c275eb512ff1c9a9dc18431e87dc7 META.yml
+SHA1 d5843aba1ed86bb92c482143a8365e8835465fc3 Makefile.PL
+SHA1 af1dd452956f29dbad62444e383e72beebbb37ab README
+SHA1 3a1f4506f297e0017c51241e723bc9bd9bbd9bc4 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 0a713988b08c731b825fd2bd728f0b98d2cfe981 debian/control
+SHA1 3e0d93904ead4a90269faf4ae3333c6a22b01aa5 debian/copyright
+SHA1 f4684ae3277597f56791ffe4a72768c4c47f7f42 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 9bff11cdc5830f59d694ab52211973776ca68995 debian/watch
+SHA1 14dc2452eb884e95cb9b1c874c536f2377c86031 devel/Barchart.t
+SHA1 f09d010319d226bcdeb4be638d3fce4501e6415f devel/Casablanca.pm
+SHA1 452058a78625bd9620e57db638fc47ebbf32294f devel/Casablanca.t
+SHA1 41283cc08292f6ac5274b729afdebf94d23d5991 devel/athex-tr.pl
+SHA1 03a143a42c3232c8f721d5cca3ea6a209dd78840 devel/athex.pl
+SHA1 73b8dc9c895b87e76e69b4410222577313558e10 devel/cb-to-fq.pl
+SHA1 d0d48972b3c90aa9388b206e78baa4fd0fa2872c devel/ghana.pl
+SHA1 9b50081e0c07ea7d26f18b43352a0d1b118b0c85 devel/lib/Finance/Quote/ATHEX.pm
+SHA1 30c864678fb044762ae67a2578f289d473d5cfa8 devel/lib/Finance/Quote/Barchart.pm
+SHA1 e6e4492b42e935c2b7170ebcde4af8b652ebd85a devel/mgex.pl
+SHA1 045f4ae2f2afa654cf92b06e1ff05addadd126b6 devel/offline.pl
+SHA1 984b180f15a1c836d7d8f1555a16236c4f5325b5 devel/online.t
+SHA1 30cb9012b7b5f7433a980e2ad79c5cae6ba4716a devel/rba-old.pl
+SHA1 4889e9d38dad7c4cdde389b701d68a97b988b31a devel/run.pl
+SHA1 c4a790e029b7d6c3f19092d2de1323d3dc563f2c examples/dump.pl
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 0c4c616d244583a60ead95a8ae4d730c1ee82c97 lib/Finance/Quote/Ghana.pm
+SHA1 c067f17ba9265f5d183ca2ec0012da85cd913201 lib/Finance/Quote/MGEX.pm
+SHA1 c01b1292d2bfbe5b7bd191d516f86eb95e03ce1b lib/Finance/Quote/MLC.pm
+SHA1 0d8b229a31c7bb31522cf24c268bb878e7139419 lib/Finance/Quote/RBA.pm
+SHA1 282827b4b2d1f4ca70d328af500d48aa55737bd7 t/MGEX.t
+SHA1 3bcffd3ff7204070ec4a2b51139c26e8e24662c6 t/MLC.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 80ce09d2908f1a1dfc2f8e5f5a98df4dac15d0fb t/RBA.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 17a9be70ef734d80b03b6a0bffa4ea99dfb7baaf xt/MyPodParser.pm
+SHA1 3b711dbdad5df580f58b0a7de37e8b46a519f869 xt/pod-fields.t
+SHA1 cd18ddee73ad0007ba667f0e472ea9d73d0dfa89 xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 fa07c8e559adbd1af5ba613e021991b0819fc7ba xtools/my-deb.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFVcNQpLFMCIV9q3ToRAvhoAJwPKMJXFo6wyw4ZoXV54Nrr0BJmZQCdF8Sn
+q8V0ec4T6m/zBo8bwN2jCEk=
+=GV2x
+-----END PGP SIGNATURE-----

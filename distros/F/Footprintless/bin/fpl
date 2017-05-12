@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+package fpl;
+$fpl::VERSION = '1.24';
+use Footprintless::App;
+
+# Let dzil --version know what to report:
+$main::VERSION = $Footprintless::VERSION;
+
+# PODNAME:  fpl
+# ABSTRACT: Run footprintless commands
+Footprintless::App->run();
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fpl - Run footprintless commands
+
+=head1 VERSION
+
+version 1.24
+
+=head1 AUTHOR
+
+Lucas Theisen <lucastheisen@pastdev.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Lucas Theisen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Footprintless|Footprintless>
+
+=back
+
+=head1 OVERVIEW
+For help with Footprintless try C<fpl commands> or C<fpl help>.
+
+=cut

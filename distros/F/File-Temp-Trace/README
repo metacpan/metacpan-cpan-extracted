@@ -1,0 +1,76 @@
+NAME
+    File::Temp::Trace - Trace the creation of temporary files
+
+VERSION
+    Version 0.02
+
+REQUIREMENTS
+    The following packages are required:
+
+      Attribute::Handlers
+      Carp
+      File::Path
+      File::Spec
+      File::Temp
+      overload
+      Scalar::Util
+      self
+
+SYNPOSIS
+        package MyPkg;
+
+        use File::Temp::Trace;
+
+        my $tmp = File::Temp::Trace->tempdir();
+
+        print STDERR "New temporary directory ${tmp} created.";
+
+        sub create_file : skip_temp_log {
+            my ($tmp, $ext) = @_;
+            return $tmp->tempfile( suffix => $ext );
+        }
+
+        sub create_text {
+            my ($tmp, $ext) = @_;
+            return create_file($tmp, '.txt');
+        }
+
+        my $fh = create_text($tmp);
+
+        # $fh->filename will be named "MyPkg-create_text-XXXXXXXX.txt",
+        # where XXXXXXXX is a unique string.
+
+DESCRIPTION
+    This module allows you to trace the creation of temporary files. By
+    default, these files are all created in the same directory, and their
+    names are prefixed by the name of the function or method that created
+    them.
+
+    You can optionally log the creation of temporary files with a stack
+    trace as well.
+
+REVISION HISTORY
+    Revision history for File-Temp-Trace
+    
+    0.02    Sun Jun 19 17:00:53 BST 2011
+                Version ready for CPAN.
+    
+    0.01    Sat Jun 18 12:35:53 BST 2011
+                Prototype version uploaded to github
+
+
+SEE ALSO
+    File::Temp
+
+AUTHOR
+    Robert Rothenberg, `<rrwo@cpan.org>'
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Robert Rothenberg.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

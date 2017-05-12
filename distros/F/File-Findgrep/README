@@ -1,0 +1,8 @@
+README for File::Findgrep
+                                        Time-stamp: "2001-05-25 08:42:27 MDT"
+
+File::Findgrep is a small example application using Locale::Maketext.
+Altho you might conceivably find it useful to install this
+module-group, it is mainly provided so you can road the source.
+
+   -- Sean M. Burke, sburke@cpan.org

@@ -1,0 +1,250 @@
+class 'Fl::Button';
+isa 'Fl::Widget';
+include 'FL/Fl_Button.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Button - Standard Push Button
+
+=head1 Synopsis
+
+    use Fl qw[:button];
+    my $button = Fl::Button->new(0, 0, 100, 200, 'Hello, World!');
+    $button->callback(sub {print q[It's dat boi]} );
+
+=head1 Description
+
+Buttons generate callbacks when they are clicked by the user.
+
+You control exactly when and how by changing the values for type() and when().
+Buttons can also generate callbacks in response to FL_SHORTCUT events. The
+button can either have an explicit shortcut($s) value or a letter shortcut can
+be indicated in the label() with an '&' character before it. For the label
+shortcut it does not matter if Alt is held down, but if you have an input
+field in the same window, the user will have to hold down the Alt key so that
+the input field does not eat the event first as an FL_KEYBOARD event.
+
+=head2 Button Types
+
+Setting the buttons's C<type(...)> allows you to define any of the following:
+
+=over
+
+=item FL_NORMAL_BUTTON
+
+This is a typical button that remains unchanged after the button is pressed.
+
+=item FL_TOGGLE_BUTTON
+
+The value of this button is inverted after it is pressed.
+
+=item FL_RADIO_BUTTON
+
+This button is set to 1 after it is pressed and all other buttons in the
+current group with C<type() == FL_RADIO_BUTTON> are set to zero.
+
+=back
+
+All of the above values may be imported with the C<:button> or C<:enum> tag.
+
+=head2 Callback Triggers
+
+For a button, the following C<when()> values are defined:
+
+=over
+
+=item C<0>
+
+The callback is not done. Instead, C<changed()> is turned on.
+
+=item FL_WHEN_RELEASED
+
+The callback is done after the user successfully clicks the button or when a
+shortcut is typed.
+
+=item FL_WHEN_CHANGED
+
+The callback is done each time the C<value()> changes (when the user pushes
+and releases the button and as the mouse is dragged around in and out of the
+button).
+
+=back
+
+All of the above values may be imported with the C<:when> or C<:enum> tag.
+
+=head1 Methods
+
+Fl::Button inherits from Fl::Widget and exposes the following methods...
+
+=head2 new(...)
+
+    my $button_a = Fl::Button->new(0, 0, 250, 500, 'Important Stuff');
+    my $button_b = Fl::Button->new(0, 0, 250, 500);
+
+The constructor creates the button using the given position, size, and label.
+
+You can control how the button is drawn when ON by setting down_box(). The
+default is FL_NO_BOX which will select an appropriate box type using the
+normal box type. The default box type is FL_UP_BOX.
+
+The destructor removes the button.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Button *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+=pod
+
+=head2 clear()
+
+    $button_a->clear();
+
+Same as C<value(0)>.
+
+=cut
+
+xs {name        => 'clear',
+    definitions => [{returns => 'int'}]
+};
+
+=pod
+
+=head2 box_down()
+
+    my $boxtype = $button_a->box_down();
+    $button_a->box_down(Fl::FL_FLAT_BOX);
+
+Gets or sets the down box type.
+
+The default value causes FLTK to figure out the correct matching down version.
+
+=cut
+
+xs {name        => 'down_box',
+    definitions => [{returns => 'Fl_Boxtype'},
+                    {required => [['Fl_Boxtype', 'type']],
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 set()
+
+    $button_a->set();
+
+Same as C<value(1)>.
+
+=cut
+
+xs {name        => 'set',
+    definitions => [{returns => 'int'}]
+};
+
+=pod
+
+=head2 setonly()
+
+    $button_a->setonly();
+
+Turns this button on and turns off all other radio button sin the group. Note
+that calling C<value(1)> or C<set()> does not do this.
+
+=cut
+
+xs {name        => 'setonly',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head2 shortcut(...)
+
+    my $shortcut = $button_a->shortcut();
+    $button_a->shortcut(FL_ALT | 'a');
+
+Sets or returns the current shortcut key for the button.
+
+Setting this overrides the use of '&' in the label(). The value is a bitwise
+OR of a key and a set of shift flags, for example: C<FL_ALT | 'a'>, or
+C<FL_ALT | (FL_F + 10)>, or just C<'a'>. A value of C<0> disables the
+shortcut.
+
+The key can be any value returned by Fl::event_key(), but will usually be an
+ASCII letter. Use a lower-case letter unless you require the shift key to be
+held down.
+
+The shift flags can be any set of values accepted by Fl::event_state(). If the
+bit is on, that shift key must be pushed. Meta, Alt, Ctrl, and Shift must be
+off if they are not in the shift flags (zero for the other bits indicates a
+"don't care" setting).
+
+C<FL_ALT>, C<FL_F>, etc. may be imported with the C<:keyboard> tag.
+
+=cut
+
+xs {name        => 'shortcut',
+    definitions => [{required => [['int', 'shortcut']],
+                     returns  => 'void'
+                    },
+                    {returns => ['int']}
+    ]
+};
+
+=pod
+
+=head2 value(...)
+
+    $button_a->value(1);
+
+Sets the current value of the button.
+
+A non-zero value sets the button to 1 (on) and zero sets it to 0 (off).
+
+=cut
+
+xs {name        => 'value',
+    definitions => [{required => [['int', 'val']],
+                     returns  => 'void'
+                    },
+                    {returns => 'int'}
+    ]
+};
+export_constant("FL_NORMAL_BUTTON", "button");
+export_constant("FL_TOGGLE_BUTTON", "button");
+export_constant("FL_RADIO_BUTTON",  "button");
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

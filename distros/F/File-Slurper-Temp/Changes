@@ -1,0 +1,15 @@
+0.003   2017-01-16 (PERLANCAR)
+
+	- [Bugfix] Derp, confused arguments for tempfile().
+
+
+0.002   2017-01-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Forgot to add Synopsis.
+
+
+0.001   2017-01-16 (PERLANCAR)
+
+        - First release.

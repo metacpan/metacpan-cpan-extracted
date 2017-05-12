@@ -1,0 +1,422 @@
+#!/usr/local/bin/perl -W
+
+# (X)Emacs mode: -*- cperl -*-
+
+=head1 NAME
+
+fileinfo-dump - Dump information found in .fileinfo file in human-readable
+fashion.
+
+=cut
+
+# Pragmas -----------------------------
+
+require 5.005_62;
+use strict;
+
+# Utility -----------------------------
+
+use Fatal          1.02 qw( :void close open seek sysopen );
+use Fcntl          1.03 qw( :DEFAULT );
+use File::Basename  2.6 qw( fileparse );
+use Getopt::Long   2.23 qw( GetOptions );
+use Log::Info      1.03 qw( :DEFAULT :log_levels :default_channels );
+use MLDBM          2.00 qw( DB_File Storable );
+use Pod::Usage     1.12 qw( pod2usage );
+use Storable      1.014 qw( );
+
+# Package Master
+use File::Info qw( $PACKAGE $VERSION );
+
+# Constants ---------------------------
+
+# Error Codes -------------------------
+
+use constant ERR_ABNORMAL       => 1;
+use constant ERR_UTILITY        => 2;
+use constant ERR_USAGE          => 3;
+use constant ERR_MISSING_PREREQ => 4;
+use constant ERR_IO_READ        => 5;
+use constant ERR_IO_WRITE       => 6;
+use constant ERR_RDBMS_READ     => 7;
+use constant ERR_RDBMS_WRITE    => 8;
+use constant ERR_UNKNOWN        => 255;
+
+# -------------------------------------
+
+use constant SCRIPT => 'fileinfo-dump'; # canonical installed name
+
+use constant COPYRIGHT => <<'END';
+
+    Copyright (c) 2002 Martyn J. Pearce.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+END
+
+use constant VERSION => <<"END";
+@{[SCRIPT()]} ($PACKAGE) $VERSION
+END
+
+# Globals --------------------------------------------------------------------
+
+my $EXIT = 0;
+
+my $DRY_RUN = 0;
+
+# Red-hot buffers for STDOUT.
+$| = 1;
+
+# Initialization -------------------------------------------------------------
+
+BEGIN {
+  Log::Info::trap_warn_die;
+}
+
+# Subrs ----------------------------------------------------------------------
+
+sub mydie {
+  if ( $_[0] =~ /^\d+$/ ) {
+    $EXIT = shift @_
+      unless $EXIT;
+  } else {
+    $EXIT = ERR_UNKNOWN
+      unless $EXIT;
+  }
+
+  my @message = grep defined, @_;
+
+  my $message = @message ? join('', @message, "\n") : "\n";
+
+  die $message;
+}
+
+# -------------------------------------
+
+# Process input file
+# Args:
+#   -) Input file handle.  Use undef to read stdin (to stdout).
+
+sub max {
+  my $max;
+  $max = ( ! defined $max || $_ > $max ) ? $_ : $max
+    for @_;
+}
+
+sub process_fn {
+  my ($in_fn) = @_;
+
+  tie my %info, 'MLDBM', $in_fn, O_RDONLY;
+
+  while ( my ($key, $value) = each %info ) {
+    print "$key\n";
+    my $maxlen = max map length, keys %$value;
+    for my $k (keys %$value) {
+      my $v = $value->{$k};
+      no strict 'refs';
+      $v = *{$k}{CODE}->($v)
+        if defined *{$k}{CODE};
+      printf "  %${maxlen}s: %s\n", $k, $v;
+    }
+  }
+
+  untie %info;
+}
+
+sub MD5 { return File::Info::_md5hex($_[0]) }
+
+# Main -----------------------------------------------------------------------
+
+# Configuration -----------------------
+
+=head1 SYNOPSIS
+
+fileinfo-dump [options] file+
+
+  option:         Value     Default   Unit   Meaning
+
+  --verbose       repeating 0                Output informational messages
+  --progress      [string]  undefined        Output progress report
+  --stats         [string]  undefined        Output statistical information
+
+  --help                                     Produce summary help on stdout
+  --longhelp                                 Produce long help on stdout
+  --man                                      Produce full man page on stdout
+  --version                                  Produce full version on stdout
+  --copyright                                Produce full copyright on stdout
+  -V|--briefversion                          Produce brief version on stdout
+
+  --dry-run       boolean   false
+  --debug         repeating 0
+
+=head1 DESCRIPTION
+
+Z<>
+
+=head1 OPTIONS
+
+Options come in short (single-character) and/or long forms.  Short options are
+preceded by a single dash (-x), whilst long options are preceded by a
+double-dash (--option).  Long options may be abbreviated to the minimal
+distinct prefix.  Single char options may not be bundled (-v -a -x != -vax).
+Options taking string values will assume that anything immediately following
+is a string value, even if the string is optional and/or the "value" could be
+interpreted as another option (if -v takes a string, -vax will give the value
+"ax" to the option -v).
+
+Options which are boolean must use the long form to negate, prefixed by "no"
+(--foo may be negated by --no_foo).
+
+Options which are repeating may be invoked multiple times for greater effect.
+
+Option & argument order does not matter: all options will be processed prior
+to any arguments.
+
+A lone "--" may be used to terminate options processing; any text(s) following
+this will be treated as arguments, rather than options.
+
+=over 4
+
+=item verbose|v
+
+Enable informational messages about choices made, etc. to stderr. This option
+may be invoked multiple times to increase the level of verbosity.
+
+=item progress
+
+Enable regular messages to inform the user of progress made.  These may be in
+simple text form, or where appropriate, progress bars may be used.
+
+This option takes an optional string argument.  If provided, this names a file
+to output information messages to (unless the first character is a colon).  If
+the first character of the string option is a colon, then the rest of the
+option must be a (non-negative) integer.  This integer will be interpreted as
+a file descriptor to use.
+
+This file will be opened for write only, and no seek issued; this is so
+character special files, named pipes, etc. may be used.
+
+Only the characters [A-Za-z0-9_-.\/] (that is both forward- and back- slashes)
+are acceptable as filenames).  All else (including colons other than the first
+character) will cause an error.
+
+If a string filename is given, an error will ensue if that file already exists
+(and is a plain file).  This is to avoid accidents due to the optional string
+syntax.
+
+Beware the optional string; if you use the C<progress> option, then any string
+following it will be treated as an option if it looks like an option.  If you
+mean an option-looking thing to be a value, use C<--progress=value>.  If you
+want to follow it with an argument that looks like a value to C<--progress>,
+follow it with C<-->.
+
+=item stats
+
+Enable statistical information to be output to the user.
+
+This option takes an optional string argument.  If provided, this names a file
+to output information messages to (unless the first character is a colon).  If
+the first character of the string option is a colon, then the rest of the
+option must be a (non-negative) integer.  This integer will be interpreted as
+a file descriptor to use.
+
+This file will be opened for write only, and no seek issued; this is so
+character special files, named pipes, etc. may be used.
+
+Only the characters [A-Za-z0-9_-.\/] (that is both forward- and back- slashes)
+are acceptable as filenames).  All else (including colons other than the first
+character) will cause an error.
+
+If a string filename is given, an error will ensue if that file already exists
+(and is a plain file).  This is to avoid accidents due to the optional string
+syntax.
+
+Beware the optional string; if you use the C<stats> option, then any string
+following it will be treated as an option if it looks like an option.  If you
+mean an option-looking thing to be a value, use C<--stats=value>.  If you
+want to follow it with an argument that looks like a value to C<--stats>,
+follow it with C<-->.
+
+=item help
+
+Print a brief help message and exit.
+
+=item longhelp
+
+Print a longer help message and exit.
+
+=item man
+
+Print the manual page and exit.
+
+=item version
+
+Print the version number (of the source package) and the copyright notice, and
+exit.
+
+=item copyright
+
+Print the copyright notice, and exit.
+
+=item briefversion|V
+
+Print the version number (of the source package), in the form
+
+  scriptname (packagename) version
+
+and exit.  scriptname is the canonical installed name of the script.
+
+=item debug
+
+Enable debugging output.
+
+=item dry-run
+
+Do not write any files (other than temporary files), nor make any changes to
+any RDBMS (other than disposable ones).
+
+=back
+
+=head1 ENVIRONMENT
+
+This program has no special environment handling
+
+=cut
+
+my $arg_seen = 0;
+my ($verbose, $debug)   = (0) x 2;
+my ($progress, $stats); # default to undef
+
+Getopt::Long::Configure (qw[ no_auto_abbrev no_bundling no_getopt_compat
+                             gnu_compat no_ignore_case permute
+                             prefix_pattern=(--|-)
+                           ]);
+GetOptions (
+            'verbose+'       => \$verbose,
+            'progress:s'     => \$progress,
+            'stats:s'        => \$stats,
+
+            'help'           => sub { pod2usage ( -exitval => ERR_UTILITY,
+                                                  -verbose => 0,
+                                                  -output  => \*STDOUT, ) },
+            'longhelp'       => sub { pod2usage ( -exitval => ERR_UTILITY,
+                                                  -verbose => 1,
+                                                  -output  => \*STDOUT, ) },
+            'man'            => sub { pod2usage ( -exitval => ERR_UTILITY,
+                                                  -verbose => 2,
+                                                  -output  => \*STDOUT, ) },
+	    'copyright'      => sub { print COPYRIGHT; exit ERR_UTILITY; },
+	    'version'        => sub { print VERSION, COPYRIGHT;
+                                      exit ERR_UTILITY; },
+	    'briefversion|V' => sub { print VERSION; exit ERR_UTILITY; },
+
+            'dry-run'        => \$DRY_RUN,
+            'debug+'         => \$debug,
+           )
+  or exit 2;
+
+# Process Logging Options -------------
+
+if ( $verbose ) {
+  Log::Info::set_sink_out_level(CHAN_INFO, SINK_STDERR,
+                                $verbose - 1 + LOG_INFO);
+}
+
+if ( $debug ) {
+  Log::Info::add_sink(CHAN_DEBUG, 'stderr', 'FH', undef,
+                      { fh => *STDOUT{IO} });
+  Log::Info::set_channel_out_level(CHAN_DEBUG, $debug - 1 + LOG_INFO);
+}
+
+eval {
+  Log::Info::enable_file_channel  (CHAN_PROGRESS,
+                                   $progress, 'progress', 'p-out');
+  Log::Info::set_channel_out_level(CHAN_PROGRESS, LOG_INFO);
+}; if ($@) {
+  mydie(ERR_USAGE, "Problem processing argument $progress to progress option");
+}
+
+eval {
+  Log::Info::enable_file_channel  (CHAN_STATS,
+                                   $stats,    'stats',    's-out');
+  Log::Info::set_channel_out_level(CHAN_STATS,    LOG_INFO);
+}; if ($@) {
+  mydie(ERR_USAGE, "Problem processing argument $stats to stats option");
+}
+
+# Process Arguments -------------------
+
+unless ( $EXIT ) {
+  my $args_done = 0;
+  for my $arg (@ARGV) {
+    last if $EXIT > 1;
+    eval {
+      process_fn($arg);
+      $args_done++;
+      Logf(CHAN_PROGRESS, LOG_INFO,
+           '[%d/%d Files Done] Done File %s',
+           $args_done, scalar(@ARGV), $arg);
+      $arg_seen = 1;
+    }; if ( $@ ) {
+      my $message = "Failed processing argument: $arg";
+      $message   .= ":\n  $@"
+        if $@ !~ /^\s*$/;
+      mydie($message);
+    }
+  }
+}
+
+pod2usage ( -message => 'At least one arg must be given',
+	    -exitval => ERR_USAGE,
+	    -verbose => 0,
+	    -output  => \*STDERR, )
+  unless $arg_seen or $EXIT;
+
+exit $EXIT;
+
+=head1 DIAGNOSTICS
+
+The following exit codes may be observed in abnormal cases:
+
+   1   Successful, but abnormal termination
+   2   A utility function was requested (--help, --version etc.)
+   3   Incorrect usage.
+   4   Prerequisites not satisifed
+   5   Filesystem error on open/read.
+   6   Filesystem error on close/write.
+   7   RDBMS access error on read/connect.
+   8   RDBMS access error on on write
+ 255   Unknown Error
+
+=head1 EXAMPLES
+
+Z<>
+
+=head1 BUGS
+
+Z<>
+
+=head1 REPORTING BUGS
+
+Log them in gnats.
+
+=head1 AUTHOR
+
+Martyn J. Pearce C<fluffy@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 Martyn J. Pearce.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Z<>
+
+=cut
+
+__END__
+

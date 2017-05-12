@@ -1,0 +1,127 @@
+class 'Fl::Counter';
+isa 'Fl::Valuator';
+include 'FL/Fl_Counter.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Counter - Controls a Single Floating Point Value with Button or Keyboard Arrows
+
+=head1 Description
+
+The Fl::Counter controls a single floating point value with button (or
+keyboard) arrows. Double arrows buttons achieve larger steps than simple
+arrows.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/counter.png" /></center>
+
+The type of an Fl::Counter object can be set using C<type(...)> to:
+
+=over
+
+=item FL_NORMAL_COUNTER: Displays a counter with 4 arrow buttons.
+
+=item FL_SIMPLE_COUNTER: Displays a counter with only 2 arrow buttons.
+
+=back
+
+=head1 Methods
+
+Fl::Counter inherits from Fl::Valuator and Fl::Widget. On top of that, it
+exposes the following methods...
+
+=head2 new(...)
+
+    my $count_a = Fl::Counter->new(0, 0, 250, 500, 'Important Stuff');
+    my $count_b = Fl::Counter->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default type is FL_NORMAL_COUNTER.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Counter *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 C<lstep(...)>
+
+    $count_a->lstep(1.2);
+
+Sets the increment for the large step buttons.
+
+The default value is C<1.0>.
+
+=cut
+
+xs {name        => 'lstep',
+    definitions => [
+        {required => [[qw[double a]]],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<step(...)>
+
+    $count_a->step(.25, 1);
+
+Sets the increments for both the normal and large step buttons.
+
+    $count_a->step(.25);
+
+Sets the increment for the normal step buttons.
+
+=cut
+
+xs {name        => 'step',
+    definitions => [
+        {required => [[qw[double normal]],[qw[double large]]
+         ],
+         returns => 'void'
+        },
+        {required => [[qw[double normal]]],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

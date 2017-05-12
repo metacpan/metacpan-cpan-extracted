@@ -1,0 +1,32 @@
+Festival::Client::Async - Perl client module for Festival servers
+-----------------------------------------------------------------
+David Huggins-Daines <dhd@cepstral.com>, Cepstral LLC
+http://www.cepstral.com/
+March 27, 2001
+
+About
+-----
+
+This module provides a flexible interface for writing clients for
+Festival speech synthesis servers.  It is not limited to speaking text
+to the local audio device; rather, any Scheme expression can be
+evaluated on the server and all types of results can be captured,
+including evaluation results and waveform data.
+
+It also provides both blocking and non-blocking modes of operation.
+The latter is ideal for event-driven programs (such as Gtk+ or Tk
+programs, or POE machines).
+
+See the POD documentation included with the module for more information.
+
+Installation
+------------
+
+In general, the following sequence of commands should be fine:
+
+  perl Makefile.PL
+  make test
+  make install
+
+Please send reports on installation or test failure to the address at
+the top of this file.

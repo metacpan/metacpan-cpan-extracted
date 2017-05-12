@@ -1,0 +1,55 @@
+--- 
+type: Futures
+name: GC
+code: GC
+exchange: XNYM
+time_zone: America/New_York
+month_cycle: GJMQVZ
+currency: USD
+tick_size: 0.1
+multiplier: 100
+session:
+  -
+    - -360
+    - 1035
+attributes:
+  cme_path: metals/precious/gold
+contract_calendar: 
+  201112: 
+    last_trading_day: 2012-12-31
+  201202: 
+    first_trading_day: 2010-03-31
+    last_trading_day: 2012-02-27
+  201204: 
+    first_trading_day: 2010-05-28
+    last_trading_day: 2012-04-26
+  201206: 
+    first_trading_day: 2007-06-29
+    last_trading_day: 2012-06-27
+  201208: 
+    first_trading_day: 2010-09-30
+    last_trading_day: 2012-08-29
+  201210: 
+    first_trading_day: 2010-11-30
+    last_trading_day: 2012-10-29
+  201212: 
+    first_trading_day: 2007-12-31
+    last_trading_day: 2012-12-27
+  201302: 
+    first_trading_day: 2011-03-31
+    last_trading_day: 2013-02-26
+  201304: 
+    first_trading_day: 2011-05-31
+    last_trading_day: 2013-04-26
+  201306: 
+    first_trading_day: 2008-06-30
+    last_trading_day: 2013-06-26
+  201308: 
+    first_trading_day: 2011-09-30
+    last_trading_day: 2013-08-28
+  201310: 
+    first_trading_day: 2011-11-30
+    last_trading_day: 2013-10-29
+  201312: 
+    first_trading_day: 2008-12-31
+    last_trading_day: 2013-12-27

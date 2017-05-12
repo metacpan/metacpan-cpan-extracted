@@ -1,0 +1,11 @@
+######################################################################
+Revision history for Perl extension File::Tail::FAM
+
+0.02  2005/10/19
+    (ms) Ignoring fake 'change' events.
+    (ms) Lots of improvements in event handling. Fixed race condition
+         for tests.
+    (ms) On truncated files, start tailing from the beginning
+
+0.01  2005/10/15
+    (ms) Where it all began.

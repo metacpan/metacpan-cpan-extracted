@@ -1,0 +1,5 @@
+TODO list for Perl module File::pushd
+
+- Add some sort of flag that avoids fatal errors changing directories.
+  Either a flag on pushd( $dir, { %opts } ) or else on use (but make it
+  calling package specific) "use File::pushd qw/pushd :non_fatal/;"

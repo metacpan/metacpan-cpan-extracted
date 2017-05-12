@@ -1,0 +1,57 @@
+{
+   "abstract" : "Platypus custom type for arrays of strings",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FFI-Platypus-Type-StringArray",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Module::Build::FFI" : "0.15",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::Platypus" : "0.15",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::CheckLib" : "0",
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/FFI-Platypus-Type-StringArray/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/FFI-Platypus-Type-StringArray",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/FFI-Platypus-Type-StringArray.git",
+         "web" : "https://github.com/plicease/FFI-Platypus-Type-StringArray"
+      }
+   },
+   "version" : "0.01"
+}
+

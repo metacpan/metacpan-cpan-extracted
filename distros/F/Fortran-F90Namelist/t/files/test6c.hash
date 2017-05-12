@@ -1,0 +1,28 @@
+# test6c.hash                             -*-cperl-*-
+#
+# Hashref tree for the namelist in test6c.nml
+#
+
+$namesref = [ 'run_type', 'ionosphere_mdl', 'station_model' ];
+
+$hashref =
+  { 'run_type' =>
+    { 'sim'        => { value =>[ '.false.' ],
+                        stype => 'logical',                type => 3 },
+      'exteoprtls' => { value =>[ '.false.' ],
+                        stype => 'logical',                type => 3 },
+      'tdppolyord' => { value => [ 2 ],
+                        stype => 'integer',                type => 4 },
+    },
+    'ionosphere_mdl' =>
+    {
+    },
+    'station_model' =>
+    { 'nmlwahrk1'  => { value =>[ '.true.' ],
+                        stype => 'logical',                type => 3 },
+      'nmlpoltid'  => { value =>[ '.true.' ],
+                        stype => 'logical',                type => 3 },
+    },
+  };
+
+$nlists = (keys %$hashref) + 0.;

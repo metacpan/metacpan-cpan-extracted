@@ -1,0 +1,83 @@
+
+=head1 NAME
+
+Fennec::Manual - The Fennec Manual
+
+=head1 COMPONENT DOCS
+
+=over 4
+
+=item Fennec
+
+L<Fennec> - The main glue and interface module.
+
+=item Fennec::Declare
+
+B<Note:> L<Fennec::Declare> is a separate distribution, and must be installed
+separately.
+
+L<Fennec::Declare> - Provides the syntax sugar.
+
+=item Test::Workflow
+
+L<Test::Workflow> - Provides RSPEC utilities.
+
+=item Mock::Quick
+
+L<Mock::Quick> - Provides the mocking capabilities.
+
+=item Child
+
+L<Child> - Provides the forking interface
+
+=item Parallel::Runner
+
+L<Parallel::Runner> - Used to manage concurrency.
+
+=item Exporter::Declare
+
+L<Exporter::Declare> - The exporting interface used in most components of Fennec.
+
+=back
+
+=head1 CUSTOMIZATION
+
+See the L<Fennec::Manual::CustomFennec> documentation.
+
+=head1 SEE ALSO
+
+These are modules loaded by Fennec, but not built as part of the Fennec project.
+
+=over 4
+
+=item Test::Builder
+
+L<Test::Builder> - The popular TAP outputting testing library.
+
+=item Test::More
+
+L<Test::More> - The most commonly used testing tools.
+
+=item Test::Warn
+
+L<Test::Warn> - Check your code that produces warnings.
+
+=item Test::Exception
+
+L<Test::Exception> - Check your code that throws exceptions.
+
+=back
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013 Chad Granum
+
+Fennec is free software; Standard perl license (GPL and Artistic).
+
+Fennec is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the license for more details.

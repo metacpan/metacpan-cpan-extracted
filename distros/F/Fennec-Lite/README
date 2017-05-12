@@ -1,0 +1,288 @@
+NAME
+    Fennec::Lite - Minimalist Fennec, the commonly used bits.
+
+DESCRIPTION
+    Fennec does a ton, but it may be hard to adopt it all at once. It also
+    is a large project, and has not yet been fully split into component
+    projects. Fennec::Lite takes a minimalist approach to do for Fennec what
+    Mouse does for Moose.
+
+    Fennec::Lite is a single module file with no non-core dependencies. It
+    can easily be used by any project, either directly, or by copying it
+    into your project. The file itself is less than 300 lines of code at the
+    time of this writing, that includes whitespace.
+
+    This module does not cover any of the more advanced features such as
+    result capturing or SPEC workflows. This module only covers test
+    grouping and group randomization. You can also use the FENNEC_ITEM
+    variable with a group name or line number to run a specific test group
+    only. Test::Builder is used under the hood for TAP output.
+
+SYNOPSIS
+  SIMPLE
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+
+        # Brings in Test::More for us.
+        use Fennec::Lite;
+
+        tests good => sub {
+            ok( 1, "A good test" );
+        };
+
+        # You most call run_tests() after declaring your tests.
+        run_tests();
+        done_testing();
+
+  ADVANCED
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+
+        use Fennec::Lite
+            plan => 8,
+            random => 1,
+            testing => 'My::Class',
+            alias => [
+                'My::Class::ThingA'
+            ],
+            alias_to => {
+                TB => 'My::Class::ThingB',
+            };
+
+        # Quickly create get/set accessors
+        fennec_accessors qw/ construction_string /;
+
+        # Create a constructor for our test class.
+        sub new {
+            my $class = shift;
+            my $string = @_;
+            return bless({ construction_string => $string }, $class );
+        }
+
+        tests good => sub {
+            # Get $self. Created with new()
+            my $self = shift;
+            $self->isa_ok( __PACKAGE__ );
+            is(
+                $self->construction_string,
+                "This is the construction string",
+                "Constructed properly"
+            );
+            ok( 1, "A good test" );
+        };
+
+        tests "todo group" => (
+            todo => "This will fail",
+            code => sub { ok( 0, "false value" )},
+        );
+
+        tests "skip group" => (
+            skip => "This will fail badly",
+            sub => sub { die "oops" },
+        );
+
+        run_tests( "This is the construction string" );
+
+  Pure OO Interface
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+
+        use Fennec::Lite ();
+        use Test::More;
+
+        my $fennec = Fennec::Lite->new( test_class => __PACKAGE__ );
+
+        $fennec->add_tests( "test name" => sub {
+            ok( ... );
+        });
+
+        $fennec->run_tests;
+
+        done_testing();
+
+IMPORTED FOR YOU
+    When you use Fennec::Lite, Test::More is automatically imported for you.
+    In addition Test::Warn and Test::Exception will also be loaded, but only
+    if they are installed.
+
+IMPORT ARGUMENTS
+        use Fennec::Lite %ARGS
+
+    plan => 'no_plan' || $count
+        Plan to pass into Test::More.
+
+    random => $bool
+        True by default. When true test groups will be run in random order.
+
+    testing => $CLASS_NAME
+        Declare what class you ore testing. Provides $CLASS and CLASS(),
+        both of which are simply the name of the class being tested.
+
+    alias => @PACKAGES
+        Create alias functions your the given package. An alias is a
+        function that returns the package name. The aliases will be named
+        after the last part of the package name.
+
+    alias_to => { $ALIAS => $PACKAGE, ... }
+        Define aliases, keys are alias names, values are tho package names
+        they should return.
+
+RUNNING IN RANDOM ORDER
+    By default test groups will be run in a random order. The random seed is
+    the current date (YYYYMMDD). This is used so that the order does not
+    change on the day you are editing your code. However the ardor will
+    change daily allowing for automated testing to find order dependent
+    failures.
+
+    You can manually set the random seed to reproduce a failure. The
+    FENNEC_SEED environment variable will be used as the seed when it is
+    present.
+
+        $ FENNEC_SEED="20100915" prove -I lib -v t/*.t
+
+RUNNING SPECIFIC GROUPS
+    You can use the FENNEC_ITEM variable with a group name or line number to
+    run a specific test group only.
+
+        $ FENNEC_ITEM="22" prove -I lib -v t/MyTest.t
+        $ FENNEC_ITEM="Test Group A" prove -I lib -v t/MyTest.t
+
+    This can easily be integrated into an editor such as vim or emacs.
+
+EXPORTED FUNCTIONS
+    tests $name => $coderef,
+    tests $name => ( code => $coderef, todo => $reason )
+    tests $name => ( code => $coderef, skip => $reason )
+    tests $name => ( sub => $coderef )
+    tests $name => ( method => $coderef )
+        Declare a test group. The first argument must always be the test
+        group name. In the 2 part form the second argument must be a
+        coderef. In the multi-part form you may optionally declare the group
+        as todo, or as a skip. A coderef must always be provided, in
+        multi-part form you may use the code, method, or sub params for this
+        purpose, they are all the same.
+
+    run_tests( %params )
+        Instantiate an instance of the test class, passing %params to the
+        constructor. If no constructor is present a default is used. All
+        tests that have been added will be run. All tests will be cleared,
+        you may continue to declare tests and call run_tests again to run
+        the new tests.
+
+    fennec()
+        Returns the instance of Fennec::Lite created when you imported it.
+        This is the instance that tests() and run_tests() act upon.
+
+    fennec_accessors( @NAMES )
+        Quickly generate get/set accessors for your test class. You could
+        alternatively do it manually or use Moose.
+
+PURE OO INTERFACE METHODS
+    $tests_ref = $fennec->tests()
+        Get a reference to the array of tests that have been added since the
+        last run.
+
+    $classname = $fennec->test_class( $classname )
+        Get/Set the class name that will be used to create test objects that
+        will act as the invocant on all test methods.
+
+    $seed = $fennec->seed( $newseed )
+        Get/Set the random seed that will be used to re-seed srand() before
+        randomizing tests, as well as before each test.
+
+    $bool = $fennec->random( $bool )
+        Turn random on/off.
+
+    $fennec->add_tests( $name => sub { ... })
+    $fennec->add_tests( $name, %args, method => sub { ... })
+        Add a test group.
+
+    $fennec->run_tests( %test_class_construction_args )
+        Run the test groups
+
+    $bool = $fennec->run_skip_test( \%test )
+        Run a skip test (really just returns true)
+
+    $bool = $fennec->run_todo_group( \%test )
+        Run a group as TODO
+
+    $bool = $fennec->run_test_group( \%test )
+        Run a test group.
+
+    ( $bool, $error ) = $fennec->run_test_eval( \%test )
+        Does the actual test running in an eval to capture errors.
+
+    $fennec->test_eval_error( $bool, $error, \%test )
+        Handle a test eval error.
+
+Extending Fennec::Lite
+    In the tradition of the Fennec project, Fennec::Lite is designed to be
+    extensible. You can even easily subclass/edit Fennec::Lite to work with
+    alternatives to Test::Builder.
+
+  METHODS TO OVERRIDE
+    $fennec->init()
+        Called by new prior to returning the newly constructed object. In
+        Fennec::Lite this loads Test::Builder and puts a reference to it in
+        the TB() accessor. If you do want to replace Test::Builder in your
+        subclass you may do so by overriding init().
+
+    $fennec->run_skip_test( \%test )
+        Calls Test::Builder->skip( $reason ), then returns true. Override
+        this if you replace Test::Builder in your subclass.
+
+    $fennec->run_todo_group( \%test )
+        Calls run_test_eval() in a TODO environment. Currently uses
+        Test::Builder to start/stop TODO mode around the test. Override this
+        if you wish to replace Test::Builder.
+
+    $fennec->test_eval_error( $bool, $error, \%test )
+        Handle an exception thrown in a test group method. Currently calls
+        Test::Bulder->ok( 0, GROUP_NAME ).
+
+    @list = must_load()
+        Returns a list of modules that MUST be loaded into tho calling class
+        (unless used in OO form). This is currently only Test::More.
+
+    @list = may_load()
+        Returns a list of modules that should be loaded only if they are
+        installed.
+
+    $name_to_code_ref = module_loaders()
+        Returns a hashref containing package => sub { ... }. Use this if you
+        need to load modules in a custom way, currently Test::More has a
+        special loader in here to account for plans.
+
+    $fennec->import_hook()
+        Called on the instance that was created by import(), runs at the
+        very end of the import process. Currently does nothing.
+
+FENNEC PROJECT
+    This module is part of the Fennec project. See Fennec for more details.
+    Fennec is a project to develop an extensible and powerful testing
+    framework. Together the tools that make up the Fennec framework provide
+    a potent testing environment.
+
+    The tools provided by Fennec are also useful on their own. Sometimes a
+    tool created for Fennec is useful outside the greater framework. Such
+    tools are turned into their own projects. This is one such project.
+
+    Fennec - The core framework
+      The primary Fennec project that ties them all together.
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2010 Chad Granum
+
+    Fennec-Lite is free software; Standard perl license.
+
+    Fennec-Lite is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

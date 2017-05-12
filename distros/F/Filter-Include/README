@@ -1,0 +1,33 @@
+Filter/Include version 1.6
+==========================
+
+Take the "#include" preproccesor directive from "C", stir in some "perl"
+semantics and we have this module. Only one keyword is used, "include",
+which is really just a processor directive for the filter, which indicates
+the file to be included. The argument supplied to "include" will be handled
+like it would by "require" and "use" so @INC is searched accordingly and
+%INC is populated.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Filter::Simple
+  Module::Locate
+  Scalar::Util
+  Test::More - only required for testing
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Dan Brook
+
+This code is distributed under the same copyright terms as Perl itself.

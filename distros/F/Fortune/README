@@ -1,0 +1,39 @@
+                                Fortune.pm
+                                version 0.2
+                             26 February 2000
+                       Greg Ward <gward@python.net>
+
+Copyright (c) 1999-2000 Gregory P. Ward. All rights reserved.  This is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+This module provides an interface to fortune cookie databases, as
+implemented by the fortune-mod-9708 distribution (which is widely used in
+the Linux world, and available with at least the Red Hat and Debian
+distributions).
+
+Currently, it is a read-only interface.  If I ever need to a read-write
+interface, I suppose I'll write one; if *you* need one, feel free to write
+it and send me a patch!
+
+
+AVAILABILITY
+------------
+
+The latest version of this module will be available at:
+
+   http://starship.python.net/~gward/perl/
+
+If you need a full-blown fortune package, try fortune-mod, which
+should be available at:
+
+   http://www.progsoc.uts.edu.au/~dbugger/hacks/hacks.html
+
+
+CREDITS
+-------
+
+Thanks to Bill Ward <wrw@bayview.com> for adding the code that allows
+reading a fortune file that doesn't have a header (index) file.
+
+$Id: README,v 1.2 2000/02/27 02:28:13 greg Exp $

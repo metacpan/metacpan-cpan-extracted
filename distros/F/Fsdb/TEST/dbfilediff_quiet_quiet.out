@@ -1,0 +1,8 @@
+#fsdb x diff
+5.23	-
+5.2	+
+8.23	-
+8.25	+
+9.23	-
+9.20	+
+#   | dbfilediff -E --quiet --quiet --input TEST/dbfilediff_epsilon_cases.in-2

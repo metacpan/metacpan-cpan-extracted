@@ -1,0 +1,43 @@
+File::Scan::ClamAV Changes
+
+1.95 2016-07-15
+    - Add executable path error handling to tests
+    - Switch to "INSTREAM" for scanning streams
+1.94 2016-02-03
+    - Fixes for increasing Kwalitee core metrics.
+    - Fix compatibility with perl 5.6.
+    - Code format via perlcritic.
+
+1.93 2015-04-25
+    - Reduce mem usage of streamscan() [cpan #78769]
+    - untaint if using find_all
+    - Add host attribute to enable remote scanning.
+    - Change test suite to Test::More
+
+1.92 2015-04-25
+    - Increase test timeouts
+
+1.91
+     - Deprecated rawscan) and replaced with scan() to maintain backwards
+       compatibility
+
+     - Tidied module 
+
+1.9 
+     - Fix for https://rt.cpan.org/Ticket/Display.html?id=26684
+   
+     - Removed rawscan() as ClamAV no longer supports this - use 
+       scan() instead
+
+1.8
+     - New versioning schema, it now uses the CVS version
+       for the module dist version.
+
+       Fixed bug reported by rt.cpan.org users in the scan()
+       routine.
+
+1.06
+     - Documentation update
+     
+1.05
+     - Initial release

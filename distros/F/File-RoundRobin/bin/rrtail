@@ -1,0 +1,163 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+=head1 DESCRIPTION
+
+This script simulates a small part of the linux C<tail> command.
+It's a small utility that helps reading / writing round-robin text files.
+
+=head1 SYNOPSIS
+
+To print the last 10 lines of a file :
+
+    tail -n 10 <filename>
+
+To print the content as it's written :
+
+    tail -f <filename>
+
+Parameters :
+
+=over 4
+
+=item * n = number of lines to print. Example : -n 10
+
+=item * f = monitor the file for changes and print them
+
+=back
+
+=head1 NOTE
+
+If the file size is verry small and you write a lot of odata into it (more than
+the file size) verry fast, tail might not be able to fallow you.
+
+=head1 VERSION
+
+Version 0.04
+
+=cut
+our $VERSION = '0.04';
+
+$|=1;
+
+use File::RoundRobin;
+use Getopt::Long;
+use Time::HiRes qw ( sleep );
+
+my $filename = pop(@ARGV);
+
+my $lines = 10;
+my $fallow = 0;
+my $help = 0;
+
+GetOptions(
+    'n=i' => \$lines,
+    'f'   => \$fallow,
+    'h|help' => \$help,
+);
+
+
+if ($help || !$filename) {
+    print_help();   
+}
+
+if (! -e $filename ) {
+    print "$filename does not exist!$/";
+    exit;
+}
+
+my $rrfile = File::RoundRobin->new(path => $filename, mode => 'read');
+
+if ( $lines ) {
+    
+    eval {
+        my $return_count = 0;
+        my $pos = -1;
+        
+        my $char = '';
+        while ($return_count <= $lines && $rrfile->seek($pos,2) ) {
+            $pos--;
+            $char = $rrfile->read(length($/));
+            if ($char eq $/) {
+                $return_count++;
+            }
+        }
+    
+        print $char unless ($char eq $/);
+        print $rrfile->read(-$pos);
+    };
+}
+
+if ( $fallow ) {
+    
+    while (1) {        
+
+        $rrfile->refresh();
+        
+        if (my $bytes = $rrfile->tell()) {
+            $rrfile->seek(0,0);
+            print $rrfile->read($bytes);
+        }
+        
+        $rrfile->sync_markers();
+        
+        sleep(0.02);
+    }
+    
+}
+
+sub print_help {
+    print <<EOF;
+Usage : 
+To print the last 100 line of a file:
+	$0 -n 100 <filename> 
+
+To fallow the ontent of a file as it's written
+	$0 -f <filename>
+	
+EOF
+}
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc File::RoundRobin
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-RoundRobin>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/File-RoundRobin>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/File-RoundRobin>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/File-RoundRobin/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Gligan Calin Horea.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut

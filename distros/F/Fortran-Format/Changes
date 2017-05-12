@@ -1,0 +1,35 @@
+Revision history for Perl extension Fortran::Format
+
+0.90  Fri Sep 16 2005
+        - Added reading support! (some bugs may be lurking there)
+        - INCOMPATIBLE CHANGE: matrices will be transposed on writing;
+          non-rectangular nested arrays result in undefined behavior.
+        - Fixed bug where 2(I8),I2 would reuse only the 2(I8) on subsequent
+          lines instead of reusing the whole format string.
+
+0.54  Fri Sep 16 2005
+        - Fixed bug where 2(I8),I2 would be interpreted as 2(I8),2I2.
+
+0.53  Mon May 24 2004
+        - Changed t/write.t so that it ignores floating number tests unless
+          $ENV{TEST_FLOAT} is set.
+
+0.52  Fri Apr 23 2004
+        - Fixed use of scale factor for F editing.
+        - Fixed blank output for Iw.0 output of zero values.
+        - Allow explicit use of zero scale factor.
+
+0.51  Fri Apr 23 2004
+        - Fixed bug where the complete format would be reused in 
+        subsequent lines, instead of using only the last list, as
+        dictated by the standard.
+        - Fixed a related bug where there was an infinite loop when there
+        were no edit descriptors to consume all the data.
+        - Changed exception handling to croak and return a more meaningful 
+        error message when there's a parsing error.
+        - Now $format->write accepts array references and flattens them
+        automatically.
+
+0.50  Thu Apr 22 2004
+	- First CPAN release
+

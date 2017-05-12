@@ -1,0 +1,66 @@
+{
+   "abstract" : "determine if a mime type is compressible",
+   "author" : [
+      "Mike Greb <michael@thegrebs.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Compressible",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mikegrb/File-Compressible/issues"
+      },
+      "homepage" : "https://github.com/mikegrb/File-Compressible",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mikegrb/File-Compressible.git",
+         "web" : "https://github.com/mikegrb/File-Compressible"
+      }
+   },
+   "version" : "1.00",
+   "x_contributors" : [
+      "Mike Greb <mikegrb@cpan.org>",
+      "Rev Michael Greb <michael@thegrebs.com>"
+   ]
+}
+

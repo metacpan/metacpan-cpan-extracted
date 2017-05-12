@@ -1,0 +1,171 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => qw( all );
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Declare;
+use MIME::Base64;
+use Data::Dumper;
+
+my $args = new Getopt::Declare q{
+  [strict]
+  -n[umber] <n:+n>	     the number of the scan to extract
+  <file>	   	     input file [required]
+}
+  or exit(-1);
+
+my $file = $args->{"<file>"};
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+open STDIN, "<$file" or die "can't open '$file': $!";
+
+# -----------------------------------------------------------------------------
+
+my $head;
+for my $i (1 .. 5) {
+  $head .= <>;
+}
+
+my ($type, $binaryTag);
+
+if ($head =~ /<mzML/m) {
+  $type = 'mzML';
+}
+elsif ($head =~ /<mzXML/) {
+  $type = 'mzXML';
+}
+else {
+  say STDERR "can't recognise file format:";
+  say STDERR $head . "...";
+}
+
+
+if ( $type eq 'mzXML' ) {
+  $/ = '</peaks>';
+  while ( <> ) {
+    if ( s/(<peaks[^>]+>)(.*)$// ) {
+      my ($tag, $data) = ($1, $2);
+      s/\n$//;
+      if ( /scan num="(\d+)"/ ) {
+        next if $1 < $args->{'-n'}{'<n>'};
+        $data =~ s{</peaks>$}{};
+        my @spec = map {unpack "f", $_} map {pack "V", $_} unpack("N*", decode_base64($data));
+
+        foreach my $i (0 .. scalar @spec / 2 - 1) {
+          say join("\t", @spec[2*$i .. 2*$i+1]);
+        }
+        last;
+      }
+      else {
+        die "cannot determine scan number";
+      }
+    }
+  }
+} # mzXML
+
+else { # mzML
+  $/ = '</binaryDataArrayList>';
+  while ( <> ) {
+    chomp;
+
+    my $chromatogram = 0;
+    if ( /<chromatogramList/) {
+      $chromatogram = 1;
+    }
+
+    if ( /<spectrum[^>]+scan=(\d+)/s ) {
+      next if $1 < $args->{'-n'}{'<n>'};
+      if ( s/^(.*<binaryDataArrayList\s+count\s*=\s*"(\d+)">)(.+)$//s ) {
+        my ($tag, $n, $tail) = ($1, $2, $3);
+        die "don't know what to do with <binaryDataArrayList> of size != 2 (read: $n)" unless $n == 2;
+        
+        my $chunk_no = 0;
+        my @key = qw/mz intensity/;
+        my $table;
+        foreach my $chunk ( split m{</binaryDataArray>\s*}, $tail) {
+          if ( $chunk =~ m{^(.*<binaryDataArray.+<binary>)(.*)(</binary>.*)$}s ) {
+            my ($head, $data, $tail) = ($1, $2, $3);
+
+            my ($size) = ( $head =~ /<cvParam.+name="(\d\d-bit)/ );
+
+            if ( $size eq '32-bit' ) {
+              $table->{$key[$chunk_no]} = [unpack("f<*", decode_base64($data))];
+            }
+            elsif ( $size eq '64-bit' ) {
+              $table->{$key[$chunk_no]} = [unpack("d<*", decode_base64($data))];
+            }
+            else {
+              die "unknown number size: $size";
+            }
+            $chunk_no++;
+
+          }
+          else {
+            say STDERR "<binaryDataArray>...<binary> not matched in: " . substr($chunk, 0, 500) . "...\n";
+          }
+        }
+        my ($n1, $n2) = (scalar @{$table->{mz}}, scalar @{$table->{intensity}});
+        die "unequal sizes of the M/z and intensity arrays ($n1 and $n2)" unless $n1 == $n2;
+        foreach my $i ( 0 .. $n1 - 1 ) {
+          say join "\t", map {$table->{$_}->[$i]} qw/mz intensity/;
+        }
+      }
+      last;
+    }
+  }
+}
+
+__END__
+=head1 NAME
+
+mzxml-unpack - decode the base64-encoded scan data in an mzXML or mzML file
+
+=head1 SYNOPSIS
+
+mzxml-unpack [options] <file>
+
+ Options:
+
+  -r[ange] <from:0+n> .. <to:0+n>  write only scans with numbers between <from> and <to>
+  -hex                             add the hex encoding of decimals
+  <file>                           input file
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-r[ange] E<lt>from:0+nE<gt> .. E<lt>to:0+nE<gt>>
+
+extract only scans with numbers between E<lt>fromE<gt> and E<lt>toE<gt>
+
+B<Note:> this option breaks the structure of the output file (the parts preceding and following the selected range of scans are not written). It is mainly useful in checking the XML syntax and the contents of a small number of scans. For extracting the scan data in tabular format, there is a more suitable tool, B<uf-scan>.
+
+=item B<-hex>
+
+add the hex encoding of decimals
+
+It is sometimes useful to see how the value written to an XML file by a decoder program was encoded in the raw file. This option instructs B<mzxml-unpack> to prepend all decimal values in binary arrays with their hexadecimal encoding. Even though the binary values in the XML interchange formats (mzXML and mzML) are encoded in the network order, B<mzxml-unpack> shows the little-endian format (in case the value needs to be located in the raw file (Thermo raw files are little-endian).
+
+This option is only implemented for mzXML files.
+
+=back
+
+=head1 DESCRIPTION
+
+B<mzxml-unpack> will read the given input file and unpack the contents of the B<scan.peaks> element in mzXML or B<binary> in mzML. Both formats use base64 encoding to save space; unpacking this encoding makes the data human-readable. It does not otherwise change the file structure (unless option -r is used), so in principle, it can be packed again.
+
+=head1 SEE ALSO
+
+uf-scan
+uf-mzxml
+
+=head1 EXAMPLES
+
+  mzxml-unpack sample.mzXML > sample-unpacked.mzXML
+
+  mzxml-unpack -hex sample.mzML > sample-unpacked.mzML
+
+=cut

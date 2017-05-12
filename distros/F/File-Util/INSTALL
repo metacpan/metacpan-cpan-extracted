@@ -1,0 +1,8 @@
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    perl ./Build
+    perl ./Build test
+    sudo perl ./Build install

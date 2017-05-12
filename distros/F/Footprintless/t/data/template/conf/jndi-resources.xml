@@ -1,0 +1,8 @@
+<Environment name="foo/principalName" 
+  type="java.lang.String" 
+  override="false"
+  value="foo" />
+<Environment name="foo/allowedFrom" 
+  type="java.lang.String" 
+  override="false"
+  value="localhost,${T{trusted.hostname}}${T_perl{$internal = property('trusted.internal_hostname');$internal?",$internal":''}}" />

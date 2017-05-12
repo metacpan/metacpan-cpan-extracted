@@ -1,0 +1,43 @@
+TYPEMAP
+
+PerlFMM*    T_FMMXS
+
+INPUT
+T_FMMXS
+    {
+        MAGIC *mg;
+        mg = PerlFMM_mg_find(aTHX_ SvRV($arg), &PerlFMM_vtbl);
+        if (mg) {
+            $var = (PerlFMM *) mg->mg_ptr;
+        }
+    }
+
+OUTPUT
+T_FMMXS
+        if (!$var)          /* if null */
+            SvOK_off($arg); /* then return as undef instead of reaf to undef */
+        else {
+            /* setup $arg as a ref to a blessed hash hv */
+            MAGIC *mg;
+            HV *hv = newHV();
+            const char *classname = \"File::MMagic::XS\";
+            /* take (sub)class name to use from class_sv if appropriate */
+            if (SvMAGICAL(class_sv))
+                mg_get(class_sv);
+
+            if (SvOK( class_sv ) && sv_derived_from(class_sv, classname ) ) {
+                if(SvROK(class_sv) && SvOBJECT(SvRV(class_sv))) {
+                    classname = sv_reftype(SvRV(class_sv), TRUE);
+                } else {
+                    classname = SvPV_nolen(class_sv);
+                }
+            }
+            sv_setsv($arg, sv_2mortal(newRV_noinc((SV*)hv)));
+            (void)sv_bless($arg, gv_stashpv(classname, TRUE));
+
+            /* now attach $var to the HV */
+            /* done as two steps to avoid sv_magic SvREFCNT_inc and MGf_REFCOUNTED */
+            mg = sv_magicext((SV*)hv, NULL, PERL_MAGIC_ext, &PerlFMM_vtbl, (char*) $var, 0); /* sizeof($var));  */
+            mg->mg_flags |= MGf_DUP;
+        }
+

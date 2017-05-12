@@ -1,0 +1,66 @@
+NAME
+
+    Footprintless::Plugin::Ldap - A Footprintless plugin for working with
+    LDAP
+
+VERSION
+
+    version 1.00
+
+DESCRIPTION
+
+    Provides the ldap factory method to the framework as well as the ldap
+    command to the CLI.
+
+ENTITIES
+
+    As with all plugins, this must be registered on the footprintless
+    entity.
+
+        plugins => [
+            'Footprintless::Plugin::Ldap',
+        ],
+
+    You may supply your own command_helper as outlined by
+    Footprintless::Plugin::Ldap::DefaultCommandHelper:
+
+        'Footprintless::Plugin::Database' => {
+            command_helper => 'My::Automation::CommandHelper',
+        }
+
+METHODS
+
+ ldap($footprintless, $coordinate, %options)
+
+    Returns a new ldap provider instance. See
+    Footprintless::Plugin::Ldap::Ldap.
+
+ ldap_command_helper($footprintless, $coordinate, %options)
+
+    Returns a new ldap command helper. See
+    Footprintless::Plugin::Ldap::DefaultCommandHelper.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Footprintless
+
+      * Footprintless::MixableBase
+
+      * Footprintless::Plugin::Ldap
+
+      * Footprintless::Plugin::Ldap::Ldap
+

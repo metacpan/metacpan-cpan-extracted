@@ -1,0 +1,7 @@
+.git
+blib
+EXCLUDE
+MANIFEST.bak
+Makefile$
+Makefile.old
+MYMETA*

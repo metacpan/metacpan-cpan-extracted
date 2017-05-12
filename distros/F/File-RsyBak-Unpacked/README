@@ -1,0 +1,12 @@
+DESCRIPTION
+
+    This distribution is for testing/development purposes. Users should
+    just install the File::RsyBak distribution because it has fewer
+    dependencies.
+
+SEE ALSO
+
+    File::RsyBak
+
+    rsybak
+

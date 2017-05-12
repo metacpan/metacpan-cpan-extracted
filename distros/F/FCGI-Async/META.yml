@@ -1,0 +1,31 @@
+---
+abstract: 'use FastCGI with L<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::HexString: 0
+  Test::More: 0
+  Test::Refcount: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FCGI-Async
+provides:
+  FCGI::Async:
+    file: lib/FCGI/Async.pm
+    version: 0.22
+  FCGI::Async::PSGI:
+    file: lib/FCGI/Async/PSGI.pm
+    version: 0.22
+  Plack::Handler::FCGI::Async:
+    file: lib/Plack/Handler/FCGI/Async.pm
+    version: 0.22
+requires:
+  Net::Async::FastCGI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.22

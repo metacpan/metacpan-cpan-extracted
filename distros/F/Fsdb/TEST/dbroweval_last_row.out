@@ -1,0 +1,6 @@
+#fsdb size mean stddev pct_rsd
+#  | dbsetheader size bw
+#  | /home/johnh/BIN/DB/dbmultistats size bw
+#  | /home/johnh/BIN/DB/dbcol size mean stddev pct_rsd
+102400	4.9216e+06	3.0939e+05	6.2863
+#  | dbroweval -e '{ $ofref = $lfref; }'

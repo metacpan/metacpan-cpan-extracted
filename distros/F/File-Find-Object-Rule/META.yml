@@ -1,0 +1,57 @@
+---
+abstract: 'Alternative interface to File::Find::Object'
+author:
+  - 'Richard Clamp <richardc@unixbeard.net> with input gained from this'
+  - 'and Andy Lester andy@petdance.com.'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - directories
+  - directory
+  - directory-traversal
+  - directory-tree
+  - file
+  - file-find-rule
+  - find
+  - instance
+  - instantiated
+  - instantiation
+  - interface
+  - iterative
+  - object
+  - rule
+  - traversal
+  - tree
+  - wrapper
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Find-Object-Rule
+provides:
+  File::Find::Object::Rule:
+    file: lib/File/Find/Object/Rule.pm
+    version: '0.0306'
+requires:
+  Carp: '0'
+  Class::XSAccessor: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Find::Object: v0.2.1
+  File::Spec: '0'
+  Number::Compare: '0'
+  Text::Glob: '0'
+  perl: '5.008'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: http://www.shlomifish.org/open-source/projects/File-Find-Object/
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/shlomif/perl-file-find-object-rule
+version: '0.0306'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

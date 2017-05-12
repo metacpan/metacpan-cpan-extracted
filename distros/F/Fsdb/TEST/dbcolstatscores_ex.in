@@ -1,0 +1,8 @@
+#h name id test1
+c 3 65
+b 2 70
+e 5 70
+a 1 80
+d 4 90
+f 6 90
+#  | dbsort -n test1

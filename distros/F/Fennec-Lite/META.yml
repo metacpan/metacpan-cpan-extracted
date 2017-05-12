@@ -1,0 +1,27 @@
+---
+abstract: 'Minimalist Fennec, the commonly used bits.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fennec-Lite
+provides:
+  Fennec::Lite:
+    file: lib/Fennec/Lite.pm
+    version: 0.004
+requires:
+  List::Util: 0
+  Test::Builder: 0
+  Test::More: 0
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/exodist/Fennec-Lite/issues
+  homepage: http://open-exodus.net/projects/Fennec-Lite
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Fennec-Lite
+version: 0.004

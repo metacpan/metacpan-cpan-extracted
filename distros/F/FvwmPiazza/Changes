@@ -1,0 +1,64 @@
+Revision History for FvwmPiazza
+===============================
+
+v0.3001 2013-09-02
+------------------
+
+* 2013-09-02 15:50:20 +1000
+  version bump
+* 2013-09-02 15:47:05 +1000
+  This time fer shure! Fixing option parsing issues.
+* 2013-09-02 15:24:11 +1000
+  Still strange.
+* 2013-09-02 15:18:28 +1000
+  Something fishy is going on around here.
+* 2013-09-02 15:14:01 +1000
+  Further fixing of argument parsing.
+* 2013-09-02 15:02:49 +1000
+  Fixing bug with argument parsing.
+
+v0.3 2013-08-30
+---------------
+
+* 2013-08-30 16:10:46 +1000
+  version bump
+* 2013-08-30 15:35:06 +1000
+  Documented new argument format.
+* 2013-08-30 15:12:13 +1000
+  Added new Matrix layout.
+* 2013-08-30 15:11:57 +1000
+  fixing a gitignore problem
+* 2013-08-30 15:10:50 +1000
+  Using Getopt::Long to parse arguments.
+
+v0.2004 2013-08-27
+------------------
+
+* 2013-08-27 18:35:52 +1000
+  version bump
+* 2013-08-27 17:51:31 +1000
+  Checking maximization behaviour.
+* 2013-08-27 17:43:05 +1000
+  clarification
+* 2013-08-27 16:48:48 +1000
+  add check_args method
+* 2013-08-27 16:43:26 +1000
+  add check_args method
+* 2013-08-27 16:30:08 +1000
+  Improve the calculate_ratios method.
+
+v0.2003 2013-08-27
+------------------
+
+* 2013-08-27 15:59:28 +1000
+  updating dist.ini
+* 2013-08-27 15:52:37 +1000
+  version bump
+* 2013-08-27 15:49:30 +1000
+  Implemented the "UseMaximize false" setting.
+* 2012-02-06 00:32:05 +1100
+  added a ConfirmRelease test
+
+===================================
+End of changes in the last 365 days
+===================================

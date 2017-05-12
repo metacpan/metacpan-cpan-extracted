@@ -1,0 +1,12 @@
+rules :
+    - Number
+setting :
+    regex_map :
+        '_id$' :
+            rule :
+                - Number#uint
+lang : ja
+labels :
+    ja :
+        user_id     : ユーザID
+        category_id : カテゴリーID

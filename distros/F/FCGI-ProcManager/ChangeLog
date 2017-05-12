@@ -1,0 +1,188 @@
+0.28 2017-02-27 Andrew Rodland <arodland@cpan.org>
+    * 2+ years may not have been long enough for a trial release.
+    * Fix startup failure in 0.27 (RT#120448).
+
+0.27 2017-02-27 Andrew Rodland <arodland@cpan.org>
+    * 2+ years seems like long enough for a trial release.
+    * No changes since 0.26_02.
+
+0.26_02 2014-11-27 Andrew Rodland <arodland@cpan.org>
+    * Try again, with the OS name spelled properly.
+
+0.26_01 2014-11-26 Andrew Rodland <arodland@cpan.org>
+    * Trial version of Win32 support
+
+0.25 2014-11-20 Andrew Rodland  <arodland@cpan.org>
+    * Notice errors writing out the PID file and abort.
+    * Make sure that children get independent random numbers by calling
+      srand() after fork.
+
+0.24 2011-10-04 Tomas Doran  <bobtfish@bobtfish.net>
+    * Further fix to pm_wait routine to find the correct PID and remove it
+      (fixing logical error introduced in the last release), noted by Vadim
+      Dashkevich
+    * Document (somewhat) FCGI::ProcManager::Constrainted
+
+0.23 2011-09-27 Tomas Doran  <bobtfish@bobtfish.net>
+    * Fix pm_wait routine to exit without a warning
+    * Fix pm_wait to correctly detect child processes which have died.
+    * Fix to return SIGCHLD handler to it's default state in the
+      pm_manage loop so that loading code which sets SIGCHLD to ignore
+      won't interfere with normal operation.
+    * Add repository metadata.
+
+0.22 2011-08-04 Tomas Doran  <bobtfish@bobtfish.net>
+    * Ship a version of FCGI::ProcManager::Constrainted which actually
+      works as advertised.
+
+0.21 2011-08-02 Tomas Doran  <bobtfish@bobtfish.net>
+    * Ship a working dist.
+
+0.20 2011-08-02 Gareth Kirwan  <gbjk@cpan.org>
+    * ProcManager::Constrained: Add a new FCGI::ProcManager::Constrainted
+      subclass which will restart workers safely after a certain number of
+      requests, or at certain memory thresholds.
+    * ProcManager: Fix start_delay causing a permanent hang.
+
+0.19 2009-07-22 Gareth Kirwan  <gbjk@cpan.org>
+
+    * ProcManager.pm: Add a pm_title option to configure the process title
+      assigned to $0
+
+0.18 2007-12-18 James Jurach  <muaddib@erf.net>
+
+     * ProcManager.pm: Remove constraint that parent process cannot die.
+
+0.17
+
+	* ProcManager.pm: Remove constraint that process can't change pid.
+	  This resolves the daemon exiting after first child dies
+	  if the process id of the daemon has changed since starting.
+	  This commonly happens when a script waits to check for the
+	  socket being available and working before forking and exitting.
+	  It can also happen in a race condition of fork && exit when
+	  the exit is delayed until after the forked child has already
+	  spawned the fastcgi handlers.
+
+2001-04-23 18:12  James Jurach  <muaddib@erf.net>
+
+	* ProcManager.pm: SIGHUP handler now issues SIGTERM to children but
+	then proceeds normally. added documentation blurb about signal
+	handling. we now use POSIX::sigaction() to avoid SA_RESTART during
+	certain regions. added re-usable POSIX::SigAction members to toggle
+	SA_RESTART. added sig_sub() -- necessary to pass name to
+	POSIX::SigAction creation. 
+
+	* README: added small blurb to consult FCGI::ProcManager
+	documentation. 
+
+	* t/exporter.t:
+	* t/procmanager.t: fixed pm_manage() test.
+
+2001-03-13 18:12  James Jurach  <muaddib@erf.net>
+
+	* ProcManager.pm: removed check for FCGI_ROLE.	now more
+	transparent when undesired.
+
+	* ProcManager.pm: detect when no FastCGI environment exists.
+
+	* ProcManager.pm: only warn and sleep -- do not abort on fork
+	failure.
+
+	* ProcManager.pm: now, we give notification to which processes we
+	send a TERM signal.
+
+2001-02-09 10:16  James Jurach  <muaddib@erf.net>
+
+	* t/: exporter.t, procmanager.t: made it easier to manage
+	sample_request_loop() for testing.
+
+	* ProcManager.pm: modified some error messages.  added immediate
+	notify of manager signal.
+
+	* ProcManager.pm: added more documentation.  renamed
+	pm_reap_server() to pm_wait().	fixed problem when ! MANAGER_PID
+	that caused server to die immediately we now delete list of child
+	PIDs from each child.  added mechanism to pm_exit() to send a
+	SIGKILL to any remaining children.
+
+2001-01-31 01:13  James Jurach  <muaddib@erf.net>
+
+	* README: more documentation
+
+	* ProcManager.pm: re-organized method layout.  separated manager
+	vs. server vs. common moved more intialization into managing_init()
+	and handling_init() created pm_die() to be called when manager
+	should die.  cleaned up error messages and notifications.
+
+	* t/: exporter.t, procmanager.t: revised test messages
+
+2001-01-30 16:35  James Jurach  <muaddib@erf.net>
+
+	* t/: exporter.t, procmanager.t: removed call to pm_state()
+
+	* ProcManager.pm: removed sleep() call after testing
+	signal-during-fork-loop
+
+2001-01-30 12:49  James Jurach  <muaddib@erf.net>
+
+	* ProcManager.pm: Cleaned up pm_manage().  removed signal
+	registration routines.	replaced by direct %SIG access.  there is
+	now a manager signal handler and a handler signal handler.  added
+	checks to die when getppid() changes.
+
+2001-01-20 02:06  James Jurach  <muaddib@erf.net>
+
+	* MANIFEST: removed Changes from MANIFEST
+
+2001-01-13 00:44  James Jurach  <muaddib@erf.net>
+
+	* t/procmanager.t: corrected various recent method name changes. 
+	removed calls to want_to_die().  added request loop hooks to
+	pm_pre_dispatch(), pm_post_dispatch().	renamed sample_handler() to
+	sample_request_loop().
+
+	* ProcManager.pm: renamed request loop hooks to pm_pre_dispatch(),
+	pm_post_dispatch().  when pm_manage() is called with
+	n_processes==0, return through goto.  renamed pre_manage_init() to
+	managing_init().  renamed post_manage_init() to handling_init(). 
+	added received_signal() to remember that a signal was received. 
+	signal handler simpler: now only notes signal and propagates
+	signal.
+
+	* t/exporter.t: this uses non-OO calling mode.
+
+	* MANIFEST: added t/exporter.t.
+
+	* Changes: ChangeLog is where per-file changes are listed.
+
+2000-12-22 05:58  James Jurach  <muaddib@erf.net>
+
+	* ProcManager.pm: corrected logic error in self_or_default(). 
+	changed all occurances of write_pid_file() to pm_write_pid_file(). 
+	changed all occurances of remove_pid_file() to
+	pm_remove_pid_file().
+
+2000-12-14 17:54  James Jurach  <muaddib@erf.net>
+
+	* ProcManager.pm: corrected state() -> pm_state() method call.
+
+2000-12-10 17:25  James Jurach  <muaddib@erf.net>
+
+	* ProcManager.pm: corrected some method renaming issues.
+
+2000-12-09 19:48  James Jurach  <muaddib@erf.net>
+
+	* t/procmanager.t: effected the changes to these subroutine names.
+
+	* ProcManager.pm: made this module OO/Exporter hybrid.	removed
+	treatment of $ENV{PROCMANAGER_PROCESSES} from constructor.  changed
+	several subroutine names.
+
+2000-12-05 22:23  James Jurach  <muaddib@erf.net>
+
+	* ProcManager.pm: made SIGHUP's do what SIGTERM's do
+
+2000-11-20  James Jurach  <muaddib@erf.net>
+
+	* Released first public version.

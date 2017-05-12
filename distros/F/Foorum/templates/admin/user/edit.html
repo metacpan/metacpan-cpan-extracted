@@ -1,0 +1,52 @@
+[% WRAPPER 'admin/bar.html' %]
+
+[% url_base = '/admin/user' %]
+<div class='one'>
+<table align='center'>
+<tr><td class='misc1'>
+
+[% IF error %]
+<h2><span class='highlight'>
+[% SWITCH error %]
+[% CASE 'NO_RECORD' %]
+No such user.
+[% CASE %]
+[% error %]
+[% END %]
+</h2>
+[% END %]
+
+<form method='get' action='/admin/user/edit'>
+<table border='0'>
+<tr><td>&nbsp;</td><td>UserID</td><td><input type='text' name='user_id' /></td></tr>
+<tr><td>OR</td><td>Username</td><td><input type='text' name='username' /></td></tr>
+<tr><td>OR</td><td>[% c.loc("Email") %]</td><td><input type='text' name='email' /></td></tr>
+<tr><td colspan='3'><input type='submit' /></td></tr>
+</table>
+</form>
+
+[% IF user %]
+<br /><h2><span class='highlight'>Edit User</span></h2>
+<form method='post' action='/admin/user/edit'>
+<input type='hidden' name='user_id' value='[% user.user_id %]' />
+<table>
+<tr class='misc2'><td align='right'>UserID</td><td>[% user.user_id %] (<a href='/admin/user/ban?username=[% user.username %]'>Ban</a>)</td></tr>
+[% FOREACH col IN ['username', 'email', 'nickname', 'threads', 'replies'] %]
+<tr class='misc[% IF loop.count mod 2;'2';ELSE;'1';END; %]'><td align='right'>[% col | ucfirst %]</td><td><input type='text' name='[% col %]' value='[% user.${col} %]' /></td></tr>
+[% END %]
+<tr class='misc1'><td align='right'>Status:</td><td>
+    <select name='status'>
+        [% FOREACH st IN ['banned','blocked','verified','unverified','terminated'] %]
+        <option value='[% st %]'[% IF user.status == st %]selected='selected'[% END %]>[% st | ucfirst %]</option>
+        [% END %]
+    </select>
+</td></tr>
+<tr class='misc2'><td></td><td><input type='submit' /></td></tr>
+</table>
+</form>
+[% END %]
+
+</td></tr>
+</table>
+
+[% END %]

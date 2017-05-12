@@ -1,0 +1,104 @@
+Revision history for Finance-InteractiveBrokers-SWIG
+------------------------------------------------------------
+Legend:
+BUG:    An actual found or reported bug fix.
+FIX:    Change toward correct behavior, but unreported.
+NEW:    New, previously non-existent feature.
+CHG:    Change in behavior.
+API:    Change in user-facing API (hopefully rare).
+DOC:    Changes to documentation.
+TST:    New tests
+------------------------------------------------------------
+
+0.13     2014-06-15
+         FIX: RT#96322 - Globalize -DFILE_OFFSET_BITS and -DLARGEFILE_SOURCE
+
+0.12     2014-06-01
+         BUG: RT#96110 - RT#88097 was incomplete - thanks!
+         TST: Tests for above now actually work..
+         BUG: RT#94918 - Fixed examples/api-demo.pl - thanks!
+         DOC: RT#94897 - IB changed their API doc URL.
+
+0.11     2014-04-20
+         BUG: RT#94880 - gcc >4.7 stopped including <unistd.h> by default
+         FIX: F::IB::API version check from 0.10 was broken
+         FIX: Regression tests for 0.10 were not added to MANIFEST
+
+0.10     2013-08-31
+         NEW: RT#88097 - Add setSelectTimeout() method
+         TST: Added a couple of regression tests
+
+0.09     2013-08-26
+         BUG: RT#88097 - Spurious error message (IBAPI bug) - thanks!
+         FIX: Refined OS-X broken compiler check - LLVM 2335 rejected
+
+0.08     2012-08-14
+         BUG: RT#79014 - SWIG min version needed to be 1.3.33 - thanks!
+         TST: Added actual string regression test for the above
+
+0.07     2012-08-04
+         Bump to production release
+
+0.06_02  2012-05-02
+         BUG: RT#76932 - OS-X segfault - ExtUtils::Embed is made of lies.
+
+0.06_01  2012-04-29
+         NEW: Added support for IB API v9.65-9.67
+         NEW: 9.66 supports reqMarketDataType method and marketDataType event
+         NEW: 9.67 supports commissionReport event
+         API: version() now returns a double (shouldn't affect Perl)
+
+0.06     2012-04-26
+         BUG: RT#76806 - Invalid event received - thanks, rod!
+         BUG: RT#76807 - OrderId needed to be typedef'ed - thanks, rod!
+
+0.05     2012-03-31
+         No reported bugs on 0.04_01; bumping to an official release.
+
+0.04_01  2011-10-13
+         BUG: F::IB::SWIG swig search on win32 incorrect (thanks, leosusanto!)
+
+0.04     2011-10-09
+         No reported bugs in 0.03_04; bumping to an official release.
+
+0.03_04  2011-09-10
+         FIX: Get rid of -fstack-protector in Makefile.swig
+
+0.03_03  2011-08-27
+         FIX: Fixed Config.pm handling
+         FIX: Properly imported File::Spec::Functions qw( catdir catfile )
+         FIX: Proper parameters in examples/MyEventHandler.pm
+         FIX: %INC handling more portable
+         FIX: Add typedefs for TickerId and IBString
+         FIX: Bad $LIBPATH handling in Makefile.PL
+         FIX: Better standardized Makefile.swig variables
+         FIX: Lowered required swig version to 1.3.28 after testing
+         NEW: More thorough unit tests
+         NEW: More comprehensive demo in examples/api-demo.pl
+         NEW: Added hooks for Alien::SWIG CPAN d/l during build process
+         BUG: F::IB::SWIG::_resolve_host misused Net::hostent (thanks, Uwe!)
+         BUG: F::IB::SWIG::Makefile.swig - OS-X build borked (thanks, Chris!)
+         DOC: Fixed bad function name in SWIG.pm synopsis
+         DOC: Notes on OS-X building in README
+         FIX: Added Test:More => 0.88 requirement, for done_testing()
+
+0.03     2011-01-27
+         FIX: Makefile.PL, META.yml needed configure_requires => F::IB::API
+         NEW: examples/show-*.pl informational utilities for cmdline
+         DOC: Minor doc cleanup and additions
+
+0.02     2011-01-25
+         First production CPAN release
+         Provides interface for InteractiveBrokers API version 9.64
+         DOC: Minor documentation tweaks
+         FIX: Versioning scheme will change from here on.
+
+0.01_02  2011-01-25     (developer release)
+         DOC: Fixing documentation bugs seen on CPAN from 9.64_01
+
+0.01_01  2011-01-24     (developer release)
+         Main suite should be complete
+         Provides interface for InteractiveBrokers API version 9.64
+         Prepped for releasing to CPAN for cpantesters feedback
+
+# END

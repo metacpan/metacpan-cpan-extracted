@@ -1,0 +1,38 @@
+
+Listing of FLTK2 wrapper status by class headers (* = done)
+----------------------------------------------------
+  Fl_Adjuster.H          * Fl_Hor_Nice_Slider.H     * Fl_Return_Button.H
+* Fl_Align_Group.H       * Fl_Hor_Slider.H            Fl_Roller.H
+  Fl_Bitmap.H            * Fl_Hor_Value_Slider.H    * Fl_Round_Button.H
+* Fl_Box.H               * Fl_Image.H                 Fl_Round_Clock.H
+* Fl_Boxtype.H           * Fl_Input.H               * Fl_Scroll.H
+* Fl_Browser.H           * Fl_Int_Input.H           * Fl_Scrollbar.H
+* Fl_Button.H            * Fl_Item.H                * Fl_Secret_Input.H
+  Fl_Chart.H             * Fl_Item_Group.H          * Fl_Select_Browser.H
+* Fl_Check_Button.H      * Fl_Labeltype.H             Fl_Shaped_Window.H
+* Fl_Choice.H            * Fl_Light_Button.H        * Fl_Shared_Image.H
+  Fl_Clock.H               Fl_Line_Dial.H             Fl_Simple_Counter.H
+* Fl_Color.H               Fl_Menu.H                  Fl_Single_Window.H
+* Fl_Color_Chooser.H     * Fl_Menu_.H               * Fl_Slider.H
+  Fl_Counter.H           * Fl_Menu_Bar.H              Fl_String_List.H
+  Fl_Dial.H              * Fl_Menu_Button.H         * Fl_Style.H
+  Fl_Divider.H             Fl_Menu_Item.H           * Fl_Tabs.H
+  Fl_Double_Window.H       Fl_Menu_Window.H         * Fl_Text_Buffer.H
+  Fl_Export.H            * Fl_Multi_Browser.H       * Fl_Text_Display.H
+  Fl_FileBrowser.H         Fl_Multi_Label.H         * Fl_Text_Editor.H
+  Fl_FileChooser.H       * Fl_Multiline_Input.H       Fl_Threads.H
+  Fl_FileIcon.H          * Fl_Multiline_Output.H    * Fl_Tile.H
+  Fl_FileInput.H         * Fl_Nice_Slider.H           Fl_Timer.H
+  Fl_Fill_Dial.H           Fl_Object.H              * Fl_Toggle_Button.H
+* Fl_Fill_Slider.H       * Fl_Output.H              * Fl_Toggle_Item.H
+* Fl_Flags.H               Fl_Overlay_Window.H      * Fl_Toggle_Light_Button.H
+* Fl_Float_Input.H       * Fl_Pack.H                * Fl_Toggle_Round_Button.H
+* Fl_Font.H              * Fl_Pixmap.H              * Fl_Tooltip.H
+  Fl_FormsBitmap.H         Fl_Plugins.H             * Fl_Valuator.H
+  Fl_FormsPixmap.H         Fl_Positioner.H          * Fl_Value_Input.H
+  Fl_Free.H                Fl_RGB_Image.H           * Fl_Value_Output.H
+  Fl_Gl_Window.H         * Fl_Radio_Button.H        * Fl_Value_Slider.H
+* Fl_Group.H             * Fl_Radio_Item.H          * Fl_Widget.H
+* Fl_Highlight_Button.H  * Fl_Radio_Light_Button.H  * Fl_Window.H
+* Fl_Hold_Browser.H      * Fl_Radio_Round_Button.H  * Fl_Wordwrap_Input.H
+* Fl_Hor_Fill_Slider.H   * Fl_Repeat_Button.H       * Fl_Wordwrap_Output.H

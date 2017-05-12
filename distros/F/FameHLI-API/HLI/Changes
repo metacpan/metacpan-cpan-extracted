@@ -1,0 +1,9 @@
+Revision history for Perl extension FameHLI::API::HLI.
+
+2.100 Tue Mar 15, 2005
+    - just checking in.  No changes.
+
+0.01  Thu Feb 22 14:50:26 2001
+	- original version; created by h2xs 1.20 with options
+		-n FameHLI::HLI hli.h
+

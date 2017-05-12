@@ -1,0 +1,59 @@
+######################################################################
+    File::Tail::FAM 0.02
+######################################################################
+
+NAME
+    File::Tail::FAM - Tail using the File Alteration Monitor (FAM)
+
+SYNOPSIS
+        use File::Tail::FAM;
+
+        my $tail = File::Tail::FAM->new(
+            file => "/tmp/abc"
+        );
+
+           # Blocking read (without wasting any CPU time)
+        while(defined( my $data = $tail->read() )) {
+            print "This just got added: [$data]\n";
+        }
+
+           # Or, read data in non-blocking mode
+        my $data = $tail->read_nonblock();
+        if(defined $data) {
+            print "This just got added: [$data]\n";
+        } else {
+            print "Nothing happened\n";
+        }
+
+DESCRIPTION
+    "File::Tail::FAM" reports when new data chunks are appended to a given
+    file. Similar to the Unix command
+
+        $ tail -f filename
+
+    it watches a file grow continuously and reports whenever a new chunk of
+    data has been added.
+
+    Differently from the traditional approach of periodically polling the
+    file (used by "tail -f" and "File::Tail"), "File::Tail::FAM" uses the
+    *File Alteration Monitor* to get notified by the Linux kernel whenever
+    new data gets added to the watched file.
+
+    This way, "File::Tail::FAM" will simply block (and therefore won't use
+    any CPU cycles) until the kernel's notification mechanism wakes it up
+    when new data has arrived.
+
+    "File::Tail::FAM" uses the Perl module "SGI::FAM", which provides an API
+    to the File Alteration Monitor (FAM) library routines which come with
+    many Linux distributions ("man 3 fam") and are available for download at
+
+        http://oss.sgi.com/projects/fam/index.html
+
+LEGALESE
+    Copyright 2005 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2005, Mike Schilli <cpan@perlmeister.com>
+

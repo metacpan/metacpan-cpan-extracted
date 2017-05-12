@@ -1,0 +1,48 @@
+[% title = 'Shared Items' %]
+
+[% c.load_once("site/star.js") %]
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='/u/[% user.username %]'><span>[% user.nickname %]</span></a></li>
+        <li selected="selected"><a href='/u/[% user.username %]/shared'><span>[% c.loc('Starred Items') %]</span></a></li>
+        <li><a href='/u/[% user.username %]/topics'><span>[% c.loc('Recent Topics') %]</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<table align='center'>
+<tr align='center' class='title'>
+    [% IF c.user_exists %]<td width='20'>[% c.loc("Share") %]</td>[% END %]
+    <td align='left'>[% c.loc("Subject") %]</td>
+    <td width='180'>[% c.loc("Author") %]</td>
+    <td width='180'>[% c.loc("Last Update") %]</td>
+</tr>
+[% FOREACH item IN shared_items %]
+<tr align='center' class='misc[% IF loop.count mod 2 %]1[% ELSE %]2[% END %]'>
+
+[% IF c.user_exists %]
+<td><a href="javascript:share('[% item.object_type %]', '[% item.object_id %]', 'shareDiv')"><span id='shareDiv'><img src='[% c.config.dir.images %]/site/t/[% IF item.is_shared;'unshare';ELSE;'share';END; %].gif' /></span></a></td>
+[% END %]
+
+[% INCLUDE include/object_tds.html object = item %]
+
+</tr>
+[% END %]
+</table>
+
+<br />
+<table align='center'>
+<tr><td class='misc1'>[% INCLUDE sub/pager.html %]</td></tr>
+</table>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

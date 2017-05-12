@@ -1,0 +1,6 @@
+Changes
+ImageSize.pm
+MANIFEST
+Makefile.PL
+t/File-Find-Rule-ImageSize.t
+t/happy-baby.JPG

@@ -1,0 +1,10 @@
+MANIFEST
+LICENSE
+README
+Todo
+lib/Filesys/Type.pm
+lib/Filesys/Type/Plugin/Unix.pm
+lib/Filesys/Type/Plugin/Windows.pm
+t/001_load.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

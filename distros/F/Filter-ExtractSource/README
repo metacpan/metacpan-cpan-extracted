@@ -1,0 +1,27 @@
+NAME
+  Filter::ExtractSource - extracts Perl code during
+  compilation after processing by source filters
+
+INSTALLATION
+  Unzip and untar the archive, cd to the distribution
+  directory and enter the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+USAGE
+  perl -c -MFilter::ExtractSource input.pl >output.pl
+
+  Where input.pl contains Perl code which uses source
+  filters, output.pl will contain the code post-filtering
+  as passed to the Perl parser.
+
+DEPENDENCIES
+  Requires the Filter::Simple module
+
+AUTHOR
+  Written by Jon Allen (JJ) <jj@jonallen.info>
+  http://perl.jonallen.info/projects/filter-extractsource
+

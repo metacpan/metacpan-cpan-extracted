@@ -1,0 +1,15 @@
+[% WRAPPER 'admin/bar.html' %]
+
+<div class='one'>
+<table align='center'>
+<tr class='title'><td colspan='4'>Forum List</td></tr>
+<tr class='misc2'><td>ID</td><td>CODE</td><td>NAME</td><td>ACTION</td></tr>
+[% FOREACH f IN forums %]
+<tr class='misc[% IF loop.count mod 2;'2';ELSE;'1';END; %]'>
+    <td>[% f.forum_id %]</td><td>[% f.forum_code %]</td><td><a href='/forum/[% f.forum_code %]'>[% f.name %]</a></td><td><a href='/forumadmin/[% f.forum_id %]/basic'>Edit</a> | <a href='/admin/forum/remove?forum_id=[% f.forum_id %]'>Delete</a> | <a href='/forumadmin/[% f.forum_id %]/style'>Edit Style</a> </td>
+</tr>
+[% END %]
+</table>
+</div>
+
+[% END %]

@@ -1,0 +1,58 @@
+NAME
+
+  Fake::Our - Fake 'our' support for perl 5.00503
+
+SYNOPSIS
+
+  use Fake::Our;
+
+DESCRIPTION
+
+  Fake::Our provides fake 'our' support on perl 5.00503. This is a module to
+  help writing portable programs and modules across recent and old versions of
+  Perl. Using this module is deprecated, since it gives your script "no strict
+  qw(vars)". Moreover, this module is incomplete and limited.
+
+INSTALLATION
+
+  1. Copy Fake/Our.pm to @INC directory.
+
+BUGS
+
+  Fake::Our doesn't provide lvalue our, like:
+    our($var) = 'lvalue';
+    our(@var) = qw(lvalue1 lvalue2 lvalue3);
+    our(%var) = qw(key1 lvalue1 key2 lvalue2 key3 lvalue3);
+
+SEE ALSO
+
+  our - Perl Programming Documentation
+  http://perldoc.perl.org/functions/our.html
+
+  Re: Problems with 'our' definition with perl 5.00503 - PerlMonks
+  http://www.perlmonks.org/?node_id=471212
+
+  Migrating scripts back to Perl 5.005_03
+  http://www.perlmonks.org/?node_id=289351
+
+  Goodnight, Perl 5.005
+  http://www.oreillynet.com/onlamp/blog/2007/11/goodnight_perl_5005.html
+
+  Perl 5.005_03 binaries
+  http://guest.engelschall.com/~sb/download/win32/
+
+  Welcome to CP5.5.3AN
+  http://cp5.5.3an.barnyard.co.uk/
+
+  Strict::Perl
+  http://search.cpan.org/dist/Strict-Perl/
+
+  japerl - CPAN
+  http://search.cpan.org/dist/japerl/
+
+  ina - CPAN
+  http://search.cpan.org/~ina/
+
+  A Complete History of CPAN - The BackPAN
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

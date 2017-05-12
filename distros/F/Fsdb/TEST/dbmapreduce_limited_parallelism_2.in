@@ -1,0 +1,8 @@
+#h experiment duration
+ufs_mab_sys1 37.2
+ufs_mab_sys1 37.3
+ufs_mab_sys2 37.2
+ufs_mab_sys2 37.3
+ufs_mab_sys3 37.2
+ufs_mab_sys3 37.3
+# test trailing comment

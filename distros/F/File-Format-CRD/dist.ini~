@@ -1,0 +1,27 @@
+name    = File-Format-CRD
+author  = Shlomi Fish <shlomif@cpan.org>
+license = MIT
+copyright_holder = Shlomi Fish
+copyright_year   = 2010
+
+[@Filter]
+-bundle = @Basic
+-remove = MakeMaker
+[AutoPrereqs]
+[MetaProvides::Package]
+[ModuleBuild]
+[PodSyntaxTests]
+[PodCoverageTests]
+[Test::Compile]
+fake_home = 1
+[PruneCruft]
+[VersionFromModule]
+[MetaResources]
+bugtracker.web = http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Format-CRD
+bugtracker.mailto = bug-file-format-crd@rt.cpan.org
+repository.url = ssh://hg@bitbucket.org/shlomif/perl-file-format-crd
+repository.web = http://bitbucket.org/shlomif/perl-file-format-crd
+repository.type = hg
+[PodWeaver]
+[Test::CPAN::Changes]
+[Test::TrailingSpace]

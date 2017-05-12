@@ -1,0 +1,25 @@
+NAME
+    Fuse::DAAP -- mount DAAP music shares using the FUSE kernel module
+
+PREREQUISITES
+    Fuse
+
+    Net::DAAP::Client
+
+TODO
+    Caching
+
+AUTHOR
+    Jack Bates <ms419@freezone.co.uk>
+
+COPYRIGHT
+    Copyright 2006, Jack Bates. All rights reserved
+
+    This program is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself
+
+SEE ALSO
+    Fuse
+
+    Net::DAAP::Client
+

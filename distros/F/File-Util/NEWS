@@ -1,0 +1,148 @@
+NEWS for File::Util
+
+Tue Jul 12 18:37:17 CDT 2016
+   Releasing this bug fix to CPAN immediately.  Having changed only one line
+   of code, and knowing the criticality of the bug, I'm releasing this as
+   GA and skipping the ...-TRIAL dist formalities.  Regression test also added.
+
+Thu Jun  6 23:11:39 CDT 2013
+   Since Sat Mar 2 01:13:46 CST 2013, 580 test runs from the CPAN testers
+   have had 100% complete PASSes.  I'm releasing the code as-is, as
+   "STABLE"/"MATURE"
+
+Wed Feb 27 21:55:28 CST 2013
+   Testing suite and documentation updated with information regarding the
+   support of UTF-8 in File::Util and how to use it.  Minor bug fixes.
+
+Mon Feb 25 19:36:21 CST 2013
+   The latest version introduces unicode support for reading/writing/appending
+   via UTF-8 encoding.  See the documentation for details.
+
+   The affected methods are:
+      * load_file()
+      * open_handle()
+      * write_file()
+
+Mon Feb 25 14:07:13 CST 2013
+   A vast number of optimizations have been applied to recursive calls in
+   methods like list_dir() which bring it more-than-up-to-par with mainstream
+   modules for directory searching and traversal in terms of performance.
+
+   Windows-specific bug fixes have been added, necessary in great part due
+   to the non-posix nature of its filesystems and its lack of support for
+   the CORE::stat() function.
+
+Sun Feb 10 21:32:36 CST 2013
+   More added to the TODO list since the last news update.  We have now a
+   4.x build that is CPAN ready (as a TRIAL).  The manual has been combed
+   through and polished off, the test suite has been greatly improved thanks
+   to newer/better "diesnice" tests made possible by Test::Fatal.  Several
+   bugs have been caught and put to rest due to the expanded testing,
+   because the improved tests revealed them where they had been hiding.
+
+Tue Jan 29 18:59:25 CST 2013
+   Most of the goals in the TODO list have been finished, or well on course
+   for completion.  Stability of new features and design are sufficient
+   enough that I feel like we're ready for the first CPAN release of the 4.x
+   series in the next few days probably.
+
+   Remaining tasks will be the ongoing improvement of the test suite and the
+   documentation.  Those are the kind of tasks that are seemingly "never done".
+
+   Everything is testing well, performing well, running well on all platforms
+   I have available for testing (which are many).  Overall the state of
+   the File::Util distribution and code is better than ever.
+
+Tue Jan 22 00:28:30 CST 2013
+   Version 4.000000 has (and never will be) released to the CPAN, as it was
+   still in active development at the time it hit that mark.  Development
+   continues, and the first formal release of the 4.x version distributions
+   is soon approaching.  Documentation seems all that is left.  There's a
+   whole slew of new features to document (higher order functions and the new
+   method invocation syntax are just two examples).
+
+   Much more has been done in the way of improving the test suite, and
+   the dist is being constantly tested on Windows, Solaris, and Unix so
+   future releases to the CPAN will never bring surprises like those that
+   happened when development first shifted to the use of Dist::Zilla.
+
+
+Thu Jan 10 22:44:45 CST 2013
+   The latest release (v 4.0) brings many fixes to the table.  The fixes
+   affect nearly all platforms and architectures.  Users are encouraged to
+   upgrade, as this is not merely a features-added release.
+
+   Fundamental changes in the internal layout of File::Util have been
+   made; it isn't a single module file anymore.  This does NOT affect the
+   end user.  To the user, this change is completely transparent and does
+   not affect their programs or libraries that use File::Util.
+
+   This change is a step forward in the stated goal of File::Util to bring
+   a more "modern" (as in Modern::Perl) interface to the user while
+   preserving compatibility with current syntax.
+
+   Also in this release we move to auto-versioning a la Dist::Zilla plugins
+   PkgVersion and AutoVersion (thank you to the authors of those plugins)
+
+   Further, the test suite has been updated to make use of Test::More and
+   Test::NoWarnings across the board, bringing better "kwalitee" (as in
+   CPANTS) to you and to OS package maintainers for various platforms out
+   there.
+
+   Since the new year and new goals for File::Util, CPANTS metrics for
+   kwalitee of the distribution have climbed from well below 100 to
+   almost 140.  This will continue to improve.  Onward and upward.
+
+   Finally, several code optimizations have been made for faster performance,
+   made possible by the increasingly rigorous test suite.
+
+   Re: flock() on Solaris -
+   Updates have been made to the test suite so flock() problems on
+   Solaris don't incorrectly cause test results to appear to have failed
+   on that single platform.  Solaris users should be aware of the problems
+   with discretionary locks on their platform.  It is not only Perl
+   that experiences issues, but Python, Ruby, and others.  The problem
+   is specifically that Solaris will happily lock a file, but will very
+   often NOT unlock it until the process has exited.  This causes all
+   kinds of problems.  The documentation for File::Util will be updated
+   in order to advise Solaris users of opening the same file more than
+   once during the lifetime of a process.
+
+
+Mon Dec 31 23:25:00 CST 2012
+   This latest release (v 3.33) is not a feature release.  It's a
+   documentation update, a few bug fixes, several code optimizations, and
+   code cleanup.  Mostly, it is a great step forward in the CPAN package
+   itself.  Read on for more details...
+
+   Please have a look at the CHANGES file, because there have been and will
+   continue to be big changes/improvements to File::Util both in terms of the
+   code itself and the CPAN distribution package releases.
+
+   File::Util is now migrated to git and uses Dist::Zilla to create a
+   build environment that works better in windows platforms.  This
+   brought about the moving the content of Util.pod back into Util.pm
+   which does have its benefits, but makes the actual file size larger
+   than I want; I'll probably soon make a cookbook and slim down the main
+   documentation a bit, since it's very exhaustive, and bring things back
+   into the file sizes I like to see.  Compile times and run times have
+   not been affected by the POD move.
+
+   File::Util now must pass Perl::Critic tests as well, therefore the
+   so-called CPANTS "kwalitee" of the code has been markedly increased.
+
+   File::Util will be signed with a Module::Signature from now on, as
+   long as this doesn't introduce failures in the build/test phases for
+   CPAN testers and end users alike.
+
+   These changes are part of an overall effort to "keep moving forward",
+   make things better, and also make the distribution compliant with
+   Fedora and Debian packaging standards.  File::Util already has a
+   maintained package for Ubuntu.
+
+   There's a writeup of my most recent reflections on File::Util that I
+   posted on Perl Monks which explains some of my new goals for the
+   distribution, the code, and the future of File::Util.  You can read it at
+   http://www.perlmonks.org/?node_id=1011110
+
+   Happy new year!

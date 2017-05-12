@@ -1,0 +1,12 @@
+0.03 2007/08/23
+    (cmb) Fix an issue with Perl 5.9.5.  Reported by david@cantrell.org.uk, who
+          was also kind enough to lend his machine for testing, and fixing.
+
+0.02 2006/07/29
+    (cmb) Fix the formatting for POD
+          Add two new functions: fetch_tags(), reorder_tags()
+          Add the tests for the new functions
+          Cleanup 10write.t
+
+0.01 2006/07/26
+    (cmb) Initial release.

@@ -1,0 +1,15 @@
+0.04 - Sun Feb  7 10:05:49 PST 2010
+ - Have commit() use _fh() so you can commit w/o reading first.
+
+0.03 - Wed Jan  9 15:09:01 PST 2008
+ - Add file locking so that only one logreader object can
+   read the file at a time.  Special thanks to Matthew O'Connor, 
+   who is truly a pleasure to work with.
+ - use ExtUtils::MakeMaker instead of Module::Install
+
+0.02 - Tue Dec 11 12:28:01 PST 2007
+ - skip tests on windows.  If anyone wants to add windows support, 
+   send me patches.
+
+0.01 - Mon Nov 26 11:38:26 PST 2007
+ - Initial release

@@ -1,0 +1,5 @@
+#fsdb experiment duration
+ufs_mab_sys	37.2
+ufs_mab_sys	37.3
+# test trailing comment
+#   | dbmapreduce --no-prepend-key -k experiment -C 'dbrow("--nolog", "_experiment eq '\''ufs_mab_sys'\''")'

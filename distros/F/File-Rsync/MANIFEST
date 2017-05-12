@@ -1,0 +1,9 @@
+Changelog
+MANIFEST
+Makefile.PL
+README
+Rsync.pm
+TODO
+test.pl
+META.yml
+META.json                                Module JSON meta-data (added by MakeMaker)

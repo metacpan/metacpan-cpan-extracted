@@ -1,0 +1,42 @@
+--- Fl_Text_Editor.H.orig	Mon Sep 25 13:40:55 2000
++++ Fl_Text_Editor.H	Mon Sep 25 13:44:07 2000
+@@ -36,11 +36,14 @@
+ class FL_API Fl_Text_Editor : public Fl_Text_Display {
+   public:
+     typedef int (*Key_Func)(int key, Fl_Text_Editor* editor);
++    typedef int (*Key_Func0)(int key, Fl_Text_Editor* editor, void* data);
+ 
+     struct FL_API Key_Binding {
+       int          key;
+       int          state;
+       Key_Func     function;
++      Key_Func0     dfunction;
++      void*        data;
+       Key_Binding* next;
+     };
+ 
+@@ -53,6 +56,10 @@
+     void add_key_binding(int key, int state, Key_Func f, Key_Binding** list);
+     void add_key_binding(int key, int state, Key_Func f)
+       { add_key_binding(key, state, f, &key_bindings); }
++    void add_key_binding(int key, int state, Key_Func0 f, void* data, 
++        Key_Binding** list);
++    void add_key_binding(int key, int state, Key_Func0 f, void* data)
++      { add_key_binding(key, state, f, data, &key_bindings); }
+     void remove_key_binding(int key, int state, Key_Binding** list);
+     void remove_key_binding(int key, int state)
+       { remove_key_binding(key, state, &key_bindings); }
+@@ -62,6 +69,13 @@
+     Key_Func bound_key_function(int key, int state, Key_Binding* list);
+     Key_Func bound_key_function(int key, int state)
+       { return bound_key_function(key, state, key_bindings); }
++    Key_Func0 bound_key_function(int key, int state, void* data, 
++        Key_Binding* list);
++    Key_Func0 bound_key_function(int key, int state, void* data)
++      { return bound_key_function(key, state, data, key_bindings); }
++    void* lookup_binding_data(int key, int state, Key_Binding* list);
++    void* lookup_binding_data(int key, int state)
++      { lookup_binding_data(key, state, key_bindings); }
+     void default_key_function(Key_Func f) { default_key_function_ = f; }
+ 
+     // functions for the built in default bindings

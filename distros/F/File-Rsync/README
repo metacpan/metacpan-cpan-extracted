@@ -1,0 +1,45 @@
+File-Rsync - A wrapper module for rsync(1) http://rsync.samba.org/rsync/
+
+*******************************************************************************
+Copyright (C) 2000-2016 Lee Eakin.  All rights reserved.
+   This program is free software; you can redistribute it and/or modify
+   it under the same terms as Perl itself.
+*******************************************************************************
+
+Arg order is now preserved!  Hopefully this provides better funtionality and
+more flexibility, and doesn't break anyone's code.  Passing a hash reference is
+now deprecated, but forcing options to be a hash reference should restore old
+behavior if needed (option order not preserved, but source and dest are always
+the last 2 args).
+
+Windows is also now supported!  See Changelog for details and credits.
+
+Updated to use $PATH environment variable to find rsync instead of hard-coding
+in the module since prompting breaks automatic builds and most modren systems
+should have rsync installed by now.  It can be overridden using path-to-rsync
+at run time.
+
+Although I am the original author and maintainer, many of the bug fixes and
+improvements have come as either suggestions or patches from the perl
+community.  The contributors names can be found near the end of the POD doc,
+and full credits can be found in the Changelog file.
+There have been many helpful people making this a much better module than
+I could ever write on my own.
+
+QUICK START GUIDE:
+
+   Install rsync if you haven't already.
+
+   Build/test/install File::Rsync
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+   Once installed you can use 'perldoc File::Rsync' to get the rest of the
+   documentation.  Or if you'd prefer to examine the docs before installation
+   try 'perldoc -F Rsync.pm'.
+
+This module is an attempt to efficiently handle the possibly numerous arguments
+to the rsync command, and it's error conditions and messages.

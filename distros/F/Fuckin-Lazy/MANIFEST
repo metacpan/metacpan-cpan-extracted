@@ -1,0 +1,7 @@
+Build.PL
+lib/Fuckin/Lazy.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/example.t

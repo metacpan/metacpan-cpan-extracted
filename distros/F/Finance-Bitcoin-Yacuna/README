@@ -1,0 +1,60 @@
+NAME
+    Finance::Bitcoin::Yacuna - Yacuna Bitcoin exchange trading api connector
+
+VERSION
+    0.1
+
+SYNOPSIS
+ use Finance::Bitcoin::Yacuna;
+
+ my $yacuna = Finance::Bitcoin::Yacuna->new(
+	tokenId => $apiTokenId, 
+	secret => $apiSecret, 
+	apiVersion => 1, # optional, default:1
+	debug => 0, # optional, default:0
+	skipSSL => 0, # optional, default:0
+	sandbox => 0 # optional, default:0
+ );
+
+ $result = $yacuna->call($httpMethod, $restPath, ["param1=$param1", "param2=$param2", ..]);
+
+ use Data::Dump qw(dump);
+ use JSON;
+ my $json = new JSON;
+ dump $json->decode($result);
+
+DESCRIPTION
+    Module to connect to the api of the currency exchange Yacuna.
+
+    Please see the Yacuna API documentation
+    <http://docs.yacuna.com/api> for a catalog of api methods.
+
+METHODS
+    $api = new Finance::Bitcoin::Yacuna
+        The constructor. Returns a "Finance::Bitcoin::Yacuna" object.
+
+    $api->uri($uri)
+        Sets or gets the uri to connect.
+
+    $api->tokenId($tokenId)
+        Sets or gets the API tokenId.
+
+    $api->secret($secret)
+        Sets or gets the API secret.
+
+    $result = $api->call($httpMethod, $restPath)
+    $result = $api->call($httpMethod, $restPath, ["param1=$param1", "param2=$param2", ..])
+        Calls the API method $restPath with the $httpMethod (with the given
+        $params, where applicable) and returns either undef or a JSON
+        string.
+
+DEPENDENCIES
+    WWW::Mechanize
+    HTTP::Request
+    MIME::Base64
+    Digest::SHA
+	Data::Dump
+
+AUTHOR and COPYRIGHT
+    Copyright Andrei Martchouk <andrei at yacuna dot com>
+

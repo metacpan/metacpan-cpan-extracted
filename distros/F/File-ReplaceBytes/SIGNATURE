@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3cf3e21f02836ae47a6ad8e7f4285e92e92bf69f Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 801f1684c98ad394ac94b7b5ceba70d95b004625 MANIFEST
+SHA1 4892b4b1cc700ee650beb40a797ad1a74eb27dd0 META.json
+SHA1 f2fa391c42227c78baee1ecada111beeea8b87da META.yml
+SHA1 e1350d00cd6fe55cf7e22fcded1cb6ec161fdc5d Makefile.PL
+SHA1 b1024055cf8666a6b3177188554ff05a879f152b README
+SHA1 bdf65332a2c7ad01ff32340ca8dd416dbd786220 ReplaceBytes.xs
+SHA1 b458466a81df7a220a5d0e27d85b40202ce751b6 lib/File/ReplaceBytes.pm
+SHA1 c054a2091499b95ffe8d55ac21f6d9637c2ca8e5 ppport.h
+SHA1 0a87fcc0dbc9d4b4b428ccf5ee6ea6dc60a8e548 t/00-load.t
+SHA1 b75968df5d0ccca1b0ba843a7645c9106cef0399 t/File-ReplaceBytes.t
+SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+SHA1 75e4352b8e21e9ce65e081f615f52c099705b17f t/testdata
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJX7JfqAAoJEKSYBH5dablgBuUH/j3y1iFj/3rjQ0opcX6Gm0gW
+ZRr2kn4E5VwzAorpLWZD2Bi/cO99S9+Yz7V5FKBPsmP7QHRrUV19o3W1vgZzADaM
+mQczLWEVyei+52uaiF3UVNAptrVGMi018myQWThlhOdnE2XbTV1ECplk96+pEeR8
+wjDmsW3cL4b5sHEF38qF+RUyw4q2PHPt66kp6yixryd/esuh0oHJuY1YMsm2S3r+
+dqrz0hCEvV0iBQkkWebdypreLDjpmGkIsw5f4H0umQokCQywSV6sYJZ0e1p8l4uj
+EHCjikEtNbzppq0y0Yj+/cVp7AZ1gq8muWYOxa8UFnowYJx2wPdGYNP+xwF647Y=
+=IXB+
+-----END PGP SIGNATURE-----

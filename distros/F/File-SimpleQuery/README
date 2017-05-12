@@ -1,0 +1,72 @@
+NAME
+    File::SimpleQuery - Query flat-files, simply!
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    Have you ever wanted to make queries against a flat-file, similar to a
+    database, but did not want to setup all the necessary database
+    machinery? Enter File::SimpleQuery, which is intended to allow you to
+    make simple sql-like queries against a file you specify.
+
+    Intended to make querying simple files easier. The file in question is
+    expected to have the first row be a header row, which is how it knows
+    whichs fields to select from.
+
+        use File::SimpleQuery;
+
+        my $delimiter = ',';
+        my $filename = 'test_file';
+        my $q = File::SimpleQuery->new($filename, $delimiter);
+
+        my @results = $q->select(
+            [ qw/ field1 fieldn / ],
+            sub { my $fields = shift; return 1 if $fields->{field1} eq 'foo' },
+        );
+
+FUNCTIONS
+  new
+    The constructor. You must specify the filename and the delimiter between
+    rows
+
+  select ( \@field_names_to_select, \&where_sub, \@group_by_fields )
+    Returns a list of hash-refs that match the lines in the file where the
+    where_sub evaluates to true, groupped by the group_by_fields
+
+AUTHOR
+    Ben Prew, "<btp at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-file-simplequery at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-SimpleQuery>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc File::SimpleQuery
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/File-SimpleQuery>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/File-SimpleQuery>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-SimpleQuery>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/File-SimpleQuery>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2006 Ben Prew, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,302 @@
+=pod
+
+=head1 NAME
+
+File::PathInfo::Ext - metadata files, renaming, some other things on top of PathInfo
+
+=head1 SYNOPSIS
+
+	use File::PathInfo::Ext;
+
+	my $f = new File::PathInfo::Ext('/home/myself/thisfile.pdf');
+   
+	$f->meta_save({ keywords => 'salt, pepper, lemon, ginger' });
+   
+	printf "keywords are: %s\n", $f->meta->{keywords};
+   
+	$f->rename('thatfile.pdf');
+   
+	printf "filename is now %s\n", $f->filename;
+	printf "keywords are still: %s\n", $f->meta->{keywords};	
+	
+
+=head1 DESCRIPTION
+
+This extends File::PathInfo.
+Added is a simple api for YAML metadata files associated to the file the object instance
+is based on.
+Also a way to rename the file, and move the file- maintaining the metadata YAML file 
+association.
+
+This software is still under development.
+
+=head1 METHODS
+
+These are added methods to the usual L<File::PathInfo> methods.
+
+=head2 md5_hex()
+
+returns md5 sum of file contents, cached in object {_data}
+if getting the md5sum digest does not work, returns undef
+see L<Digest::MD5>
+
+=head2 ls() and lsa()
+
+Takes no argument
+Returns array ref of files (and dirs and everything else). No . and ..
+Returns undef if it's not a dir.
+
+lsa() returns absolute paths, not just filename.
+
+=head2 lsf() and lsfa()
+
+returns array ref of files (-f) in dir. 
+returns undef if it's not a dir.
+
+lsfa() returns absolute paths, not just filename.
+
+=head2 lsd() and lsda()
+
+returns array ref of dirs (-d) in dir. 
+returns undef if it's not a dir.
+
+lsda() returns absolute paths, not just filename.
+
+=head2 ls_count()
+
+number of entries in directory, returns undef if not a dir
+
+=head2 lsd_count()
+
+number of directory entries in directory, returns undef if not a dir
+
+=head2 lsf_count()
+
+number of file entries in directory, returns undef if not a dir
+
+=head2 meta()
+
+takes no argument, like L<get_meta()>
+returns hash ref with metadata for file.
+
+=head2 meta_save()
+
+takes no argument, like L<set_meta>
+returns true. 
+Saves the current metadata to disk.
+
+=head2 meta_delete()
+
+Takes no argument. 
+Makes sure file does not have a meta file associated with it.
+
+=head2 move()
+
+Argument is absolute path destination to move to.
+It can be a directory, or a new absolute path.
+
+	$f->move('/home/myself/newdocs/');
+	
+	$f->move('/home/myself/newdocs/great.pdf');
+	
+If the destination exists, and is a directory, we move into there.
+Works with File::Copy::move().
+
+
+If the destination exists and is not a dir, it will warn and return undef.
+
+(Note that after moving or renaming, the other file info is automatically
+updated, such as abs_loc() and rel_path() etc.)
+The meta file is moved also if it exists. That is part why one would consider using
+this move instead of File::Copy::move().
+Also, this will not overrite existing.
+
+Returns abs path of where the file moved to.
+
+=head2 rename()
+
+Argument is new filename. New filename cannot have /\ characters, etc.
+This rename makes it so if you have a meta file, it is renamed also.
+
+	$f->rename('blah') or die'cant rename';
+
+If the file you are renaming to already exists, carps and returns false. It will not
+overrite an existing file. You must first delete the exisitng file or rename to
+something else.
+
+=cut
+
+
+
+
+
+
+
+=head1 USAGE EXAMPLES
+
+I adore this little module. I use it a lot.
+Here are some examples of how to use it, and you'll see why I like it.
+
+=head2 using meta() and meta_save()
+
+=over 4
+
+=item Example 1
+
+	use File::PathInfo::Ext;
+
+	my $f = new File::PathInfo::Ext('/home/myself/documents/doc1.pdf');
+	
+	$f->meta_save({ title => 'great title here', keywords => [qw(food spices mice cats)]});
+
+This creates the YAML file '/home/myself/documents/.doc1.pdf.meta':
+
+	---
+	title: 'great title here'
+	keywords:
+	 - food
+	 - spices
+	 - mice
+	 - cats
+
+So if you call meta(), you get the title.
+This is really useful if you want to be able to simply add info to a file via vim or notepad.
+
+=item Example 2
+
+What if you don't want to have the files hidden, and you want to use another extension?
+
+	use File::PathInfo;
+	File::PathInfo::Ext::META_EXT = 'data';
+	File::PathInfo::Ext::META_HIDDEN = 0;	
+
+	my $f = new File::PathInfo('/home/myself/documents/doc1.pdf');
+	$f->meta_save({ title => 'great title here', keywords => [qw(food spices mice cats)]});
+
+And then..
+
+	printf "Title for this file %s\n", $f->meta->{title};
+
+Add some more stuff
+
+	$f->meta->{age} = 24;
+	$f->meta->{state} = 'WY';
+
+And save it
+
+	$f->meta_save;	
+
+To erase it
+
+	$f->meta_delete
+
+Furthermore what if you want to rename the file without losing the metadata (which is associated
+by filename)
+
+	$f->rename('newname.whatever');
+
+=item Example 3
+
+A more real world example. If you're a unix minion like me, you swear by the cli. So, I want
+to be able to edit metadata with vim for anything.
+Maybe I'm keeping an archive of scanned documents.. and I want to remember that file 
+/home/docs/document1.pdf is authored by Joe, and that it's a replacement for another file.
+So I simply do 'vim /home/docs/.document1.pdf.meta' and enter:
+
+	---
+	author:joe
+	description: this is not the original. The other one got eaten by my dog.
+
+You can see how useful this can be if you're maintaining a client website, or a large
+archive of mundane data.
+
+=cut
+
+
+
+=head1 PROCEDURAL SUBROUTINES
+
+None of these are exported by default.
+
+=head2 get_meta()
+
+argument is absolute path to a file on disk
+returns metadata hash if found. (YAML).
+
+
+=head2 set_meta()
+
+argument is absolute path and hash ref with metadata
+if the hash ref is empty, will attempt to delete existing metadata
+file.
+
+does NOT check to see if the file exists.
+
+	set_meta('/home/file',{ name => 'hi', age => 4 });
+	
+Above example creates meta file '/home/file.meta' :
+
+	---
+	name: hi
+	age: 4
+
+If you wish all metadata files to be hidden;
+
+	use File::PathInfo;
+	File::PathInfo::META_HIDDEN = 1;	
+
+See also: L<YAML>
+
+=head2 delete_meta()
+
+argument is absolute path to file the meta is for.
+will delete hidden as well as non-hidden meta.
+
+	delete_meta('/home/myself/document');
+
+Deletes /home/myself/document.meta and /home/myself/.document.meta
+This is just to assure a file does not have metadata anymore.
+
+
+
+
+
+=head1 SEE ALSO
+
+See also L<File::PathInfo>, L<YAML>, L<File::Attributes>, L<File::Copy>.
+
+=head1 PACKAGE SETTINGS
+
+Metadata files can be hidden (prepended by period). 
+
+	File::PathInfo::Ext::META_HIDDEN = 1;	
+
+Metadata ext, by default .meta
+
+	File::PathInfo::Ext::META_EXT = meta;
+
+=head1 BUGS
+
+Yes. No doubt.
+Please forwards any bug detection to author.
+
+=head1 CAVEATS
+
+Will not work on non-posix systems.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

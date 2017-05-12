@@ -1,0 +1,151 @@
+Revision history for FTN-JAM
+
+0.30    16:49 dd September 2012
+    - Add parentheses to the parameter localization in the RemoveMB, OpenMB,
+      and Crc32 functions.
+
+0.29    13:20 16 September 2012
+    Changes for UnlockMB:
+    - Explicitly have UnlockMB return true for a normal exit.
+    - Add parentheses to $handleref for localizing the parameter to UnlockMB.
+
+0.28    10:24 16 September 2012
+    Changes for Crc32:
+    - Remove the old code that was checking the number of parameters.
+    - Change the initial local parameter assignment to fail if the function
+      isn't passed a parameter.
+
+0.27    10:01 16 September 2012
+    Changes for UnlockMB:
+    - Remove the old code that was checking the number of parameters.
+    - Change the initial local parameter assignment to fail if the function
+      isn't passed a parameter.
+
+0.26    09:08 16 September 2012
+    Changes for RemoveMB:
+    - Remove the old code that was checking the number of parameters.
+    - Change the initial local parameter assignment to fail if the function
+      isn't passed a parameter.
+
+0.25    18:52 15 September 2012
+    Changes for OpenMB:
+    - Remove the old code that was checking the number of parameters.
+    - Change the initial local parameter assignment to fail if the function
+      isn't passed a parameter.
+
+0.24    18:13 15 September 2012
+    Changes for CloseMB:
+    - Use 'close FH or croak' style for all file closeing.
+    - Have the function fail if it isn't passed a parameter.
+    - Remove the unneeded code that was checking the number of parameters.
+    - Explicitly return true for a normal exit using a '1' and rewrite the test
+      in t/01-basic.t to reflect that.
+
+0.23    13:08 15 September 2012
+    - Change the declaration for $Errnum from the deprecated 'use vars' to 'our'.
+    - Move the declaration for $Errnum to just before the functions in JAM.pm.
+    - Add a note regarding the $Errnum global variable to POD documentation.
+
+0.22    18:33 11 September 2012
+    - Localize usage of the Magic $| variable.
+
+0.21    17:34 11 September 2012
+    - Correct NAME section in POD for FTN::JAM::Attr.
+    - Rewrite NAME section in POD for FTN::JAM::Errnum.
+
+0.20    19:42  9 September 2012
+    - Create initial version of t/manifest.t test script.
+    - Add t/manifest.t and t/01-basic.t to the MANIFEST file.
+    - Correct the URL for browsing the FTN::JAM git repository at SourceForge.
+
+0.19    14:55  9 September 2012
+    - Rearrange version information and POD in lib/FTN/JAM/Attr.pm.
+    - Minor whitespace clean up plus update configuration for clean and dist
+      targets in Makefile.PL.
+
+0.18    12:25  9 September 2012
+    - Move package FTN::JAM::Errnum into its own file.
+    - Add lib/FTN/JAM/Errnum.pm to MANIFEST.
+    - Add lib/FTN/JAM/Errnum.pm to t/00-load.t.
+
+0.17    11:25  9 September 2012
+    - Move package FTN::JAM::Attr into its own file.
+    - Add lib/FTN/JAM/Attr.pm to MANIFEST.
+    - Add lib/FTN/JAM/Attr.pm to t/00-load.t.
+
+0.16    09:25  9 September 2012
+    - Move package FTN::JAM::Subfields into its own file.
+    - Add lib/FTN/JAM/Subfields.pm to MANIFEST.
+    - Add lib/FTN/JAM/Subfields.pm to t/00-load.t.
+
+0.15    07:52  9 September 2012
+    - Create initial version of the t/01-basic.t test script.
+    - Update Robert James Clay copyright years to include 2012.
+
+0.14    00:35  1 November 2011
+    - Use 'our' instead of 'my' when setting the Readonly variables in JAM.pm.
+
+0.13    19:23 31 October 2011
+    - Use 'croak' instead of 'die' when checking the number of arguments in the
+    functions in JAM.pm module.
+
+0.12    18:24 31 October 2011
+    - The "$FTN::JAM::WriteMBHeader" in line 1018 of JAM.pm is a function call,
+     not a variable. Remove the "$" from that, as it is a typo.
+
+0.11    16:22 31 October 2011
+    - Because of possible issues with mixed high and low-precedence booleans in
+    lines 146 & 225, use '||' instead of 'or'.
+
+0.10    23:32 29 October 2011
+    - Correct issue with using bareword file handles in the OpenMB and CreateMB
+    functions. For the OpenMB function, it also resolves bug # 66608.
+
+0.09    21:50 29 October 2011
+    - Change the open() calls in JAM.pm from their two argument form to their
+    three argument form in the OpenMB & CreateMB functions.
+
+0.08    21:03 29 October 2011
+    - Add ReadOnly to Makefile.PL as a required module.
+    - Correct issue with how constants are defined, using the ReadOnly function
+    instead of the 'constant' pragma in JAM.pm.
+
+0.07    16:56 29 October 2011
+    - Corrected issue with the following subroutines not ending with a return:
+    CloseMB, UnlockMB, and FindUser.
+
+0.06    20 October 2011
+    - Move the file doc/ToDo to the lib/FTN/JAM source directory, rename
+    and reformat the file as ToDo.pod.
+    - Reorganized the documentation in JAM.pm: adding a SEE ALSO section,
+    cleaning up white space,and expanding the ACKNOWLEDGEMENTS section.
+
+0.05    19 October 2011
+    - Update copyright years to include 2011.
+    - A bug in line 634 of JAM.pm was causing "Not a HASH reference" error
+    message. A abolychev@gmail.com also found the same issue and reported it.
+    Corrected by changing the line to "@$subfieldsref = ();", which resolves
+    bug # 66607.
+
+0.04    22 August 2010
+    - Add doc/ToDo to distribution.
+    - Add a LICENSE entry ('perl') to Makefile.PL file.
+    - Added the Time::Local and Time::Zone modules to the PREREQ_PM list
+    in Makefile.PL.
+    - Added the Test::Pod and Test::Pod::Coverage modules to the PREREQ_PM
+    list in Makefile.PL.
+
+0.03    14 August 2010
+    - Updated documentation in README and the POD in lib/FTN/JAM.pm:
+    Corrected the subroutines error message package references. Corrected
+    the sub-package naming and references. Edits for spelling, wording, and
+    formating. Added a module usage summary to the SYNOPIS section. Moved
+    the syntax comments to their POD section. Correct the subroutine error
+    message package references.
+
+0.02    5 July 2010
+    - Adapted v0.02 of FTN::JAM from v0.02 of the public domain Perl::JAM,
+    which is available at http://bitbucket.org/johanbilling/jampm/.
+
+0.01    5 March 2010
+    - Used module-starter to create initial files and directory structure.

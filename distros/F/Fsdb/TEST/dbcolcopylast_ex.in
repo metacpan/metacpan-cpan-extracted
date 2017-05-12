@@ -1,0 +1,5 @@
+#fsdb experiment mean stddev n
+ufs_mab_sys	37.25	0.070711	2
+ufs_rcp_real	271.2	9.4752	2
+#  | dbmultistats -k experiment duration
+#   | dbcol experiment mean stddev n

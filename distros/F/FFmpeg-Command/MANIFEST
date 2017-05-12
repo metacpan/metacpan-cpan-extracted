@@ -1,0 +1,17 @@
+Changes
+lib/FFmpeg/Command.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01-coderef.t
+t/02-option_a.t
+t/03-option_b.t
+t/04-option_c.t
+t/05-option_d.t
+t/06-output_options.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

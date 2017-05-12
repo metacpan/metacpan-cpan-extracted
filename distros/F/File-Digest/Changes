@@ -1,0 +1,36 @@
+Revision history for File-Digest
+
+0.006   2016-11-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update example in Synopsis.
+
+
+0.005   2016-11-23 (PERLANCAR)
+
+	- Remove (planned) feature to check digest, offload that feature to
+	  App::xsum.
+
+
+0.004   2016-11-23 (PERLANCAR)
+
+	- Support the other SHA algorithms: sha224, sha284, sha512,
+	  sha512224, sha512256.
+
+
+0.003   2016-11-22 (PERLANCAR)
+
+	- [refactor] Extract routine digest_file().
+
+
+0.002   2016-11-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix Rinci metadata.
+
+
+0.001   2016-11-21 (PERLANCAR)
+
+        - First release, checking digest not yet implemented.

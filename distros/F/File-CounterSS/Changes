@@ -1,0 +1,6 @@
+Revision history for Perl extension File::CounterSS.
+
+0.01  Wed Aug 10 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A File::CounterSS
+

@@ -1,0 +1,20 @@
+Revision history for File-Dedup
+
+0.007       2015-08-04
+   - switching to SHA1 from MD5 based on feedback from David Farrell in issue #1
+0.006       2015-07-30
+    - remove pointless Ctrl-C capture test from t/03-duplicates.t that caused a CPANTesters failure on Windows
+0.005       2015-07-28
+    - fixed bug where pressing [nN] to not delete a file would continue to prompt the user for input instead of exiting
+    - fixed bug where the return status of _get_numeric_response was being checked with logical not but has a valid return status of '0' sometimes
+      this caused the program to not function properly when a user chose to keep the first duplicated file
+0.004       2015-07-28
+    - updated dist.ini to correct metaresources for TravisCI and coveralls.io
+0.003       2015-07-28
+    - specify minimum Perl version as 5.10
+0.002       2015-07-24
+    - removed leftover Data::Dumper import and print statement
+0.001       2015-07-24
+    - initial release 
+    - Duplicate files can be found and deleted by their MD5 checksum
+    - 'group' option not yet implemented

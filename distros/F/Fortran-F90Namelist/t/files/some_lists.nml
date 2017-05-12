@@ -1,0 +1,24 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test3a.nml -- Several namelists in one file
+!  $Id: test3a.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $
+!
+&nlist1                         ! First namelist
+  string_var1    = 'A simple string',   ! string
+  int_var1 =14, real_var1= -0.5 , double_var1 = 1.D4
+  complex_var1 = (1.234,5.678) ,dcompl_var1= (3.14D0, 2.718D0),
+  repeated_var = 7
+/
+&nlist2                         ! Second namelist
+  string_var2    = 'A simple string',   ! string
+  int_var2 =14, real_var2= -0.5 , double_var2 = 1.D4
+  complex_var2 = (1.234,5.678) ,dcompl_var2= (3.14D0, 2.718D0),
+  repeated_var = 7
+/
+&nlist3                         ! Third namelist
+  string_var3    = 'A simple string',   ! string
+  int_var3 =14, real_var3= -0.5 , double_var3 = 1.D4
+  complex_var3 = (1.234,5.678) ,dcompl_var3= (3.14D0, 2.718D0),
+  repeated_var = 7
+/
+! Trailing comment

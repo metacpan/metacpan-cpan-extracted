@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Data::Dumper;
+use Fedora::Bugzilla;
+
+my $bz = Fedora::Bugzilla->new(
+    userid => shift @ARGV,
+    passwd => shift @ARGV,
+);
+    
+die "Must pass bug ids/aliases on the command line!\n" unless scalar @ARGV;
+
+$Data::Dumper::Indent = 1;
+
+for my $id (@ARGV) {
+
+    my $bug = $bz->bug($id);
+
+    print Dumper $bug->data;
+}

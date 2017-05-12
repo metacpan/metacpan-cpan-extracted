@@ -1,0 +1,46 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+9.2615 0.022789 0.24606 0.0032374 9.2582 9.2647 0.95 1806 16726 9.196848 9.327973 195
+#
+# This dataset is from http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm
+# NIST/SEMATECH e-Handbook of Statistical Methods,
+# section 1.4.2.8.1. Background and Data
+# description:
+# Generation: This data set was collected by Bob Zarr of NIST in January, 1990 from a heat flow meter calibration and stability analysis. The response variable is a calibration factor. ...
+#
+#
+# Their summary statistics from Dataplot
+# (at http://www.itl.nist.gov/div898/handbook/eda/section4/eda4283.htm):
+#
+#                               SUMMARY
+# 
+#                     NUMBER OF OBSERVATIONS =      195
+# 
+# 
+#***********************************************************************
+#*        LOCATION MEASURES         *       DISPERSION MEASURES        *
+#***********************************************************************
+#*  MIDRANGE     =   0.9262411E+01  *  RANGE        =   0.1311255E+00  *
+#*  MEAN         =   0.9261460E+01  *  STAND. DEV.  =   0.2278881E-01  *
+#*  MIDMEAN      =   0.9259412E+01  *  AV. AB. DEV. =   0.1788945E-01  *
+#*  MEDIAN       =   0.9261952E+01  *  MINIMUM      =   0.9196848E+01  *
+#*               =                  *  LOWER QUART. =   0.9246826E+01  *
+#*               =                  *  LOWER HINGE  =   0.9246496E+01  *
+#*               =                  *  UPPER HINGE  =   0.9275530E+01  *
+#*               =                  *  UPPER QUART. =   0.9275708E+01  *
+#*               =                  *  MAXIMUM      =   0.9327973E+01  *
+#***********************************************************************
+#*       RANDOMNESS MEASURES        *     DISTRIBUTIONAL MEASURES      *
+#***********************************************************************
+#*  AUTOCO COEF  =   0.2805789E+00  *  ST. 3RD MOM. =  -0.8537455E-02  *
+#*               =   0.0000000E+00  *  ST. 4TH MOM. =   0.3049067E+01  *
+#*               =   0.0000000E+00  *  ST. WILK-SHA =   0.9458605E+01  *
+#*               =                  *  UNIFORM PPCC =   0.9735289E+00  *
+#*               =                  *  NORMAL  PPCC =   0.9989640E+00  *
+#*               =                  *  TUK -.5 PPCC =   0.8927904E+00  *
+#*               =                  *  CAUCHY  PPCC =   0.6360204E+00  *
+#***********************************************************************
+#
+#
+# And 95% confidence interval: (9.258242,9.26479)
+#
+#   | dbcolstats x

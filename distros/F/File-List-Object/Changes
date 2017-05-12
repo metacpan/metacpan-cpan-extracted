@@ -1,0 +1,37 @@
+Revision history for File-List-Object
+
+0.202  Fri 12 Feb 2009
+     - Updated to make all files in the list on 
+       Win32 systems have backslashes instead of
+       forward slashes (fixes bug in Perl::Dist::WiX)
+     - Added debug flag. (documented as write only)
+
+0.201  Thu 12 Nov 2009
+     - Updated to use new Moose 0.90 syntax
+       instead of MooseX::AttributeHelpers.
+     - Added ability to filter out file attributes
+       in a packlist.
+	 
+0.200  Sat  1 Aug 2009
+     - Documentation corrections only.
+
+0.190  Fri 26 Jun 2009
+     - Forgot to run author tests. OOPS.
+       No functionality added, no need to 
+	   upgrade 0.189. 
+
+0.189  Thu 25 Jun 2009
+     - Bug in clone() fixed. Test added.
+
+0.188  Sun  7 Jun 2009
+     - Documentation fixes only.
+
+0.187  Fri  5 Jun 2009
+     - Fixed tests so as less likely to fail under 
+	   CPAN Testers conditions.
+	 - added remove_file, remove_files, and add_files.
+	 - added exception testing.
+
+0.185  Thu  4 Jun 2009
+       Initial release.
+

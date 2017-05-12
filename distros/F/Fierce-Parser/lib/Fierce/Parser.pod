@@ -1,0 +1,680 @@
+=pod
+
+=head1 NAME
+
+Fierce::Parser - Parse fierce scan data with Perl
+
+=head1 VERSION
+
+This document describes the latest version of Fierce::Parser
+
+=head1 SYNOPSIS
+
+ use Fierce::Parser;
+ my $fp = new Fierce::Parser;
+
+ # a Fierce::Parser Object
+ my $parser = $fp->parse_file('test1.xml');
+
+ # a Fierce::Parser::Host Object
+ my $host = $parser->get_node('google.com');
+
+I<For a full listing of methods see the documentation corresponding to each object.>
+
+=head1 DESCRIPTION
+
+
+=head1 OVERVIEW
+
+
+ Fierce::Parser                               -- Core parser
+ |
+ +--Fierce::Parser::Session                   -- Fierce scan session information
+ |  
+ +--Fierce::Parser::Domain                    -- General domain information
+ |  |
+ |  |--Fierce::Parser::Domain::NameServers    -- Nameserver Information about the Domain
+ |  |
+ |  |--Fierce::Parser::Domain::ZoneTransfer   -- Zone Transfer information
+ |  |
+ |  |--Fierce::Parser::Domain::Bruteforce     -- Nodes found using Bruteforce 
+ |  |
+ |  |--Fierce::Parser::Domain::ExtBruteforce  -- Nodes found using Extension Bruteforce 
+ |  |
+ |  |--Fierce::Parser::Domain::ReverseLookups -- Nodes found using Reverse Lookups
+ |  |
+ |  |--Fierce::Parser::Domain::WildCard       -- Information about MX records found
+ |  |
+ |  |--Fierce::Parser::Domain::WhoisLookup    -- Information about Whois lookups
+ |  |
+ |  |--Fierce::Parser::Domain::FindMX         -- Information about MX records found
+ |  |
+ |  |--Fierce::Parser::Domain::Vhost          -- Information about Virtual Hosts found
+ 
+
+
+=head1 METHODS
+
+=head2 Fierce::Parser
+
+The main idea behind the core modules is, you will first parse the scan data
+then extract the information. Therefore, you should run parse_file then you can use any of the subroutines.
+
+=over 4
+
+=item B<parse_file($xml_file)>
+
+Parse a fierce XML file. The XML files are generated from using the following command: 
+ 
+ fierce.pl -dns $DOMAIN -format xml -output domain.xml
+
+=item B<parse_file($args,@domains)>
+
+Perform a fierce scan and parse the XML result.
+
+ use Fierce::Parser;
+ my $fp = new Fierce::Parser;
+ my @domains;
+ push(@domains,"google.com");
+ 
+ my $parser = $fp->parse_scan("",@domains);
+
+=item B<get_session()>
+
+Obtain the fierce::Parser::Session object which contains the session scan information.
+
+=item B<get_node($domain)>
+
+Obtain the Fierce::Parser::Host object which the host information.
+
+=item B<get_all_nodes()>
+
+Obtain an Array of Fierce::Parser::Node objects which contain domain information.
+
+=back
+
+=head2 Fierce::Parser::Session
+
+This object contains the scan session information of the Fierce scan.
+
+=over 4
+
+=item B<options()>
+
+Returns the options used to execute fierce.
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=item B<fversion()>
+
+Returns the version of Fierce.
+
+=item B<xmlversion()>
+
+Returns the xml version.
+
+=back
+
+=head2 Fierce::Parser::Domain
+
+This object contains the information for a domain.
+
+=over 4
+
+=item B<domain()>
+
+Returns the domain name.
+
+=back
+
+=head2 Fierce::Parser::Node
+
+This object contains the information for a node. A Node is a simplistic object
+containing information about a device found during a Fierce scan. Many of the
+Fierce modules use a Node to represent the a device.
+
+=over 4
+
+=item B<ip()>
+
+Returns the ip address of the node.
+
+=item B<hostname()>
+
+Returns the hostname of the node.
+
+=item B<type()>
+
+Return the type of the node.
+
+=back
+
+=head2 Fierce::Parser::ZoneTransferResult
+
+This Object contains the information for a zone transfer request.
+
+=over 4
+
+=item B<domain>
+
+Returns the domain being tested.
+
+=item B<name_server>
+
+Returns the name_server being tested.
+
+=item B<bool>
+
+Returns 1 or 0 if a zone transfer exists. 1=true and 0=false. 
+
+=item B<raw_output>
+
+Returns the raw output of a axfr request.
+
+=item B<nodes>
+
+Returns an ArrayRef containing Node Objects.
+
+=back 
+
+=head2 Fierce::Parser::Domain::NameServers
+
+This object contains the Nameserver Information about the Domain.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=item B<nodes()>
+
+Returns an Arrayref containing Node Objects.
+
+=back
+
+=head2 EXAMPLE
+
+ my $name_servers = $domain->name_servers;
+
+ foreach my $i ( @{ $name_servers->nodes } ) {
+     print "\thostname:" . "\t" . $i->hostname . "\n";
+     print "\tip:" . "\t\t" . $i->ip . "\n";
+ }   
+
+=head2 Fierce::Parser::Domain::ZoneTransfer
+
+This object contains the Zone Transfer information.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=item B<result()>
+
+Returns an ArrayRef containing ZoneTransferResult objects.
+
+=back
+
+=head2 EXAMPLE
+
+ my $name_servers = $domain->name_servers;
+ my $zone_transfers = $domain->zone_transfers;
+ 
+ foreach my $i ( @{ $name_servers->nodes } ) {
+     print "\tIP:" . "\t\t" . $i->ip . "\n";
+     print "\tZone Transfer:" . "\t";
+     foreach ( @{ $zone_transfers->result } ) {
+         if ($i->hostname eq $_->name_server ) {
+             if ($_->bool == 1) {
+                print "Enabled\n";
+                print "\n\tZone Trasfer Result:" . "\t";
+                print "\t\t" . $_->raw_output  . "\n";
+             }
+             else {
+                 print "Disabled\n";
+             }
+         }
+      }
+ } 
+
+=head2 Fierce::Parser::Domain::Bruteforce
+
+This object contains the Nodes found using Prefix Bruteforce.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=item B<nodes()>
+
+Returns an ArrayRef containing Node objects.
+
+=back
+
+=head2 EXAMPLE
+
+ my $bruteforce = $domain->bruteforce;
+
+ foreach ( @{ $bruteforce->nodes } ) {
+     print "\tHostname:" . "\t" . $_->hostname . "\n";
+     print "\tIP: " . "\t\t" . $_->ip . "\n";
+ }
+
+=head2 Fierce::Parser::Domain::ExtBruteForce
+
+This object contains the Nodes found using Extension Bruteforce.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=item B<nodes()>
+
+Returns an ArrayRef containing Node objects.
+
+=back
+
+=head2 EXAMPLE
+
+ my $ext_bruteforce = $domain->ext_bruteforce;
+
+ foreach ( @{ $ext_bruteforce->nodes } ) {
+     print "\thostname:" . "\t" . $_->hostname . "\n";
+     print "\tip: " . "\t\t" . $_->ip . "\n";
+ }
+
+=head2 Fierce::Parser::Domain::ReverseLookups
+
+This object contains the Nodes found using Reverse Lookups.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=item B<nodes()>
+
+Returns an ArrayRef containing Node Objects.
+
+=back
+
+=head2 EXAMPLE
+
+ my $reverse_lookups = $domain->reverse_lookups;
+ 
+ foreach ( @{ $reverse_lookups->nodes } ) {
+    print "\thostname:" . "\t" . $_->hostname . "\n";
+    print "\tip: " . "\t\t" . $_->ip . "\n";
+ }
+
+=head2 Fierce::Parser::Domain::WildCard
+
+This object contains the Information about MX records found.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=back 
+
+=head2 Fierce::Parser::Domain::WhoisLookup
+
+This object contains the Information about Whois lookups.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=back
+
+=head2 EXAMPLE
+
+ my $whois_lookup = $domain->whois_lookup;
+ 
+ print "Whois:\n";
+ foreach ( @{ $whois_lookup->result } ) {
+     print "\tNetHandle:" . "\t" . $_->net_handle . "\n";
+     print "\tNetRange: " . "\t" . $_->net_range . "\n";
+ }
+ print "\n";
+
+=head2 Fierce::Parser::Domain::FindMX
+
+This object contains Information about MX records found.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=back
+
+=head2 EXAMPLE
+
+ my $reverse_lookups = $domain->reverse_lookups;
+ 
+ foreach ( @{ $findmx->result } ) {
+     print "\tpreference:" . "\t" . $_->preference . "\n";
+     print "\texchange: " . "\t" . $_->exchange . "\n";
+ }
+ 
+
+=head2 Fierce::Parser::Domain::Vhost
+
+This object contains Information about Virtual Hosts found.
+
+=over 4
+
+=item B<startscan()>
+
+Returns the start time of the scan in unixtime format.
+
+=item B<startscanstr()>
+
+Returns the start time of the scan in a readable string.
+
+=item B<endscan()>
+
+Returns the end time of the scan in unixtime format.
+
+=item B<endscanstr()>
+
+Returns the end time of the scan in a readable string.
+
+=item B<elapsedtime()>
+
+Returns the elapsed time of the scan.
+
+=item B<nodes()>
+
+Returns an ArrayRef containing Node Objects.
+
+=back
+
+=head2 EXAMPLE
+
+ my $reverse_lookups = $domain->reverse_lookups;
+ 
+ foreach ( @{ $vhost->nodes } ) {
+    print "\thostname:" . "\t" . $_->hostname . "\n";
+    print "\tip: " . "\t\t" . $_->ip . "\n";
+ }
+
+=head1 EXAMPLES
+
+
+Here is an example of parsing an XML file using Fierce::Parser:
+
+ use Fierce::Parser;
+ my $fp = new Fierce::Parser;
+
+ if (defined($ARGV[0])){
+    my $file = $ARGV[0];
+    my $parser = $fp->parse_file($file);
+    my @nodes    = $parser->get_all_nodes();
+
+    foreach my $n (@nodes){
+        my $domain = $n;
+        my $name_servers = $domain->name_servers;
+        my $zone_transfers = $domain->zone_transfers;
+        my $bruteforce = $domain->bruteforce;
+        my $vhost = $domain->vhost;
+        my $subdomain_bruteforce = $domain->subdomain_bruteforce;
+        my $ext_bruteforce = $domain->ext_bruteforce;
+        my $reverse_lookups = $domain->reverse_lookups;
+        my $wildcard = $domain->wildcard;
+        my $findmx = $domain->findmx;
+        my $find_nearby = $domain->find_nearby;
+
+        print "==== " . $n->domain . " ====\n";
+        if ( $name_servers ) {
+            print "Nameservers:\n";
+            foreach my $i ( @{ $name_servers->nodes } ) {
+                print "\tHostname:" . "\t" . $i->hostname . "\n";
+                print "\tIP:" . "\t\t" . $i->ip . "\n";
+                print "\tZone Transfer:" . "\t";
+                foreach ( @{ $zone_transfers->result } ) {
+                    if ($i->hostname eq $_->name_server ) {
+                        if ($_->bool == 1) {
+                            print "Enabled\n";
+                            print "\n\tZone Trasfer Result:" . "\t";
+                            print "\t\t" . $_->raw_output  . "\n";
+                        }
+                        else {
+                            print "Disabled\n";
+                    }
+                }
+            }   
+            print "\n";
+        }
+        if ( $findmx ) {
+            print "MX:\n";
+            foreach ( @{ $findmx->result } ) {
+                print "\tpreference:" . "\t" . $_->preference . "\n";
+                print "\texchange: " . "\t" . $_->exchange . "\n";
+            }   
+            print "\n";
+        }
+        
+        if ($bruteforce) {
+            print "Prefix Bruteforce:\n";
+            foreach ( @{ $bruteforce->nodes } ) {
+                print "\tHostname:" . "\t" . $_->hostname . "\n";
+                print "\tIP: " . "\t\t" . $_->ip . "\n";
+            }
+            print "\n";
+        }
+        if ($vhost) {
+            print "Virtual Hosts:\n";
+            foreach ( @{ $vhost->nodes } ) {
+                print "\thostname:" . "\t" . $_->hostname . "\n";
+                print "\tip: " . "\t\t" . $_->ip . "\n";
+            }
+            print "\n";
+        }
+        if ($ext_bruteforce){
+            print "Extension Bruteforce:\n";
+            foreach ( @{ $ext_bruteforce->nodes } ) {
+                print "\thostname:" . "\t" . $_->hostname . "\n";
+                print "\tip: " . "\t\t" . $_->ip . "\n";
+            }
+            print "\n";
+        }
+        if ($reverse_lookups){
+            print "reverse lookup:\n";
+            foreach ( @{ $reverse_lookups->nodes } ) {
+                print "\thostname:" . "\t" . $_->hostname . "\n";
+                print "\tip: " . "\t\t" . $_->ip . "\n";
+            }
+            print "\n";
+        }
+       
+        if ($find_nearby){ 
+            print "Find Nearby:\n";
+            foreach ( @{ $find_nearby->ptrs } ) {
+                print "\tPtrdname:" . "\t" . $_->ptrdname . "\n";
+                print "\tIP: " . "\t\t" . $_->ip . "\n";
+            }
+        }
+    }
+
+ }
+ else {
+    print "Usage: $0 [fierce-xml]\n";
+ }
+
+=head1 SEE ALSO
+
+ fierce, XML::LibXML and Object::InsideOut
+
+=head1 AUTHOR
+
+Joshua D. Abraham, S<E<lt>jabra AT spl0it DOT orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 Joshua D. Abraham. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

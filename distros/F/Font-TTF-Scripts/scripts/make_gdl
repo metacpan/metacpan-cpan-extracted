@@ -1,0 +1,281 @@
+#! /usr/bin/perl
+use strict;
+use Font::TTF::Scripts::GDL;
+use IO::File;
+use Getopt::Long;
+use Pod::Usage;
+
+our(%opts);
+GetOptions(\%opts, 
+	'ap|a=s', 
+	# 'b',				# used in make_volt
+	'classfile|c=s', 
+	'classprops',
+	'autodefines|d', 
+	'define|D=s%', 
+	'empty|e=s', 
+	# 'forceadd|f=i', 	# used in make_volt
+	'help|h', 
+	'include|i=s@', 
+	'ligatures|l=s',
+	'mark|m=s', 
+	'normalize|n=i', 
+	'omitaps|o=s', 
+	'positions|p=i', 
+	'renameaps|r', 
+	'substitutions|s=i',
+	# 'outVOLT|t',		# used in make_volt
+	'z=i');
+
+unless ($ARGV[1] || $opts{'help'})
+{
+    pod2usage(1);
+    exit;
+}
+
+if ($opts{'help'})
+{
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit;
+}
+
+my %options;
+
+# Parse -e file if supplied
+if ($opts{'empty'}) 
+{
+    my @glist;
+	open (IN, "<$opts{'empty'}") or die "Couldn't open '$opts{'empty'}' for reading.";
+	while (<IN>)
+	{
+		s/[\r\n]*$//o;      # platform-safe chomp
+		s/;.*$//o;          # Strip comments
+		s/ //go;            # Strip whitespace
+		push (@glist, $_) unless $_ eq '';
+	}
+    close IN;
+	$options{'-knownemptyglyphs'} = \@glist if scalar(@glist);
+}
+
+my $f = Font::TTF::Scripts::GDL->read_font($ARGV[0], $opts{'ap'}, %options) || die "Can't read font information";
+
+if (exists $f->{'WARNINGS'})
+{
+	warn $f->{'WARNINGS'};
+}
+
+
+my $outfh = IO::File->new("> $ARGV[1]") || die "Can't open $ARGV[1] for writing";
+
+my $comp = $1 if ($opts{'ligatures'} =~ s/(comp)$//oi);
+
+if ($opts{'renameaps'})
+{
+    foreach my $g (@{$f->{'glyphs'}})
+    {
+        my ($points) = {};
+        foreach my $p (keys %{$g->{'points'}})
+        {
+            my ($pname) = $p;
+
+            if ($pname =~ s/^(.+)M$/_$1/o)
+            { }
+            elsif ($pname =~ s/^(.+)S$/$1/o)
+            { }
+            $points->{$pname} = $g->{'points'}{$p};
+        }
+        $g->{'points'} = $points;
+    }
+}
+
+$f->{'vecs'} = {};
+
+$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}) if ($opts{'classfile'});
+$f->start_gdl($outfh);
+$f->make_classes(-ligatures => $opts{'ligatures'}, -ligtype => $comp, -ignoredAPs => $options{'omitaps'}, -notmark => $opts{'mark'});
+$f->out_gdl($outfh, -split_ligs => ($opts{'z'} & 1), -psnames => ($opts{'z'} & 4));
+$f->out_classes($outfh, -defines => $opts{'autodefines'});
+$f->endtable($outfh);
+$f->normal_rules($outfh, $opts{'normalize'}, ($opts{'z'} & 2)) if ($opts{'normalize'});
+$f->lig_rules($outfh, $opts{'substitutions'}, $opts{'ligatures'}) if ($opts{'ligatures'});
+$f->pos_rules($outfh, $opts{'positions'}) if ($opts{'positions'});
+$f->end_gdl($outfh, $opts{'include'}, $opts{'define'});
+
+$outfh->close();
+
+__END__
+
+=head1 NAME
+
+make_gdl - Create GDL from a TrueType Font
+
+=head1 SYNOPSIS
+
+  make_gdl [-a file] [-i file] [-l type [-s num]] [-n num] [-z bitfield]
+           infile outfile
+  make_gdl -h
+Creates font specific GDL from a font and optional attachment point database
+
+=head1 OPTIONS
+
+  -a file       Attachment point database
+  -c classfile  xml file of class and property information to merge in
+  --classproperties
+                specifies whether classes are made for property values in
+                the classfile
+  -d            Output per class #defines for key classes
+  -D name=val   Add #defines to output gdl
+  -e file       A file containing names (1 per line) of glyphs that are 
+                known to have no outline (thus shouldn't generate warnings). 
+  -h            print manpage
+  -i file       add #include statement at end of file
+  -l type       type =
+                    first - class name is first code, contents other codes
+                    last  - class name is last code, contents other codes
+                    firstcomp - treat extensions as part of elements, as first
+                    lastcomp - treat extensions as part of elements, as last
+  -m "list"     List of APs to ignore when deciding whether a glyph is a mark
+  -n num        Add a normalization substitution with the given pass number
+  -o "list"     List of AP names to omit
+  -p num        Add auto positioning attachment rules with the given pass number
+  -r            Rename point names such that final M gets initial _ and final S
+                is removed. Typically for Fontographer fonts.
+  -s num        Add ligature substitution rules with the given pass number
+  -z bitfield   Bitfield of various controls:
+                    0 - use component properties to set ligature bounding boxes
+                    1 - normalise even if presentation is only references
+                    2 - use postscript names in glyph definitions
+
+=head1 DESCRIPTION
+
+When writing a GDL description for a font there are generally two parts to
+such a description. The first part is a general behaviour description that is
+appropriate to a number of fonts for a particular writing system. It will
+contain rules for reordering, substitution, positioning, etc and is often
+written in terms of classes rather than individual glyphs. For a very simple
+script such a description may be empty.
+
+The second part of a description is font specific and includes names of glyphs
+positions of attachment points and other properties for each glyph. It will
+also contain class definitions and perhaps even some glyph specific rules.
+
+It is this second part that make_gdl is designed to address. Make_gdl will
+take a TTF and perhaps an attachment point database (defined in ttfbuilder)
+and will create a standardised font specific GDL description which may or
+may not be sufficient to describe the behaviour of the font. It is more
+likely that a general behaviour file will also need to be written.
+
+The generated GDL consists of 4 sections:
+
+=head2 Glyph Definitions
+
+Each glyph has a definition as part of a C<table(glyph)> section. The name of
+the glyph is based on the postscript name of the glyph. If the name is of
+the form of a general Unicode character in the Adobe Glyph List, then the
+name is transformed with an initial C<g_> followed by the unicode USV. If
+there is a sequence of unicode values in the name, the C<uni> parts of the
+name are replaced by <_> resulting in something like: C<g_1000_103c>.
+Otherwise the name is transformed to lower case with each upper case letter
+preceded by C<_> and the name preceded by C<g_> as in C<g__a> for A. If
+a glyph has a variant (C<.>I<var>) the C<.> is turned into C<_>. If a glyph
+is multinamed (separated by C</>) then only the first name is used for the
+glyph name although the glyph will appear in all the classes appropriate to
+all its names.
+
+Glyphs may have attachment points and these come from the attachment points
+database given on the command line. In addition any properties with the name
+starting C<GDL_> are included as glyph attributes for use in rules. Ligature
+components may also propagate from the attachment point database.
+
+Attachment points are assumed to be named according to the Fontlab convention
+whereby a diacritic has an anchor named C<_>I<x> that is anchored to a base
+character on the attachment point I<x>. The names of the se attachment points
+are munged so that C<_>I<x> becomes C<xM> and I<x> becomes I<x>C<S>.
+
+=head2 Class Definitions
+
+For each attachment point base name (I<x>) a class is created. Class C<c>I<x>C<Dia>
+contains a list of all the glyphs with the attachment point C<_>I<x>. Class
+C<cTakes>I<x>C<Dia> contains all the glyphs with attachment point I<x>. Class
+C<cn>I<x>C<Dia> contains all the glyphs without attachment point C<_>I<X>. And
+the class C<cnTakes>I<x>C<Dia> contains all the glyphs without the I<x>
+attachment point.
+
+In addition for each glyph name variant (as labelled in a postscript name for
+a glyph using C<.>I<var>) a class named C<c>I<var> is created with all the glyphs
+with that variant in their name. A class named C<cno_>I<var> is also created
+containing all the corresponding glyphs without the variant, in direct
+correspondance, so that the non-variant form may be mapped to the variant
+form using a single rule, for all the glyphs in the class.
+
+Finally a class is created for ligature components. If a glyph is part of a
+ligature rule it is either the key glyph for the rule or part of the class
+for the rule. Thus for a rule keyed of a glyph named I<x> there will be two
+classes: C<clig_>I<x> which is the ligatures involving I<x> and C<cligno_>I<x>
+which contains all the components that correspond to the ligatures found in
+the other class. This makes a ligature rule a simple 2:1 mapping from
+C<cligno_>I<x> + key to C<clig_>I<x>.
+
+=head2 Rules
+
+Make_gdl may also create generalised rules to simplify the creation of GDL
+descriptions. Which rule sets are generated is controlled from the command line.
+
+If the C<-n> command line option is used, make_gdl will create normalisation
+rules. These rules will map any glyph sequence that corresponds to a unicode
+sequence that has a canonical composition that exists in the font into that
+glyph.
+
+If the C<-s> command line option is used, make_gdl will write rules for combining
+glyphs into ligatures according to the glyph naming in the postscript name table.
+Ligature rules are based on a class and a glyph. By default the class contains a
+list of first glyphs in a ligature pair and there is a rule for each second glyph.
+If C<-l last> is used then this is reversed with there being a rule for each first
+glyph and the second glyph is in a class. If variants are involved, should
+the name be a variant of the ligature or the last glyph in the ligature sequence?
+If C<-l firstcomp> or C<-l lastcomp> then then variant is considered part of the
+last glyph otherwise it is considered part of the ligature.
+
+=head2 Inclusion
+
+make_gdl outputs a preprocessor definition C<MAXGLYPH> that is set to the number
+of glyphs in the font.
+
+Since a GDL description is only a single file, the command line allows one to
+specify another GDL file to include at the end of the file. This makes including
+a font independent GDL fragment much easier.
+
+=head2 Classfile
+
+The DTD for the classes file is:
+
+    <!ELEMENT classes (class, property)*>
+
+    <!ELEMENT class (#PCDATA)>
+    <!ATTLIST class
+        name    CDATA #REQUIRED
+        exts    CDATA #IMPLIED>
+
+    <!ELEMENT property (#PCDATA)>
+    <!ATTLIST property
+        name    CDATA #REQUIRED
+        value   CDATA #REQUIRED
+        exts    CDATA #IMPLIED>
+
+=head1 SEE ALSO
+
+ttfbuilder
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

@@ -1,0 +1,66 @@
+{
+   "abstract" : "Common rules for searching for Perl things",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Find-Rule-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find::Rule" : "0.20",
+            "File::Spec" : "0.82",
+            "Params::Util" : "0.38",
+            "Parse::CPAN::Meta" : "1.38",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-File-Find-Rule-Perl@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Rule-Perl"
+      },
+      "homepage" : "https://github.com/karenetheridge/File-Find-Rule-Perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/karenetheridge/File-Find-Rule-Perl.git",
+         "web" : "https://github.com/karenetheridge/File-Find-Rule-Perl"
+      }
+   },
+   "version" : "1.15",
+   "x_authority" : "cpan:ADAMK",
+   "x_contributors" : [
+      "Adam Kennedy <adam@ali.as>",
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Ash Berlin <ash_github@firemirror.com>",
+      "Jonathan Yu <jawnsy@cpan.org>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ]
+}

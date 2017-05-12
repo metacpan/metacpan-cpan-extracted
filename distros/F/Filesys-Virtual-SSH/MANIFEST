@@ -1,0 +1,9 @@
+Changes
+Build.PL
+Makefile.PL
+README
+MANIFEST
+MANIFEST.SKIP
+META.yml
+lib/Filesys/Virtual/SSH.pm
+t/vs_plain.t

@@ -1,0 +1,26 @@
+File/Mirror version 0.01
+========================
+
+File::Mirror provides two helper functions to do recursive directory
+operations between source path and destination path.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only core modules
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Jianyuan Wu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

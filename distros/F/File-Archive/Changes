@@ -1,0 +1,33 @@
+Revision history for Perl extension File::Archive.
+
+0.1  Thu Sep  2 20:56:11 1999
+	- original version; created by h2xs 1.19
+
+0.2  Thu Sep  2 21:46:00 1999
+	- Added new, filename, type
+
+0.3  Thu Sep  2 22:35:00 1999
+	- Added catalog method. Return contents of the file
+
+0.41 Thu Sep  2 23:01:00 1999
+	- Started on member method. Added some docs.
+
+0.5  Thu Sep  3 00:04:00 1999
+	- Got member method almost working. something.Z files don't
+	work yet. But maybe that's OK, since real people use gzip,
+	particularly on single files.
+
+0.51 Thu Sep  3 00:53:00 1999
+	- Doh! Forgot to name the Readme the right thing, so CPAN
+	ignored it.
+
+0.53 Thu Dec 9, 1999
+	- Hmm. I guess there must have been a 0.52 in there somewhere,
+	but I'm not sure. OK, it seems that between version 0.07 and
+	version 0.2, Archive::Tar changed the name of the list_files()
+	method to list_archive() method, thus breaking this module for
+	folks that have the older version installed. I'm taking the
+	lazy approach and requiring that people upgrade to the newer
+	version of Archive::Tar, since there are a number of improvements
+	and bug fixes.
+

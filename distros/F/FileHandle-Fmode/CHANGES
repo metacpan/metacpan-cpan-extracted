@@ -1,0 +1,33 @@
+0.14 - Add metadata to Makefile.PL.
+     - Define PERL_NO_GET_CONTEXT
+
+0.13 - Apply patch from Xavier Guimard. (Ticket 80607)
+
+0.12 - Apply patch from Diab Jerius. (Ticket #79983)
+
+0.11 - Add copyright notice to the LICENSE section of the pod.
+
+0.10 - Add is_FH() - which is just a (more intuitively named) alias for
+       is_arg_ok().
+       Various minor adjustments to enable trouble-free building on pre-5.6.
+
+0.09 - Correct error that prevents the module from building on perl 5.6.0.
+
+0.08 - Add is_A() function.
+       Rewrite internal functions to reduce (but not completely eradicate) repetition.
+
+0.05 - (Hopefully) fix problems with Solaris and some other operating
+       systems re testing for readability.
+
+0.04 - Can now handle filehandles connected to memory objects.
+
+0.03 - Rewrite the existing functions so that they die if:
+       1) the received  argument is not an open filehandle;
+       or
+       2) the received argument is a filehandle connected to a memory object.
+
+     - Add the is_arg_ok() function.
+
+0.02 - Minor changes for compatibility with pre-5.6 versions of perl, and some tidying up.
+
+0.01 - ummm ....

@@ -1,0 +1,38 @@
+Filter::NumberLines - Source filter for Numbering lines.
+========================================================
+
+SYNOPSIS
+========
+    Just put use Filter::NumberLines; at the top of your source file (below
+    the shebang). It will automagically number your lines starting from the
+    line after the use statement.
+
+      use Filter::NumberLines;
+
+NOTE
+    This module is used in the Source Filters in Perl talk I gave at
+    YAPC::Eu 2.00.2 in Munich.
+
+REQUIREMENTS
+    Filter::NumberLines requires Filter::Util::Call.
+    Filter::NumberLines::Simple requires Filter::Simple.
+    Filter::NumberLines::Scratch requires nothing.
+
+DISCLAIMER
+    This code is released under GPL (GNU Public License). More information
+    can be found on http://www.gnu.org/copyleft/gpl.html
+
+VERSION
+    This is Filter::NumberLines 0.02.
+
+AUTHOR
+    Hendrik Van Belleghem (beatnik -at- quickndirty -dot- org)
+
+SEE ALSO
+    GNU & GPL - http://www.gnu.org/copyleft/gpl.html
+
+    Filter::Util::Call - http://search.cpan.org/search?dist=Filter
+
+    Paul Marquess' article on Source Filters -
+    http://www.samag.com/documents/s=1287/sam03030004/
+

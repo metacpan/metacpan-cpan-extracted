@@ -1,0 +1,54 @@
+Revision history for File-Read
+
+0.0801  2007.10.19  (SAPER)
+        [DIST] CPAN-RT#30104: Converted the few accented characters to UTF-8 
+        (Damyan Ivanov).
+
+0.0800  2007.10.18  (SAPER)
+        [BUGFIX] Don't use Text::Unidecode on 5.6 because it doesn't really
+        work. Thanks to Andreas Koenig for finding this bug.
+        [TESTS] Fixed for passing again under Perl 5.5 and 5.4
+        [DIST] Have to change the version to 4 digits because packaging tools
+        are plain stupid.
+
+0.07    2007.10.17  (SAPER)
+        [FEATURE] Option "cmd" to set the command used to read files as root.
+        [TESTS] Removed the clunky tests for "as_root" as the "cmd" option 
+        allows for easy mocking.
+        [TESTS] t/file-read.t also tests if the functions are actually exported.
+        [DIST] eg/read_hosts.pl really present now.
+
+0.0602  2006.10.13  (SAPER)
+        [DIST] Added example eg/read_hosts.pl
+        [DOC] Small Pod changes.
+
+0.0601  2006.07.22  (SAPER)
+        [TESTS] Fixed t/file-read.t so it skips when file doesn't exist.
+
+0.06    2006.07.05  (SAPER)
+        [CODE] _to_ascii(): Improved the substitution.
+
+0.0501  2005.03.30  (SAPER)
+        [DIST] Updated MANIFEST..
+
+0.05    2005.03.30  (SAPER)
+        [FEATURE] Added new filter: to_ascii.
+
+0.04    2006.03.29  (SAPER)
+        [DOC] Added a rationale subsection.
+        [DOC] Added a See Also section.
+        [DOC] Small presentation change.
+
+0.03    2006.03.27  (SAPER)
+        [CODE] Small improvment: replaced an eval-string with an eval-code.
+        [DIST] Added missing prereq File::Slurp in Build.PL, Makefile.PL
+
+0.02    2006.02.08  (SAPER)
+        [BUGFIX] Fixed a problem when reading files as root.
+        [API] Changed the semantic of the aggregate option for a more 
+        useful one.
+        [DOC] Fixed a few pod typos.
+
+0.01    2006.02.03  (SAPER)
+        First version, released on an unsuspecting world.
+

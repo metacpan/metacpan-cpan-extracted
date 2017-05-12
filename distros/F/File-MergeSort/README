@@ -1,0 +1,47 @@
+File/MergeSort version 1.23
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::File
+  Test::More (for running tests during 'make test')
+
+OPTIONAL MODULES:
+
+These modules will be utilised if installed, but are not essential:
+
+  IO::Zlib (for handling compressed files, as discussed above)
+  Test::Pod::Coverage (for running additional tests during 'make test')
+
+POINTS TO NOTE
+
+As of version 1.06, sorts are now performed lexicographically, so
+File::MergeSort can now merge files with non-numeric merge keys.
+
+As of version 1.10 IO::Zlib is no longer a prerequisite.
+If IO::Zlib is installed, File::MergeSort will use it to handle
+compressed input files.
+If IO::Zlib is not installed and compressed files are specified as
+input files, File::MergeSort will raise an exception.
+If you do not need to process compressed files, there is no longer any
+need install IO::Zlib to use File::MergeSort.
+
+COPYRIGHT AND LICENCE
+
+ Copyright (c) 2001-2003 Christopher Brown
+               2003-2010 Barrie Bremner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,9 @@
+Revision history for FormValidator-Simple-Plugin-DBIC-Schema-Unique
+
+0.0.2  2008-04-15
+       inheritance ResultSet class case: thanks to id:spiritloose.
+       add test case.
+
+0.0.1  Mon Apr 23 18:01:29 2007
+       Initial release.
+

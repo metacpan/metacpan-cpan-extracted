@@ -1,0 +1,39 @@
+---
+abstract: 'file storage and file readers'
+author:
+  - 'Vyacheslav Matyukhin <me@berekuk.ru>'
+build_requires:
+  Test::Class: 0
+  Test::Exception: 0
+  Test::More: 0
+  Time::HiRes: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Flux-File
+requires:
+  Carp: 0
+  Fcntl: 0
+  File::Basename: 0
+  Flux::In: 0
+  Flux::In::Role::Lag: 0
+  Flux::Role::Description: 0
+  Flux::Role::Owned: 0
+  Flux::Storage: 0
+  IO::Handle: 0
+  Lock::File: 0
+  Moo: 0
+  MooX::Types::MooseLike::Base: 0
+  Params::Validate: 0
+  autodie: 0
+resources:
+  repository: git://github.com/berekuk/Flux-File.git
+version: 1.01

@@ -1,0 +1,5 @@
+#fsdb -F S paper papertitle reviewer reviewername score1 score2 score3 score4 score5
+1  test, paper  2  Smith  4  4  -  -  -
+2  other paper  3  Jones  3  3  -  -  -
+2  input double space  3  Jones  3  3  -  -  -
+#   | csv_to_db

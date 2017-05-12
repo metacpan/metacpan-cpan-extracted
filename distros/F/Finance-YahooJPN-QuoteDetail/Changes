@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::YahooJPN::QuoteDetail.
+
+0.01  Thu Apr 15 11:25:41 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Finance::YahooJPN::QuoteDetail
+

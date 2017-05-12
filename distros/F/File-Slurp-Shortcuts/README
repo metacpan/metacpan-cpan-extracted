@@ -1,0 +1,79 @@
+NAME
+    File::Slurp::Shortcuts - Several shortcut functions for File::Slurp
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+     # instead of 'use File::Slurp', you 'use File::Slurp::Shortcuts' instead
+
+DESCRIPTION
+    File::Slurp::Shortcuts is a drop-in replacement for File::Slurp,
+    offering more shortcut functions for convenience. It exports all
+    File::Slurp exports. It currently also adds autochomping to read_file().
+
+    About autochomping: It is supposed to be in the upcoming version of
+    File::Slurp, but since I'm tired of waiting, this module is the band-aid
+    solution. It wraps read_file() (and slurp()) so it handles the chomp
+    option. It reads in file containing, e.g. "foo\n" into Perl data as
+    "foo".
+
+FUNCTIONS
+    For the complete list of functions available, see File::Slurp. Below are
+    functions introduced by File::Slurp::Shortcuts:
+
+  read_file_c($path, %opts) (or slurp_c)
+    Shortcut for:
+
+     read_file('path', chomp=>1, ...)
+
+  slurp_c
+    Alias for read_file_c
+
+  read_file_cq($path, %opts) (or slurp_cq)
+    Shortcut for:
+
+     read_file('path', chomp=>1, err_mode=>'quiet', ...)
+
+    I personally use this a lot to retrieve configuration value from files.
+
+  slurp_cq
+    Alias for read_file_cq
+
+  read_file_q($path, %opts) (or slurp_q)
+    Shortcut for:
+
+     read_file('path', err_mode=>'quiet', ...)
+
+    I personally use this a lot to read files that are optional.
+
+  slurp_q
+    Alias for read_file_q
+
+SEE ALSO
+    File::Slurp, obviously.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Slurp-Shortcuts>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-File-Slurp-Shortcuts>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurp-Shortcuts>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

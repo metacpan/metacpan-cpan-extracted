@@ -1,0 +1,25 @@
+---
+abstract: 'base class for dealing with FTN message serialno.'
+author:
+  - 'Valery Kalesnik <valkoles@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FTN-Message-serialno
+provides:
+  FTN::Message::serialno:
+    file: lib/FTN/Message/serialno.pm
+    version: '20141121'
+  FTN::Message::serialno::File:
+    file: lib/FTN/Message/serialno/File.pm
+    version: '20141121'
+requires:
+  File::Spec: '0'
+version: '20141121'

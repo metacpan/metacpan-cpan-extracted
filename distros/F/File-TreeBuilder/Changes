@@ -1,0 +1,9 @@
+Revision history for File-TreeBuilder
+
+0.02      2011-02-08
+    + Can now run on 5.8.1.
+    + Can now be installed on Windows (fixed a test bug).
+
+0.01      2011-01-28
+    + First release
+

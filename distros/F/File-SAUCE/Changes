@@ -1,0 +1,114 @@
+Revision history for Perl extension File::SAUCE.
+
+0.25  Thu Nov 19 2009
+    - repackaged with a new version of Module::Install
+
+0.24  Tue Mar 04 2008
+    - test suite work
+
+0.23  Wed Feb 27 2008
+    - Module::Install update
+
+0.22  Thu Aug 23 2007
+    - switch to Module::Install
+    - remove File::Slurp from test deps
+
+0.21  Tue Dec 20 2005
+    - changed $fh->binmode to binmode $fh
+
+0.2   Thu Sep 29 2005
+    - Switched from IO::File to FileHandle
+    - use string multiplication where needed
+
+0.13  Wed Mar 02 2005
+    - added pod_coverage test
+
+0.12  Mon Sep 27 2004
+    - minor doc fixes
+
+0.11  Fri Sep 24 2004
+    - more generic warning testing
+    - re-added clear() on read()
+
+0.1   Fri Sep 24 2004
+    - another interface overhaul
+    - removed the "guess mode" (must be one of file, handle or string)
+    - using IO modules for file manipulation
+    - removed get and set methods in favor of Class::Accessor methods
+    - updated pack/unpack string to work on different platforms
+    - various code fixes as a result of increasing the test coverage
+      to 100%
+
+0.08  Tue Feb 10 2004
+    - removed extra boolean requirement for raw data.
+      old code should still work, though
+    - read() does a clear() as well
+
+0.07  Sat Feb 07 2004
+    - checking endian-ness for pack template portability
+    - added an example script
+
+0.06  Mon Dec 15 2003
+    - added more tests
+    - minor bug fixes dealing with undef data
+
+0.05  Sun Dec 07 2003
+    - still attempting to make t/30-as_string.t pass
+    - added tinfo data
+    - added tinfo1-4 subs and docs
+    - pretty_print now uses tinfo1-4 subs
+
+0.04  Sun Nov 30 2003
+    - the module now "eats its own dog food" (get/set)
+    - fixed pack/unpack template
+    - reverted clear() back to settings SAUCE record defaults
+    - from the above change, has_sauce() MUST be used to check if a file
+      has sauce
+    - added has_sauce() to docs
+    - added get/set sauce_comments (number of comments)
+    - get/set flags now returns/takes a number as output/input
+    - spoon compatibility for SAUCE removal added and documented
+    - suppressed "ambiguous read" warnings by qualifying them with CORE::
+    - comments are actually truncated now, oops.
+    - misc doc fixes
+    - misc code clean-ups
+    - Re-organized the directory structure
+    - using Test::More to test
+    - added several test
+
+0.03  Sun Aug 10 2003
+    - comment lines are auto-trucated when comments are set
+    - comment data is now an array ref even when no comments are available.
+    - as_string method created (used by all _write* subs)
+    - internal sub _write_raw_data() now explicitly returns the data
+    - _write_raw_data() also auto-fixes file size
+    - SAUCE_ID and COMNT_ID are now exported.
+    - has_sauce() sub added. You can now check SAUCE existance by
+      doing: if ( $ansi->has_sauce  ) { ... }
+    - auto_date() sub added. It will auto-set the date in the sauce record
+      (unless it already exists). Calling it with no args uses the current
+      date. Note: this is auto-called before a write()
+    - convert_localtime() sub added. it takes a localtime-able value and
+      turns it into a suitable SAUCE record date (uses time() if arg is
+      omitted)
+
+0.02  Sun Apr 06 2003
+    Interface overhaul:
+    - Removed the need to specify a filename on new()
+    - You can specify nothing, a filename, a ref to a filehandle or raw data
+      for new()
+    - read(), write(), and remove() now require either a filename, a ref
+      to a filehandle, or raw data to work
+    - when using raw data, you must set the $is_raw_data flag to true
+      ex: $ansi->read($data, 1);
+    - get_id(), still gets the SAUCE ID, but you can now use get_sauce_id()
+      and get_comnt_id() to get either ID.
+    - clear() now sets all elements to '', rather than the last version's
+      defaults
+    - by changing to the above you can check to see if a file has a SAUCE
+      record by checking the return of get_sauce_id() (eq 'SAUCE' -> yes,
+      else -> no)
+
+0.01  Mon Mar 10 20:11:04 2003
+    - original version; created by h2xs 1.21 with options
+    	-AX File::SAUCE

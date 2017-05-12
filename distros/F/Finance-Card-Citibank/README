@@ -1,0 +1,72 @@
+NAME
+    Finance::Card::Citibank - Check your Citigroup credit card accounts from
+    Perl
+
+SYNOPSIS
+      use Finance::Card::Citibank;
+      my @accounts = Finance::Card::Citibank->check_balance(
+          username => "xxxxxxxxxxxx",
+          password => "12345",
+      );
+
+      foreach (@accounts) {
+          printf "%20s : %8s / %8s : USD %9.2f\n",
+          $_->name, $_->sort_code, $_->account_no, $_->balance;
+      }
+
+DESCRIPTION
+    This module provides a rudimentary interface to Citigroup's credit card
+    balances. You will need either "Crypt::SSLeay" or "IO::Socket::SSL"
+    installed for HTTPS support to work. Version 2.01 was a re-write to use
+    the OFX interface rather than screen scraping. This should make the
+    module more stable as the screen scrapping method required updates
+    whenever there were changes to Citigroup's site.
+
+CLASS METHODS
+  check_balance()
+      check_balance( usename => $u, password => $p )
+
+    Return an array of account objects, one for each of your bank accounts.
+
+OBJECT METHODS
+      $ac->name
+      $ac->sort_code
+      $ac->account_no
+
+    Return the account name, sort code and the account number. The sort code
+    is just the name in this case, but it has been included for consistency
+    with other Finance::Bank::* modules.
+
+      $ac->balance
+
+    Return the account balance as a signed floating point value.
+
+WARNING
+    This warning is verbatim from Simon Cozens' "Finance::Bank::LloydsTSB",
+    and certainly applies to this module as well.
+
+    This is code for online banking, and that means your money, and that
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the source
+    of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to me,
+    but is provided under NO GUARANTEE, explicit or implied.
+
+THANKS
+    Simon Cozens for "Finance::Bank::LloydsTSB". The interface to this
+    module, some code and the pod were all taken from Simon's module.
+
+    Brandon Fosdick's for his Finance::OFX module. I was unable to use the
+    modules outright as their is quite a bit that differs between bank and
+    credit card OFX, but some of his parsing routines were very helpful.
+
+    Jon Keller added the ability to pull multiple accounts.
+
+AUTHOR
+    Mark Grimes, <mgrimes@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Mark Grimes.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,15 @@
+MANIFEST
+LICENSE
+README
+Changes
+Makefile.PL
+lib/Fuse/PerlSSH/FS.pm
+lib/Fuse/PerlSSH/RemoteFunctions.pm
+t/000_env.t
+t/001_load.t
+t/002_methods.t
+t/003_mount.t
+t/004_mounted.t
+bin/perlsshfs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

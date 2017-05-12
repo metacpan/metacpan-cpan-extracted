@@ -1,0 +1,57 @@
+2009-08-26 14:02  cvs
+
+	* INSTALL, MANIFEST, META.yml, Makefile.PL, README,
+	  lib/Finance/MICR/LineParser.pm: Updated documentation.  Made sure
+	  that the license stated is perl.  Nicer README.
+
+2006-11-29 17:29  cvs
+
+	* t/basic.t: tests, etc
+
+2006-11-22 11:16  cvs
+
+	* Finance-MICR-LineParser-1.06.tar.gz: dist added
+
+2006-11-22 11:14  cvs
+
+	* META.yml: added meta yml
+
+2006-11-22 11:13  cvs
+
+	* lib/Finance/MICR/LineParser.pm: fixed up docs a little, did not
+	  redist
+
+2006-11-09 13:05  cvs
+
+	* Finance-MICR-LineParser-1.05.tar.gz, META.yml: fixing
+
+2006-11-09 13:03  cvs
+
+	* MANIFEST, META.yml: meta?
+
+2006-11-09 12:19  cvs
+
+	* MANIFEST, Makefile.PL, lib/Finance/MICR/LineParser.pm: testing
+
+2006-11-09 12:15  cvs
+
+	* Makefile.PL, lib/Finance/MICR/LineParser.pm, t/basic.t: tweaked
+	  LineParser.pm to treat "888 888U" to find account number in there
+	  regardless of spaces or dashes
+
+	  tweaked tests
+
+2006-11-07 15:18  cvs
+
+	* lib/Finance/MICR/LineParser.pm: cleaning
+
+2006-11-07 15:08  cvs
+
+	* MANIFEST, Makefile.PL, README, example_script/micrline.pl,
+	  lib/Finance/MICR/LineParser.pm, t/basic.t: Initial revision
+
+2006-11-07 15:08  cvs
+
+	* MANIFEST, Makefile.PL, README, example_script/micrline.pl,
+	  lib/Finance/MICR/LineParser.pm, t/basic.t: stable, functional.
+

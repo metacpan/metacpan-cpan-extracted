@@ -1,0 +1,12 @@
+CHANGELOG			Change log 
+MANIFEST			This file
+README				A short readme file about this library
+Makefile.PL			Makefile maker
+LICENSE				This modules LICENSE policy
+lib/File/Fingerprint/Huge.pm	The File::Fingerprint::Huge module it self.
+t/00basic.t			A simple run test
+t/01crc32.t			CRC32 data verification test
+t/02crc64.t			CRC64 data verification test
+t/03md5hex.t			MD5 hex verification test
+t/testdata			1 megabyte of random test data
+META.yml			Module meta-data (added by MakeMaker)

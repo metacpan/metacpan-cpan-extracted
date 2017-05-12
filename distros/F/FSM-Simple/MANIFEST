@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/FSM-Simple.t
+t/add_state.t
+t/add_trans.t
+t/init_state.t
+t/run.t
+lib/FSM/Simple.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+#fsdb experiment duration
+ufs_mab_sys	37.2
+ufs_mab_sys	37.3
+ufs_mab_sys	37.3
+ufs_mab_sys	37.4
+#   | dbrow _experiment =~ /mab/

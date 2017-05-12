@@ -1,0 +1,13 @@
+Revision history for File-RsyBak-Unpacked
+
+0.29    2015-10-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Update (remove) dependencies because File-RsyBak-0.29 has
+	  its deps fixed.
+
+
+0.28    2015-10-21 (PERLANCAR)
+
+        - First release.

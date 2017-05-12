@@ -1,0 +1,19 @@
+0.05    21 January 2005
+        Fixed some test issues
+	Added ability to talk to the RBoS site, which uses the same backend [Jonathan McDowell]
+
+0.04    13 November 2003
+        Added a couple of missing dependencies to Makefile.PL
+	Updated README contact email address; was missed in the last change
+
+0.03    11 November 2003
+        Update to deal with small change to website
+	Update to contact email address
+
+0.02    29 September 2003
+        Version numbers weren't set correctly
+
+0.01    28 September 2003
+        Initial release
+	Pre-release bug fix to deal with balances of 1000 or more [Dave Holland]
+

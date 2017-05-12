@@ -1,0 +1,14 @@
+#fsdb cid sid cname
+9	-	spreadsheets
+10	1	-
+11	2	pascal
+12	1	os
+12	2	os
+13	1	-
+14	-	databases
+15	1	-
+16	1	-
+17	1	-
+# There was a bug when a was longer than b
+#  | dbsort -n cid
+#   | dbjoin -S -e - -a --input TEST/dbjoin_non_matching_2.in-2 -n cid

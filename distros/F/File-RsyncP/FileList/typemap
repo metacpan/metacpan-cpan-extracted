@@ -1,0 +1,2 @@
+TYPEMAP
+File::RsyncP::FileList   T_PTROBJ

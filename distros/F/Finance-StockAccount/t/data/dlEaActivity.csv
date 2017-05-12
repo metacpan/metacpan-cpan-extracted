@@ -1,0 +1,4 @@
+Symbol, Description, Action, Quantity, Price, Commission, Reg Fees, Date, TransactionID, Order Number, Transaction Type ID, Total Cost
+
+EA,EA - ELECTRONIC ARTS INC,Sell,193,15.73,8.95,0.07,1/31/2013 9:40:54 AM,286389452,129716558,6,3026.87
+EA,EA - ELECTRONIC ARTS INC,Buy,93,15.03,8.95,0,5/7/2012 10:08:55 AM,248463951,120143904,6,-1406.74

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Filter/ExtractSource.pm
+lib/Filter/ExtractSource/CodeObj.pm
+t/00.load.t
+t/pod.t

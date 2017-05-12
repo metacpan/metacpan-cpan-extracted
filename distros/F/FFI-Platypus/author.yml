@@ -1,0 +1,92 @@
+---
+pod_spelling_system:
+  skip: 0
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - longdouble
+    - sint
+    - uint
+    - parentheticals
+    - ffi
+    - xsub
+    - JIT
+    - xsubs
+    - libffi
+    - strdup
+    - libc
+    - libarchive
+    - free'd
+    - free'ing
+    - SIGSEGV
+    - Ctypes
+    - libm
+    - libnotify
+    - libuuid
+    - libzmq
+    - deparsed
+    - tcc
+    - fsprogs
+    - DLLs
+    - libtest
+    - bzip
+    - Fortran
+    - smushes
+    - Bakkiaraj
+    - Murugesan
+    - bakkiaraj
+    - demangling
+    - lang
+    - demangled
+    - alignof
+    - ALEXBIO
+    - AWWAIID
+    - Alessandro
+    - Ghedini
+    - MHOWARD
+    - JRuby
+    - Rubinius
+    - reimplemented
+    - Mughal
+    - Zaki
+    - zmughal
+    - Scala
+    - JVM
+    - gcj
+    - integrators
+    - ABIs
+    - abis
+    - abi
+    - ABI
+    - pipcet
+    - FSF
+    - bzip2
+    - e2fsprogs
+    - g3
+    - sint8
+    - sint16
+    - sint32
+    - sint64
+    - uint8
+    - uint16
+    - uint32
+    - uint64
+    - x86
+    - calid
+    - Fitz
+    - felliott
+    - Fesunov
+    - Vickenty
+    - vyf
+    - Gregor
+    - Herrmann
+    - gregoa
+
+pod_coverage:
+  skip: 0
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - FFI::Platypus::Type::.*
+    - FFI::Platypus::ShareConfig
+

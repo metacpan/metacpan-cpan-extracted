@@ -1,0 +1,9 @@
+Only in t01/old: aaa
+Only in t01/new: bbb
+Files t01/old/ddd and t01/new/ddd differ
+Only in t01/old/dir1: hhh
+Only in t01/new/dir1: iii
+Only in t01/old: dir2
+Only in t01/new: dir3
+Files t01/old/dlink2 and t01/new/dlink2 differ
+Files t01/old/fff and t01/new/fff differ

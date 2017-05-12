@@ -1,0 +1,33 @@
+---
+abstract: 'An interface to firebase.com.'
+author:
+  - 'JT Smith <jt@plainblack.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Firebase
+no_index:
+  directory:
+    - author.t
+requires:
+  Digest::SHA: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Thin: '0'
+  JSON: '0'
+  JSON::XS: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  Ouch: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  URI: '0'
+resources:
+  bugtracker: http://github.com/rizen/Firebase/issues
+  repository: git://github.com/rizen/Firebase.git
+version: '1.0002'

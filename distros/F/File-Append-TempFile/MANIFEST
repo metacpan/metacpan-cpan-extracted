@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/coverage.t
+t/meta-json.t
+t/podcheck.t
+t/use.t
+lib/File/Append/TempFile.pm
+META.json

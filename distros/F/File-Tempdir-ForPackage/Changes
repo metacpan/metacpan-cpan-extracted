@@ -1,0 +1,60 @@
+Release history for File-Tempdir-ForPackage
+
+1.000002 2017-03-10T11:35:18Z 2b67ff5
+ - Avoid test failures due to -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+1.000001 2014-08-15T22:56:28Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes
+ - whitespace reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - develop: ↑1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+1.000000 2014-08-14T08:50:45Z
+ [00 Major]
+ - Changes that will affect hand operated downstreams.
+
+ [01 Version Scheme]
+ - Migrated to x.yyyzzz from x.y.z
+ - This is the primary reason for the 1.x on the box.
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [02 Tooling]
+ - Moved to ExtUtils::MakeMaker
+ - "Latest" deps for toolchain parts are now only "recommended"
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [03 Cleanup functions nuked from orbit]
+ - The persist function is now handled on a tempdir basis by directly using File::Temp tricks.
+ - This means that any tempdir that is to be freed will be freed as soon as it is no longer referenced
+ - so ->_clear_dir will wipe it
+ - and program termination should wipe it.
+ - so cleanse and DESTROY are no longer needed
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +49 -1 (recommends: -1, suggests: +1 ↑1)
+ - runtime: +2 ↓1 -2
+ - test: +2 ↓1 -1 (recommends: +3)
+
+0.1.1 2012-07-26T14:43:40Z
+ [Documentation]
+ - Full documentation of all directly defined properties.
+
+0.1.0 2012-07-26T12:58:43Z
+ - First version.

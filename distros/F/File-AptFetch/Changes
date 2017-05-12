@@ -1,0 +1,150 @@
+  v0.1.14 20170415
+
+      *   Disabling APT-poking tests.
+
+      *   Abandoning
+
+  v0.1.13 20140811
+
+      *   Working time-to-finish estimation has been added.
+
+      *   Dropping scary "NOTHING".
+
+      *   Silencing t/simple/copy.t and t/simple/file.t.
+
+  v0.1.12 20140704
+
+      *   Adding *$force_file* "cCM" option.
+
+      *   Going for time estimation (probably will be totally reworked)
+          (just a release excuse).
+
+      *   Attempt to fix for reals "tag+576b" bug (might affect
+          "tag+38a2" too); Rolling back "qr/\V/" (too early).
+
+  v0.1.11 20140612
+
+      *   Adding speed aproximation.  Changing oscillator; leads to new
+          dependecy List::Util.
+
+      *   Attempt to fix two popular FTBFSes.
+
+      *   Rolling back to base; parent has appeared in *v5.10.1* or
+          something.
+
+  v0.1.10 20140516
+      But-why-god-why release.
+
+      *   It figures qv doesn't have prototype.
+
+  v0.1.9 20140515
+
+      *   Progress exposing route has been made through.  Adding options
+          (*$beat* and *$wink*) to control it.  Adding *requires*
+          (String::Truncate) to support it.
+
+      *   Attempt to fix any-random-nix-but-mostly-linux FTBFSes (race)
+          (probably won't fix anything, read -- introducing new).
+
+  v0.1.8 20140419
+
+      *   Adding *select* callback (*gain* callback looks useless now)
+          (AAMOF, it's release excuse).
+
+      *   Attempt to fix linux-but-debian FTBFSes (weird) (most
+          probably, won't fix anything; just an excuse to peek into).
+
+  v0.1.7 20140403
+
+      *   Introducing *gain* callback (preparing place for F::AF::S to
+          move in).
+
+      *   *$uri* identifies transfer, but *$filename*.
+
+      *   Attempt to fix nix-but-linux FTBFSes (totally my fault).
+
+      *   Attempt to prevent losing diagnostics around non-empty
+          *STDERR* (just in case).
+
+  v0.1.6 20140318
+
+      *   Transfer-is-in-progress check is moved to callback.  What
+          could be user-provided.  Introducing *$ConfigData{tick}* and
+          changing *$ConfigData{timeout}* handling.
+
+      *   Another attempt to fix got-''-expected-'{{{TERM}}}' build
+          errors (guesswork).  Another attempt to fix
+          got-'1'-expected-'' build errors (being *@$log* filled with
+          yet-to-be-processed message or empty isn't reliable anymore).
+
+      *   Adding unit with required manual configuration (slow
+          inter-device copy).  That's the very first torturing unit,
+          please welcome.
+
+      *   Investigating weird compatibility problem (two units:
+          t/0/EmMn8o.t and t/0/9raCtd.t).
+
+  v0.1.5 20140226
+
+      *   Trying to test minimally implemented File::AptFetch::Simple.
+
+      *   Attempt to fix got-''-expected-'{{{TERM}}}' build errors
+          (guesswork).  Attempt to fix got-'1'-expected-'' build errors
+          (probably, in vein).  Attempt to fix unexpected locale
+          settings build errors.
+
+  v0.1.4 20140209
+      F::AF::S pre-release.
+
+      *   *$ConfigData{apt_source}* parser has been rewriten: accepting
+          new config entries, more strictures.
+
+      *   Incompatible change! Message parser has been rewritten: long
+          promised changing hyphens to underscores, more strictures.
+
+      *   Pipe reader has been rewritten: runs on select(2), eval has
+          been dropped; side effect -- all possible messages are read at
+          once (not one-by-one, as before).  Probable regression (may be
+          there's none): what if a message is that big that it doesn't
+          fit in buffer?
+
+      *   TS has been reloaded.  Ridiculous "INIT { use_ok }" has been
+          dropped from t/0.t.
+
+      *   Attempt to declare legal stuff correctly without dependecies
+          boosting.  (v0.1.5 -- nope.)
+
+  v0.0.9 20101205
+      Mostly cosmetic change (one underscore added in
+      _cache_configuration parsing re) in order to work with APT of
+      squeeze.
+
+      *   Requiring perl of v.5.8.0 at minimum.
+
+      *   Playing with POD in diags has been plain stupid.
+
+      *   Misguided attempt to survive the die of "Interrupted system
+          call" (btw, TS only, F::AF is still affected).
+
+      *   Misguided attempt to fix missing log of signaling tests.
+
+      *   Adding simplest test-unit that's run first and BAIL_OUTs for
+          any reason.
+
+  v0.0.8 20101125
+      Panic release -- methods have no will to report any progress.
+
+      *   *$ConfigData{timeout}* has been invented.  Default timeout was
+          bumped 12x times in order to recover from too silent
+          APT-methods.
+
+      *   Hopefully fixing part of FAILs of cpan-testers.
+
+  v0.0.7 20090511
+
+      *   First release.
+
+  v0.0.0 20090222
+
+      *   Initialization.
+

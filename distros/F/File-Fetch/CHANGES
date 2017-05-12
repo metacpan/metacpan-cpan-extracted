@@ -1,0 +1,248 @@
+0.52        Fri Aug 12 11:15:46 2016
+
+* Set a cleaned env when running git clone
+* Changed git repository link in tests
+* Removed consistently failing httpbin.org tests
+
+0.50        Mon Aug  8 12:49:13 2016
+
+* Require Module::Load::Conditional 0.66
+* Fix FTP tests for ipv6
+
+0.48        Fri Jan 24 10:32:52 2014
+
+* Force curl to be IPv4 only during testing
+  on NetBSD
+
+0.46        Tue Nov 26 22:26:42 2013
+
+* Blacklist 'lftp' on DragonflyBSD
+
+0.44        Sat Sep 28 21:14:12 2013
+
+* Fix INSTALLDIRS to 'site' for perl 5.12+
+  (Olivier Mengué)
+  https://rt.perl.org/rt3/Public/Bug/Display.html?id=116479
+
+0.42        Fri Apr 12 15:28:34 2013
+
+* Skip slurp tests for git://
+
+0.40        Fri Apr 12 11:18:52 2013
+
+* Added git:// url support
+
+0.38        Thu Jan 10 20:52:53 2013
+
+* Add support for an optional tempdir_root
+  parameter (Kent Fredric)
+
+0.36        Thu Jun 28 13:41:31 2012
+
+* Added 'file_default' option for URLs that do
+  not have a file component (Andrew Kirkpatrick)
+
+0.34        Thu Apr 12 22:25:01 2012
+
+* Added heuristics to skip tests when no
+  Internet access
+
+0.32        Mon Jan 17 10:26:40 2011
+
+* Added support for HTTP::Tiny
+
+0.30        Fri Jan  7 21:00:27 2011
+
+* Apply blead patches from Peter Acklam
+
+0.28        Sun Nov  7 21:22:26 2010
+
+* Added support for FreeBSDs 'fetch' command for
+  both http and ftp schemes.
+
+0.26        Sat Nov  6 23:30:59 2010
+
+* Added support for HTTP::Lite 
+* Resolved issue with '-l' switch and iosock fetch
+
+0.24        Wed Jan  6 23:32:19 2010
+
+* Applied a patch from brian d foy RT #53427
+  that makes new() respect sub-classes.
+
+0.22        Sat Nov 14 23:13:16 2009
+
+* Bumped to stable version
+
+0.21_02     Thu Nov 12 12:55:57 2009
+
+* Additional checks for the iosock retriever
+
+0.21_01     Wed Nov 11 23:38:27 2009
+
+* Added a simple IO::Socket/IO::Select based http retriever,
+  based on code suggested by Paul 'Leonerd' Evans
+
+0.20        Sat Jun 27 16:30:59 2009
+
+* Promote 0.19_01 to stable
+
+0.19_01     Mon Feb  9 18:04:01 2009
+
+* Address: #42268: Wishlist: slurp to scalar
+  File::Fetch can now fetch to scalars as well
+
+0.18        Wed Dec 17 14:00:40 2008
+
+* Address #41412: User agent string contains uninterpolated 
+  $VERSION.
+* Use IPC::Cmd 0.42's supplied QUOTE constant, rather than 
+  rolling our own
+
+0.16        Fri Oct 10 13:54:40 2008
+
+* Promote 0.15_04 to stable.
+
+0.15_04     Mon Sep 22 15:08:49 2008
+
+* Address: #37649: Feature request: Support lftp
+  File::Fetch now supports lftp, with one minor caveat: it uses
+  a temporary file to store the commands for lftp, as they are
+  multiline commands. Without this, we run into portability issues
+  with 'special' characters on various platforms, like ; and &.
+  
+0.15_03     Sun Jul 13 15:56:41 2008
+
+* Add -q to curl, to inhibit the reading of .curlrc, 
+  which may interfere with the options we pass ourselves. 
+  This addresses #36902
+
+0.15_02     Sun May 18 13:42:30 2008
+
+* Address #35018: Treat HTTP 404 Message as fail with lynx
+  lynx now does a -head request first to make sure the file
+  exists before proceeding
+
+0.15_01     Sun Apr  6 13:55:36 2008
+
+* Address: #32755: File-Fetch tests cannot fail if 
+  unable to connect to internet. Tests are now skipped
+  if it looks as the failure is due to a lacking network
+  connection.
+* New IPC::Cmd (0.41) fixes an IPC::Open3 bug, which we
+  now rely on.
+
+0.14        Fri Dec 14 13:42:30 2007
+
+* Promote 0.13_04 to stable.
+
+0.13_04     Wed Nov 14 20:07:02 2007
+
+* VMS patches for file:// uris by John M.
+
+0.13_03         2007-11-04 21:32:40
+
+* Restore OS specific file:// URI behaviour. The 
+  RFC's specify that the url definition is host OS
+  specific, so what a url means on one machine will
+  mean something different on another.
+  VMS is now treated according to RFC 1738 
+  (http://www.faqs.org/rfcs/rfc1738.html).
+
+0.13_02 Sun Nov  4 10:38:40 CET 2007
+
+* Apply a perl 5.5.x compatibility fix. Users with
+  perl 5.6.0 or higher do not need to upgrade.
+
+0.13_01 Sat Nov  3 18:55:10 CET 2007
+
+* Apply a modified version of dmq's patch to deal
+  properly with file:// URIs on Win32. 
+* Add test cases for Win32 file:// URIs
+
+0.12    Mon Oct 15 14:32:23 CEST 2007
+
+* Treat VMS like UNIX when dealing with file URIs
+
+0.10    Fri Jan 26 13:51:19 CET 2007
+
+* Promote 0.09_02 to stable.
+
+0.09_02 Sun Jan  7 18:44:09 CET 2007
+
+* The quotation as done in 0.09_01 doesn't play
+  nicely with Win32 and IPC::Run. IPC::Run is
+  therefor disabled during the fetch() call.
+* Remove File::Fetch::Item as a class. All objects
+  are now plain File::Fetch objects. This has no
+  impact on user-end code, except code that checks
+  the class of objects.
+* URI encoding is not always clear or trivial. Add
+  a FAQ entry about it.
+* Add $ff->output_file as accessor, which is the 
+  requested file, stripped from query parameters.
+* Errors are now stored per object rather than 
+  class wide.
+
+0.09_01 Wed Jan  3 17:17:31 CET 2007
+
+* address: #23864: File:Fetch does not use quotation 
+    marks while using wget:
+  * the handlers for lynx, wget, curl and rsync now
+    quote their URIs.
+
+0.08    Wed Jul  5 13:56:36 CEST 2006
+
+* address: #18942: unproper handling of http errors 
+  in external handlers:
+  * the wget handler, on a failed attempt, now 
+    unlinks its outputfile
+  * the curl handler is updated to follow '302 moved' 
+    and such like status messages
+  * lynx use is further discouraged, as it doesn't 
+    communicate http status messages back to the caller 
+    at all.
+* address #11483: File::Fetch 0.07 cannot do an FTP 
+  fetch on Win32. FTP fetching using Net::FTP should
+  now work properly on win32.
+* update test suite so it runs safely under PERL_CORE
+
+0.07    Thu Dec 23 09:31:00 PST 2004
+
+
+* Add $TIMEOUT to specify the network timeout
+
+0.06    Thu Dec 16 03:21:00 PST 2004
+
+
+* Add rsync support
+
+0.05    Fri Jun 18 13:55:51 CEST 2004
+
+
+* Update faq
+* Silence silly warnings
+
+0.04    Fri Jun 11 22:40:34 CEST 2004
+
+
+* Add file support using File::Copy
+
+0.03    Fri Jun 11 20:40:22 CEST 2004
+
+
+* Add I18N support
+* Add better error handling
+
+0.02    Sat May 22 14:40:29 CEST 2004
+
+
+* Add an extra 'FAQ' entry
+* Include a 'use File::Fetch::Item'
+
+
+0.01    Tue May  4 15:48:24 CEST 2004
+
+
+* Initial release
+    

@@ -1,0 +1,511 @@
+0 HEAD
+1 SOUR Geni.com
+2 VERS 1.0
+1 DATE 19 DEC 2008
+2 TIME 08:13:10
+1 SUBM @S0@
+1 GEDC
+2 VERS 5.5
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I0@ INDI
+1 NAME Николай /Мишин/
+2 GIVN Николай
+2 NICK mishin, anelka
+2 SURN Мишин
+1 SEX M
+1 BIRT
+2 DATE 7 FEB 1976
+2 ADDR
+3 CITY Moscow
+3 CTRY Russia
+2 NOTE {geni:county} Russia
+1 GRAD
+2 DATE 1 SEP 1983 TO 23 JUL 1993
+2 PLAC 780
+2 ADDR
+3 CITY Moscow
+3 CTRY Russia
+2 NOTE {geni:current} 0
+1 GRAD
+2 DATE 1 SEP 1993 TO 24 JUN 1998
+2 PLAC МГУПС
+2 ADDR
+3 CITY Moscow
+3 CTRY Russia
+2 NOTE {geni:current} 0
+1 OCCU
+2 DATE 6 MAY 2008 TO 17 OCT 2008
+2 PLAC CJSC «SITRONICS Telecom Solutions»
+2 ADDR
+3 CITY Moscow
+3 CTRY Russia
+2 NOTE {geni:current} 0
+2 NOTE {geni:job_title} Lead Consultant
+1 OCCU
+2 DATE 20 OCT 2008
+2 PLAC JET Infosystems
+2 ADDR
+3 CITY Moscow
+3 CTRY Russia
+2 NOTE {geni:current} 1
+2 NOTE {geni:job_title} Senior Administrator Siebel
+1 RESI
+2 ADDR
+3 CITY Moscow
+3 CTRY Russia
+2 NOTE {geni:county} Russia
+1 NOTE {geni:occupation} Consultant
+1 NOTE {geni:about_me} В начале, я программировал на perl, пытался сделать конструктор сайтов а-ля narod.ru, но из-за плохого процесса разработки пришлось отказаться от этого, и стал поддерживать биллинговую (выдающую счета) систему в со
+2 CONC товом операторе (билайн). Потом, выучив язык общения с базами данных, я стал строить хранилище в банке на oracle, потом sas, строил витрины для наших и иноземных бухгалтеров, гордо именующиеся кубами данных. Но жажда денег потянул
+2 CONC а заниматься еще и системой, которая помогает работать с клиентами (вольный перевод CRM) в другом операторе связи (мтс). На этом примере мы видим закольцованность нашей судьбы и необходимость изучать генеалогию, чтобы понимать, ку
+2 CONC да мы может еще зайти в наших изысканиях.
+1 NOTE {geni:hair_color} Black
+1 NOTE {geni:eye_color} Brown
+1 NOTE {geni:height_1} 
+1 NOTE {geni:height_2} 
+1 _EMAIL mi@ya.ru
+1 _EMAIL nikolay.mishin@gmail.com
+1 PHON (903) 265-90-84
+1 PHON (499) 761-01-82
+1 FAMC @F1@
+1 FAMS @F2@
+1 OBJE
+2 FORM text/html
+2 FILE http://www.geni.com/photo/view/?photo_id=6000000000910785672
+1 OBJE
+2 FORM image/jpeg
+2 FILE http://photos.geni.com/p4/8147/1604/5344483622a17c88/paj94dam_large.jpg
+1 CHAN
+2 DATE 04 NOV 2008
+3 TIME 17:15:25
+0 @I3@ INDI
+1 NAME Ирина Юревна /Метелкина/
+2 GIVN Ирина Юревна
+2 SURN Метелкина
+2 _MAR Лебедева
+1 SEX F
+1 BIRT
+2 DATE 23 MAR 1979
+1 FAMS @F2@
+1 CHAN
+2 DATE 18 DEC 2008
+3 TIME 08:06:12
+0 @I4@ INDI
+1 NAME Алексей /Мишин/
+2 GIVN Алексей
+2 SURN Мишин
+1 SEX M
+1 BIRT
+2 DATE 18 JUN 1939
+1 FAMC @F5@
+1 FAMS @F1@
+1 CHAN
+2 DATE 09 DEC 2008
+3 TIME 08:14:48
+0 @I6@ INDI
+1 NAME Кира Кирилловна /Флоренская/
+2 GIVN Кира Кирилловна
+2 SURN Флоренская
+2 _MAR Мишина
+1 SEX F
+1 BIRT
+2 DATE 29 DEC 1941
+1 RESI
+2 ADDR
+3 CTRY Russia
+1 NOTE {geni:occupation} 
+1 NOTE {geni:about_me} 
+1 NOTE {geni:hair_color} 
+1 NOTE {geni:eye_color} 
+1 NOTE {geni:height_1} 
+1 NOTE {geni:height_2} 
+1 PHON (7903) 529-20-71
+1 FAMC @F7@
+1 FAMS @F1@
+1 FAMS @F8@
+1 OBJE
+2 FORM text/html
+2 FILE http://www.geni.com/photo/view/?photo_id=6000000001951156276
+1 OBJE
+2 FORM image/jpeg
+2 FILE http://photos.geni.com/p2/8147/1604/5344483660a44834/mama_large.jpg
+1 CHAN
+2 DATE 09 DEC 2008
+3 TIME 08:14:48
+0 @I9@ INDI
+1 NAME Лидия /Мишина/
+2 GIVN Лидия
+2 SURN Мишина
+2 _MAR Левицкая
+1 SEX F
+1 BIRT
+2 DATE 5 MAR 1970
+1 _EMAIL pony70@ya.ru
+1 FAMC @F1@
+1 CHAN
+2 DATE 04 NOV 2008
+3 TIME 17:15:25
+0 @I10@ INDI
+1 NAME Никита /Мишин/
+2 GIVN Никита
+2 SURN Мишин
+1 SEX M
+1 BIRT
+1 FAMC @F1@
+1 SUBM @S9@
+1 CHAN
+2 DATE 09 DEC 2008
+3 TIME 08:14:48
+0 @I11@ INDI
+1 NAME Елена /Мишина/
+2 GIVN Елена
+2 SURN Мишина
+1 SEX F
+1 BIRT
+1 FAMC @F1@
+1 SUBM @S9@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:48
+0 @I12@ INDI
+1 NAME Михаил /Мишин/
+2 GIVN Михаил
+2 SURN Мишин
+1 SEX M
+1 BIRT
+1 _EMAIL mishin@d-v.ru
+1 FAMC @F1@
+1 SUBM @S9@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:47
+0 @I13@ INDI
+1 NAME Мария /Мишина/
+2 GIVN Мария
+2 SURN Мишина
+1 SEX F
+1 BIRT
+1 FAMC @F1@
+1 SUBM @S9@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:48
+0 @I14@ INDI
+1 NAME Анна /Мишина/
+2 GIVN Анна
+2 SURN Мишина
+1 SEX F
+1 BIRT
+1 FAMC @F1@
+1 SUBM @S9@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:48
+0 @I15@ INDI
+1 NAME Лидия /Хомякова/
+2 GIVN Лидия
+2 SURN Хомякова
+2 _MAR Мишина
+1 SEX F
+1 BIRT
+2 DATE 5 APR 1906
+1 GRAD
+2 DATE ABT 1923
+2 PLAC Императорская гимназия
+2 ADDR
+2 NOTE {geni:current} 0
+1 DEAT
+2 DATE 5 APR 1970
+1 FAMC @F16@
+1 FAMS @F5@
+1 CHAN
+2 DATE 14 DEC 2008
+3 TIME 09:50:32
+0 @I17@ INDI
+1 NAME Михаил /Мишин/
+2 GIVN Михаил
+2 SURN Мишин
+1 SEX M
+1 BIRT
+2 DATE 16 SEP 1906
+1 DEAT
+2 DATE 14 JAN 1966
+1 FAMC @F18@
+1 FAMS @F5@
+1 CHAN
+2 DATE 04 NOV 2008
+3 TIME 17:15:26
+0 @I19@ INDI
+1 NAME Валерий /Варлашкин/
+2 GIVN Валерий
+2 SURN Варлашкин
+1 SEX M
+1 BIRT
+1 FAMS @F8@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:47
+0 @I20@ INDI
+1 NAME Андрей /Варлашкин/
+2 GIVN Андрей
+2 SURN Варлашкин
+1 SEX M
+1 BIRT
+1 _EMAIL varlash@sci.lebedev.ru
+1 FAMC @F8@
+1 CHAN
+2 DATE 05 DEC 2008
+3 TIME 09:19:23
+0 @I21@ INDI
+1 NAME Кирилл /Флоренский/
+2 GIVN Кирилл
+2 SURN Флоренский
+1 SEX M
+1 BIRT
+2 DATE 27 DEC 1915
+1 DEAT
+2 DATE 9 APR 1982
+1 FAMC @F22@
+1 FAMS @F7@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:17:28
+0 @I23@ INDI
+1 NAME Зинаида Сергеевна /Самуиловна/
+2 GIVN Зинаида Сергеевна
+2 SURN Самуиловна
+2 _MAR Флоренская
+1 SEX F
+1 BIRT
+2 DATE 24 OCT 1916
+1 NOTE {geni:occupation} 6 oct 89
+1 FAMC @F24@
+1 FAMS @F7@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:18:31
+0 @I25@ INDI
+1 NAME Михаил /Хомякова/
+2 GIVN Михаил
+2 SURN Хомякова
+1 SEX M
+1 BIRT
+1 FAMS @F16@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:48
+0 @I26@ INDI
+1 NAME уу /Хомякова/
+2 GIVN уу
+2 SURN Хомякова
+1 SEX F
+1 BIRT
+1 FAMS @F16@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:47
+0 @I27@ INDI
+1 NAME Иван /Мишин/
+2 GIVN Иван
+2 SURN Мишин
+1 SEX M
+1 BIRT
+1 FAMS @F18@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:48
+0 @I28@ INDI
+1 NAME Павел /Флоренский/
+2 GIVN Павел
+2 SURN Флоренский
+1 SEX M
+1 BIRT
+1 FAMS @F22@
+1 CHAN
+2 DATE 04 DEC 2008
+3 TIME 00:08:48
+0 @I29@ INDI
+1 NAME Анна /Флоренский/
+2 GIVN Анна
+2 SURN Флоренский
+1 SEX F
+1 BIRT
+2 DATE 17 FEB 1889
+1 DEAT
+2 DATE ABT 1973
+1 FAMS @F22@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:20:36
+0 @I30@ INDI
+1 NAME Анна /Найдышева/
+2 GIVN Анна
+2 SURN Найдышева
+2 _MAR Васильвена
+1 SEX F
+1 BIRT
+2 DATE ABT 1888
+1 DEAT
+2 DATE ABT 1974
+1 FAMC @F31@
+1 FAMS @F24@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:21:30
+0 @I32@ INDI
+1 NAME Самуил Иванович /Кейвар/
+2 GIVN Самуил Иванович
+2 SURN Кейвар
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE ABT 1937
+1 FAMS @F24@
+1 FAMS @F33@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:25:41
+0 @I34@ INDI
+1 NAME Василий /Найдышева/
+2 GIVN Василий
+2 SURN Найдышева
+1 SEX M
+1 BIRT
+1 DEAT
+2 DATE ABT 1916
+1 FAMS @F31@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:22:00
+0 @I35@ INDI
+1 NAME Елена Васильевна /Торбинская/
+2 GIVN Елена Васильевна
+2 SURN Торбинская
+2 _MAR Найдышева
+1 SEX F
+1 BIRT
+2 DATE ABT 1865
+1 DEAT
+2 DATE ABT 1933
+1 FAMC @F36@
+1 FAMS @F31@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:24:20
+0 @I37@ INDI
+1 NAME Александра /Короткова/
+2 GIVN Александра
+2 SURN Короткова
+2 _MAR Кейвар
+1 SEX F
+1 BIRT
+1 FAMS @F33@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:26:26
+0 @I38@ INDI
+1 NAME Борис /Кейвар/
+2 GIVN Борис
+2 SURN Кейвар
+1 SEX M
+1 BIRT
+1 FAMC @F33@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:28:15
+0 @I39@ INDI
+1 NAME Леонид /Кейвар/
+2 GIVN Леонид
+2 SURN Кейвар
+1 SEX M
+1 BIRT
+1 FAMC @F33@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:28:32
+0 @I40@ INDI
+1 NAME Пелагея Ивановна /Чумакова/
+2 GIVN Пелагея Ивановна
+2 SURN Чумакова
+2 _MAR Торбинская
+1 SEX F
+1 BIRT
+1 DEAT
+2 DATE ABT 1916
+1 FAMS @F36@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:23:51
+0 @I41@ INDI
+1 NAME Василий /Торбинская/
+2 GIVN Василий
+2 SURN Торбинская
+1 SEX M
+1 BIRT
+1 FAMS @F36@
+1 CHAN
+2 DATE 19 DEC 2008
+3 TIME 07:23:12
+0 @F2@ FAM
+1 HUSB @I0@
+1 WIFE @I3@
+0 @F1@ FAM
+1 HUSB @I4@
+1 WIFE @I6@
+1 CHIL @I0@
+1 CHIL @I9@
+1 CHIL @I10@
+1 CHIL @I11@
+1 CHIL @I12@
+1 CHIL @I13@
+1 CHIL @I14@
+0 @F5@ FAM
+1 WIFE @I15@
+1 HUSB @I17@
+1 CHIL @I4@
+0 @F8@ FAM
+1 WIFE @I6@
+1 HUSB @I19@
+1 CHIL @I20@
+0 @F7@ FAM
+1 HUSB @I21@
+1 WIFE @I23@
+1 CHIL @I6@
+0 @F16@ FAM
+1 HUSB @I25@
+1 WIFE @I26@
+1 CHIL @I15@
+0 @F18@ FAM
+1 HUSB @I27@
+1 CHIL @I17@
+0 @F22@ FAM
+1 HUSB @I28@
+1 WIFE @I29@
+1 CHIL @I21@
+0 @F24@ FAM
+1 WIFE @I30@
+1 HUSB @I32@
+1 CHIL @I23@
+0 @F31@ FAM
+1 HUSB @I34@
+1 WIFE @I35@
+1 CHIL @I30@
+0 @F33@ FAM
+1 HUSB @I32@
+1 WIFE @I37@
+1 CHIL @I38@
+1 CHIL @I39@
+0 @F36@ FAM
+1 WIFE @I40@
+1 HUSB @I41@
+1 CHIL @I35@
+0 @S0@ SUBM
+1 NAME Николай Мишин
+1 ADDR
+2 CITY Moscow
+2 CTRY Russia
+1 NOTE {geni:county} Russia
+0 @S9@ SUBM
+1 NAME Лидия Левицкая
+0 TRLR

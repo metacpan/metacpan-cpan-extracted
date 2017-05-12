@@ -1,0 +1,168 @@
+
+README.windows file for Forks::Super module
+===========================================
+
+Many standard functions of Perl are not
+supported or not completely supported in
+most of the ports to Windows, including
+many features that would be useful to the
+Forks::Super module.
+
+
+1. Process groups and pseudo-process IDs
+
+On Un*x systems, a process group is identified
+with a negative value. In a Perl script, it can
+be obtained with the getpgrp() function or set
+with the setpgrp() function. A process group can
+be used as an argument to  Forks::Super::waitpid  to wait
+on any process that belongs to a process group.
+
+In Windows, the getpgrp() and setpgrp() functions
+are usually not supported, and the Perl  fork
+call will usually return a negative value that
+represents a psuedo-process id. On a Windows system,
+calling  Forks::Super::waitpid  with a negative value on
+a Windows system will be interpreted as waiting 
+on a single child process with the specified 
+pseudo-process ID.
+
+Since v0.70 there is an experimental emulation of 
+process groups on Windows, which may or may not have
+any relation to how Windows actually thinks of the
+relationships between processes.
+
+See the  perlfork  POD for more information about
+how  CORE::fork  is emulated on Windows.
+
+
+2. Process priority
+
+The getpriority() and setpriority() calls in Perl
+are often not supported on Windows. If the
+Win32::API  module is installed on your system,
+then this module can emulate the getpriority() and
+setpriority() functions. If  Win32::API  is
+unavailable, then calling  Forks::Super::fork
+with an  os_priority  option will have no effect.
+
+
+3. Signal handling
+
+The Forks::Super module provides features such as job
+throttling (limiting the number of simultaneous
+background proceses that can be running), job
+dependencies (where one job will not start until
+one or more other jobs have started and/or
+finished), and job deferral (scheduling a job to
+start at a future time). When a child process
+finishes, this is often a trigger for other
+child processes to begin. So it is important for
+the Forks::Super module to be able to detect when a
+child process has finished.
+
+On POSIX systems, child processes send a SIGCHLD
+signal to the parent process when they complete.
+The Forks::Super module will install a SIGCHLD handler
+that will manage cleanup of completed child
+processes and attempt to dispatch the jobs that
+are deferred. A SIGUSR1 handler may also be
+installed. The SIGUSR1 handler may periodically
+receive signals from a background process that 
+will cause the Forks::Super module to attempt to 
+dispatch deferred jobs from the queue. The design
+goal was to keep these operations as transparent to
+the user as possible. 
+
+In Windows systems, it is more difficult to 
+achieve this goal. There is no mechanism for
+background processes to signal to the parent,
+and so the parent process must poll the operating 
+system to determine when child processes are
+complete. This polling must occur in the main
+execution thread. Such polling is built into
+functions like  Forks::Super::wait  and  Forks::Super::waitpid,
+but it is up to the caller whether these functions
+are called in a timely manner. Windows users are
+recommended to use the  Forks::Super::pause  function
+as a *productive* drop-in replacement for the 
+Perl  sleep  system call. The  Forks::Super::pause  function
+will perform operating system polling and queue
+management. The caller may also invoke  Forks::Super::pause
+with an argument of  0  to perform these child
+management functions but without any additional
+delay.
+
+
+4. More signal handling
+
+Although Windows lacks the signal framework of more
+Un*x-like systems, there are still ways for Windows to
+Do What I Mean with respect to many common uses of signals.
+For example, there are Windows API calls to suspend
+and resume execution of pseudo-processes -- they just
+don't have anything to do with Un*x's SIGSTOP/SIGCONT
+framework. 
+
+It is highly recommended that you install the  Win32::API
+module. Then  Forks::Super  will have access to these
+API calls and be able to do things like suspend, resume,
+and terminate pseudo-processes through the same methods
+that you would perform these tasks on a Un*x system.
+
+
+5. Alarm
+
+The Perl  alarm  system call is not fully supported 
+on all systems, including all Windows ports of Perl
+prior to 5.8.3.  The feature of passing a  timeout
+or  expiration  option to a  Forks::Super::fork  
+call depends on this feature, so the call
+will fail when used with those options on systems that
+cannot support  alarm().
+
+On Windows systems that do implement  alarm() ,
+it may not be fully functional. For example, the
+SIGALRM signal might still not interrupt certain
+system calls like  sysread().
+
+
+6. Socket interprocess communication
+
+On Windows systems, socket-based IPC is not
+likely to work with any child process that
+uses an external command (the  cmd  or  exec
+options to  fork).
+
+
+
+7. Pipes
+
+Using pipes for IPC is disabled in Windows because
+of their severe limitations:
+
+  * tiny input buffer capacity (~512 bytes)
+  * are always blocking, so your program can hang
+    if you read from an empty pipe
+  * it is difficult to recover from a pipe deadlock --
+    the operation does not time out and it is quite
+    difficult to interrupt
+  * the 4-arg select function doesn't work with pipes,
+    so it's hard to tell when there is input to be
+    read on a pipe
+
+If you invoke  fork { child_fh => [ "pipe" ] }  from
+a Windows system, this module will attempt to configure
+your IPC with sockets instead.
+
+
+
+
+
+The  perlfork  pod discusses many pitfalls of 
+attempting to use  fork  under Windows systems.
+All of these caveats also apply to any background
+processes created with this module.
+
+Did I mention that it is highly recommended for
+Windows users to install the  Win32::API  module?

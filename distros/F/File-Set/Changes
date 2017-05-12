@@ -1,0 +1,11 @@
+Revision history for Perl extension File::Set
+
+1.02  Mon Feb 4 13:30 2008
+  - update synopsis docs
+
+1.01  Mon Sep 19 10:05 2005
+  - optional error handler when recursing directories
+
+1.00  Tue Aug 26 12:15 2004
+  - initial release
+

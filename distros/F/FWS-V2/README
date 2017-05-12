@@ -1,0 +1,64 @@
+FWS-V2
+
+Framework Sites Version 2
+
+
+OVERVIEW
+
+FWS::V2 is a web-based content management development platform provided at www.frameworksites.com. This open source platform is currently the foundation of websites, blogs, ecommerce sites, and many more web apps, both business and personal, world wide. The software is packed with features for designers, developers and end-users and its years of development and support have proven it to be mature and stable. Once installed, developers, designers, and end users can collaborate using embedded tools and extended features provided by 3rd parties. For more information, news, documentation and installation instructions visit www.frameworksites.com. 
+
+
+COMPATABILITY
+
+FWS::V2 is currently used at most major ISPs platforms to power a variety of websites and apps. A compressed version of the software is available with an automated upgrade and installation available at www.frameworksites.com. It is recommended to use the compressed version for maximum compatibility. Live core and element updates are available through the developer administration's easy to use one-click upgrade interface.
+
+
+PACKAGE DEPENDENCE
+
+Wait a second... why does FWS::V2 seem to have its own home grown methods that are already in popular, well established packages?
+
+One of the main goals of FWS is to have a bundled, autonomous version of the FWS that can be picked up and installed on almost any major ISP or Linux hosting environment without any care for what is present on the server. The packages used by the FWS have been carefully picked and validated to be supported on most all major ISPs.  
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc FWS::V2
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=FWS-V2
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/FWS-V2
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/FWS-V2
+
+    Search CPAN
+        http://search.cpan.org/dist/FWS-V2/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Nate Lewis
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

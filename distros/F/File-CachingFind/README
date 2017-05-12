@@ -1,0 +1,153 @@
+File::CachingFind - Perl Module for multiple file search in paths
+=================================================================
+
+
+TABLE OF CONTENTS
+-----------------
+
+1. Description
+2. Availability
+3. Prerequisites
+4. Installation
+5. Running Tests
+6. Example
+7. Known Bugs
+8. Copyright
+9. Author Information
+
+
+1. DESCRIPTION
+--------------
+
+File::CachingFind is a Perl module to cache filenames and directories
+for multiple file searches so that your script only has to browse the
+appropriate directories once.  To achive this, it mainly uses a hash
+containing filenames and their corresponding directories.
+
+The Author used this module for a script analyzing a big tree of
+source modules.  After introducing this modul, the process of locating
+the scattered include files was notably faster than before.  (The
+include statements of the modules didn't contain directory
+informations.)
+
+See the provided user documentation for more details.  As usual it
+is contained within the module source in POD format.
+
+
+2. AVAILABILITY
+---------------
+
+You can get the latest version of File::CachingFind from the
+Comprehensive Perl Archive Network (CPAN) at
+
+    http://www.perl.org/CPAN/modules/by-module/File/
+
+
+3. PREREQUISITES
+----------------
+
+File::CachingFind requires Perl version 5.6.0 or later as well as the
+standard modules Cwd and DirHandle.  It may also work with earlier
+"5er" versions of Perl, but this is untested yet.  The latest versions
+of Perl can be obtained from CPAN:
+
+    http://www.perl.org/CPAN/
+
+
+4. INSTALLATION
+---------------
+
+To build, test and install this module, run the following commands:
+
+perl Build.PL
+perl Build
+perl Build test
+perl Build install
+
+If you prefer the traditional way of installation, use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you want to install the module under a special directory (instead
+of the default directory), try something like
+
+    perl Makefile.PL PREFIX=/usr/local/special/directory
+
+
+5. RUNNING TESTS
+----------------
+
+If any of the tests fail, please contact the author with the output
+from the following command:
+
+    make test TEST_VERBOSE=1
+
+Some tests in t/locate_link.t will fail in any environment not
+supporting symbolic links, the test is not depending on the operating
+system yet.
+
+
+6. EXAMPLE
+----------
+
+Consider having the followin files on your system:
+
+/usr/include/time.h
+/usr/include/sys/time.h
+/usr/include/bits/time.h
+/usr/local/include/net/time.h
+/usr/local/include/project/time.h
+
+Now you would initialize a File::CachingFind object with 
+
+$includes =
+    File::CachingFind->new(Path => ['/usr/include', '/usr/local/include']);
+
+Afterwords you can locate all time.h files with one call
+
+@time_h = $includes->findInPath('time.h');
+
+giving you above list without any further directory access.  If you
+have to look up many files that way, you'll notice the performance
+gain.  You may customize the File::CachingFind object to be case
+insensitve, to cache only certain files, how to handle softlinks and
+in many other ways.  See the user documentation for further details.
+
+
+7. KNOWN BUGS
+-------------
+
+Directory names ending with an exclamation mark can't be handled yet!
+
+Softlinks creating a cyclic directory structure will cause an infinite
+loop.
+
+If the same file is found more than once using different paths in the
+constructor (B<new>), it will be cached more than once!  At the moment
+this is considered a feature, not a bug.
+
+If you find a(nother) bug, please report it to the author along with
+the following information:
+
+    * version of Perl
+    * version of File::CachingFind
+    * operating system type and version
+    * exact text of error message or description of problem
+    * the shortest possible program that exhibits the problem
+
+If I don't have access to a system similar to yours, I may ask you
+to insert some debugging lines and report back on the results.
+The more help and information you can provide, the better.
+
+
+8. COPYRIGHT AND LICENCE
+------------------------
+
+Copyright (c) 2002-2007 by Thomas Dorner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.

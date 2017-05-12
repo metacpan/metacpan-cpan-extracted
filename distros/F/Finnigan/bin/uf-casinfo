@@ -1,0 +1,169 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+use Finnigan;
+
+my $option_help = 0;
+my $option_man = 0;
+my $option_dump = 0;
+my $option_html = 0;
+my $option_wiki = 0;
+my $option_size = 0;
+my $option_preamble = 0;
+my $option_relative = 0;
+
+Getopt::Long::Configure ("bundling");
+GetOptions(
+           'help|?' => \$option_help,
+           'man' => \$option_man,
+           'size|s' => \$option_size,
+           'html|h' => \$option_html,
+           'wiki|w' => \$option_wiki,
+           'preamble|p' => \$option_preamble,
+           'relative|r' => \$option_relative,
+          ) or pod2usage(2);
+pod2usage(1) if $option_help;
+pod2usage(-existstatus => 0, -verbose => 2) if $option_man;
+
+@ARGV == 1 or do{ say STDERR "Expecting a single input file\n"; pod2usage(2) };
+
+my $file = shift @ARGV;
+
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $header->version);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+
+if ( $option_size ) {
+  if ( $option_preamble ) {
+    say "size: " . $cas_info->preamble->size;
+  }
+  else {
+    say "size: " . $cas_info->size;
+  }
+}
+
+if ( $option_html ) {
+  if ( $option_preamble ) {
+    $cas_info->preamble->dump(style => 'html', relative => $option_relative);
+  }
+  else {
+    $cas_info->dump(style => 'html', relative => $option_relative);
+  }
+}
+elsif ( $option_wiki ) {
+  if ( $option_preamble ) {
+    $cas_info->preamble->dump(style => 'wiki', relative => $option_relative);
+  }
+  else {
+    $cas_info->dump(style => 'wiki', relative => $option_relative);
+  }
+}
+else {
+  if ( $option_preamble ) {
+    $cas_info->preamble->dump(relative => $option_relative);
+  }
+  else {
+    $cas_info->dump(relative => $option_relative);
+  }
+}
+
+__END__
+=head1 NAME
+
+uf-casinfo - decode the CASInfo structure in a Finnigan raw file
+
+=head1 SYNOPSIS
+
+uf-casinfo [options] file
+
+ Options:
+   --help            brief help message
+   --man             full documentation
+   --html            format as HTML
+   --wiki            format as a wiki table
+   --size            tell object size
+   --preamble        dump the content of CASInfoPreamble instead of CASInfo itself
+   --relative        show relative addresses
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the manual page and exit.
+
+=item B<--dump>
+
+Prints the table listing all fields in the structure with their seek
+addresses, sizes, names and values.
+
+=item B<--html>
+
+Dump as html table.
+
+=item B<--wiki>
+
+Dump as a wiki table.
+
+=item B<--size>
+
+Show structure size in bytes.
+
+=item B<--preamble>
+
+Dump the contents of CASInfoPreamble, instead of the parent object.
+
+=item B<--relative>
+
+Show relative addresses of all itmes. The default is to show the
+absolute seek address.
+
+=back
+
+=head1 DESCRIPTION
+
+B<uf-casinfo> dumps the CASInfo structure, or its component CASInfoPreamble.
+
+It will return an earror message if its input is not a Finnigan raw
+file.
+
+By default, it dumps the object in a tabular format.
+
+=head1 SEE ALSO
+
+Finnigan::CASInfo
+
+=head1 EXAMPLES
+
+=over 4
+
+=item Show the location and size of the preamble and the text following it, with absolute addresses:
+
+  uf-casinfo sample.raw
+
+=item Dump the contents of the preamble with relative addresses:
+
+  uf-casinfo --preamble --relative sample.raw
+
+=back
+
+=cut

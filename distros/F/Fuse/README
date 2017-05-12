@@ -1,0 +1,216 @@
+Fuse perl bindings
+==================
+
+Fuse is combination of Linux kernel module and user space library which
+enables you to write user-space filesystems. This module enables you to
+write filesystems using perl.
+
+Additional file-systems using Fuse module are released on CPAN using Fuse::
+namespace. Currently that includes only Fuse::DBI which allows you to mount
+database as file system, but there will be more.
+
+This is a pre-production release.  It seems to work quite well.  In fact, I
+can't find any problems with it whatsoever.  If you do, I want to know.
+
+INSTALLATION
+
+To install this module type the standard commands as root:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires the FUSE C library and the FUSE kernel module.
+See http://fuse.sourceforge.net/
+
+If you intend to use FUSE in threaded mode, you need a version of Perl which
+has been compiled with USE_ITHREADS.  Then, you need to use threads and
+threads::shared.
+
+
+COPYRIGHT AND LICENCE
+
+This is contributed to the FUSE project by Mark Glines <mark@glines.org>,
+and is therefore subject to the same license and copyright as FUSE itself.
+Please see the AUTHORS and COPYING files from the FUSE distribution for
+more information.
+
+
+EXAMPLES
+
+There are a few example scripts.  You can find them in the examples/
+subdirectory.  These are:
+
+* example.pl, a simple "Hello world" type of script
+
+* loopback.pl, a filesystem loopback-device.  like fusexmp from
+               the main FUSE dist, it simply recurses file operations
+               into the real filesystem.  Unlike fusexmp, it only
+               re-shares files under the /tmp/test directory.
+
+* rmount.pl, an NFS-workalike which tunnels through SSH.  It requires
+             an account on some ssh server (obviously), with public-key
+             authentication enabled.  (if you have to type in a password,
+             you don't have this.  man ssh_keygen.).  Copy rmount_remote.pl
+             to your home directory on the remote machine, and create a
+             subdir somewhere, and then run it like:
+             ./rmount.pl host /remote/dir /local/dir
+
+* rmount_remote.pl, a ripoff of loopback.pl meant to be used as a backend
+                    for rmount.pl.
+
+
+BUGS
+
+At time of writing, Perl (5.8.7) did not support shared subroutine references.
+Symptoms include a cryptic error message like "Invalid value for shared scalar"
+from Fuse.pm.  Until this is fixed, if you use threaded mode, you need to use
+symbolic references (i.e. passing "main::cb" instead of \&cb).  This doesn't
+allow things like closures, lexical subs and that sort of thing, but it does
+work for me.
+
+Currently tests have been attempted and succeeded on:
+  * Ubuntu 13.04/amd64
+  * Fedora 19/amd64
+  * CentOS 6.4/amd64
+  * CentOS 5.9/amd64
+  * CentOS 5.9/i386
+  * OpenSuSE 12.3/amd64
+  * Debian 7.1/powerpc
+  * Slackware 13.1/amd64
+  * NetBSD 6.1.1/amd64
+  * FreeBSD 9.1/amd64
+  * MacOS X 10.6.8 [OSXFUSE 2.6.1]
+  * MacOS X 10.7.5 [OSXFUSE 2.6.1]
+
+
+NOTES FOR BSD USERS
+
+On NetBSD, there is a potential issue with readdir() only being called
+once when using librefuse. However, currently using Perfuse causes other
+issues (readlink() drops the last character from the read link path, and
+the block count in stat() is incorrect). We will be addressing these
+concerns with the appropriate developers in the near future.
+
+If you are using Perfuse on NetBSD, you should do the following (as root):
+
+cat >> /etc/sysctl.conf <<_EOT_
+kern.sbmax=2621440
+net.inet.tcp.sendbuf_max=2621440
+net.inet6.tcp6.sendbuf_max=2621440
+_EOT_
+sysctl -f /etc/sysctl.conf
+
+Perfuse uses TCP sockets, and needs large send buffers.
+
+On NetBSD and FreeBSD, extended attributes do not work. These are
+specifically related to the FUSE implementations on those platforms.
+
+Normally you can not mount FUSE filesystems as non-root users on FreeBSD
+and NetBSD. They can allow non-root users to mount FUSE filesystems, but
+instead of changing the mode of /dev/fuse or /bin/fusermount, you need
+to use sysctl to allow user mounts. For FreeBSD, this involves (as root):
+
+sysctl -w vfs.usermount=1
+pw usermod <your username here> -G operator
+
+And on NetBSD (also as root):
+
+sysctl -w vfs.generic.usermount=1
+chmod 0660 /dev/putter
+usermod -G wheel <your username here>
+
+
+NOTES FOR OPENBSD IN PARTICULAR
+
+Oh, hello. You're an OpenBSD user. You like your secure, minimalist OS, but
+you really want in on that FUSE-y goodness. Well, it's still pretty early
+and kind of broken, but yes, FUSE has actually made its way onto OpenBSD.
+
+That said, it's not (as of this writing) in a released version. It *has*
+made its way into OpenBSD's CVS HEAD, but unless you're feeling very
+brave, you may not want to take that leap. You should, however, read this
+mailing list thread:
+
+http://marc.info/?t=136248759400010&r=1&w=4
+
+Even after patching with the latest userspace and kernel code patches,
+I still needed to add the following to src/sys/miscfs/fuse/fuse_vfsops.c,
+as line 23:
+
+#include <sys/filedesc.h>
+
+For me, it wouldn't build otherwise. You should be familiar with building
+a kernel, and your entire userspace; if not, read the OpenBSD FAQ.
+
+Once you've built your kernel, installed it, and built and installed your
+new userspace, reboot. You may also need to copy /usr/src/lib/libfuse/fuse.h
+to /usr/include/fuse.h. (I did.) Also, for the tests, I recommend installing
+devel/p5-Lchown, and installing Filesys::Statvfs, Unix::Mknod and Test::Pod
+out of CPAN.
+
+Okay, once you've done all that, run (as root):
+
+cd /dev
+./MAKEDEV fuse
+
+If that doesn't work, do this (also as root):
+
+cd /usr/src/etc
+make
+cp etc.`uname -m`/MAKEDEV /dev
+cd /dev
+./MAKEDEV fuse
+
+Now, in your perl-fuse distribution, run:
+
+perl Makefile.PL
+make
+
+You'll probably need to 'make test' as root. If you want to run your FUSE
+filesystem as non-root, run the following (as root):
+
+sysctl kern.usermount=1
+chmod 0660 /dev/fuse0
+
+Now, you should be able to run 'make test'. Yes, there are some test
+failures. No, those actually aren't our fault. Here are some things
+you should know about the state of FUSE on OpenBSD:
+
+ * truncate() does not work. This is not our fault. The fuse kernel
+   driver doesn't implement any support for truncate(), never mind
+   libfuse. It literally doesn't do anything with it.
+ * You can't make anything other than plain files, directories and
+   symlinks right now. The kernel driver doesn't support it yet.
+ * There is a bug if a file is created in the fuse filesystem and goes
+   away, then you create another file of the same name via FUSE and
+   try to do utime(). Not sure if it's just utime() or if other things
+   trip it too, but I discovered that via playing around. I *THINK*
+   it's a vnode caching problem.
+ * There's a reason the rename() test doesn't run. IT WILL CRASH YOUR
+   KERNEL. No joke. The rename() op in the kernel driver is busted.
+ * The kernel code passes the trailing null character at the end of
+   the read symlink path in readlink(). This causes all sorts of fun
+   trouble. This needs to be fixed in the kernel driver.
+ * fuse_get_context() returns an undef, because the reimplemented
+   libfuse doesn't implement that. It also doesn't do any argument
+   handling at all. Hence why it's all #ifndef'd out for OpenBSD.
+ * mknod() will not get called to create a plain file. You need to
+   implement create(), unless the OpenBSD devs fix libfuse to call
+   mknod() for plain files.
+ * You should probably implement release(); the kernel driver whines
+   a lot about the ENOSYS if you don't.
+ * You should probably implement all of chown(), chmod() and
+   utime() and/or utimens(). The kernel driver will mask out future
+   setattr() requests if it gets ENOSYS from ANY of these. Oops.
+ * Oh, and don't interrupt the FUSE implementation while it's running.
+   If you do (or if it aborts for some reason), umount the mountpoint
+   ASAP. If you don't, and especially if you then try to mount the
+   filesystem on that mountpoint again, you can hang your kernel. Not
+   even kidding. I have done this.
+
+Anyway, happy FUSEing!

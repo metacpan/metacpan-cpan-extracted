@@ -1,0 +1,12 @@
+HOW TO INSTALL THIS:
+
+  The same as usual; see 'perldoc perlmodinstall' if you're stuck.
+
+TESTING NOTES:
+
+  There are (small) mp3 files in t/ - I stole these from pudge's test
+  directory in the MP3::Info module.  I hope I'm not going to get yelled
+  at for that. I've not even actually listened to them. Yes, two of them
+  are tagged like they're real proper good music. No, they're not really
+  Kristin Hersh stuff. Go buy CDs.
+

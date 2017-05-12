@@ -1,0 +1,20 @@
+---
+abstract: 'pasive agent'
+author:
+  - 'santex <santex@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Flower
+no_index:
+  directory:
+    - misc
+resources:
+  homepage: http://github.com/santex/flower
+version: '0.02'

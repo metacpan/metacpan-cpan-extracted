@@ -1,0 +1,82 @@
+class 'Fl::MultilineInput';
+isa 'Fl::Input';
+include 'FL/Fl_Multiline_Input.H';
+widget_type 'Fl_Multiline_Input';
+
+=pod
+
+=head1 NAME
+
+Fl::MultilineInput - Text Widget that Allows Editing of Multiline Text
+
+=head1 Synopsis
+
+    use Fl;
+    my $input = Fl::MultilineInput->new(0, 0, 100, 200, 'Hello, World!');
+
+=head1 Description
+
+The Fl::MultilineInput class represents a widget that displays '\n' characters
+as new lines rather than ^J, and accepts the Return, Tab, and up and down
+arrow keys.
+
+This is far from the nirvana of text editors, and is probably only good for
+small bits of text, 10 lines at most. Note that this widget does not support
+scrollbars or per-character color control.
+
+If you are presenting large amounts of text and need scrollbars or full color
+control of characters, you probably want Fl::TextEditor instead.
+
+=head1 Methods
+
+Fl::MultilineInput inherits from Fl::Input and Fl::Widget. On top of that, it
+exposes the following methods...
+
+=head2 new(...)
+
+    my $text_a = Fl::MultilineInput->new(0, 0, 250, 500, 'Important Stuff');
+    my $text_b = Fl::MultilineInput->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The widget's boxtype is FL_DOWN_BOX by default.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Multiline_Input *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

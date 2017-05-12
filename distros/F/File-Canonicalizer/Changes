@@ -1,0 +1,13 @@
+Revision history for File-Canonicalizer
+
+0.01    2013/01
+        First version, released on an unsuspecting world.
+
+0.02    2013/01
+        Documentation enhancements.
+
+0.10    2013/01
+        Replaced last pair of parameters with array reference.
+
+0.11    2013/04
+        Documentation enhancements.

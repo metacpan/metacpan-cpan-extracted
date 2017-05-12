@@ -1,0 +1,78 @@
+NAME
+    File::PatternMatch - parse media information from filenames
+
+SYNOPSIS
+      use File::PatternMatch;
+
+      my @files = glob("$ENV{HOME}/music/*");
+
+      my $plain = patternmatch(@files);
+
+      my $extended_colors = patternmatch(256, @files);
+
+DESCRIPTION
+    File::PatternMatch takes a list of filenames and tries to parse relevant
+    information from them. If a filename contains the string 'S01E01' we can
+    safely assume it's a new TV show, the first episode from the first
+    season, and thus we label it 'New Show'.
+
+    There are filters for various music genres, tv shows and music videos.
+
+    The labels can be formatted in three ways (output formats):
+
+  plaintext
+    Raw, plain text.
+
+  colored
+    Colored using extended escape sequences (see Term::ExtendedColor).
+
+  dzen2
+    Formatted using the dzen2(1) notation.
+
+EXPORTS
+  patternmatch()
+    Parameters: $output_format, @files
+
+    Returns: \%results
+
+    patternmatch() takes a list of filenames and tries to match them aginst
+    specific patterns. The result might look like:
+
+      # Plain text
+      2 => {
+        'Prison.Break.S01E01-FOOBAR'  => 'New Show',
+      },
+      42 => {
+        'Laleh-Prinsessor-FOOBAZ'     => 'Pop/Rock',
+      },
+
+      # Using extended color escape sequences
+      2 => {
+        'Prison.Break.S01E01-FOOBAR'  => "\e[38;5;160mNew Show\e[0m",
+      },
+
+      # Using dzen2 format
+      2 => {
+        'Prison.Break.S01E01-FOOBAR'  => '^fg(#ff0000)New Show^fg()',
+      },
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      magnus@trapd00r.se
+      http://japh.se
+
+REPORTING BUGS
+    Report bugs and/or feature requests:
+
+    <https://rt.cpan.org>
+
+    <https://github.com/trapd00r/Foo-Bar/issues>
+
+    magnus@trapd00r.se
+
+COPYRIGHT
+    Copyright 2011 Magnus Woldrich <magnus@trapd00r.se>. This program is
+    free software; you may redistribute it and/or modify it under the same
+    terms as Perl itself.
+

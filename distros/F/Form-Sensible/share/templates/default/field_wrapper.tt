@@ -1,0 +1,7 @@
+[% DEFAULT FS_fieldcontainerclass = css_prefix _ 'formfieldline' -%]
+[%- IF has_errors %][% error_css = css_prefix _ 'has_errors' %][% ELSE %][% error_css = '' %][% END -%]
+[%- IF has_status_messages %][% status_css = css_prefix _ 'has_status_messages' %][% ELSE %][% status_css = '' %][% END -%]
+<div id="[% css_prefix _ field_name %]_div" class="[% FS_fieldcontainerclass %] [% css_prefix _ field_type %] [% css_prefix _ field_name %] [% error_css %] [% status_css %]">
+    [% IF FS_showlabel != 0 %]<label class="[% css_prefix -%]label [% css_prefix _ field_type %]_label [% IF !field.editable %] noteditable[% END %]" for="[% css_prefix _ form.name %]_[% field_name %]_input">[% field_display_name %]</label>[% END %]
+    [% content %]
+</div>

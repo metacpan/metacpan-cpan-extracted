@@ -1,0 +1,27 @@
+
+
+Festival::Client
+
+
+This is a really simple module for sending text to a Festival
+speech synthesizer.
+
+Festival is a free speech synthesizer for unixen from the University
+of Edinburgh, see the Festival homepage at:
+   http://www.cstr.ed.ac.uk/~awb/festival/
+
+
+Note that this module uses the synth itself to say the text - it
+doesn't return the waveform to you.  That capability may be added in
+the future if people want it.
+
+
+Contacting me:  gossamer@tertius.net.au is best.
+
+
+ObLegalStuff:
+   Copyright (c) 1998 Bek Oberin. All rights reserved. This program is
+   free software; you can redistribute it and/or modify it under the
+   same terms as Perl itself.
+
+

@@ -1,0 +1,58 @@
+
+=pod
+
+
+=head1 NAME
+
+Foorum::Manual::PreRelease - things when release
+
+=head2 Before Release
+
+  * $ cd Misc/bin
+  * $ perl js-min.pl
+
+  # minify the javascript under root/static/js to root/static/js/min by L<JavaScript::Minifier>
+
+  * $ perl css-min.pl
+
+  # minify the css under root/static/css to root/static/css/min by L<CSS::Minifier>
+
+  * $ perl bdfgw.pl
+
+  # build docs from GoogleCode wiki by L<Text::GooglewikiFormat>
+
+  * $ perl wiki2pod.pl
+
+  # use L<Pod::From::GoogleWiki> to build Foorum::Manual::
+
+  * $ perl g2b.pl
+
+  # tranlate lib/Foorum/I18N/cn.po to lib/Foorum/I18N/tw.po and etc by L<Encode::HanConvert>
+
+  * $ perl perltidy.pl
+
+  # make all .pl .pm .t clean by L<Perl::Tidy>
+
+  * $ perl perlcritic.pl
+
+  # use L<Perl::Critic> to all .pl .pm .t files.
+
+
+=head2 Release
+
+  * $ perl Makefile.PL
+  * $ make
+
+  # or 'nmake' under Win32
+
+  * $ rm MANIFEST
+  * $ make manifest
+  * $ make test
+  * $ make dist
+  * $ make realclean
+
+  # just do those stuff as normal Perl distribution.
+
+
+
+=cut

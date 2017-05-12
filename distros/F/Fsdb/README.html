@@ -1,0 +1,3272 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<h1 id="NAME">NAME</h1>
+
+<p>Fsdb - a flat-text database for shell scripting</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Fsdb, the flatfile streaming database is package of commands for manipulating flat-ASCII databases from shell scripts. Fsdb is useful to process medium amounts of data (with very little data you&#39;d do it by hand, with megabytes you might want a real database). Fsdb was known as as Jdb from 1991 to Oct. 2008.</p>
+
+<p>Fsdb is very good at doing things like:</p>
+
+<ul>
+
+<li><p>extracting measurements from experimental output</p>
+
+</li>
+<li><p>examining data to address different hypotheses</p>
+
+</li>
+<li><p>joining data from different experiments</p>
+
+</li>
+<li><p>eliminating/detecting outliers</p>
+
+</li>
+<li><p>computing statistics on data (mean, confidence intervals, correlations, histograms)</p>
+
+</li>
+<li><p>reformatting data for graphing programs</p>
+
+</li>
+</ul>
+
+<p>Fsdb is built around the idea of a flat text file as a database. Fsdb files (by convention, with the extension <i>.fsdb</i>), have a header documenting the schema (what the columns mean), and then each line represents a database record (or row).</p>
+
+<p>For example:</p>
+
+<pre><code>        #fsdb experiment duration
+        ufs_mab_sys 37.2
+        ufs_mab_sys 37.3
+        ufs_rcp_real 264.5
+        ufs_rcp_real 277.9</code></pre>
+
+<p>Is a simple file with four experiments (the rows), each with a description, size parameter, and run time in the first, second, and third columns.</p>
+
+<p>Rather than hand-code scripts to do each special case, Fsdb provides higher-level functions. Although it&#39;s often easy throw together a custom script to do any single task, I believe that there are several advantages to using Fsdb:</p>
+
+<ul>
+
+<li><p>these programs provide a higher level interface than plain Perl, so</p>
+
+<dl>
+
+<dt id="pod">**</dt>
+<dd>
+
+<p>Fewer lines of simpler code:</p>
+
+<pre><code>    dbrow &#39;_experiment eq &quot;ufs_mab_sys&quot;&#39; | dbcolstats duration</code></pre>
+
+<p>Picks out just one type of experiment and computes statistics on it, rather than:</p>
+
+<pre><code>    while (&lt;&gt;) { split; $sum+=$F[1]; $ss+=$F[1]**2; $n++; }
+    $mean = $sum / $n; $std_dev = ...</code></pre>
+
+<p>in dozens of places.</p>
+
+</dd>
+</dl>
+
+</li>
+<li><p>the library uses names for columns, so</p>
+
+<dl>
+
+<dt id="pod1">**</dt>
+<dd>
+
+<p>No more <code>$F[1]</code>, use <code>_duration</code>.</p>
+
+</dd>
+<dt id="pod2">**</dt>
+<dd>
+
+<p>New or different order columns? No changes to your scripts!</p>
+
+</dd>
+</dl>
+
+<p>Thus if your experiment gets more complicated with a size parameter, so your log changes to:</p>
+
+<pre><code>        #fsdb experiment size duration
+        ufs_mab_sys 1024 37.2
+        ufs_mab_sys 1024 37.3
+        ufs_rcp_real 1024 264.5
+        ufs_rcp_real 1024 277.9
+        ufs_mab_sys 2048 45.3
+        ufs_mab_sys 2048 44.2</code></pre>
+
+<p>Then the previous scripts still work, even though duration is now the third column, not the second.</p>
+
+</li>
+<li><p>A series of actions are self-documenting (each program records what it does).</p>
+
+<dl>
+
+<dt id="pod3">**</dt>
+<dd>
+
+<p>No more wondering what hacks were used to compute the final data, just look at the comments at the end of the output.</p>
+
+</dd>
+</dl>
+
+<p>For example, the commands</p>
+
+<pre><code>    dbrow &#39;_experiment eq &quot;ufs_mab_sys&quot;&#39; | dbcolstats duration</code></pre>
+
+<p>add to the end of the output the lines # | dbrow _experiment eq &quot;ufs_mab_sys&quot; # | dbcolstats duration</p>
+
+</li>
+<li><p>The library is mature, supporting large datasets, corner cases, error handling, backed by an automated test suite.</p>
+
+<dl>
+
+<dt id="pod4">**</dt>
+<dd>
+
+<p>No more puzzling about bad output because your custom script skimped on error checking.</p>
+
+</dd>
+<dt id="pod5">**</dt>
+<dd>
+
+<p>No more memory thrashing when you try to sort ten million records.</p>
+
+</dd>
+</dl>
+
+</li>
+<li><p>Fsdb-2.x supports Perl scripting (in addition to shell scripting), with libraries to do Fsdb input and output, and easy support for pipelines. The shell script</p>
+
+<pre><code>    dbcol name test1 | dbroweval &#39;_test1 += 5;&#39;</code></pre>
+
+<p>can be written in perl as:</p>
+
+<pre><code>    dbpipeline(dbcol(qw(name test1)), dbroweval(&#39;_test1 += 5;&#39;));</code></pre>
+
+</li>
+</ul>
+
+<p>(The disadvantage is that you need to learn what functions Fsdb provides.)</p>
+
+<p>Fsdb is built on flat-ASCII databases. By storing data in simple text files and processing it with pipelines it is easy to experiment (in the shell) and look at the output. To the best of my knowledge, the original implementation of this idea was <code>/rdb</code>, a commercial product described in the book <i>UNIX relational database management: application development in the UNIX environment</i> by Rod Manis, Evan Schaffer, and Robert Jorgensen (and also at the web page <a href="http://www.rdb.com/">http://www.rdb.com/</a>). Fsdb is an incompatible re-implementation of their idea without any accelerated indexing or forms support. (But it&#39;s free, and probably has better statistics!).</p>
+
+<p>Fsdb-2.x will exploit multiple processors or cores, and provides Perl-level support for input, output, and threaded-pipelines. (As of Fsdb-2.44 it no longer uses Perl threading, just processes.)</p>
+
+<p>Installation instructions follow at the end of this document. Fsdb-2.x requires Perl 5.8 to run. All commands have manual pages and provide usage with the <code>--help</code> option. All commands are backed by an automated test suite.</p>
+
+<p>The most recent version of Fsdb is available on the web at <a href="http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html">http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html</a>.</p>
+
+<h1 id="WHATS-NEW">WHAT&#39;S NEW</h1>
+
+<h2 id="Re-add-some-features-supposedly-in-2.62-but-not-and-add-more---header-options">2.63, 2017-02-03 Re-add some features supposedly in 2.62 but not, and add more --header options.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT">ENHANCEMENT</dt>
+<dd>
+
+<p>The option <b>-j</b> is now a synonym for <b>--parallelism</b>. (And several documention bugs about this option are fixed.)</p>
+
+</dd>
+<dt id="ENHANCEMENT1">ENHANCEMENT</dt>
+<dd>
+
+<p>Additional support for <code>--header</code> in <a>dbcolmerge</a>, <a>dbcol</a>, <a>dbrow</a>, and <a>dbroweval</a>.</p>
+
+</dd>
+<dt id="BUG-FIX">BUG FIX</dt>
+<dd>
+
+<p>Version 2.62 was supposed to have this improvement, but did not (and now does): <a>dbfilepivot</a> now allows the <b>--possible-pivots</b> option, and if it is provided processes the data in one pass.</p>
+
+</dd>
+<dt id="BUG-FIX1">BUG FIX</dt>
+<dd>
+
+<p>Version 2.62 was supposed to have this improvement, but did not (and now does): <a>dbroweval</a> logs are now quoted.</p>
+
+</dd>
+</dl>
+
+<h1 id="README-CONTENTS">README CONTENTS</h1>
+
+<dl>
+
+<dt id="executive-summary">executive summary</dt>
+<dd>
+
+</dd>
+<dt id="whats-new">what&#39;s new</dt>
+<dd>
+
+</dd>
+<dt id="README-CONTENTS1">README CONTENTS</dt>
+<dd>
+
+</dd>
+<dt id="installation">installation</dt>
+<dd>
+
+</dd>
+<dt id="basic-data-format">basic data format</dt>
+<dd>
+
+</dd>
+<dt id="basic-data-manipulation">basic data manipulation</dt>
+<dd>
+
+</dd>
+<dt id="list-of-commands">list of commands</dt>
+<dd>
+
+</dd>
+<dt id="another-example">another example</dt>
+<dd>
+
+</dd>
+<dt id="a-gradebook-example">a gradebook example</dt>
+<dd>
+
+</dd>
+<dt id="a-password-example">a password example</dt>
+<dd>
+
+</dd>
+<dt id="history">history</dt>
+<dd>
+
+</dd>
+<dt id="related-work">related work</dt>
+<dd>
+
+</dd>
+<dt id="release-notes">release notes</dt>
+<dd>
+
+</dd>
+<dt id="copyright">copyright</dt>
+<dd>
+
+</dd>
+<dt id="comments">comments</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="INSTALLATION">INSTALLATION</h1>
+
+<p>Fsdb now uses the standard Perl build and installation from ExtUtil::MakeMaker(3), so the quick answer to installation is to type:</p>
+
+<pre><code>    perl Makefile.PL
+    make
+    make test
+    make install</code></pre>
+
+<p>Or, if you want to install it somewhere else, change the first line to</p>
+
+<pre><code>    perl Makefile.PL PREFIX=$HOME</code></pre>
+
+<p>and it will go in your home directory&#39;s <i>bin</i>, etc. (See <a href="http://man.he.net/man3/ExtUtil::MakeMaker">ExtUtil::MakeMaker(3)</a> for more details.)</p>
+
+<p>Fsdb requires perl 5.8 or later.</p>
+
+<p>A test-suite is available, run it with</p>
+
+<pre><code>    make test</code></pre>
+
+<p>A FreeBSD port to Fsdb is available, see <a href="http://www.freshports.org/databases/fsdb/">http://www.freshports.org/databases/fsdb/</a>.</p>
+
+<p>A Fink (MacOS X) port is available, see <a href="http://pdb.finkproject.org/pdb/package.php/fsdb">http://pdb.finkproject.org/pdb/package.php/fsdb</a>. (Thanks to Lars Eggert for maintaining this port.)</p>
+
+<h1 id="BASIC-DATA-FORMAT">BASIC DATA FORMAT</h1>
+
+<p>These programs are based on the idea storing data in simple ASCII files. A database is a file with one header line and then data or comment lines. For example:</p>
+
+<pre><code>        #fsdb account passwd uid gid fullname homedir shell
+        johnh * 2274 134 John_Heidemann /home/johnh /bin/bash
+        greg * 2275 134 Greg_Johnson /home/greg /bin/bash
+        root * 0 0 Root /root /bin/bash
+        # this is a simple database</code></pre>
+
+<p>The header line must be first and begins with <code>#h</code>. There are rows (records) and columns (fields), just like in a normal database. Comment lines begin with <code>#</code>. Column names are any string not containing spaces or single quote (although it is prudent to keep them alphanumeric with underscore).</p>
+
+<p>By default, columns are delimited by whitespace. With this default configuration, the contents of a field cannot contain whitespace. However, this limitation can be relaxed by changing the field separator as described below.</p>
+
+<p>The big advantage of simple flat-text databases is that it is usually easy to massage data into this format, and it&#39;s reasonably easy to take data out of this format into other (text-based) programs, like gnuplot, jgraph, and LaTeX. Think Unix. Think pipes. (Or even output to Excel and HTML if you prefer.)</p>
+
+<p>Since no-whitespace in columns was a problem for some applications, there&#39;s an option which relaxes this rule. You can specify the field separator in the table header with <code>-F x</code> where <code>x</code> is a code for the new field separator. A full list of codes is at <a href="http://man.he.net/man1/dbfilealter">dbfilealter(1)</a>, but two common special values are <code>-F t</code> which is a separator of a single tab character, and <code>-F S</code>, a separator of two spaces. Both allowing (single) spaces in fields. An example:</p>
+
+<pre><code>        #fsdb -F S account passwd uid gid fullname homedir shell
+        johnh  *  2274  134  John Heidemann  /home/johnh  /bin/bash
+        greg  *  2275  134  Greg Johnson  /home/greg  /bin/bash
+        root  *  0  0  Root  /root  /bin/bash
+        # this is a simple database</code></pre>
+
+<p>See <a href="http://man.he.net/man1/dbfilealter">dbfilealter(1)</a> for more details. Regardless of what the column separator is for the body of the data, it&#39;s always whitespace in the header.</p>
+
+<p>There&#39;s also a third format: a &quot;list&quot;. Because it&#39;s often hard to see what&#39;s columns past the first two, in list format each &quot;column&quot; is on a separate line. The programs dblistize and dbcolize convert to and from this format, and all programs work with either formats. The command</p>
+
+<pre><code>    dbfilealter -R C  &lt; DATA/passwd.fsdb</code></pre>
+
+<p>outputs:</p>
+
+<pre><code>        #fsdb -R C account passwd uid gid fullname homedir shell
+        account:  johnh
+        passwd:   *
+        uid:      2274
+        gid:      134
+        fullname: John_Heidemann
+        homedir:  /home/johnh
+        shell:    /bin/bash
+        
+        account:  greg
+        passwd:   *
+        uid:      2275
+        gid:      134
+        fullname: Greg_Johnson
+        homedir:  /home/greg
+        shell:    /bin/bash
+        
+        account:  root
+        passwd:   *
+        uid:      0
+        gid:      0
+        fullname: Root
+        homedir:  /root
+        shell:    /bin/bash
+        
+        # this is a simple database
+        #  | dblistize </code></pre>
+
+<p>See <a href="http://man.he.net/man1/dbfilealter">dbfilealter(1)</a> for more details.</p>
+
+<h1 id="BASIC-DATA-MANIPULATION">BASIC DATA MANIPULATION</h1>
+
+<p>A number of programs exist to manipulate databases. Complex functions can be made by stringing together commands with shell pipelines. For example, to print the home directories of everyone with ``john&#39;&#39; in their names, you would do:</p>
+
+<pre><code>        cat DATA/passwd | dbrow &#39;_fullname =~ /John/&#39; | dbcol homedir</code></pre>
+
+<p>The output might be:</p>
+
+<pre><code>        #fsdb homedir
+        /home/johnh
+        /home/greg
+        # this is a simple database
+        #  | dbrow _fullname =~ /John/
+        #  | dbcol homedir</code></pre>
+
+<p>(Notice that comments are appended to the output listing each command, providing an automatic audit log.)</p>
+
+<p>In addition to typical database functions (select, join, etc.) there are also a number of statistical functions.</p>
+
+<p>The real power of Fsdb is that one can apply arbitrary code to rows to do powerful things.</p>
+
+<pre><code>        cat DATA/passwd | dbroweval &#39;_fullname =~ s/(\w+)_(\w+)/$2,_$1/&#39;</code></pre>
+
+<p>converts &quot;John_Heidemann&quot; into &quot;Heidemann,_John&quot;. Not too much more work could split fullname into firstname and lastname fields.</p>
+
+<h1 id="TALKING-ABOUT-COLUMNS">TALKING ABOUT COLUMNS</h1>
+
+<p>An advantage of Fsdb is that you can talk about columns by name (symbolically) rather than simply by their positions. So in the above example, <code>dbcol homedir</code> pulled out the home directory column, and <code>dbrow &#39;_fullname =~ /John/&#39;</code> matched against column fullname.</p>
+
+<p>In general, you can use the name of the column listed on the <code>#fsdb</code> line to identify it in most programs, and _name to identify it in code.</p>
+
+<p>Some alternatives for flexibility:</p>
+
+<ul>
+
+<li><p>Numeric values identify columns positionally, numbering from 0. So 0 or _0 is the first column, 1 is the second, etc.</p>
+
+</li>
+<li><p>In code, _last_columnname gets the value from columname&#39;s previous row.</p>
+
+</li>
+</ul>
+
+<p>See <a href="http://man.he.net/man1/dbroweval">dbroweval(1)</a> for more details about writing code.</p>
+
+<h1 id="LIST-OF-COMMANDS">LIST OF COMMANDS</h1>
+
+<p>Enough said. I&#39;ll summarize the commands, and then you can experiment. For a detailed description of each command, see a summary by running it with the argument <code>--help</code> (or <code>-?</code> if you prefer.) Full manual pages can be found by running the command with the argument <code>--man</code>, or running the Unix command <code>man dbcol</code> or whatever program you want.</p>
+
+<h2 id="TABLE-CREATION">TABLE CREATION</h2>
+
+<dl>
+
+<dt id="dbcolcreate">dbcolcreate</dt>
+<dd>
+
+<p>add columns to a database</p>
+
+</dd>
+<dt id="dbcoldefine">dbcoldefine</dt>
+<dd>
+
+<p>set the column headings for a non-Fsdb file</p>
+
+</dd>
+</dl>
+
+<h2 id="TABLE-MANIPULATION">TABLE MANIPULATION</h2>
+
+<dl>
+
+<dt id="dbcol">dbcol</dt>
+<dd>
+
+<p>select columns from a table</p>
+
+</dd>
+<dt id="dbrow">dbrow</dt>
+<dd>
+
+<p>select rows from a table</p>
+
+</dd>
+<dt id="dbsort">dbsort</dt>
+<dd>
+
+<p>sort rows based on a set of columns</p>
+
+</dd>
+<dt id="dbjoin">dbjoin</dt>
+<dd>
+
+<p>compute the natural join of two tables</p>
+
+</dd>
+<dt id="dbcolrename">dbcolrename</dt>
+<dd>
+
+<p>rename a column</p>
+
+</dd>
+<dt id="dbcolmerge">dbcolmerge</dt>
+<dd>
+
+<p>merge two columns into one</p>
+
+</dd>
+<dt id="dbcolsplittocols">dbcolsplittocols</dt>
+<dd>
+
+<p>split one column into two or more columns</p>
+
+</dd>
+<dt id="dbcolsplittorows">dbcolsplittorows</dt>
+<dd>
+
+<p>split one column into multiple rows</p>
+
+</dd>
+<dt id="dbfilepivot">dbfilepivot</dt>
+<dd>
+
+<p>&quot;pivots&quot; a file, converting multiple rows corresponding to the same entity into a single row with multiple columns.</p>
+
+</dd>
+<dt id="dbfilevalidate">dbfilevalidate</dt>
+<dd>
+
+<p>check that db file doesn&#39;t have some common errors</p>
+
+</dd>
+</dl>
+
+<h2 id="COMPUTATION-AND-STATISTICS">COMPUTATION AND STATISTICS</h2>
+
+<dl>
+
+<dt id="dbcolstats">dbcolstats</dt>
+<dd>
+
+<p>compute statistics over a column (mean,etc.,optionally median)</p>
+
+</dd>
+<dt id="dbmultistats">dbmultistats</dt>
+<dd>
+
+<p>group rows by some key value, then compute stats (mean, etc.) over each group (equivalent to dbmapreduce with dbcolstats as the reducer)</p>
+
+</dd>
+<dt id="dbmapreduce">dbmapreduce</dt>
+<dd>
+
+<p>group rows (map) and then apply an arbitrary function to each group (reduce)</p>
+
+</dd>
+<dt id="dbrvstatdiff">dbrvstatdiff</dt>
+<dd>
+
+<p>compare two samples distributions (mean/conf interval/T-test)</p>
+
+</dd>
+<dt id="dbcolmovingstats">dbcolmovingstats</dt>
+<dd>
+
+<p>computing moving statistics over a column of data</p>
+
+</dd>
+<dt id="dbcolstatscores">dbcolstatscores</dt>
+<dd>
+
+<p>compute Z-scores and T-scores over one column of data</p>
+
+</dd>
+<dt id="dbcolpercentile">dbcolpercentile</dt>
+<dd>
+
+<p>compute the rank or percentile of a column</p>
+
+</dd>
+<dt id="dbcolhisto">dbcolhisto</dt>
+<dd>
+
+<p>compute histograms over a column of data</p>
+
+</dd>
+<dt id="dbcolscorrelate">dbcolscorrelate</dt>
+<dd>
+
+<p>compute the coefficient of correlation over several columns</p>
+
+</dd>
+<dt id="dbcolsregression">dbcolsregression</dt>
+<dd>
+
+<p>compute linear regression and correlation for two columns</p>
+
+</dd>
+<dt id="dbrowaccumulate">dbrowaccumulate</dt>
+<dd>
+
+<p>compute a running sum over a column of data</p>
+
+</dd>
+<dt id="dbrowcount">dbrowcount</dt>
+<dd>
+
+<p>count the number of rows (a subset of dbstats)</p>
+
+</dd>
+<dt id="dbrowdiff">dbrowdiff</dt>
+<dd>
+
+<p>compute differences between a columns in each row of a table</p>
+
+</dd>
+<dt id="dbrowenumerate">dbrowenumerate</dt>
+<dd>
+
+<p>number each row</p>
+
+</dd>
+<dt id="dbroweval">dbroweval</dt>
+<dd>
+
+<p>run arbitrary Perl code on each row</p>
+
+</dd>
+<dt id="dbrowuniq">dbrowuniq</dt>
+<dd>
+
+<p>count/eliminate identical rows (like Unix uniq(1))</p>
+
+</dd>
+<dt id="dbfilediff">dbfilediff</dt>
+<dd>
+
+<p>compare fields on rows of a file (something like Unix diff(1))</p>
+
+</dd>
+</dl>
+
+<h2 id="OUTPUT-CONTROL">OUTPUT CONTROL</h2>
+
+<dl>
+
+<dt id="dbcolneaten">dbcolneaten</dt>
+<dd>
+
+<p>pretty-print columns</p>
+
+</dd>
+<dt id="dbfilealter">dbfilealter</dt>
+<dd>
+
+<p>convert between column or list format, or change the column separator</p>
+
+</dd>
+<dt id="dbfilestripcomments">dbfilestripcomments</dt>
+<dd>
+
+<p>remove comments from a table</p>
+
+</dd>
+<dt id="dbformmail">dbformmail</dt>
+<dd>
+
+<p>generate a script that sends form mail based on each row</p>
+
+</dd>
+</dl>
+
+<h2 id="CONVERSIONS">CONVERSIONS</h2>
+
+<p>(These programs convert data into fsdb. See their web pages for details.)</p>
+
+<dl>
+
+<dt id="cgi_to_db">cgi_to_db</dt>
+<dd>
+
+<p><a href="http://stein.cshl.org/boulder/">http://stein.cshl.org/boulder/</a></p>
+
+</dd>
+<dt id="combined_log_format_to_db">combined_log_format_to_db</dt>
+<dd>
+
+<p><a href="http://httpd.apache.org/docs/2.0/logs.html">http://httpd.apache.org/docs/2.0/logs.html</a></p>
+
+</dd>
+<dt id="html_table_to_db">html_table_to_db</dt>
+<dd>
+
+<p>HTML tables to fsdb (assuming they&#39;re reasonably formatted).</p>
+
+</dd>
+<dt id="kitrace_to_db">kitrace_to_db</dt>
+<dd>
+
+<p><a href="http://ficus-www.cs.ucla.edu/ficus-members/geoff/kitrace.html">http://ficus-www.cs.ucla.edu/ficus-members/geoff/kitrace.html</a></p>
+
+</dd>
+<dt id="ns_to_db">ns_to_db</dt>
+<dd>
+
+<p><a href="http://mash-www.cs.berkeley.edu/ns/">http://mash-www.cs.berkeley.edu/ns/</a></p>
+
+</dd>
+<dt id="sqlselect_to_db">sqlselect_to_db</dt>
+<dd>
+
+<p>the output of SQL SELECT tables to db</p>
+
+</dd>
+<dt id="tabdelim_to_db">tabdelim_to_db</dt>
+<dd>
+
+<p>spreadsheet tab-delimited files to db</p>
+
+</dd>
+<dt id="tcpdump_to_db">tcpdump_to_db</dt>
+<dd>
+
+<p>(see man tcpdump(8) on any reasonable system)</p>
+
+</dd>
+<dt id="xml_to_db">xml_to_db</dt>
+<dd>
+
+<p>XML input to fsdb, assuming they&#39;re very regular</p>
+
+</dd>
+</dl>
+
+<p>(And out of fsdb:)</p>
+
+<dl>
+
+<dt id="db_to_csv">db_to_csv</dt>
+<dd>
+
+<p>Comma-separated-value format from fsdb.</p>
+
+</dd>
+<dt id="db_to_html_table">db_to_html_table</dt>
+<dd>
+
+<p>simple conversion of Fsdb to html tables</p>
+
+</dd>
+</dl>
+
+<h2 id="STANDARD-OPTIONS">STANDARD OPTIONS</h2>
+
+<p>Many programs have common options:</p>
+
+<dl>
+
+<dt id="or---help"><b>-?</b> or <b>--help</b></dt>
+<dd>
+
+<p>Show basic usage.</p>
+
+</dd>
+<dt id="N-on---new-name"><b>-N</b> on <b>--new-name</b></dt>
+<dd>
+
+<p>When a command creates a new column like <a>dbrowaccumulate</a>&#39;s <code>accum</code>, this option lets one override the default name of that new column.</p>
+
+</dd>
+<dt id="T-TmpDir"><b>-T TmpDir</b></dt>
+<dd>
+
+<p>where to put tmp files. Also uses environment variable TMPDIR, if -T is not specified. Default is /tmp.</p>
+
+<p>Show basic usage.</p>
+
+</dd>
+<dt id="c-FRACTION-or---confidence-FRACTION"><b>-c FRACTION</b> or <b>--confidence FRACTION</b></dt>
+<dd>
+
+<p>Specify confidence interval FRACTION (<a>dbcolstats</a>, <a>dbmultistats</a>, etc.)</p>
+
+</dd>
+<dt id="C-S-or---element-separator-S"><b>-C S</b> or <code>--element-separator S</code></dt>
+<dd>
+
+<p>Specify column separator S (<a>dbcolsplittocols</a>, <a>dbcolmerge</a>).</p>
+
+</dd>
+<dt id="d-or---debug"><b>-d</b> or <b>--debug</b></dt>
+<dd>
+
+<p>Enable debugging (may be repeated for greater effect in some cases).</p>
+
+</dd>
+<dt id="a-or---include-non-numeric"><b>-a</b> or <b>--include-non-numeric</b></dt>
+<dd>
+
+<p>Compute stats over all data (treating non-numbers as zeros). (By default, things that can&#39;t be treated as numbers are ignored for stats purposes)</p>
+
+</dd>
+<dt id="S-or---pre-sorted"><b>-S</b> or <b>--pre-sorted</b></dt>
+<dd>
+
+<p>Assume the data is pre-sorted. May be repeated to disable verification (saving a small amount of work).</p>
+
+</dd>
+<dt id="e-E-or---empty-E"><b>-e E</b> or <b>--empty E</b></dt>
+<dd>
+
+<p>give value E as the value for empty (null) records</p>
+
+</dd>
+<dt id="i-I-or---input-I"><b>-i I</b> or <b>--input I</b></dt>
+<dd>
+
+<p>Input data from file I.</p>
+
+</dd>
+<dt id="o-O-or---output-O"><b>-o O</b> or <b>--output O</b></dt>
+<dd>
+
+<p>Write data out to file O.</p>
+
+</dd>
+<dt id="header-H"><b>--header</b> H</dt>
+<dd>
+
+<p>Use H as the full Fsdb header, rather than reading a header from then input. This option is particularly useful when using Fsdb under Hadoop, where split files don&#39;t have heades.</p>
+
+</dd>
+<dt id="nolog"><b>--nolog</b>.</dt>
+<dd>
+
+<p>Skip logging the program in a trailing comment.</p>
+
+</dd>
+</dl>
+
+<p>When giving Perl code (in <a>dbrow</a> and <a>dbroweval</a>) column names can be embedded if preceded by underscores. Look at <a href="http://man.he.net/man1/dbrow">dbrow(1)</a> or <a href="http://man.he.net/man1/dbroweval">dbroweval(1)</a> for examples.)</p>
+
+<p>Most programs run in constant memory and use temporary files if necessary. Exceptions are <a>dbcolneaten</a>, <a>dbcolpercentile</a>, <a>dbmapreduce</a>, <a>dbmultistats</a>, <a>dbrowsplituniq</a>.</p>
+
+<h1 id="ANOTHER-EXAMPLE">ANOTHER EXAMPLE</h1>
+
+<p>Take the raw data in <code>DATA/http_bandwidth</code>, put a header on it (<code>dbcoldefine size bw</code>), took statistics of each category (<code>dbmultistats -k size bw</code>), pick out the relevant fields (<code>dbcol size mean stddev pct_rsd</code>), and you get:</p>
+
+<pre><code>        #fsdb size mean stddev pct_rsd
+        1024    1.4962e+06      2.8497e+05      19.047
+        10240   5.0286e+06      6.0103e+05      11.952
+        102400  4.9216e+06      3.0939e+05      6.2863
+        #  | dbcoldefine size bw
+        #  | /home/johnh/BIN/DB/dbmultistats -k size bw
+        #  | /home/johnh/BIN/DB/dbcol size mean stddev pct_rsd</code></pre>
+
+<p>(The whole command was:</p>
+
+<pre><code>        cat DATA/http_bandwidth |
+        dbcoldefine size |
+        dbmultistats -k size bw |
+        dbcol size mean stddev pct_rsd</code></pre>
+
+<p>all on one line.)</p>
+
+<p>Then post-process them to get rid of the exponential notation by adding this to the end of the pipeline:</p>
+
+<pre><code>    dbroweval &#39;_mean = sprintf(&quot;%8.0f&quot;, _mean); _stddev = sprintf(&quot;%8.0f&quot;, _stddev);&#39;</code></pre>
+
+<p>(Actually, this step is no longer required since <a>dbcolstats</a> now uses a different default format.)</p>
+
+<p>giving:</p>
+
+<pre><code>        #fsdb      size    mean    stddev  pct_rsd
+        1024     1496200          284970        19.047
+        10240    5028600          601030        11.952
+        102400   4921600          309390        6.2863
+        #  | dbcoldefine size bw
+        #  | dbmultistats -k size bw
+        #  | dbcol size mean stddev pct_rsd
+        #  | dbroweval   { _mean = sprintf(&quot;%8.0f&quot;, _mean); _stddev = sprintf(&quot;%8.0f&quot;, _stddev); }</code></pre>
+
+<p>In a few lines, raw data is transformed to processed output.</p>
+
+<p>Suppose you expect there is an odd distribution of results of one datapoint. Fsdb can easily produce a CDF (cumulative distribution function) of the data, suitable for graphing:</p>
+
+<pre><code>    cat DB/DATA/http_bandwidth | \
+        dbcoldefine size bw | \
+        dbrow &#39;_size == 102400&#39; | \
+        dbcol bw | \
+        dbsort -n bw | \
+        dbrowenumerate | \
+        dbcolpercentile count | \
+        dbcol bw percentile | \
+        xgraph</code></pre>
+
+<p>The steps, roughly: 1. get the raw input data and turn it into fsdb format, 2. pick out just the relevant column (for efficiency) and sort it, 3. for each data point, assign a CDF percentage to it, 4. pick out the two columns to graph and show them</p>
+
+<h1 id="A-GRADEBOOK-EXAMPLE">A GRADEBOOK EXAMPLE</h1>
+
+<p>The first commercial program I wrote was a gradebook, so here&#39;s how to do it with Fsdb.</p>
+
+<p>Format your data like DATA/grades.</p>
+
+<pre><code>        #fsdb name email id test1
+        a a@ucla.example.edu 1 80
+        b b@usc.example.edu 2 70
+        c c@isi.example.edu 3 65
+        d d@lmu.example.edu 4 90
+        e e@caltech.example.edu 5 70
+        f f@oxy.example.edu 6 90</code></pre>
+
+<p>Or if your students have spaces in their names, use <code>-F S</code> and two spaces to separate each column:</p>
+
+<pre><code>        #fsdb -F S name email id test1
+        alfred aho  a@ucla.example.edu  1  80
+        butler lampson  b@usc.example.edu  2  70
+        david clark  c@isi.example.edu  3  65
+        constantine drovolis  d@lmu.example.edu  4  90
+        debrorah estrin  e@caltech.example.edu  5  70
+        sally floyd  f@oxy.example.edu  6  90</code></pre>
+
+<p>To compute statistics on an exam, do</p>
+
+<pre><code>        cat DATA/grades | dbstats test1 |dblistize</code></pre>
+
+<p>giving</p>
+
+<pre><code>        #fsdb -R C  ...
+        mean:        77.5
+        stddev:      10.84
+        pct_rsd:     13.987
+        conf_range:  11.377
+        conf_low:    66.123
+        conf_high:   88.877
+        conf_pct:    0.95
+        sum:         465
+        sum_squared: 36625
+        min:         65
+        max:         90
+        n:           6
+        ...</code></pre>
+
+<p>To do a histogram:</p>
+
+<pre><code>        cat DATA/grades | dbcolhisto -n 5 -g test1</code></pre>
+
+<p>giving</p>
+
+<pre><code>        #fsdb low histogram
+        65      *
+        70      **
+        75
+        80      *
+        85
+        90      **
+        #  | /home/johnh/BIN/DB/dbhistogram -n 5 -g test1</code></pre>
+
+<p>Now you want to send out grades to the students by e-mail. Create a form-letter (in the file <i>test1.txt</i>):</p>
+
+<pre><code>        To: _email (_name)
+        From: J. Random Professor &lt;jrp@usc.example.edu&gt;
+        Subject: test1 scores
+
+        _name, your score on test1 was _test1.
+        86+   A
+        75-85 B
+        70-74 C
+        0-69  F</code></pre>
+
+<p>Generate the shell script that will send the mail out:</p>
+
+<pre><code>        cat DATA/grades | dbformmail test1.txt &gt; test1.sh</code></pre>
+
+<p>And run it:</p>
+
+<pre><code>        sh &lt;test1.sh</code></pre>
+
+<p>The last two steps can be combined:</p>
+
+<pre><code>        cat DATA/grades | dbformmail test1.txt | sh</code></pre>
+
+<p>but I like to keep a copy of exactly what I send.</p>
+
+<p>At the end of the semester you&#39;ll want to compute grade totals and assign letter grades. Both fall out of dbroweval. For example, to compute weighted total grades with a 40% midterm/60% final where the midterm is 84 possible points and the final 100:</p>
+
+<pre><code>        dbcol -rv total |
+        dbcolcreate total - |
+        dbroweval &#39;
+                _total = .40 * _midterm/84.0 + .60 * _final/100.0;
+                _total = sprintf(&quot;%4.2f&quot;, _total);
+                if (_final eq &quot;-&quot; || ( _name =~ /^_/)) { _total = &quot;-&quot;; };&#39; | 
+        dbcolneaten  </code></pre>
+
+<p>If you got the data originally from a spreadsheet, save it in &quot;tab-delimited&quot; format and convert it with tabdelim_to_db (run tabdelim_to_db -? for examples).</p>
+
+<h1 id="A-PASSWORD-EXAMPLE">A PASSWORD EXAMPLE</h1>
+
+<p>To convert the Unix password file to db:</p>
+
+<pre><code>        cat /etc/passwd | sed &#39;s/:/  /g&#39;| \
+                dbcoldefine -F S login password uid gid gecos home shell \
+                &gt;passwd.fsdb</code></pre>
+
+<p>To convert the group file</p>
+
+<pre><code>        cat /etc/group | sed &#39;s/:/  /g&#39; | \
+                dbcoldefine -F S group password gid members \
+                &gt;group.fsdb</code></pre>
+
+<p>To show the names of the groups that div7-members are in (assuming DIV7 is in the gecos field):</p>
+
+<pre><code>        cat passwd.fsdb | dbrow &#39;_gecos =~ /DIV7/&#39; | dbcol login gid | \
+                dbjoin -i - -i group.fsdb gid | dbcol login group</code></pre>
+
+<h1 id="SHORT-EXAMPLES">SHORT EXAMPLES</h1>
+
+<p>Which Fsdb programs are the most complicated (based on number of test cases)?</p>
+
+<pre><code>        ls TEST/*.cmd | \
+                dbcoldefine test | \
+                dbroweval &#39;_test =~ s@^TEST/([^_]+).*$@$1@&#39; | \
+                dbrowuniq -c | \
+                dbsort -nr count | \
+                dbcolneaten</code></pre>
+
+<p>(Answer: <a>dbmapreduce</a>, then <a>dbcolstats</a>, <a>dbfilealter</a> and <a>dbjoin</a>.)</p>
+
+<p>Stats on an exam (in <code>$FILE</code>, where <code>$COLUMN</code> is the name of the exam)?</p>
+
+<pre><code>        cat $FILE | dbcolstats -q 4 $COLUMN &lt;$FILE | dblistize | dbstripcomments
+
+        cat $FILE | dbcolhisto -g -n 20 $COLUMN | dbcolneaten | dbstripcomments</code></pre>
+
+<p>Merging a the hw1 column from file hw1.fsdb into grades.fsdb assuming there&#39;s a common student id in column &quot;id&quot;:</p>
+
+<pre><code>        dbcol id hw1 &lt;hw1.fsdb &gt;t.fsdb
+
+        dbjoin -a -e - grades.fsdb t.fsdb id | \
+            dbsort  name | \
+            dbcolneaten &gt;new_grades.fsdb</code></pre>
+
+<p>Merging two fsdb files with the same rows:</p>
+
+<pre><code>        cat file1.fsdb file2.fsdb &gt;output.fsdb</code></pre>
+
+<p>or if you want to clean things up a bit</p>
+
+<pre><code>        cat file1.fsdb file2.fsdb | dbstripextraheaders &gt;output.fsdb</code></pre>
+
+<p>or if you want to know where the data came from</p>
+
+<pre><code>        for i in 1 2
+        do
+                dbcolcreate source $i &lt; file$i.fsdb
+        done &gt;output.fsdb</code></pre>
+
+<p>(assumes you&#39;re using a Bourne-shell compatible shell, not csh).</p>
+
+<h1 id="WARNINGS">WARNINGS</h1>
+
+<p>As with any tool, one should (which means <i>must</i>) understand the limits of the tool.</p>
+
+<p>All Fsdb tools should run in <i>constant memory</i>. In some cases (such as <i>dbcolstats</i> with quartiles, where the whole input must be re-read), programs will spool data to disk if necessary.</p>
+
+<p>Most tools buffer one or a few lines of data, so memory will scale with the size of each line. (So lines with many columns, or when columns have lots data, may cause large memory consumption.)</p>
+
+<p>All Fsdb tools should run in constant or at worst <code>n log n</code> time.</p>
+
+<p>All Fsdb tools use normal Perl math routines for computation. Although I make every attempt to choose numerically stable algorithms (although I also welcome feedback and suggestions for improvement), normal rounding due to computer floating point approximations can result in inaccuracies when data spans a large range of precision. (See for example the <i>dbcolstats_extrema</i> test cases.)</p>
+
+<p>Any requirements and limitations of each Fsdb tool is documented on its manual page.</p>
+
+<p>If any Fsdb program violates these assumptions, that is a bug that should be documented on the tool&#39;s manual page or ideally fixed.</p>
+
+<p>Fsdb does depend on Perl&#39;s correctness, and Perl (and Fsdb) have some bugs. Fsdb should work on perl from version 5.10 onward.</p>
+
+<h1 id="HISTORY">HISTORY</h1>
+
+<p>There have been three versions of Fsdb; fsdb 1.0 is a complete re-write of the pre-1995 versions, and was distributed from 1995 to 2007. Fsdb 2.0 is a significant re-write of the 1.x versions for reasons described below.</p>
+
+<p>Fsdb (in its various forms) has been used extensively by its author since 1991. Since 1995 it&#39;s been used by two other researchers at UCLA and several at ISI. In February 1998 it was announced to the Internet. Since then it has found a few users, some outside where I work.</p>
+
+<h2 id="Fsdb-2.0-Rationale">Fsdb 2.0 Rationale</h2>
+
+<p>I&#39;ve thought about fsdb-2.0 for many years, but it was started in earnest in 2007. Fsdb-2.0 has the following goals:</p>
+
+<dl>
+
+<dt id="in-one-process-processing">in-one-process processing</dt>
+<dd>
+
+<p>While fsdb is great on the Unix command line as a pipeline between programs, it should <i>also</i> be possible to set it up to run in a single process. And if it does so, it should be able to avoid serializing and deserializing (converting to and from text) data between each module. (Accomplished in fsdb-2.0: see <a>dbpipeline</a>, although still needs tuning.)</p>
+
+</dd>
+<dt id="clean-IO-API">clean IO API</dt>
+<dd>
+
+<p>Fsdb&#39;s roots go back to perl4 and 1991, so the fsdb-1.x library is very, very crufty. More than just being ugly (but it was that too), this made things reading from one format file and writing to another the application&#39;s job, when it should be the library&#39;s. (Accomplished in fsdb-1.15 and improved in 2.0: see <a>Fsdb::IO</a>.)</p>
+
+</dd>
+<dt id="normalized-module-APIs">normalized module APIs</dt>
+<dd>
+
+<p>Because fsdb modules were added as needed over 10 years, sometimes the module APIs became inconsistent. (For example, the 1.x <code>dbcolcreate</code> required an empty value following the name of the new column, but other programs specify empty values with the <code>-e</code> argument.) We should smooth over these inconsistencies. (Accomplished as each module was ported in 2.0 through 2.7.)</p>
+
+</dd>
+<dt id="everyone-handles-all-input-formats">everyone handles all input formats</dt>
+<dd>
+
+<p>Given a clean IO API, the distinction between &quot;colized&quot; and &quot;listized&quot; fsdb files should go away. Any program should be able to read and write files in any format. (Accomplished in fsdb-2.1.)</p>
+
+</dd>
+</dl>
+
+<p>Fsdb-2.0 preserves backwards compatibility where possible, but breaks it where necessary to accomplish the above goals. In August 2008, Fsdb-2.7 was declared preferred over the 1.x versions. Benchmarking in 2013 showed that threading performed much worse than just using pipes, so Fsdb-2.44 uses threading &quot;style&quot;, but implemented with processes (via my &quot;Freds&quot; library).</p>
+
+<h2 id="Contributors">Contributors</h2>
+
+<p>Fsdb includes code ported from Geoff Kuenning (<code>Fsdb::Support::TDistribution</code>).</p>
+
+<p>Fsdb contributors: Ashvin Goel <i>goel@cse.oge.edu</i>, Geoff Kuenning <i>geoff@fmg.cs.ucla.edu</i>, Vikram Visweswariah <i>visweswa@isi.edu</i>, Kannan Varadahan <i>kannan@isi.edu</i>, Lars Eggert <i>larse@isi.edu</i>, Arkadi Gelfond <i>arkadig@dyna.com</i>, David Graff <i>graff@ldc.upenn.edu</i>, Haobo Yu <i>haoboy@packetdesign.com</i>, Pavlin Radoslavov <i>pavlin@catarina.usc.edu</i>, Graham Phillips, Yuri Pradkin, Alefiya Hussain, Ya Xu, Michael Schwendt, Fabio Silva <i>fabio@isi.edu</i>, Jerry Zhao <i>zhaoy@isi.edu</i>, Ning Xu <i>nxu@aludra.usc.edu</i>, Martin Lukac <i>mlukac@lecs.cs.ucla.edu</i>, Xue Cai, Michael McQuaid, Christopher Meng, Calvin Ardi, H. Merijn Brand, Lan Wei.</p>
+
+<p>Fsdb includes datasets contributed from NIST (<i>DATA/nist_zarr13.fsdb</i>), from <a href="http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm">http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm</a>, the NIST/SEMATECH e-Handbook of Statistical Methods, section 1.4.2.8.1. Background and Data. The source is public domain, and reproduced with permission.</p>
+
+<h1 id="RELATED-WORK">RELATED WORK</h1>
+
+<p>As stated in the introduction, Fsdb is an incompatible reimplementation of the ideas found in <code>/rdb</code>. By storing data in simple text files and processing it with pipelines it is easy to experiment (in the shell) and look at the output. The original implementation of this idea was /rdb, a commercial product described in the book <i>UNIX relational database management: application development in the UNIX environment</i> by Rod Manis, Evan Schaffer, and Robert Jorgensen (and also at the web page <a href="http://www.rdb.com/">http://www.rdb.com/</a>).</p>
+
+<p>While Fsdb is inspired by Rdb, it includes no code from it, and Fsdb makes several different design choices. In particular: rdb attempts to be closer to a &quot;real&quot; database, with provision for locking, file indexing. Fsdb focuses on single user use and so eschews these choices. Rdb also has some support for interactive editing. Fsdb leaves editing to text editors like emacs or vi.</p>
+
+<p>In August, 2002 I found out Carlo Strozzi extended RDB with his package NoSQL <a href="http://www.linux.it/~carlos/nosql/">http://www.linux.it/~carlos/nosql/</a>. According to Mr. Strozzi, he implemented NoSQL in awk to avoid the Perl start-up of RDB. Although I haven&#39;t found Perl startup overhead to be a big problem on my platforms (from old Sparcstation IPCs to 2GHz Pentium-4s), you may want to evaluate his system. The Linux Journal has a description of NoSQL at <a href="http://www.linuxjournal.com/article/3294">http://www.linuxjournal.com/article/3294</a>. It seems quite similar to Fsdb. Like /rdb, NoSQL supports indexing (not present in Fsdb). Fsdb appears to have richer support for statistics, and, as of Fsdb-2.x, its support for Perl threading may support faster performance (one-process, less serialization and deserialization).</p>
+
+<h1 id="RELEASE-NOTES">RELEASE NOTES</h1>
+
+<p>Versions prior to 1.0 were released informally on my web page but were not announced.</p>
+
+<h2 id="pod0.0-1991">0.0 1991</h2>
+
+<p>started for my own research use</p>
+
+<h2 id="May-94">0.1 26-May-94</h2>
+
+<p>first check-in to RCS</p>
+
+<h2 id="Mar-95">0.2 15-Mar-95</h2>
+
+<p>parts now require perl5</p>
+
+<h2 id="Jul-97">1.0, 22-Jul-97</h2>
+
+<p>adds autoconf support and a test script.</p>
+
+<h2 id="Jan-98">1.1, 20-Jan-98</h2>
+
+<p>support for double space field separators, better tests</p>
+
+<h2 id="Feb-98">1.2, 11-Feb-98</h2>
+
+<p>minor changes and release on comp.lang.perl.announce</p>
+
+<h2 id="Mar-98">1.3, 17-Mar-98</h2>
+
+<ul>
+
+<li><p>adds median and quartile options to dbstats</p>
+
+</li>
+<li><p>adds dmalloc_to_db converter</p>
+
+</li>
+<li><p>fixes some warnings</p>
+
+</li>
+<li><p>dbjoin now can run on unsorted input</p>
+
+</li>
+<li><p>fixes a dbjoin bug</p>
+
+</li>
+<li><p>some more tests in the test suite</p>
+
+</li>
+</ul>
+
+<h2 id="Mar-981">1.4, 27-Mar-98</h2>
+
+<ul>
+
+<li><p>improves error messages (all should now report the program that makes the error)</p>
+
+</li>
+<li><p>fixed a bug in dbstats output when the mean is zero</p>
+
+</li>
+</ul>
+
+<h2 id="Jun-98">1.5, 25-Jun-98</h2>
+
+<dl>
+
+<dt id="BUG-FIX-dbcolhisto-dbcolpercentile-now-handles-non-numeric-values-like-dbstats">BUG FIX dbcolhisto, dbcolpercentile now handles non-numeric values like dbstats</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolstats-computes-zscores-and-tscores-over-a-column">NEW dbcolstats computes zscores and tscores over a column</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolscorrelate-computes-correlation-coefficients-between-two-columns">NEW dbcolscorrelate computes correlation coefficients between two columns</dt>
+<dd>
+
+</dd>
+<dt id="INTERNAL-ficus_getopt.pl-has-been-replaced-by-DbGetopt.pm">INTERNAL ficus_getopt.pl has been replaced by DbGetopt.pm</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-all-tests-are-now-portable-previously-some-tests-ran-only-on-my-system">BUG FIX all tests are now ``portable&#39;&#39; (previously some tests ran only on my system)</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-you-no-longer-need-to-have-the-db-programs-in-your-path-fix-arose-from-a-discussion-with-Arkadi-Gelfond">BUG FIX you no longer need to have the db programs in your path (fix arose from a discussion with Arkadi Gelfond)</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-installation-no-longer-uses-cp--f-to-work-on-SunOS-4">BUG FIX installation no longer uses cp -f (to work on SunOS 4)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="May-99">1.6, 24-May-99</h2>
+
+<dl>
+
+<dt id="NEW-dbsort-dbstats-dbmultistats-now-run-in-constant-memory-using-tmp-files-if-necessary">NEW dbsort, dbstats, dbmultistats now run in constant memory (using tmp files if necessary)</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolmovingstats-does-moving-means-over-a-series-of-data">NEW dbcolmovingstats does moving means over a series of data</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcol-has-a--v-option-to-get-all-columns-except-those-listed">NEW dbcol has a -v option to get all columns except those listed</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbmultistats-does-quartiles-and-medians">NEW dbmultistats does quartiles and medians</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbstripextraheaders-now-also-cleans-up-bogus-comments-before-the-fist-header">NEW dbstripextraheaders now also cleans up bogus comments before the fist header</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-dbcolneaten-works-better-with-double-space-separated-data">BUG FIX dbcolneaten works better with double-space-separated data</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Jan-00">1.7, 5-Jan-00</h2>
+
+<dl>
+
+<dt id="NEW-dbcolize-now-detects-and-rejects-lines-that-contain-embedded-copies-of-the-field-separator">NEW dbcolize now detects and rejects lines that contain embedded copies of the field separator</dt>
+<dd>
+
+</dd>
+<dt id="NEW-configure-tries-harder-to-prevent-people-from-improperly-configuring-installing-fsdb">NEW configure tries harder to prevent people from improperly configuring/installing fsdb</dt>
+<dd>
+
+</dd>
+<dt id="NEW-tcpdump_to_db-converter-incomplete">NEW tcpdump_to_db converter (incomplete)</dt>
+<dd>
+
+</dd>
+<dt id="NEW-tabdelim_to_db-converter:-from-spreadsheet-tab-delimited-files-to-db">NEW tabdelim_to_db converter: from spreadsheet tab-delimited files to db</dt>
+<dd>
+
+</dd>
+<dt id="NEW-mailing-lists-for-fsdb-are-fsdb-announce-heidemann.la.ca.us-and-fsdb-talk-heidemann.la.ca.us">NEW mailing lists for fsdb are <code>fsdb-announce@heidemann.la.ca.us</code> and <code>fsdb-talk@heidemann.la.ca.us</code></dt>
+<dd>
+
+<p>To subscribe to either, send mail to <code>fsdb-announce-request@heidemann.la.ca.us</code> or <code>fsdb-talk-request@heidemann.la.ca.us</code> with &quot;subscribe&quot; in the BODY of the message.</p>
+
+</dd>
+<dt id="BUG-FIX-dbjoin-used-to-produce-incorrect-output-if-there-were-extra-unmatched-values-in-the-2nd-table.-Thanks-to-Graham-Phillips-for-providing-a-test-case">BUG FIX dbjoin used to produce incorrect output if there were extra, unmatched values in the 2nd table. Thanks to Graham Phillips for providing a test case.</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-the-sample-commands-in-the-usage-strings-now-all-should-explicitly-include-the-source-of-data-typically-from-cat-foo.fsdb-.-Thanks-to-Ya-Xu-for-pointing-out-this-documentation-deficiency">BUG FIX the sample commands in the usage strings now all should explicitly include the source of data (typically from &quot;cat foo.fsdb |&quot;). Thanks to Ya Xu for pointing out this documentation deficiency.</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-DOCUMENTATION-dbcolmovingstats-had-incorrect-sample-output">BUG FIX (DOCUMENTATION) dbcolmovingstats had incorrect sample output.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Jun-00">1.8, 28-Jun-00</h2>
+
+<dl>
+
+<dt id="BUG-FIX-header-options-are-now-preserved-when-writing-with-dblistize">BUG FIX header options are now preserved when writing with dblistize</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbrowuniq-now-optionally-checks-for-uniqueness-only-on-certain-fields">NEW dbrowuniq now optionally checks for uniqueness only on certain fields</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbrowsplituniq-makes-one-pass-through-a-file-and-splits-it-into-separate-files-based-on-the-given-fields">NEW dbrowsplituniq makes one pass through a file and splits it into separate files based on the given fields</dt>
+<dd>
+
+</dd>
+<dt id="NEW-converter-for-crl-format-network-traces">NEW converter for &quot;crl&quot; format network traces</dt>
+<dd>
+
+</dd>
+<dt id="NEW-anywhere-you-use-arbitrary-code-like-dbroweval-_last_foo-now-maps-to-the-last-rows-value-for-field-_foo">NEW anywhere you use arbitrary code (like dbroweval), _last_foo now maps to the last row&#39;s value for field _foo.</dt>
+<dd>
+
+</dd>
+<dt id="OPTIMIZATION-comment-processing-slightly-changed-so-that-dbmultistats-now-is-much-faster-on-files-with-lots-of-comments-for-example-100k-lines-of-comments-and-700-lines-of-data-Thanks-to-Graham-Phillips-for-pointing-out-this-performance-problem">OPTIMIZATION comment processing slightly changed so that dbmultistats now is much faster on files with lots of comments (for example, ~100k lines of comments and 700 lines of data!) (Thanks to Graham Phillips for pointing out this performance problem.)</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-dbstats-with-median-quartiles-now-correctly-handles-singleton-data-points">BUG FIX dbstats with median/quartiles now correctly handles singleton data points.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Nov-00">1.9, 6-Nov-00</h2>
+
+<dl>
+
+<dt id="NEW-dbfilesplit-split-a-single-input-file-into-multiple-output-files-based-on-code-contributed-by-Pavlin-Radoslavov">NEW dbfilesplit, split a single input file into multiple output files (based on code contributed by Pavlin Radoslavov).</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-dbsort-now-works-with-perl-5.6">BUG FIX dbsort now works with perl-5.6</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Apr-01">1.10, 10-Apr-01</h2>
+
+<dl>
+
+<dt id="BUG-FIX-dbstats-now-handles-the-case-where-there-are-more-n-tiles-than-data">BUG FIX dbstats now handles the case where there are more n-tiles than data</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbstats-now-includes-a--S-option-to-optimize-work-on-pre-sorted-data-inspired-by-code-contributed-by-Haobo-Yu">NEW dbstats now includes a -S option to optimize work on pre-sorted data (inspired by code contributed by Haobo Yu)</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-dbsort-now-has-a-better-estimate-of-memory-usage-when-run-on-data-with-very-short-records-problem-detected-by-Haobo-Yu">BUG FIX dbsort now has a better estimate of memory usage when run on data with very short records (problem detected by Haobo Yu)</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-cleanup-of-temporary-files-is-slightly-better">BUG FIX cleanup of temporary files is slightly better</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Nov-01">1.11, 2-Nov-01</h2>
+
+<dl>
+
+<dt id="BUG-FIX-dbcolneaten-now-runs-in-constant-memory">BUG FIX dbcolneaten now runs in constant memory</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolneaten-now-supports-field-specifiers-that-allow-some-control-over-how-wide-columns-should-be">NEW dbcolneaten now supports &quot;field specifiers&quot; that allow some control over how wide columns should be</dt>
+<dd>
+
+</dd>
+<dt id="OPTIMIZATION-dbsort-now-tries-hard-to-be-filesystem-cache-friendly-inspired-by-Information-and-Control-in-Gray-box-Systems-by-the-Arpaci-Dusseaus-at-SOSP-2001">OPTIMIZATION dbsort now tries hard to be filesystem cache-friendly (inspired by &quot;Information and Control in Gray-box Systems&quot; by the Arpaci-Dusseau&#39;s at SOSP 2001)</dt>
+<dd>
+
+</dd>
+<dt id="INTERNAL-t_distr-now-ported-to-perl5-module-DbTDistr">INTERNAL t_distr now ported to perl5 module DbTDistr</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Oct-02">1.12, 30-Oct-02</h2>
+
+<dl>
+
+<dt id="BUG-FIX-dbmultistats-documentation-typo-fixed">BUG FIX dbmultistats documentation typo fixed</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolmultiscale">NEW dbcolmultiscale</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcol-has--r-option-for-relaxed-error-checking">NEW dbcol has -r option for &quot;relaxed error checking&quot;</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolneaten-has-new--e-option-to-strip-end-of-line-spaces">NEW dbcolneaten has new -e option to strip end-of-line spaces</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbrow-finally-has-a--v-option-to-negate-the-test">NEW dbrow finally has a -v option to negate the test</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-math-bug-in-dbcoldiff-fixed-by-Ashvin-Goel-need-to-check-Scheaffer-test-cases">BUG FIX math bug in dbcoldiff fixed by Ashvin Goel (need to check Scheaffer test cases)</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-some-patches-to-run-with-Perl-5.8.-Note:-some-programs-dbcolmultiscale-dbmultistats-dbrowsplituniq-generate-warnings-like:-Use-of-uninitialized-value-in-concatenation-.-or-string-at-usr-lib-perl5-5.8.0-FileCache.pm-line-98-STDIN-line-2.-Please-ignore-this-until-I-figure-out-how-to-suppress-it.-Thanks-to-Jerry-Zhao-for-noticing-perl-5.8-problems">BUG FIX some patches to run with Perl 5.8. Note: some programs (dbcolmultiscale, dbmultistats, dbrowsplituniq) generate warnings like: &quot;Use of uninitialized value in concatenation (.)&quot; or &quot;string at /usr/lib/perl5/5.8.0/FileCache.pm line 98, &lt;STDIN&gt; line 2&quot;. Please ignore this until I figure out how to suppress it. (Thanks to Jerry Zhao for noticing perl-5.8 problems.)</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-fixed-an-autoconf-problem-where-configure-would-fail-to-find-a-reasonable-prefix-thanks-to-Fabio-Silva-for-reporting-the-problem">BUG FIX fixed an autoconf problem where configure would fail to find a reasonable prefix (thanks to Fabio Silva for reporting the problem)</dt>
+<dd>
+
+</dd>
+<dt id="NEW-db_to_html_table:-simple-conversion-to-html-tables-NO-fancy-stuff">NEW db_to_html_table: simple conversion to html tables (NO fancy stuff)</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dblib-now-has-a-function-dblib_text2html-that-will-do-simple-conversion-of-iso-8859-1-to-HTML">NEW dblib now has a function dblib_text2html() that will do simple conversion of iso-8859-1 to HTML</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Feb-04">1.13, 4-Feb-04</h2>
+
+<dl>
+
+<dt id="NEW-fsdb-added-to-the-freebsd-ports-tree-http:-www.freshports.org-databases-fsdb-.-Maintainer:-larse-isi.edu">NEW fsdb added to the freebsd ports tree <a href="http://www.freshports.org/databases/fsdb/">http://www.freshports.org/databases/fsdb/</a>. Maintainer: <code>larse@isi.edu</code></dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-properly-handle-trailing-spaces-when-data-must-be-numeric-ex.-dbstats-with--FS-see-test-dbstats_trailing_spaces-.-Fix-from-Ning-Xu-nxu-aludra.usc.edu">BUG FIX properly handle trailing spaces when data must be numeric (ex. dbstats with -FS, see test dbstats_trailing_spaces). Fix from Ning Xu <code>nxu@aludra.usc.edu</code>.</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolize-error-message-improved-bug-report-from-Terrence-Brannon-and-list-format-documented-in-the-README">NEW dbcolize error message improved (bug report from Terrence Brannon), and list format documented in the README.</dt>
+<dd>
+
+</dd>
+<dt id="NEW-cgi_to_db-converts-CGI.pm-format-storage-to-fsdb-list-format">NEW cgi_to_db converts CGI.pm-format storage to fsdb list format</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-handle-numeric-synonyms-for-column-names-in-dbcol-properly">BUG FIX handle numeric synonyms for column names in dbcol properly</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-talking-about-columns-section-added-to-README.-Lack-of-documentation-pointed-out-by-Lars-Eggert">ENHANCEMENT &quot;talking about columns&quot; section added to README. Lack of documentation pointed out by Lars Eggert.</dt>
+<dd>
+
+</dd>
+<dt id="CHANGE-dbformmail-now-defaults-to-using-Mail-Berkeley-Mail-to-send-mail-rather-than-sendmail-sendmail-is-still-an-option-but-mail-doesnt-require-running-as-root">CHANGE dbformmail now defaults to using Mail (&quot;Berkeley Mail&quot;) to send mail, rather than sendmail (sendmail is still an option, but mail doesn&#39;t require running as root)</dt>
+<dd>
+
+</dd>
+<dt id="NEW-on-platforms-that-support-it-i.e.-with-perl-5.8-fsdb-works-fine-with-unicode">NEW on platforms that support it (i.e., with perl 5.8), fsdb works fine with unicode</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbfilevalidate:-check-a-db-file-for-some-common-errors">NEW dbfilevalidate: check a db file for some common errors</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Aug-06">1.14, 24-Aug-06</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT-README-cleanup">ENHANCEMENT README cleanup</dt>
+<dd>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE-dbcolsplit-renamed-dbcolsplittocols">INCOMPATIBLE CHANGE dbcolsplit renamed dbcolsplittocols</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolsplittorows-split-one-column-into-multiple-rows">NEW dbcolsplittorows split one column into multiple rows</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbcolsregression-compute-linear-regression-and-correlation-for-two-columns">NEW dbcolsregression compute linear regression and correlation for two columns</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-cvs_to_db:-better-error-handling-normalize-field-names-skip-blank-lines">ENHANCEMENT cvs_to_db: better error handling, normalize field names, skip blank lines</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-dbjoin-now-detects-and-fails-if-non-joined-files-have-duplicate-names">ENHANCEMENT dbjoin now detects (and fails) if non-joined files have duplicate names</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-minor-bug-fixed-in-calculation-of-Student-t-distributions-doesnt-change-any-test-output-but-may-have-caused-small-errors">BUG FIX minor bug fixed in calculation of Student t-distributions (doesn&#39;t change any test output, but may have caused small errors)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Nov-07">1.15, 12-Nov-07</h2>
+
+<dl>
+
+<dt id="NEW-fsdb-1.14-added-to-the-MacOS-Fink-system-http:-pdb.finkproject.org-pdb-package.php-fsdb.-Thanks-to-Lars-Eggert-for-maintaining-this-port">NEW fsdb-1.14 added to the MacOS Fink system <a href="http://pdb.finkproject.org/pdb/package.php/fsdb">http://pdb.finkproject.org/pdb/package.php/fsdb</a>. (Thanks to Lars Eggert for maintaining this port.)</dt>
+<dd>
+
+</dd>
+<dt id="NEW-Fsdb::IO::Reader-and-Fsdb::IO::Writer-now-provide-reasonably-clean-OO-I-O-interfaces-to-Fsdb-files.-Highly-recommended-if-you-use-fsdb-directly-from-perl.-In-the-fullness-of-time-I-expect-to-reimplement-the-entire-thing-using-these-APIs-to-replace-the-current-dblib.pl-which-is-still-hobbled-by-its-roots-in-perl4">NEW Fsdb::IO::Reader and Fsdb::IO::Writer now provide reasonably clean OO I/O interfaces to Fsdb files. Highly recommended if you use fsdb directly from perl. In the fullness of time I expect to reimplement the entire thing using these APIs to replace the current dblib.pl which is still hobbled by its roots in perl4.</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbmapreduce-now-implements-a-Google-style-map-reduce-abstraction-generalizing-dbmultistats">NEW dbmapreduce now implements a Google-style map/reduce abstraction, generalizing dbmultistats.</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-fsdb-now-uses-the-Perl-build-system-Makefile.PL-etc.-instead-of-autoconf.-This-change-paves-the-way-to-better-perl-5-style-modularization-proper-manual-pages-input-of-both-listize-and-colize-format-for-every-program-and-world-peace">ENHANCEMENT fsdb now uses the Perl build system (Makefile.PL, etc.), instead of autoconf. This change paves the way to better perl-5-style modularization, proper manual pages, input of both listize and colize format for every program, and world peace.</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-dblib.pl-is-now-moved-to-Fsdb::Old.pm">ENHANCEMENT dblib.pl is now moved to Fsdb::Old.pm.</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-dbmultistats-now-propagates-its-format-argument--f-.-Bug-and-fix-from-Martin-Lukac-thanks">BUG FIX dbmultistats now propagates its format argument (-f). Bug and fix from Martin Lukac (thanks!).</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-dbformmail-documentation-now-is-clearer-that-it-doesnt-send-the-mail-you-have-to-run-the-shell-script-it-writes.-Problem-observed-by-Unkyu-Park">ENHANCEMENT dbformmail documentation now is clearer that it doesn&#39;t send the mail, you have to run the shell script it writes. (Problem observed by Unkyu Park.)</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-adapted-to-autoconf-2.61-and-then-these-changes-were-discarded-in-favor-of-The-Perl-Way">ENHANCEMENT adapted to autoconf-2.61 (and then these changes were discarded in favor of The Perl Way.</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-dbmultistats-memory-usage-corrected-O-tags-not-O-1">BUG FIX dbmultistats memory usage corrected (O(# tags), not O(1))</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-dbmultistats-can-now-optionally-run-with-pre-grouped-input-in-O-1-memory">ENHANCEMENT dbmultistats can now optionally run with pre-grouped input in O(1) memory</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-dbroweval--N-was-finally-implemented-eat-comments">ENHANCEMENT dbroweval -N was finally implemented (eat comments)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Jan-08">2.0, 25-Jan-08</h2>
+
+<p>2.0, 25-Jan-08 --- a quiet 2.0 release (gearing up towards complete)</p>
+
+<dl>
+
+<dt id="ENHANCEMENT:-shifting-old-programs-to-Perl-modules-with-the-front-end-program-as-just-a-wrapper.-In-the-short-term-this-change-just-means-programs-have-real-man-pages.-In-the-long-run-it-will-mean-that-one-can-run-a-pipeline-in-a-single-Perl-program.-So-far:-dbcol-dbroweval-the-new-dbrowcount.-dbsort-the-new-dbmerge-the-old-dbstats-renamed-dbcolstats-dbcolrename-dbcolcreate">ENHANCEMENT: shifting old programs to Perl modules, with the front-end program as just a wrapper. In the short-term, this change just means programs have real man pages. In the long-run, it will mean that one can run a pipeline in a single Perl program. So far: <a>dbcol</a>, <a>dbroweval</a>, the new <a>dbrowcount</a>. <a>dbsort</a> the new <a>dbmerge</a>, the old <code>dbstats</code> (renamed <a>dbcolstats</a>), <a>dbcolrename</a>, <a>dbcolcreate</a>,</dt>
+<dd>
+
+</dd>
+<dt id="NEW:-Fsdb::Filter::dbpipeline-is-an-internal-only-module-that-lets-one-use-fsdb-commands-from-within-perl-via-threads">NEW: <a>Fsdb::Filter::dbpipeline</a> is an internal-only module that lets one use fsdb commands from within perl (via threads).</dt>
+<dd>
+
+<p>It also provides perl function aliases for the internal modules, so a string of fsdb commands in perl are nearly as terse as in the shell:</p>
+
+<pre><code>    use Fsdb::Filter::dbpipeline qw(:all);
+    dbpipeline(
+        dbrow(qw(name test1)),
+        dbroweval(&#39;_test1 += 5;&#39;)
+    );</code></pre>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE:-The-old-dbcolstats-has-been-renamed-dbcolstatscores.-The-new-dbcolstats-does-the-same-thing-as-the-old-dbstats.-This-incompatibility-is-unfortunate-but-normalizes-program-names">INCOMPATIBLE CHANGE: The old <a>dbcolstats</a> has been renamed <a>dbcolstatscores</a>. The new <a>dbcolstats</a> does the same thing as the old <a>dbstats</a>. This incompatibility is unfortunate but normalizes program names.</dt>
+<dd>
+
+</dd>
+<dt id="CHANGE:-The-new-dbcolstats-program-always-outputs---the-default-empty-value-for-statistics-it-cannot-compute-for-example-standard-deviation-if-there-is-only-one-row-instead-of-the-old-mix-of---and-na">CHANGE: The new <a>dbcolstats</a> program always outputs <code>-</code> (the default empty value) for statistics it cannot compute (for example, standard deviation if there is only one row), instead of the old mix of <code>-</code> and &quot;na&quot;.</dt>
+<dd>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE:-The-old-dbcolstats-program-now-called-dbcolstatscores-also-has-different-arguments.-The--t-mean-stddev-option-is-now---tmean-mean---tstddev-stddev.-See-dbcolstatscores-for-details">INCOMPATIBLE CHANGE: The old <a>dbcolstats</a> program, now called <a>dbcolstatscores</a>, also has different arguments. The <code>-t mean,stddev</code> option is now <code>--tmean mean --tstddev stddev</code>. See <a>dbcolstatscores</a> for details.</dt>
+<dd>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE:-dbcolcreate-now-assumes-all-new-columns-get-the-default-value-rather-than-requiring-each-column-to-have-an-initial-constant-value.-To-change-the-initial-value-sue-the-new--e-option">INCOMPATIBLE CHANGE: <a>dbcolcreate</a> now assumes all new columns get the default value rather than requiring each column to have an initial constant value. To change the initial value, sue the new <code>-e</code> option.</dt>
+<dd>
+
+</dd>
+<dt id="NEW:-dbrowcount-counts-rows-an-almost-subset-of-dbcolstatss-n-output-except-without-differentiating-numeric-non-numeric-input-or-the-equivalent-of-dbstripcomments-wc--l">NEW: <a>dbrowcount</a> counts rows, an almost-subset of <a>dbcolstats</a>&#39;s <code>n</code> output (except without differentiating numeric/non-numeric input), or the equivalent of <code>dbstripcomments | wc -l</code>.</dt>
+<dd>
+
+</dd>
+<dt id="NEW:-dbmerge-merges-two-sorted-files.-This-functionality-was-previously-embedded-in-dbsort">NEW: <a>dbmerge</a> merges two sorted files. This functionality was previously embedded in <a>dbsort</a>.</dt>
+<dd>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE:-dbjoins--i-option-to-include-non-matches-is-now-renamed--a-so-as-to-not-conflict-with-the-new-standard-option--i-for-input-file">INCOMPATIBLE CHANGE: <a>dbjoin</a>&#39;s <code>-i</code> option to include non-matches is now renamed <code>-a</code>, so as to not conflict with the new standard option <code>-i</code> for input file.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Apr-08">2.1, 6-Apr-08</h2>
+
+<p>2.1, 6-Apr-08 --- another alpha 2.0, but now all converted programs understand both listize and colize format</p>
+
+<dl>
+
+<dt id="ENHANCEMENT:-shifting-more-old-programs-to-Perl-modules.-New-in-2.1:-dbcolneaten-dbcoldefine-dbcolhisto-dblistize-dbcolize-dbrecolize">ENHANCEMENT: shifting more old programs to Perl modules. New in 2.1: <a>dbcolneaten</a>, <a>dbcoldefine</a>, <a>dbcolhisto</a>, <a>dblistize</a>, <a>dbcolize</a>, <a>dbrecolize</a></dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-dbmerge-now-handles-an-arbitrary-number-of-input-files-not-just-exactly-two">ENHANCEMENT <a>dbmerge</a> now handles an arbitrary number of input files, not just exactly two.</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbmerge2-is-an-internal-routine-that-handles-merging-exactly-two-files">NEW <a>dbmerge2</a> is an internal routine that handles merging exactly two files.</dt>
+<dd>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE-dbjoin-now-specifies-inputs-like-dbmerge2-rather-than-assuming-the-first-two-arguments-were-tables-as-in-fsdb-1">INCOMPATIBLE CHANGE <a>dbjoin</a> now specifies inputs like <a>dbmerge2</a>, rather than assuming the first two arguments were tables (as in fsdb-1).</dt>
+<dd>
+
+<p>The old <a>dbjoin</a> argument <code>-i</code> is now <code>-a</code> or &lt;--type=outer&gt;.</p>
+
+<p>A minor change: comments in the source files for <a>dbjoin</a> are now intermixed with output rather than being delayed until the end.</p>
+
+</dd>
+<dt id="ENHANCEMENT-dbsort-now-no-longer-produces-warnings-when-null-values-are-passed-to-numeric-comparisons">ENHANCEMENT <a>dbsort</a> now no longer produces warnings when null values are passed to numeric comparisons.</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-dbroweval-now-once-again-works-with-code-that-lacks-a-trailing-semicolon.-This-bug-fixes-a-regression-from-1.15">BUG FIX <a>dbroweval</a> now once again works with code that lacks a trailing semicolon. (This bug fixes a regression from 1.15.)</dt>
+<dd>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE-dbcolneatens-old--e-option-to-avoid-end-of-line-spaces-is-now--E-to-avoid-conflicts-with-the-standard-empty-field-argument">INCOMPATIBLE CHANGE <a>dbcolneaten</a>&#39;s old <code>-e</code> option (to avoid end-of-line spaces) is now <code>-E</code> to avoid conflicts with the standard empty field argument.</dt>
+<dd>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE-dbcolhistos-old--e-option-is-now--E-to-avoid-conflicts.-And-its--n--s-and--w-are-now--N--S-and--W-to-correspond">INCOMPATIBLE CHANGE <a>dbcolhisto</a>&#39;s old <code>-e</code> option is now <code>-E</code> to avoid conflicts. And its <code>-n</code>, <code>-s</code>, and <code>-w</code> are now <code>-N</code>, <code>-S</code>, and <code>-W</code> to correspond.</dt>
+<dd>
+
+</dd>
+<dt id="NEW-dbfilealter-replaces-dbrecolize-dblistize-and-dbcolize-but-with-different-options">NEW <a>dbfilealter</a> replaces <a>dbrecolize</a>, <a>dblistize</a>, and <a>dbcolize</a>, but with different options.</dt>
+<dd>
+
+</dd>
+<dt id="ENHANCEMENT-The-library-routines-Fsdb::IO-now-understand-both-list-format-and-column-format-data-so-all-converted-programs-can-now-automatically-read-either-format.-This-capability-was-one-of-the-milestone-goals-for-2.0-so-yea">ENHANCEMENT The library routines <code>Fsdb::IO</code> now understand both list-format and column-format data, so all converted programs can now <i>automatically</i> read either format. This capability was one of the milestone goals for 2.0, so yea!</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="May-08">2.2, 23-May-08</h2>
+
+<p>Release 2.2 is another 2.x alpha release. Now <i>most</i> of the commands are ported, but a few remain, and I plan one last incompatible change (to the file header) before 2.x final.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT2">ENHANCEMENT</dt>
+<dd>
+
+<p>shifting more old programs to Perl modules. New in 2.2: <a>dbrowaccumulate</a>, <a>dbformmail</a>. <a>dbcolmovingstats</a>. <a>dbrowuniq</a>. <a>dbrowdiff</a>. <a>dbcolmerge</a>. <a>dbcolsplittocols</a>. <a>dbcolsplittorows</a>. <a>dbmapreduce</a>. <a>dbmultistats</a>. <a>dbrvstatdiff</a>. Also <a>dbrowenumerate</a> exists only as a front-end (command-line) program.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p>The following programs have been dropped from fsdb-2.x: <a>dbcoltighten</a>, <a>dbfilesplit</a>, <a>dbstripextraheaders</a>, <a>dbstripleadingspace</a>.</p>
+
+</dd>
+<dt id="NEW">NEW</dt>
+<dd>
+
+<p><a>combined_log_format_to_db</a> to convert Apache logfiles</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE1">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p>Options to <a>dbrowdiff</a> are now <b>-B</b> and <b>-I</b>, not <b>-a</b> and <b>-i</b>.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE2">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p><a>dbstripcomments</a> is now <a>dbfilestripcomments</a>.</p>
+
+</dd>
+<dt id="BUG-FIXES">BUG FIXES</dt>
+<dd>
+
+<p><a>dbcolneaten</a> better handles empty columns; <a>dbcolhisto</a> warning suppressed (actually a bug in high-bucket handling).</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE3">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p><a>dbmultistats</a> now requires a <code>-k</code> option in front of the key (tag) field, or if none is given, it will group by the first field (both like <a>dbmapreduce</a>).</p>
+
+</dd>
+<dt id="KNOWN-BUG">KNOWN BUG</dt>
+<dd>
+
+<p><a>dbmultistats</a> with quantile option doesn&#39;t work currently.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE4">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p><a>dbcoldiff</a> is renamed <a>dbrvstatdiff</a>.</p>
+
+</dd>
+<dt id="BUG-FIXES1">BUG FIXES</dt>
+<dd>
+
+<p><a>dbformmail</a> was leaving its log message as a command, not a comment. Oops. No longer.</p>
+
+</dd>
+</dl>
+
+<h2 id="May-08-alpha">2.3, 27-May-08 (alpha)</h2>
+
+<p>Another alpha release, this one just to fix the critical dbjoin bug listed below (that happens to have blocked my MP3 jukebox :-).</p>
+
+<dl>
+
+<dt id="BUG-FIX2">BUG FIX</dt>
+<dd>
+
+<p>Dbsort no longer hangs if given an input file with no rows.</p>
+
+</dd>
+<dt id="BUG-FIX3">BUG FIX</dt>
+<dd>
+
+<p>Dbjoin now works with unsorted input coming from a pipeline (like stdin). Perl-5.8.8 has a bug (?) that was making this case fail---opening stdin in one thread, reading some, then reading more in a different thread caused an lseek which works on files, but fails on pipes like stdin. Go figure.</p>
+
+</dd>
+<dt id="BUG-FIX-KNOWN-BUG">BUG FIX / KNOWN BUG</dt>
+<dd>
+
+<p>The dbjoin fix also fixed dbmultistats -q (it now gives the right answer). Although a new bug appeared, messages like: Attempt to free unreferenced scalar: SV 0xa9dd0c4, Perl interpreter: 0xa8350b8 during global destruction. So the dbmultistats_quartile test is still disabled.</p>
+
+</dd>
+</dl>
+
+<h2 id="Jun-08">2.4, 18-Jun-08</h2>
+
+<p>Another alpha release, mostly to fix minor usability problems in dbmapreduce and client functions.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT3">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbrow</a> now defaults to running user supplied code without warnings (as with fsdb-1.x). Use <code>--warnings</code> or <code>-w</code> to turn them back on.</p>
+
+</dd>
+<dt id="ENHANCEMENT4">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbroweval</a> can now write different format output than the input, using the <code>-m</code> option.</p>
+
+</dd>
+<dt id="KNOWN-BUG1">KNOWN BUG</dt>
+<dd>
+
+<p><a>dbmapreduce</a> emits warnings on perl 5.10.0 about &quot;Unbalanced string table refcount&quot; and &quot;Scalars leaked&quot; when run with an external program as a reducer.</p>
+
+<p><a>dbmultistats</a> emits the warning &quot;Attempt to free unreferenced scalar&quot; when run with quartiles.</p>
+
+<p>In each case the output is correct. I believe these can be ignored.</p>
+
+</dd>
+<dt id="CHANGE">CHANGE</dt>
+<dd>
+
+<p><a>dbmapreduce</a> no longer logs a line for each reducer that is invoked.</p>
+
+</dd>
+</dl>
+
+<h2 id="Jun-081">2.5, 24-Jun-08</h2>
+
+<p>Another alpha release, fixing more minor bugs in <code>dbmapreduce</code> and lossage in <code>Fsdb::IO</code>.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT5">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbmapreduce</a> can now tolerate non-map-aware reducers that pass back the key column in put. It also passes the current key as the last argument to external reducers.</p>
+
+</dd>
+<dt id="BUG-FIX4">BUG FIX</dt>
+<dd>
+
+<p><a>Fsdb::IO::Reader</a>, correctly handle <code>-header</code> option again. (Broken since fsdb-2.3.)</p>
+
+</dd>
+</dl>
+
+<h2 id="Jul-08">2.6, 11-Jul-08</h2>
+
+<p>Another alpha release, needed to fix DaGronk. One new port, small bug fixes, and important fix to <a>dbmapreduce</a>.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT6">ENHANCEMENT</dt>
+<dd>
+
+<p>shifting more old programs to Perl modules. New in 2.2: <a>dbcolpercentile</a>.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE-and-ENHANCEMENTS-dbcolpercentile-arguments-changed-use---rank-to-require-ranking-instead-of--r.-Also---ascending-and---descending-can-now-be-specified-separately-both-for---percentile-and---rank">INCOMPATIBLE CHANGE and ENHANCEMENTS <a>dbcolpercentile</a> arguments changed, use <code>--rank</code> to require ranking instead of <code>-r</code>. Also, <code>--ascending</code> and <code>--descending</code> can now be specified separately, both for <code>--percentile</code> and <code>--rank</code>.</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX5">BUG FIX</dt>
+<dd>
+
+<p>Sigh, the sense of the --warnings option in <a>dbrow</a> was inverted. No longer.</p>
+
+</dd>
+<dt id="BUG-FIX6">BUG FIX</dt>
+<dd>
+
+<p>I found and fixed the string leaks (errors like &quot;Unbalanced string table refcount&quot; and &quot;Scalars leaked&quot;) in <a>dbmapreduce</a> and <a>dbmultistats</a>. (All <code>IO::Handle</code>s in threads must be manually destroyed.)</p>
+
+</dd>
+<dt id="BUG-FIX7">BUG FIX</dt>
+<dd>
+
+<p>The <code>-C</code> option to specify the column separator in <a>dbcolsplittorows</a> now works again (broken since it was ported).</p>
+
+</dd>
+</dl>
+
+<p>2.7, 30-Jul-08 beta</p>
+
+<p>The beta release of fsdb-2.x. Finally, all programs are ported. As statistics, the number of lines of non-library code doubled from 7.5k to 15.5k. The libraries are much more complete, going from 866 to 5164 lines. The overall number of programs is about the same, although 19 were dropped and 11 were added. The number of test cases has grown from 116 to 175. All programs are now in perl-5, no more shell scripts or perl-4. All programs now have manual pages.</p>
+
+<p>Although this is a major step forward, I still expect to rename &quot;fsdb&quot; to &quot;fsdb&quot;.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT7">ENHANCEMENT</dt>
+<dd>
+
+<p>shifting more old programs to Perl modules. New in 2.7: <a>dbcolscorellate</a>. <a>dbcolsregression</a>. <a>cgi_to_db</a>. <a>dbfilevalidate</a>. <a>db_to_csv</a>. <a>csv_to_db</a>, <a>db_to_html_table</a>, <a>kitrace_to_db</a>, <a>tcpdump_to_db</a>, <a>tabdelim_to_db</a>, <a>ns_to_db</a>.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE5">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p>The following programs have been dropped from fsdb-2.x: <a>db2dcliff</a>, <a>dbcolmultiscale</a>, <a>crl_to_db</a>. <a>ipchain_logs_to_db</a>. They may come back, but seemed overly specialized. The following program <a>dbrowsplituniq</a> was dropped because it is superseded by <a>dbmapreduce</a>. <a>dmalloc_to_db</a> was dropped pending a test cases and examples.</p>
+
+</dd>
+<dt id="ENHANCEMENT8">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbfilevalidate</a> now has a <code>-c</code> option to correct errors.</p>
+
+</dd>
+<dt id="NEW1">NEW</dt>
+<dd>
+
+<p><a>html_table_to_db</a> provides the inverse of <a>db_to_html_table</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Aug-08">2.8, 5-Aug-08</h2>
+
+<p>Change header format, preserving forwards compatibility.</p>
+
+<dl>
+
+<dt id="BUG-FIX8">BUG FIX</dt>
+<dd>
+
+<p>Complete editing pass over the manual, making sure it aligns with fsdb-2.x.</p>
+
+</dd>
+<dt id="SEMI-COMPATIBLE-CHANGE">SEMI-COMPATIBLE CHANGE</dt>
+<dd>
+
+<p>The header of fsdb files has changed, it is now #fsdb, not #h (or #L) and parsing of -F and -R are also different. See <a>dbfilealter</a> for the new specification. The v1 file format will be read, compatibly, but not written.</p>
+
+</dd>
+<dt id="BUG-FIX9">BUG FIX</dt>
+<dd>
+
+<p><a>dbmapreduce</a> now tolerates comments that precede the first key, instead of failing with an error message.</p>
+
+</dd>
+</dl>
+
+<h2 id="Aug-081">2.9, 6-Aug-08</h2>
+
+<p>Still in beta; just a quick bug-fix for <a>dbmapreduce</a>.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT9">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
+
+</dd>
+</dl>
+
+<h2 id="Sep-08">2.10, 23-Sep-08</h2>
+
+<p>Still in beta, but picking up some bug fixes.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT10">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
+
+</dd>
+<dt id="ENHANCEMENT11">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbroweval</a> the warnings option was backwards; now corrected. As a result, warnings in user code now default off (like in fsdb-1.x).</p>
+
+</dd>
+<dt id="BUG-FIX10">BUG FIX</dt>
+<dd>
+
+<p><a>dbcolpercentile</a> now defaults to assuming the target column is numeric. The new option <code>-N</code> allows selection of a non-numeric target.</p>
+
+</dd>
+<dt id="BUG-FIX11">BUG FIX</dt>
+<dd>
+
+<p><a>dbcolscorrelate</a> now includes <code>--sample</code> and <code>--nosample</code> options to compute the sample or full population correlation coefficients. Thanks to Xue Cai for finding this bug.</p>
+
+</dd>
+</dl>
+
+<h2 id="Oct-08">2.11, 14-Oct-08</h2>
+
+<p>Still in beta, but picking up some bug fixes.</p>
+
+<dl>
+
+<dt id="ENHANCEMENT12">ENHANCEMENT</dt>
+<dd>
+
+<p><a>html_table_to_db</a> is now more aggressive about filling in empty cells with the official empty value, rather than leaving them blank or as whitespace.</p>
+
+</dd>
+<dt id="ENHANCEMENT13">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbpipeline</a> now catches failures during pipeline element setup and exits reasonably gracefully.</p>
+
+</dd>
+<dt id="BUG-FIX12">BUG FIX</dt>
+<dd>
+
+<p><a>dbsubprocess</a> now reaps child processes, thus avoiding running out of processes when used a lot.</p>
+
+</dd>
+</dl>
+
+<h2 id="Oct-081">2.12, 16-Oct-08</h2>
+
+<p>Finally, a full (non-beta) 2.x release!</p>
+
+<dl>
+
+<dt id="INCOMPATIBLE-CHANGE6">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p>Jdb has been renamed Fsdb, the flatfile-streaming database. This change affects all internal Perl APIs, but no shell command-level APIs. While Jdb served well for more than ten years, it is easily confused with the Java debugger (even though Jdb was there first!). It also is too generic to work well in web search engines. Finally, Jdb stands for ``John&#39;s database&#39;&#39;, and we&#39;re a bit beyond that. (However, some call me the ``file-system guy&#39;&#39;, so one could argue it retains that meeting.)</p>
+
+<p>If you just used the shell commands, this change should not affect you. If you used the Perl-level libraries directly in your code, you should be able to rename &quot;Jdb&quot; to &quot;Fsdb&quot; to move to 2.12.</p>
+
+<p>The jdb-announce list not yet been renamed, but it will be shortly.</p>
+
+<p>With this release I&#39;ve accomplished everything I wanted to in fsdb-2.x. I therefore expect to return to boring, bugfix releases.</p>
+
+</dd>
+</dl>
+
+<h2 id="Oct-082">2.13, 30-Oct-08</h2>
+
+<dl>
+
+<dt id="BUG-FIX13">BUG FIX</dt>
+<dd>
+
+<p><a>dbrowaccumulate</a> now treats non-numeric data as zero by default.</p>
+
+</dd>
+<dt id="BUG-FIX14">BUG FIX</dt>
+<dd>
+
+<p>Fixed a perl-5.10ism in <a>dbmapreduce</a> that breaks that program under 5.8. Thanks to Martin Lukac for reporting the bug.</p>
+
+</dd>
+</dl>
+
+<h2 id="Nov-08">2.14, 26-Nov-08</h2>
+
+<dl>
+
+<dt id="BUG-FIX15">BUG FIX</dt>
+<dd>
+
+<p>Improved documentation for <a>dbmapreduce</a>&#39;s <code>-f</code> option.</p>
+
+</dd>
+<dt id="ENHANCEMENT14">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolmovingstats</a> how computes a moving standard deviation in addition to a moving mean.</p>
+
+</dd>
+</dl>
+
+<h2 id="Apr-09">2.15, 13-Apr-09</h2>
+
+<dl>
+
+<dt id="BUG-FIX16">BUG FIX</dt>
+<dd>
+
+<p>Fix a <i>make install</i> bug reported by Shalindra Fernando.</p>
+
+</dd>
+</dl>
+
+<h2 id="Apr-091">2.16, 14-Apr-09</h2>
+
+<dl>
+
+<dt id="BUG-FIX17">BUG FIX</dt>
+<dd>
+
+<p>Another minor release bug: on some systems <i>programize_module</i> looses executable permissions. Again reported by Shalindra Fernando.</p>
+
+</dd>
+</dl>
+
+<h2 id="Jun-09">2.17, 25-Jun-09</h2>
+
+<dl>
+
+<dt id="TYPO-FIXES">TYPO FIXES</dt>
+<dd>
+
+<p>Typo in the <i>dbroweval</i> manual fixed.</p>
+
+</dd>
+<dt id="IMPROVEMENT">IMPROVEMENT</dt>
+<dd>
+
+<p>There is no longer a comment line to label columns in <i>dbcolneaten</i>, instead the header line is tweaked to line up. This change restores the Jdb-1.x behavior, and means that repeated runs of dbcolneaten no longer add comment lines each time.</p>
+
+</dd>
+<dt id="BUG-FIX18">BUG FIX</dt>
+<dd>
+
+<p>It turns out <i>dbcolneaten</i> was not correctly handling trailing spaces when given the <code>-E</code> option to suppress them. This regression is now fixed.</p>
+
+</dd>
+<dt id="EXTENSION">EXTENSION</dt>
+<dd>
+
+<p><a href="http://man.he.net/man1/dbroweval">dbroweval(1)</a> can now handle direct references to the last row via <i>$lfref</i>, a dubious but now documented feature.</p>
+
+</dd>
+<dt id="BUG-FIXES2">BUG FIXES</dt>
+<dd>
+
+<p>Separators set with <code>-C</code> in <i>dbcolmerge</i> and <i>dbcolsplittocols</i> were not properly setting the heading, and null fields were not recognized. The first bug was reported by Martin Lukac.</p>
+
+</dd>
+</dl>
+
+<h2 id="Jul-09-A-minor-release">2.18, 1-Jul-09 A minor release</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT1">IMPROVEMENT</dt>
+<dd>
+
+<p>Documentation for <i>Fsdb::IO::Reader</i> has been improved.</p>
+
+</dd>
+<dt id="IMPROVEMENT2">IMPROVEMENT</dt>
+<dd>
+
+<p>The package should now be PGP-signed.</p>
+
+</dd>
+</dl>
+
+<h2 id="Jul-09">2.19, 10-Jul-09</h2>
+
+<dl>
+
+<dt id="BUG-FIX19">BUG FIX</dt>
+<dd>
+
+<p>Internal improvements to debugging output and robustness of <i>dbmapreduce</i> and <i>dbpipeline</i>. <i>TEST/dbpipeline_first_fails.cmd</i> re-enabled.</p>
+
+</dd>
+</dl>
+
+<h2 id="Nov-09-A-collection-of-minor-bugfixes-plus-a-build-against-Fedora-12">2.20, 30-Nov-09 (A collection of minor bugfixes, plus a build against Fedora 12.)</h2>
+
+<dl>
+
+<dt id="BUG-FIX20">BUG FIX</dt>
+<dd>
+
+<p>Loging for <i>dbmapreduce</i> with code refs is now stable (it no longer includes a hex pointer to the code reference).</p>
+
+</dd>
+<dt id="BUG-FIX21">BUG FIX</dt>
+<dd>
+
+<p>Better handling of mixed blank lines in <i>Fsdb::IO::Reader</i> (see test case <i>dbcolize_blank_lines.cmd</i>).</p>
+
+</dd>
+<dt id="BUG-FIX22">BUG FIX</dt>
+<dd>
+
+<p><i>html_table_to_db</i> now handles multi-line input better, and handles tables with COLSPAN.</p>
+
+</dd>
+<dt id="BUG-FIX23">BUG FIX</dt>
+<dd>
+
+<p><i>dbpipeline</i> now cleans up threads in an <code>eval</code> to prevent &quot;cannot detach a joined thread&quot; errors that popped up in perl-5.10. Hopefully this prevents a race condition that causes the test suites to hang about 20% of the time (in <i>dbpipeline_first_fails</i>).</p>
+
+</dd>
+<dt id="IMPROVEMENT3">IMPROVEMENT</dt>
+<dd>
+
+<p><i>dbmapreduce</i> now detects and correctly fails when the input and reducer have incompatible field separators.</p>
+
+</dd>
+<dt id="IMPROVEMENT4">IMPROVEMENT</dt>
+<dd>
+
+<p><i>dbcolstats</i>, <i>dbcolhisto</i>, <i>dbcolscorrelate</i>, <i>dbcolsregression</i>, and <i>dbrowcount</i> now all take an <code>-F</code> option to let one specify the output field separator (so they work better with <i>dbmapreduce</i>).</p>
+
+</dd>
+<dt id="BUG-FIX24">BUG FIX</dt>
+<dd>
+
+<p>An omitted <code>-k</code> from the manual page of <i>dbmultistats</i> is now there. Bug reported by Unkyu Park.</p>
+
+</dd>
+</dl>
+
+<h2 id="Apr-10-bug-fix-release">2.21, 17-Apr-10 bug fix release</h2>
+
+<dl>
+
+<dt id="BUG-FIX25">BUG FIX</dt>
+<dd>
+
+<p><i>Fsdb::IO::Writer</i> now no longer fails with -outputheader =&gt; never (an obscure bug).</p>
+
+</dd>
+<dt id="IMPROVEMENT5">IMPROVEMENT</dt>
+<dd>
+
+<p><i>Fsdb</i> (in the warnings section) and <i>dbcolstats</i> now more carefully document how they handle (and do not handle) numerical precision problems, and other general limits. Thanks to Yuri Pradkin for prompting this documentation.</p>
+
+</dd>
+<dt id="IMPROVEMENT6">IMPROVEMENT</dt>
+<dd>
+
+<p><code>Fsdb::Support::fullname_to_sortkey</code> is now restored from <code>Jdb</code>.</p>
+
+</dd>
+<dt id="IMPROVEMENT7">IMPROVEMENT</dt>
+<dd>
+
+<p>Documention for multiple styles of input approaches (including performance description) added to <a>Fsdb::IO</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="One-new-tool-dbcolcopylast-and-several-bug-fixes-for-Perl-5.10">2.22, 2010-10-31 One new tool <i>dbcolcopylast</i> and several bug fixes for Perl 5.10.</h2>
+
+<dl>
+
+<dt id="BUG-FIX26">BUG FIX</dt>
+<dd>
+
+<p><i>dbmerge</i> now correctly handles n-way merges. Bug reported by Yuri Pradkin.</p>
+
+</dd>
+<dt id="INCOMPARABLE-CHANGE">INCOMPARABLE CHANGE</dt>
+<dd>
+
+<p><i>dbcolneaten</i> now defaults to <i>not</i> padding the last column.</p>
+
+</dd>
+<dt id="ADDITION">ADDITION</dt>
+<dd>
+
+<p><i>dbrowenumerate</i> now takes <b>-N NewColumn</b> to give the new column a name other than &quot;count&quot;. Feature requested by Mike Rouch in January 2005.</p>
+
+</dd>
+<dt id="ADDITION1">ADDITION</dt>
+<dd>
+
+<p>New program <i>dbcolcopylast</i> copies the last value of a column into a new column copylast_column of the next row. New program requested by Fabio Silva; useful for converting dbmultistats output into dbrvstatdiff input.</p>
+
+</dd>
+<dt id="BUG-FIX27">BUG FIX</dt>
+<dd>
+
+<p>Several tools (particularly <i>dbmapreduce</i> and <i>dbmultistats</i>) would report errors like &quot;Unbalanced string table refcount: (1) for &quot;STDOUT&quot; during global destruction&quot; on exit, at least on certain versions of Perl (for me on 5.10.1), but similar errors have been off-and-on for several Perl releases. Although I think my code looked OK, I worked around this problem with a different way of handling standard IO redirection.</p>
+
+</dd>
+</dl>
+
+<h2 id="Several-small-portability-bugfixes-improved-dbcolstats-for-large-datasets">2.23, 2011-03-10 Several small portability bugfixes; improved <i>dbcolstats</i> for large datasets</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT8">IMPROVEMENT</dt>
+<dd>
+
+<p>Documentation to <i>dbrvstatdiff</i> was changed to use &quot;sd&quot; to refer to standard deviation, not &quot;ss&quot; (which might be confused with sum-of-squares).</p>
+
+</dd>
+<dt id="BUG-FIX28">BUG FIX</dt>
+<dd>
+
+<p>This documentation about <i>dbmultistats</i> was missing the <i>-k</i> option in some cases.</p>
+
+</dd>
+<dt id="BUG-FIX29">BUG FIX</dt>
+<dd>
+
+<p><i>dbmapreduce</i> was failing on MacOS-10.6.3 for some tests with the error</p>
+
+<pre><code>    dbmapreduce: cannot run external dbmapreduce reduce program (perl TEST/dbmapreduce_external_with_key.pl)</code></pre>
+
+<p>The problem seemed to be only in the error, not in operation. On MacOS, the error is now suppressed. Thanks to Alefiya Hussain for providing access to a Mac system that allowed debugging of this problem.</p>
+
+</dd>
+<dt id="IMPROVEMENT9">IMPROVEMENT</dt>
+<dd>
+
+<p>The <i>csv_to_db</i> command requires an external Perl library (<i>Text::CSV_XS</i>). On computers that lack this optional library, previously Fsdb would configure with a warning and then test cases would fail. Now those test cases are skipped with an additional warning.</p>
+
+</dd>
+<dt id="BUG-FIX30">BUG FIX</dt>
+<dd>
+
+<p>The test suite now supports alternative valid output, as a hack to account for last-digit floating point differences. (Not very satisfying :-(</p>
+
+</dd>
+<dt id="BUG-FIX31">BUG FIX</dt>
+<dd>
+
+<p><i>dbcolstats</i> output for confidence intervals on very large datasets has changed. Previously it failed for more than 2^31-1 records, and handling of T-Distributions with thousands of rows was a bit dubious. Now datasets with more than 10000 are considered infinitely large and hopefully correctly handled.</p>
+
+</dd>
+</dl>
+
+<h2 id="Improvements-to-fix-an-old-bug-in-dbmapreduce-with-different-field-separators">2.24, 2011-04-15 Improvements to fix an old bug in dbmapreduce with different field separators</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT10">IMPROVEMENT</dt>
+<dd>
+
+<p>The <i>dbfilealter</i> command had a <code>--correct</code> option to work-around from incompatible field-separators, but it did nothing. Now it does the correct but sad, data-loosing thing.</p>
+
+</dd>
+<dt id="IMPROVEMENT11">IMPROVEMENT</dt>
+<dd>
+
+<p>The <i>dbmultistats</i> command previously failed with an error message when invoked on input with a non-default field separator. The root cause was the underlying <i>dbmapreduce</i> that did not handle the case of reducers that generated output with a different field separator than the input. We now detect and repair incompatible field separators. This change corrects a problem originally documented and detected in Fsdb-2.20. Bug re-reported by Unkyu Park.</p>
+
+</dd>
+</dl>
+
+<h2 id="Two-new-tools-xml_to_db-and-dbfilepivot-and-a-bugfix-for-two-people">2.25, 2011-08-07 Two new tools, <i>xml_to_db</i> and <i>dbfilepivot</i>, and a bugfix for two people.</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT12">IMPROVEMENT</dt>
+<dd>
+
+<p><i>kitrace_to_db</i> now supports a <i>--utc</i> option, which also fixes this test case for users outside of the Pacific time zone. Bug reported by David Graff, and also by Peter Desnoyers (within a week of each other :-)</p>
+
+</dd>
+<dt id="NEW2">NEW</dt>
+<dd>
+
+<p><i>xml_to_db</i> can convert simple, very regular XML files into Fsdb.</p>
+
+</dd>
+<dt id="NEW3">NEW</dt>
+<dd>
+
+<p><i>dbfilepivot</i> &quot;pivots&quot; a file, converting multiple rows corresponding to the same entity into a single row with multiple columns.</p>
+
+</dd>
+</dl>
+
+<h2 id="Bug-fixes-particularly-for-perl-5.14.2">2.26, 2011-12-12 Bug fixes, particularly for perl-5.14.2.</h2>
+
+<dl>
+
+<dt id="BUG-FIX32">BUG FIX</dt>
+<dd>
+
+<p>Bugs fixed in <a href="http://man.he.net/man3/Fsdb::IO::Reader">Fsdb::IO::Reader(3)</a> manual page.</p>
+
+</dd>
+<dt id="BUG-FIX33">BUG FIX</dt>
+<dd>
+
+<p>Fixed problems where <a>dbcolstats</a> was truncating floating point numbers when sorting. This strange behavior happens as of perl-5.14.2 and it <i>seems</i> like a Perl bug. I&#39;ve worked around it for the test suites, but I&#39;m a bit nervous.</p>
+
+</dd>
+</dl>
+
+<h2 id="Accumulated-bug-fixes">2.27, 2012-11-15 Accumulated bug fixes.</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT13">IMPROVEMENT</dt>
+<dd>
+
+<p><i>csv_to_db</i> now reports errors in CVS input with real diagnostics.</p>
+
+</dd>
+<dt id="IMPROVEMENT14">IMPROVEMENT</dt>
+<dd>
+
+<p><i>dbcolmovingstats</i> can now compute median, when given the <code>-m</code> option.</p>
+
+</dd>
+<dt id="BUG-FIX34">BUG FIX</dt>
+<dd>
+
+<p><i>dbcolmovingstats</i> non-numeric handling (the <code>-a</code> option) now works properly.</p>
+
+</dd>
+<dt id="DOCUMENTATION">DOCUMENTATION</dt>
+<dd>
+
+<p>The internal <i>t/test_command.t</i> test framework is now documented.</p>
+
+</dd>
+<dt id="BUG-FIX35">BUG FIX</dt>
+<dd>
+
+<p><i>dbrowuniq</i> now correctly handles the case where there is no input (previously it output a blank line, which is a malformed fsdb file). Thanks to Yuri Pradkin for reporting this bug.</p>
+
+</dd>
+</dl>
+
+<h2 id="A-quick-release-to-fix-most-rpmlint-errors">2.28, 2012-11-15 A quick release to fix most rpmlint errors.</h2>
+
+<dl>
+
+<dt id="BUG-FIX36">BUG FIX</dt>
+<dd>
+
+<p>Fixed a number of minor release problems (wrong permissions, old FSF address, etc.) found by rpmlint.</p>
+
+</dd>
+</dl>
+
+<h2 id="a-quick-release-for-CPAN-testing">2.29, 2012-11-20 a quick release for CPAN testing</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT15">IMPROVEMENT</dt>
+<dd>
+
+<p>Tweaked the RPM spec.</p>
+
+</dd>
+<dt id="IMPROVEMENT16">IMPROVEMENT</dt>
+<dd>
+
+<p>Modified <i>Makefile.PL</i> to fail gracefully on Perl installations that lack threads. (Without this fix, I get massive failures in the non-ithreads test system.)</p>
+
+</dd>
+</dl>
+
+<h2 id="improvements-to-perl-portability">2.30, 2012-11-25 improvements to perl portability</h2>
+
+<dl>
+
+<dt id="BUG-FIX37">BUG FIX</dt>
+<dd>
+
+<p>Removed unicode character in documention of <i>dbcolscorrelated</i> so pod tests will pass. (Sigh, that should work :-( )</p>
+
+</dd>
+<dt id="BUG-FIX38">BUG FIX</dt>
+<dd>
+
+<p>Fixed test suite failures on 5 tests (<i>dbcolcreate_double_creation</i> was the first) due to <a>Carp</a>&#39;s addition of a period. This problem was breaking Fsdb on perl-5.17. Thanks to Michael McQuaid for helping diagnose this problem.</p>
+
+</dd>
+<dt id="IMPROVEMENT17">IMPROVEMENT</dt>
+<dd>
+
+<p>The test suite now prints out the names of tests it tries.</p>
+
+</dd>
+</dl>
+
+<h2 id="A-release-with-actual-improvements-to-dbfilepivot-and-dbrowuniq">2.31, 2012-11-28 A release with actual improvements to dbfilepivot and dbrowuniq.</h2>
+
+<dl>
+
+<dt id="BUG-FIX39">BUG FIX</dt>
+<dd>
+
+<p>Documentation fixes: typos in <a>dbcolscorrelated</a>, bugs in <a>dbfilepivot</a>, clarification for comment handling in <a>Fsdb::IO::Reader</a>.</p>
+
+</dd>
+<dt id="IMPROVEMENT18">IMPROVEMENT</dt>
+<dd>
+
+<p>Previously <a>dbfilepivot</a> assumed the input was grouped by keys and didn&#39;t very that pre-condition. Now there is no pre-condition (it will sort the input by default), and it checks if the invariant is violated.</p>
+
+</dd>
+<dt id="BUG-FIX40">BUG FIX</dt>
+<dd>
+
+<p>Previously <a>dbfilepivot</a> failed if the input had comments (oops :-); no longer.</p>
+
+</dd>
+<dt id="IMPROVEMENT19">IMPROVEMENT</dt>
+<dd>
+
+<p>Now <a>dbrowuniq</a> has the <code>-L</code> option to preserve the last unique row (instead of the first), a common idiom.</p>
+
+</dd>
+</dl>
+
+<h2 id="Test-suites-should-now-be-more-numerically-robust">2.32, 2012-12-21 Test suites should now be more numerically robust.</h2>
+
+<dl>
+
+<dt id="NEW4">NEW</dt>
+<dd>
+
+<p>New <a>dbfilediff</a> does fsdb-aware file differencing. It does not do smart intuition of add/removes like Unix diff(1), but it does know about columns, and with <code>-E</code>, it does numeric-aware differences.</p>
+
+</dd>
+<dt id="IMPROVEMENT20">IMPROVEMENT</dt>
+<dd>
+
+<p>Test suites that are numeric now use <a>dbfilediff</a> to do numeric-aware comparisons, so the test suite should now be robust to slightly different computers and operating systems and compilers than <i>exactly</i> what I use.</p>
+
+</dd>
+</dl>
+
+<h2 id="Minor-fixes-to-some-test-cases">2.33, 2012-12-23 Minor fixes to some test cases.</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT21">IMPROVEMENT</dt>
+<dd>
+
+<p><a>dbfilediff</a> and <a>dbrowuniq</a> now supports the <code>-N</code> option to give the new column a different name. (And a test cases where this duplication mattered have been fixed.)</p>
+
+</dd>
+<dt id="IMPROVEMENT22">IMPROVEMENT</dt>
+<dd>
+
+<p><a>dbrvstatdiff</a> now show the t-test breakpoint with a reasonable number of floating point digits.</p>
+
+</dd>
+<dt id="BUG-FIX41">BUG FIX</dt>
+<dd>
+
+<p>Fixed a numerical stability problem in the <i>dbroweval_last</i> test case.</p>
+
+</dd>
+</dl>
+
+<h1 id="WHATS-NEW1">WHAT&#39;S NEW</h1>
+
+<h2 id="Parallelism-in-dbmerge">2.34, 2013-02-10 Parallelism in <a>dbmerge</a>.</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT23">IMPROVEMENT</dt>
+<dd>
+
+<p>Documention for <a>dbjoin</a> now includes resource requirements.</p>
+
+</dd>
+<dt id="IMPROVEMENT24">IMPROVEMENT</dt>
+<dd>
+
+<p>Default memory usage for <a>dbsort</a> is now about 256MB. (The world keeps moving forward.)</p>
+
+</dd>
+<dt id="IMPROVEMENT25">IMPROVEMENT</dt>
+<dd>
+
+<p><a>dbmerge</a> now does merging in parallel. As a side-effect, <a>dbsort</a> should be faster when input overflows memory. The level of parallelism can be limited with the <code>--parallelism</code> option. (There is more work to do here, but we&#39;re off to a start.)</p>
+
+</dd>
+</dl>
+
+<h2 id="Improvements-to-dbmerge-parallelism">2.35, 2013-02-23 Improvements to dbmerge parallelism</h2>
+
+<dl>
+
+<dt id="BUG-FIX42">BUG FIX</dt>
+<dd>
+
+<p>Fsdb temporary files are now created more securely (with File::Temp).</p>
+
+</dd>
+<dt id="IMPROVEMENT26">IMPROVEMENT</dt>
+<dd>
+
+<p>Programs that sort or merge on fields (<a>dbmerge2</a>, <a>dbmerge</a>, <a>dbsort</a>, <a>dbjoin</a>) now report an error if no fields on which to join or merge are given.</p>
+
+</dd>
+<dt id="IMPROVEMENT27">IMPROVEMENT</dt>
+<dd>
+
+<p>Parallelism in <a>dbmerge</a> is should now be more consistent, with less starting and stopping.</p>
+
+</dd>
+<dt id="IMPROVEMENT-In-dbmerge-the---xargs-option-lets-one-give-input-filenames-on-standard-input-rather-than-the-command-line.-This-feature-paves-the-way-for-faster-dbsort-for-large-inputs-by-pipelining-sorting-and-merging-expected-in-the-next-release">IMPROVEMENT In <a>dbmerge</a>, the <code>--xargs</code> option lets one give input filenames on standard input, rather than the command line. This feature paves the way for faster dbsort for large inputs (by pipelining sorting and merging), expected in the next release.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="dbsort-pipelines-with-dbmerge">2.36, 2013-02-25 dbsort pipelines with dbmerge</h2>
+
+<dl>
+
+<dt id="IMPROVEMENT-For-large-inputs-dbsort-now-pipelines-sorting-and-merging-allowing-earlier-processing">IMPROVEMENT For large inputs, <a>dbsort</a> now pipelines sorting and merging, allowing earlier processing.</dt>
+<dd>
+
+</dd>
+<dt id="BUG-FIX-Since-2.35-dbmerge-delayed-cleanup-of-intermediate-files-thereby-requiring-extra-disk-space">BUG FIX Since 2.35, <a>dbmerge</a> delayed cleanup of intermediate files, thereby requiring extra disk space.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="quick-bugfix-to-support-parallel-sort-and-merge-from-recent-releases">2.37, 2013-02-26 quick bugfix to support parallel sort and merge from recent releases</h2>
+
+<dl>
+
+<dt id="BUG-FIX-Since-2.35-dbmerge-delayed-removal-of-input-files-given-by---xargs.-This-problem-is-now-fixed">BUG FIX Since 2.35, <a>dbmerge</a> delayed removal of input files given by <code>--xargs</code>. This problem is now fixed.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="minor-bug-fixes">2.38, 2013-04-29 minor bug fixes</h2>
+
+<dl>
+
+<dt id="CLARIFICATION">CLARIFICATION</dt>
+<dd>
+
+<p>Configure now rejects Windows since tests seem to hang on some versions of Windows. (I would love help from a Windows developer to get this problem fixed, but I cannot do it.) See <i>https://rt.cpan.org/Ticket/Display.html?id=84201</i>.</p>
+
+</dd>
+<dt id="IMPROVEMENT28">IMPROVEMENT</dt>
+<dd>
+
+<p>All programs that use temporary files (<a>dbcolpercentile</a>, <a>dbcolscorrelate</a>, <a>dbcolstats</a>, <a>dbcolstatscores</a>) now take the <code>-T</code> option and set the temporary directory consistently.</p>
+
+<p>In addition, error messages are better when the temporary directory has problems. Problem reported by Liang Zhu.</p>
+
+</dd>
+<dt id="BUG-FIX43">BUG FIX</dt>
+<dd>
+
+<p><a>dbmapreduce</a> was failing with external, map-reduce aware reducers (when invoked with -M and an external program). (Sigh, did this case ever work?) This case should now work. Thanks to Yuri Pradkin for reporting this bug (in 2011).</p>
+
+</dd>
+<dt id="BUG-FIX44">BUG FIX</dt>
+<dd>
+
+<p>Fixed perl-5.10 problem with <a>dbmerge</a>. Thanks to Yuri Pradkin for reporting this bug (in 2013).</p>
+
+</dd>
+</dl>
+
+<h2 id="date-2013-05-31-quick-release-for-the-dbrowuniq-extension">2.39, date 2013-05-31 quick release for the dbrowuniq extension</h2>
+
+<dl>
+
+<dt id="BUG-FIX45">BUG FIX</dt>
+<dd>
+
+<p>Actually in 2.38, the Fedora <i>.spec</i> got cleaner dependencies. Suggestion from Christopher Meng via <a href="https://bugzilla.redhat.com/show_bug.cgi?id=877096">https://bugzilla.redhat.com/show_bug.cgi?id=877096</a>.</p>
+
+</dd>
+<dt id="ENHANCEMENT15">ENHANCEMENT</dt>
+<dd>
+
+<p>Fsdb files are now explicitly set into UTF-8 encoding, unless one specifies <code>-encoding</code> to <code>Fsdb::IO</code>.</p>
+
+</dd>
+<dt id="ENHANCEMENT16">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbrowuniq</a> now supports <code>-I</code> for incremental counting.</p>
+
+</dd>
+</dl>
+
+<h2 id="small-bug-fixes">2.40, 2013-07-13 small bug fixes</h2>
+
+<dl>
+
+<dt id="BUG-FIX46">BUG FIX</dt>
+<dd>
+
+<p><a>dbsort</a> now has more respect for a user-given temporary directory; it no longer is ignored for merging.</p>
+
+</dd>
+<dt id="IMPROVEMENT29">IMPROVEMENT</dt>
+<dd>
+
+<p><a>dbrowuniq</a> now has options to output the first, last, and both first and last rows of a run (<code>-F</code>, <code>-L</code>, and <code>-B</code>).</p>
+
+</dd>
+<dt id="BUG-FIX47">BUG FIX</dt>
+<dd>
+
+<p><a>dbrowuniq</a> now correctly handles <code>-N</code>. Sigh, it didn&#39;t work before.</p>
+
+</dd>
+</dl>
+
+<h2 id="small-bug-and-packaging-fixes">2.41, 2013-07-29 small bug and packaging fixes</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT17">ENHANCEMENT</dt>
+<dd>
+
+<p>Documentation to <a>dbrvstatdiff</a> improved (inspired by questions from Qian Kun).</p>
+
+</dd>
+<dt id="BUG-FIX48">BUG FIX</dt>
+<dd>
+
+<p><a>dbrowuniq</a> no longer duplicates singleton unique lines when outputting both (with <code>-B</code>).</p>
+
+</dd>
+<dt id="BUG-FIX49">BUG FIX</dt>
+<dd>
+
+<p>Add missing <code>XML::Simple</code> dependency to <i>Makefile.PL</i>.</p>
+
+</dd>
+<dt id="ENHANCEMENT18">ENHANCEMENT</dt>
+<dd>
+
+<p>Tests now show the diff of the failing output if run with <code>make test TEST_VERBOSE=1</code>.</p>
+
+</dd>
+<dt id="ENHANCEMENT19">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbroweval</a> now includes documentation for how to output extra rows. Suggestion from Yuri Pradkin.</p>
+
+</dd>
+<dt id="BUG-FIX50">BUG FIX</dt>
+<dd>
+
+<p>Several improvements to the Fedora package from Michael Schwendt via <a href="https://bugzilla.redhat.com/show_bug.cgi?id=877096">https://bugzilla.redhat.com/show_bug.cgi?id=877096</a>, and from the harsh master that is <i>rpmlint</i>. (I am stymied at teaching it that &quot;outliers&quot; is spelled correctly. Maybe I should send it Schneier&#39;s book. And an unresolvable invalid-spec-name lurks in the SRPM.)</p>
+
+</dd>
+</dl>
+
+<h2 id="A-bug-fix-and-packaging-release">2.42, 2013-07-31 A bug fix and packaging release.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT20">ENHANCEMENT</dt>
+<dd>
+
+<p>Documentation to <a>dbjoin</a> improved to better memory usage. (Based on problem report by Lin Quan.)</p>
+
+</dd>
+<dt id="BUG-FIX51">BUG FIX</dt>
+<dd>
+
+<p>The <i>.spec</i> is now <i>perl-Fsdb.spec</i> to satisfy <i>rpmlint</i>. Thanks to Christopher Meng for a specific bug report.</p>
+
+</dd>
+<dt id="BUG-FIX52">BUG FIX</dt>
+<dd>
+
+<p>Test <i>dbroweval_last.cmd</i> no longer has a column that caused failures because of numerical instability.</p>
+
+</dd>
+<dt id="BUG-FIX53">BUG FIX</dt>
+<dd>
+
+<p>Some tests now better handle bugs in old versions of perl (5.10, 5.12). Thanks to Calvin Ardi for help debugging this on a Mac with perl-5.12, but the fix should affect other platforms.</p>
+
+</dd>
+</dl>
+
+<h2 id="Adds-in-file-compression">2.43, 2013-08-27 Adds in-file compression.</h2>
+
+<dl>
+
+<dt id="BUG-FIX54">BUG FIX</dt>
+<dd>
+
+<p>Changed the sort on <i>TEST/dbsort_merge.cmd</i> to strings (from numerics) so we&#39;re less susceptible to false test-failures due to floating point IO differences.</p>
+
+</dd>
+<dt id="EXPERIMENTAL-ENHANCEMENT">EXPERIMENTAL ENHANCEMENT</dt>
+<dd>
+
+<p>Yet more parallelism in <a>dbmerge</a>: new &quot;endgame-mode&quot; builds a merge tree of processes at the end of large merge tasks to get maximally parallelism. Currently this feature is off by default because it can hang for some inputs. Enable this experimental feature with <code>--endgame</code>.</p>
+
+</dd>
+<dt id="ENHANCEMENT21">ENHANCEMENT</dt>
+<dd>
+
+<p><code>Fsdb::IO</code> now handles being given <code>IO::Pipe</code> objects (as exercised by <a>dbmerge</a>).</p>
+
+</dd>
+<dt id="BUG-FIX55">BUG FIX</dt>
+<dd>
+
+<p>Handling of NamedTmpfiles now supports concurrency. This fix will hopefully fix occasional &quot;Use of uninitialized value $_ in string ne at ...NamedTmpfile.pm line 93.&quot; errors.</p>
+
+</dd>
+<dt id="BUG-FIX56">BUG FIX</dt>
+<dd>
+
+<p>Fsdb now requires perl 5.10. This is a bug fix because some test cases used to require it, but this fact was not properly documented. (Back-porting to 5.008 would require removing all <code>//</code> operators.)</p>
+
+</dd>
+<dt id="ENHANCEMENT22">ENHANCEMENT</dt>
+<dd>
+
+<p>Fsdb now handles automatic compression of file contents. Enable compression with <code>dbfilealter -Z xz</code> (or <code>gz</code> or <code>bz2</code>). All programs should operate on compressed files and leave the output with the same level of compression. <code>xz</code> is recommended as fastest and most efficient. <code>gz</code> is produces unrepeatable output (and so has no output test), it seems to insist on adding a timestamp.</p>
+
+</dd>
+</dl>
+
+<h2 id="A-major-change--all-threads-are-gone">2.44, 2013-10-02 A major change--all threads are gone.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT23">ENHANCEMENT</dt>
+<dd>
+
+<p>Fsdb is now thread free and only uses processes for parallelism. This change is a big change--the entire motivation for Fsdb-2 was to exploit parallelism via threading. Parallelism--good, but perl threading--bad for performance. Horribly bad for performance. About 20x worse than pipes on my box. (See perl bug #119445 for the discussion.)</p>
+
+</dd>
+<dt id="NEW5">NEW</dt>
+<dd>
+
+<p><code>Fsdb::Support::Freds</code> provides a thread-like abstraction over forking, with some nice support for callbacks in the parent upon child termination.</p>
+
+</dd>
+<dt id="ENHANCEMENT24">ENHANCEMENT</dt>
+<dd>
+
+<p>Details about removing threads: <code>dbpipeline</code> is thread free, and new tests to verify each of its parts. The easy cases are <code>dbcolpercentile</code>, <code>dbcolstats</code>, <code>dbfilepivot</code>, <code>dbjoin</code>, and <code>dbcolstatscores</code>, each of which use it in simple ways (2013-09-09). <code>dbmerge</code> is now thread free (2013-09-13), but was a significant rewrite, which brought <code>dbsort</code> along. <code>dbmapreduce</code> is partly thread free (2013-09-21), again as a rewrite, and it brings <code>dbmultistats</code> along. Full <code>dbmapreduce</code> support took much longer (2013-10-02).</p>
+
+</dd>
+<dt id="BUG-FIX57">BUG FIX</dt>
+<dd>
+
+<p>When running with user-only output (<code>-n</code>), <a>dbroweval</a> now resets the output vector <code>$ofref</code> after it has been output.</p>
+
+</dd>
+<dt id="NEW6">NEW</dt>
+<dd>
+
+<p><a>dbcolcreate</a> will create all columns at the head of each row with the <code>--first</code> option.</p>
+
+</dd>
+<dt id="NEW7">NEW</dt>
+<dd>
+
+<p><a>dbfilecat</a> will concatenate two files, verifying that they have the same schema.</p>
+
+</dd>
+<dt id="ENHANCEMENT25">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbmapreduce</a> now passes comments through, rather than eating them as before.</p>
+
+<p>Also, <a>dbmapreduce</a> now supports a <code>--</code> option to prevent misinterpreting sub-program parameters as for dbmapreduce.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE7">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p><a>dbmapreduce</a> no longer figures out if it needs to add the key to the output. For multi-key-aware reducers, it never does (and cannot). For non-multi-key-aware reducers, it defaults to add the key and will now fail if the reducer adds the key (with error &quot;dbcolcreate: attempt to create pre-existing column...&quot;). In such cases, one must disable adding the key with the new option <code>--no-prepend-key</code>.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE8">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p><a>dbmapreduce</a> no longer copies the input field separator by default. For multi-key-aware reducers, it never does (and cannot). For non-multi-key-aware reducers, it defaults to <i>not</i> copying the field separator, but it will copy it (the old default) with the <code>--copy-fs</code> option</p>
+
+</dd>
+</dl>
+
+<h2 id="cleanup-from-de-thread-ification">2.45, 2013-10-07 cleanup from de-thread-ification</h2>
+
+<dl>
+
+<dt id="BUG-FIX58">BUG FIX</dt>
+<dd>
+
+<p>Corrected a fast busy-wait in <a>dbmerge</a>.</p>
+
+</dd>
+<dt id="ENHANCEMENT26">ENHANCEMENT</dt>
+<dd>
+
+<p>Endgame mode enabled in <a>dbmerge</a>; it (and also large cases of <a>dbsort</a>) should now exploit greater parallelism.</p>
+
+</dd>
+<dt id="BUG-FIX59">BUG FIX</dt>
+<dd>
+
+<p>Test case with <code>Fsdb::BoundedQueue</code> (gone since 2.44) now removed.</p>
+
+</dd>
+</dl>
+
+<h2 id="continuing-cleanup-of-our-no-threads-version">2.46, 2013-10-08 continuing cleanup of our no-threads version</h2>
+
+<dl>
+
+<dt id="BUG-FIX60">BUG FIX</dt>
+<dd>
+
+<p>Fixed some packaging details. (Really, threads are no longer required, missing tests in the MANIFEST.)</p>
+
+</dd>
+<dt id="IMPROVEMENT30">IMPROVEMENT</dt>
+<dd>
+
+<p><a>dbsort</a> now better communicates with the merge process to avoid bursty parallelism.</p>
+
+<p><a>Fsdb::IO::Writer</a> now can take <code>-autoflush =</code> 1&gt; for line-buffered IO.</p>
+
+</dd>
+</dl>
+
+<h2 id="test-suite-cleanup-for-non-threaded-perls">2.47, 2013-10-12 test suite cleanup for non-threaded perls</h2>
+
+<dl>
+
+<dt id="BUG-FIX61">BUG FIX</dt>
+<dd>
+
+<p>Removed some stray &quot;use threads&quot; in some test cases. We didn&#39;t need them, and these were breaking non-threaded perls.</p>
+
+</dd>
+<dt id="BUG-FIX62">BUG FIX</dt>
+<dd>
+
+<p>Better handling of Fred cleanup; should fix intermittent <a>dbmapreduce</a> failures on BSD.</p>
+
+</dd>
+<dt id="ENHANCEMENT27">ENHANCEMENT</dt>
+<dd>
+
+<p>Improved test framework to show output when tests fail. (This time, for real.)</p>
+
+</dd>
+</dl>
+
+<h2 id="small-bugfixes-and-improved-release-engineering">2.48, 2014-01-03 small bugfixes and improved release engineering</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT28">ENHANCEMENT</dt>
+<dd>
+
+<p>Test suites now skip tests for libraries that are missing. (Patch for missing <code>IO::Compresss:Xz</code> contributed by Calvin Ardi.)</p>
+
+</dd>
+<dt id="ENHANCEMENT29">ENHANCEMENT</dt>
+<dd>
+
+<p>Removed references to Jdb in the package specification. Since the name was changed in 2008, there&#39;s no longer a huge need for backwards comparability. (Suggestion form Petr &Scaron;abata.)</p>
+
+</dd>
+<dt id="ENHANCEMENT30">ENHANCEMENT</dt>
+<dd>
+
+<p>Test suites now invoke the perl using the path from <code>$Config{perlpath}</code>. Hopefully this helps testing in environments where there are multiple installed perls and the default perl is not the same as the perl-under-test (as happens in cpantesters.org).</p>
+
+</dd>
+<dt id="BUG-FIX63">BUG FIX</dt>
+<dd>
+
+<p>Added specific encoding to this manpage to account for Unicode. Required to build correctly against perl-5.18.</p>
+
+</dd>
+</dl>
+
+<h2 id="bugfix-to-unicode-handling-in-Fsdb-IO-plus-minor-packaging-fixes">2.49, 2014-01-04 bugfix to unicode handling in Fsdb IO (plus minor packaging fixes)</h2>
+
+<dl>
+
+<dt id="BUG-FIX64">BUG FIX</dt>
+<dd>
+
+<p>Restored a line in the <i>.spec</i> to chmod g-s.</p>
+
+</dd>
+<dt id="BUG-FIX65">BUG FIX</dt>
+<dd>
+
+<p>Unicode decoding is now handled correctly for programs that read from standard input. (Also: New test scripts cover unicode input and output.)</p>
+
+</dd>
+<dt id="BUG-FIX66">BUG FIX</dt>
+<dd>
+
+<p>Fix to <a>Fsdb</a> documentation encoding line. Addresses test failure in perl-5.16 and earlier. (Who knew &quot;encoding&quot; had to be followed by a blank line.)</p>
+
+</dd>
+</dl>
+
+<h1 id="WHATS-NEW2">WHAT&#39;S NEW</h1>
+
+<h2 id="a-quick-release-for-spec-tweaks">2.50, 2014-05-27 a quick release for spec tweaks</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT31">ENHANCEMENT</dt>
+<dd>
+
+<p>In <a>dbroweval</a>, the <code>-N</code> (no output, even comments) option now implies <code>-n</code>, and it now suppresses the header and trailer.</p>
+
+</dd>
+<dt id="BUG-FIX67">BUG FIX</dt>
+<dd>
+
+<p>A few more tweaks to the <i>perl-Fsdb.spec</i> from Petr &Scaron;abata.</p>
+
+</dd>
+<dt id="BUG-FIX68">BUG FIX</dt>
+<dd>
+
+<p>Fixed 3 uses of <code>use v5.10</code> in test suites that were causing test failures (due to warnings, not real failures) on some platforms.</p>
+
+</dd>
+</dl>
+
+<h2 id="Feature-enhancements-to-dbcolmovingstats-dbcolcreate-dbmapreduce-and-new-sqlselect_to_db">2.51, 2014-09-05 Feature enhancements to <a>dbcolmovingstats</a>, <a>dbcolcreate</a>, <a>dbmapreduce</a>, and new <a>sqlselect_to_db</a></h2>
+
+<dl>
+
+<dt id="ENHANCEMENT32">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolcreate</a> now has a <code>--no-recreate-fatal</code> that causes it to ignore creation of existing columns (instead of failing).</p>
+
+</dd>
+<dt id="ENHANCEMENT33">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbmapreduce</a> once again is robust to reducers that output the key; <code>--no-prepend-key</code> is no longer mandatory.</p>
+
+</dd>
+<dt id="ENHANCEMENT34">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolsplittorows</a> can now enumerate the output rows with <code>-E</code>.</p>
+
+</dd>
+<dt id="BUG-FIX69">BUG FIX</dt>
+<dd>
+
+<p><a>dbcolmovingstats</a> is more mathematically robust. Previously for some inputs and some platforms, floating point rounding could sometimes cause squareroots of negative numbers.</p>
+
+</dd>
+<dt id="NEW8">NEW</dt>
+<dd>
+
+<p><a>sqlselect_to_db</a> converts the output of the MySQL or MarinaDB select comment into fsdb format.</p>
+
+</dd>
+<dt id="INCOMPATIBLE-CHANGE9">INCOMPATIBLE CHANGE</dt>
+<dd>
+
+<p><a>dbfilediff</a> now outputs the <i>second</i> row when doing sloppy numeric comparisons, to better support test suites.</p>
+
+</dd>
+</dl>
+
+<h2 id="Fixing-the-test-suite-for-line-number-changes">2.52, 2014-11-03 Fixing the test suite for line number changes.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT35">ENHANCEMENT</dt>
+<dd>
+
+<p>Test suites changes to be robust to exact line numbers of failures, since different Perl releases fail on different lines. <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1158380">https://bugzilla.redhat.com/show_bug.cgi?id=1158380</a></p>
+
+</dd>
+</dl>
+
+<h2 id="bug-fixes-and-stability-improvements-to-dbmapreduce">2.53, 2014-11-26 bug fixes and stability improvements to dbmapreduce</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT36">ENHANCEMENT</dt>
+<dd>
+
+<p>The <a>dbfilediff</a> how supports a <code>--quiet</code> option.</p>
+
+</dd>
+<dt id="ENHANCEMENT37">ENHANCEMENT</dt>
+<dd>
+
+<p>Better documention of <a>dbpipeline_filter</a>.</p>
+
+</dd>
+<dt id="BUGFIX">BUGFIX</dt>
+<dd>
+
+<p>Added groff-base and perl-podlators to the Fedora package spec. Fixes <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1163149">https://bugzilla.redhat.com/show_bug.cgi?id=1163149</a>. (Also in package 2.52-2.)</p>
+
+</dd>
+<dt id="BUGFIX1">BUGFIX</dt>
+<dd>
+
+<p>An important stability improvement to <a>dbmapreduce</a>. It, plus <a>dbmultistats</a>, and <a>dbcolstats</a> now support controlled parallelism with the <code>--pararallelism=N</code> option. They default to run with the number of available CPUs. <a>dbmapreduce</a> also moderates its level of parallelism. Previously it would create reducers as needed, causing CPU thrashing if reducers ran much slower than data production.</p>
+
+</dd>
+<dt id="BUGFIX2">BUGFIX</dt>
+<dd>
+
+<p>The combination of <a>dbmapreduce</a> with <a>dbrowenumerate</a> now works as it should. (The obscure bug was an interaction with <a>dbcolcreate</a> with non-multi-key reducers that output their own key. <a>dbmapreduce</a> has too many useful corner cases.)</p>
+
+</dd>
+</dl>
+
+<h2 id="fix-for-the-test-suite-to-correct-failing-tests-on-not-my-platform">2.54, 2014-11-28 fix for the test suite to correct failing tests on not-my-platform</h2>
+
+<dl>
+
+<dt id="BUGFIX3">BUGFIX</dt>
+<dd>
+
+<p>Sigh, the test suite now has a test suite. Because, yes, I broke it, causing many incorrect failures at cpantesters. Now fixed.</p>
+
+</dd>
+</dl>
+
+<h2 id="many-spelling-fixes-and-dbcolmovingstats-tests-are-more-robust-to-different-numeric-precision">2.55, 2015-01-05 many spelling fixes and <a>dbcolmovingstats</a> tests are more robust to different numeric precision</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT38">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbfilediff</a> now can be extra quiet, as I continue to try to track down a numeric difference on FreeBSD AMD boxes.</p>
+
+</dd>
+<dt id="ENHANCEMENT39">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolmovingstats</a> gave different test output (just reflecting rounding error) when stddev approaches zero. We now detect hand handle this case. See &lt;https://rt.cpan.org/Public/Bug/Display.html?id=101220&gt; and thanks to H. Merijn Brand for the bug report.</p>
+
+</dd>
+<dt id="BUG-FIX70">BUG FIX</dt>
+<dd>
+
+<p>Many, many spelling bugs found by H. Merijn Brand; thanks for the bug report.</p>
+
+</dd>
+<dt id="INCOMPATBLE-CHANGE">INCOMPATBLE CHANGE</dt>
+<dd>
+
+<p>A number of programs had misspelled &quot;separator&quot; in <code>--fieldseparator</code> and <code>--columnseparator</code> options as &quot;seperator&quot;. These are now correctly spelled.</p>
+
+</dd>
+</dl>
+
+<h2 id="fix-against-Getopt::Long-2.43s-stricter-error-checkign">2.56, 2015-02-03 fix against Getopt::Long-2.43&#39;s stricter error checkign</h2>
+
+<dl>
+
+<dt id="BUG-FIX71">BUG FIX</dt>
+<dd>
+
+<p>Internal argument parsing uses Getopt::Long, but mixed pass-through and &lt;&gt;. Bug reported by Petr Pisar at <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1188538">https://bugzilla.redhat.com/show_bug.cgi?id=1188538</a>.a</p>
+
+</dd>
+<dt id="BUG-FIX72">BUG FIX</dt>
+<dd>
+
+<p>Added missing BuildRequires for <code>XML::Simple</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Minor-changes-with-better-performance-from-dbmulitstats">2.57, 2015-04-29 Minor changes, with better performance from <a>dbmulitstats</a>.</h2>
+
+<dl>
+
+<dt id="BUG-FIX73">BUG FIX</dt>
+<dd>
+
+<p><a>dbfilecat</a> now honors <code>--remove-inputs</code> (previously it didn&#39;t). This omission meant that <a>dbmapreduce</a> (and <a>dbmultistats</a>) would accumulate files in <i>/tmp</i> when running. Bad news for inputs with 4M keys.</p>
+
+</dd>
+<dt id="ENHANCMENT">ENHANCMENT</dt>
+<dd>
+
+<p><a>dbmultistats</a> should be faster with lots of small keys. <a>dbcolstats</a> now supports <code>-k</code> to get some of the functionality of <a>dbmultistats</a> (if data is pre-sorted and median/quartiles are not required).</p>
+
+<p><a>dbfilecat</a> now honors <code>--remove-inputs</code> (previously it didn&#39;t). This omission meant that <a>dbmapreduce</a> (and <a>dbmultistats</a>) would accumulate files in <i>/tmp</i> when running. Bad news for inputs with 4M keys.</p>
+
+</dd>
+</dl>
+
+<h2 id="Bugfix-in-dbmerge">2.58, 2015-04-30 Bugfix in <a>dbmerge</a></h2>
+
+<dl>
+
+<dt id="BUG-FIX74">BUG FIX</dt>
+<dd>
+
+<p>Fixed a case where <a>dbmerge</a> suffered mojobake in endgame mode. This bug surfaced when <a>dbsort</a> was applied to large files (big enough to require merging) with unicode in them; the symptom was soemthing like: Wide character in print at /usr/lib64/perl5/IO/Handle.pm line 420, &lt;GEN12&gt; line 111.</p>
+
+</dd>
+</dl>
+
+<h2 id="Collect-a-few-small-bug-fixes-and-documentation-improvements">2.59, 2016-09-01 Collect a few small bug fixes and documentation improvements.</h2>
+
+<dl>
+
+<dt id="BUG-FIX75">BUG FIX</dt>
+<dd>
+
+<p>More IO is explicitly marked UTF-8 to avoid Perl&#39;s tendency to mojibake on otherwise valid unicode input. This change helps <a>html_table_to_db</a>.</p>
+
+</dd>
+<dt id="ENHANCEMENT40">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolscorrelate</a> now crossreferences <a>dbcolsregression</a>.</p>
+
+</dd>
+<dt id="ENHANCEMENT41">ENHANCEMENT</dt>
+<dd>
+
+<p>Documentation for <a>dbrowdiff</a> now clarifies that the default is baseline mode.</p>
+
+</dd>
+<dt id="BUG-FIX76">BUG FIX</dt>
+<dd>
+
+<p><a>dbjoin</a> now propagates <code>-T</code> into the sorting process (if it is required). Thanks to Lan Wei for reporting this bug.</p>
+
+</dd>
+</dl>
+
+<h2 id="Adds-support-for-hash-joins">2.60, 2016-09-04 Adds support for hash joins.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT42">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbjoin</a> now supports hash joins with <code>-t lefthash</code> and <code>-t righthash</code>. Hash joins cache a table in memory, but do not require that the other table be sorted. They are ideal when joining a large table against a small one.</p>
+
+</dd>
+</dl>
+
+<h2 id="Support-left-and-right-outer-joins">2.61, 2016-09-05 Support left and right outer joins.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT43">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbjoin</a> now handles left and right outer joins with <code>-t left</code> and <code>-t right</code>.</p>
+
+</dd>
+<dt id="ENHANCEMENT44">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbjoin</a> hash joins are now selected with <code>-m lefthash</code> and <code>-m righthash</code> (not the shortlived <code>-t righthash</code> option). (Technically this change is incompatible with Fsdd-2.60, but no one but me ever used that version.)</p>
+
+</dd>
+</dl>
+
+<h2 id="A-new-yaml_to_db-and-other-minor-improvements">2.62, 2016-11-29 A new <a>yaml_to_db</a> and other minor improvements.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT45">ENHANCEMENT</dt>
+<dd>
+
+<p>Documentation for <a>xml_to_db</a> now includes sample output.</p>
+
+</dd>
+<dt id="NEW9">NEW</dt>
+<dd>
+
+<p><a>yaml_to_db</a> converts a specific form of YAML to fsdb.</p>
+
+</dd>
+<dt id="BUG-FIX77">BUG FIX</dt>
+<dd>
+
+<p>The test suite now uses <code>diff -c -b</code> rather than <code>diff -cb</code> to make OpenBSD-5.9 happier, I hope.</p>
+
+</dd>
+<dt id="ENHANCEMENT46">ENHANCEMENT</dt>
+<dd>
+
+<p>Comments that log operations at the end of each file now do simple quoting of spaces. (It is not guaranteed to be fully shell-compliant.)</p>
+
+</dd>
+<dt id="ENHANCEMENT47">ENHANCEMENT</dt>
+<dd>
+
+<p>There is a new standard option, <code>--header</code>, allowing one to specify an Fsdb header for inputs that lack it. Currently it is supported by <a>dbcoldefine</a>, <a>dbrowuniq</a>, <a>dbmapreduce</a>, <a>dbmultistats</a>, <a>dbsort</a>, <a>dbpipeline</a>.</p>
+
+</dd>
+<dt id="ENHANCEMENT48">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbfilepivot</a> now allows the <b>--possible-pivots</b> option, and if it is provided processes the data in one pass.</p>
+
+</dd>
+<dt id="ENHANCEMENT49">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbroweval</a> logs are now quoted.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>John Heidemann, <code>johnh@isi.edu</code></p>
+
+<p>See <a href="#Contributors">&quot;Contributors&quot;</a> for the many people who have contributed bug reports and fixes.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Fsdb is Copyright (C) 1991-2016 by John Heidemann &lt;johnh@isi.edu&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the terms of version 2 of the GNU General Public License as published by the Free Software Foundation.</p>
+
+<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
+
+<p>A copy of the GNU General Public License can be found in the file ``COPYING&#39;&#39;.</p>
+
+<h1 id="COMMENTS-and-BUG-REPORTS">COMMENTS and BUG REPORTS</h1>
+
+<p>Any comments about these programs should be sent to John Heidemann <code>johnh@isi.edu</code>.</p>
+
+
+</body>
+
+</html>
+
+

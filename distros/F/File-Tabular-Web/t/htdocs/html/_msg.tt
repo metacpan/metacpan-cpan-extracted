@@ -1,0 +1,5 @@
+[%- WRAPPER entities_main.tt -%]
+
+[% self.msg %]
+
+[%- END -%]

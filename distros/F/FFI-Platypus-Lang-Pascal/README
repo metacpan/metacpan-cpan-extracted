@@ -1,0 +1,248 @@
+NAME
+
+    FFI::Platypus::Lang::Pascal - Documentation and tools for using
+    Platypus with the Free Pascal programming language
+
+SYNOPSIS
+
+    Free Pascal:
+
+     { compile and link with: fpc mylib.pas }
+     
+     Library MyLib;
+     
+     Function Add(A: Integer; B: Integer): Integer; Cdecl;
+     Begin
+       Add := A + B;
+     End;
+     
+     Exports
+       Add;
+     
+     End.
+
+    Perl:
+
+     use FFI::Platypus;
+     
+     my $ffi = FFI::Platypus->new;
+     $ffi->lang('Pascal');
+     $ffi->lib('./libmylib.so');
+     
+     $ffi->attach(
+       Add => ['Integer','Integer'] => 'Integer'
+     );
+     
+     print Add(1,2), "\n";
+
+DESCRIPTION
+
+    This modules provides native types and demangling for the Free Pascal
+    Programming language when used with FFI::Platypus.
+
+    This module provides these types (case sensitive):
+
+    Byte
+
+    ShortInt
+
+    SmallInt
+
+    Word
+
+    Integer
+
+      This is an alias for SmallInt (which is appropriate for Free Pascal's
+      default mode)
+
+    Cardinal
+
+    LongInt
+
+    LongWord
+
+    Int64
+
+    QWord
+
+    Boolean
+
+    ByteBool
+
+    WordBool
+
+    LongBool
+
+    Single
+
+    Double
+
+    The following types are not (yet) supported:
+
+    Extended
+
+    Comp
+
+    Currency
+
+    ShortString
+
+    This module also has some support for demangled functions and
+    overloading, if you are using a dynamic library constructed from units
+    via ppumove.
+
+    You may also use Module::Build::FFI::Pascal to bundle Free Pascal code
+    with your distribution.
+
+CAVEATS
+
+    I've been experimenting with Free Pascal 2.6.0 while working on this
+    module.
+
+ name mangling
+
+    If you compile one or more Pascal Units and link them using ppumove,
+    they symbols in the resulting dynamic library will include mangled
+    Pascal names. This module has at least some support for such names.
+
+    For example, suppose you had this Pascal Unit:
+
+     Unit Add;
+     
+     Interface
+     
+     Function Add( A: SmallInt; B: SmallInt) : SmallInt; Cdecl;
+     Function Add( A: Real;    B: Real)      : Real; Cdecl;
+     
+     Implementation
+     
+     Function Add( A: SmallInt; B: SmallInt) : SmallInt; Cdecl;
+     Begin
+       Add := A + B;
+     End;
+     
+     Function Add( A: real; B: real) : real; Cdecl;
+     Begin
+       Add := A + B;
+     End;
+     
+     End.
+
+    On Linux, you could compile and link this into a shared object with
+    these commands:
+
+     fpc add.pas
+     gcc -o add.so -shared add.o
+
+    And you could then use it from Perl:
+
+     use FFI::Platypus;
+     
+     my $ffi = FFI::Platypus->new;
+     $ffi->lang('Pascal');
+     $ffi->lib('./add.so');
+     
+     $ffi->attach(
+       ['Add.Add(SmallInt,SmallInt):SmallInt' => 'Add'] => ['SmallInt','SmallInt'] => 'SmallInt'
+     );
+     
+     print Add(1,2), "\n";
+
+    When attaching the function you have to specify the argument and return
+    types because the Add function is overloaded and is ambiguous without
+    it. If there were just one Add function, then you could attach it like
+    this:
+
+     $ffi->attach('Add' => ['SmallInt','SmallInt'] => 'SmallInt');
+
+    The downside to using a shared library constructed from Pascal Units in
+    this way is that the resulting dynamic library does not include the
+    Pascal standard library so very simple capabilities such as IO and
+    ShortString are not available. It is recommended instead to use a
+    Pascal Library (possibly linked with one or more Pascal Units), as
+    inthe "SYNOPSIS" at the top.
+
+METHODS
+
+    Generally you will not use this class directly, instead interacting
+    with the FFI::Platypus instance. However, the public methods used by
+    Platypus are documented here.
+
+ native_type_map
+
+     my $hashref = FFI::Platypus::Lang::Pascal->native_type_map;
+
+    This returns a hash reference containing the native aliases for the
+    Free Pascal programming languages. That is the keys are native C++
+    types and the values are libffi native types.
+
+    Types are in camel case. For example use ShortInt, not Shortint or
+    SHORTINT.
+
+ mangler
+
+     my $mangler = FFI::Platypus::Lang::Pascal->mangler($ffi->libs);
+     # prints ADD_ADD$SMALLINT$SMALLINT$$SMALLINT
+     print $mangler->("add(smallint,smallint):smallint");
+
+    Returns a subroutine reference that will "mangle" C++ names.
+
+EXAMPLES
+
+    See the above "SYNOPSIS" or the examples directory that came with this
+    distribution.
+
+SUPPORT
+
+    If something does not work as advertised, or the way that you think it
+    should, or if you have a feature request, please open an issue on this
+    project's GitHub issue tracker:
+
+    https://github.com/plicease/FFI-Platypus-Lang-Pascal/issues
+
+    This project's GitHub issue tracker listed above is not Write-Only. If
+    you want to contribute then feel free to browse through the existing
+    issues and see if there is something you feel you might be good at and
+    take a whack at the problem. I frequently open issues myself that I
+    hope will be accomplished by someone in the future but do not have time
+    to immediately implement myself.
+
+    Another good area to help out in is documentation. I try to make sure
+    that there is good document coverage, that is there should be
+    documentation describing all the public features and warnings about
+    common pitfalls, but an outsider's or alternate view point on such
+    things would be welcome; if you see something confusing or lacks
+    sufficient detail I encourage documentation only pull requests to
+    improve things.
+
+CONTRIBUTING
+
+    If you have implemented a new feature or fixed a bug then you may make
+    a pull reequest on this project's GitHub repository:
+
+    https://github.com/plicease/FFI-Platypus-Lang-Pascal/issues
+
+    Caution: if you do this too frequently I may nominate you as the new
+    maintainer. Extreme caution: if you like that sort of thing.
+
+SEE ALSO
+
+    FFI::Platypus
+
+      The Core Platypus documentation.
+
+    Module::Build::FFI::Pascal
+
+      Bundle Free Pascal with your FFI / Perl extension.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

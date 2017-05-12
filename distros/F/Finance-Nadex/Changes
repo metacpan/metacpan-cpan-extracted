@@ -1,0 +1,26 @@
+Revision history for Finance-Nadex
+
+0.07    9/7/16 12:17:09 CST
+        Adds an example to the POD of connecting to the demo platform
+
+0.06    9/7/16 11:46:43 CST
+        Enables selection of live platform or demo platform
+        Fixes cancel order functionality
+
+0.05    6/22/16 23:30:01 CST
+        Updates base urls for NADEX API changes
+        Updates client version
+
+0.04    2/3/16 04:30:22 CST
+        Updates login method to match NADEX API changes
+
+0.03    3/3/15 11:30:10 CST
+        Allow increments of 25 cents in the price level of an order
+
+0.02    2/3/15 06:26:06 CST
+        Finance::Nadex::get_time_series() now returns a list of Finance::Nadex::Contract objects
+        when the designated market is either '5 Minute Binaries' or '20 Minute Binaries'
+
+0.01    2/1/15 17:26:19 CST 
+        First version
+

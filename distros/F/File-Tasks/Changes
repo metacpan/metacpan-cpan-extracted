@@ -1,0 +1,26 @@
+Revision history for Perl extension File::Tasks
+
+0.07 Wed 14 Nov 2007
+	- No functional changes
+	- Upgrading Module::Install to 0.68
+
+0.06 Fri 21 Apr 2006
+	- No functional changes
+	- Updated from Param::Coerce to renamed Params::Coerce (Gábor Szabó)
+	- Upgrading Module::Install to 0.62
+	- Moved the t.data directory to under t for cleanliness
+
+0.05 Thu 10 Nov 2005
+	- First public release
+
+0.04 Thu 20 Oct 2005
+	- Converted from File::Script to File::Tasks and moved into CPAN repository
+
+0.03 Thu  7 Oct 2004
+	- Added support for Coercion from Archive::Builder
+
+0.02 Tue 28 Sep 2004
+	- Moved to File::Script
+
+0.01 Wed  1 Sep 2004
+	- original version

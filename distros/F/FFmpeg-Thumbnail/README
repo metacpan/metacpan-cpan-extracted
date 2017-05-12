@@ -1,0 +1,73 @@
+FFmpeg-Thumbnail
+
+VERSION
+    Version 0.02
+
+DESCRIPTION
+    A wrapper for FFmpeg::Command specifically for creating video
+    thumbnails. Grabs a frame at a specific point in the video and stores it
+    as an image using ffmpeg ( <http://ffmpeg.org> ).
+
+    Provides the ability to set specific output paramaters, such as
+    file-type and file size, and use them across multiple video files.
+
+SYNOPSIS
+
+        use FFmpeg::Thumbnail;
+
+        # Create a thumbnail 20 seconds into the video.
+        my $foo = FFmpeg::Thumbnail->new( { video => '/my/video/file.flv' } );
+
+        # Create a thumbnail from $offset and store it at $output_filename:
+        $foo->create_thumbnail( $offset, $output_filename );
+
+        # Create a thumbnail from $offset and store it at the default location:
+        $foo->create_thumbnail( $offset );
+
+        # Create a thumbnail from the video's beginning and store it at $filename:
+        $foo->create_thumbnail( undef, $output_filename);
+
+        # Create a thumbnail from the video's beginning and store it at the default location:
+        $foo->create_thumbnail();
+
+    See the module documentation for more detailed information.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc FFmpeg::Thumbnail
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=FFmpeg-Thumbnail
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/FFmpeg-Thumbnail
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/FFmpeg-Thumbnail
+
+    Search CPAN
+        http://search.cpan.org/dist/FFmpeg-Thumbnail/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Brian Sauls
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

@@ -1,0 +1,29 @@
+---
+abstract: 'Object-oriented module for working with BinkleyTerm Style Outbound.'
+author:
+  - 'Valery Kalesnik <valkoles@gmail.com>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FTN-Outbound-BSO
+requires:
+  Encode: '0'
+  Encode::Locale: '0'
+  FTN::Addr: '0'
+  FTN::Outbound::Reference_file: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  Log::Log4perl: '0'
+  Scalar::Util: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '20160516'

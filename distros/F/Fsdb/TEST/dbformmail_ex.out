@@ -1,0 +1,21 @@
+#!/bin/sh
+Mail -s 'time to change your password'  -c 'Super User <root@sample.com>'  'johnh' <<'END'
+Please change your password regularly.
+   - your superuser
+
+END
+
+Mail -s 'time to change your password'  -c 'Super User <root@sample.com>'  'greg' <<'END'
+Please change your password regularly.
+   - your superuser
+
+END
+
+Mail -s 'time to change your password'  -c 'Super User <root@sample.com>'  'root' <<'END'
+Please change your password regularly.
+   - your superuser
+
+END
+
+# this is a simple database
+#   | dbformmail TEST/dbformmail_ex.in-2

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               File-Listing
+version:            6.04
+abstract:           parse directory listing
+author:
+    - Gisle Aas <gisle@activestate.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Date:  6
+    perl:        5.006002
+resources:
+    MailingList:  mailto:libwww@perl.org
+    repository:   http://github.com/gisle/libwww-perl/tree/File-Listing/master
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

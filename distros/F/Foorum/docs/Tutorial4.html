@@ -1,0 +1,89 @@
+<html>
+<head>
+<title>Tutorial4</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<h1> NAME </h1><p>Foorum::Manual::Tutorial4 - Tutorial 4: jQuery javascript framework</p><h2> Short Introducation </h2><p><a href="http://jquery.com/" rel="nofollow">jQuery</a> is a fast, concise, JavaScript Library that simplifies how you traverse HTML documents, handle events, perform animations, and add Ajax interactions to your web pages.</p><p>There are a lot of javascript frameworks: prototype, mootool, dojo, YUI etc. Yet why we pick up jquery is just a matter of taste. (Dude, I can't tell more, that's just personal feeling.)</p><h2> Used in Foorum </h2><p>We load jquery in every page by default.</p><ul><li>disable Submit button when submit() form to avoid duplicate submit. </li></ul><pre class="prettyprint">    $(document.forms).each( function(theform) {
+        
+        // disabled the Submit and Reset when submit a form
+        // to avoid duplicate submit
+        $(theform).submit( function() {
+            $('input:submit').attr( { disabled : 'disabled' } );
+            $('input:reset').attr(  { disabled : 'disabled' } );
+        } );
+        
+        // Press Ctrl+Enter to submit the form. like QQ.
+        $(theform).keypress( function(evt) {
+            var x = evt.keyCode;
+            var q = evt.ctrlKey;
+            
+            if (q &amp;&amp; (x == 13 || x == 10)) {
+                theform.submit();
+            }
+        } );
+    } );
+</pre><ul><li>timezone auto-detection.  2008-01-17 15:46:33  in my local time, meanwhile that's  2008-01-17 16:46:33  in your computer. that's provided by this piece of code. (put class="date" in MySQL DateTime format span. &lt;span class="date"&gt;2008-01-17 15:46:33&lt;/span&gt;) </li></ul><pre class="prettyprint">    // follows are copied from datePicker/date.js
+    // utility method
+    var _zeroPad = function(num) {
+        var s = '0'+num;
+        return s.substring(s.length-2)
+        //return ('0'+num).substring(-2); // doesn't work on IE :(
+    };
+    
+   $(".date").each(function (i) {
+        var s = $(this).text();
+        if (! s) { return false; }
+ 
+        var f = this.id; //format
+        if (! f) {
+            f = 'yyyy-mm-dd hh:ii:ss';
+        }
+        
+        var d = new Date(1997, 1, 1, 1, 1, 1);
+        var iY = f.indexOf('yyyy');
+        if (iY &gt; -1) {
+            d.setFullYear(Number(s.substr(iY, 4)));
+        }
+        var iM = f.indexOf('mm');
+        if (iM &gt; -1) {
+            d.setMonth(Number(s.substr(iM, 2)) - 1);
+        }
+        d.setDate(Number(s.substr(f.indexOf('dd'), 2)));
+        d.setHours(Number(s.substr(f.indexOf('hh'), 2)));
+        d.setMinutes(Number(s.substr(f.indexOf('ii'), 2)));
+        d.setSeconds(Number(s.substr(f.indexOf('ss'), 2)));
+        
+        var timezoneOffset = -(new Date().getTimezoneOffset());
+        d.setMinutes(d.getMinutes() + timezoneOffset);
+        
+        if (! isNaN(d.getFullYear()) &amp;&amp; d.getFullYear() &gt; 1997) {
+            var t = f
+                .split('yyyy').join(d.getFullYear())
+                .split('mm').join(_zeroPad(d.getMonth()+1))
+                .split('dd').join(_zeroPad(d.getDate()))
+                .split('hh').join(_zeroPad(d.getHours()))
+                .split('ii').join(_zeroPad(d.getMinutes()))
+                .split('ss').join(_zeroPad(d.getSeconds()))
+                ;
+        
+            $(this).text(t);
+        }
+   } );
+</pre><p>Above code is from <a href="http://foorum.googlecode.com/svn/trunk/root/static/js/utils.js" rel="nofollow">http://foorum.googlecode.com/svn/trunk/root/static/js/utils.js</a> it may be changed later.</p><h2> jQuery UI </h2><p><a href="http://ui.jquery.com/" rel="nofollow">http://ui.jquery.com/</a></p><p>We are using Tabs. <a href="http://dev.jquery.com/view/tags/ui/1.0.1a/demos/ui.tabs.html" rel="nofollow">http://dev.jquery.com/view/tags/ui/1.0.1a/demos/ui.tabs.html</a></p><h1> SEE ALSO </h1><p><a href="Tutorial1.html">Tutorial1</a>, <a href="Tutorial2.html">Tutorial2</a>, <a href="Tutorial3.html">Tutorial3</a>, <a href="Tutorial5.html">Tutorial5</a></p>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/Tutorial4">http://code.google.com/p/foorum/wiki/Tutorial4</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

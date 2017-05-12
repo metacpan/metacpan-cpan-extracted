@@ -1,0 +1,45 @@
+Revision history for Perl extension File::Stamped
+
+0.08 2014-07-29T06:00:50Z
+    [MISC]
+    - fix symlink file check at generate file (thx spiritloose)
+
+0.07 2014-03-05T07:03:01Z
+    [MISC]
+    - fix symlink file check.
+
+0.06 2014-02-03T03:08:10Z
+    [MISC]
+    - skip symlink test at unsupport environments.
+
+0.05 2014-01-31T11:13:28Z
+
+    [MISC]
+    - fixed docs
+
+0.04 2014-01-31T11:06:48Z
+
+    [NEW FEATURE]
+    - generate symlink.
+    - auto make parent directory for log file.
+    - be able to use syswrite
+
+    [MISC]
+    - switched to Minilla from M::B.
+
+0.03 2013-01-20T18:59:22
+
+    [NEW FEATURE]
+    - You can specify the 'callback' to generate file name.
+      This feature makes customizable file name generation.
+      (tokuhirom)
+
+    [MISC]
+    - switched to M::B from M::I.
+
+0.02
+
+        - updated docs
+
+0.01    Fri Nov 19 09:21:19 2010
+        - original version

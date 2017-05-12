@@ -1,0 +1,9 @@
+Changes
+lib
+Makefile.PL
+MANIFEST
+README
+lib/Filter/Object/Simple.pm
+t/Filter-Object-Simple.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

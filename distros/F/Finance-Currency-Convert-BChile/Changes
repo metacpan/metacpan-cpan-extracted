@@ -1,0 +1,24 @@
+Revision history for Finance-Currency-Convert-BChile
+
+0.05    Wed Jul 24 10:38:32 CLT 2013
+        Banco Central has changed its homepage. The numbers now are inside
+        a frame with different URL and layout.
+
+0.04    Mon Sep 26 21:47:44 CLST 2011
+        Fixed URL change in bchile.cl page.
+
+0.032   Sat May 24 11:40:23 CLT 2008
+        Added the prerequisites in Makefile.PL, to pass automated tests.
+
+0.031   Tue Nov 27 09:21:45 CLST 2007
+        Fixed a bug in the tests.
+
+0.03    Mon Nov 26 17:26:06 CLST 2007
+        Better error handling, mainly on weekend changes of bchile.cl
+
+0.02    Wed Oct 31 10:28:52 CLST 2007
+    	Fixed bug in testing on freebsd. Scope of VERSION variable.
+
+0.01    Tue Oct 30 16:36:42 CLST 2007
+        First version, released on an unsuspecting world.
+

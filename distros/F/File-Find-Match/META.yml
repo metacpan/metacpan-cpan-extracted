@@ -1,0 +1,21 @@
+---
+name: File-Find-Match
+version: 1.0
+author:
+  - 'Dylan William Hardison <dhardison@cpan.org>'
+abstract: Perform different actions on files based on file name.
+license: perl
+requires:
+  perl: 5.8.0
+build_requires:
+  Test::More: 0
+provides:
+  File::Find::Match:
+    file: lib/File/Find/Match.pm
+    version: 1.0
+  File::Find::Match::Sugar:
+    file: lib/File/Find/Match/Sugar.pm
+  File::Find::Match::Util:
+    file: lib/File/Find/Match/Util.pm
+    version: 0.10
+generated_by: Module::Build version 0.26

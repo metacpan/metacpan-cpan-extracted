@@ -1,0 +1,16 @@
+README				README file
+INSTALL				How to instal this package
+Changes				history of the package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+TB.pm				The TB module
+t/00load.t			test sample
+t/01gensign.t			test sample
+t/02setparam.t			test sample
+t/03getparam.t			test sample
+doc/CardPay_technicka_prirucka_v3.1.pdf	Protocol Specification for CardPay
+doc/TatraPay_technicka_prirucka_v3.1.pdf	Protocol Specification for TatraPay
+examples/makeform.pl		simple example
+examples/makegenericform.pl	simple example
+examples/makelink.pl		simple example
+META.yml                                 Module meta-data (added by MakeMaker)

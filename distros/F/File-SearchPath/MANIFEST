@@ -1,0 +1,14 @@
+README
+MANIFEST
+MANIFEST.SKIP
+Build.PL
+lib/File/SearchPath.pm
+t/search.t
+t/a/file1
+t/a/file2
+t/b/file2
+t/b/file3
+t/c/file4
+ChangeLog
+META.yml
+META.json

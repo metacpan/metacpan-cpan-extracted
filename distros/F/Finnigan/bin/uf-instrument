@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Declare;
+use Finnigan;
+
+my $args = new Getopt::Declare q{
+  [strict]
+  [mutex: -h -w]
+  -d[ump]			dump the requested feature with file seek addresses
+  -s[ize]			print record size [requires: -d]
+  -h[tml]			format as html
+  -w[iki]			format as a wiki table
+  -r[elative]			show relative addersess in the dump [requires: -d]
+  <file>			input file [required]
+}
+  or exit(-1);
+
+my $file = $args->{"<file>"};
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $header->version);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+my $rfi = Finnigan::RawFileInfo->decode(\*INPUT, $header->version);
+
+my $run_header_addr = $rfi->preamble->run_header_addr;
+
+# fast-forward to RunHeader
+seek INPUT, $run_header_addr, 0;
+my $run_header = Finnigan::RunHeader->decode(\*INPUT, $header->version);
+my $inst_id  = Finnigan::InstID->decode( \*INPUT );
+
+if ( exists $args->{-d} ) {
+  if ( exists $args->{-s} ) {
+    my $size = $inst_id->size;
+    say "size: $size";
+  }
+  if ( exists $args->{-h} ) {
+    $inst_id->dump(style => 'html', relative => exists $args->{-r});
+  }
+  elsif ( exists $args->{-w} ) {
+    $inst_id->dump(style => 'wiki', relative => exists $args->{-r});
+  }
+  else {
+    $inst_id->dump(relative => exists $args->{-r});
+  }
+}
+else {
+  say $inst_id->stringify;
+}
+
+__END__
+=head1 NAME
+
+uf-instrument - print or dump the instrument IDs found a Finnigan raw file
+
+=head1 SYNOPSIS
+
+uf-log <file>
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print a brief help message and exit.
+
+=item B<-d[ump]>
+
+Prints a table listing all fields in the InstID structure containing
+the instrument IDs, incliding their seek addresses, sizes, names and
+values.
+
+=item B<-h[tml]>
+
+Format the dump output as an HTML table.
+
+=item B<-w[iki]>
+
+Format the dump output as a wiki table.
+
+=item B<-s[ize]>
+
+Show the structure size in bytes (works with the -d[ump] option).
+
+=item B<-r[elative]>
+
+Show relative addresses of all elemests in the dump. The default is to
+show the absolute seek address.
+
+=back
+
+=head1 DESCRIPTION
+
+If called without options, B<uf-instrument> prints all instrument ID
+information on one line.
+
+For more detailed information about all instruments involved in the
+acquisition of the data, use B<uf-meth>, the method file tool.
+
+It will exit with no output if there are no error messages.
+
+=head1 SEE ALSO
+
+Finnigan::InstID
+
+L<uf-meth>
+
+=cut

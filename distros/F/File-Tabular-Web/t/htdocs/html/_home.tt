@@ -1,0 +1,7 @@
+[%- WRAPPER entities_main.tt -%]
+
+Welcome to this list of HTML entities.
+Please use the form above to inspect the data.
+
+[%- END -%]
+

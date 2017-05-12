@@ -1,0 +1,10 @@
+#fsdb j left right
+1	left1	right1
+2	left2	right2
+2	left2	right3
+2	left2	right4
+2	left3	right2
+2	left3	right3
+2	left3	right4
+3	left4	right5
+#   | dbjoin -S --input TEST/dbjoin_multiples_right.in -n j

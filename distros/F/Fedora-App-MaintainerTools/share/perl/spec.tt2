@@ -1,0 +1,8 @@
+[% PROCESS perl/spec/preamble.tt2 -%]
+[% IF middle && !data.is_fully_managed %]
+%description
+[% middle %]
+[% ELSE %]
+[% PROCESS perl/spec/middle.tt2 %]
+[% END -%]
+[% PROCESS perl/spec/changelog.tt2 %]

@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta name="keywords" content="similar finder file" /><meta name="summary" content="similar finder file" /><meta name="description" content="similar finder file" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 7.1.2" />
+<link rel="stylesheet" href="../../asciidoc/stylesheets/xhtml11.css" type="text/css" />
+<link rel="stylesheet" href="../../asciidoc/stylesheets/xhtml11-quirks.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+</div>
+<h2><a id="_Similar_file_finder"></a>1. Similar file finder<a href="#_Similar_file_finder">&nbsp;</a></h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><tt>Newsgroups: comp.lang.perl.misc,comp.unix.programmer</tt></pre>
+</div></div>
+<p>Hi,</p>
+<p>I'm planing to write a "Similar file finder", which will walks along
+the given dirs to find all similar files within it.</p>
+<p>First I want to know if anybody has written similar tools already.</p>
+<p>Searching intensively in news archive, I can only located such
+request/respond in newsgroups: comp.graphics.apps.paint-shop-pro
+(what a strange place to find such kind of program :-&gt;)</p>
+<p><a href="http://groups.google.com/groups?hl=en&amp;threadm=LhAh4.11633%24NU6.569262%40tw12.nn.bcandid.com&amp;rnum=56&amp;prev=/groups%3Fq%3Dfile%2Bsimilar%2Bcompare%2Bscript%2BOR%2Bprogram%26num%3D50%26hl%3Den%26start%3D50%26sa%3DN">http://groups.google.com/groups?hl=en&amp;threadm=LhAh4.11633%24NU6.569262%40tw12.nn.bcandid.com&amp;rnum=56&amp;prev=/groups%3Fq%3Dfile%2Bsimilar%2Bcompare%2Bscript%2BOR%2Bprogram%26num%3D50%26hl%3Den%26start%3D50%26sa%3DN</a></p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>,----- [quotes from above thread] ---
+| Now you can down load any number of similar files and run the program to
+| compare the incoming files against the list of "got that one" Even if
+| someone renamed the file the program will recognize that and rename it to
+| the correct name...
+|
+| If you want to get an idea of how powerful this tool is just substitute the
+| word "font" in the above paragraph with any file extension you like (.jpg
+| .gif .bmp   .mp3   .mpg   .avi  etc.)
+|
+| How it works inside is kind of technical( I don't understand all of
+| it)... so far the program has worked on every file type I have tried
+| it on.
+`-----</tt></pre>
+</div></div>
+<p>I did not include the DOS program's name here because what seems as
+such an amazing tools to a PSP user is just a CRC checksum
+comparing program. I'm sure most of us here can hack one in just
+minutes.</p>
+<p>What's in my mind is much more powerful than it. It can not only
+find out <strong>*identical*</strong> files but also find out similar files. Ok, what
+are similar files? Files that have different file name, time and
+size (might be content also), and yet they represent same thing.</p>
+<p>Is such program really necessary? Why would files that have
+different name, time and size represent same thing? Well, does words
+like "Napster", "Gnutella" ring the bell? Different names for same
+file are not rare at all. Different version (.txt, .html, or .pdf)
+and different compression methods (.zip, .gz, .tar.gz, .bip2) make
+it even worse. And let alone there are partial downloads floating
+around everywhere. Moreover, sample rate make a huge different in
+MP3 files, even if they sound no much different to human ears.</p>
+<p>One poster said (in above thread):</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>,-----
+| I have over 200 cd that I have burned full of different files. Also three
+| HD's. There is not a duplicate of any file anywhere on any of my storage
+| mediums.
+`-----</tt></pre>
+</div></div>
+<p>Well, I have much much less collection than s/he did, but I'm sure more
+than 10% of my collection are duplicated similar files, and the
+percentage is very likely above that.</p>
+<h3><a id="_Similar_file_finder_1"></a>1.1. Similar file finder<a href="#_Similar_file_finder_1">&nbsp;</a></h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&gt; It sounds like you're trying to reinvent what Napster calls the
+&gt; "fingerprinting technology". And it seems to me that that isn't exactly
+&gt; simple. No, I'm not an insider.
+&gt;
+&gt; So let's say you want to recognize files of the same audio track, or
+&gt; image files at a different resolution. So what can you do? First,</tt></pre>
+</div></div>
+<p>No I'm not planing to be that fancy. I'm going to make the guess
+only based on the file name and file size.</p>
+<p>I'd be happy enough if my program can pick out the following (among
+thousands of files) as similar file candidates:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Andie Macdowell.jpg 8k
+andy macddowel.gif  12k</tt></pre>
+</div></div>
+<p>As to the algorithm, I'm going to map each individual word in file
+name into soundex, and use term vector (I borrow this term and
+thought from the famous TF/IDF information retrieval algorithm for
+similarity calculation) to determine the similarity between
+files. Generally it means that if there are n files, each having
+approximately m words, the degree of calculation is</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>O(n^2 * m)</tt></pre>
+</div></div>
+<p>File size is also taken into consideration.</p>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 30-Apr-2007 23:31:11 EDT
+</div>
+<div id="footer-badges">
+<a href="http://validator.w3.org/check?uri=referer">
+  <img style="border:none; width:88px; height:31px;"
+       src="http://www.w3.org/Icons/valid-xhtml11"
+       alt="Valid XHTML 1.1!" />
+</a>
+<a href="http://jigsaw.w3.org/css-validator/check/referer">
+  <img style="border:none; width:88px; height:31px;"
+       src="http://jigsaw.w3.org/css-validator/images/vcss"
+       alt="Valid CSS!" />
+</a>
+<a href="http://www.mozilla.org/products/firefox/">
+  <img style="border:none; width:110px; height:32px;"
+       src="http://www.spreadfirefox.com/community/images/affiliates/Buttons/110x32/safer.gif"
+       alt="Get Firefox!" />
+</a>
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=163815&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</div>
+</div>
+</body>
+</html>

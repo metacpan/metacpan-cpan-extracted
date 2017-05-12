@@ -1,0 +1,412 @@
+#!/usr/bin/perl
+
+# xxx list dir_types
+
+# xxx convert all module version numbers
+#     use hg keywords (?)
+#                            equivalent
+#  decimal    zero-padded    dotted-decimal
+#  -------    -----------    --------------
+#  1.2        1.200          v1.200.0
+#  1.02       1.020          v1.20.0
+#  1.002      1.002          v1.2.0
+#  1.0023     1.002300       v1.2.300
+#  1.00203    1.002030       v1.2.30
+#  1.002003   1.002003       v1.2.3
+
+use 5.006;
+use strict;
+use warnings;
+
+my $VERSION = $File::Namaste::VERSION;
+
+use Pod::Usage;
+# this :config allows -h24w80 for '‐h 24 ‐w 80', -vax for --vax or --Vax
+use Getopt::Long qw(:config bundling_override);
+
+use File::Namaste ':all';
+use File::OM;
+
+my %opt = (
+	portable	=> undef,	# NOT 0 because Namaste.pm does
+		# if defined(...) to check if $portable_default applies
+	help		=> 0,
+	man		=> 0,
+	version		=> 0,
+	directory	=> 0,
+	format		=> 0,
+	verbose		=> 0,
+);
+
+# main
+{
+	GetOptions(\%opt,
+		'portable',
+		'help|?',
+		'man',
+		'version',
+		'format|m=s',
+		'directory|d=s',
+		'verbose|v',
+	) or pod2usage(1);
+
+	help(), exit(0)
+		if $opt{help};
+	pod2usage(-exitstatus => 0, -verbose => 2)
+		if $opt{man};
+	print "$VERSION\n" and exit(0)
+		if $opt{version};
+	help(), exit(1)
+		unless @ARGV > 0;
+
+	$opt{listformats} and
+		print(join("\n", File::OM::listformats()), "\n"),
+		exit 0;
+
+	my $format = $opt{format} || 'Plain';	# given format name
+	my %om_opt = (
+		outhandle	=> *STDOUT,
+	);
+	my $om = File::OM->new($format, \%om_opt) or
+		pod2usage("$0: unknown format: $format");
+
+	my $dir = $opt{directory} || "";
+
+	my $cmd = lc shift @ARGV;
+	my ($num, $fname, $fvalue, $msg, @nnv);
+	my $delete = 0;
+
+	if ($cmd eq "add") {	# easiest, since don't need to check existence
+		@ARGV > 1 or
+			pod2usage("$cmd: needs at least two arguments");
+		($msg = nam_add($dir, $opt{portable}, @ARGV)) and
+			die $msg;
+		exit 0;
+	}
+	elsif (($delete = $cmd eq "rm") || $cmd eq "set") {
+
+		pod2usage("$cmd what? (more arguments needed)")
+			if (@ARGV == 0);
+
+		# same args for command as for nam_get()
+		@nnv = ($delete
+			? nam_get($dir, @ARGV)		# delete all args or
+			: nam_get($dir, $ARGV[0]));	# just 1st for "set"
+		# @nnv may contain multiple tags (even for "set") to delete
+
+		while (defined($num = shift @nnv)) {
+			$fname = shift @nnv;
+			$fvalue = shift @nnv;
+			unlink($fname) or
+				print STDERR "$fname: $!";
+		}
+		$delete and		exit 0;		# since we're done
+		# "set" case
+		($msg = nam_add($dir, $opt{portable}, @ARGV)) and
+			die $msg;
+		exit 0;
+	}
+	elsif (($delete = $cmd eq "rmall") || $cmd eq "get") {
+
+		# same args for command as for nam_get()
+		@nnv = nam_get($dir, @ARGV);
+		while (defined($num = shift @nnv)) {
+			$fname = shift @nnv;
+			$fvalue = shift @nnv;
+			if ($delete) {		# we're doing a delete
+				unlink($fname) or
+					print STDERR "$fname: $!";
+				next;
+			}
+			$om->elem(File::Namaste::num2label($num), $fvalue);
+			$opt{verbose} and
+				$om->elem("file", $fname, '#');
+		}
+		exit 0;
+	}
+	elsif ($cmd eq "elide") {
+		$om->elem('elide', nam_elide(@ARGV));
+		exit 0;
+	}
+	pod2usage("$cmd: unrecognized command");
+}
+
+# One of the main benefits of this help text is to make it easy to find
+# out what the numeric assignments are.  Absent a command for tracking
+# the current assignments, it is a priority to track them here.
+sub help {
+	print << 'EOI';
+
+nam - manage Namaste (NAMe-AS-TExt) tag files for describing directories
+
+Usage:
+     nam [options] set|add N string [[maxlen] ellipsis]
+     nam [options] get|rm [N ...]
+     nam [options] rmall
+     nam elide string [[maxlen] ellipsis]
+
+A Namaste tag file holds a single metadata value and its filename is derived
+from that value.  N specifies Dublin Core Kernel metadata elements, roughly:
+
+     0   dir_type   directory type (e.g., bagit_0.97)
+     1    who       creator (or contributor or publisher)
+     2    what      title (human-oriented name or identifier)
+     3    when      date of creation or collection of content
+     4    where     machine-oriented identifier
+
+Commands (set, add, get, rm) act as you would expect, but "rmall" removes
+all tags and "elide" just returns an elided string, operating on no files.
+Use the "-d directory" option for tag files not in the current directory.
+See "nam --man" for full documentation.
+
+EOI
+	return 1;
+}
+
+__END__
+
+=pod
+
+=for roff
+.nr PS 12p
+.nr VS 14.4p
+
+=head1 NAME
+
+nam - command to set, get, and remove Namaste tag files
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<nam> [I<options>] B<add> I<N> I<string> [[I<maxlen>] I<ellipsis>]
+
+=item B<nam> [I<options>] B<set> I<N> I<string> [[I<maxlen>] I<ellipsis>]
+
+=item B<nam> [I<options>] B<get> [I<N> ...]
+
+=item B<nam> [I<options>] B<rm> [I<N> ...]
+
+=item B<nam> [I<options>] B<rmall>
+
+=item B<nam> [I<options>] B<elide> I<string> [[I<maxlen>] I<ellipsis>]
+
+=back
+
+=head1 DESCRIPTION
+
+The B<nam> command manages Namaste (Name-as-text) tag files, which are
+useful for describing directories.  A Namaste tag file holds a single
+metadata string and its name is a filesystem-safe derivation of that
+string.  The name of the file consists of an integer I<N>, an '=', and
+the derivative string.
+
+For example, consider a large collection of publically downloadable
+digital objects, each one in a directory that looks something like
+
+  $ ls
+  m_abbyy.gz  m_djvu.txt   m_jp2.zip         m_meta.xml
+  m_bw.pdf    m_djvu.xml   m_marc.xml        m_orig_jp2.tar
+  m_dc.xml    m_files.xml  m_meta.mrc        m.pdf
+  m.djvu      m.gif        m_metasource.xml  
+
+The directory layout reveals little to someone not already familiar with
+this kind of digital object.  But if Namaste tags were added, a visitor
+who asks for a directory listing could be greeted by this instead:
+
+  $ ls
+  0=oca_book_1.1          m_abbyy.gz  m_djvu.xml   m_meta.mrc
+  1=Carmichael, Orton H.  m_bw.pdf    m_files.xml  m_metasource.xml
+  2=Lincoln's Gettysbu..  m_dc.xml    m.gif        m_meta.xml
+  3=1917                  m.djvu      m_jp2.zip    m_orig_jp2.tar
+  4=ark:=13960=t50g49p5m  m_djvu.txt  m_marc.xml   m.pdf
+
+In the first column of the listing, the filenames themselves contain
+abbreviated metadata designed to permit a human being (e.g., an end user
+or a system administrator) with no training in this collection or in
+bibliographic description to quickly form a mental picture and to start a
+discussion about it (e.g., when using the content for schoolroom
+instruction or when notifying the collection manager of a system
+exception).
+
+The integers correspond to simple metadata, mostly as per Dublin Core
+Kernel and roughly as follows:
+
+  0   dir_type   directory type (e.g., bagit_0.97)
+  1    who       creator (or contributor or publisher)
+  2    what      title (human-oriented name or identifier)
+  3    when      date of creation or collection of content
+  4    where     machine-oriented identifier
+
+Setting the above Namaste tags was done with
+
+  $ nam set 0 'oca_book_1.1' 20
+  $ nam set 1 'Carmichael, Orton H.' 20
+  $ nam set 2 "Lincoln's Gettysburg address" 20
+  $ nam set 3 '1917' 20
+  $ nam set 4 'ark:/13960/t50g49p5m' 20
+
+Tranforming the given metadata values into tag filenames may involve
+converting unsafe characters (e.g., '/' becomes '=') and truncation.
+The optional "20" on the end of each command above specifies the maximum
+width of a created tag name.  Any filename that would be longer will be
+truncated and the missing part replaced by an ellipsis, which could have
+been given as a final optional argument.  The maximum length (default 16)
+can be adjusted according to the desired "greeting" experience, or given
+as 0 to prevent truncation.  For example, changing the "20" to "16m" in
+all the above settings would leave more display space for proper files.
+
+  $ ls
+  0=oca_book_1.1      m_abbyy.gz  m_djvu.xml   m_meta.mrc
+  1=Carmic...rton H.  m_bw.pdf    m_files.xml  m_metasource.xml
+  2=Lincol...address  m_dc.xml    m.gif        m_meta.xml
+  3=1917              m.djvu      m_jp2.zip    m_orig_jp2.tar
+  4=ark:=1...0g49p5m  m_djvu.txt  m_marc.xml   m.pdf
+  
+In this case, the "m" in "16m" specifies truncation in the middle of the
+string, as opposed to "s" (start) or "e" (end, the default).  The
+ellipsis normally defaults to "..", but for middle truncation it defaults
+to "...".  Tags in the same directory can be created with different
+truncation policies.  For example, some values carry more specific or
+more interesting information towards the end of the string, as with many
+identifiers, rather than the beginning.  If tag 4 above had been created
+with "16s" truncation, the last line of the listing would look like
+
+  4=..3960=t50g49p5m  m_djvu.txt  m_marc.xml   m.pdf
+
+Additional tags corresponding to an existing tag number can be created
+with B<add> (but all tags for a given number are replaced with B<set>):
+
+  $ nam add 1 Lennon
+  $ nam add 1 McCartney
+
+The verbatim metadata value (unabbreviated and not transformed to comply
+with filesystem naming rules) is stored as the content of the
+corresponding file, where it can be conveniently retrieved by tag number,
+
+  $ nam get 2
+  Lincoln's Gettysburg address
+
+or all at once with
+
+  $ nam get
+  oca_book_1.1
+  Carmichael, Orton H.
+  Lincoln's Gettysburg address
+  1917
+  ark:/13960/t50g49p5m
+
+A fully labeled record can be retrieved by specifying a format such as
+JSON, XML, or ANVL:
+
+  $ name --format anvl get > Namaste.txt
+  $ cat Namaste.txt
+  dir_type: oca_book_1.1
+  who: Carmichael, Orton H.
+  what: Lincoln's Gettysburg address
+  when: 1917
+  where: ark:/13960/t50g49p5m
+
+Tag files can always be removed with L<rm(1)>, but it is much more
+convenient to use B<nam> with a tag number, as in,
+
+  $ nam rm 3
+
+or to remove them all at once with
+
+  $ nam rmall
+
+Use B<elide> for raw access to the same general-purpose string ellision
+functionality as described above, but without any filesystem-safe
+character transformations.  It involves no interaction with the
+filesystem at all.
+
+  $ nam elide 'The question is this: why and/or how?' 24s '**'
+  ** this: why and/or how?
+
+=head2 Portability
+
+In creating filesystem-safe derivations of metadata values, lossy
+transformations may occur.  Since the primary beneficiaries of tag
+filenames are human, the default mapping for Unix systems tries to
+convert as few characters as possible.  It converts '/' to '=', runs of
+newlines and other whitespace to a single SPACE, and control characters
+to '?'.
+
+The default mapping for Windows systems is more lossy but more portable
+than that for Unix.  Filenames created with it will remain unchanged when
+transferred between Windows and Unix systems.  In addition to the above
+mappings, it converts the characters
+
+    " * : < > ? \ |
+    
+to '.' (period).  To request the more portable mapping explicitly, use
+the B<--portable> option.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-d> I<directory>, B<--directory> I<directory>
+
+Use I<directory> instead of the current directory to look for tag files.
+
+=item B<-m> I<format>, B<--format> I<format>
+
+Output in the given I<format>, currently one of "ANVL", "XML",
+"JSON", or "Plain" (default).
+
+=item B<--portable>
+
+Request the most portable transformation of metadata values into tag
+filenames.
+
+=item B<-v>, B<--verbose>
+
+Output ancillary information (the tag filename itself) as a comment.
+
+=item B<-h>, B<--help>
+
+Print extended help documentation.
+
+=item B<--man>
+
+Print full documentation.
+
+=item B<--version>
+
+Print the current version number and exit.
+
+=back
+
+=head1 SEE ALSO
+
+Directory Description with Namaste Tags
+    L<https://confluence.ucop.edu/display/Curation/Namaste>
+
+Dublin Core Kernel Metadata
+    L<https://confluence.ucop.edu/display/Curation/ERC>
+
+L<rm(1)>
+
+=head1 AUTHOR
+
+John Kunze I<jak at ucop dot edu>
+
+=head1 COPYRIGHT
+
+Copyright 2009-2010 UC Regents.  Open source BSD license.
+
+=begin CPAN
+
+=head1 README
+
+Manage Namaste tag files.
+
+=head1 SCRIPT CATEGORIES
+
+=end CPAN
+
+=cut
+
+#  LocalWords:  LocalWords Getopt GetOptions ARGV 

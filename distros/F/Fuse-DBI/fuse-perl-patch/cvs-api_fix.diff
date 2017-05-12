@@ -1,0 +1,40 @@
+Index: Fuse.pm
+===================================================================
+RCS file: /cvsroot/fuse/perl/Fuse.xs,v
+retrieving revision 1.1.1.1
+diff -u -w -r1.1.1.1 Fuse.xs
+--- Fuse.xs	11 Nov 2004 15:44:16 -0000	1.1.1.1
++++ Fuse.xs	16 Nov 2004 15:41:43 -0000
+@@ -2,7 +2,7 @@
+ #include "perl.h"
+ #include "XSUB.h"
+ 
+-#include <fuse.h>
++#include <fuse/fuse.h>
+ 
+ #undef DEBUGf
+ #if 0
+@@ -101,7 +101,7 @@
+ 	if(prv) {
+ 		rv = POPi;
+ 		while(--prv)
+-			dirfil(dirh,POPp,0);
++			dirfil(dirh,POPp,0,0);
+ 	} else {
+ 		fprintf(stderr,"getdir() handler returned nothing!\n");
+ 		rv = -ENOSYS;
+Index: Makefile.PL
+===================================================================
+RCS file: /cvsroot/fuse/perl/Makefile.PL,v
+retrieving revision 1.1.1.1
+diff -u -w -r1.1.1.1 Makefile.PL
+--- Makefile.PL	11 Nov 2004 15:44:16 -0000	1.1.1.1
++++ Makefile.PL	16 Nov 2004 15:41:43 -0000
+@@ -13,5 +13,6 @@
+ 	# Insert -I. if you add *.h files later:
+     'INC'		=> '-I../include', # e.g., '-I/usr/include/other'
+ 	# Un-comment this if you add C files to link with later:
+-    'OBJECT'		=> 'Fuse.o ../lib/.libs/libfuse.a -lpthread', # link all the C files too
++#    'OBJECT'		=> 'Fuse.o ../lib/.libs/libfuse.a -lpthread', # link all the C files too
++    'OBJECT'		=> 'Fuse.o -lfuse -lpthread', # link all the C files too
+ );

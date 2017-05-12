@@ -1,0 +1,11 @@
+File::Coda
+==========
+
+File::Coda closes standard output, ensuring that any error is reported
+
+Usage is simple.  Just insert this line near the top of your script:
+
+	use File::Coda;
+
+Then, if your script writes to stdout, you can rely on it exiting
+nonzero with a proper diagnostic if writing to standard output fails.

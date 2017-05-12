@@ -1,0 +1,34 @@
+DESCRIPTION
+
+  File::Find::Rule::XPath - rule to match on XPath expressions
+
+  This module extends File::Find::Rule to provide the ability to locate
+  XML files which match a given XPath expression.
+
+PREREQUISITES
+
+  Requires either XML::LibXML or XML::XPath
+
+
+BUILDING/INSTALLING
+
+  Once the archive is unpacked, use these commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+
+RELEASE HISTORY
+
+  Version 0.03 fixes an incompatibility with recent versions of File::Spec
+
+
+COPYRIGHT
+
+  Copyright 2003 Grant McLean <grantm@cpan.org>
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+

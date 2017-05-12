@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Form-Sensible-Reflector-MySQL
+version:            0.7
+abstract:           Create a Form::Sensible object from a MySQL schema
+author:
+    - Lee Goddard <lgoddard@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DateTime::Format::MySQL:  0.04
+    DBD::mysql:           1
+    DBI:                  1
+    Form::Sensible:       0.20012
+    Form::Sensible::Reflector:  0
+    Math::BigInt:         0.1
+    Test::Most:           0.23
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

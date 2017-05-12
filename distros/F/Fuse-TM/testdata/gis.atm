@@ -1,0 +1,534 @@
+#
+# GIS
+# Robert Barta
+#
+
+gis
+bn @long: Geographic Information System
+bn: GIS
+
+(is-subclass-of)
+subclass: gis
+superclass: system
+
+#--
+
+latlon (company)
+bn: lat/lon
+bn @long: gesellschaft fuer raumbezogene informationssystem mbH
+oc (homepage): http://www.lat-lon.de/
+in: spin-off of Department of Geography of Bonn University
+oc (factsheet): http://www.lat-lon.de/latlon/latlon/produktblaetter/deegree_igeo3d_en.pdf
+
+(promotes)
+topic: gis
+promoter: latlon
+
+(is-member-of)
+member: latlon
+group: ogc
+
+#--
+
+sensorML (xml-application standard)
+bn: SensorML
+oc (wikipedia): http://en.wikipedia.org/wiki/SensorML
+in: descriptions of sensor systems -- measurement process
+in: discovery -- geolocation -- processing of sensor observations -- sensor programming -- sensor alert subscription
+in (motivation): Plug-N-Play, auto-configuring, and automous sensor networks 
+in (history): 1998 CEOS -- 2000 OGC
+oc: http://vast.nsstc.uah.edu/SensorML/
+in (concepts): <<<
+- sensor includes detectors
+- detector defines sampling
+- process method defines algorithm and interface (or references it)
+- process chain connects subprocesses with inputs and outputs
+- process model with atomic blocks
+- system is composite physical group of components
+<<<
+oc (overview): http://vast.uah.edu/SensorML/home.html
+oc (overview): http://vast.uah.edu/SensorML/
+in (perpetrators): Mike Botts or Alex Robin
+oc (homepage): http://www.opengeospatial.org/standards/sensorml
+oc (schema-definitions): http://schemas.opengis.net/SCHEMAS_OPENGIS_NET.zip
+oc (specification): http://portal.opengeospatial.org/files/?artifact_id=21273
+
+(is-governed-by)
+governor: ogc
+object: sensorML
+
+ogc-sos (interface-specification)
+bn: SOS
+bn @long: OGC Sensor Observation Services
+in: cascadable SOSes
+
+(is-governed-by)
+governor: ogc
+object: ogc-sos
+
+ogc-sps (interface-specification)
+bn: SPS
+bn @long: OGC Sensor Planning Services
+in: "is measurement feasible?"
+
+(is-governed-by)
+governor: ogc
+object: ogc-sps
+
+ogc-sas (interface-specification)
+bn: SAS
+bn @long: OGC Sensor Alert Services
+in (observation): some overlap with WS-Notification
+in (objectives): allow applications to subscribe to certain event patterns
+in: last mile mode
+in (open-issue): limited policy model how alerts should persist or escalate -- how aggregate alerts should be triggered
+
+
+(is-governed-by)
+governor: ogc
+object: ogc-sas
+
+ogc-swe (interface-specification)
+bn: SWE
+bn @long: OGC Sensor Web Enablement
+oc (overview): http://portal.opengeospatial.org/files/?artifact_id=15540
+
+(is-governed-by)
+governor: ogc
+object: ogc-swe
+
+#--
+
+geoserver (software)
+bn: GeoServer
+oc (homepage): http://geoserver.org/
+in (objectives): connects information to the Geospatial Web
+in (features): <<<
+- open standards (OGC) compliant
+- transactional, shared editing of features
+- publishing of maps and images
+- produce JPEG, PNG, SVG, KML/KMZ, GML, PDF, Shapefiles
+- publishing of feature data
+<<<
+oc (download): http://docs.codehaus.org/display/GEOS/Latest
+oc (quickstart): http://docs.codehaus.org/display/GEOSDOC/Quickstart
+oc (user-guide): http://docs.codehaus.org/display/GEOSDOC/User
+oc (blog): http://blog.geoserver.org
+oc (faq): http://docs.codehaus.org/display/GEOSDOC/6+FAQ
+oc (overview): http://docs.codehaus.org/display/GEOS/What+is+Geoserver
+oc (overview): http://www.terrapages.com/LISAsoft/SupportedProducts/GeoServer.html
+oc (screenshots): http://docs.codehaus.org/display/GEOS/Gallery
+oc (developer-hint): http://docs.codehaus.org/display/GEOSDOC/Google+Maps
+in (deployment): as WAR file into Java application servers
+oc (presentation): http://www.foss4g2007.org/presentations/viewattachment.php?attachment_id=64
+oc (source-code): http://freshmeat.net/projects/geoserver/
+oc (demo): http://sigma.openplans.org/
+oc (tutorial): http://docs.codehaus.org/display/MAP/Building+A+Web+App
+oc (wikipedia): http://en.wikipedia.org/wiki/GeoServer
+oc (history): http://en.wikipedia.org/wiki/GeoServer#History
+oc (presentation): http://www.youtube.com/watch?v=Ie-696-o1xs
+
+(competes-with)
+competitor: geoserver mapserver
+market: geographic-information-systems
+
+## http://www.fernandoquadro.com.br/html/2007/07/19/mapserver-versus-geoserver-english-version/
+## http://www.foss4g2007.org/presentations/view.php?abstract_id=120
+
+(complies-to)
+system: geoserver
+convention: wsf-t
+
+(complies-to)
+system: geoserver
+convention: wms
+
+(is-based-on)
+basis: geotools
+structure: geoserver
+
+geotools (software)
+bn: GeoTools
+oc (homepage): http://www.geotools.org/
+in: open source Java GIS toolkit
+in: implements OGC specifications
+oc (screenshots): http://geotools.codehaus.org/Screenshots
+oc (user-guide): http://docs.codehaus.org/display/GEOTDOC/Home
+oc (download): http://geotools.codehaus.org/Downloads
+
+(is-member)
+member: geotools
+group: open-source-geospatial-foundation
+
+open-source-geospatial-foundation (foundation)
+bn: Open Source Geospatial Foundation
+oc (homepage): http://www.osgeo.org/
+
+#--
+
+geoapi (project)
+bn: GeoAPI
+in: capturing OGC as Java interfaces
+
+#--
+
+wsf-t (standard)
+
+(is-variant-of)
+variant: wsf-t wsf
+
+(is-governed-by)
+governor: ogc
+object: wsf-t
+
+wsf (standard)
+bn: Web Feature Service Interface Standard
+in (addresses-problem): interface allowing requests for geographical features across a web platform
+in: uses GML as the default transport of geographic features -- shapefiles alternatively
+oc (wikipedia): http://en.wikipedia.org/wiki/Web_Feature_Service
+in: discover, querying and retrieval of features -- transactional variant (WFS-T) allows for creation, deletion and update
+oc: http://docs.codehaus.org/display/GEOSDOC/WFS
+in: non-RESTful RPC web service
+
+(is-governed-by)
+governor: ogc
+object: wsf
+
+ogc (consortium)
+bn: Open Geospatial Consortium
+oc (homepage): http://www.opengeospatial.org/
+
+(promotes)
+topic: gis
+promoter: latlon
+
+
+arcs (research-center)
+oc (homepage): http://www.arcs.ac.at/
+
+(is-member-of)
+member: arcs
+group: ogc
+
+#--
+
+(conducts)
+program: ogc-interop-program
+conductor: ogc
+
+ogc-interop-program
+bn: OGC Interoperability Program
+oc (initiatives): http://www.opengeospatial.org/projects/initiatives/active
+oc (initiatives): http://www.opengeospatial.org/projects/initiatives/past
+
+(defined-by)
+whole: ogc-interop-program
+part: ogc-interop-program-test-bed ogc-interop-program-pilot-project ogc-interop-program-interop-support ogc-interop-program-interop-experiments ogc-interop-program-network
+
+ogc-interop-program-test-bed
+bn: OGC Test beds
+
+ogc-interop-program-pilot-project
+bn: OGC Pilot Projects
+
+ogc-interop-program-interop-support
+bn: OGC Interoperability Support Services
+
+ogc-interop-program-interop-experiments
+bn: OGC Interoperability Experiments
+
+ogc-interop-program-network
+bn: OGC Network
+
+(is-part-of)
+part: ogc-gswie
+whole: ogc-interop-program
+
+ogc-gswie (activity)
+bn: Geospatial Semantic Web Interoperability Experiment
+oc: http://www.opengeospatial.org/projects/initiatives/gswie
+in: Joshue Lieberman
+in: Geospatial Semantic Web -- add semantic query capability to WFS -- ontology for geospatial intelligence
+in: WFS/FE interfaces based on OWL-S specs -- WFS/FE service interfaces which can accept query requests in a semantic query language -- Tools for easily generating semantically expressed geospatial information
+
+#--
+
+n-52-north (company)
+oc (homepage): http://52north.org/
+in (blurb): promote the conception, development and application of free open source geo-software for research, education, training and practical use
+
+(is-member-of)
+member: n-52-north
+group: ogc
+
+agile (consortium)
+bn: AGILE
+bn@long: Association of Geographic Information Laboratories for Europe
+oc (homepage): http://www.agile-online.org
+
+(is-member-of)
+member: n-52-north
+group: agile
+
+#--
+
+
+opengis-gml (xml-application map-transport-encoding)
+bn: OpenGIS GML Simple Features Profile
+oc: http://portal.opengeospatial.org/files/?artifact_id=15201
+oc (wikipedia): http://en.wikipedia.org/wiki/Geography_Markup_Language
+in: basic geometric 'primitives': points, lines, polygons, etc. -- curves, surfaces, multi-dimensions (time, elevation, multi-band imagery)
+
+shapefile (map-transport-encoding)
+bn: ESRI Shapefile
+oc (wikipedia): http://en.wikipedia.org/wiki/Shapefile
+in: geospatial vector data format
+in (history): has been developed by ESRI
+in: describe geometries: points, polylines, and polygons -- together with projection informatio
+oc (specification): http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
+oc (tutorial): http://www.esri.com/news/arcuser/0401/topo.html
+
+(is-developed-by)
+developer: esri
+product: shapefile
+
+esri (organisation)
+bn: Environmental Systems Research Institute
+oc (homepage): http://www.esri.com
+
+(complies-to)
+system: ogr-library
+convention: shapefile
+
+
+wms (standard)
+bn: WMS
+oc (homepage): http://docs.codehaus.org/display/GEOSDOC/WMS
+oc (wikipedia): http://en.wikipedia.org/wiki/Web_Map_Service
+oc: http://portal.opengeospatial.org/files/?artifact_id=14416
+bn @long: Web Map Service
+in: Displays geographic data as raster images
+in: generally rendered in PNG, GIF or JPEG, or SVG
+in: service-level metadata -- map with geographic parameters -- optionally metadata about features
+
+(complies-to)
+system: google-earth-client
+convention: wms
+
+google-earth-client (software)
+bn: Google Earth
+oc (wikipedia): http://en.wikipedia.org/wiki/Google_Earth
+
+(complies-to)
+system: NASA-world-wind
+convention: wms
+
+NASA-world-wind (software)
+bn: NASA World Wind
+oc (wikipedia): http://en.wikipedia.org/wiki/NASA_World_Wind
+
+(complies-to)
+system: mapserver
+convention: wms
+
+
+(is-governed-by)
+governor: ogc
+object: wsm
+
+wcs (standard)
+bn @long: Web Coverage Service
+bn: WCS
+
+
+
+gml (markup-language)
+bn: GML
+bn @long: Geography Markup Language
+in: XML application that describes geographic data
+
+grass (software)
+bn: GRASS
+oc (download): http://grass.itc.it/download/index.php
+oc (debian): http://debian.gfoss.it/preview/
+
+#-- PostGIS
+
+postgis (software)
+bn: PostGIS
+oc (homepage): http://www.postgis.org/
+oc: http://postgis.refractions.net/
+oc (wikipedia): http://en.wikipedia.org/wiki/PostGIS
+oc (documentation): http://postgis.refractions.net/docs/
+oc (description): can store GIS objects into PostgreSQL -- supports 'spatial queries' -- points, polygons, ...
+
+(extends)
+extension: postgis
+system: postgresql
+
+postgresql (relational-database-software)
+bn: PostgreSQL
+oc (homepage): http://www.postgresql.com
+in (description): object-relational database
+
+(complies-to)
+convention: opengis-simple-feature-specification
+system: postgis
+
+opengis-simple-feature-specification (standard)
+bn: Simple Features Specification for SQL
+oc: http://www.opengis.org/docs/99-049.pdf
+
+(is-developed-by)
+developer: refractions-research
+product: postgis
+
+refractions-research (company)
+bn: Refractions Research Inc
+
+(has-agenda)
+agenda: consulting-business-model
+organisation: refractions-research
+
+(is-located-in)
+object: refractions-research
+region: canada
+
+canada (country)
+bn: Canada
+
+#--
+
+tilecache (software)
+oc (homepage): http://www.tilecache.org/
+bn: TileCache
+in: pre-tiling of map pages as static images which enables fast, scalable mapping services
+oc (tutorial): http://docs.codehaus.org/display/GEOSDOC/TileCache+Tutorial
+in: MetaCarta
+in (history): discussions the Open Source Geospatial community had at the FOSS4G 2006 conference
+in (objectives): clients to work against 'tiles' which they can request in a batch
+oc: http://wiki.osgeo.org/index.php/WMS_Tiling_Client_Recommendation
+oc: http://wiki.osgeo.org/index.php/Tile_Map_Service_Specification
+in: developed in Python -- and sits in front of any WMS
+
+(complies-to)
+system: tilecache
+convention: wms-tiling-recommendation
+
+wms-tiling-recommendation
+bn: WMS Tiling Client Recommendation
+in: extensions to and constraints on the OGC WMS 1.1.1 
+oc: http://wiki.osgeo.org/index.php/WMS_Tiling_Client_Recommendation
+
+(is-compatible-with)
+system: tilecache
+system: openlayers
+
+#--
+
+ieee-1451 (standard)
+bn: IEEE 1451
+in: connecting smart transducers 
+oc (homepage): http://ieee1451.nist.gov/
+oc (introduction): http://www.smartsensorsystems.com/What_does_IEEE_1451_do.htm
+oc (introduction): http://www.telemonitor.com/ieee1451.html
+oc (introduction): http://ieee1451.nist.gov/introduction.htm
+oc (motivation): http://www.smartsensorsystems.com/Why_IEEE_1451.htm
+oc (faq): http://standards.ieee.org/regauth/1451/FAQs.html
+oc: http://www.sensorsportal.com/HTML/standard_0.htm
+
+
+(is-governed-by)
+governor: ieee
+object: ieee-1451
+
+
+
+
+%cancel
+
+###############################################
+
+ISO/TC211 
+
+MapBuilder 
+
+
+
+
+
+openlayers
+http://www.openlayers.org
+http://www.terrapages.com/LISAsoft/SupportedProducts/OpenLayers.html
+pure JavaScript
+API to incorporate maps from a variety of sources into a webpag
+
+
+
+Google Earth
+http://earth.google.com
+
+UDig
+http://udig.refractions.net
+
+GVSig
+http://www.gvsig.gva.es
+
+http://map-s.de/
+
+
+
+ogc
+
+%cancel
+
+PHP Mapscript for Mapserver, whic
+
+
+
+mapserver isa software
+! MapServer
+homepage: http://mapserver.gis.umn.edu/
+description: for building spatially-enabled Internet applications
+tutorial: http://biometry.gis.umn.edu/tutorial/sections.html
+  is-used-for cartographic-map-web-services
+  supports-technology gdal
+  has-licence open-source
+in (history): developed at the University of Minnesota
+in: scripting environment that supports many popular languages including PHP, Python, Perl, C# and Java
+
+
+gdal isa software-library
+! GDAL
+wikipedia: http://en.wikipedia.org/wiki/GDAL
+description: library for raster geospatial data formats
+homepage: http://www.gdal.org
+api-bindings @ perl: http://search.cpan.org/~ajolma/Geo-GDAL-0.20/lib/Geo/GDAL.pod
+tutorial: http://www.gdal.org/gdal_tutorial.html
+data-model: http://www.gdal.org/gdal_datamodel.html
+faq: http://trac.osgeo.org/gdal/wiki/FAQGeneral
+supported-format-list: http://www.gdal.org/formats_list.html
+  has-licence open-source
+
+
+grass isa software
+! Geographic Resources Analysis Support System
+! @ acronym : GRASS
+homepage: http://grass.itc.it/
+tutorial: http://skagit.meas.ncsu.edu/~helena/grasswork/grassclass/grass5tutor02/
+wiki: http://grass.gdf-hannover.de/wiki/Main_Page
+tutorial @de: http://www.grass-verein.de/grasskurs/
+tutorial: http://www.isat.jmu.edu/env/edss/grass/start.htm
+tutorial: http://www.ing.unitn.it/~grass/docs/tutorial/english/index_en.htm
+tutorial @de: http://grass.gdf-hannover.de/wiki/GRASS_6_Tutorial
+  is-used-for cartographic-map-visualisation
+  supports-technology gdal
+  has-licence open-source
+
+cartogram isa map
+wikipedia: http://en.wikipedia.org/wiki/Cartogram
+
+-- 
+And then he said: "You should read my blog." http://kill.devc.at/
+
+

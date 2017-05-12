@@ -1,0 +1,15 @@
+#fsdb experiment key
+ufs_mab_sys1	ufs_mab_sys1-x
+ufs_mab_sys2	ufs_mab_sys2-x
+ufs_mab_sys3	ufs_mab_sys3-x
+ufs_rcp_real1	ufs_rcp_real1-x
+ufs_rcp_real2	ufs_rcp_real2-x
+ufs_rcp_real3	ufs_rcp_real3-x
+# dbmapreduce: test_parallelism backlog 1, max 100
+# dbmapreduce: test_parallelism backlog 2, max 100
+# dbmapreduce: test_parallelism backlog 3, max 100
+# dbmapreduce: test_parallelism backlog 4, max 100
+# dbmapreduce: test_parallelism backlog 5, max 100
+# test trailing comment
+# dbmapreduce: test_parallelism backlog 6, max 100
+#   | dbmapreduce -S --test-parallelism --prepend-key --parallelism=100 -K -k experiment -- perl TEST/dbmapreduce_limited_parallelism.pl

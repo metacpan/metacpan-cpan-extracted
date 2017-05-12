@@ -1,0 +1,8 @@
+Version 0.11
+    * added no_archive option
+
+Version 0.09
+    * ability to configure regular expressions for the archive files
+      and directories in the case where you only use the rotate()
+      method, e.g., on directories or files not created by this module
+    * 

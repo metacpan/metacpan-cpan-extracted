@@ -1,0 +1,60 @@
+Finance-Currency-Convert-BChile
+
+Currency conversion module between Chilean Pesos (CLP) and USA
+Dollars (USD). The conversion rate is obtained from the official
+source in Chile: the "Banco Central de Chile" (Chilean Central
+Bank), from their webpage http://www.bcentral.cl
+
+It depends on modules LWP::UserAgent and HTML::TokeParser.
+
+Synopsis:
+
+   use Finance::Currency::Convert::BChile;
+
+   my $conversor = Finance::Currency::Convert::BChile->new();
+
+   # Get fresh data from bcentral site
+   $conversor->update;
+
+   print $conversor->CLP2USD(20170);
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Finance::Currency::Convert::BChile
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-Currency-Convert-BChile
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Finance-Currency-Convert-BChile
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Finance-Currency-Convert-BChile
+
+    Search CPAN
+        http://search.cpan.org/dist/Finance-Currency-Convert-BChile
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Hugo Salgado
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

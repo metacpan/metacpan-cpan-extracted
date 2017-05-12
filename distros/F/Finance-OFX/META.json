@@ -1,0 +1,74 @@
+{
+   "abstract" : "An OFX client implementation.",
+   "author" : [
+      "Brandon Fosdick <bfoz@bfoz.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-OFX",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::GUID" : 0,
+            "HTML::Parser" : 0,
+            "HTTP::Date" : 0,
+            "LWP" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Finance::OFX" : {
+         "file" : "lib/Finance/OFX.pm",
+         "version" : "2"
+      },
+      "Finance::OFX::Account" : {
+         "file" : "lib/Finance/OFX/Account.pm",
+         "version" : "2"
+      },
+      "Finance::OFX::Institution" : {
+         "file" : "lib/Finance/OFX/Institution.pm",
+         "version" : "2"
+      },
+      "Finance::OFX::Parse" : {
+         "file" : "lib/Finance/OFX/Parse.pm",
+         "version" : "2"
+      },
+      "Finance::OFX::Response" : {
+         "file" : "lib/Finance/OFX/Response.pm",
+         "version" : "2"
+      },
+      "Finance::OFX::Tree" : {
+         "file" : "lib/Finance/OFX/Tree.pm",
+         "version" : "2"
+      },
+      "Finance::OFX::UserAgent" : {
+         "file" : "lib/Finance/OFX/UserAgent.pm",
+         "version" : "2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ]
+   },
+   "version" : "2"
+}

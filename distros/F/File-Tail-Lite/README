@@ -1,0 +1,28 @@
+File::Tail::Lite version 0.02
+======================
+
+This module is made for seekable 'tailf' implementation.
+File::Tail is good, but it can not seek when reading started,so we may miss contents if programe crash.
+This module slove the problem.
+And it is quite simple and easy to use.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2014 Chen Gang.
+This library is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+

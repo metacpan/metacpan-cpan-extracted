@@ -1,0 +1,11 @@
+ * Work with Test::Builder
+ * Do not force Test::Builder
+ * Forking should just plain work
+ * In a verbose handler error diagnostics should be with their failed test.
+  * Errors should still be in stderr in a non-verbose handler
+ * Desired test dist's should be loaded all at once (Test::More, etc.)
+ * Subclass Fennec.pm to configure things, then load that subclass in all tests
+ * Test groups (Test-Workflow)
+ * Case workflow
+ * SPEC workflow
+ * Easy mocking (Object-Quick)

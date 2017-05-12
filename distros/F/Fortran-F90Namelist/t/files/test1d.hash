@@ -1,0 +1,22 @@
+# test1d.hash                             -*-cperl-*-
+#
+# Name and hashref for the namelist in test1d.nml
+#
+$name = "nlist";
+$hashref =
+  {
+   'string_var'   => { value => [ 'A simple string' ],
+		       stype => 'single-quote string',    type => 1 },
+   'int_var'      => { value => [ '14' ],
+		       stype => 'integer',                type => 4 },
+   'real_var'     => { value => [ '-0.5' ],
+		       stype => 'unspecified float',      type => 5 },
+   'double_var'   => { value => [ '1.D4' ],
+		       stype => 'double precision float', type => 7 },
+   'double_array' => { value => [ '1.20', '.272E1', '314.D-2', '24' ],
+		       stype => 'double precision float', type => 7 },
+   'real_array'   => { value => [ '0', '1', '2', '3.e0' ],
+		       stype => 'single precision float', type => 6 }
+  };
+
+$nslots = (keys %$hashref)+0.;

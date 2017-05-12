@@ -1,0 +1,10 @@
+Revision history for Perl module FSSM::SOAPClient
+
+0.012 Thu Jan 21 21:45:00 2010
+    - default Build.PL response for automated tests
+0.011 Tue Jan 19 18:52:00 2010
+    - pod spiff
+0.01 Tue Jan 19 12:08:53 2010
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

@@ -1,0 +1,74 @@
+Revision history for File-TypeCategories
+
+0.06   2016-11-20
+        Updating for release of version 0.06
+        Skipping processing dir if it doesn't exist (Ivan Wills)
+        Added eval to prodect getting dist_dir during tests (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Removed default should still be false (Ivan Wills)
+        Added more configs (Ivan Wills)
+        Changing default to undef as some systems seem to not like 0 (Ivan Wills)
+        Updated license date (Ivan Wills)
+
+0.05   2015-08-04
+        Updating for release of version 0.05
+        Removed creation of makefile (Ivan Wills)
+
+0.04   2015-07-20
+        Updating for release of version 0.04
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+        Changed CVS and RSC to explicitly check that they are directories (Ivan Wills)
+
+0.03   2015-06-17
+        Updating for release of version 0.03
+        Added missing files (Ivan Wills)
+        Tagging as CPAN released module (Ivan Wills)
+        Set Test::More minimum version (Ivan Wills)
+        Added todo tasks (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+
+0.02   2015-01-06
+        Updating for release of version 0.02
+        Updated License (Ivan Wills)
+        Fixed tests (Ivan Wills)
+        Adjusted the logic to return true if no "include" logic present (Ivan Wills)
+        Refined SKIPs (Ivan Wills)
+        Fixed issue where files that are not matched are being set as matched (Ivan Wills)
+        Cleaned up --VERSION to --version (Ivan Wills)
+        More config (Ivan Wills)
+        Added autodie dependency (Ivan Wills)
+        Fixed spelling and missing boilerplate (Ivan Wills)
+
+0.01    2014-10-09
+        Adding tests for types (Ivan Wills)
+        Changed tests so that they have 100% coverage (Ivan Wills)
+        Fixed up unnessesary logic (Ivan Wills)
+        Moved code protection to surrounding if (Ivan Wills)
+        More tests to increase coverage (Ivan Wills)
+        Added eval to protect against not being able to read the directory (Ivan Wills)
+        Made bang config compatible with array of bangs (Ivan Wills)
+        Fixed issue with perl finding non-perl files (Ivan Wills)
+        Added more tests (Ivan Wills)
+        Worked on documentation (Ivan Wills)
+        Cleaned up Path::Class dependency, added Path::Tiny and File::chdir dependencies (Ivan Wills)
+        Implemented tfind (Ivan Wills)
+        Added test helper file (Ivan Wills)
+        Travis CI config (Ivan Wills)
+        Improving code coverage (Ivan Wills)
+        Dist clean up (Ivan Wills)
+        New test and data (Ivan Wills)
+        Added new documentation and removed unused parameter (Ivan Wills)
+        Added more tests (Ivan Wills)
+        Fixed adding to a type (Ivan Wills)
+        Added dependencies (Ivan Wills)
+        New test for type categories (Ivan Wills)
+        Got boilerplate test passing (Ivan Wills)
+        Fixed config loading (Ivan Wills)
+        Fixed YAML (Ivan Wills)
+        Renamed to keep name consistent (Ivan Wills)
+        Made categories.yml installable (Ivan Wills)
+        Started on the documentation (Ivan Wills)
+        fixed version numbers (Ivan Wills)
+        Ported File::CodeSearch::Files over (Ivan Wills)
+        Defaults (Ivan Wills)
+        Initial commit (Ivan Wills)

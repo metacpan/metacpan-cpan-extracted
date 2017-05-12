@@ -1,0 +1,11 @@
+* More tests for inflate
+* Immutabilization
+** inflate/deflate
+** _load_from_dbms list of keys & _load_from_key SQL
+** share candidate key list between caching bits & _load_from_dbms
+* Sugar for SQL generation - use example in Fey::ORM::Manual::Intro as guide
+* Objects represent "potential" rows (data not yet in DBMS)
+* TableClass->All()
+** probably needs a default sort order or something as well
+* has_many ( ..., via => $linking_table )
+

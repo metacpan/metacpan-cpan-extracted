@@ -1,0 +1,43 @@
+[% USE FillInForm %]
+
+[% WRAPPER 'message/bar.html' %]
+
+[% FILTER fillinform fdat => c.req.params %]
+<div class='one'> 
+<form method='post'>
+<table align='center'>
+<tr><td class="title" colspan='2'><b>[% c.loc('Compose New Message') %]</b></td></tr>
+<tr class='misc1'>
+<td><b>[% c.loc('Rept.') %]</b></td>
+<td><input type='text' name='to' size='16'> <select name=friend OnChange="friendls()"><option>Friends List</option></select> 
+[% IF c.form.error('to') %]
+[% IF c.form.error('to', 'USER_NONEXIST') %] 
+NO such user.
+[% ELSIF c.form.error('to', 'USER_THESAME') %]
+You cann't compose to yourself.
+[% ELSE %]
+please spec a rept.
+[% END %]
+[% END %]
+</td>
+</tr>
+<tr class='misc2'>
+<td valign='top' align='right'>[% c.loc('Title') %]</td>
+<td><input type='text' name='title' size='36' maxlength='80'>
+[% IF c.form.error('title') %]title should be 1-80 chars.[% END %]
+</td>
+</tr>
+<tr class='misc1'>
+<td valign='top' align='right'>[% c.loc('Content') %]</td>
+<td>
+    <textarea cols='70' rows='8' name='text'></textarea>
+[% IF c.form.error('text') %]text is required.[% END %]
+</td>
+</tr>
+<tr class='misc2'><td>&nbsp;</td><td><input type='submit' /> <input type='reset' /></td></tr>
+</table>
+</form>
+</div>
+[% END %]
+
+[% END %]

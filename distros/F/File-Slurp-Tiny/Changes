@@ -1,0 +1,16 @@
+Revision history for File-Slurp-Tiny
+
+0.004     2015-07-15 16:51:45+02:00 Europe/Amsterdam
+          Add discouragement notice
+          Don't skip '.\n' amd '..\n' in read_dir
+          Don't install benchmark.pl
+
+0.003     2014-01-21 00:02:40CET+0100 Europe/Amsterdam
+          use FileHandle, for $fh->autoflush on older perls
+          Switch over to MakeMaker
+
+0.002     2013-11-12 17:58:01 Europe/Amsterdam
+          Fixed embarassing mistake in SYNOPSIS [Matt Phillips]
+
+0.001     2013-11-12 16:44:35 Europe/Amsterdam
+          Released to an unsuspecting world

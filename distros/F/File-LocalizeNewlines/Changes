@@ -1,0 +1,49 @@
+Revision history for Perl extension File-LocalizeNewlines
+
+1.12 Wed  8 Jul 2009
+	- Fixing the Makefile.PL (adding the missing requires_from)
+
+1.11 Thu 18 Jul 2009
+        - Fixed Bug 45176. Individual files can now be localized 
+	- Upgrading to Module::Install::DSL 0.91
+
+1.10 Thu 10 Jul 2008
+	- No functional changes
+	- Actually use the File::Remove::clear function
+
+1.09 Thu 10 Jul 2008
+	- No functional changes
+	- Moved localizenewlines from bin to script dir
+	- Updated to Module::Install 0.76
+	- Updated File::Remove dep to 1.42
+	- Removed the use of base
+
+1.08 Wed  6 Jun 2007
+	- Adding a missing build-time dependency on Test::Script
+
+1.07 Mon  4 Jun 2007
+	- Adding a sort to the tests to factor out filesystem order
+
+1.06 Mon 19 Mar 2007
+	- No functional changes
+	- Moving to a production version
+	- Upgrading to Module::Install 0.65
+
+0.05 Sun  7 May 2006
+	- Adding .svn skip support
+	- Default filter only localises writable files
+
+0.04 Sun  7 May 2006
+	- Moved from older CVS to newer SVN repository
+	- Replaced uses of UNIVERSAL::isa|can with Params::Util
+	- Updated to Module::Install 0.62
+	- Added localizenewlines script
+
+0.03 Tue May 31 2005
+	- Added the verbose option (no unit tests for it yet)
+
+0.02 Sat Feb 19 2005
+	- Merged in patch from DDICK to add FileHandle support
+
+0.01 Thu Jan 27 2005
+	- Created the initial version of the module

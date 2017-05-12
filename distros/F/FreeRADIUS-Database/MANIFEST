@@ -1,0 +1,36 @@
+Changes
+lib/FreeRADIUS/freeradius_database.conf.pod
+lib/FreeRADIUS/Database.pm
+lib/FreeRADIUS/Database/Storage.pm
+lib/FreeRADIUS/Database/Storage/Replicated.pm
+lib/FreeRADIUS/Database/Storage/Result/DailyAgg.pm
+lib/FreeRADIUS/Database/Storage/Result/MonthlyAgg.pm
+lib/FreeRADIUS/Database/Storage/Result/Radacct.pm
+lib/FreeRADIUS/Database/Storage/Result/Radcheck.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+src/conf/freeradius_database.conf-dist
+src/schema/_test_radius.db
+src/schema/_test_radius_tables.sqlite3
+src/schema/aggregate_daily.sql
+src/schema/aggregate_monthly.sql
+src/utilities/aggregate_daily
+src/utilities/aggregate_monthly
+src/utilities/archive_radacct
+src/utilities/update_nas_ip_address
+t/01-use.t
+t/02-new.t
+t/021-coverage_null.t
+t/03-date.t
+t/04-password.t
+t/05-ras_callback.t
+t/06-database.t
+t/07-aggregate_daily.t
+t/08-aggregate_monthly.t
+t/09-month_used_hours.t
+t/10-update_ras_name.t
+t/_test_radius.db
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

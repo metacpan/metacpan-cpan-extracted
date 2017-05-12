@@ -1,0 +1,34 @@
+---
+abstract: 'Perl extension for renaming multiple files'
+author:
+  - 'Robin Barker <RMBarker@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Rename
+provides:
+  File::Rename:
+    file: lib/File/Rename.pm
+    version: 0.20
+  File::Rename::Options:
+    file: lib/File/Rename.pm
+    version: 0
+recommends:
+  File::Spec: 0.82
+  Getopt::Long: 2.24
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+requires:
+  Getopt::Long: 0
+  perl: 5
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.20

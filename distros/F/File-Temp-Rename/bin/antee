@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Temp::Rename;
+use Pod::Usage;
+use Getopt::Long qw/:config bundling no_ignore_case/;
+
+my $result = GetOptions (
+    "stdout|t"        => \(my $stdout),
+    "stderr|T"        => \(my $stderr),
+    "debug|d"         => \(my $debug),
+    "buffer-size|s=i" => \(my $buffer_size = 64*1024), # this is apparently what gnu's coreutils uses as default.
+    "no-clobber|n"    => \(my $no_clobber),
+);
+my $output_file = shift;
+pod2usage(-verbose => 2, -noperldoc => 1) if (!$result || ! $output_file);  
+
+my $tmpfh = File::Temp::Rename->new( FILE => $output_file , CLOBBER => ! $no_clobber);
+my $tmp_filename = $tmpfh->filename;
+
+debug("staging to $tmp_filename");
+
+while (1){
+    my $bytes_read = STDIN->read(my $bytes, $buffer_size);
+    if (defined $bytes_read){
+        if ($bytes_read > 0){
+            $tmpfh->print($bytes);
+            if ($stdout){
+                print $bytes;
+            }
+        }
+        else{ # eof
+            $tmpfh->close();
+            debug("renaming $tmp_filename, $output_file");
+            last;
+        }
+    }
+    else{
+        error("couldn't read? $!");
+    }
+}
+
+sub error{
+    my $msg = shift;
+    print STDERR $msg;
+    exit 1;
+}
+
+sub debug{
+    my $msg = shift;
+    print STDERR $msg if $debug;
+}
+
+# PODNAME: antee
+# ABSTRACT: read input from STDIN, write to a temporary staging file, and rename it to FILENAME when there is nothing left to read.  
+
+__END__
+
+=pod
+
+=head1 NAME
+
+antee - read input from STDIN, write to a temporary staging file, and rename it to FILENAME when there is nothing left to read.  
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+ antee [-t|--stdout] [-T|--stderr] [-n|--no-clobber] FILENAME
+
+=head1 DESCRIPTION
+
+antee is like tee(1) in that it reads input from STDIN and writes it to a file,
+but all output is staged to the temporary file first, which is renamed to the
+final filename only when there is nothing left to read.  It is useful for
+staging the output of long running processes with lots of output, to avoid
+partially written files in the case of error.  
+
+ -t write all input to stdout
+ -T write all input to stderr
+ -n do not clobber if FILENAME already exists
+
+The name 'antee' was chosen b/c 'antechamber' means waiting room, so it's
+tee(1) with a waiting room...
+
+=head1 EXAMPLES
+
+Write all the output of long_running_process to output-file.tmpXXXXX, where
+XXXXX are random characters, and rename output-file.tmpXXXXX to output-file
+only when long_running_process is finished:
+
+ long_running_process | antee output-file
+
+You don't have to check the output-file to see if it completed or not, since
+it'll never be created if it didn't.  In case of error, just remove the tmp
+files with the command below and start over:
+
+ rm output-file.tmp*
+
+Write all output of long_running_process to output-file via a temporary file
+like above, but pipe all output to some_other_program as well.
+
+ long_running_process | antee -t output-file | some_other_program
+
+Same as above, but without the benefit of a temporary file by using the tee
+command instead of antee.
+
+ long_running_process | tee output-file | some_other_program
+
+=head1 AUTHOR
+
+T. Nishimura <tnishimura@fastmail.jp>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by T. Nishimura.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

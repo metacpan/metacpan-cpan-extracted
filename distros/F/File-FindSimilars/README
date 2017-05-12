@@ -1,0 +1,155 @@
+= Fast Similar Files Finder
+
+== Basics
+
+=== Info
+
+findsimilars walks along the given dirs to find all similar files.
+
+=== Description
+
+findsimilars will find all similar files, not only identical ones:
+different version (.txt, .html, or .pdf) and different compression methods
+(.zip, .gz, .tar.gz, .bip2), MP3 files with slightly different names or even
+different sample rates, etc. It uses advanced soundex vector algorithm to
+determine the file similarities.
+
+The file similarity checking is extremely fast. It uses advanced soundex
+vector algorithm to determine the similarity between files. Generally it
+means that if there are n files, each having approximately m words in the
+file name, the degree of calculation is merely
+
+ O(n^2 * m)
+
+regardless of file size. This is over hundreds times faster than any
+existing file fingerprinting technology.
+
+=== Files
+
+link:release-log.txt[Release notes]. 
+
+link:Changes[Changes logs]. 
+
+== Help
+
+The self-test output will help you understand what the module do and what
+would you expect from the outcome.
+
+  $ make test
+  PERL_DL_NONLAZY=1 /usr/bin/perl "-Iblib/lib" "-Iblib/arch" test.pl
+  1..5 todo 2;
+  # Running under perl version 5.010000 for linux
+  # Current time local: Mon Nov  3 08:57:42 2008
+  # Current time GMT:   Mon Nov  3 13:57:42 2008
+  # Using Test.pm version 1.25
+  # Testing File::FindSimilars version 2.03
+  
+  . . .
+  
+==== Testing 2, files under test/ subdir:
+  
+    9 test/(eBook) GNU - Python Standard Library 2001.pdf
+    3 test/Audio Book - The Grey Coloured Bunnie.mp3
+    5 test/ColoredGrayBunny.ogg
+    5 test/GNU - 2001 - Python Standard Library.pdf
+    4 test/GNU - Python Standard Library (2001).rar
+    9 test/LayoutTest.java
+    3 test/PopupTest.java
+    2 test/Python Standard Library.zip
+  ok 2 # (test.pl at line 83 TODO?!)
+  
+Note:
+  
+  - The findsimilars script will pick out similar files from them in next test.
+  - Let's assume that the number represent the file size in KB.
+  
+==== Testing 3 result should be:
+  
+  ## =========
+             3 'Audio Book - The Grey Coloured Bunnie.mp3' 'test/'
+             5 'ColoredGrayBunny.ogg'                      'test/'
+  
+  ## =========
+             4 'GNU - Python Standard Library (2001).rar' 'test/'
+             5 'GNU - 2001 - Python Standard Library.pdf' 'test/'
+  ok 3
+  
+Note:
+  
+  - There are 2 groups of similar files picked out by the script.
+  - The similar files are picked because their file names look similar.
+    Note that the first group looks different and spells differently too,
+    which means that the script is versatile enough to handle file names that
+    don't have space in it, and robust enough to deal with spelling mistakes.
+  - Apart from the file name, the file size plays an important role as well.
+  - There are 2 files in the second similar files group, the book files group.
+  - The file 'Python Standard Library.zip' is not considered to be similar to
+    the group because its size is not similar to the group.
+  
+==== Testing 4, if Python.zip is bigger, result should be:
+  
+  ## =========
+             4 'Python Standard Library.zip' 'test/'
+             4 'GNU - Python Standard Library (2001).rar' 'test/'
+             5 'GNU - 2001 - Python Standard Library.pdf' 'test/'
+  
+  ## =========
+             3 'Audio Book - The Grey Coloured Bunnie.mp3' 'test/'
+             5 'ColoredGrayBunny.ogg'                      'test/'
+  ok 4
+  
+Note:
+  
+  - The previous second similar files group is now the first. I.e.,
+    the order of similar files groups is not important.
+  - There are now 3 files in the book files group.
+  - The file 'Python Standard Library.zip' is included in the
+    group because its size is now similar to the group.
+  
+==== Testing 5, if Python.zip is even bigger, result should be:
+  
+  ## =========
+             4 'GNU - Python Standard Library (2001).rar' 'test/'
+             5 'GNU - 2001 - Python Standard Library.pdf' 'test/'
+             6 'Python Standard Library.zip' 'test/'
+             9 '(eBook) GNU - Python Standard Library 2001.pdf' 'test/'
+  
+  ## =========
+             3 'Audio Book - The Grey Coloured Bunnie.mp3' 'test/'
+             5 'ColoredGrayBunny.ogg'                      'test/'
+  ok 5
+  
+Note:
+  
+  - There are 4 files in the book files group now.
+  - The file 'Python Standard Library.zip' is still in the group.
+  - But this time, because it is also considered to be similar to the .pdf
+    file (since their size are now similar, 6 vs 9), a 4th file the .pdf one
+    is now included in the book group.
+  - If the size of file 'Python Standard Library.zip' is 12(KB), then the
+    book files group will be split into two. Do you know why and
+    which files each group will contain?
+
+== Installation & Configuration
+
+=== Installation
+
+ perl Makefile.PL 
+ make 
+ make test
+ make install
+
+There includes in the package a client program called 'findsimilars'.
+It should have been copied to a directory which is in the PATH 
+by 'make install'. 
+
+=== Get Help
+
+Issue 'findsimilars' to get help on how to use it. And also,
+
+ perldoc File::FindSimilars
+
+== Misc
+
+link:Similars.why.htm[Why writting such tool; why it might be necessary].
+

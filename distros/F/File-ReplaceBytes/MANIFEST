@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+ReplaceBytes.xs
+lib/File/ReplaceBytes.pm
+ppport.h
+t/00-load.t
+t/File-ReplaceBytes.t
+t/pod.t
+t/testdata
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,168 @@
+NAME
+    Filter::QuasiQuote - Quasiquoting for Perl
+
+VERSION
+    This document describes Filter::QuasiQuote 0.07 released on August 20,
+    2008.
+
+SYNOPSIS
+        package MyFilter;
+
+        require Filter::QuasiQuote;
+        our @ISA = qw( Filter::QuasiQuote );
+
+        sub my_filter {
+            my ($self, $s, $file, $line, $col) = @_;
+            # parse the dsl source in $s and emit the perl source in ONE LINE
+            return generate_perl_source( parse_dsl( $s ) );
+        }
+
+        # and in another file:
+        use MyFilter;
+
+        [:my_filter|This is my little DSL...|]
+
+DESCRIPTION
+    GHC 6.10.x is going to have a nice quasiquoting feature for Haskell:
+
+    <http://www.eecs.harvard.edu/~mainland/ghc-quasiquoting/>
+
+    This module implements similar quasiquoting syntax for Perl by means of
+    carefully designed source filters.
+
+    The user can subclass "Filter::QuasiQuote" and define her own DSL
+    extensions. Besides, multiple concrete quasiquoting filters can be
+    chained and composed within a single Perl file.
+
+    Special efforts have been made to ensure line numbers for the resulting
+    Perl source won't be corrupted and support for precise file position
+    information is also provided to user's DSL compilers as well.
+
+    This work is still in alpha phase and under active development. So
+    please check back often ;)
+
+EXAMPLES
+    SQL auto-quoter
+        The concrete filter class could be defined as follows:
+
+            # QuoteSQL.pm
+            package QuoteSQL;
+
+            require Filter::QuasiQuote;
+            our @ISA = qw( Filter::QuasiQuote );
+
+            sub sql {
+                my ($self, $s, $file, $line, $col) = @_;
+                my $package = ref $self;
+                #warn "SQL: $file: $line: $s\n";
+                $s =~ s/\n+/ /g;
+                $s =~ s/^\s+|\s+$//g;
+                $s =~ s/\\/\\\\/g;
+                $s =~ s/"/\\"/g;
+                $s =~ s/\$\w+\b/".${package}::Q($&)."/g;
+                $s = qq{"$s"};
+                $s =~ s/\.""$//;
+                $s;
+            }
+
+            sub Q {
+                my $s = shift;
+                $s =~ s/'/''/g;
+                $s =~ s/\\/\\\\/g;
+                $s =~ s/\n/ /g;
+                "'$s'";
+            }
+
+            1;
+
+        And then use it this way:
+
+            use QuoteSQL;
+
+            my $sql = [:sql|
+                select id, title
+                from posts
+                where id = $id and title = $title |];
+
+        which is actually equivalent to
+
+            my ($id, $title) = (32, 'Hello');
+            my $sql =
+                "select id, title from posts where id = ".quote($id);
+
+INTERNAL METHODS
+    The following methods are internal and are not intended to call
+    directly.
+
+    debug
+        Used to print debug info to stderr when $Filter::QuasiQuote::Debug
+        is set to 1.
+
+    filter
+        Main filter function which is usually inherited by concrete filter
+        subclasses.
+
+CAVEATS
+    Subclasses of "Filter::QuasiQuote" should NOT use it directly. For
+    example, the following will break things:
+
+        use Filter::QuasiQuote; # BAD!!!
+        use base 'Filter::QuasiQuote'; # BAD TOO!!!
+
+    Because One should never call the "import" method of Filter::QuasiQuote
+    directly. (Perl's "use" statement calls its "import" automatically while
+    the "require" statement does not.)
+
+TODO
+    *   Use Module::Compile's .pmc trick to cache the filters' results onto
+        disks.
+
+BUGS
+    Please report bugs or send wish-list to the CPAN RT site:
+
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filter-QuasiQuote>.
+
+VERSION CONTROL
+    For the very latest version of this module, check out the source from
+    the SVN repos below:
+
+    <http://svn.openfoundry.org/filterquote>
+
+    There is anonymous access to all. If you'd like a commit bit, please let
+    me know. :)
+
+AUTHOR
+    Agent Zhang "<agentzh@yahoo.cn>"
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 by Agent Zhang (agentzh).
+
+    This software is released under the MIT license cited below. The "MIT"
+    License
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+SEE ALSO
+    Quasiquoting support in Haskell (via GHC)
+        <http://www.eecs.harvard.edu/~mainland/ghc-quasiquoting/>,
+
+    Related CPAN modules
+        Filter::Util::Call, Filter::Simple, Module::Compile.
+

@@ -1,0 +1,68 @@
+Fry::Lib::CPANPLUS - Fry::Shell reimplentation of CPANPLUS::Shell::Default.
+
+DESCRIPTION
+-----------
+This module implements most of the functionality of CPANPLUS::Shell::Default using CPANPLUS::Backend
+v 0.048 with most of the code coming from &_input_loop.  The aliases assigned to the commands are
+the same letters as the original shell but with a prefixed 'c'. For example, to get a CPANPLUS style
+help of this library's commands type 'ch'.
+
+There are a few differences (mostly positive) between this library and the original shell:
+
+	The 's' command which changed configurations is split up into two commands
+		with aliases 'cs' and 'Cs'.
+	There is no autopaging for output's longer than the terminal's screen.
+		You must explicitly invoke the pager option ie:
+		`-l cm Module::`
+	There is autocompletion for the a, m and f commands. 
+	There are three new commands: &listInstalled which uses the &installed
+		method to see if given modules are installed,
+		&listInstalledRegex which returns all installed modules that match
+		a given regular expression, and &listAuthorsRegex which returns all
+                authors matching a regular expression.
+	Use the menu option to pass arguments as numbers.
+
+Using the Menu option
+----------------------
+
+	You invoke the menu option when you want the output of one command to be
+		selectively passed to another command ie:
+			`-m cm Acme::` followed by `ci 1,4,6`
+
+	In this example	we search for modules starting with 'Acme::'. From that
+		large list, we choose a few to install. Notice that both commands
+		output and input the same argument type, modules. It wouldn't make
+		sense to have the first command return authors and then pass it to ci.
+
+	The following commands can be used as the first command for the
+			menu option: searchModulesbyAuthor, searchModulesbyModule,
+			listInstalled,listAuthorsRegex and listInstalledRegex.
+	Any commands that take an author or module argument can be used as the second
+	command.
+
+	Look at Fry::Shell for a more thorough example.
+
+MOTIVATION       
+-----------
+
+So why bother rewriting CPANPLUS::Shell::Default? Well the easy answer is just look at
+the FEATURES section of Fry::Shell. But here are a few anyway:
+
+	Change command aliases to one's you remember better.
+		Do this by changing the 'a' attribute of a command.
+	Combine CPANPLUS with other often used libraries or other CPANPLUS::*
+		libraries into one shell.
+	The flexibility to define options for any options to CPANPLUS::Backend methods.
+	Easier autocompletion definition for commands. 
+	By breaking up the commands into separate subroutines, these commands can
+		be combined to make other useful commands.
+		For example, you could get apt-get upgrade behavior by combining
+		&listModulesToUpdate with &installModules.
+
+TODO
+-----
+
+The only functionality in the original shell that hasn't been implemented here
+are commandline options. Once options can be defined for a command then this
+will be implemented, allowing one to flip any options of a command's method.
+

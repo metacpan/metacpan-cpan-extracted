@@ -1,0 +1,19 @@
+Revision history for Perl extension File::SharedNFSLock.
+
+0.04  Fri Dec 7 11:45 2012
+  - Throw an error on systems without link support (RT bug #81683)
+  - Implemented a wait() and is_locked method, and aliased locked() to got_lock()
+    for clarity (RT bug #81600)
+  - Support for threads (RT bug #81597)
+
+0.03  Fri Mar 18 18:00 2011
+  - Allow passing a unique token for multiple locking
+    attempts on the same file from the same process.
+
+0.02  Mon Apr 12 12:25 2010
+  - Require perl 5.8.1 instead of 5.10.0.
+  - Minor documentation changes.
+
+0.01  Thu Apr  8 14:38 2010
+  - original version
+

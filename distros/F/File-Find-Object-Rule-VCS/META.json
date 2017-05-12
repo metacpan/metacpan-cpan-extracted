@@ -1,0 +1,72 @@
+{
+   "abstract" : "Exclude files/directories for Version Control",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "keywords" : [
+      "bzr",
+      "cvs",
+      "file-find-object-rule",
+      "file-find-rule",
+      "find",
+      "git",
+      "mercurial",
+      "mmagic",
+      "object",
+      "revision control",
+      "subversion",
+      "types",
+      "vcs",
+      "version control"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Find-Object-Rule-VCS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Find::Object::Rule" : "0",
+            "Text::Glob" : "0",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Find::Object::Rule::VCS" : {
+         "file" : "lib/File/Find/Object/Rule/VCS.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.shlomifish.org/open-source/projects/File-Find-Object/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.berlios.de/svnroot/repos/web-cpan/File-Find-Object/"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_test_requires" : {
+      "File::Spec" : "0.82",
+      "Test::More" : "0.47"
+   }
+}

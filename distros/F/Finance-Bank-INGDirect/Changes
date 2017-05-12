@@ -1,0 +1,26 @@
+1.05 Fri Dec 16 23:33:54 CET 2005
+     - Upgrade and compatibility errata for statements list.
+
+1.04 Thu Aug 18 12:21:56 CET 2005
+     - Documentation errata.
+
+1.03 Thu Aug 11 12:21:56 CET 2005
+     - Porting code for ING Direct France
+
+1.02 Thu Jan 20 11:13:05 CET 2005
+     - fix _get_cookie() which generated many redirects before giving up, causing some failure
+     - fix _list_accounts()
+     - fix ->as_string on a Statement
+
+1.01 Sat Jan  1 20:42:37 CET 2005
+     - minor fix for setting the year of the statements at the beginning of a new year
+       with no statements for this new year 
+
+1.00 Fri Jun 25 11:40:18 CEST 2004
+     - adapt to www.videoposte.com layout
+
+0.02 Thu Jan  8 12:03:33 CET 2004
+     - internal change (the Finance::Bank::LaPoste::Statement hash now contains the "year")
+
+0.01 Wed Oct  8 11:00:07 CEST 2003
+     - initial release

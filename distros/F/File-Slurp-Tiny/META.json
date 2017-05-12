@@ -1,0 +1,75 @@
+{
+   "abstract" : "A simple, sane and efficient file slurper [DISCOURAGED]",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Slurp-Tiny",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "File::Spec::Functions" : "0",
+            "FileHandle" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Slurp::Tiny" : {
+         "file" : "lib/File/Slurp/Tiny.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-file-slurp-tiny at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurp-Tiny"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/file-slurp-tiny.git",
+         "web" : "https://github.com/Leont/file-slurp-tiny"
+      }
+   },
+   "version" : "0.004",
+   "x_contributors" : [
+      "Leon Timmermans <fawaka@gmail.com>",
+      "Matt Phillips <mattp@cpan.org>"
+   ]
+}
+

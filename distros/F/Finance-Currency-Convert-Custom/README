@@ -1,0 +1,27 @@
+Finance-Currency-Convert-Custom version 1.00
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Finance::Currency::Convert
+  LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Dmitry Nikolayev <dmitry@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

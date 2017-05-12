@@ -1,0 +1,500 @@
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2013-2014 -- leonerd@leonerd.org.uk
+
+=head1 NAME
+
+C<Future::Phrasebook> - coding examples for C<Future> and C<Future::Utils>
+
+This documentation-only module provides a phrasebook-like approach to giving
+examples on how to use L<Future> and L<Future::Utils> to structure
+Future-driven asynchronous or concurrent logic. As with any inter-dialect
+phrasebook it is structured into pairs of examples; each given first in a
+traditional call/return Perl style, and second in a style using Futures. In
+each case, the generic function or functions in the example are named in
+C<ALL_CAPITALS()> to make them stand out.
+
+In the examples showing use of Futures, any function that is expected to
+return a C<Future> instance is named with a leading C<F_> prefix. Each example
+is also constructed so as to yield an overall future in a variable called
+C<$f>, which represents the entire operation.
+
+=head1 SEQUENCING
+
+The simplest example of a sequencing operation is simply running one piece of
+code, then immediately running a second. In call/return code we can just place
+one after the other.
+
+ FIRST();
+ SECOND();
+
+Using a Future it is necessary to await the result of the first C<Future>
+before calling the second.
+
+ my $f = F_FIRST()
+    ->then( sub { F_SECOND(); } );
+
+Here, the anonymous closure is invoked once the C<Future> returned by
+C<F_FIRST()> succeeds. Because C<then> invokes the code block only if the
+first Future succeeds, it shortcircuits around failures similar to the way that
+C<die()> shortcircuits around thrown exceptions. A C<Future> representing the
+entire combination is returned by the method.
+
+Because the C<then> method itself returns a C<Future> representing the
+overall operation, it can itself be further chained.
+
+ FIRST();
+ SECOND();
+ THIRD();
+
+Z<>
+
+ my $f = F_FIRST()
+    ->then( sub { F_SECOND(); } )
+    ->then( sub { F_THIRD(); } );
+
+See below for examples of ways to handle exceptions.
+
+=head2 Passing Results
+
+Often the result of one function can be passed as an argument to another
+function.
+
+ OUTER( INNER() );
+
+The result of the first C<Future> is passed into the code block given to the
+C<then> method.
+
+ my $f = F_INNER()
+    ->then( sub { F_OUTER( @_ ) } );
+
+=head1 CONDITIONALS
+
+It may be that the result of one function call is used to determine whether or
+not another operation is taken.
+
+ if( COND() == $value ) {
+    ACTION();
+ }
+
+Because the C<then_with_f> code block is given the first future in addition to
+its results it can decide whether to call the second function to return a new
+future, or simply return the one it was given.
+
+ my $f = F_COND()
+    ->then_with_f( sub {
+       my ( $f_cond, $result ) = @_;
+       if( $result == $value ) {
+          return F_ACTION();
+       }
+       else {
+          return $f_cond;
+       }
+    });
+
+=head1 EXCEPTION HANDLING
+
+In regular call/return style code, if any function throws an exception, the
+remainder of the block is not executed, the containing C<try> or C<eval> is
+aborted, and control is passed to the corresponding C<catch> or line after the
+C<eval>.
+
+ try {
+    FIRST();
+ }
+ catch {
+    my $e = $_;
+    ERROR( $e );
+ };
+
+The C<else> method on a C<Future> can be used here. It behaves similar to
+C<then>, but is only invoked if the initial C<Future> fails; not if it
+succeeds.
+
+ my $f = F_FIRST()
+    ->else( sub { F_ERROR( @_ ); } );
+
+Alternatively, the second argument to the C<then> method can be applied, which
+is invoked only on case of failure.
+
+ my $f = F_FIRST()
+    ->then( undef, sub { F_ERROR( @_ ); } );
+
+Often it may be the case that the failure-handling code is in fact immediate,
+and doesn't return a C<Future>. In that case, the C<else> code block can
+return an immediate C<Future> instance.
+
+ my $f = F_FIRST()
+    ->else( sub {
+       ERROR( @_ );
+       return Future->done;
+    });
+
+Sometimes the failure handling code simply needs to be aware of the failure,
+but rethrow it further up.
+
+ try {
+    FIRST();
+ }
+ catch {
+    my $e = $_;
+    ERROR( $e );
+    die $e;
+ };
+
+In this case, while the C<else> block could return a new C<Future> failed with
+the same exception, the C<else_with_f> block is passed the failed C<Future>
+itself in addition to the failure details so it can just return that.
+
+ my $f = F_FIRST()
+    ->else_with_f( sub {
+       my ( $f1, @failure ) = @_;
+       ERROR( @failure );
+       return $f1;
+    });
+
+The C<followed_by> method is similar again, though it invokes the code block
+regardless of the success or failure of the initial C<Future>. It can be used
+to create C<finally> semantics. By returning the C<Future> instance that it
+was passed, the C<followed_by> code ensures it doesn't affect the result of
+the operation.
+
+ try {
+    FIRST();
+ }
+ catch {
+    ERROR( $_ );
+ }
+ finally {
+    CLEANUP();
+ };
+
+Z<>
+
+ my $f = F_FIRST()
+    ->else( sub {
+       ERROR( @_ );
+       return Future->done;
+    })
+    ->followed_by( sub {
+       CLEANUP();
+       return shift;
+    });
+
+=head1 ITERATION
+
+To repeat a single block of code multiple times, a C<while> block is often
+used.
+
+ while( COND() ) {
+    FUNC();
+ }
+
+The C<Future::Utils::repeat> function can be used to repeatedly iterate a
+given C<Future>-returning block of code until its ending condition is
+satisfied.
+
+ use Future::Utils qw( repeat );
+ my $f = repeat {
+    F_FUNC();
+ } while => sub { COND() };
+
+Unlike the statement nature of perl's C<while> block, this C<repeat> C<Future>
+can yield a value; the value returned by C<< $f->get >> is the result of the
+final trial of the code block.
+
+Here, the condition function it expected to return its result immediately. If
+the repeat condition function itself returns a C<Future>, it can be combined
+along with the loop body. The trial C<Future> returned by the code block is
+passed to the C<while> condition function.
+
+ my $f = repeat {
+    F_FUNC()
+       ->followed_by( sub { F_COND(); } );
+ } while => sub { shift->get };
+
+The condition can be negated by using C<until> instead
+
+ until( HALTING_COND() ) {
+    FUNC();
+ }
+
+Z<>
+
+ my $f = repeat {
+    F_FUNC();
+ } until => sub { HALTING_COND() };
+
+=head2 Iterating with Exceptions
+
+Technically, this loop isn't quite the same as the equivalent C<while> loop in
+plain Perl, because the C<while> loop will also stop executing if the code
+within it throws an exception. This can be handled in C<repeat> by testing for
+a failed C<Future> in the C<until> condition.
+
+ while(1) {
+    TRIAL();
+ }
+
+Z<>
+
+ my $f = repeat {
+    F_TRIAL();
+ } until => sub { shift->failure };
+
+When a repeat loop is required to retry a failure, the C<try_repeat> function
+should be used. Currently this function behaves equivalently to C<repeat>,
+except that it will not print a warning if it is asked to retry after a
+failure, whereas this behaviour is now deprecated for the regular C<repeat>
+function so that yields a warning.
+
+ my $f = try_repeat {
+    F_TRIAL();
+ } while => sub { shift->failure };
+
+Another variation is the C<try_repeat_until_success> function, which provides
+a convenient shortcut to calling C<try_repeat> with a condition that makes
+another attempt each time the previous one fails; stopping once it achieves a
+successful result.
+
+ while(1) {
+    eval { TRIAL(); 1 } and last;
+ }
+
+Z<>
+
+ my $f = try_repeat_until_success {
+    F_TRIAL();
+ };
+
+=head2 Iterating over a List
+
+A variation on the idea of the C<while> loop is the C<foreach> loop; a loop
+that executes once for each item in a given list, with a variable set to one
+value from that list each time.
+
+ foreach my $thing ( @THINGS ) {
+    INSPECT( $thing );
+ }
+
+This can be performed with C<Future> using the C<foreach> parameter to the
+C<repeat> function. When this is in effect, the block of code is passed each
+item of the given list as the first parameter.
+
+ my $f = repeat {
+    my $thing = shift;
+    F_INSPECT( $thing );
+ } foreach => \@THINGS;
+
+=head2 Recursing over a Tree
+
+A regular call/return function can use recursion to walk over a tree-shaped
+structure, where each item yields a list of child items.
+
+ sub WALK
+ {
+    my ( $item ) = @_;
+    ...
+    WALK($_) foreach CHILDREN($item);
+ }
+
+This recursive structure can be turned into a C<while()>-based repeat loop by
+using an array to store the remaining items to walk into, instead of using the
+perl stack directly:
+
+ sub WALK
+ {
+    my @more = ( $root );
+    while( @more ) {
+       my $item = shift @more;
+       ...
+       unshift @more, CHILDREN($item)
+    }
+ }
+
+This arrangement then allows us to use C<fmap_void> to walk this structure
+using Futures, possibly concurrently. A lexical array variable is captured
+that holds the stack of remaining items, which is captured by the item code so
+it can C<unshift> more into it, while also being used as the actual C<fmap>
+control array.
+
+ my @more = ( $root );
+
+ my $f = fmap_void {
+    my $item = shift;
+    ...->on_done( sub {
+       unshift @more, @CHILDREN;
+    })
+ } foreach => \@more;
+
+By choosing to either C<unshift> or C<push> more items onto this list, the
+tree can be walked in either depth-first or breadth-first order.
+
+=head1 SHORT-CIRCUITING
+
+Sometimes a result is determined that should be returned through several
+levels of control structure. Regular Perl code has such keywords as C<return>
+to return a value from a function immediately, or C<last> for immediately
+stopping execution of a loop.
+
+ sub func {
+    foreach my $item ( @LIST ) {
+       if( COND($item) ) {
+          return $item;
+       }
+    }
+    return MAKE_NEW_ITEM();
+ }
+
+The C<Future::Utils::call_with_escape> function allows this general form of
+control flow, by calling a block of code that is expected to return a future,
+and itself returning a future. Under normal circumstances the result of this
+future propagates through to the one returned by C<call_with_escape>.
+
+However, the code is also passed in a future value, called here the "escape
+future". If the code captures this future and completes it (either by calling
+C<done> or C<fail>), then the overall returned future immediately completes
+with that result instead, and the future returned by the code block is
+cancelled.
+
+ my $f = call_with_escape {
+    my $escape_f = shift;
+
+    ( repeat {
+       my $item = shift;
+       COND($item)->then( sub {
+          my ( $result ) = @_;
+          if( $result ) {
+             $escape_f->done( $item );
+          }
+          return Future->done;
+       })
+    } foreach => \@ITEMS )->then( sub {
+       MAKE_NEW_ITEM();
+    });
+ };
+
+Here, if C<$escape_f> is completed by the condition test, the future chain
+returned by the code (that is, the C<then> chain of the C<repeat> block
+followed by C<MAKE_NEW_ITEM()>) will be cancelled, and C<$f> itself will
+receive this result.
+
+=head1 CONCURRENCY
+
+This final section of the phrasebook demonstrates a number of abilities that
+are simple to do with C<Future> but can't easily be done with regular
+call/return style programming, because they all involve an element of
+concurrency. In these examples the comparison with regular call/return code
+will be somewhat less accurate because of the inherent ability for the
+C<Future>-using version to behave concurrently.
+
+=head2 Waiting on Multiple Functions
+
+The C<< Future->wait_all >> constructor creates a C<Future> that waits for all
+of the component futures to complete. This can be used to form a sequence with
+concurrency.
+
+ { FIRST_A(); FIRST_B() }
+ SECOND();
+
+Z<>
+
+ my $f = Future->wait_all( FIRST_A(), FIRST_B() )
+    ->then( sub { SECOND() } );
+
+Unlike in the call/return case, this can perform the work of C<FIRST_A()> and
+C<FIRST_B()> concurrently, only proceeding to C<SECOND()> when both are ready.
+
+The result of the C<wait_all> C<Future> is the list of its component
+C<Future>s. This can be used to obtain the results.
+
+ SECOND( FIRST_A(), FIRST_B() );
+
+Z<>
+
+ my $f = Future->wait_all( FIRST_A(), FIRST_B() )
+    ->then( sub {
+       my ( $f_a, $f_b ) = @_
+       SECOND( $f_a->get, $f_b->get );
+    } );
+
+Because the C<get> method will re-raise an exception caused by a failure of
+either of the C<FIRST> functions, the second stage will fail if any of the
+initial Futures failed.
+
+As this is likely to be the desired behaviour most of the time, this kind of
+control flow can be written slightly neater using C<< Future->needs_all >>
+instead.
+
+ my $f = Future->needs_all( FIRST_A(), FIRST_B() )
+    ->then( sub { SECOND( @_ ) } );
+
+The C<get> method of a C<needs_all> convergent Future returns a concatenated
+list of the results of all its component Futures, as the only way it will
+succeed is if all the components do.
+
+=head2 Waiting on Multiple Calls of One Function
+
+Because the C<wait_all> and C<needs_all> constructors take an entire list of
+C<Future> instances, they can be conveniently used with C<map> to wait on the
+result of calling a function concurrently once per item in a list.
+
+ my @RESULT = map { FUNC( $_ ) } @ITEMS;
+ PROCESS( @RESULT );
+
+Again, the C<needs_all> version allows more convenient access to the list of
+results.
+
+ my $f = Future->needs_all( map { F_FUNC( $_ ) } @ITEMS )
+    ->then( sub {
+       my @RESULT = @_;
+       F_PROCESS( @RESULT )
+    } );
+
+This form of the code starts every item's future concurrently, then waits for
+all of them. If the list of C<@ITEMS> is potentially large, this may cause a
+problem due to too many items running at once. Instead, the
+C<Future::Utils::fmap> family of functions can be used to bound the
+concurrency, keeping at most some given number of items running, starting new
+ones as existing ones complete.
+
+ my $f = fmap {
+    my $item = shift;
+    F_FUNC( $item )
+ } foreach => \@ITEMS;
+
+By itself, this will not actually act concurrently as it will only keep one
+Future outstanding at a time. The C<concurrent> flag lets it keep a larger
+number "in flight" at any one time:
+
+ my $f = fmap {
+    my $item = shift;
+    F_FUNC( $item )
+ } foreach => \@ITEMS, concurrent => 10;
+
+The C<fmap> and C<fmap_scalar> functions return a Future that will eventually
+give the collected results of the individual item futures, thus making them
+similar to perl's C<map> operator.
+
+Sometimes, no result is required, and the items are run in a loop simply for
+some side-effect of the body.
+
+ foreach my $item ( @ITEMS ) {
+    FUNC( $item );
+ }
+
+To avoid having to collect a potentially-large set of results only to throw
+them away, the C<fmap_void> function variant of the C<fmap> family yields a
+Future that completes with no result after all the items are complete.
+
+ my $f = fmap_void {
+    my $item = shift;
+    F_FIRST( $item )
+ } foreach => \@ITEMS, concurrent => 10;
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

@@ -1,0 +1,34 @@
+<html>
+<title>Example of FLAP in action</title>
+<body>
+
+<center>
+<table width=800 cellspacing=10><tr>
+<td align=left width=400 valign=top>
+<H2>This is an example of <a href=http://www.simonf.com/flap/>FLAP</a> in action.</H2>
+<br>
+<p>
+Download Flash 6 player from <a href="http://www.macromedia.com/shockwave/download/alternates/">here</a> if you don't have it. It even works on Linux!
+<p>
+These are the 1, 5 and 15 minute load values on this web server. Press Refresh to see the current load.
+If you want to use this on your server, but do not have Macromedia authoring tools, you can type your URL instead of the default URL that you see in this Flash movie.
+<br>
+<a href=cpu.pl>This is the server-side Perl script cpu.pl.</a>
+</td>
+<td width=400>
+<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" id="CpuExample" width=400 height=400>
+<PARAM NAME=movie VALUE="cpu.swf"> 
+<PARAM NAME=quality VALUE=high>
+<PARAM NAME=bgcolor VALUE=#FFFFFF>
+
+<EMBED src="cpu.swf" quality=high bgcolor=#FFFFFF width=400 height=400
+NAME="CpuExample" ALIGN="" TYPE="application/x-shockwave-flash" 
+PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+</EMBED>
+</OBJECT>
+</td>
+</tr></table>
+</center>
+</body>
+</html>

@@ -1,0 +1,61 @@
+Revision history for Perl module File-Find-utf8
+
+0.012     2017-04-22
+  * Adpated to changes in Encode v2.89 [gh-1]
+
+0.011     2016-08-17
+  * Fixed misplaced SYNOPSIS
+  * Only updating $UTF8_CHECK when necessary
+  * Added Travis and AppVeyor testing
+  * Prevent "UTF-16 surrogate 0xd800" error in some builds' tests
+
+0.010     2016-08-10
+  * Amendments for Test::Synopsis > v0.13
+  * Removed Build.PL, require >= v0.009 of PluginBundle
+  * Updated author e-mail address
+
+0.009     2015-04-10
+  * Fixed: encoding of processor return values
+  * Corrected minimum version requirement
+  * Corrected typo in MANIFEST.SKIP
+  * Corrected typo in comment in import.t test
+
+0.008     2015-01-16
+  * Corrected END for find.t
+
+0.007     2015-01-15
+  * Forgot to exclude utf8_check test when run on Windows/OS2/DOS
+  * Now decoding arguments to processors, also not decoding
+    unavailable vars in pre-/postprocessors
+
+0.006     2015-01-11
+  * Added ability to specify what to do with UTF-8 encoding errors via
+    $File::Find::utf8::UTF8_CHECK
+  * Making use of encoding object for increased speed
+  * Not decoding "special" File::Find variables unles requested via
+    $File::Find::utf8::SPECIALVARS
+  * Reporting File::Find warnings at caller level
+  * Using Exporter to Export symbols, allows for e.g.
+    "use File::Find::utf8 qw(!finddepth);"
+  * Corrected double encoding of find arguments
+
+0.005     2015-01-05
+  * Excluding Windows platform again as it's UTF-8 filesystem support
+    is incomplete
+  * Added test for "no File::Find::utf8;"
+  * More informative naming of the tests
+
+0.004     2014-12-24
+  * Corrected determination of target
+
+0.003     2014-12-24
+  * Rewrote warning level tests to also fail when run as admin
+    The test should now work well on all systems/circumstances
+
+0.002     2014-12-22
+  * Not testing warnings::fatal_enabled if not present (i.e. Perl < 5.12)
+  * Allowing Win32 platform
+  * Corrected warning test to be language independent
+
+0.001     2014-12-21
+  * Initial release

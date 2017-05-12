@@ -1,0 +1,77 @@
+class 'Fl::ToggleButton';
+isa 'Fl::Button';
+include 'FL/Fl_Toggle_Button.H';
+widget_type 'Fl_Toggle_Button';
+
+=pod
+
+=head1 NAME
+
+Fl::ToggleButton - Button that Toggles On and Off
+
+=head1 Synopsis
+
+    use Fl;
+    my $button = Fl::ToggleButton->new(0, 0, 100, 200, 'Hello, World!');
+    $button->callback(sub {print q[It's dat boi]} );
+
+=head1 Description
+
+The Fl::ToggleButton class represents a button that needs to be clicked once
+to toggle on and once more to toggle off.
+
+The toggle button shows the "ON" state by drawing a pushed-in button.
+
+=head1 Methods
+
+Fl::RadioButton inherits from Fl::Button and Fl::Widget. On top of that, it
+exposes the following methods...
+
+=head2 new(...)
+
+    my $button_a = Fl::ToggleButton->new(0, 0, 250, 500, 'Important Stuff');
+    my $button_b = Fl::ToggleButton->new(0, 0, 250, 500);
+
+The constructor creates a new button using the given position, size, and
+label.
+
+The button's C<type()> is set to FL_TOGGLE_BUTTON by default.
+
+The destructor removes the button.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Toggle_Button *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

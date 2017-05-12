@@ -1,0 +1,48 @@
+Fortran::Format version 0.90
+============================
+
+This is a Perl implementation of the Fortran 77 formatted input/output
+facility.  One possible use is for producing input files for old Fortran
+programs, making sure that their column-oriented records are rigorously
+correct. Fortran formats may also have some advantages over C<printf> in some
+cases: it is very easy to output an array, reusing the format as needed; and
+the syntax for repeated columns is more concise. Unlike C<printf>, for good or
+ill, Fortran-formatted fields B<never> exceed their desired width. For
+example, compare
+
+    printf "%3d", 12345;                            # prints "12345"
+    print Fortran::Format->new("I3")->write(12345); # prints "***"
+
+This implementation was written in pure Perl, with portability and correctness
+in mind. It implements the full ANSI standard for Fortran 77 Formats (or at
+least it should). It was not written with speed in mind, so if you need to
+process millions of records it may not be what you need.
+
+CHANGES SINCE VERSON 0.54
+
+        - Added reading support! (some bugs may be lurking there)
+        - INCOMPATIBLE CHANGE: matrices will be transposed on writing;
+          non-rectangular nested arrays result in undefined behavior.
+        - Fixed bug where 2(I8),I2 would reuse only the 2(I8) on subsequent
+          lines instead of reusing the whole format string.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None, except Test::Simple and Test::Pod for testing.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Ivan Tubert-Brohman <itub@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

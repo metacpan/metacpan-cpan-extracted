@@ -1,0 +1,82 @@
+Revision history for Perl module FCGI::Spawn.
+
+0.1  2007-04-01
+
+	- initial release
+
+0.12  Tue Jun 12 22:05:25 2008
+
+	- several bugfixes before 0.2, special thnx to Yuri @ Reunion
+
+0.13  Sun Aug 31 15:27:35 2008 SAMST
+
+	- fixed major POST processing bug, added more parameters for considerability about inclusion and execution ways
+
+0.14  Thu Jul  9 08:54:25 SAMST 2009
+
+	- added clean_inc_subnamespace feature, doc fixes
+
+0.15  Thu Oct  1 23:02:56 SAMST 2009
+
+	- added stats feature, globalized $fcgi request variable, default callout is do() now
+
+0.16  Tue Feb 23 17:54:11 SAMT 2010
+
+	- added xinc feature
+
+0.16.2 Fri Nov 16 13:33:20 MSK 2012
+
+    - Ticket: 11 (ae6fa1bc-dca4-5c40-a84b-3c3db7ad7a0f) [CPAN RT #72408]
+ should use '$) = "$gid $gid";' instead of '$) = $gid;'
+ Thanks: John Lightsey <john@nixnuts.net>
+
+0.16.4 Fri Nov 23 15:35:31 MSK 2012
+
+    - Ticket: 17 (baf0a7a2-15d1-42b4-9fee-24b13b208c36)
+ Test::Strict and Test::Most are added to the dependencies (EU::MM's
+ Makefile.PL)
+
+0.16.5 Wed Nov 28 19:49:48 MSK 2012
+
+    - Ticket: 19 (0c755c6f-ea00-4f03-9e8b-dd61a93ea55b)
+
+    - Missed FCGI.pm  and Const::Fast from dependencies:
+ (http://www.cpantesters.org/cpan/report/f9b413e4-35f9-11e2-a2f1-82091a5d253f)
+
+    - 'Can't locate FCGI.pm in @INC (@INC contains: ...) at
+ /home/cpan/pit/thr/perl-5.14.3/lib/5.14.3/CGI/Fast.pm line 25.'
+
+    - 'Can't locate Const/Fast.pm in @INC (@INC contains: ... .) at
+ t/15-binutils-public.t line 33.
+
+0.16.6 Mon Dec  3 12:03:05 MSK 2012
+
+    - Ticket: 23 (060a80c7-c75b-4520-ac49-7520ea6dbcb0)
+
+        - Tests pass with perl-5.8.9:
+
+            - t/10-binutils-private.t
+
+            - t/15-binutils-public.t
+
+0.16.7 Fri Dec  7 13:32:39 MSK 2012
+
+    - Ticket: 26 (b34f99d3-13f7-4383-84aa-b7d79c89e1b3)
+
+        - Report:
+ http://www.cpantesters.org/cpan/report/26c33b00-3dc8-11e2-ac74-1fb6836e7670
+
+            - 'Exists /tmp/spawner.sock: not a socket or unremoveable at
+ /export/home/cpantest/.cpan/build/FCGI-Spawn-0.16.6-RVzJh7/t/../lib/FCGI/\
+ Spawn.pm line 435.'
+
+        - Every tests plans a 'skip all' against this non-sense situation.
+
+    - Ticket: 26 (b34f99d3-13f7-4383-84aa-b7d79c89e1b3)
+
+        - CGI::Fast dependency
+
+            - Report:
+ http://www.cpantesters.org/cpan/report/051c492c-3ece-11e2-896b-16ee30b64f85
+
+            - Add CGI::Fast for EU::MM

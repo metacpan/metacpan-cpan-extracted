@@ -1,0 +1,271 @@
+#!perl -w
+
+use strict;
+use File::Mork;
+use HTML::Entities;
+use POSIX qw(strftime);
+
+
+=head1 NAME
+
+mork - a program for dumping Mozilla URL history files
+
+=head1 USAGE
+
+    mork  [--verbose] [--html] [--age secs]  <filename>
+
+The files are normally found at C<$HOME/.mozilla/default/*.slt/history.dat>
+
+=head1 COMMAND LINE OPTIONS
+
+=head2 -v[v[v]]
+
+Increase verbosity. With C<-vv>  it prints all the information known 
+about each URL, including time of first visit, last visit, document 
+title, etc.
+
+=head2 --html
+
+Produces HTML output instead of plain text
+
+=head2 --age <age string>
+
+With "--age 2H", it limits itself to URLs that were loaded within the
+last two hours.  Likewise with "sec", "min", "day", "month", etc.
+
+=cut
+
+my $verbose  = 0;
+my $age      = 0;
+my $html     = 0;
+my $file     = undef;
+my $progname = $0; $progname =~ s@.*/@@g;
+
+sub usage;
+
+my %key_sort_table = (
+    'ID'          => ' 0 ',
+    'URL'         => ' 1 ',
+    'Name'        => ' 2 ',
+    'Hostname'    => ' 3 ',
+    'FirstVisitDate'  => ' 4 ',
+    'LastVisitDate'   => ' 5 '
+);
+
+
+
+while ($#ARGV >= 0) {
+    $_ = shift @ARGV;
+    if ($_ eq "--verbose") { $verbose++; }
+    elsif (m/^-v+$/) { $verbose += length($_)-1; }
+    elsif ($_ eq "--age") { $age = shift @ARGV; }
+    elsif ($_ eq "--html") { $html = 1; }
+    elsif (m/^-./) { usage; }
+    elsif (!defined($file)) { $file = $_; }
+    else { usage; }
+}
+
+my $show_all = $verbose>1;
+
+usage() unless defined($file);
+
+
+# sort out the natural langauge 'age' parsing stuff
+if (!$age) {
+} elsif ($age =~ m/^(\d+)\s*s(ec(onds?)?)?$/i) {
+    $age = $1 + 0;
+} elsif ($age =~ m/^(\d+)\s*m(in(utes?)?)?$/i) {
+    $age = $1 * 60;
+} elsif ($age =~ m/^(\d+)\s*h(ours?)?$/i) {
+    $age = $1 * 60 * 60;
+} elsif ($age =~ m/^(\d+)\s*d(ays?)?$/i) {
+    $age = $1 * 60 * 60 * 24;
+} elsif ($age =~ m/^(\d+)\s*w(eeks?)?$/i) {
+    $age = $1 * 60 * 60 * 24 * 7;
+} elsif ($age =~ m/^(\d+)\s*m(on(ths?)?)?$/i) {
+    $age = $1 * 60 * 60 * 24 * 30;
+} elsif ($age =~ m/^(\d+)\s*y(ears?)?$/i) {
+    $age = $1 * 60 * 60 * 24 * 365;
+} else {
+    die "unparsable: --age $age\n";
+}
+
+ 
+   
+my $mork = File::Mork->new($file, age => $age, verbose => $verbose) 
+    || die $File::Mork::ERROR."\n";
+
+if ($html) {
+    print_html($mork,$show_all);
+} else {
+    print_normal($mork,$show_all);
+}    
+
+exit 0;
+
+###
+#
+# Printing functions
+#
+###
+
+
+sub print_normal {
+    my ($mork, $all) = @_;
+
+    foreach my $entry ($mork->entries) {
+        if ($all) {
+        #
+          # Print every field in the hash.
+          #
+            foreach my $key (sort mork_sort keys %$entry) {
+                my $val = $entry->$key;
+                $val = localtime($val) if $key =~ /Date$/;
+                printf ("%14s = %s\n", $key, $val);
+            }
+            print "\n";
+        } else {
+        #
+          # Print just the URLs and their last-load-times.
+          #
+              my $url   = $entry->URL;
+              my $date  = $entry->LastVisitDate || 0;
+              my $count = $entry->VisitCount    || 1;
+              next unless defined ($url);
+            print "$date\t$count\t$url\n";
+        }
+    }
+}
+
+sub print_html {
+    my ($mork, $all) = @_;
+
+      print "<TABLE BORDER=0 CELLPADDING=" . ($all ? "4" : "0") ." CELLSPACING=0>\n";
+
+    foreach my $entry ($mork->entries) {
+        if ($all) {
+        #
+        # Print every field in the hash.
+        #
+            print " <TR>\n";
+            print "  <TD NOWRAP ALIGN=RIGHT VALIGN=TOP>".$entry->ID."&nbsp;</TD>\n";
+            print "  <TD NOWRAP>\n";
+            print "   <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0>\n";
+            foreach my $key (sort mork_sort keys %$entry) {
+                next if ($key eq 'ID');
+                  my $val = $entry->$key;
+                $val = localtime($val) if $key =~ /Date$/;
+                  $key = encode_entities($key);
+                  $val = ($key eq 'URL'
+                  ? "<A HREF=\"$val\">" . html_wrap ($val) . "</A>"
+                  : html_wrap ($val));
+                  print "    <TR>\n";
+                  print "     <TD VALIGN=TOP NOWRAP ALIGN=RIGHT>$key: &nbsp;</TD>\n";
+                  print "     <TD VALIGN=TOP>$val</TD>\n";
+                  print "    </TR>\n";
+            }
+            print "   </TABLE>\n";
+            print "  </TD>\n";
+            print " </TR>\n";
+
+            print "\n";
+        } else {
+        #
+        # Print just the URLs and their last-load-times.
+        #
+            my $url   = $entry->URL;
+            my $date  = $entry->LastVisitDate || 0;
+            my $count = $entry->VisitCount    || 1;
+            next unless defined ($url);
+            $date = strftime("%d %b %l:%M %p", localtime ($date));
+            my $u2 = html_wrap($url);
+            print " <TR>";
+            print "<TD VALIGN=TOP ALIGN=RIGHT NOWRAP>";
+            print "($count) " if ($count > 1);
+            print "$date &nbsp;</TD>";
+            print "<TD VALIGN=TOP><A HREF=\"$url\">$u2</A></TD>";
+            print "</TR>\n";
+
+        }
+    }
+    print "</TABLE>\n"
+}
+
+sub html_wrap {
+  my $s = shift;
+  $s =  encode_entities($s);
+
+  # while there are non-wrappable chunks of 30 characters,
+  # insert wrap points at certain punctuation characters every 10 characters.
+  while ($s =~ m/[^\s]{30}/s) {
+    last unless ($s =~ s@([^\s]{10})([/;,])([^/\s])@$1$2 $3@gs ||
+                 $s =~ s@([^\s]{10})([-_\$\#?.]|&amp;|%(2F|2C|26))@$1 $2@gs);
+  }
+
+  # if we still have non-wrappable chunks of 40 characters,
+  # insert wrap points every 30 characters no matter what.
+  while ($s =~ m/[^\s]{40}/s) {
+    last unless ($s =~ s@([^\s]{30})@$1 @gs);
+  }
+
+  return $s;
+}
+
+
+
+###
+#
+# Usage (duh)
+#
+###
+
+sub usage {
+  print STDERR "usage: $progname [--verbose] [--html] [--age secs] " .
+                    "mork-input-file\n" .
+    "\t'age' can be of the form '2h', '3d', etc.\n";
+  exit 1;
+}
+
+
+
+###
+#
+# Sorting stuff
+#
+##
+
+sub mork_sort {
+    return ($key_sort_table{$a} || $a) cmp ($key_sort_table{$b} || $b);
+}
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org> 
+
+based on
+
+    http://www.jwz.org/hacks/mork.pl
+
+Created:  3-Mar-2004 by Jamie Zawinski, Anonymous, and Jacob Post.
+
+
+=head1 COPYRIGHT
+
+Copyright © 2004 Jamie Zawinski <jwz@jwz.org>
+
+=head1 LICENSE
+
+Permission to use, copy, modify, distribute, and sell this software and its
+documentation for any purpose is hereby granted without fee, provided that
+the above copyright notice appear in all copies and that both that
+copyright notice and this permission notice appear in supporting
+documentation.  No representations are made about the suitability of this
+software for any purpose.  It is provided "as is" without express or
+implied warranty.
+
+=head1 SEE ALSO
+
+L<File::Mork>
+
+=cut
+

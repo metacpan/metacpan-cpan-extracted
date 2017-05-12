@@ -1,0 +1,11 @@
+Changes
+lib/File/Value.pm
+Makefile.PL
+MANIFEST
+README
+snag
+t/fiso.t
+t/snag.t
+t/value.t
+VERSION
+META.yml                                 Module meta-data (added by MakeMaker)

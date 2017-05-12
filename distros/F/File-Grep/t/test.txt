@@ -1,0 +1,10 @@
+This is a test.  In this test
+we are looking for the word
+'Bob'.  Only instances of the
+word 'Bob' should be counted
+by this test.  If there are
+other instances of 'Bob' that
+show up, as in unBobically,
+then this test for testing
+'Bob' has failed.
+

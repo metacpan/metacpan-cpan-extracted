@@ -1,0 +1,77 @@
+Revision history for FabForce::DBDesigner4::DBIC
+
+0.15    2015-01-17
+
+        + add metaresources to dist.ini
+        + last release before deprecation
+
+0.14    2013-03-26
+
+        + fix distro
+
+0.13    2013-03-26
+
+        + fix distro
+
+0.12    2013-03-26
+
+        + fix test failures 
+
+0.11    2013-03-24
+
+        + fix test failures (fake existance of DBIx::Class)
+
+0.10    2013-03-20
+
+        + add column_details
+
+0.09    2013-03-20
+
+        + add versions to modules
+        + switch to Dist::Zilla
+
+0.0803  2009-09-01
+
+        minor bugfixes in Testscripts
+
+0.08    2009-08-30
+
+        + files are now in Result::* namespace
+
+0.07    2009-01-02
+
+        + added .cvsignore to MANIFEST
+        - fixed a small documentation bug
+        - removed Build.PL, use Makefile.PL instead
+        - rename create_scheme to create_schema
+        + added schema_name to set a name for the schema
+        + added tests for new functions
+        + added method to get FabForce::DBDesigner4 object
+        - bugfix: in "belongs_to" relations the field names were switched
+
+0.06    2008-05-13
+
+        - skip tests in 98_perl_critic.t if RELEASE_TESTING is not set
+
+0.05    2008-04-12
+
+        - bugfix in parameters for new
+        - added prefix() to get unique names for relationships
+        
+0.04    2007-08-12
+
+        + bugfixes
+        
+0.03    2007-07-25
+
+        - bugfix Build.PL: moved requirements from build_requires to requires
+        + added Test::CheckManifest to build_requires
+        - bugfix 98_perl_critic.t: skip tests if Perl::Critic is not installed
+        
+0.02    2007-07-24
+
+        - bugfix: tablename in classes were barewords
+
+0.01    2007-07-08
+
+        First version, released on an unsuspecting world.

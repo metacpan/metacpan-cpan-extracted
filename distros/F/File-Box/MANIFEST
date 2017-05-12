@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/File-Box.t
+lib/File/Box.pm
+lib/File/Box/.box/success.txt
+installed.t
+META.yml                                 Module meta-data (added by MakeMaker)

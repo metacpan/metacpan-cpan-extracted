@@ -1,0 +1,6 @@
+Revision history for Perl extension File::Inplace.
+
+0.01  Wed Jan 26 19:59:44 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n File::Inplace
+

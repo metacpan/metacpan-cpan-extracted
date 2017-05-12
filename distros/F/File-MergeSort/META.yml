@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                File-MergeSort
+version:             1.23
+abstract:            Mergesort ordered files.
+license:             perl
+author:              
+    - Barrie Bremner
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    IO::File:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

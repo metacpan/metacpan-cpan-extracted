@@ -1,0 +1,53 @@
+CHANGES
+LICENSE
+MANIFEST
+Makefile.PL
+README
+TODO
+
+# The module files
+lib/FileHandle/Unget.pm
+
+# Tests
+t/stdin_tell_bug.t
+t/binmode_bug.t
+t/buffer.t
+t/class_pipe.t
+t/core_pipe.t
+t/dumper.t
+t/eof.t
+t/filehandle.t
+t/fileno.t
+t/gensym.t
+t/input_record_separator.t
+t/loop_bug.t
+t/memory_leak.t
+t/multiple_handles.t
+t/new.t
+t/overridden_pipe.t
+t/pod.t
+t/seek.t
+t/tell.t
+t/ungetc.t
+t/ungets.t
+
+# Module::Install extensions
+inc/Module/Install.pm
+inc/Module/Install/AutoLicense.pm
+inc/Module/Install/AutomatedTester.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Bugtracker.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+
+# Private Module::Install extensions
+private-lib/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+
+META.yml

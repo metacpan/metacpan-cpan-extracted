@@ -1,0 +1,35 @@
+---
+abstract: 'represents a contract object for a single bet'
+author:
+  - 'binary.com <cpan@binary.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Contract
+requires:
+  Date::Utility: '0'
+  Format::Util::Numbers: '0'
+  Math::Util::CalculatedValue::Validatable: '0'
+  Moose: '0'
+  Time::Duration::Concise: '0'
+  Time::HiRes: '0'
+  YAML: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Finance-Contract/issues
+  repository: git://github.com/binary-com/perl-Finance-Contract.git
+version: '0.009'
+x_serialization_backend: 'YAML::Tiny version 1.66'

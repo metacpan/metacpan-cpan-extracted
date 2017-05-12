@@ -1,0 +1,129 @@
+[% USE FillInForm %]
+
+[% c.load_once("jquery/validate.js") %]
+[% IF lang != 'en' %]
+[% c.load_once("jquery/validate/messages_${lang}.js") %]
+[% END %]
+[% c.load_once("form.css") %]
+
+<script type="text/javascript">
+
+$().ready(function() {
+	// validate the RegisterForm form when it is submitted
+	$("#RegisterForm").validate( {
+	   messages: {
+			agreement: "Check it before process"
+		}
+    } );
+    
+    $('#username').blur( function() {
+        var username = $('#username').val();
+        if (username.length < 6 || username.length > 20) {
+            $('#error_username').html('username should be 6-20 chars.');
+            return false;
+        }
+        
+        $.get('/ajax/validate_username', { 'username': username }, function(data) {
+            if (data == 'OK') {
+                $('#error_username').css( { color: 'green' } );
+                $('#error_username').html('OK');
+            } else {
+                var error;
+                switch (data) {
+                    case 'HAS_BLANK' :
+                        error = "don't put blank in your username.";
+                        break;
+                    case 'HAS_SPECAIL_CHAR' :
+                        error = "only A-Z, a-z, 0-9, -, _ is allowed.";
+                        break;
+                    case 'HAS_RESERVED' :
+                        error = "this username is reserved.";
+                        break;
+                    case 'DBIC_UNIQUE'  :
+                        error = "This username is used by another one.";
+                        break;
+                    default : 
+                        error = "Unkown";
+                }
+                $('#error_username').html(error);
+            }
+        } );
+    } );
+} );
+
+</script>
+
+<style type="text/css">
+#RegisterForm { margin-left: 15%; margin-right: 15%; }
+</style>
+
+[% FILTER fillinform fdat => c.req.params %]
+<form class="valid" method='post' id="RegisterForm">
+<fieldset>
+    <legend>[% c.loc("Register") %]</legend>
+	<p>
+	    <label for="username">[% c.loc('Username') %]</label>
+	    <input type='text' name='username' id='username' class="required" minlength="6" maxlength="20" />
+	
+	<label class="error" id='error_username'>
+	[% IF c.form.error('username') %]
+	
+	    [% IF c.form.error('username', 'HAS_BLANK') %]
+	    don't put blank in your username.
+	    [% ELSIF c.form.error('username', 'HAS_SPECAIL_CHAR') %]
+	    only A-Z, a-z, 0-9, - is allowed.
+	    [% ELSIF c.form.error('username', 'HAS_RESERVED') %]
+	    this username is reserved.
+	    [% ELSIF c.form.error('username', 'DBIC_UNIQUE') %]
+	    This username is used by another one.
+	    [% ELSE %]
+	    username should be 6-20 chars.
+	    [% END %]
+	[% END %]
+	</label>
+	
+	</p>
+	
+	<p>
+        <label id="nickname">[% c.loc('Nickname') %]</label>
+        <input type='text' name='nickname' id='nickname' class="required" />
+    </p>
+    
+    <p>
+	    <label id="password">[% c.loc('Password') %]</label>
+	    <input type='password' id='password' name='password' class="required" minlength="6" maxlength="20" />
+	    [% IF c.form.error('password') %]<label class="error">password should be 6-20</label>[% END %]
+	</p>
+	
+	<p>
+	    <label id="confirm_password">[% c.loc('Confirm Password') %]</label>
+	    <input type='password' name='confirm_password' id="confirm_password" class="required" equalTo="#password" />
+	    [% IF c.form.error('passwords') %]<label class="error">Confirm password is not the same as password</label>[% END %]
+	</p>
+	
+	<p>
+	    <label id="email">[% c.loc("Email") %]</label>
+	    <input type='text' name='email' id="email" class="required email" />
+	[% IF c.form.error('email') %]
+	<label class="error">
+	    [% IF c.form.error('email', 'DBIC_UNIQUE') %]
+	    This email is used by another one.
+	    [% ELSE %]
+	    you should spec a correct email.
+	    [% END %]
+	</label>
+	[% END %]
+	</p>
+	
+	<p>
+	    <input type="checkbox" class="checkbox" name="agreement" id="agreement" class="required" />
+	    <label for="agreement" class="other">I have read and agree to the <a href="/info/tos">Terms of Service</a> and <a href="/info/privacy">Privacy Statement</a>.</span></label>
+	</p>
+	
+	<iframe src="/info/tos?format=raw" scrolling="auto" frameborder='0' marginheight="0" marginwidth="0" width='400' height='100' id="rule_iframe" style="border: solid #7F9DB9 1px; margin-left: 10px;" ></iframe>
+	
+	<p><input class="submit" type='submit' /></p>
+	
+</fieldset>
+</form>
+[% END %]

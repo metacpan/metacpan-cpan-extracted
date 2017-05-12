@@ -1,0 +1,59 @@
+NAME
+    Finance::QuoteTW - Fetch quotes of mutual funds in Taiwan
+
+SYNOPSIS
+            use Finance::QuoteTW;
+
+            $q = Finance::QuoteTW->new(encoding => 'utf8');  # The default encoding is big5
+            @tisc_fund = $q->fetch(site => 'tisc');          # Fetch all fund quotes from www.tisc.com.tw
+            $tisc_fund = $q->fetch(site => 'tisc');          # Do the same thing but get an array reference
+            @us_funds  = $q->fetch(site => 'blackrock', name => 'taiwan.*'); # Select funds with regex
+            %all_funds = $q->fetch_all;                      # Fetch all available fund quotes
+            %all_onshore_funds  = $q->fetch_all('onshore');  # Fetch all available onshore fund quotes
+            %all_offshore_funds = $q->fetch_all('offshore'); # Fetch all available offshore fund quotes
+
+DESCRIPTION
+    Finance::QuoteTW provides a easy way to get the latest fund quotes from
+    various website in Taiwan
+
+METHODS
+  new
+    Take an optional argument 'encoding'. The default value is big5.
+
+            Finance::QuoteTW->new(encoding => 'utf8');
+
+  names
+    Return currently available site names.
+
+            $q->names;
+            $q->names('onshore');
+            $q->names('offshore');
+
+  fetch
+    Return all fund quotes from specified site. You can use regex to filter
+    the fund quotes. The return value is a hash of array. Every hash
+    contains a single fund information. The attributes are: name, date, nav,
+    change, type, currency
+
+            $q->fetch( site => 'tisc' );
+            $q->fetch( site => 'blackrock', name => 'taiwan.*');
+            $q->fetch( site => 'jpmrich',   type => 'onshore');
+
+  fetch_all
+    Fetch fund quotes from all available sites. The return value is a hash
+    (or a hash reference). The keys of the hash is the site abbreviations.
+
+            $q->fetch_all;
+            $q->fetch_all('onshore');
+            $q->fetch_all('offshore');
+
+AUTHOR
+    Alec Chen <alec@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2007 by Alec Chen. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

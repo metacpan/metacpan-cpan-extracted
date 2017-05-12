@@ -1,0 +1,43 @@
+Revision history for Perl extension Filter::Arguments.
+
+0.14  Mon Aug 10 00:27:55 2009
+    - Updated dependency list
+
+0.13  Wed Jul 30 00:09:56 2009
+    - Recognizes --help, --usage, --? and returns usage text
+    - Fixed a bug with interpreting alias and default keys
+    - Fixed a bug with requiring values when default value given is "" or 0
+
+0.12  Wed Jul 29 22:50:18 2009
+    - Fixed incorrect file listing in MANIFEST resulting in Makefile.PL fatal error.
+
+0.11  Wed Jul 29 21:36:08 2009
+    - Bug fix for default values of empty string
+    - Removed references to obsolete Template dependency
+    - Additions for pre 0.10 backward compatibility
+
+0.10  Sun Jul 19 19:56:50 2009
+    - Major rethinking of the syntax - not backward compatible.
+
+0.07  Fri May 22 04:56:11 2009
+    - Noting dependency for Text::Balance version 2.0.0 in Makefile.
+
+0.06  Fri May 01 19:34:00 2009
+    - Added usage text to output on unknown argument.
+
+0.05  Sun Mar 22 10:54:02 2009
+    - Fix for the line number problem.
+
+0.04  Sat Mar 14 14:25:44 2009
+    - Ignores commented Argument attributes.
+    - Argument attribute without type defaults to bool.
+
+0.03  Sat Mar 14 07:33:38 2009
+    - Fixed Makefile.PL
+
+0.02  Mon Mar 09 06:57:00 2009
+    - Update dependencies list
+
+0.01  Sat Mar 07 18:31:25 2009
+	- original version
+

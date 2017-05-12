@@ -1,0 +1,27 @@
+#fsdb -R C account passwd uid gid fullname homedir shell
+account: johnh
+passwd: *
+uid: 2274
+gid: 134
+fullname: John_Heidemann
+homedir: /home/johnh
+shell: /bin/bash
+
+account: greg
+passwd: *
+uid: 2275
+gid: 134
+fullname: Greg_Johnson
+homedir: /home/greg
+shell: /bin/bash
+
+account: root
+passwd: *
+uid: 0
+gid: 0
+fullname: Root
+homedir: /root
+shell: /bin/bash
+
+# this is a simple database
+#   | dbfilealter -R C

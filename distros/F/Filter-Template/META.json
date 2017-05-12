@@ -1,0 +1,68 @@
+{
+   "abstract" : "a source filter for inline code templates (macros)",
+   "author" : [
+      "Rocco Caputo <rcaputo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Filter-Template",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "Filter::Util::Call" : "1.49",
+            "Symbol" : "1.06",
+            "bytes" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "1.29",
+            "Test::More" : "0.98",
+            "lib" : "0",
+            "perl" : "5.004",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Filter-Template@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Filter-Template"
+      },
+      "homepage" : "http://search.cpan.org/dist/Filter-Template/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rcaputo/filter-template.git",
+         "web" : "https://github.com/rcaputo/filter-template"
+      }
+   },
+   "version" : "1.043"
+}
+

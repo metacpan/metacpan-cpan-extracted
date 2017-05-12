@@ -1,0 +1,42 @@
+
+		-----------------------------------------
+				Font::TFM
+		-----------------------------------------
+
+This is the README file for the Font::TFM package.
+
+This Perl module allows you to read the TeX font metric (TFM) files
+and access the information stored in them. You create an object for the
+file and its methods then return the values of the font. See the man
+page for complete list and usage of the module.
+
+Installation:
+	Download the tar.gz, unpack it, change to the Font-TFM-*
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+	or you can use CPAN module and just type "install Font::TFM".
+	
+Ideas, bug reports:
+	Any comments or bug reports concerning this module can be send
+	to my e-mail address. Sending message to clpm is OK but send a
+	copy to me since I might miss your post. Please provide as
+	much information as possible, including version of Perl and
+	this module, and state "Font::TFM" in the Subject. It will
+	help me solve the problem faster.
+
+Available:
+	http://www.adelton.com/perl/Font-TFM/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+
+	Contact the author at jpx dash perl at adelton dot com.
+
+Copyright: (c) 1996--2011 Jan Pazdziora.
+	All rights reserved. This program is free software; you can
+	redistribute it and/or modify it under the same terms as Perl
+	itself. 
+

@@ -1,0 +1,28 @@
+---
+abstract: 'Mock Fey::ORM based classes so you can test without a DBMS'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  Fey::Test: 0.05
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.131560'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fey-ORM-Mock
+requires:
+  Class::MOP: 0.69
+  DBD::Mock: 0
+  Fey::DBIManager: 0.08
+  Fey::ORM: 0.33
+  Moose: 0.90
+  MooseX::Params::Validate: 0
+  MooseX::StrictConstructor: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Fey-ORM-Mock
+  repository: git://git.urth.org/Fey-ORM-Mock.git
+version: 0.06

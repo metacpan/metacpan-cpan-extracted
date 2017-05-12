@@ -1,0 +1,8 @@
+0.000002 2015-07-26 <symkat@symkat.com>
+    * Fixed use of DESTROY over DEMOLISH in Moo code
+    * Fixed undeclared dependency for MooX::Types::MoseLike::Numeric
+    * readme.POD symlinks to the library for GitHub Readme
+    * README.md removed
+
+0.000001 2012-05-14 <symkat@symkat.com>
+    * Inital Release

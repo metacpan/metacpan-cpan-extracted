@@ -1,0 +1,13 @@
+0.04 / Thu Aug  2 16:25:02 CEST 2007
+    - [rt.cpan.org #28029] Thanks to DRBEAN:
+      Changed Filter::Util::Call prereq from 1.0601 to 1.06
+
+0.03 / Sun Jun 24 18:35:07 CEST 2007
+    - Added on_eof_call export
+
+0.02 / Sat Feb  3 21:46:45 CET 2007
+    - Some POD corrections
+    - Appending code after eof implemented
+
+0.01 / Sun Jan 21 19:28:49 CET 2007
+    - Initial version

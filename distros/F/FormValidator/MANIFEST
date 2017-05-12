@@ -1,0 +1,11 @@
+NEWS
+ChangeLog
+HTML/FormValidator.pm
+HTML/FormValidator/ConstraintsFactory.pm
+HTML/FormValidator/Constraints.pm
+HTML/FormValidator/Filters.pm
+HTML/FormValidator/Results.pm
+MANIFEST
+MANIFEST.SKIP
+README
+Makefile.PL

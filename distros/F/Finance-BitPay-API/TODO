@@ -1,0 +1,29 @@
+
+Research the error handling process:
+ - I think there is an object being used that doesnt exist
+ - I dont think HTTP Request errors are reported properly
+
+Consider providing Response objects:
+ - response objects would take the hash of the json response
+and put each key into the attributes of the object.
+ - an error response object could also be provided.
+ - then the caller could determine the result based on the object type like:
+
+ my $response = $bitpay->get_invoice(id => '12345');
+ print "Response ISA: " . ref $response;
+
+ will print:
+   Finance::BitPay::Error   -> http or json parsing error
+   Finance::BitPay::Invoice -> on success
+
+ the problems with returning objects is that it is no longer free style.
+ This means that if BitPay changes the API to return new response values,
+ then these return objects will need to be coded to support that.
+
+IPN.pm is not tested and likely doesnt fully work.
+- find a way to test this.
+
+Setup a test webserver so it can send fake BitPay responses when requested.
+- this allows the class methods to be tested without the need for BitPay merchant credentials.
+
+

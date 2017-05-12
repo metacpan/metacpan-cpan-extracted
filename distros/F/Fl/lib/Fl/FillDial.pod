@@ -1,0 +1,71 @@
+class 'Fl::FillDial';
+isa 'Fl::Dial';
+include 'FL/Fl_Fill_Dial.H';
+widget_type 'Fl_Fill_Dial';
+
+=pod
+
+=head1 NAME
+
+Fl::FillDial - Filled, Circular Dial to Control a Single Floating Point Value
+
+=head1 Description
+
+The Fl::FillDial widget proides a circular dial to control a single floating
+point value. The dial is drawn with a filled arc.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/dial.png" /></center>
+
+=head1 Methods
+
+Fl::FillDial inherits from Fl::Dial and Fl::Widget. On top of that, it exposes
+the following methods...
+
+=head2 new(...)
+
+    my $dial_a = Fl::FillDial->new(0, 0, 250, 500, 'Important Stuff');
+    my $dial_b = Fl::FillDial->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default type is FL_FILL_DIAL.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Fill_Dial *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

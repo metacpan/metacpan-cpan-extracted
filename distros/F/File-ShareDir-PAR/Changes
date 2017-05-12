@@ -1,0 +1,22 @@
+Revision history for Perl extension File::ShareDir::PAR
+
+0.06 Fri 10 Sep 2010
+  - Allow global installation of the File::ShareDir::PAR
+    routines by lobotomizing File::ShareDir.
+
+0.05 Fri 20 Mar 2009
+  - Attempt band-aid fix for strange win32 test problem.
+
+0.04 Mon  2 Mar 2009
+  - Fix issues accessing the dist_dir of PAR'd exes.
+
+0.03 Sat 15 Nov 2008
+  - Fix issue on Win32 wrt path separators.
+
+0.02 Wed 15 Oct 2008
+  - Fix 03 tests with par: previously, got spurious fails from
+    cpan testers because @INC was cleaned too eagerly.
+
+0.01 Fri 12 Sep 2008
+  - Initial implementation.
+

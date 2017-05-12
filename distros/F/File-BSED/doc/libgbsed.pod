@@ -1,0 +1,318 @@
+=pod
+
+=head1 NAME
+
+libgbsed - Search/Replace in binary files.
+
+=head1 SYNOPSIS
+
+    #include <libgbsed.h>
+
+    // using file names.
+    struct gbsed_arguments
+    {
+        char *search;
+        char *replace;
+        char *infilename;
+        char *outfilename;
+        int  minmatch;
+        int  maxmatch;
+    };
+
+    typedef struct gbsed_arguments GBSEDargs;
+    
+    int
+    gbsed_binary_search_replace(struct gbsed_arguments *)
+
+    // using FILE*s 
+    struct fgbsed_arguments
+    {
+        char *search;
+        char *replace;
+        FILE *infile;
+        FILE *outfile;
+        int   minmatch;
+        int   maxmatch;
+    };
+    typedef struct fgbsed_arguments fGBSEDargs;
+
+    int
+    gbsed_fbinary_search_replace(struct fgbsed_arguments *);
+
+    // Error handling
+
+    extern int
+    gbsed_errno;
+
+    const char*
+    gbsed_errtostr(int);
+
+=head1 DESCRIPTION
+
+This is <libgbsed>, a binary stream editor.
+
+C<gbsed> lets you search and replace binary data in binary files by using hex
+values in text strings as search patterns. You can also use wildcard matches
+with C<??>, which will match any wide byte.
+
+These are all valid search strings:
+
+    search = "0xffc300193ab2f63a";
+    search = "0xff??00??3ab2f??a";
+    search = "FF??00??3AB2F??A";
+
+while these are not:
+
+    search = "the quick brown fox"; // only hex, no text. you would have to
+                                    // convert the text to hex first.
+    search = "0xff?c33ab3?accc";    // no nybbles only wide bytes. (?? not ?).
+
+=head1 FUNCTIONS
+
+=head2 C<gbsed_binary_search_replace(struct gbsed_arguments *)>
+
+=head3 ARGUMENTS
+
+C<gbsed_binary_search_replace> uses a struct for it's arguments.
+The members of the argument struct is as follows:
+
+=over 4
+
+=item C<char *search>
+
+What to search for. This must be a string with hex values or the wildcard
+character sequence C<??>, which will match any byte. The string
+can start with C<0x>, but this is optional.
+
+=item C<char *replace>
+
+What to replace with. Must also be a string with hex values,
+but no wildcards allowed. It must also be of the same length
+as the search string (This is by intention, as binary data is always
+in structured form. If you add extra information to a binary executable
+it will be rendered useless as address offsets will be shifted and
+relocation tables and internal address references will point to the
+wrong place).
+
+=item C<char *infilename>
+
+The file name of the file to search in.
+
+=item C<char *outfilename>
+
+The file name to save the modified binary as.
+
+=item C<int minmatch>
+
+Need at least C<minmatch> matches before any work.
+
+=item C<int maxmatch>
+
+Stop after C<maxmatch> matches. A value of C<-1> means no limit.
+
+=back
+
+
+=head3 EXAMPLE USAGE
+    
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <libgbsed.h>
+    
+    extern int gbsed_errno;
+
+    int main(int argc, char **argv) {
+
+        int         gbsed_ret;
+        int         sysret;
+        const char *errmessage;
+        GBSEDargs   *bargs;
+
+        sysret  = EXIT_SUCCESS;
+        bargs   = (GBSEDargs *)malloc(sizeof(GBSEDargs));
+        if (bargs == NULL) {
+            fprintf(stderr, "Out of memory!\n");
+            exit(1);
+        }
+
+        bargs->search      = "0xff";
+        bargs->replace     = "0x00";
+        bargs->infilename  = "/bin/ls";
+        bargs->outfilename = "bsed.out";
+        bargs->minmatch    =  1;                        // atleast one match.
+        bargs->maxmatch    = GBSED_MAXMATCH_NO_LIMIT;   // no limit.
+
+        if (argc > 1)
+            bargs->infilename  = argv[1];
+
+        gbsed_ret = gbsed_binary_search_replace(bargs);
+
+        switch (gbsed_ret) {
+            
+            case GBSED_ERROR:
+                errmessage = gbsed_errtostr(gbsed_errno);
+                fprintf(stderr, "ERROR: %s\n", errmessage);
+                sysret = EXIT_FAILURE;
+                break;
+            case GBSED_NO_MATCH:
+                fprintf(stderr, "No match for %s found in %s\n",
+                    bargs->search, bargs->infilename
+                );
+                sysret = EXIT_FAILURE;
+                break;
+            
+            default:
+                printf("Search for '%s' in '%s' matched %d times.\n",
+                    bargs->search, bargs->infilename, gbsed_ret
+                );
+                break;
+        }
+        
+        free(bargs);
+        return sysret;
+    }
+
+=head2 C<const char * gbsed_errtostr(int)>
+
+This function returns a string describing what happened.
+if an error has occurred with either C<gbsed_binary_search_replace> or
+C<binary_file_matches>.
+
+Example:
+    
+    extern int gbsed_errno;
+
+    const char *errmessage;
+    errmessage = gbsed_errtostr(gbsed_errno);
+    fprintf(stderr, "ERROR: %s\n", errmessage);
+
+=head1 RETURN VALUES
+
+C<gbsed_binary_search_replace> returns C<GBSED_ERROR> on failure.
+The error code can then be found in C<gbsed_errno>, error codes are defined in I<libgbsed.h>.
+and they all start with C<GBSED_> and is C<int>. To get a string containing the
+error message you have to call C<bsed_errtomsg> with C<bsed_errno> as argument.
+
+=head2 Error codes returned by C<gbsed_binary_search_replace()>
+
+=head3 C<GBSED_NO_MATCH>
+
+No matches found.
+
+=head3 C<GBSED_ERROR>
+
+An error has occurred and a error code has been left in C<gbsed_errno>.
+
+=head2 Error codes found in C<gbsed_errno>
+
+=head3 C<GBSED_ESEARCH_TOO_LONG>
+
+Search string was longer than the limit.
+
+=head3 C<GBSED_EREPLACE_TOO_LONG>
+
+Replace string was longer than the limit.
+
+=head3 C<GBSED_ENULL_SEARCH>
+
+Missing search string.
+
+=head3 C<GBSED_ENULL_REPLACE>
+
+Missing replace string.
+
+=head3 C<GBSED_EMISSING_INPUT>
+
+Missing input filename.
+
+=head3 C<GBSED_EMISSING_OUTPUT>
+
+Missing output filename.
+
+=head3 C<GBSED_EINVALID_CHAR>
+
+Invalid characters in search string. Only hex values and wildcards
+are allowed.
+
+=head3 C<GBSED_ENIBBLE_NOT_BYTE>
+
+Wildcard must be wild byte, not nibble.  (C<??> not C<?>).
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<libgbsed> requires no configuration file or environment variables.
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-file-bsed@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<gbsed>
+
+=back
+
+=head1 AUTHOR
+
+Ask Solem,   C<< ask@0x61736b.net >>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Dave Dykstra C<< dwdbsed@drdykstra.us >>.
+for C<bsed> the original program,
+
+I<0xfeedface>
+for the wildcards patch.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2007 Ask Solem <ask@0x61736b.net>
+
+
+gbsed is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+gbsed is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE
+SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE
+STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE
+SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND
+PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE,
+YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY
+COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE
+SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR
+THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER
+SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+
+
+=cut
+

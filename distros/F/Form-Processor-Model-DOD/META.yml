@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Form-Processor-Model-DOD
+version:             0.01
+abstract:            Model Class for Form::Processor based on Data::ObjectDriver
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Data::ObjectDriver:            0
+    Form::Processor:               0.11
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Yann Kerherve

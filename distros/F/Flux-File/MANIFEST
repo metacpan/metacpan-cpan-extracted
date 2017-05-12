@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Flux/File.pm
+lib/Flux/File/Cursor.pm
+lib/Flux/File/In.pm
+t/file.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/storage/file
+tfiles/file
+tfiles/storage

@@ -1,0 +1,59 @@
+PREREQUISITES
+
+    C Compiler
+
+        You need a C compiler to build these modules.
+
+        Ideally you should try to use the same compiler as was used to build
+        your perl itself, although this is not essential.  (However, there is a
+        known compatibility problem when building this module with Visual Studio
+        .NET 2002/2003 (VC7) or earlier if your perl was built with Visual
+        Studio 2005 (VC8) or later: see Perl RT#121448.)
+
+    OpenSSL
+
+        OpenSSL version 0.9.6k or 0.9.7c or later.
+        The latest version of OpenSSL is available from http://www.openssl.org/.
+
+    Perl
+
+        Perl version 5.8.1 or later.
+        The latest version of Perl is available from http://www.perl.com/.
+
+    Perl Modules
+
+        There are no non-standard Perl modules required by the two main modules
+        in this distribution (Filter::Crypto::CryptFile and
+        Filter::Crypto::Decrypt), but the PAR::Filter::Crypto module requires
+
+            PAR::Filter
+
+        which is part of the PAR::Packer distribution, available from CPAN
+        (http://www.cpan.org/).
+
+INSTALLATION
+
+    To install these modules, cd to the directory that contains this INSTALL
+    file and type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    The Makefile.PL script will ask various questions regarding (amongst other
+    things) the location of OpenSSL or SSLeay, which cipher algorithm to use,
+    what password or key to use and whether to install a script.
+
+    Alternatively, command-line options can be used to provide the answers to
+    these questions and hence run the script non-interactively.  Type:
+
+        perl Makefile.PL --help
+
+    for more details.
+
+    On Windows, you will need to use "nmake" or "dmake" rather than "make" in
+    the commands above, depending on what your perl was built with.  To
+    determine which make program was used to build your perl type the following:
+
+        perl -V:make

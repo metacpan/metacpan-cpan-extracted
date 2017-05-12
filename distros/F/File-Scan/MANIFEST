@@ -1,0 +1,21 @@
+Changes
+docs/write_sign_bin.txt
+examples/latest.pl
+examples/procmail/.procmailrc
+examples/procmail/README
+examples/procmail/scanvirus.pl
+examples/scan.pl
+examples/vscan.pl
+FAQ
+files/Scan.base
+files/signatures.txt
+files/suspicious.txt
+Makefile.PL
+MANIFEST
+README
+spec-files/RedHat/perl-File-Scan.spec
+spec-files/SuSE/perl-File-Scan.spec
+Scan.pm
+t/scan.t
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

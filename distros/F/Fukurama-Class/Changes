@@ -1,0 +1,66 @@
+Revision history for Fukurama-Class
+
+0.01	2007-06-03
+		initial release
+
+0.02	2007-12-21
+		bugfix: no "final" method-check if force_inheritation is not set
+		bugfix: Too late to run CHECK/INIT warnings for mod_perl removed
+		bugfix: Fukurama::Class(abstract) parameter repaired, if it was defined even with '0' the class was used as abstract
+		bugfix: deep-recursion warning in Fukurama.:Class::Tree removed
+
+0.021	2008-01-04
+		bugfix: tests Rigid, Tree, Class and Implements adapted for curiosities in perl 5.10
+		bugfix: GLOB-reference-test adapted for curiosities in perl 5.10
+
+0.0.22	2008-01-05
+		bugfix: lax int-overflow test for os with other int-sizes
+
+0.023	2008-01-13	
+		bugfix: increase distance for version test to avoiding float-truncation
+		bugfix: decrease float-overflow test distance to avoid overflow in test itself
+		bugfix: increase distance for decimal-overflow test to force overflow in test
+
+0.024	2008-01-15
+		bugfix: extend overflow-tests to find overfloating for actual system
+		bugfix: fix package-string for version tests
+
+0.025	2008-01-15
+		bugfix: fix detection for overflow-marks for different OS
+
+0.026	2008-01-24
+		insert module dependencies into the makefile
+		laxed data-type tests tightened
+
+0.027	2008-03-12
+		search for overflow-sign extendet
+
+0.028	2008-03-12
+		bugfix: POD for implements-syntax changed
+
+0.029	2008-03-14
+		bugfix: change the method to find the overflow-sign for M$-Systems
+		create interface to disable the warnings-pragma when disabling the whole Fukurama::Class
+
+0.030	2008-03-19
+		complete the list of perls system internal subs for threads and new system-subs for perl 5.10
+		fix incorrect creation of float-overflow-base-string in DataType test for some 64bit systems
+
+0.031	2008-04-06
+		extendet versions allowed (eg 1.0.1.12)
+		bugfix: endless recursion in compiletime-check removed
+		bugfix: parents can call protected methods from a child
+		change: now you cant tighten or loosen the access-level for a method in the inheritation tree (private, protected, public)
+		change all status to beta
+
+0.032	2008-04-10
+		bugfix: data-type class is now correct checked as type-definition
+		bugfix: static-declaration is now not automaticly set every time
+		bugfix: POD description for (not-)extending access-level improved
+		bugfix: check for static and oo-methodcalls correctly implemeted
+		change: data type scalar behaves like perl's standard scalar
+		bugfix: POD for datatype 'class' created
+		data type 'object' created
+		POD for data type decimal improved
+
+ 

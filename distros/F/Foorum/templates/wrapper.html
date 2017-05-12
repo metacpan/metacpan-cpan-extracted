@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+[% USE date %]
+
+[% c.load_once("jquery.js") %]
+
+[% c.load_once("utils.js") %]
+[% c.load_once("common.css") %]
+[% IF forum.forum_id %]
+    [% TRY %]
+    [% css_file = c.config.home _ '/root/static/css/style/forum' _ forum.forum_id _ '.css' %]
+    [% USE File( css_file ) %]
+    [% c.load_once("style/forum" _ forum.forum_id _ ".css") %]
+    [% CATCH File %]
+    [% c.load_once("default.css") %]
+    [% END %]
+[% ELSE %]
+[% c.load_once("default.css") %]
+[% END %]
+<title> 
+    [% IF title %]
+    [% title _ ' : ' _ c.config.name %]
+    [% ELSE %]
+    [% c.config.name %]
+    [% END %]
+</title>
+[% c.user_online(title) # set user online %]
+<link rel="shortcut icon" href="[% c.config.dir.static %]/favicon.ico" type="image/x-icon" />
+[% IF RSS_URL %]
+<link rel="alternate" type="application/rss+xml" title="[% title %]" href="[% RSS_URL %]" />
+[% END %]
+</head>
+<body>
+
+[% UNLESS simple_wrapper %]
+
+<div id="gbar">
+<table border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td class="gbarp" nowrap="nowrap">
+<b><a href='/forum'>[% c.config.name %]</a></b>
+</td>
+[% IF forum %]
+<td class="gbarp" nowrap="nowrap">-></td>
+<td class="gbarp" nowrap="nowrap">
+<b><a href='[% forum.forum_url %]'>[% forum.name %]</a></b>
+</td>
+[% END %]
+[% IF topic %]
+<td class="gbarp" nowrap="nowrap">-></td>
+<td class="gbarp" nowrap="nowrap">
+<b>[% topic.title %]</b>
+</td>
+[% END %]
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="guser" width="100%" align="right">
+<nowrap>
+    <a href='/help/WhatsNew'><span class='highlight'>[% c.loc("What's New?") %]</span></a> | 
+    [% UNLESS forum %]
+       <a href='/site/recent'>[% c.loc("Recent Topics") %]</a>
+     | <a href='/site/popular'>[% c.loc("Popular") %]</a>
+     [% IF c.config.function_on.create_forum %]
+     | <a href='/forum/create'>[% c.loc("Create a Forum") %]</a>
+     [% END %]
+      <br />
+    [% END %]
+    [% IF c.user_exists %]
+        [% IF message_unread %]
+        <a href='/message'><span style='color:red'>[% c.loc( "You have new messages ([_1])", message_unread) %]</span></a>
+        [% END %]
+     <a href='/message'>[% c.loc('Message') %]</a>
+     | <a href='/profile/edit'>[% c.loc('Edit Profile') %]</a>
+     | <a href='/settings'>[% c.loc('Settings') %]</a>
+     | <a href='/logout'>[% c.loc("Log out") %]</a> 
+     [% IF roles.site.admin OR roles.site.moderator %]
+     | <a href='/admin'>[% c.loc('Site Admin') %]</a>
+     [% END %]
+    [% ELSE %]
+     <a href='/register'>[% c.loc("Register") %]</a>  | <a href='/login'>[% c.loc("Log in") %]</a> | <a href='/profile/forget_password'>[% c.loc("Forget password?") %]</a>
+    [% END %]
+    [% IF forum %]
+    | <a href="/search/forum/[% forum.forum_id %]">[% c.loc("Search") %]</a>
+    [% END %]
+
+    [% IF c.user_exists %]
+    <br />
+    <a href='/u/[% c.user.username %]'>[% c.loc('My Profile Page') %]</a> | 
+    <a href='/u/[% c.user.username %]/topics'>[% c.loc('My Recent Topics') %]</a> | 
+    <a href='/my/starred'><img src='[% c.config.dir.images %]/site/t/star_on.gif' align='absmiddle' /> [% c.loc("My Starred Items") %]</a> | 
+    <a href='/u/[% c.user.username %]/shared'><img src='[% c.config.dir.images %]/site/t/unshare.gif' align='absmiddle' /> [% c.loc("My Shared Items") %]</a>
+    [% END %]
+</nowrap>
+</div>
+<div class='barline'></div>
+<div style="clear: both;"></div>
+<p></p>
+[% END %]
+
+[% IF st || c.req.params.st %]
+    [% INCLUDE simple/info_or_error.html %]
+[% END %]
+
+[% content %]
+
+[% UNLESS simple_wrapper %]
+
+[% IF whos_view_this_page %] 
+[% INCLUDE site/whos_view_this_page.html %]
+[% END %]
+
+<div id='footer'>
+    <p>
+    <div>Languages: <a href='[% c.req.uri_with( { lang => 'en' } ) %]'>English</a> | <a href='[% c.req.uri_with( { lang => 'cn' } ) %]'>简体中文</a> | <a href='[% c.req.uri_with( { lang => 'tw' } ) %]'>繁體中文</a></div>
+    [% UNLESS forum %]
+    <a href='/info/about_us'>[% c.loc("About Us") %]</a> | 
+    <a href='/info/tos'>[% c.loc('Terms of Service') %]</a> | 
+    <a href='/info/privacy'>[% c.loc('Privacy Statement') %]</a> | 
+    <a href='/info/contact_us'>[% c.loc("Contact Us") %]</a> | 
+    <a href='/help'>[% c.loc("Help Center") %]</a><br />
+    [% END %]
+    &copy; [% date.format(date.now, format =>'%Y') %]&nbsp;[% c.config.name %]. Powered by <a href='/info/powered_by'>Foorum [% c.config.VERSION %]</a>.
+    [% IF RSS_URL %]
+    <a href='[% RSS_URL %]'><img src='[% c.config.dir.images %]/site/feed-icon-16x16.gif' width='16' height='16' align='absmiddle' /></a> 
+    [% END %]
+    </p>
+</div>
+<div id='timer'><p>This page takes [% elapsed_time %] to load. </p></div>
+[% END %]
+
+[% IF c.config.extra.urchin_account AND NOT c.config.debug_mode %]
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write("\<script src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'>\<\/script>" );
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("[% c.config.extra.urchin_account %]");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+[% END %]
+
+    [% IF c.config.debug_mode %]
+      <div class="featurebox">
+        <h3>Query Log Report</h3>
+        [% SET total = c.model('DBIC').querylog.time_elapsed | format('%0.6f') %]
+        <div>Total SQL Time: [% total | format('%0.6f') %] seconds</div>
+        [% SET qcount = c.model('DBIC').querylog.count %]
+        <div>Total Queries: [% qcount %]</div>
+        [% IF qcount %]
+        <div>Avg Statement Time: [% (c.model('DBIC').querylog.time_elapsed / qcount) | format('%0.6f') %] seconds.</div>
+        <div>
+         <table class="table1">
+          <thead>
+           <tr>
+            <th colspan="3">5 Slowest Queries</th>
+           </tr>
+          </thead>
+          <tbody>
+           <tr>
+            <th>Time</th>
+            <th>%</th>
+            <th>SQL</th>
+           </tr>
+           [% SET i = 0 %]
+           [% FOREACH q = c.model('DBIC').querylog_analyzer.get_sorted_queries %]
+           <tr class="[% IF loop.count % 2 %]odd[% END %]">
+            <th class="sub">[% q.time_elapsed | format('%0.6f') %]
+            <td>[% ((q.time_elapsed / total ) * 100 ) | format('%i') %]%</td>
+            <td>[% q.sql %] : ([% q.params.join(', ') %])</td>
+           </th></tr>
+           [% IF i == 5 %]
+            [% LAST %]
+           [% END %]
+           [% SET i = i + 1 %]
+           [% END %]
+          </tbody>
+         </table>
+        </div>
+        [% END %]
+      </div>
+    [% END %]
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+examples/lncopies
+inc/MyBuilder.pm
+lib/File/Find/Parallel.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/10.accessor.t
+t/20.iter.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+SIGNATURE    Added here by Module::Build

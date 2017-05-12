@@ -1,0 +1,10 @@
+Revision history for Perl extension Filter::NumberLines.
+
+0.01  Monday Sep 16 23:00:00 2002
+	- Added Filter::NumberLines::Simple
+        - Added Filter::NumberLines::Scratch
+
+0.02  Wednesday Apr 16 14:15:00 2003
+	- Fixed dist, thanks to mjd
+
+

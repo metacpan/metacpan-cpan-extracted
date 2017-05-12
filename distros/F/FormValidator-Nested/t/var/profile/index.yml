@@ -1,0 +1,21 @@
+params:
+  mail:
+    validators:
+      - Email#email
+      - String#max_length:
+          max: 100
+  mail_array:
+    array: 1
+    validators:
+      - Email#email
+      - String#max_length:
+          max: 100
+  mail_array_required:
+    array: 1
+    validators:
+      - Blank#not_blank
+      - Email#email
+      - String#max_length:
+          max: 100
+
+

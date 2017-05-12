@@ -1,0 +1,43 @@
+params:
+  mail:
+    name: メールアドレス
+    validators:
+      - Blank#not_blank:
+          if:
+            - EMPTY: target
+  mail2:
+    name: メールアドレス2
+    validators:
+      - Blank#not_blank:
+          if:
+            - NOT_EMPTY: target
+  mail3:
+    name: メールアドレス3
+    validators:
+      - Blank#not_blank:
+          if:
+            - EQUAL:
+                target: target
+                value: hoge
+  mail4:
+    name: メールアドレス4
+    validators:
+      - Blank#not_blank:
+          if:
+            - NOT_EQUAL:
+                target: target
+                value: hoga
+  mail5:
+    name: メールアドレス5
+    validators:
+      - Blank#not_blank:
+          if:
+            - EMPTY: target_empty
+            - NOT_EMPTY: target
+            - EQUAL:
+                target: target
+                value: hoge
+            - NOT_EQUAL:
+                target: target
+                value: hoga
+

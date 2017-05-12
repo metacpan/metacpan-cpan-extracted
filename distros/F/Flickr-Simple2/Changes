@@ -1,0 +1,10 @@
+Revision history for Perl extension Flickr::Simple2.
+
+0.03  Wed May 13 11:18:00 2009
+    - significant changes to the API to make more methods of the Flickr API available.
+    - using Iterator::Simple so we can retrieve one photo at a time and internalize the handling of Flickr Photo *pages*
+0.02  Initial CPAN release 
+0.01  Thu Feb 12 11:33:35 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n Flickr::Simple2
+

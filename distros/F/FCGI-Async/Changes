@@ -1,0 +1,91 @@
+Revision history for FCGI-Async
+
+0.21    CHANGES:
+         * Implement HTTP::Request/HTTP::Response gatewaying
+         * Implement PSGI gatewaying
+         * Provide Plack::Handler::FCGI::Async for plackup et.al.
+         * Implement ->stdin, ->stdout, ->stderr pseudo-filehandles
+
+0.20    CHANGES:
+         * Use Net::FastCGI for low-level FastCGI constants and message
+           handling functions
+         * Ensure that ->set_encoding( undef ) actually works to disable the
+           encoding mechanism
+
+        BUGFIXES:
+         * Collect the entire PARAMS stream and only parse it when it's all
+           present, rather than piecewise
+
+0.19    CHANGES:
+         * import Exporter::import instead of @ISAing it
+         * Respond with FCGI_UNKNOWN_TYPE or FCGI_UNKNOWN_ROLE when
+           appropriate (fixes RT 54480)
+         * Updated bundled example applications to a modern IO::Async style
+
+0.18    CHANGES:
+         * Allow setting of per-request encoding for STDIN/STDOUT/STDERR
+           streams
+         * Code adjustment to make use of the new IO::Async::Listener class
+         * Deprecated ->listen( handle => IO ) in favour of ->new or
+           ->configure instead.
+
+0.17    CHANGES:
+         * Added 'use warnings'
+         * Documentation updates
+         * Various small updates to keep CPANTS happy
+
+0.16    BUGFIXES:
+         * Support FCGI_GET_VALUES 
+           (closes http://rt.cpan.org/Ticket/Display.html?id=43976)
+         * Use Test::HexString and wait_for_stream() during testing
+
+0.15    BUGFIXES:
+         * Correctly handle webserver-aborted requests - silently discard
+           output.
+
+0.14    CHANGES:
+         * Reworked constructor to use IO::Async::Loop->listen(). Allows
+           specifying a specific hostname.
+         * Added Request->stream_stdout_then_finish().
+         * Combine small stream writes into larger ones, to gain overhead
+           efficiences over the TCP socket.
+
+        BUGFIXES:
+         * Respect the FCGI_KEEP_CONN flag to close connections if required
+
+0.13    CHANGES:
+         * Updated for IO::Async 0.11:
+            + IO::Async::Set is now ::Loop
+            + IO::Async::Buffer is now ::Stream
+            + Use of $loop->watch_child() in examples rather than hand-coded
+              around watching SIGCHLD directly.
+
+0.12    BUGFIXES:
+         * Updated to IO::Async::Buffer 0.10 (method/event renames)
+
+0.11    CHANGES:
+         * Allow Request->finish() to take an exitcode
+
+        BUGFIXES:
+         * Cope with environment parameters longer than 127 bytes
+         * Small updates to included 'example' scripts
+
+0.10    CHANGES:
+         * Added CGI->FastCGI gateway example
+
+        BUGFIXES:
+         * Better handling of ->read_stdin_line()
+
+0.09:   CHANGES:
+         * Added 'fortune' example
+         * Better testing of connection reuse
+         * Support printing to STDERR FastCGI stream
+
+0.08:   CHANGES:
+         * First version to be based on IO::Async
+
+0.07:   CHANGES:
+         * Changed build system from ExtUtils::MakeMaker to Module::Build
+
+Versions before this did not appear on CPAN, and no 'Changes' notes are
+provided for them.

@@ -1,0 +1,45 @@
+{
+   "abstract" : "base class for dealing with FTN message serialno.",
+   "author" : [
+      "Valery Kalesnik <valkoles@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FTN-Message-serialno",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "FTN::Message::serialno" : {
+         "file" : "lib/FTN/Message/serialno.pm",
+         "version" : "20141121"
+      },
+      "FTN::Message::serialno::File" : {
+         "file" : "lib/FTN/Message/serialno/File.pm",
+         "version" : "20141121"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "20141121"
+}

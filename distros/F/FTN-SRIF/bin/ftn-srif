@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+#
+# ftn-srif
+
+# Setup
+
+use warnings;
+use strict;
+use File::Spec;
+use Config::Tiny;
+
+use FTN::Log qw(&logging);
+
+use FTN::SRIF qw(&parse_srif &get_request_list);
+
+=head1 NAME
+
+ftn-srif - A Perl script to process file requests via an incoming SRIF file
+
+=head1 VERSION
+
+Version 0.09
+
+=cut
+
+our $VERSION = 0.09;
+
+=head1 SYNOPSIS
+
+C<ftn-srif srif_path_and_file>
+
+=head1 DESCRIPTION
+
+ftn-srif is a an external request processor that is passed the name and path of
+an SRIF (Standard Request Information File) on its command line.  It expects to
+find a configuration file named F<ftn-srif.cfg> one directory up from the
+directory that the SRIF is located in, and from that determines the location
+of its Log file and the 'Magic' file it will will be using during processing.
+
+It then uses the parse_srif function from the FTN::SRIF module to get the 
+contents of the SRIF, especially the following:
+
+=over 4
+
+=item RequestList
+
+This is the path and filename of the list containing the requested files.
+
+=item ResponseList
+
+This is the path and filename of the response list. It must not
+be equal to RequestList. One file per line, including the full
+path to the file. The first character defines the way the mailer
+should act after sending that file:
+		
+    =   erase file if sent successfully
+    +   do not erase the file after sent
+    -   erase the file in any case after session
+
+=back
+
+It then processes the filenames list in the RequestList file.  If the system
+has the file being requested, the name and path for it is added to the
+ResponseList file for the mailer to send back to the requesting system and a
+note regarding that is added to a response message that will also be sent to
+the requesting system.   If it does not, a note about not having that file is
+added to the result summary message.
+
+=cut
+
+
+my ($srif_path, $srif_file, $SRIF, @directories, $request_file, $response_file, $srif_info, $request_list);
+
+my $debug = 1;		# set debug flag to true (1) or false (0)
+
+my $log_id="SRIF";
+
+# There should only be one command line argument.
+
+die "Usage: ftn-srif SRIF_path_and_file\n" unless (@ARGV == 1);
+
+$SRIF = pop @ARGV;
+
+#  Get configuration file
+
+#  Get path and file of the srif file
+(undef, $srif_path, $srif_file  ) = File::Spec->splitpath($SRIF);   
+
+#  Get the next directory up from $srif_path, where the srif file is (mailer inbound, presumably)
+@directories = File::Spec->splitdir( $srif_path );
+my $srif_dir = pop @directories;
+if ($srif_dir eq "") {
+    $srif_dir = pop @directories;
+}
+my $config_dir = File::Spec->catdir(@directories);
+my $config_file = File::Spec->join($config_dir, 'ftn-srif.cfg');
+
+#  Get configuration
+my $srif_config = Config::Tiny->new();
+$srif_config = Config::Tiny->read($config_file)
+    or die "Could not open SRIF configuration file:  $config_file";
+
+my $log_file = $srif_config->{SRIF}->{LogFile};	# set log file
+
+my $magic_file = $srif_config->{SRIF}->{MagicFile};
+
+logging($log_file, $log_id, "SRIF magic file:  $magic_file") if ($debug);
+
+# sent if file(s) requested isn't found
+my $default_file = $srif_config->{SRIF}->{DefaultFile};
+
+$srif_info = FTN::SRIF::parse_srif($SRIF);
+
+$request_file = ${$srif_info}{'RequestList'};
+
+logging($log_file, $log_id, "SRIF request file is: $request_file") if ($debug);
+
+$request_list = FTN::SRIF::get_request_list($request_file);
+
+$response_file = ${$srif_info}{'ResponseList'};
+
+logging($log_file, $log_id, "SRIF mailer response file is:  $response_file") if ($debug);
+
+send_response();
+
+cleanup();
+
+############################################
+# subroutines
+############################################
+
+############################################
+# send response
+############################################
+sub send_response {
+
+# $response_file is the filename of the response list file.  One
+# file per line, including drives/paths to the file.  The first
+# character defnes the way the mailer should act after sending that
+# file:
+#  = erase file if successfully sent
+#  + do not erase the file
+#  - erase the file in any case
+
+    logging($log_file, $log_id, "Sending response to $srif_file") if ($debug);
+    
+#  Send Default file if any FREQ is unfullfilled
+    send_default_file();  
+
+}
+
+############################################
+# send Default File
+############################################
+sub send_default_file {
+
+    my $keep = "+";  # keep file after sending.
+    
+#  If cannot locate any of the requested files, send a txt file back 
+# saying so & add the path to that in the response list.  Initially,
+# this will be the list of "magic" names for file requests;  but will
+# also want to send a message file or packet back.
+
+    logging($log_file, $log_id, "Sending default file $default_file") if ($debug);
+  
+    open my $rsp_handle, q{>>}, "$response_file"
+		or die ("Could not open Response file $response_file");
+#        print $rsp_handle ("+",$default_file,"\n");
+        print $rsp_handle ($keep,$default_file,"\n");
+    close($rsp_handle);
+
+}
+
+############################################
+# send response packet back
+############################################
+sub send_packet_response {
+
+    my $keep = "=";  # do not keep packet file if successfully sent.
+    my ($Sec, $Min, $Hour, $Day, $Mon, $Year) = localtime();
+
+    #   need to parse this from the $response_file
+    my $out_dir ="/var/spool/ftn/out"; 
+
+    logging($log_file, $log_id, "Sending Response Message packet") if ($debug);
+  
+
+    # create packet file name
+    my $packet_file = sprintf("%s/%02d%02d%02d%02d.PKT",$out_dir,$Day,$Hour,$Min,$Sec);
+
+
+    create_husky_packet($packet_file);
+
+    open my $rsp_handle, q{>>}, "$response_file"
+		or die ("Could not open Response file $response_file.");
+        print $rsp_handle ($keep,$packet_file,"\n");
+    close($rsp_handle);
+
+}
+
+############################################
+#    create_husky_packet($packet_file);
+############################################
+sub create_husky_packet {
+
+#Usage:
+#txt2pkt -xf "<pkt from address>" -xt "<pkt to address>"  \
+# -af "<from address>" -at "<to address>" \
+# -nf "<from name>" -nt "<to name>" \
+# -e "echo name" -p "password" -t "tearline" -o "origin" \
+# -s "subject" -d "<directory>" <text file>
+
+    my($packet_file) = @_;	# need to localize?
+
+#    logging($log_file, $log_id, "Create packet using Husky project utility.") if ($debug);
+    
+    logging($log_file, $log_id, "Creating pkt using Husky project utility not yet implemented.") if ($debug);    
+    
+}
+
+############################################
+# cleanup
+############################################
+sub cleanup {
+
+    logging($log_file, $log_id, "Removing Request file $request_file") if ($debug);
+    
+    unlink $request_file;
+    
+}
+
+############################################
+
+=head1 EXAMPLES
+
+This is the contents of an example ftn-srif.cfg file:
+
+    [SRIF]
+    LogFile=/opt/ftn/log/srif.log
+    MagicFile=/opt/ftn/magic.txt
+    DefaultFile=/opt/ftn/freqerr.txt
+
+
+This is an example line in a BinkD configuration file to make use of ftn-srif:
+
+    # Run an external program. 
+    # The "*S" macro in command line substed with S.R.I.F., see !SRIF.TXT
+    #
+    exec "/opt/ftn/bin/ftn-srif *S" *.req
+
+An example of a command line that ftn-srif might see:
+
+    C<ftn-srif /opt/ftn/pin/07800220.srf>
+
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-ftn-srif at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FTN-SRIF>.  I will be notified,
+and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this with the perldoc command.
+
+    perldoc ftn-srif
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=FTN-SRIF>
+
+=back
+
+=head1 SEE ALSO
+
+ L<FTN::SRIF>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2001-2003,2010-2012 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

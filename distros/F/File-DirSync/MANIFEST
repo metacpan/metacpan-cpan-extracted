@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+README
+Changes
+dirsync
+lib/File/DirSync.pm
+t/100_compile.t
+t/100_load.t
+t/110_behave.t
+t/120_rmtree.t

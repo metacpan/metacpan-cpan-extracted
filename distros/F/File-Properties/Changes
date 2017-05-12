@@ -1,0 +1,10 @@
+Revision history for Perl extension File::Properties.
+
+0.01  2011-11-05
+	- Original version.
+
+0.02  2011-12-22
+        - Fixed file test script locking problem occurring on BSD 
+          platforms.
+        - Improved mechanism for determining whether properties were 
+          retrieved from the cache.

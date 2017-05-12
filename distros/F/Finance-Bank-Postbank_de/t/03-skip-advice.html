@@ -1,0 +1,472 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+
+
+
+
+
+
+
+<html>
+
+<head>
+
+<title id="fst">Postbank Online-Banking</title>
+
+<!--
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+-->
+
+
+
+<meta http-equiv="content-language" content="de" />
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+
+<!--
+<link rel="shortcut icon" type="image/icon" href="favicon.ico" />
+<link rel="icon" type="image/icon" href="favicon.ico" />
+-->
+
+<link rel="SHORTCUT ICON" href="/app/static/images/favicon.ico" />
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/app/static/css/main.css" />
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/app/static/css/formular.css" />
+<!--[if gte IE 5]>
+<link rel="stylesheet" type="text/css" media="screen,projection" href="/app/static/css/ie.css" />
+<![endif]-->
+
+<!--[if lt IE 6]>
+<link rel="stylesheet" type="text/css" media="screen,projection" href="/app/static/css/ie5.css" />
+<![endif]-->
+
+
+
+
+
+<script type="text/javascript">
+// Globale Konstanten Definitionen in JavaScript
+var EXTERN_URL_GIRO_ABSCHLIESSEN = 'https://produktabschluss.postbank.de/giroplus/ekantrag/einzelkonto1.jsp';
+var EXTERN_URL_POSTBANK_BANKING_FREISCHALTEN = 'https://produktabschluss.postbank.de/ipvk/onlineBanking/welcome.jsp';
+
+
+var EXTERN_URL_KONTAKT_IPVK = 'https://produktabschluss.postbank.de/ipvk/kontakte/welcome.jsp?ipvk_aufruf=iob&amp;url=https://banking.postbank.de/app/private/servlet.callback;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3';
+var EXTERN_URL_PREISINFORMATION_AZV = 'http://www.postbank.de/iob_azv_preise';
+
+
+</script>
+
+
+
+
+
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/script.js"></script>
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/util.js"></script>
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/browserCheck.js"></script>
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/iob.js"></script>
+
+</head>
+
+
+
+
+
+<body class="aktiv" onload="init()">
+
+
+
+
+<h1 class="notvisible">Postbank Internet <span lang="en">Online-Banking</span></h1>
+<p class="notvisible"><a href="#level2">Direkt zum Inhalt</a></p>
+
+
+
+<div id="logo" class="logo">
+
+
+
+
+
+        <img src="/app/static/images/pblogo2.gif" width="140" height="90" alt="Postbank" id="pblogo" />
+
+
+</div>
+
+
+
+<div class="lftBar" id="lftBar">
+
+
+<h2 class="notvisible">Hauptnavigation</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="navigation nowrap">
+<ul class="links">
+
+
+
+
+  <li><div><a href="/app/finanzstatus.reduziert.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" accesskey="f" tabindex="102" class="inaktiv" title="Tastenkombination: Alt + f"><span class="underline">F</span>inanzstatus</a></div></li>
+
+
+
+
+        <li class="liUnderEmpty"><div class="navBlocked">Konto<span class="underline">u</span>ms&auml;tze</a></div></li>
+        <li><div class="navBlocked"><span class="underline">&Uuml;</span>berweisung</a></div></li>
+        <li><div class="navBlocked"><span class="underline">D</span>auerauftrag</a></div></li>
+        <li><div class="navBlocked"><span class="underline">A</span>uslandsauftrag</a></div></li>
+        <li><div class="navBlocked"><span class="underline">K</span>omfort-Sparen</a></div></li>
+        <li class="liUnderEmpty"><div class="navBlocked">Auf<span class="underline">t</span>ragslisten</a></div></li>
+        <li><div class="navBlocked"><span class="underline">E</span>instellungen</a></div></li>
+
+
+
+
+
+  <li class="liUnderEmpty"><div class="nowrap"><a href="/app/logout.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" accesskey="b" tabindex="110" class="iob-nav-close" id="navigation-logout" title="Tastenkombination: Alt + b"><span class="underline">B</span>anking beenden</a></div></li>
+
+
+
+</ul>
+
+<div class="NavTeaser">
+<a class="aTeaser" tabindex="111" title="Deutsche Post World Net - &Ouml;ffnet ein neues Fenster"
+   href="http://www.dpwn.de/" target="_blank"><img
+   src="/app/static/images/dpwn.gif" alt="Deutsche Post World Net"
+   width="140" height="52" /></a>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<hr class="notvisible" />
+<h2 class="notvisible">Definition und Links der Tastenkombinationen</h2>
+<p class="notvisible"><a href="#level1">Links f&uuml;r Tastenkombinationen &uuml;berspringen</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p class="keylinks">
+
+
+<a href="#logo" accesskey="1" tabindex="500" title="[Alt+1] Seitenanfang"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+<a href="#level2" accesskey="8" title="[Alt+8] Direkt zum Inhalt"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+
+
+
+<a href="/app/finanzstatus.reduziert.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" accesskey="0" tabindex="500" title="[Alt+0] Startseite"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+<a href="/app/sitemap.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" accesskey="7" tabindex="500" title="[Alt+7] Seiten&uuml;bersicht"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+
+
+</p>
+
+
+
+
+
+</div>
+
+
+
+
+<div class="level1">
+<a name="level1"></a>
+
+
+
+<hr class="notvisible" />
+<h2 class="notvisible">Kopfbereich mit weiteren Informationen</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="topNav"></div>
+
+
+
+<div class="topBar">
+
+<div class="visual"><img class="imgVisual"
+  src="/app/static/images/head_visual.jpg"
+  alt="Postbank Online-Banking" width="430" height="65" /></div>
+
+
+
+<div class="headName">
+  <h4 class="h4HeadName">PETRA PFIFFIG</h4>
+  <p class="pHeadName">
+    <br />Girokonto: <span class="digit">9999999999</span>
+    <br /><span class="abbr" title="Bankleitzahl"><abbr title="Bankleitzahl">BLZ:</abbr></span>
+          <span class="digit">20010020</span>
+  </p>
+
+</div>
+
+
+
+
+<br />
+
+</div>
+
+
+
+<div class="advBar clearBoth"></div>
+
+
+
+
+<div class="level2">
+<a name="level2"></a>
+
+
+
+<hr class="notvisible" />
+<h2 class="notvisible">Hauptinhalt</h2>
+
+
+
+
+
+
+<div class="main">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="content">
+
+    <div class="headline"><p class="pHeadlineLeft">Demokonto</p><br /> </div>
+
+    <div class="contentTabelle">
+
+        <div class="innerContentTabelle">
+
+            <div class="block">
+                <div class="emptyline">&nbsp;</div>
+                <p class="pContent"><strong>Sehr geehrte Kundin, sehr geehrter Kunde,</strong></p>
+                <p class="pContent">seit neuestem bietet Ihnen das Postbank <span lang="en">Online-Banking</span> zahlreiche neue Sicherheitsmerkmale. Diese werden bald auch
+                im Demokonto verf&uuml;gbar sein. Bis dahin m&ouml;chten wir Ihnen zu diesen Neuerungen einige Vorabinformationen geben:
+                </p>
+
+                <div class="emptyline">&nbsp;</div>
+
+                <p class="pContent"><strong>Indizierte <acronym title="Transaktionsnummer">TAN</acronym>s</strong><br />
+                Ab sofort werden neue <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>-Listen mit so genannten "indizierten <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>s" ausgeliefert.  K&uuml;nftig wird bei einer Transaktion im
+                Internet jeweils eine spezifische <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym> aus Ihrer Liste zugeordnnet (= indiziert). Die laufende Nummer dieser indizierten <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym> wird
+                Ihnen im Online Banking angezeigt. Sie m&uuml;ssen dann die dazu passende indizierte <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym> eingeben. Durch die individuelle Reservierung
+                einer bestimmten <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym> f&uuml;r eine Transaktion wird diese <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym> f&uuml;r betr&uuml;gerische Absichten wertlos, da sie eben nur f&uuml;r einen einzigen
+                Vorgang verwendet werden kann. Im Unterschied zum bisherigen <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>-Verfahren kann mit der indizierten <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym> nur die eine von
+                Ihnen gew&uuml;nschte Transaktion freigegeben werden.
+                </p>
+                <div class="emptyline">&nbsp;</div>
+                <p class="pContent"><strong>Mobiles <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>-Verfahren</strong><br />
+                Das <acronym title="mobile Transaktionsnummer">mTAN</acronym>-Verfahren ist nun auch im Online-Banking verf&uuml;gbar. Dabei wird Ihnen im Rahmen eines Auftrags eine spezielle Mobile <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>
+                per <span class="abbr" title="Short Message Service"><abbr title="Short Message Service">SMS</abbr></span> auf ein Telefon gesendet. Dieses Telefon m&uuml;ssen Sie zuvor f&uuml;r diesen Service freischalten. Das bedeutet f&uuml;r Sie mehr
+                Flexibilit&auml;t und Sicherheit. Denn so k&ouml;nnen Sie Auftr&auml;ge auch ohne <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>-Liste erteilen. Durch die  &Uuml;bermittlung der <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym> per
+                Mobilfunk ist ein Abfangen der <acronym class="verdeckt" title="mobile Transaktionsnummer">mTAN</acronym> sehr schwierig und die &uuml;bermittelte <acronym class="verdeckt" title="mobile Transaktionsnummer">mTAN</acronym> kann nur f&uuml;r die von Ihnen eingestellte Transaktion
+                genutzt werden.
+                </p>
+
+                <div class="emptyline">&nbsp;</div>
+                <p class="pContent"><strong>Aktivierungscode</strong><br />
+                Eine neue <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>-Liste schalten Sie mit einem Aktivierungscode frei. Erst danach k&ouml;nnen die (indizierten) <acronym class="verdeckt" title="Transaktionsnummer">TAN</acronym>s dieser Liste genutzt werden.
+                </p>
+                <div class="emptyline">&nbsp;</div>
+                <p class="pContent"><strong>&Uuml;berweisungslimit</strong><br />
+                Sie k&ouml;nnen je ein &Uuml;berweisungslimit f&uuml;r Internet und Finanzsoftware definieren. Danach k&ouml;nnen nur noch &Uuml;berweisungen &uuml;ber maximal diesen Betrag ausgef&uuml;hrt werden.
+                </p>
+                <div class="emptyline">&nbsp;</div>
+                <p class="pContent"><strong>Vorl&auml;ufige <acronym title="Personal Identification Number">PIN</acronym>-Sperre mit Zwangspause</strong><br />
+                Nach dreimaliger Falscheingabe Ihrer <acronym class="verdeckt" title="Personal Identification Number">PIN</acronym> wird der Zugang zum <span lang="en">Online-Banking</span> vorl&auml;ufig gesperrt. Erst nach Ablauf einer gewissen Zeitspanne k&ouml;nnen Sie diese Sperre aufheben.
+                </p>
+                <div class="emptyline">&nbsp;</div>
+                <p class="pContent"><strong>Sicherheitsstatus</strong><br />
+                Mit dem Sicherheitsstatus sind Sie jederzeit &uuml;ber alle sicherheitsrelevanten Einstellungen rund um Ihr <span lang="en">Online-Banking</span> auf dem Laufenden.
+                </p>
+                <div class="emptyline">&nbsp;</div>
+            </div>
+            <div class="Linkleiste">
+                <div class="LinkLinksSize2 LinkLinks"></div>
+                <div class="LinkRechtsSize6 LinkRechts">
+                    <a href="/app/finanzstatus.reduziert.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" tabindex="30" class="aLinkleiste"><strong>Zum Finanzstatus</strong></a><a href="/app/finanzstatus.reduziert.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" tabindex="30" class="aLinkleiste" title="Zum Finanzstatus"><img class="rightIcon" width="13" height="13"
+                    src="/app/static/images/ic_linkpfeil.gif"
+                    alt="Zum Finanzstatus" /></a>
+                </div>
+                <br />
+            </div>
+
+        </div><!-- *** div innerContentTabelle Ende *** -->
+    </div><!-- *** div contentTabelle Ende *** -->
+</div><!-- *** div content Ende *** -->
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+<p class="notvisible"><a href="#lftBar">Zurück zur Hauptnavigation</a></p>
+
+
+<hr class="notvisible" />
+
+
+
+
+
+
+<div class="fusszeile">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script language="JavaScript" type="text/javascript">
+  <!--
+  var rel = '';
+  var sim = '';
+
+
+  var s = '<p class="pFusszeile"><a href="/app/sitemap.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" tabindex="250" class="aFusszeile"><span lang="en">Sitemap</span></a> | '
+        + '<a href="/app/bedienungshilfe.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" tabindex="251" class="aFusszeile">Bedienungshilfen</a> | '
+        + '<a href="javascript:;" onclick="openNewProcess(EXTERN_URL_KONTAKT_IPVK)" title="&Ouml;ffnet ein neues Fenster" tabindex="252" class="aFusszeile">Kontakt</a>'
+        + sim + rel + '</p>';
+  // alert('s=[' + s + ']');
+  document.write(s);
+  //-->
+  </script>
+  <noscript>
+  <p class="pFusszeile">
+  <a href="/app/sitemap.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" tabindex="250" class="aFusszeile"><span lang="en">Sitemap</span></a> |&nbsp;
+  <a href="/app/bedienungshilfe.init.do;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" tabindex="251" class="aFusszeile">Bedienungshilfen</a> |&nbsp;
+  <a href="https://produktabschluss.postbank.de/ipvk/kontakte/welcome.jsp?ipvk_aufruf=iob&amp;amp;url=https://banking.postbank.de/app/private/servlet.callback;jsessionid=A3639C63B080B57F3C4DD0089D4FBB45.B1_3" target="_blank" title="&Ouml;ffnet ein neues Fenster"
+    tabindex="252" class="aFusszeile">Kontakt</a>
+
+</p></noscript>
+
+
+
+
+
+</div>
+<br />
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+</body>
+
+</html>

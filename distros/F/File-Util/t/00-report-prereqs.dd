@@ -1,0 +1,84 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build' => '0.28',
+                                        'perl' => '5.008001'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Devel::Cover' => '0',
+                                      'Dist::Zilla' => '0',
+                                      'English' => '0',
+                                      'File::Temp' => '0',
+                                      'Perl::Critic' => '0',
+                                      'Perl::Critic::Lax' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::Fatal' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Version' => '1',
+                                      'inc::latest' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Unicode::UTF8' => '0.58'
+                                      },
+                      'requires' => {
+                                      'Exporter' => '0',
+                                      'Fcntl' => '0',
+                                      'Scalar::Util' => '0',
+                                      'constant' => '0',
+                                      'lib' => '0',
+                                      'perl' => '5.008001',
+                                      'strict' => '0',
+                                      'subs' => '0',
+                                      'vars' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'AutoLoader' => '0',
+                                   'Config' => '0',
+                                   'Cwd' => '0',
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'Fcntl' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Module::Build' => '0.28',
+                                   'Scalar::Util' => '0',
+                                   'Test' => '0',
+                                   'Test::More' => '0',
+                                   'Test::NoWarnings' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.008001',
+                                   'utf8' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

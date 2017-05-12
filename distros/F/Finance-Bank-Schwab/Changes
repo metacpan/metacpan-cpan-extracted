@@ -1,0 +1,40 @@
+Changes for Finance::Bank::Schwab
+
+2.03 - Tue Dec 10 10:50:37 EST 2013
+    Retrieves positions along with balances based on the patch from Ryan Clark.
+    <ryan.clark9 at gmail.com>. Positions include stock/bond/etc share count,
+    price, etc. in addition to the overall account balance.
+
+    Big code, documentation and repository clean up.
+
+    Updates the prereqs for SSL library
+
+1.23 - Thu Jun 21 18:56:58 EDT 2012
+    Removes superscripted notes from account numbers
+
+1.22 - Thu Jun 21 18:10:00 EDT 2012
+    Updates the table parsing to work with new Schwab html
+
+1.21 - Wed Mar 28 19:35:21 EDT 2012
+    Updates to avoid picking up Totals line in table
+
+1.20 - Fri Jul 23 10:10:39 EDT 2010
+    Updated the login form/post routine to accommodate the new Schwab login
+    procedures.
+
+1.19 - Thu Apr  8 16:30:30 2010
+    Strip ALL of the footnotes out of the table fields
+
+1.18 - Wed Apr  7 09:29:20 2010
+    Updated web scraping routine to strip off footnotes from account names
+
+1.17 - Thu Mar  4 09:19:50 2010
+    Switch to HTML::Extract rather than regexes to scrape data
+
+1.16 - Thu Mar  4 08:46:20 2010
+    Updated to regex to work with the new "Cash & Cash Inv" column in the
+    Schwab accounts table.
+
+1.14 - Mon Nov  9 16:06:20 2009
+    Updated to work with Schwab's new site.
+

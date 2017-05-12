@@ -1,0 +1,455 @@
+------------------------------------------------------------------------
+r57 | dpavlin | 2005-04-26 22:18:45 +0200 (Tue, 26 Apr 2005) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+
+added Strix examples
+
+------------------------------------------------------------------------
+r56 | dpavlin | 2005-04-26 22:17:14 +0200 (Tue, 26 Apr 2005) | 2 lines
+Changed paths:
+   A /trunk/examples/strix-multi_static.pl
+   A /trunk/examples/strix-static3.pl
+
+added examples for Strix portal (www.strix-portal.com)
+
+------------------------------------------------------------------------
+r55 | dpavlin | 2005-04-26 22:12:55 +0200 (Tue, 26 Apr 2005) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+0.08: support for filenames which are null (it will ne named NULL-id)
+
+------------------------------------------------------------------------
+r54 | dpavlin | 2005-04-26 21:57:51 +0200 (Tue, 26 Apr 2005) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+better support for zero-sized files
+
+------------------------------------------------------------------------
+r53 | dpavlin | 2004-11-28 21:20:36 +0100 (Sun, 28 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+fixed work-around for non-working fusermount, removed some debugging output
+
+------------------------------------------------------------------------
+r52 | dpavlin | 2004-11-27 16:08:10 +0100 (Sat, 27 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+really remove all output from fusermount, define constant BLOCK to 1024
+(used in various places)
+
+------------------------------------------------------------------------
+r51 | dpavlin | 2004-11-27 15:02:18 +0100 (Sat, 27 Nov 2004) | 11 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/Makefile.PL
+
+Improvements in getattr and statfs: du will not return meaningful values and
+df will return something which is not as wrong as it was (but, still not
+correct).
+
+Fuse::DBI will not try to load kernel module using sudo, and try to umount
+using sudo umount if fusermount -u fails (as it happends with current CVS
+version of fuse).
+
+New webgui test target in Makefile which work as test on my local machine
+(and hopefully on any with webgui default installation).
+
+------------------------------------------------------------------------
+r50 | dpavlin | 2004-11-27 01:40:18 +0100 (Sat, 27 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+
+add patches
+
+------------------------------------------------------------------------
+r49 | dpavlin | 2004-11-26 22:34:02 +0100 (Fri, 26 Nov 2004) | 2 lines
+Changed paths:
+   D /trunk/fuse-perl-patch/cvs-20041116.diff
+   A /trunk/fuse-perl-patch/cvs-api_fix.diff (from /trunk/fuse-perl-patch/cvs-20041116.diff:48)
+   A /trunk/fuse-perl-patch/cvs-blocks_fix.diff
+
+rename one patch, added blocks fix
+
+------------------------------------------------------------------------
+r48 | dpavlin | 2004-11-24 11:24:07 +0100 (Wed, 24 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/t/02sqlite.t
+
+test cleanup
+
+------------------------------------------------------------------------
+r47 | dpavlin | 2004-11-24 00:54:58 +0100 (Wed, 24 Nov 2004) | 5 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+API 0.07:
+- added is_mounted
+- mount will now block until filesystem is mounted
+  (this might take up to 2 sec in intervals of 0.5 sec)
+
+------------------------------------------------------------------------
+r46 | dpavlin | 2004-11-24 00:52:06 +0100 (Wed, 24 Nov 2004) | 2 lines
+Changed paths:
+   D /trunk/Changes
+
+this will be generated from svn log
+
+------------------------------------------------------------------------
+r45 | dpavlin | 2004-11-24 00:49:24 +0100 (Wed, 24 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/examples/webgui.pl
+
+fix support for PostgreSQL
+
+------------------------------------------------------------------------
+r44 | dpavlin | 2004-11-23 12:16:41 +0100 (Tue, 23 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/t/99pod.t
+
+fix POD test
+
+------------------------------------------------------------------------
+r43 | dpavlin | 2004-11-23 12:16:32 +0100 (Tue, 23 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+produce Changes from svn log
+
+------------------------------------------------------------------------
+r42 | dpavlin | 2004-11-23 12:03:38 +0100 (Tue, 23 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/README
+
+better explanation
+
+------------------------------------------------------------------------
+r41 | dpavlin | 2004-11-23 12:03:24 +0100 (Tue, 23 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/t/01load.t
+   M /trunk/t/99pod.t
+
+fix tests to remove dependency on jsFind (and I souldn't copy tests between
+my modules anyway :-)
+
+------------------------------------------------------------------------
+r40 | dpavlin | 2004-11-19 22:56:12 +0100 (Fri, 19 Nov 2004) | 4 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+fixed mounted mess. This will probably fix fusermount errors users are
+seeing once and forever. Added $SIG{'QUIT'} handler, documented bug in
+upstream Fuse module.
+
+------------------------------------------------------------------------
+r39 | dpavlin | 2004-11-16 17:00:52 +0100 (Tue, 16 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+
+added patch to MANIFEST
+
+------------------------------------------------------------------------
+r38 | dpavlin | 2004-11-16 16:59:04 +0100 (Tue, 16 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/README
+
+documentation update before release
+
+------------------------------------------------------------------------
+r37 | dpavlin | 2004-11-16 16:48:11 +0100 (Tue, 16 Nov 2004) | 2 lines
+Changed paths:
+   A /trunk/fuse-perl-patch
+   A /trunk/fuse-perl-patch/cvs-20041116.diff
+
+patch to fix current CVS version of Fuse perl bindings
+
+------------------------------------------------------------------------
+r36 | dpavlin | 2004-11-16 16:34:25 +0100 (Tue, 16 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/examples/webgui.pl
+
+update URL to fuse web site
+
+------------------------------------------------------------------------
+r35 | dpavlin | 2004-11-16 16:32:36 +0100 (Tue, 16 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+   A /trunk/MANIFEST.SKIP
+
+bookkeeping update before release
+
+------------------------------------------------------------------------
+r34 | dpavlin | 2004-11-16 16:32:21 +0100 (Tue, 16 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/t/03pgsql.t
+
+working PostgreSQL example
+
+------------------------------------------------------------------------
+r33 | dpavlin | 2004-11-15 21:55:10 +0100 (Mon, 15 Nov 2004) | 5 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/MANIFEST
+   M /trunk/Makefile.PL
+   M /trunk/t/02sqlite.t
+
+SQLite test is finally working,
+bumped version to 0.05,
+you can really umount filesystem when using fork (which is still very
+experimental and useful only for tests anyway)
+
+------------------------------------------------------------------------
+r32 | dpavlin | 2004-11-15 21:45:03 +0100 (Mon, 15 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+fix quoting of characters in regex: Fuse::DBI will now work correctly with
+parens and other characters which have special meaning in regexps
+
+------------------------------------------------------------------------
+r31 | dpavlin | 2004-10-10 21:33:23 +0200 (Sun, 10 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+modify ctime only when writing to file, prevents message "file has changed"
+
+------------------------------------------------------------------------
+r30 | dpavlin | 2004-10-09 02:03:42 +0200 (Sat, 09 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/MANIFEST
+
+fix for pod2html
+
+------------------------------------------------------------------------
+r29 | dpavlin | 2004-10-09 01:44:34 +0200 (Sat, 09 Oct 2004) | 2 lines
+Changed paths:
+   D /trunk/examples/webgui-mysql.pl
+
+removed obsolete example
+
+------------------------------------------------------------------------
+r28 | dpavlin | 2004-10-09 01:43:06 +0200 (Sat, 09 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+documentation improvements, API 0.04
+
+------------------------------------------------------------------------
+r27 | dpavlin | 2004-10-09 00:56:55 +0200 (Sat, 09 Oct 2004) | 4 lines
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/examples/webgui.pl
+
+use Data::Config from WebGUI installation to read configuration file and
+extract all needed data from it, added a lot of documentation and finished
+example for WebGUI
+
+------------------------------------------------------------------------
+r26 | dpavlin | 2004-10-09 00:55:36 +0200 (Sat, 09 Oct 2004) | 3 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+added invalidation of file list with rmdir,
+prevent multiple umounts by keeping mounted flag
+
+------------------------------------------------------------------------
+r25 | dpavlin | 2004-10-08 22:07:32 +0200 (Fri, 08 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/examples/webgui-mysql.pl
+
+invalidate example
+
+------------------------------------------------------------------------
+r24 | dpavlin | 2004-10-08 22:07:12 +0200 (Fri, 08 Oct 2004) | 4 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+call umount on DESTROY, support for optional 'invalidate' code ref which
+erase templates from disk (user running fuse must have permissions on
+template directory for this to work)
+
+------------------------------------------------------------------------
+r23 | dpavlin | 2004-10-02 18:54:42 +0200 (Sat, 02 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+correct links in pod to that pod2html doesn't choke
+
+------------------------------------------------------------------------
+r22 | dpavlin | 2004-10-02 18:30:16 +0200 (Sat, 02 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/t/02sqlite.t
+   M /trunk/t/03pgsql.t
+
+fixed fork option and tests
+
+------------------------------------------------------------------------
+r21 | dpavlin | 2004-10-02 17:29:02 +0200 (Sat, 02 Oct 2004) | 10 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+a lot of changes (0.03 API):
+- added unlink (rm) method to invalidate in-memory cache
+- added fuse_module_loaded method to check if fuse module is loaded
+- fixed short read of last block
+- removed Proc::Simple usage and replaced with simplier forking mechanism
+
+This is first working version, but it's not binary-safe yet. NULL bytes
+are still problem.
+
+
+------------------------------------------------------------------------
+r20 | dpavlin | 2004-10-02 02:42:38 +0200 (Sat, 02 Oct 2004) | 2 lines
+Changed paths:
+   A /trunk/t/03pgsql.t
+
+added PostgreSQL test
+
+------------------------------------------------------------------------
+r19 | dpavlin | 2004-10-02 02:42:27 +0200 (Sat, 02 Oct 2004) | 2 lines
+Changed paths:
+   D /trunk/t/02database.t
+   A /trunk/t/02sqlite.t (from /trunk/t/02database.t:18)
+
+moved sqlite test to 02sqlite.t
+
+------------------------------------------------------------------------
+r18 | dpavlin | 2004-09-05 18:59:41 +0200 (Sun, 05 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+
+broken version with DBD::SQLite (transaction problems)
+
+------------------------------------------------------------------------
+r17 | dpavlin | 2004-09-05 18:55:12 +0200 (Sun, 05 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/t/02database.t
+
+make files writable
+
+------------------------------------------------------------------------
+r16 | dpavlin | 2004-09-05 18:55:02 +0200 (Sun, 05 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+quote module names
+
+------------------------------------------------------------------------
+r15 | dpavlin | 2004-09-05 18:04:35 +0200 (Sun, 05 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/t/02database.t
+
+use DBD::SQLite to run tests (if installed)
+
+------------------------------------------------------------------------
+r14 | dpavlin | 2004-08-29 22:56:23 +0200 (Sun, 29 Aug 2004) | 2 lines
+Changed paths:
+   A /trunk/examples/webgui-mysql.pl
+
+working example for MySQL installation of WebGUI
+
+------------------------------------------------------------------------
+r13 | dpavlin | 2004-08-29 22:12:37 +0200 (Sun, 29 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/examples/webgui.pl
+
+getdir fix, working WebGUI example
+
+------------------------------------------------------------------------
+r12 | dpavlin | 2004-08-29 21:16:01 +0200 (Sun, 29 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/t/02database.t
+
+umount works, as well as tests
+
+------------------------------------------------------------------------
+r11 | dpavlin | 2004-08-29 20:51:29 +0200 (Sun, 29 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/DBI.pm
+   M /trunk/Makefile.PL
+   A /trunk/examples
+   A /trunk/examples/webgui.pl
+   A /trunk/t/02database.t
+
+first try at making this module (late commit)
+
+------------------------------------------------------------------------
+r10 | dpavlin | 2004-08-29 19:52:02 +0200 (Sun, 29 Aug 2004) | 2 lines
+Changed paths:
+   D /trunk/Makefile
+
+created from Makefile.PL
+
+------------------------------------------------------------------------
+r9 | dpavlin | 2004-08-07 21:06:03 +0200 (Sat, 07 Aug 2004) | 2 lines
+Changed paths:
+   A /trunk/Changes
+   A /trunk/DBI.pm (from /trunk/fuse_dbi.pl:8)
+   A /trunk/MANIFEST
+   M /trunk/Makefile
+   A /trunk/Makefile.PL
+   A /trunk/README
+   D /trunk/fuse_dbi.pl
+   A /trunk/t
+   A /trunk/t/01load.t
+   A /trunk/t/99pod.t
+
+move code to Fuse::DBI module (probably broken now)
+
+------------------------------------------------------------------------
+r8 | dpavlin | 2004-08-07 17:16:50 +0200 (Sat, 07 Aug 2004) | 3 lines
+Changed paths:
+   M /trunk/fuse_dbi.pl
+
+better output, read fixes, ctime preserved (so that vi won't complain that
+your file changed if you save changes and try that again)
+
+------------------------------------------------------------------------
+r7 | dpavlin | 2004-08-07 16:48:23 +0200 (Sat, 07 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/fuse_dbi.pl
+
+make updates really work
+
+------------------------------------------------------------------------
+r6 | dpavlin | 2004-08-04 18:17:09 +0200 (Wed, 04 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile
+   M /trunk/fuse_dbi.pl
+
+first try at making it writable
+
+------------------------------------------------------------------------
+r3 | dpavlin | 2004-08-04 11:25:31 +0200 (Wed, 04 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile
+   M /trunk/fuse_dbi.pl
+
+file reading fix
+
+------------------------------------------------------------------------
+r2 | dpavlin | 2004-08-04 11:03:05 +0200 (Wed, 04 Aug 2004) | 2 lines
+Changed paths:
+   A /trunk/Makefile
+   M /trunk/fuse_dbi.pl
+
+directory browsing, Makefile for debugging
+
+------------------------------------------------------------------------
+r1 | dpavlin | 2004-08-04 10:58:46 +0200 (Wed, 04 Aug 2004) | 2 lines
+Changed paths:
+   A /trunk
+   A /trunk/fuse_dbi.pl
+
+import FUSE perl module to connect to database via DBI
+
+------------------------------------------------------------------------

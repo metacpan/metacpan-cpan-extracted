@@ -1,0 +1,8 @@
+Changes
+lib/Function/Override.pm
+Makefile.PL
+MANIFEST
+t/core.t
+t/Override.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

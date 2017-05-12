@@ -1,0 +1,4 @@
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Mon Feb 22 14:50:09 EST 2016
+baz-1.0.0.pom>=
+baz-1.0.0.war>=

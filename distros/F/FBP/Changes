@@ -1,0 +1,230 @@
+Changes for Perl extension FBP
+
+0.41 Mon 30 Jan 2012
+	- Added FBP::Sizer::minimum_size method
+	- Added FBP::Sizer POD documentation
+
+0.40 Mon 30 Jan 2012
+	- Corrected FBP::ComboBox::OnComboBox to OnCombobox
+
+0.39 Mon 9 Jan 2012
+	- Moved FBP::HyperLink to FBP::HyperlinkCtrl
+
+0.38 Tue 27 Sep 2011
+	- Added FBP::Project::encoding method
+	- Added FBP::Project::namespace method
+
+0.37 Wed 20 Jul 2011
+	- Updating Mouse dependency to 0.90 to get ->DOES support
+
+0.36 Wed 6 Jul 2011
+	- Added missing rows methods to FBP::Grid
+	- FBP::Window no longer inherits from FBP::Children, but instead
+	  each class that has children inherits FBP::Children themselves.
+
+0.35 Tue 5 Jul 2011
+	- Completed all possible non-AUI widgets for Dialog, Frame and Panel
+	- Added FBP::Choicebook class
+	- Added FBP::RichTextCtrl class
+	- Added FBP::Grid class
+	- Added FBP::ScrollBar class
+	- Added FBP::GenericDirCtrl class
+	- Added FBP::SpinButton class
+
+0.34 Mon 4 Jul 2011
+	- Added FBP::AnimationCtrl class
+	- Added FBP::GridBagSizer class
+	- Added FBP::Notebook class
+	- Added FBP::RadioButton class
+	- Added FBP::TreeCtrl class
+	- Abstracted the sizeritem classes into more granular roles
+	- Adding no Mouse and make_immutable to all classes
+
+0.33 Thu 30 Jun 2011
+	- Added FBP::Window::OnEraseBackground event
+	- Added FBP::Window::OnPaint event
+	- Added FBP::Window::OnSize event
+	- Added FBP::Window::OnUpdateUI event
+	- Added FBP::Calendar class
+	- Added FBP::DatePickerCtrl class
+	- Added FBP::ScrolledWindow class
+	- Added FBP::Slider class
+	- Added FBP::StaticBitmap class
+	- Added FBP::StdDialogButtonSizer class
+	- Added FBP::ToggleButton class
+	- Added missing tests for FBP::BitmapButton
+
+0.32 Mon 20 Jun 2011
+	- Added FBP::Menu class
+	- Added FBP::MenuBar class
+	- Added FBP::MenuItem class
+	- Added FBP::MenuSeparator class
+	- Added FBP::StatusBar class
+	- Added FBP::Tool class
+	- Added FBP::ToolBar class
+	- Added FBP::ToolSeparator class
+
+0.31 Fri 17 Jun 2011
+	- Added FBP::SearchCtrl class
+	- Added FBP::Gauge class
+	- Added FBP::HyperLink class
+
+0.30 Thu 16 Jun 2011
+	- Added FBP::BitmapButton class
+	- Added FBP::Frame class
+	- Added FBP::FormPanel class
+	- Added FBP::Form role
+	- Added FBP::TopLevelWindow role
+	- Added FBP::project method
+	- Added FBP::form method
+	- Added FBP::Project::forms method
+	- Added FBP::Project::name method
+	- Added FBP::Project::relative_path method
+
+0.29 Tue 17 May 2011
+	- Added FBP::RadioBox::style method
+
+0.28 Tue 17 May 2011
+	- Added FBP::RadioBox class
+
+0.27 Tue 10 May 2011
+	- Now that the object model is largely completed, removed the storage
+	  of the raw property hash on object creation. This will dramatically
+	  reduce the memory size of FBP object trees.
+	- Removed FBP::Object::raw method
+	- Added FBP::Window::hidden method
+
+0.26 Tue 3 May 2011
+	- Added FBP::Window::minimum_size method
+	- Added FBP::Window::maximum_size method
+
+0.25 Wed 30 Mar 2011
+	- Added FBP::Window::font method
+
+0.24 Tue 29 Mar 2011
+	- Added FBP::CustomControl::wxclass method
+	- Added FBP::CustomControl::header method
+
+0.23 Tue 29 Mar 2011
+	- Added FBP::CustomControl class
+
+0.22 Mon 21 Mar 2011
+	- Added FBP::Window::header attribute
+	- Added missing tests for FBP::Window::wxclass
+
+0.21 Tue 1 Mar 2011
+	- Added a number of missing style attributes
+
+0.20 Tue 1 Mar 2011
+	- Added FBP::Window::fg attribute
+	- Added FBP::Window::bg attribute
+
+0.19 Tue 1 Mar 2011
+	- Added FBP::SpinCtrl         class
+	- Added FBP::FontPickerCtrl   class
+	- Added FBP::ColourPickerCtrl class
+	- Added FBP::FilePickerCtrl   class
+	- Added FBP::DirPickerCtrl    class
+	- Added FBP::StaticText::wrap attribute
+	- Moved permissions attribute to FBP::Object
+
+0.18 Mon 28 Feb 2011
+	- Added FBP::SplitterWindow::permission attribute
+	- Added FBP::HtmlWindow::permission     attribute
+	- FBP::HtmlWindow is no longer a FBP::Panel subclass
+
+0.17 Mon 28 Feb 2011
+	- Updating copyright year
+	- Added FBP::Listbook       class
+	- Added FBP::ListbookPage   class
+	- Added FBP::SplitterWindow class
+	- Added FBP::SplitterItem   class
+
+0.16 Thu 20 Sep 2010
+	- Changed FBP::Control to a subclass of FBP::Window
+	- Changed control classes to inherit directly from FBP::Control
+	- Added FBP::ControlWithItems class
+	- Changed FBP::Choice, FBP::ListBox and FBP::ComboBox classes to
+	  inherit from FBP::ControlWithItems.
+
+0.15 Wed 29 Sep 2010
+	- Added FBP::Window::subclass attribute
+	- Added FBP::Window::wxclass  method
+
+0.14 Sun  1 Aug 2010
+	- Removed FBP::Window::label       attribute
+	- Added FBP::Dialog::title         attribute
+	- Added FBP::StaticText::label     attribute
+	- Added FBP::Button::label         attribute
+	- Added FBP::StaticBoxSizer::label attribute
+	- Added FBP::CheckBox::label       attribute
+
+0.13 Sat 31 Jul 2010
+	- Added FBP::TextCtrl       class
+	- Added FBP::FlexGridSizer  class
+	- Added FBP::StaticBoxSizer class
+
+0.12 Wed 14 Jul 2010
+	- Added FBP::GridSizer class
+
+0.11 Sun 11 Jul 2010
+	- Added FBP::Panel class
+	- Added FBP::Control::permission attribute
+	- Added FBP::Sizer::permission   attribute
+	- FBP::StaticText now uses role FBP::Control
+	- FBP::StaticLine now uses role FBP::Control
+	- FBP::HtmlWindow now extends FBP::Panel
+
+0.10 Fri  8 Jul 2010
+	- Added FBP::KeyEvent   role
+	- Added FBP::MouseEvent role
+	- Added FBP::FocusEvent role
+	- Added about 50 class-specific role attributes
+
+0.09 Thu  8 Jul 2010
+	- Added FBP::StaticLine::style attribute
+	- Added FBP::Window::window_style attribute
+	- Added FBP::Window::styles method
+
+0.08 Thu  8 Jul 2010
+	- Added FBP::HtmlWindow test
+	- Added FBP::HtmlWindow::style attribute
+
+0.07 Thu  8 Jul 2010
+	- Added FBP::ListBox class
+	- Added FBP::ListCtrl test
+	- Added FBP::ListCtrl::style attribute
+
+0.06 Sat  3 Jul 2010
+	- Added FBP::Choice class
+	- Added FBP::Spacer attribute
+	- Added FBP::Spacer attribute
+
+0.05 Fri 25 Jun 2010
+	- Switching to Mouse so we don't have to load Moose in Padre
+	- Added FBP::ComboBox::value attribute
+	- Added FBP::ComboBox::style attribute
+
+0.04 Wed 23 Jun 2010
+	- Added FBP::Control    role
+	- Added FBP::CheckBox   class
+	- Added FBP::ComboBox   class
+	- Added FBP::HtmlWindow class
+	- Added FBP::ListCtrl   class
+	- Added FBP::Spacer     class
+	- Moved FBP::Button::default --> FBP::Control::default
+
+0.03 Wed 23 Jun 2010
+	- Added FBP::Children::find   method
+	- Added FBP::Window::pos      attribute
+	- Added FBP::Window::size     attribute
+	- Added FBP::Sizer::name      attribute
+	- Added FBP::BoxSizer::orient attribute
+
+0.02 Mon 21 Jun 2010
+	- Updating Moose dependency to 1.05
+	- Added search method FBP->find_first
+	- Added a variety of other stuff
+
+0.01 Mon 21 Jun 2010
+	- Created the initial implementation

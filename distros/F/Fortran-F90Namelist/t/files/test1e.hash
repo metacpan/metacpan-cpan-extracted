@@ -1,0 +1,33 @@
+# test1e.hash                             -*-cperl-*-
+#
+# Name and hashref for the namelist in test1e.nml
+#
+$name = "nlist";
+$hashref =
+  {
+   'string1a' => { value => [ 'A simple string' ],
+		   stype => 'single-quote string',    type => 1 },
+   'string1b' => { value => [ 'A "doubly-quoted" string' ],
+		   stype => 'single-quote string',    type => 1 },
+   'string1c' => { value => [ "A 'singly-quoted' string" ],
+		   stype => 'single-quote string',    type => 1 },
+   'string1d' => { value => [ "A \"very quoted\" 'string'" ],
+		   stype => 'single-quote string',    type => 1 },
+   'string1e' => { value => [ "'A \"completely quoted\" string'" ],
+		   stype => 'single-quote string',    type => 1 },
+
+   ##
+
+   'string2a' => { value => [ 'A simple string' ],
+		   stype => 'double-quote string',    type => 2 },
+   'string2b' => { value => [ 'A "doubly-quoted" string' ],
+		   stype => 'double-quote string',    type => 2 },
+   'string2c' => { value => [ "A 'singly-quoted' string" ],
+		   stype => 'double-quote string',    type => 2 },
+   'string2d' => { value => [ "A 'very quoted' \"string\"" ],
+		   stype => 'double-quote string',    type => 2 },
+   'string2e' => { value => [ "\"A 'completely quoted' string\"" ],
+		   stype => 'double-quote string',    type => 2 }
+  };
+
+$nslots = (keys %$hashref)+0.;

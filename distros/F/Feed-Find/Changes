@@ -1,0 +1,32 @@
+Revision history for Feed::Find
+
+0.07  2011.01.28
+    - Use $ua->env_proxy to load local proxy settings. (RT 53817)
+    - Fixed documentation for find_in_html. (RT 19183)
+    - Removed sign() and auto_install() from Makefile.PL.
+    - Removed magic svn keywords.
+    - Converted test suite to Test::More.
+    - Added author tests (xt/) and modified SYNOPSIS for all modules to
+      make them pass the compilation test.
+
+0.06  2005.09.08
+    - Added application/xml as a valid feed type, because certain
+      services use that as the content type for RSS feeds.
+
+0.05  2005.01.08
+    - Fixed bug where base URI would be unset if there was a <base>
+      tag without an href attribute.
+
+0.04  2004.12.31
+    - Added Feed::Find->find_in_html to perform the same auto-discovery
+      on a chunk of HTML already in memory.
+
+0.03  2004.09.06
+    - Feed::Find->find($url_of_feed) will now return $url_of_feed.
+      (RT ID 7416)
+
+0.02  2004.08.18
+    - Added missing prereq to Makefile.PL (Class::ErrorHandler).
+
+0.01  2004.08.17
+    - Initial distribution.

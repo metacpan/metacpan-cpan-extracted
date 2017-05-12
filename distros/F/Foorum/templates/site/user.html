@@ -1,0 +1,45 @@
+[% PROCESS sub/date.html %]
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='/site/recent'><span>[% c.loc("Recent Topics") %]</span></a></li>
+        <li><a href='/site/popular'><span>[% c.loc("Popular") %]</span></a></li>
+        <li selected="selected"><a href='/site/members'><span>[% c.loc("Recent Members") %]</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<table align='center'>
+<tr align='center' class='title'>
+    <td>[% c.loc("Nickname") %]</td>
+    <td>[% c.loc("Gender") %]</td>
+    <td>[% c.loc("Status") %]</td>
+    <td>[% c.loc("Register on") %]</td>
+</tr>
+[% FOREACH user IN users %]
+<tr align='center' class='misc[% IF loop.count mod 2 %]1[% ELSE %]2[% END %]'>
+
+<td><a href="/u/[% user.username %]">[% user.nickname%]</a></td>
+<td>[% IF user.gender != 'NA' %]<img src='[% c.config.dir.images %]/site/gender_[% user.gender %].gif' width='20' height='14' align='absmiddle' /></span>[% ELSE %]N/A[% END %]</td>
+<td>[% user.status | ucfirst %]</td>
+<td><span class='date'>[% date_format(user.register_time) %]</span></td>
+
+</tr>
+[% END %]
+</table>
+
+<br />
+<table align='center'>
+<tr><td class='misc1'>[% INCLUDE sub/pager.html %]</td></tr>
+</table>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

@@ -1,0 +1,9 @@
+Revision history for Perl extension Finance::Bank::ES::INGDirect.
+
+0.01  Wed Jun 20 23:20:59 2007
+	- original version; created by h2xs 1.23 with options
+		-X -n Finance::Bank::ES::INGDirect
+0.03  Junio 2007 
+        - Se cambia el acceso para reconocimiento del tablero gráfico presentado
+0.04  Agosto 2007 
+        - Se actualiza cambio en el formulario de validación del PIN

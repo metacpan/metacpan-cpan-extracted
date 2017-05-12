@@ -1,0 +1,10 @@
+Changes
+lib/Flv/Info/Lite.pm
+Makefile.PL
+MANIFEST
+README
+t/Flv-Info2-Lite-00.t
+t/Flv-Info2-Lite-01.t
+t/material/test00.flv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

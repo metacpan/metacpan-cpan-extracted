@@ -1,0 +1,34 @@
+Revision history for FreeBSD-Ports-INDEXhash
+
+1,2,2	2010-08-28/06:00
+		-Require Exporter to make Perl 5.10 happy.
+
+1.2.1	2009-04-27/12:00
+		-Edeps now processes Edeps instead of Pdeps.
+		-Rdeps now properly inters through Rdeps.
+
+1.2.0	2009-03-25/13:00
+		-Implement short origin mapping.
+
+1.1.0	2009-03-11/00:50
+		-Implement origin mapping.
+
+1.0.5	2008-06-05/13:35
+		Fixed issue with Fdeps always being defined due to a new line on the end of it.
+
+1.0.4	2008-04-18/17:40
+		Finally fully implement the example using the each function.
+
+1.0.3	2008-03-23/12:10
+		Another small pod cleanup.
+		Make changes to synopsis as suggested by  kevin brintnall <kbrint@rufus.net>.
+
+1.0.2	2008-03-23/12:10
+		Another small pod cleanup.
+
+1.0.1	2008-03-23/11:20
+		Clean up POD stuff a bit so 'make test' passes.
+
+1.0.0   2008-03-23/4:30
+        First version, released on an unsuspecting world.
+

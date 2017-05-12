@@ -1,0 +1,31 @@
+2003-08-12  Jeremy Madea  <jeremy@neon>
+
+	* Signature.pm: Fixups to tests.
+
+2003-08-11  Jeremy Madea  <jeremy@neon>
+
+	* Signature.pm: Fixed bad POD.
+
+2003-06-12  Jeremy Madea  <jeremy@neon>
+
+	* Signature.pm: Bug fixes, doc updates, minor changes.
+
+2003-06-11  Jeremy Madea  <jeremy@neon>
+
+	* Signature.pm:
+	_Croak() fixed. Additional error states handled in constructors.
+
+2003-06-10  Jeremy Madea  <jeremy@neon>
+
+	* Signature.pm: POD updates.
+
+2003-06-08  Jeremy Madea  <jeremy@neon>
+
+	* Signature.pm: POD changes.
+
+	* Signature.pm: More minor prepping for RCS.
+
+	* Signature.pm: Minor touch-ups for RCS prepping.
+
+	* Signature.pm: New file.
+

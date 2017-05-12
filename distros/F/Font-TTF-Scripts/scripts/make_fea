@@ -1,0 +1,158 @@
+#! /usr/bin/perl
+use strict;
+use Font::TTF::Scripts::Fea;
+use IO::File;
+use Getopt::Long;
+use Pod::Usage;
+
+our(%opts);
+GetOptions(\%opts, 
+    'ap|a=s', 
+    # 'b',              # used in make_volt
+    'classfile|c=s', 
+    'classprops',
+    # 'autodefines|d',  # used in make_gdl
+    # 'define|D=s%',    # used in make_gdl
+    'empty|e=s', 
+    # 'forceadd|f=i',   # used in make_volt
+    'help|h', 
+    'include|i=s@', 
+    'ligatures|l=s', 
+    'mark|m=s', 
+    # 'normalize|n=i',  # used in make_gdl, make_volt
+    'omitaps|o=s', 
+    # 'positions|p=i',  # used in make_gdl
+    # 'substitutions|s=i',  # used in make_gdl
+    # 'outVOLT|t',      # used in make_volt
+    'renameaps|r', 
+    'z=i');
+
+unless ($ARGV[1] || $opts{'help'})
+{
+    pod2usage(1);
+    exit;
+}
+
+if ($opts{'help'})
+{
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit;
+}
+
+my %options;
+
+# Parse -e file if supplied
+if ($opts{'empty'}) 
+{
+    my @glist;
+    open (IN, "<$opts{'empty'}") or die "Couldn't open '$opts{'empty'}' for reading.";
+    while (<IN>)
+    {
+        s/[\r\n]*$//o;      # platform-safe chomp
+        s/;.*$//o;          # Strip comments
+        s/ //go;            # Strip whitespace
+        push (@glist, $_) unless $_ eq '';
+    }
+    close IN;
+    $options{'-knownemptyglyphs'} = \@glist if scalar(@glist);
+}
+
+$options{'-omittedAPs'} = $opts{'omitaps'} if $opts{'omitaps'};
+
+my $f = Font::TTF::Scripts::Fea->read_font($ARGV[0], $opts{'ap'}, %opts) || die "Can't read font information";
+
+if (exists $f->{'WARNINGS'})
+{
+    warn $f->{'WARNINGS'};
+}
+
+
+my $outfh = IO::File->new("> $ARGV[1]") || die "Can't open $ARGV[1] for writing";
+
+my $comp = $1 if ($opts{'ligatures'} =~ s/(comp)$//oi);
+
+if ($opts{'renameaps'})
+{
+    foreach my $g (@{$f->{'glyphs'}})
+    {
+        my ($points) = {};
+        foreach my $p (keys %{$g->{'points'}})
+        {
+            my ($pname) = $p;
+
+            if ($pname =~ s/^(.+)M$/_$1/o)
+            { }
+            elsif ($pname =~ s/^(.+)S$/$1/o)
+            { }
+            $points->{$pname} = $g->{'points'}{$p};
+        }
+        $g->{'points'} = $points;
+    }
+}
+
+$f->{'vecs'} = {};
+
+$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}) if ($opts{'classfile'});
+$f->make_classes(-ligatures => $opts{'ligatures'}, -ligtype => $comp, -ignoredAPs => $options{'omitaps'}, -notmark => $opts{'mark'});
+$f->out_classes($outfh);
+$f->out_pos_lookups($outfh);
+$f->end_out($outfh, $opts{'include'}, %opts);
+
+$outfh->close();
+
+__END__
+
+=head1 NAME
+
+make_fea - Create GDL from a TrueType Font
+
+=head1 SYNOPSIS
+
+  make_fea [-a file] [-i file] [-l type [-s num]] [-n num] [-z bitfield]
+           infile outfile
+  make_fea -h
+Creates font specific AFDKO fea source file from a font and optional attachment point database
+
+=head1 OPTIONS
+
+  -a file       Attachment point database
+  -c classfile  xml file of class and property information to merge in
+  --classproperties
+                specifies whether classes are made for property values in
+                the classfile
+  -e file       A file containing names (1 per line) of glyphs that are 
+                known to have no outline (thus shouldn't generate warnings). 
+  -h            print manpage
+  -i file       add #include statement at end of file
+  -l type       type =
+                    first - class name is first code, contents other codes
+                    last  - class name is last code, contents other codes
+                    firstcomp - treat extensions as part of elements, as first
+                    lastcomp - treat extensions as part of elements, as last
+  -m "list"     List of APs to ignore when deciding whether a glyph is a mark
+  -o "list"     List of AP names to omit
+  -r            Rename point names such that final M gets initial _ and final S
+                is removed. Typically for Fontographer fonts.
+  -z bitfield   Bitfield of various controls:
+                    0 - use component properties to set ligature bounding boxes
+                    1 - normalise even if presentation is only references
+                    2 - use postscript names in glyph definitions
+                    3 - do not output ; after include statement
+
+=head1 SEE ALSO
+
+ttfbuilder, make_gdl
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

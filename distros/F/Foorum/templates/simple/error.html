@@ -1,0 +1,47 @@
+[% IF is_rss_template; # MUST no linebreak before <?xml %]
+<?xml version="1.0" encoding="UTF-8"?>
+[% END %]
+
+[% IF (matches = error.msg.match('ERROR_(\w+)'));
+    SWITCH matches.0;
+    CASE 'PERMISSION_DENIED';
+    error.msg = c.loc("Permission Denied.");
+    CASE 'USER_NON_EXSIT';
+    error.msg = c.loc("User non-exist");
+    CASE 'USER_BLOCKED';
+    error.msg = c.loc("User is blocked");
+    CASE 'ACCOUNT_CLOSED_STATUS';
+    error.msg = c.loc("Account is banned or blocked or terminated.");
+    CASE 'USER_PENDING';
+    error.msg = c.loc("Your status is pending");
+    CASE 'USER_REJECTED';
+    error.msg = c.loc("Your status is rejected");
+    CASE 'WRONG_VISIT';
+    error.msg = c.loc("URL WRONG HERE");
+    CASE 'CLOSED';
+    error.msg = c.loc("IT'S CLOSED");
+    CASE 'ILLEGAL_REQUEST';
+    error.msg = c.loc("Illegal Request.");
+    CASE '404';
+    error.msg = c.loc("The requested URL is not found on this server.");
+    END;
+   END %]
+
+[% IF is_rss_template %]
+<rss version="2.0">
+<channel>
+<title><![CDATA[[% c.config.name %] : Error]]></title>
+<link>[% c.req.base %]</link>
+<description><![CDATA[[% error.msg %]]]></description>
+</channel>
+</rss>
+[% ELSE %]
+<style>
+	A:visited{text-decoration: underline}
+	A:link{text-decoration: underline;}
+</style>
+<div class='message'>
+    <div class='highlight'>[% error.msg %]</div>
+    <p>[% c.loc("Please click <a href='javascript:history.back()'>here</a> to go back.") %]</p>
+</div>
+[% END %]

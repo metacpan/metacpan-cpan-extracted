@@ -1,0 +1,10 @@
+[% SET url = "http://www.jasonkohles.com/projects/DBICx-AutoDoc/" %]
+[% SET pkg = 'DBICx::AutoDoc' %]
+    <p>
+        Generated [% generated %]
+        by <a href="[% url %]">[% pkg %]</a>
+        version [% software_versions.$pkg %]
+    </p>
+</body>
+</html>
+[%# $Id: html_footer.tt2 16 2007-11-20 19:16:29Z jason $ #%]

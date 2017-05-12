@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/File/Headerinfo.pm
+lib/File/Headerinfo/Image.pm
+lib/File/Headerinfo/MP3.pm
+lib/File/Headerinfo/SWF.pm
+lib/File/Headerinfo/Video.pm
+lib/File/Headerinfo/WAV.pm
+test.pl
+test/test.avi
+test/test.jpg
+test/test.mov
+test/test.png
+test/test.swf
+test/test.wav
+META.yml                                Module meta-data (added by MakeMaker)

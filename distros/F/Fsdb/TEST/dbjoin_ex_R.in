@@ -1,0 +1,15 @@
+#fsdb -R C sid cid
+sid: 1
+cid: 10
+
+sid: 2
+cid: 11
+
+sid: 1
+cid: 12
+
+sid: 2
+cid: 12
+
+#  | dbsort -n cid
+#   | dbfilealter -R C

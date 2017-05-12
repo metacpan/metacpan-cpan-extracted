@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/File/Copy/Vigilant.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-main.t
+t/97-perlcritic.t
+t/98-pod.t
+t/99-pod-coverage.t
+t/perlcriticrc
+META.json

@@ -1,0 +1,10 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+4996.5 2864.8 57.337 45.847 4950.6 5042.3 0.95 7.4947e+07 4.9757e+11 0 9998 15000
+#
+# Exercises the T-Distribution lookup table for values of "infinity".
+# See "MAXINIT" comment in TDistribution.pm.
+#
+# Data is 15000 random numbers between 0 and 10000.
+# perl -e  'foreach (0..15000) { print int rand(10000), "\n"; }'
+#
+#   | dbcolstats x

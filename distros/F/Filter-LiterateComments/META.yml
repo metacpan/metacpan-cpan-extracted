@@ -1,0 +1,12 @@
+name: Filter-LiterateComments
+version: 0.01
+abstract: Haskell-style literate comments
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+requires:
+  Filter::Simple: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

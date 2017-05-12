@@ -1,0 +1,21 @@
+---
+file_groups:
+  -
+    name: All MyApp classes
+    file_profiles:
+
+      -
+        name: Cat Controller
+        regex: /Controller.(\w+)\.pm$/
+        sprintf: Controller/%s.pm
+
+      -
+        name: DBIC Schema
+        regex: /Model.Schema.(\w+)\.pm$/
+        sprintf: Model/Schema/%s.pm
+
+      -
+        name: Template
+        regex: /root.template.(\w+)\.pm$/
+        sprintf: root/template/%s.pm
+

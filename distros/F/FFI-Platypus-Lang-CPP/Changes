@@ -1,0 +1,16 @@
+Revision history for Perl module FFI::Platypus::Lang::CPP
+
+0.04  Feb 2, 2015
+  - Update documentation.
+
+0.03  Feb 1, 2015
+  - Use ExtUtils::CppGuess to get the correct c++ flags
+  - Use FFI::ExtractSymbols instead of Parse::nm
+  - use FFI::Platypus::Lang::CPP::Demangle::XS if c++filt
+    is not found at install time.
+
+0.02  Jan 30, 2015
+  - Documentation fixes
+
+0.01  Jan 30, 2015
+  - Initial release

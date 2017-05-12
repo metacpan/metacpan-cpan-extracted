@@ -1,0 +1,23 @@
+Revision history for Perl extension File::Remote.
+
+1.10  Mon Apr 17 12:48:50 2000
+	- original version; created by h2xs 1.19
+
+1.11  Tue Nov 28 12:39:29 2000 
+        - rewrote to use strict
+        - fixed miscellaneous warnings under -w
+        - added symlink(), link(), and readlink()
+        - cleaned up open filehandles END() code
+
+1.12  Thu Nov 30 15:10:01 2000 
+	- misc bug fixes
+
+1.13  Thu May  3 15:32:23 2001 
+	- Perl 5.6 and above made changes to the way strict
+	  checks strings like "FILE", so had to rewrite the
+	  _to_filehandle() function's manip of symbol globs
+	- misc changes to documentation
+
+1.14  Fri May  4 13:54:40 PDT 2001 
+	- changed default rsh/rcp path to /usr/bin for Linux
+	- more documentation clarifications

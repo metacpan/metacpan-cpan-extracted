@@ -1,0 +1,3 @@
+
+    - Figure out windows support
+    - enable timeout for _send() to not get stuck waiting on a busy clamd

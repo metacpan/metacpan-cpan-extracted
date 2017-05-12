@@ -1,0 +1,13 @@
+Revision history for Perl extension Fax::Hylafax::Client.
+
+1.00  Sun Dec 7 01:37:47 2003 MST
+	- original version; framework created by h2xs 1.21
+
+1.01  Sat Dec 13 19:14:25 2003 MST
+	- a number of "service" methods added
+	- global variables implemented
+	- documentation added
+
+1.02  Sun Jun 25 23:42:40 2006 MDT
+	- redesigned temporary file storage (bug #5008)
+	- added ability to attach multiple source documents

@@ -1,0 +1,155 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000009
+ [Changed / test requires]
+ - Test::More 0.96 → 0
+
+1.000008 2015-07-12T03:57:39Z
+
+1.000007 2015-04-22T05:48:43Z
+
+1.000006 2015-04-22T03:04:21Z
+
+1.000005 2015-04-14T12:54:44Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+1.000004 2014-08-18T22:18:54Z
+
+1.000003 2014-08-16T06:53:18Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+1.000002 2014-06-13T15:17:10Z
+ [Added / test requires]
+ - Class::Tiny
+
+1.000001 2014-03-04T14:17:26Z
+
+1.000000 2014-02-28T15:00:49Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4007
+
+ [Removed / configure requires]
+ - Module::Build 0.4007
+
+ [Removed / runtime requires]
+ - Path::Class::Dir
+ - Path::Class::File
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.5.2 2013-09-25T20:04:10Z
+ [Added / test requires]
+ - File::Spec
+
+0.5.1 2013-09-16T07:34:01Z
+ [Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.5.0 2013-07-06T18:11:52Z
+ [Added / runtime requires]
+ - Path::Class::Dir
+ - Path::FindDev
+ - Path::IsDev
+ - Path::Tiny
+
+ [Added / test requires]
+ - lib
+
+0.4.4 2013-06-05T17:11:18Z
+
+0.4.3 2013-05-23T18:29:12Z
+
+0.4.2 2013-05-23T17:11:31Z
+ [Changed / build requires]
+ - Module::Build 0.4003 → 0.4005
+
+ [Changed / configure requires]
+ - Module::Build 0.4003 → 0.4005
+
+0.4.1 2013-02-13T23:17:46Z
+ [Changed / build requires]
+ - Module::Build 0.4002 → 0.4003
+
+ [Changed / configure requires]
+ - Module::Build 0.4002 → 0.4003
+
+0.4.0 2012-07-28T21:54:15Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+0.3.2 2012-05-07T17:07:54Z
+
+0.3.1 2012-03-07T03:57:06Z
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.006
+
+0.3.0 2012-03-05T05:27:43Z
+ [Added / runtime requires]
+ - perl v5.10.0
+
+0.2.0 2011-10-15T02:08:29Z
+ [Added / runtime requires]
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.1.1 2011-04-08T01:29:46Z

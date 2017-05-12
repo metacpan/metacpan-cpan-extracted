@@ -1,0 +1,43 @@
+Finance::Bank::Bundesschatz version 1.01
+========================================
+
+This module provides you with a basic interface to the bundesschatz.at
+online banking system at http://www.bundesschatz.at.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   - WWW::Mechainze (at least 0.57)
+   - HTML::TokeParser (at least 2.24)
+   - Class::MethodMaker (at least 1.06)
+
+Additonally, you need either Crypt::SSLeay or IO::Socket::SSL to enable
+HTTPS support of LWP.
+
+
+RECENT CHANGES
+
+1.01  Sun Oct 12 13:57:31 CEST 2003
+        - Fixed documentation concerning the format of the
+          external configuration file.
+        - Put the correct licence into the documention.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Florian Helmberger
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

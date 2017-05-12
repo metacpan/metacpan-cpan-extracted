@@ -1,0 +1,83 @@
+{
+   "abstract" : "file and directory objects",
+   "author" : [
+      "Eric Wilhelm @ <ewilhelm at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Fu",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Classy" : "v0.9.0",
+            "File::Spec" : "0",
+            "File::Which" : "0.05",
+            "IO::File" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Fu" : {
+         "file" : "lib/File/Fu.pm",
+         "version" : "v0.0.8"
+      },
+      "File::Fu::Base" : {
+         "file" : "lib/File/Fu/Base.pm",
+         "version" : "v0.0.8"
+      },
+      "File::Fu::Dir" : {
+         "file" : "lib/File/Fu/Dir.pm",
+         "version" : "v0.0.8"
+      },
+      "File::Fu::Dir::FindKnob" : {
+         "file" : "lib/File/Fu/Dir.pm"
+      },
+      "File::Fu::Dir::Temp" : {
+         "file" : "lib/File/Fu/Dir/Temp.pm",
+         "version" : "v0.0.8"
+      },
+      "File::Fu::Dir::Token" : {
+         "file" : "lib/File/Fu/Dir.pm"
+      },
+      "File::Fu::File" : {
+         "file" : "lib/File/Fu/File.pm",
+         "version" : "v0.0.8"
+      },
+      "File::Fu::File::Temp" : {
+         "file" : "lib/File/Fu/File/Temp.pm",
+         "version" : "v0.0.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Fu"
+      },
+      "homepage" : "http://enobacon.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://git.enobacon.com/File-Fu.pm.git"
+      }
+   },
+   "version" : "v0.0.8"
+}

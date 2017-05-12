@@ -1,0 +1,45 @@
+{
+   "abstract" : "Convenient and fast Dropbox API abstraction",
+   "author" : [
+      "Alexander Nazarov <nfokz@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Dropbox",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Furl" : "2.16",
+            "IO::Socket::SSL" : "1.4",
+            "JSON" : "2.0",
+            "Net::DNS::Lite" : "0.1"
+         }
+      }
+   },
+   "provides" : {
+      "File::Dropbox" : {
+         "file" : "lib/File/Dropbox.pm",
+         "version" : "0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.7",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

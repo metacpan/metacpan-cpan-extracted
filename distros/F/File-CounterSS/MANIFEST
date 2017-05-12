@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/File-CounterSS.t
+lib/File/CounterSS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

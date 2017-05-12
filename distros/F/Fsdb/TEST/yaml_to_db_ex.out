@@ -1,0 +1,5 @@
+#fsdb -F t alttext date image link name role
+ACM, the Association for Computing Machinery	2016-01-01	logos/acm-small.jpg	https://www.acm.org/	ACM	sponsor
+SIGCOMM, ACM'S Special Interest Group on Communication	2016-01-02	logos/sigcommlogo.png	http://sigcomm.org	SIGCOMM	sponsor
+SIGMETRICS, ACM'S Special Interest Group on Performance Evaluation	2016-01-03	logos/sigmetrics-small.png	http://www.sigmetrics.org	SIGMETRICS	sponsor
+#   | yaml_to_db

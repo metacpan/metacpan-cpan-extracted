@@ -1,0 +1,83 @@
+Revision history for Perl extension Facebook::OpenGraph
+
+## CAUTION ####################################################################
+
+FROM Version 1.22 it doesn't check if 'expires' parameter is properly returned
+from /oauth/access_token endpoint. Affected methods are listed below:
+
+- get_user_token_by_code
+- get_user_token_by_cookie
+- exchange_token
+
+There are some edge cases that they do not return 'expires' so this module does
+not check its existense, any more. If 'expires' should be returned on your use
+case, you must explicitly check by yourself.
+The detailed schenario concerning those edge cases are shown at the link below.
+https://developers.facebook.com/bugs/597779113651383/
+
+###############################################################################
+
+1.23 2015-03-29T07:41:06Z
+    - Add support for Graph API v2.3 including parsing JSON formatted response
+      from /oauth/access_token
+
+1.22 2014-05-18T08:37:32Z
+    - Fixed a bug that it croaks when 'expires' is not returned from
+      /oauth/access_token
+
+1.21 2014-05-03T00:15:37Z
+    - Add support for API and dialog versioning that were introduced at f8
+
+1.20 2014-04-24T13:56:31Z
+    - Add js_cookie_name and get_user_token_by_cookie to work with JS SDK
+    - Add $res->etag and $res->header($field_name) to access response header
+    - Add more documentation
+
+1.13 2014-04-13T03:03:03Z
+    - Add exchange_token() to aqcuire long lived user token
+    - Update links to official document
+    - Add more comments for each implementation
+
+1.12 2014-02-27T16:40:08Z
+    - Fixed test comments
+    - Updated document URLs
+    - minilized
+
+1.11 Sat Jul 20 00:00:00 2013
+    - Fixed bug that $fb->request('/foo?bar=bazz', +{one => two}) becomes
+      /foo?one=two and bar=bazz are gone
+    - Add tests for paging and create_test_users
+    - Better Makefile.PL with App::scan_prereqs_cpanfile
+    - Refactoring
+
+1.10 Sun Jul 07 21:00:00 2013
+    - Add publish_staging_resource() to support Object API's staging functionality
+    - Use Test::Mock::Furl instead of t::Utils
+
+1.00 Sun Jun 02 22:00:00 2013
+    - Add use_post_method option
+      It enables you to send POST request for every API call with 
+      method=(GET|POST|DELETE) parameter. PHP SDK works this way.
+    - Bumped up version to 1.00. Yay!
+
+0.05 Sun Jun 02 01:00:00 2013
+    - Add use_appsecret_proof option to add appsecret_proof parameter
+
+0.04 Sat Jun 01 18:45:00 2013
+    - Set capture_request option when initializing Furl::HTTP
+    - Add and organize test
+    - Add document
+
+0.03 Fri May 17 20:45:00 2013
+    - $res->req_headers and $res->req_content are available w/ later version of Furl
+    - Store JSON object and reuse it for better performance
+    - Remove dependency on parent.pm in test codes.
+      Now it's my turn to get away from my parents and be self-dependent.
+    - Handles ids parameter.
+      Set +{ids => [qw/4 5 oklahomer.docs/]} and it will be parsed like ids=4,5,oklahomer.docs
+
+0.02 Tue May 13 21:00:00 2013
+    - Fix test
+
+0.01 Mon May 12 20:00:00 2013
+    - original version

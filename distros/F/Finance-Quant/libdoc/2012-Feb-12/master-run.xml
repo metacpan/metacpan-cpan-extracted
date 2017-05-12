@@ -1,0 +1,12 @@
+<opt>
+  <AAPL>
+    <extended avg-day-range-pct="1.92" avg-vol="17412558" days="272" guru-sum="63" momentum="0.00138858" position="middle" />
+    <nasdaq-guru author=" Peter Lynch" methode="P/E Growth " pct="74%" />
+    <nasdaq-guru author=" Benjamin Graham" methode="Value " pct="43%" />
+    <nasdaq-guru author=" Validea" methode="Momentum Strategy " pct="89%" />
+    <nasdaq-guru author=" Motley Fool" methode="Small Cap Growth " pct="79%" />
+    <nasdaq-guru author=" David Dreman" methode="Contrarian " pct="57%" />
+    <nasdaq-guru author=" Kenneth Fisher" methode="Price/Sales " pct="40%" />
+  </AAPL>
+  <symbols>AAPL</symbols>
+</opt>

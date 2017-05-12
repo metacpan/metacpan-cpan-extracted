@@ -1,0 +1,43 @@
+Revision history for Perl extension Finance::Math::IRR
+
+0.01  2006-12-15
+	- first working version
+
+0.02  2006-12-18
+        - differentiate bugs from failures when calling secant() and brent()
+        - update module dependencies
+
+0.03  2007-01-04
+        - handle precision correctly
+        - POD updates
+
+0.04  2007-01-04
+        - fix broken link
+
+0.05  2007-02-20
+        - require version 0.05 of Math::Polynom
+
+0.06  2007-02-20
+        - more robust strategy: handle when the secant method
+          converges toward a value that is not a root
+        - more tests
+
+0.07  2007-04-11
+        - cleanup cashflow from transactions with 0 amounts
+        - added debug mode
+        - reject cashflows with positive last transaction
+        - return undef on cashflows with only 1 none 0 amount
+        - updated META.yml to new spec
+        - added examples
+        - more tests
+
+0.08  2007-04-18
+        - fixed MANIFEST
+        - updated license
+
+0.09  2007-07-11
+        - removed the restriction requiring last transactions to be negative
+          thanks to Nicholas Caratzas!
+
+0.10  2007-07-12
+        - add a test verifying irr continuity

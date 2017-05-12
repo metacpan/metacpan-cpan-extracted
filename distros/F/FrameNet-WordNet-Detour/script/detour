@@ -1,0 +1,176 @@
+#!/usr/bin/perl -w 
+
+use Getopt::Long;
+use WordNet::QueryData;
+use WordNet::Similarity::path;
+use FrameNet::WordNet::Detour;
+use Pod::Usage;
+use Storable; 
+#use Mac::Growl;
+
+my $VERSION = "0.99c";
+# one result by default
+my $number_results = 1;
+my $weights = 0;
+my $fees = 0;
+my $sims = 0;
+my $list = 0;
+my $cached = 1;
+my $limited = 0;
+my $version = 0;
+my $license = 0;
+my $man = 0;
+my $cachecounter = 1;
+my $wnhome = $ENV{'WNHOME'};
+my $fnhome = $ENV{'FNHOME'};
+my $growl = 0;
+
+GetOptions ('weights' => \$weights, 
+	    'v' => \$verbose, 
+	    'vv' => \$vverbose,
+	    'fees' => \$fees, 
+	    'sims' => \$sims,
+	    'limited!' => \$limited,
+	    'cache!' => \$cached,
+	    'cachecounter=i' => \$cachecounter,
+	    'wn=s' => \$wnhome,
+	    'fn=s' => \$fnhome,
+	    'help|?' => \$help,
+	    'version' => \$version,
+	    'license' => \$license,
+#	    'growl!' => \$growl,
+	    'man' => \$man,
+	    'n=i' =>\$number_results);
+
+if ($version) {
+  print "detour version $VERSION\n";
+  exit;
+}
+
+pod2usage(1) if ($help);
+pod2usage(-verbose => 2) if ($man);
+
+my $detour = FrameNet::WordNet::Detour->new(-wnhome => $wnhome,
+					    -fnhome => $fnhome,
+					    -cached => $cached,
+					    -limited => $limited,
+					    -cachecounter => $cachecounter );
+
+#Mac::Growl->RegisterNotifications('detour', ['SingleResult','ListResult'], ['SingleResult', 'ListResult']) if ($growl);
+
+sub getresult {
+  $ret = "";
+  $result = shift;
+  $ret .= $result->query."\n" if ($list);
+  my $rhash = $result->get_best_frames($number_results);
+  foreach $frame (@$rhash) {
+    $ret .= $frame->name;
+    $ret .= " ".FrameNet::WordNet::Detour->round($frame->weight) if ($weights);
+    if ($fees or $sims) {
+      $ret .= " (";
+      for ($i=0; $i<@{scalar $frame->fees}-1; $i++) {
+	$ret .= $frame->fees->[$i];
+	if ($sims) {
+	  $ret .= "[";
+	  $ret .= $frame->sims->[$i];
+	  $ret .= "]";
+	};
+	$ret .= ",";
+      };
+      $ret .= $frame->fees->[$i];
+      if ($sims) {
+	$ret .= "[";
+	$ret .= $frame->sims->[$i];
+	$ret .= "]";
+      };
+      $ret .= ")"; 
+    }
+    $ret .= "; ";
+  };
+  #$ret .= "\n";
+  return $ret;
+};
+
+
+my $query = shift;
+
+#$detour->unlimited;
+#$detour->uncached;
+#$detour->limited if ($limited);
+$detour->set_verbose if ($verbose);
+$detour->set_debug if ($vverbose);
+#$detour->cached if ($cached);
+
+
+my $result = $detour->query($query);
+
+if ((ref $result) eq "FrameNet::WordNet::Detour::Data") {
+ # Mac::Growl->PostNotification('detour', 'SingleResult', 'Computation complete', getresult($result)) if ($growl);
+  print getresult($result)."\n";
+} else {
+  my $g = "";
+  foreach $res (@$result) {
+    $list = 1;
+    my $t = getresult($res);
+    $g .= $t."\n";
+    print $t."\n\n";
+  }
+#  Mac::Growl->PostNotification('detour', 'ListResult', 'Computation complete', $g) if ($growl);
+
+}
+
+
+__END__
+
+=head1 NAME 
+
+detour - Command-line interface for FrameNet::WordNet::Detour
+
+=head1 SYNOPSIS
+
+detour [options] synset
+
+ Options:
+   -w, --weights  display weights for each frame
+   -f, --fees     display the frame evoking elements
+   -s, --sims     display the similarity for each evoking 
+                     lexical unit. Implies --fees.
+   -v             run in verbose mode
+   -vv            run in debuging mode
+   -l, --limited  run in limited mode
+   --no-limited   run in unlimited mode
+   -c, --cache    run using the cache
+   --no-cache     do not use the cache
+   --wn PATH      set path to WordNet
+   --fn PATH      set path to FrameNet
+   --version      show version information
+   -h             show this help
+   --man          show the manpage
+
+ Synset:
+   A specific synset (e.g. 'get#v#1') or all synsets for one 
+   lexical unit for one part-of-speech (e.g. 'get#v')
+
+=head1 DESCRIPTION
+
+detour is a small command line script that can be used to pose a query to the detour system. The detour system is a perl module, that can be found on CPAN (FrameNet::WordNet::Detour).
+
+Example:
+
+  $ detour --weight --sims -n=2 --limited drink#v#1
+  Ingestion 0.198 (consume#v#2[0.5],have#v#6[0.5],imbibe#v#3[1],ingest#v#1[0.5]); Possession 0.01 (have#v#6[0.5]); Birth 0.01 (have#v#6[0.5]);
+
+  # Frame Weight (fee[similarity], fee[similarity],...); Frame ...
+
+=head1 BUGS
+
+Please report bugs to L<mailto:reiter@cpan.org>.
+
+=head1 COPYRIGHT
+
+Copyright 2005 Aljoscha Burchardt and Nils Reiter. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+

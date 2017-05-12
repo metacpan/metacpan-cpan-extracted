@@ -1,0 +1,12 @@
+#
+# $Id: Changes,v 0.2 2009/06/10 05:51:19 dankogai Exp dankogai $
+#
+# Revision history for File-Glob-Slurp
+$Revision: 0.2 $ $Date: 2009/06/10 05:51:19 $
+! lib/File/Glob/Slurp.pm
+  POD fixes
+
+0.01 2009/06/09 21:05:34
++ *
+  First version, released on an unsuspecting world.
+

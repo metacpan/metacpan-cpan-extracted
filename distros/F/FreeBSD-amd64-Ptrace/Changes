@@ -1,0 +1,13 @@
+# Revision history for FreeBSD-amd64-Ptrace
+#
+# $Id: Changes,v 0.2 2015/01/14 22:23:25 dankogai Exp dankogai $
+#
+$Revision: 0.2 $ $Date: 2015/01/14 22:23:25 $
++ t/peekpoke.pl
+! lib/FreeBSD/amd64/Ptrace.pm
+  * fix pt_(peek|poke)str
+  * fix POD
+
+0.01 2015/01/14 10:07:56
++ *
+        Forked from FreeBSD::i386::Ptrace.

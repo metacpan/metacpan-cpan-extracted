@@ -1,0 +1,9 @@
+Changes
+README
+META.yml
+Makefile.PL
+Build.PL
+ftp_republish
+lib/Filesys/Virtual/DAAP.pm
+MANIFEST
+MANIFEST.SKIP

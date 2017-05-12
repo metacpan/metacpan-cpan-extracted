@@ -1,0 +1,63 @@
+Filesys-Btrfs
+
+Simple wrapper around Linux C<btrfs> util. Btrfs util is used to
+manage btrfs filesystem: manage snapshots, subvolumes and etc.  Only
+subset of C<btrfs> options is supported (hopefuly it is useful
+subset).
+
+For more information about C<btrfs> util please see L<btrfs> manpage.
+
+B<WARNING> This module is hightly experimental (as btrfs itself). API
+can change in the future.
+
+Example:
+
+    use Filesys::Btrfs;
+
+    my $btrfs = Filesys::Btrfs->new($mount_point);
+    $btrfs->subvolume_create('subvolume');
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Note: due to nature of the module most of tests cannot be run if user is not root,
+'sudo make test' should make sure that module is working fine.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Filesys::Btrfs
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filesys-Btrfs
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Filesys-Btrfs
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Filesys-Btrfs
+
+    Search CPAN
+        http://search.cpan.org/dist/Filesys-Btrfs/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Nikolay Martynov
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

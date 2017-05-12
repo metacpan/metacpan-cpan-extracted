@@ -1,0 +1,26 @@
+Changelog for File-LinkTree-Builder
+
+0.006     2013-12-25 22:33:06-0500 America/New_York
+          update github links
+
+0.005     2013-07-07 08:39:29 America/New_York
+          just repackaged, updated bugtracker
+
+0.004     2007-06-17
+          POSSIBLY BREAKS YOUR CODE
+          storage_root (now storage_roots) can now be an arrayref
+          better determination of file's abs path
+
+          added on_existing option
+
+
+0.003     2007-06-17
+          fix META.yaml
+          double-happy father's day!
+
+0.002     2007-06-17
+          fix prereqs
+          happy father's day!
+
+0.001     2007-06-13
+          first release!

@@ -1,0 +1,62 @@
+README
+======
+
+
+HOW TO TRAIN THE LIBRARY
+=======================
+
+gocr -p ./micrdb/ -m 256 -m 130 -m 2 -s 80 -d 20 -C 0123456789CcAa -i /tmp/.1173296049117329605632_MICR.png
+
+||" = CCc
+|: = Aa
+
+see man gocr for  more
+
+You want to train the database against the MICR extractions that the check module generates
+
+---
+
+NOTES
+
+All MICR fonts must meet ANSI standard X9.27-1995. 
+
+MICR
+====
+
+http://www.micrfonts.com/what.htm
+the MICR has only 14 characters
+
+0-9
+Transit
+Ammount
+On-Us 
+dash
+
+each char occupies exactly 1/8th of an inch
+although each char itself occupies one of 5 possible widths
+
+codes are ordered as:
+
+ROUTING_NUMBER  CHECK_NUMBER  BANK_ACCOUNT_NUMBER
+
+---
+
+
+How is the MICR data on U.S. check organized?
+There are five major fields on a MICR line :
+1. Auxiliary On Us - contains check number if present; bracketed by on us symbols
+2. EPC - one character located to the left of the transit field if present
+3. Transit - 9 digits including check digit
+4. On Us - variable length 19 digits max; between transit and amount fields
+5. Amount - 10 digits zero filled; bracketed by two amount symbols
+
+Two of the five major fields are broken into multiple fields:
+Transit (9 digits)
+6. Routing Number (digits 1-4)
+7. Bank Number (digits 5-8)
+8. Check Digit (1 digit)
+On Us
+9. Account Number - Variable length; always followed by the On Us symbol
+10. Check number - Located in various places in the on us field
+11. TPC - max 6 characters; Located to right of account number
+

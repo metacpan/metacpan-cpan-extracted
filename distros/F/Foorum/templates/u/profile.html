@@ -1,0 +1,163 @@
+[% PROCESS sub/date.html %]
+
+<table border='0' width='100%'>
+    <tr>
+        <td width="30%" valign="top">
+
+<div class='one'>
+<table align='center'>
+	<tbody>
+	<tr class='title'><td colspan='2'>User profile</td></tr>
+	<tr class='misc1'><td align='right'>[% c.loc('Username') %]</td><td>[% user.username %]</td></tr>
+	<tr class='misc2'><td align='right'>[% c.loc('Nickname') %]</td><td>[% user.nickname %]</td></tr>
+	[% IF user.profile_photo %]
+    <tr class='misc1'><td align='right'>Profile Photo:</td><td>[% INCLUDE include/user_profile_photo.html %]</td></tr>
+	[% END %]
+	<tr class='misc1'><td align='right'>[% c.loc('Gender') %]</td><td>
+	    [% SWITCH user.gender; CASE 'M';'Male';CASE 'F';'Female';CASE;'Secret';END; %]
+	    [% IF user.gender != 'NA' %] &nbsp;<img src='[% c.config.dir.images %]/site/gender_[% user.gender %].gif' width='20' height='14' align='absmiddle' />[% END %]
+	</td></tr>
+	[% IF user.details.birthday %]
+	<tr class='misc2'><td align='right'>[% c.loc('Birthday') %]</td><td>[% user.details.birthday %]</td></tr>
+	[% END %]
+	<tr class='misc1'><td align='right'>[% c.loc("Point:") %]</td><td>[% user.point %]</td></tr>
+	<tr class='misc1'><td align='right'>[% c.loc("Threads:") %]</td><td>[% user.threads %]</td></tr>
+	<tr class='misc2'><td align='right'>[% c.loc("Replies:") %]</td><td>[% user.replies %]</td></tr>
+	<tr class='misc2'><td align='right'>[% c.loc("Register on") %]</label></td><td>[% date_format(user.register_time) %]</td></tr>
+	<tr class='misc1'><td align='right'>Last Logon On:</td><td>[% date_format(user.last_login_on) %]</td></tr>
+	[% IF user.details.homepage %]
+	<tr class='misc2'><td align='right'>[% c.loc('Homepage') %]</td><td><a href='[% user.details.homepage %]' target='_blank' rel="nofollow">[% user.details.homepage %] <img src="[% c.config.dir.images %]/site/new-window-icon.gif" /></a></td></tr>
+	[% END %]
+	
+	[% IF user.country %]
+	<tr class='title'><td colspan='2'>[% c.loc('Location Information') %]</td></tr>
+	<tr class='misc1'><td align='right'>[% c.loc('Country/Territory') %]</td><td>[% user.country | code2country(lang) %]</td></tr>
+	[% END %]
+
+    [% has_contact_info = user.details.qq OR user.details.msn OR user.details.gtalk OR user.details.skype OR user.details.yahoo %]
+
+  [% IF has_contact_info OR NOT user.settings.show_email_public == 'N' %]
+	<tr class='title'><td colspan='2'>[% c.loc('Contact Information') %]</td></tr>
+	[% UNLESS user.settings.show_email_public == 'N' %]
+	<tr class='misc1'><td align='right'>[% c.loc("Email") %]</td><td>
+	    <img src='[% c.config.dir.images %]/myprofile/mail.png' width='20' height='20' align='absmiddle' /> [% user.email | email_obfuscate %] <a href='/help/email'><img src='[% c.config.dir.images %]/site/help.gif' width='16' height='16' align='absmiddle' /></a>
+	</td></tr>
+	[% END %]
+	[% IF has_contact_info %]
+	[% IF user.details.qq %]
+	<tr class='misc2'><td align='right'>QQ:</td><td>
+	    <a target='_blank' href='tencent://message/?uin=[% user.details.qq %]&Site=Foorum&Menu=yes'><img border="0" src="http://wpa.qq.com/pa?p=1:[% user.details.qq %]:4" align='absmiddle' /> [% user.details.qq %]</a>
+	</td></tr>
+	[% END %]
+	[% IF user.details.msn %]
+	<tr class='misc1'><td align='right'>MSN:</td><td>
+	    <img src='[% c.config.dir.images %]/myprofile/msn.png' width='20' height='20' align='absmiddle' /> [% user.details.msn | email_obfuscate %]
+	</td></tr>
+	[% END %]
+	[% IF user.details.gtalk %]
+	<tr class='misc2'><td align='right'>Gtalk:</td><td>
+	    <img src='[% c.config.dir.images %]/myprofile/gtalk.png' width='20' height='20' align='absmiddle' /> [% user.details.gtalk %]
+	</td></tr>
+	[% END %]
+	[% IF user.details.yahoo %]
+	<tr class='misc1'><td align='right'>Yahoo! ID:</td><td>
+	    <a href='http://messenger.yahoo.com/edit/send/?.target=[% user.details.yahoo %]&.src=pg' target='_blank'><img src='[% c.config.dir.images %]/myprofile/yahoo.png' width='20' height='20' align='absmiddle' /> [% user.details.yahoo %]</a>
+	</td></tr>
+	[% END %]
+	[% IF user.details.skype %]
+	<tr class='misc2'><td align='right'>Skype:</td><td>
+	    <img src='[% c.config.dir.images %]/myprofile/skype.png' width='20' height='20' align='absmiddle' /> [% user.details.skype %]
+	</td></tr>
+	[% END %]
+	[% END %][%# has_contact_info %]
+  [% END %][%# has_contact_info OR NOT user.settings.show_email_public == 'N' %]
+	</tbody>
+</table>
+</div>
+
+    </td><td width='70%' valign="top">
+
+[% IF recent_topics.size %]
+<!-- Start Recent Topics -->
+<div class='one'>
+<table align='center'>
+    <tbody>
+	<tr class='title'><td><span style="float: right;"><a href="/u/[% user.username %]/topics">View More</a></span>Recent Topics</td></tr>
+    </tbody>
+</table>
+</div>
+<br />
+<div class='one'>
+<table height='28' align='center'>
+	<tr class="title" align='center'>
+	<td width='200'>[% c.loc('Forum') %]</td>
+	<td width='*'>[% c.loc("Subject") %]</td>
+	<td width='40'>[% c.loc("Reply") %]</td>
+	<td width='40'>[% c.loc("Hit") %]</td>
+	<td width='200'>[% c.loc("Last Update") %]</td>
+	</tr>
+</table>
+</div>
+[% FOREACH t IN recent_topics %]
+<div class='multi'>
+<table align='center'>
+	<tr align='center'>
+	<td class='forum2' width='200'><a href='/forum/[% t.forum.forum_code %]'>[% t.forum.name %]</a></td>
+	<td class='forum2' valign='top' width='*'>
+		<table>
+			<tr>
+			<td align="left">
+			    [% IF t.elite %]
+			    <span class='highlight'>[Elite]</a> 
+			    [% END %]
+			    <a href='/forum/[% t.forum.forum_code %]/[% t.topic_id %]'><span class='semilight'>[% t.title %]</span></a>
+			</td>
+			</tr>
+    	</table>
+	</td>
+	<td class='forum2' width='40'><span class='highlight'>[% t.total_replies %]</span></td>
+	<td class='forum2' width='40'><span class='highlight'>[% t.hit %]</span></td>
+	<td class='forum2' width='200' align='right'><a href='/u/[% t.last_updator.username %]'>[% t.last_updator.nickname %]</a> | <span class='date'>[% date_format(t.last_update_date) %]</span></td>
+	</tr>
+</table>
+</div>
+[% END %]
+<!-- END Recent Topics -->
+[% END %]
+
+[% IF shared_items.size %]
+<!-- Start Shared Items -->
+<br />
+<div class='one'>
+<table align='center'>
+    <tbody>
+	<tr class='title'><td><span style="float: right;"><a href="/u/[% user.username %]/shared">View More</a></span>Shared Items</td></tr>
+    </tbody>
+</table>
+</div>
+<br />
+<div class='one'>
+<table height='28' align='center'>
+<tr align='center' class='title'>
+    <td align='left'>[% c.loc("Subject") %]</td>
+    <td width='180'>[% c.loc("Author") %]</td>
+    <td width='180'>[% c.loc("Last Update") %]</td>
+</tr>
+[% FOREACH item IN shared_items %]
+<tr align='center' class='misc[% IF loop.count mod 2 %]1[% ELSE %]2[% END %]'>
+
+[% INCLUDE include/object_tds.html object = item %]
+
+</tr>
+[% END %]
+</table>
+</div>
+<!-- END Shared Items -->
+[% END %]
+
+[% INCLUDE comment/show_with_head.html %]
+<br />
+[% INCLUDE comment/post.html %]
+
+    </td></tr>
+</table>

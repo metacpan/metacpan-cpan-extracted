@@ -1,0 +1,95 @@
+Revision history for FFmpeg-Command
+
+0.19    Fri Jun 7
+        Support for avconv
+        https://github.com/mizzy/FFmpeg-Command/pull/8
+        Thanks to @espizo!
+
+0.18    Tue Apr 17
+        Current version of ffmpeg has global, infile and outfile options.
+        So fix how to handling options.
+        https://github.com/mizzy/FFmpeg-Command/issues/3
+        Thanks to @sumikawa and @SteveBz!
+
+0.17    Tue Apr 10
+        Fix to pullreq #2(https://github.com/mizzy/FFmpeg-Command/pull/2)
+        Options before input files cause error in some version of ffmpeg.
+        So I reverted the fix of #1.
+        Thanks to sumikawa-san.
+
+0.16    Wed Feb 22
+        Fix to pullreq #1(https://github.com/mizzy/FFmpeg-Command/pull/1)
+        This avoids processing/decoding the file when performing a seek for
+        instance.
+	Thanks to c0decafe.
+
+0.15    Tue Jun 8
+        Fix to #58206.
+        It seems that older version of ffmpeg returns exit code 1 instead
+        of 0 when executing ffmpeg -version.
+        Thanks to Jim Bacon.
+
+0.14    Thu May 13
+        Add STDIN support.
+        Add coderef support to stdout and stderr methods.
+	Thanks to Hiroya Itoh.
+
+0.13    Sat Nov 14
+        Fix a bug in composing $cmd.
+        Thanks to Doran L. "Fozz" Barton.
+
+0.12    Fri Nov 13
+        Fix redirect in cheking existense of ffmpeg binary.
+        Thanks to Gea-Suan Lin.
+
+        You can specify more than one input file now.
+        Thanks to Doran L. "Fozz" Barton.
+
+0.11    Sun Jun 7
+        Changed how to handle title, author and comment options
+        because recent version of ffmpeg changed the way to handling these
+        options. Thanks to hsbt.
+
+0.10    Thu Mar 3
+        Change audio_codec value from aac to libaac in %device_option
+        because recent version of ffmpeg -acodec option doesn't recognize aac.
+        Thanks to hsbt.
+
+0.09    Mon Feb 23
+        Fix for RT#43525.
+        Now tests don't fail even if you don't have ffmpeg installed.
+        Thanks to ANDK.
+
+0.08    Sun Feb 15
+        - Only set device options if a device name is supplied.
+        - Only include output_file in the ffmpeg command line if we have
+          supplied one.
+        - Add 'command' accessor to make it easier to inspect the ffmpeg
+          command line created by a call to execute()
+        - Fix typo in POD
+        Thanks to Will Hawes.
+
+0.07    Wed Oct 10
+        Support timeout(), stdout() and stderr() methods.
+        Thanks to Yasuhiro Horiuchi.
+
+0.06    Sun Sep 24
+        Fix t/01-ffmpeg.t to succeed test with ffmpeg that comes with 3gp converter.
+
+0.05    Fri Sep 22
+        Change %option from 'my' to 'our'.
+
+0.04    Wed Aug 30
+        Change default video_codec from h264 to mpeg4.
+
+0.03    Mon Jul 31
+        Skip an output option if its value is undef.
+
+0.02    Mon Jul 31
+        Added checking routine of output_options keys.
+        Added output_options (title, author, comment, frame_rate)
+        Renamed size options to frame_size.(You can still use 'size.')
+
+0.01    Thu Jul 27
+        First version, released on an unsuspecting world.
+

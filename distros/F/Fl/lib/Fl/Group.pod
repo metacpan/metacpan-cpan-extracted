@@ -1,0 +1,262 @@
+class 'Fl::Group';
+isa 'Fl::Widget';
+include 'FL/Fl_Group.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Group - The FLTK Container Widget
+
+=head1 Synopsis
+
+    my $group = Fl::Group->new(100, 200, 340, 180);
+    $group->begin();
+    # Create new widgets here
+    $group->end();
+
+=head1 Description
+
+Fl::Group is the FLTK container widget.
+
+It maintains an array of child widgets. These children can themselves be any
+widget including Fl::Group. The most important subclass of Fl::Group is
+Fl::Window, however groups can also be used to control radio buttons or to
+enforce resize behavior.
+
+The tab and arrow keys are used to move the focus between widgets of this
+group, and to other groups. The only modifier grabbed is shift (for
+shift-tab), so that ctrl-tab, alt-up, and such are free for the app to use as
+shortcuts.
+
+=head1 Methods
+
+Fl::Group is a subclass of Fl::Widget but also supports these methods:
+
+=head2 new(...)
+
+The constructor creates a group of a given size and position on screen or
+within the parent.
+
+    my $group_a = Fl::Group->new(100, 150, 300, 500);
+
+...or...
+
+    my $group_b = Fl::Group->new(100, 150, 300, 500, 'Math is singular');
+
+In these examples, the new group is placed 100 pixels from the left and 150
+pixels down from the top of either the display area or parent widget.
+
+=begin TODO
+
+Ideally, we could also create windows with something like:
+
+    my $window = Fl::Group->new(
+        -position => [100, 100],
+        -size     => [380, 400],
+        -title    => 'NA'
+    );
+
+=end TODO
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Group *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+The destructor I<also deletes all children.> This allows a whole tree to be
+deleted at once, without having to keep a pointer to all children in the user
+code.
+
+=cut
+
+=pod
+
+=head2 C<add(...)>
+
+    my $button = Fl::Button->new(...);
+    $group->add($button);
+
+Adds a widget to the end of this group. If the widget already has a parent, it
+is first removed from that parent.
+
+=cut
+
+xs {name        => 'add',
+    definitions => [{required => [['Fl_Widget *', 'widget']],
+                     c_args   => 'self->cp_ctx',
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 C<add_resizable(...)>
+
+    my $button = Fl::Button->new(...);
+    $group->add_resizable($button);
+
+Adds the widget to the group and makes it the resizable widget.
+
+=cut
+
+xs {name        => 'add_resizable',
+    definitions => [{required => [['Fl_Widget *', 'widget']],
+                     c_args   => '* self->cp_ctx',
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 begin()
+
+Sets the current group so youcan build the widget tree by just constructing
+the widgets.
+
+    $group_a->begin();
+    Fl::Box->new(100, 75); # Automatically added to $group_a
+
+C<begin()> is automatically called by the constructor for Fl::Group (and thus
+Fl::Window as well). <begin()> is exactly the same as C<Fl::current(...)>.
+Don't gorget to C<end()> the group or window!
+
+=cut
+
+xs {name        => 'begin',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head2 C<children()>
+
+Returns how many child widgets the group has.
+
+=cut
+
+xs {name        => 'children',
+    definitions => [{returns => 'int'}]
+};
+
+=pod
+
+=head2 C<child(...)>
+
+    my $kid = $group->child(1);
+
+Returns the N'th child of the group. Please not that no index checks are made.
+
+=cut
+
+xs {name => 'child',
+    definitions =>
+        [{required => [['int', 'index']], returns => 'Fl_Widget *'}]
+};
+
+=pod
+
+=head2 C<clear()>
+
+Deletes all child widgets from memory recursively.
+
+This method differs from the C<remove()> method in that it affects all child
+widgets and deletes them from memory.
+
+=cut
+
+xs {name        => 'clear',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head2 C<resizable(...)>
+
+The resizable widget defines the resizing box for the group.
+
+When the group is resized, it calculates a new size and position for all of
+its children. Widgets that rae horizontally or vertically inside the
+dimensions of the box are scaled to the new size. Widgets outside othe box are
+moved.
+
+=begin html
+
+In these examples, the gray area is the resizable:
+
+<center><img src="http://www.fltk.org/doc-1.3/resizebox2.png" /></center>
+
+<br />
+
+<center><img src="http://www.fltk.org/doc-1.3/resizebox2.png" /></center>
+
+=end html
+
+The resizable may be set to the group itself, in which case all the contents
+are resized. This is the default value for Fl::Group, although undef is the
+default for Fl::Window and Fl::Pack.
+
+If the resizable is undef then all widgets remain a fixed size and distance
+from the top-left corner.
+
+It is possible to achieve any type of resize behavior by using an invisible
+Fl::Box as the resizable and/or by using a hierarchy of child Fl::Group's.
+
+=cut
+
+xs {name        => 'resizable',
+    definitions => [{required => [['Fl_Widget *', 'widget']],
+                     c_args   => 'self->cp_ctx',
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 end()
+
+Any new widgets added to the widget tree will be added to the parent of the
+group.
+
+=cut
+
+xs {name        => 'end',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

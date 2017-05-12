@@ -1,0 +1,127 @@
+NAME
+    Finance::FITF - Fast Intraday Transaction Format
+
+SYNOPSIS
+      use Finance::FITF;
+
+      my $day = Finance::FITF->new_from_file('XTAF.TX-2010-11-19.fitf');
+      warn $day->header->{start}[0]; # start of the first session
+      warn $day->header->{end}[0];   # end of the first session
+
+      warn $day->header->{bar_seconds}; # number of seconds per bar
+
+      # last bar in the file. you can get open/high/low/close/volume from $bar
+      my $bar = $day->bar_at($day->header->{end}[0]);
+
+      # run the ticks in the last bar with the given callback
+      $day->run_ticks($bar->{index}, $bar->{index}+$bar->{ticks}-1,
+                      sub { my ($time, $price, $volume) = @_; });
+
+DESCRIPTION
+    Finance::FITF provides access to the FITF format, an efficient storage
+    format for intraday trading records.
+
+FORMAT
+    The FITF format consists 3 parts:
+
+    header
+        The header defines the name, date, and sessions of the transactions
+        that the file is describing.
+
+        The fields and packing format of FITF header are:
+
+        magic a2
+            magic for FITF files should be "\x1f\xf1".
+
+        version n
+            FITF format version
+
+        date a8
+            YYYYMMDD string of the trading day
+
+        time_zone Z31
+            Long time zone name. For example: America/Chicago, Asia/Taipei.
+
+        start N:3
+            start timestamp of each session
+
+        end N:3
+            end timestamp of each session
+
+        records N
+            number of tick records
+
+        bar_seconds n
+            number of seconds per bar
+
+        format N
+            flags for bar and tick sizing and format
+
+        divisor N
+            the number that the all prices in this file should be divided by
+
+        name Z47
+            free form name
+
+    bars
+        The number of bars in the file is determined by the total seconds in
+        the sessions defined in the header, divided by "bar_seconds" defined
+        in the header. The first bar denotes trading transaction between the
+        start of the session, until and excluding "bar_seconds" past the
+        start of the session.
+
+        Each bar contains the "open", "high", "low", and "close" prices
+        information of the given period, as well as "volume" and "ticks".
+
+        The "index" field points to the start of the tick records of the
+        period of the current bar.
+
+    ticks
+        The number of ticks in the file is determined by the "records" field
+        in the header. Each record contains "price" and "volume" for the
+        transaction. The time of the transaction is determined by
+        "offset_min" and "offset_msec", which are time offset in minutes and
+        milliseconds from the start of the *first session*, respectively.
+
+  METHODS
+    Finance::FITF->new_from_file($fname)
+        Returns Finance::FITF object for the given FITF-formatted file at
+        $fname.
+
+    $self->bar_at($ts)
+        Returns the bar hash located at $ts. The bar represents trades
+        within the "bar_seconds" before and excluding the epoch timestamp
+        $ts.
+
+    $self->bar_idx($ts)
+        Returns the index of the bar located $ts.
+
+    $self->run_ticks($start, $end, $cb)
+        Iterate the ticks indexed by $start and $end for the callback $cb.
+        the callback takes timestamp, price, and volume as argument.
+
+    $self->run_bars($start, $end, $cb)
+        Iterate the bars indexed by $start and $end for the callback $cb.
+        the callback takes the bar hash.
+
+    $self->run_bars_as($bar_seconds, $offset, $cb)
+        Aggregate bars into $bar_seconds-bars for the callback $cb. The
+        callback takes timestamp of the bar and the bar hash.
+
+    $self->format_timestamp($ts)
+        A faster helper to format timestamp as "%F %T" in the
+        "$self-"header->{time_zone}>.
+
+  ATTRIBUTES
+    header
+    fh
+    nbars
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

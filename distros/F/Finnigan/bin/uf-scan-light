@@ -1,0 +1,233 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Declare;
+use Finnigan;
+
+my $args = new Getopt::Declare q{
+  [strict]
+  [mutex: -d -e -l -p]
+  [mutex: -mz -intensity]
+  -l[ist]				print or extract the peak list [required]
+  -p[rofile]				print or extract the scan profile as a 2-column table [required]
+  -b[ookends] <n:+i>			add <n> empty bins on both sides of each profile chunk [requires: -p]
+  -n[umber] <n:+i>			select scan number <n> [required]
+  -mz					list just the M/z values [requires: -p || -l]
+  -intensity				list just the intensity values [requires: -p || -l]
+  <file>				input file [required]
+}
+  or exit(-1);
+
+my $file = $args->{"<file>"};
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+my $option;
+if (exists $args->{-mz}) {
+  $option = 'm/z';
+}
+if (exists $args->{-intensity}) {
+  $option = 'intensity';
+}
+
+my $bookends = 0;
+if ($args->{-n}) {
+  $bookends = $args->{-b}{"<n>"};
+}
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $VERSION = $header->version;
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $VERSION);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+my $rfi = Finnigan::RawFileInfo->decode(\*INPUT, $VERSION);
+
+my $data_addr = $rfi->preamble->data_addr;
+my $run_header_addr = $rfi->preamble->run_header_addr;
+
+# fast-forward to RunHeader
+seek INPUT, $run_header_addr, 0;
+my $run_header = Finnigan::RunHeader->decode(\*INPUT, $VERSION);
+my $scan_index_addr = $run_header->scan_index_addr;
+my $trailer_addr = $run_header->trailer_addr;
+
+# fast-forward to ScanIndex
+seek INPUT, $scan_index_addr, 0;
+
+my $scan_index;
+
+# this code is not fool-proof and is not finished! It assumes that
+# there are exactly as many entries in ScanIndex as would fit
+# between $first_scan and $last_scan. In other words, the internal
+# indices and links are not checked.
+my $first_scan = $run_header->sample_info->first_scan;
+my $last_scan = $run_header->sample_info->last_scan;
+
+my $n = $args->{-n}{"<n>"};
+die "index $n is not in the range of available scan numbers ($first_scan .. $last_scan)"
+  unless $n >= $first_scan and $n <= $last_scan;
+
+# get the first entry
+my $entry = Finnigan::ScanIndexEntry->decode(\*INPUT, $VERSION);
+my $size = $entry->size;
+if ($n > 1) {
+  seek INPUT, $scan_index_addr + ($n - 1)*$size, 0;
+  $entry = Finnigan::ScanIndexEntry->decode(\*INPUT, $VERSION);
+}
+
+$scan_index = $entry->values;
+
+# Now go read the trailer. Because the trailer records are of variable
+# size, they are not directly addressable and all of them must be
+# read, up to the highest number in the range.
+seek INPUT, $trailer_addr, 0;
+
+# read the number of ScanEvent records in the file
+my $rec;
+my $bytes_to_read = 4;
+my $nbytes = read INPUT, $rec, $bytes_to_read;
+$nbytes == $bytes_to_read
+  or die "could not read all $bytes_to_read bytes of the trailer scan events count at $trailer_addr";
+my $trailer_length = unpack 'V', $rec;
+
+# read all scan events preceding the desired one (they are variable-size structures)
+my $scan_event;
+foreach my $i ( 1 .. $trailer_length) {
+  $scan_event = Finnigan::ScanEvent->decode(\*INPUT, $VERSION);
+  next if $i < $n;
+  last;
+}
+
+# start of the scan data (packet header)
+seek INPUT, $data_addr + $scan_index->{offset}, 0;
+
+my $scan = Finnigan::Scan->decode( \*INPUT );
+my $ph = $scan->header;
+my $profile = $scan->profile;
+
+my $peaks;
+$peaks = $scan->centroids if $ph->peak_list_size;
+
+if ( exists $args->{-l} ) {
+  if ($peaks) {
+    foreach ( @{$peaks->list} ) {
+      say join "\t", @$_;
+    }
+  }
+  else {
+    say STDERR "this scan has no called peaks";
+  }
+}
+
+if ( exists $args->{-p}) {
+  unless ( $profile ) {
+    say STDERR "this scan has no profile";
+    exit; # done with the task
+  }
+  if ( exists $args->{-p} ) {
+    $profile->set_converter($scan_event->converter);
+    $profile->print_bins($bookends);
+  }
+}
+
+__END__
+=head1 NAME
+
+uf-scan-light - list the profile or centroids in a single MS scan
+
+=head1 SYNOPSIS
+
+uf-scan-light [options] file
+
+ Options:
+
+  -l[ist]                            list the called peaks [required]
+  -p[rofile]                         print the scan profile as a 2-column table [required]
+  -b[ookends] <n:+i>		     add <n> empty bins on both sides of each profile chunk [requires: -p]
+  -n[umber] <n:+i>                   select scan number <n> [required]
+  -mz                                list just the M/z values
+  <file>                             input file [required]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-l[ist]>
+
+Get the peak list from the scan number B<-n>, if they are available. If the called peaks are not present, B<uf-scan-light> will print a message to that effect and exit.
+
+=item B<-p[rofile]>
+
+Prints the scan profile for scan number B<-n>, if it is available. If the profile is not present, B<uf-scan-light> will print a message to that effect and exit.
+
+=item B<-n[umber]>
+
+Gives the number of a single scan to process
+
+=item B<-b[ookends]>
+
+Sets the number of empty bins to add prepend and append to each profile chunk. Doing so can enhance the appearance of peak shapes rendered on simple plots when the profiles are filtered. Threshold filtering removes the bases of detected peaks as well, so this is a primitive way of reconstructing them.
+
+=back
+
+=head1 DESCRIPTION
+
+B<uf-scan-light> can be used to list the scan data for a single scan. Unlike L<uf-scan>, it is based on a lightweight version of scan data decoder, L<Finnigan::Scan>, which does not preserve the location and type data of decoded elements and therefore cannot generate detailed data dumps. But there is one thing B<uf-scan-light> does that L<uf-scan> does not: it mimics the manner in which Thermo-derived tools assign bin values in profile mode and it can insert stretches of empty bins on both sides of each profile peak, in the same way as they do it. Setting the value of the B<-bookends> option to B<4> results in the same output as that of readw or msconvert.
+
+Also, B<uf-scan-light> does not output the raw profiles. It automatically converts frequency values to M/z.
+
+The B<-profile> option instructs B<uf-scan-light> to print the profile data. The B<-list> option lists the peaks.
+
+Options B<-profile> and B<-list> are mutually exclusive.
+
+To convert the raw scan data into M/z values, use the B<-v> option.
+
+Option B<-bookends> adds the specified number of empty bins to each side of a profile chunk. If the gap is smaller than 2x the number of bookend bins, it is completely zeroed out.
+
+=head1 SEE ALSO
+
+Finnigan::PacketHeader
+
+Finnigan::Scan
+
+L<uf-scan>
+
+L<uf-mzxml>
+
+L<uf-mzml>
+
+=head1 EXAMPLES
+
+=over 4
+
+=item Print converted profile bins (M/z values) in the 1st scan:
+
+ uf-scan-light -p -n 1 sample.raw
+
+=item Print converted  profile bins in the 1st scan and add four-bin 'bookends' to make the output look like Thermo's:
+
+ uf-scan-light -p -n 1 -b 4 sample.raw
+
+=item Print the list of centroids in the 1st scan:
+
+ uf-scan-light -l -n 1 sample.raw
+
+Note that B<uf-scan-lightq> does not calculate the peak centroids from the
+profile; it only lists the existing centroids if they are present.
+
+=back
+
+=cut
+

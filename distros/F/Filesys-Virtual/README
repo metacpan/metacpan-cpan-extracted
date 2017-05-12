@@ -1,0 +1,30 @@
+NAME
+    Filesys::Virtual - Perl extension to provide a framework for a virtual
+    filesystem
+
+SYNOPSIS
+      use Filesys::Virtual;
+
+DESCRIPTION
+    This is a base class. See "SEE ALSO" below.
+
+  EXPORT
+    None by default.
+
+  TODO
+    Please contact David if you have any suggestions.
+
+AUTHORS
+    David Davis, <xantus@cpan.org>, http://teknikill.net/
+
+    L.M.Orchard, <deus_x@pobox.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), Filesys::Virtual, Filesys::Virtual::SSH,
+    Filesys::Virtual::DAAP, POE::Component::Server::FTP, Net::DAV::Server,
+    HTTP::Daemon, http://perladvent.org/2004/20th/
+

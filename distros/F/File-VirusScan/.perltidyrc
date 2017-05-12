@@ -1,0 +1,22 @@
+# PEP project Perl::Tidy policy
+# (as of Thu, 06 Mar 2008, from rjbs)
+# Modified by dmo, 24 Mar 2008
+-i=8   # standard indent of 8, (per dmo)
+-et=8  # Yes, keep the tabs (per dmo)
+-ce    # cuddly elses
+-pt=2  # parentheses should be tight
+-sbl   # Opening sub brace on new line (dmo)
+-nsfs  # no space before "for" loop semicolon
+-nolq  # don't outdent long quotes
+-b     # edit file in place, leave .bak file
+-nola  # don't outdent labels
+-msc=2 # two spaces for post-line comments (not 4)
+-bok   # keep old breaks before map/grep/sort (we're smarter than perltidy)
+-l=0   # Assume author knows what he's doing with long lines (dmo)
+
+# dmo likes if( ), not if ( ) 
+-nsak="if else elsif"
+
+# we always want to break BEFORE operators
+-wbb="+ - * / x != == >= <= =~ !~ < > | & >= <"
+-wbb="= **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="

@@ -1,0 +1,178 @@
+Fwctl NEWS -- History of User-Visible Changes. August 01 2000
+
+* Changes in fwctl 0.28
+
+* Now distributed under GPL only.
+
+* New service definitions for Cytrix ICA (Fwctl::Services::ica).
+
+* Bugs fixed:
+    - Masquerading module wasn't loaded when port forwarding was turned on.
+    - Requires Net::IPv4Addr 0.10 for security.
+
+
+Fwctl NEWS -- History of User-Visible Changes.  June 11 2000
+
+* Changes in fwctl 0.27
+
+* Bug fixes:
+    - Reduce memory usage by four for report's generation.
+    - Interface selection was broken when multiple routes were possible. 
+      (It picked the first one, rather than the most specific).
+    - Fixed ordering problem in the all service related to rules 
+      optimization. 
+
+
+Fwctl NEWS -- History of User-Visible Changes.  May 08 2000
+
+* Changes in fwctl 0.26
+
+* Bug fixes:
+    - fwctllog was skipping packets which were logged on chains with
+      an hyphen (-) in them.
+
+
+Fwctl NEWS -- History of User-Visible Changes.  Feb 17 2000
+
+* Changes in fwctl 0.25
+
+** Configuration 
+    - Possible to change the default policy using a new --default 
+      command line option. (Use with care.) Defaults remains DENY.
+    - Possibility to change the default logging policy with a new
+      --log or --nolog command line option. Defaults remains --log.
+    - Possibility to specify default marking and copy behaviour using
+      the command line --mark and --copy. The defaults is now to copy
+      unknown packets to user space. 
+
+** Reports
+    - Selection of subset of records is done via expression like tcpdump's
+      rather than command line switch.
+
+** Name service
+    - When using the -server option, accepts queries from any ports rather
+      than 53 and > 1023.
+
+** Bug fixes:
+    - Postrotate script definitions.
+    - Src and dst ip when removing duplicates in reports wasn't done 
+      properly.
+
+
+Fwctl NEWS -- History of User-Visible Changes.  Jan 26 2000
+
+* Changes in fwctl 0.24
+
+** Miscellaneous enhancements:
+    - Write NO RECORDS when no records are found in a report's period.
+    - Use carp and croak only for programmer's errors.
+    - Check for path of ipchains at startup.
+    - Make sure that the logrotate script generates only a one week report.
+ 
+** Bug fixes:
+    - Error when Date::Manip module wasn't present.
+    - For some reports, there was an error when no records we found for 
+      the report's period.
+    - When dumping accounting stats, there was a silent error when ipchains
+      couldn't be found in the PATH.
+
+
+Fwctl NEWS -- History of User-Visible Changes.  Jan 23 2000
+
+* Changes in fwctl 0.23
+
+** New report generation tools.
+
+    - fwctlog: Transforms kernel packet log messages into an intermediate
+      format which can be used to generate reports.
+    - fwctlreport: Can generate 15 different reports with various parameters
+      from the output of fwctlog.
+    - fwctlacctlog: Generates report for accounting statistics dumped by the 
+      fwctl dump-acct command.
+
+   The example cron and logrotate configuration files uses those tools to 
+   generate daily and weekly reports.
+
+** Support for multiple interfaces with same IP.
+
+   An interface can now be associated with an alias. You can tag
+   hosts and networks expansion with the name of the interface in
+   parenthesis. This will override the default interface guessing mechanism.
+   It is only useful when you have multiple interfaces with the same
+   IP address (as occurring with IPSec). All default aliases are tagged
+   with their respective interface.
+
+   Example:
+
+   VPN_CLIENT1 = 192.168.4.1(VPN1)
+   
+   
+** Support for generic IP forwarding.
+
+   It is now possible to generate rules for non tcp/udp << port >> 
+   forwarding. You still have to start the ipfwd daemon seperately. The
+   PPTP and IPSec services take advantage of this new feature to
+   support the --portfw option.
+
+** Bug fixes:
+	- Missing optional ipmasqadm triggered a configuration time error.
+	- Allow device wildcards (ppp+) in interface configuration.
+	- Masquerading of the ftp port data connection.
+
+
+Fwctl NEWS -- History of User-Visible Changes.  Dec 17 1999
+
+* Changes in fwctl 0.22
+
+** Support for port forwarding with TCP and UDP based services. You can
+   now use a --portfw [ip] option with most services to specify one of the
+   firewall's ip address from which the service will be redirected to its
+   destination. 
+
+** New services: ip_pkt, udp_pkt, icmp_pkt, pptp and ipsec.
+
+** Masquerading not limited to icmp, tcp, udp. (Useful on kernel
+with VPN masquerading patch).
+
+** Protocol can now be specified numerically.
+
+** New alias: IF_REM_NETS expands to all networks attached to an
+interface EXCEPT the directly connected one.
+
+** fwctl flush will flush all chains even if there is a configuration error.
+
+** Bug fixes: 
+	- IF_NETS alias expansion. 
+	- Forwarding between two networks attached to the same interface.
+	- fwctl.init: check was doing a flush.
+	- Output chains protocol  optimisation wasn't working. (All packets
+	  passed through all the chains).
+
+
+Fwctl NEWS -- history of user-visible changes.  19 Oct 1999
+
+* Changes in fwctl 0.21
+
+** Default directory for configuration files is now under /etc/fwctl
+
+** Default accounting files is now named fwctl_acct.
+
+** Fwctl now uses Net::IPv4Addr which was renamed from Network::IPv4Addr.
+
+** Hylafax services now works correctly.
+
+** Ping accounting doesn't fail. 
+
+** New services : pcanywhere.pm, lpd.pm, redirect.pm.
+
+** -log, -copy, -mark options now works as expected.
+
+** debian packaging by Bernd Eckenfels <ecki@lina.inka.de>
+
+** Added sample logrotate config file in RedHat package.
+
+** New flush commands.
+
+You can now reset the kernel packet filters by using the fwctl flush 
+commands. It deletes flush all rules, deletes all chains and sets the
+default policy to ACCEPT all.

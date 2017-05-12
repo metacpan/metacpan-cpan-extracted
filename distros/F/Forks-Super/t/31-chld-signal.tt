@@ -1,0 +1,151 @@
+use Forks::Super ':test_CA';
+use Test::More tests => 21;
+use strict;
+use warnings;
+
+#
+# test that background jobs send a SIGCHLD to the parent when
+# they complete and that the signal is handled by the parent.
+# Jobs stay in the "COMPLETE" state until they are waited on
+# with Forks::Super::wait or Forks::waitpid. Then the job changes to
+# the "REAPED" status.
+#
+
+our $_LOCK = 0;  # use same synchronization technique as F::S::Sighandler
+our %COMPLETE = ();
+
+sub child_signal_hijacker {
+    $_LOCK++;
+    if ($_LOCK>1) {
+	$_LOCK--;
+	return;
+    }
+
+    Forks::Super::Sigchld::handle_CHLD(@_);
+
+    for my $cj (grep { $_->{state} eq "COMPLETE" } @Forks::Super::ALL_JOBS) {
+	unless ($COMPLETE{$cj}++) {
+	    $LAST::COMPLETE = $cj;
+	    $LAST::COMPLETE{$cj}++;
+	    $SIGNAL::TIME = Time::HiRes::time();
+	}
+    }
+    $_LOCK--;
+    return;
+}
+
+##################################################################
+
+*Forks::Super::handle_CHLD = *child_signal_hijacker;
+$SIGNAL::TIME = Time::HiRes::time();
+
+# SIGCHLD will only interrupt sleep (tests 3 and 4) if a handler is defined.
+# For now this is being set up in each &Forks::Super::fork call.
+
+my ($j,$pid);
+$pid = fork();
+if (defined($pid) && $pid == 0) {
+    sleep 2;
+    exit 0;
+}
+
+ok(defined($pid) && isValidPid($pid), "$$\\valid pid $pid");
+$j = Forks::Super::Job::get($pid);
+ok($j->{state} eq "ACTIVE", "active state");
+
+# Perl's sleep can _sometimes_ be interrupted by SIGCHLD.
+# This never happens on Windows, which doesn't have a
+# POSIX-style signaling mechanism.
+# But I've also seen it not happen intermittently
+# on FreeBSD and CentOS :-(
+
+my $t = Time::HiRes::time();
+SKIP: {
+    if ($^O eq "MSWin32") {
+	Forks::Super::pause(5);
+	skip "sleep call not interrupted on $^O", 2;
+    }
+    local $! = 0;
+    sleep 10;   # sleep should be interrupted by SIGCHLD
+    $t = Time::HiRes::time() - $t;
+    okl($t <= 5.05, "Perl sleep interrupted by CHLD signal ${t}s");
+
+    # on Cygwin, sleep is interrupted but $! may not be set?
+    ok($!{EINTR} || ($^O eq 'cygwin' && $! == 0),
+       "\$! indicates interrupted system call - $!")
+	or diag "@{[%!]}";
+    Forks::Super::pause();
+}
+ok($j->{state} eq "COMPLETE", "job state is COMPLETE");
+ SKIP: {
+     skip "No implicit SIGCHLD handling on Win32", 3 if $^O eq 'MSWin32';
+
+     # XXX - pass test (1) and fail test (2) would be ok
+     ok(defined $LAST::COMPLETE{$j}, 
+	"job caught in SIGCHLD handler/$j/" . $j->{pid}); ### 5 ###
+     ok($LAST::COMPLETE eq $j, 
+	"job caught in SIGCHLD handler/$LAST::COMPLETE/"
+	. $LAST::COMPLETE->{pid});                        ### 6 ###
+     my $tt = $SIGNAL::TIME - $j->{end};
+     okl(abs($tt) < 2, "short delay ${tt}s in SIGCHLD HANDLER expected <2s");
+}
+sleep 1;
+my $p = wait;
+ok($pid == $p, "wait reaped correct process");
+ok($j->{state} eq "REAPED", "reaped process has REAPED state");
+ok($j->{reaped} - $j->{end} > 0, "reap occurred after job completed");
+#print $j->toString();
+%LAST::COMPLETE = ();
+
+#######################################################
+
+# try  Forks::Super::pause  for uninterruptible sleep
+
+$pid = fork();
+if (defined($pid) && $pid == 0) {
+    sleep 2;
+    exit 0;
+}
+ok(defined($pid) && isValidPid($pid), "valid pid $pid");
+$j = Forks::Super::Job::get($pid);
+ok($j->{state} eq "ACTIVE", "active state");
+$t = Time::HiRes::time();
+Forks::Super::pause(6);
+$t = Time::HiRes::time() - $t;
+okl($t > 5.7 && $t < 7.75,                           ### 13 ### was 7.1 obs 7.10
+    "Forks::Super::pause(6) took ${t}s expected 6");
+ok($j->{state} eq 'COMPLETE', "complete state " . $j->{state});
+SKIP: {
+    skip "No implicit SIGCHLD handling on Win32", 3 if $^O eq 'MSWin32';
+
+    # XXX - pass test (1) and fail test (2) would be ok
+    ok(defined $LAST::COMPLETE{$j}, 
+       "job in SIGCHLD handler/$j/" . $j->{pid});    ### 15 ###
+    ok($LAST::COMPLETE eq $j,
+       "job in SIGCHLD handler/$LAST::COMPLETE/"
+       . $LAST::COMPLETE->{pid});                    ### 16 ###
+    my $tt = $SIGNAL::TIME - $j->{end};
+    okl(abs($tt) < 2, "short delay ${tt}s in SIGCHLD handler, expected <2s");
+}
+$p = wait;
+ok($pid == $p, "wait reaped correct job");
+ok($j->{state} eq "REAPED", "job state changed to REAPED in wait");
+my $tt = $j->{reaped} - $j->{end};
+okl($tt > 1,
+    "reaped at $j->{reaped}, ended at $j->{end} ${tt}s expected >1s");
+if ($tt <= 1) {
+    diag "Job created at $j->{created}";
+    diag "Job started at $j->{start}";
+    diag "Job ended at $j->{end}";
+    diag "Job reaped at $j->{reaped}";
+}
+
+__END__
+
+What is the status of this test?
+
+passes all tests on Linux, v5.8.8, v5.12.2, v5.16.3
+ok on MSWin32 5.16.3
+ok on solaris v5.16.3, v5.12.2, v5.10.1
+ok on aix v5.16.3, v5.12.2, v5.10.1
+on Cygwin, SIG interrupts sleep (#3) but doesn't set $! (#4)

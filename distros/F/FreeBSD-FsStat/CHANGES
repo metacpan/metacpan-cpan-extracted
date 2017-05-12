@@ -1,0 +1,115 @@
+==================================================
+Changes from 2015-10-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.107 at 2016-10-26 12:33:49 +0000
+------------------------------------------
+
+  Change: e23ed4cafae2d48f92309d6d3a216710b675ee18
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-26 15:33:38 +0000
+
+    Again, fix typo in FileSystem.pm
+
+    f_mnttoname to f_mntonname, hope I will get it correct eventually. 
+
+  Change: 449f33794dc0504704a93e52cc54f1750950fe2a
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-26 15:31:04 +0000
+
+    Merge branch 'master' of github.com:aduitsis/perl-freebsd-fsstat 
+
+  Change: 0b8c9a6eb9f2eabe6757952cca875ae187a52175
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-26 15:15:09 +0000
+
+    Fix method name in pod, was 'size' should be 'free' 
+
+------------------------------------------
+version 0.106 at 2016-10-26 12:25:15 +0000
+------------------------------------------
+
+  Change: 1b54fc105ab2527f6bdae328989666383897b766
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-26 15:25:15 +0000
+
+    Fix error in mountpoint method
+
+    In FreeBSD::FileSystem, the mountpoint method was erroneously
+    returning the device instead of the mountpoint. Fixed. 
+
+------------------------------------------
+version 0.105 at 2016-10-26 12:15:47 +0000
+------------------------------------------
+
+  Change: a7339fc29365dcfe02fbe84cfdcbaa204c2cc7de
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-26 15:15:47 +0000
+
+    Fix method name in pod, was 'size' should be 'free' 
+
+------------------------------------------
+version 0.104 at 2016-10-26 12:00:45 +0000
+------------------------------------------
+
+  Change: a3b2a30cef804df5205cb49ec8b581099903b823
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-26 15:00:45 +0000
+
+    Fix typo in FileSystem.pm 
+
+------------------------------------------
+version 0.103 at 2016-10-13 08:55:25 +0000
+------------------------------------------
+
+  Change: d55e5ee7f3b367c19fd61013e041879cec0df810
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-13 11:55:25 +0000
+
+    Add FreeBSD::FileSystem class and use it.
+
+    - Added the FreeBSD::FileSystem class. The getfsstat function returns
+    an arrayref of hashrefs, each one of these refs represents a
+    filesystem. A FreeBSD::FileSystem object can be initialized with one
+    of these hashrefs and provides convenient encapsulation. - Added pod
+    documentation to FreeBSD::FileSystem, etc. - Minor misc changes. 
+
+------------------------------------------
+version 0.102 at 2016-10-05 19:49:20 +0000
+------------------------------------------
+
+  Change: ff6218cfee3c087f5e208ac9f9b0fc8b912463c8
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-05 22:49:20 +0000
+
+    Commit changes in README.mkdn 
+
+  Change: f9119149339279b71edebd3bb1416c48e86ef7fb
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-05 22:45:31 +0000
+
+    Move distribution to Dist::Zilla.
+
+    - Modifications mainly relevant with creating a suitable dist.ini and
+    making sure that tests can be run without any problems reported. -
+    Had to switch off Perl::Critic check of 'use strict' as the automatic
+    insertion of $VERSION by PkgVersion module of Dist::Zilla is being
+    done right after the package first line. A workaround would be to use
+    strict before the package declaration, but this is awkward. 
+
+  Change: 7e3771f81252f756d35fac78c1779e6e67d109cf
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-05 18:10:17 +0000
+
+    add MANIFEST 
+
+  Change: b06d0dab77ee37e45c7b33cb4397c08cc27ccf97
+  Author: Athanasios Douitsis <aduitsis@cpan.org>
+  Date : 2016-10-05 18:07:47 +0000
+
+    first commit 
+
+================
+End of releases.
+================

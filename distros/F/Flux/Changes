@@ -1,0 +1,16 @@
+Revision history for Flux
+
+1.03    2013-06-28
+    * improve docs
+
+1.02    2013-04-14
+    * Flux::Storage::Memory: don't advance client position on undef reads
+
+1.01    2013-04-13
+    * Flux::Format
+    * Flux::MemoryStorage
+    * Flux::In::Role::Easy and Flux::Out::Role::Easy
+    * Flux::Storage::Role::ClientList
+
+1.00    2013-04-11
+    * First opensource release.

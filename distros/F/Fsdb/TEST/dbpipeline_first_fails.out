@@ -1,0 +1,3 @@
+dbcolcreate: cannot open input: no header line
+dbroweval: cannot open input: no header line
+Fsdb::Support::Freds: ending, but running process: dbpipeline

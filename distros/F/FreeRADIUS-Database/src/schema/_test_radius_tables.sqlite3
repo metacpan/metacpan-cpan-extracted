@@ -1,0 +1,84 @@
+CREATE TABLE aggregate_daily (
+  TotAcctId INTEGER NOT NULL PRIMARY KEY autoincrement,
+  UserName varchar(64) NOT NULL default '',
+  AcctDate date NOT NULL default '0000-00-00',
+  ConnNum bigint(12) default NULL,
+  ConnTotDuration bigint(12) default NULL,
+  ConnMaxDuration bigint(12) default NULL,
+  ConnMinDuration bigint(12) default NULL,
+  InputOctets bigint(20) default NULL,
+  OutputOctets bigint(20) default NULL,
+  NASIPAddress varchar(15) default NULL
+);
+
+CREATE TABLE aggregate_monthly (
+  MTotAcctId INTEGER NOT NULL PRIMARY KEY autoincrement,
+  UserName varchar(64) NOT NULL default '',
+  AcctDate date NOT NULL default '0000-00-00',
+  ConnNum bigint(12) default NULL,
+  ConnTotDuration bigint(12) default NULL,
+  ConnMaxDuration bigint(12) default NULL,
+  ConnMinDuration bigint(12) default NULL,
+  InputOctets bigint(20) default NULL,
+  OutputOctets bigint(20) default NULL,
+  NASIPAddress varchar(15) default NULL
+);
+
+CREATE TABLE radacct (
+  RadAcctId INTEGER NOT NULL PRIMARY KEY autoincrement,
+  AcctSessionId varchar(32) NOT NULL default '',
+  AcctUniqueId varchar(32) NOT NULL default '',
+  UserName varchar(64) NOT NULL default '',
+  Realm varchar(64) default '',
+  NASIPAddress varchar(15) NOT NULL default '',
+  NASPortId int(12) default NULL,
+  NASPortType varchar(32) default NULL,
+  AcctStartTime datetime NOT NULL default '0000-00-00 00:00:00',
+  AcctStopTime datetime NOT NULL default '0000-00-00 00:00:00',
+  AcctSessionTime int(12) default NULL,
+  AcctAuthentic varchar(32) default NULL,
+  ConnectInfo_start varchar(32) default NULL,
+  ConnectInfo_stop varchar(32) default NULL,
+  AcctInputOctets bigint(20) default NULL,
+  AcctOutputOctets bigint(20) default NULL,
+  CalledStationId varchar(50) NOT NULL default '',
+  CallingStationId varchar(50) NOT NULL default '',
+  AcctTerminateCause varchar(32) NOT NULL default '',
+  ServiceType varchar(32) default NULL,
+  FramedProtocol varchar(32) default NULL,
+  FramedIPAddress varchar(15) NOT NULL default '',
+  AcctStartDelay int(12) default NULL,
+  AcctStopDelay int(12) default NULL
+);
+
+CREATE TABLE radcheck (
+  id INTEGER NOT NULL PRIMARY KEY autoincrement,
+  UserName varchar(64) NOT NULL default '',
+  Attribute varchar(32) NOT NULL default '',
+  op char(2) NOT NULL default '==',
+  Value varchar(253) NOT NULL default ''
+);
+
+INSERT INTO radcheck VALUES ('1', 'test1', 'Password', ':=', 'test1' );
+INSERT INTO radcheck VALUES ('2', 'test2', 'Password', ':=', 'test2' );
+INSERT INTO radcheck VALUES ('3', 'test3', 'Password', ':=', 'test3' );
+
+INSERT INTO radacct VALUES ('1', '005D116E', '3e2fa6f7e163b5fe', 'test', '', 'dialup', '486', 'Virtual', '2009-01-01 20:54:03', '2009-01-01 21:03:23', '561', 'RADIUS', '155520000', '155520000', '1745', '2093', 'test', 'atm 10', 'User-Request', 'Framed-User', 'PPP', '10.100.100.255', '0', '0' );
+
+INSERT INTO radacct VALUES ('2', '2300E9E0', '922e0cd93083dca9', 'test2', '', '172.16.4.4', '25', 'Async', '2009-12-03 11:33:22', '2009-12-03 11:33:58', '36', 'RADIUS', '21600 LAPM/V42BIS', '21600 LAPM/V42BIS', '7384', '38959', '', '', 'User-Request', 'Framed-User', 'PPP', '172.16.4.5', '0', '0' );
+
+INSERT INTO radacct VALUES ('3', '00317FDF', '55f9519dc79940a6', 'test3', '', '10.0.0.1', '1585', 'Virtual', '2009-12-13 23:52:46', '2009-12-14 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '853481', '2068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );
+
+INSERT INTO radacct VALUES ('4', '00317FEF', '55f9519db79940a6', 'test3', '', '10.0.0.1', '1585', 'Virtual', '2009-12-15 23:52:46', '2009-12-16 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '953481', '3842068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );
+
+INSERT INTO radacct VALUES ('5', '00317FEF', '55f9519db79940a6', 'test3', '', '10.0.0.1', '1585', 'Virtual', '2009-12-15 23:52:46', '2009-12-16 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '953481', '3842068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );
+
+INSERT INTO radacct VALUES ('6', '00317FEF', '55f9519db79940a6', 'test3', '', '10.0.0.1', '1585', 'Virtual', '2009-12-18 23:52:46', '2009-12-19 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '953481', '3842068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );
+
+INSERT INTO radacct VALUES ('7', '00317FEF', '55f9519db79940a6', 'test3', '', '10.0.0.1', '1585', 'Virtual', '2009-12-18 23:52:46', '2009-12-19 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '953481', '3842068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );
+
+INSERT INTO radacct VALUES ('8', '00317FEF', '55f9519db79940a6', 'hsras', '', '10.0.0.1', '1585', 'Virtual', '2009-01-30 23:52:46', '2009-02-02 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '953481', '3842068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );
+
+INSERT INTO radacct VALUES ('9', '00317FEF', '55f9519db79940a6', 'dunras', '', '172.16.25.9', '1585', 'Virtual', '2009-02-01 23:52:46', '2009-02-02 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '953481', '3842068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );
+
+INSERT INTO radacct VALUES ('10', '00317FEF', '55f9519db79940a6', 'hotras', '', '10.10.9.5', '1585', 'Virtual', '2009-02-01 23:52:46', '2009-02-02 03:07:10', '11664', 'RADIUS', '155520000', '155520000', '953481', '3842068177', 'test ', 'atm 10', 'Port-Error', 'Framed-User', 'PPP', '10.0.0.2', '0', '0' );

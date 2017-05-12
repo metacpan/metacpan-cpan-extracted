@@ -1,0 +1,16 @@
+---
+access_token: AAABnTSoIUkEBAHQ3quxxBFv4WEIyBUuOEu7ILIYZBB91PT8pC5p3QQuAZAZBFDDMkqHZABZApdGCNYjWIiWLkUacAZBTeBI3NSIx7wQNz4HwZDZD
+app_id: 113581115331137
+bccess_token: AAABnTSoIUkEBAHQ3quxxBFv4WEIyBUuOEu7ILIYZBB91PT8pC5p3QQuAZAZBFDDMkqHZABZApdGCNYjWIiWLkUacAZBTeBI3NSIx7wQNz4HwZDZD
+permissions:
+- email
+- offline_access
+- publish_stream
+- publish_actions
+- create_event
+- rsvp_event
+- manage_pages
+- user_groups
+- friends_location
+postback: http://localhost:8123/
+secret: b75698b18f8a68b05d71d8e9f36f56b4

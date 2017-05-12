@@ -1,0 +1,438 @@
+#!/usr/bin/perl
+
+use strict;
+use 5.010;
+
+use Getopt::Long;
+use Getopt::ArgvFile justload => 1;
+use Pod::Usage;
+use Carp;
+use Cwd;
+
+use POSIX qw(locale_h setsid);
+use FusqlFS;
+
+my $locale = setlocale(LC_CTYPE);
+if ($locale =~ /\.([-A-Za-z0-9]+)$/) {
+    $locale = lc $1;
+    $locale =~ s/-//g;
+} else {
+    $locale = '';
+}
+
+my %options = (
+    'host'            => 'localhost',
+    'port'            => '',
+    'database'        => '',
+    'user'            => 'root',
+    'password'        => '',
+    'mountpoint'      => '',
+    'mkdir'           => 0,
+    'rmdir'           => 0,
+    'debug'           => 0,
+    'help'            => 0,
+    'charset'         => $locale,
+    'daemon'          => 1,
+    'logfile'         => '',
+    'fnsep'           => '.',
+    'engine'          => 'PgSQL',
+    'innodb'          => 0,
+    'limit'           => 0,
+    'format'          => '',
+    'cache_strategy'  => 'memory',
+    'cache_threshold' => 0,
+    'namemap'         => [],
+);
+
+Getopt::Long::Configure('no_ignore_case');
+Getopt::ArgvFile::argvFile(default => 1, fileOption => '-r');
+GetOptions(
+    'host|h:s'        => \$options{'host'},
+    'port|P:i'        => \$options{'port'},
+    'database|db|d:s' => \$options{'database'},
+    'user|u:s'        => \$options{'user'},
+    'password|p:s'    => \$options{'password'},
+    'mountpoint|m:s'  => \$options{'mountpoint'},
+    'mkdir|k!'        => \$options{'mkdir'},
+    'rmdir|K!'        => \$options{'rmdir'},
+    'debug|D+'        => \$options{'debug'},
+    'help'            => \$options{'help'},
+    'charset|C:s'     => \$options{'charset'},
+    'daemon!'         => \$options{'daemon'},
+    'logfile|l:s'     => \$options{'logfile'},
+    'fnsep|s:s'       => \$options{'fnsep'},
+    'engine|e:s'      => \$options{'engine'},
+    'innodb!'         => \$options{'innodb'},
+    'limit|L:i'       => \$options{'limit'},
+    'cache|c:s'       => \$options{'cache_strategy'},
+    'cache-limit|M:i' => \$options{'cache_threshold'},
+    'format|f:s'      => \$options{'format'},
+    'namemap|n:s@'    => $options{'namemap'},
+) or pod2usage(2);
+
+$options{'database'} ||= shift @ARGV;
+$options{'mountpoint'} ||= shift @ARGV;
+
+pod2usage(1) unless !$options{'help'} && $options{'database'} && $options{'mountpoint'};
+
+$options{'mountpoint'} = getcwd().'/'.$options{'mountpoint'} unless $options{'mountpoint'} =~ m{^/};
+
+$options{'namemap'} = { map { my ($table, $names) = split /:/; $table => [ split /,/, $names ] } @{$options{'namemap'} || []} };
+
+daemonize($options{'logfile'}) if $options{'daemon'};
+
+my $fusqlfs = FusqlFS->init(%options);
+$fusqlfs->mount($options{'mountpoint'},
+    mkdir => $options{'mkdir'},
+    rmdir => $options{'rmdir'});
+
+sub daemonize {
+    my $logfile = shift;
+
+    if ($logfile) {
+        open STDERR, ">>", $logfile;
+        select((select(\*STDERR), $| = 1)[0]);
+    }
+
+    my $ppid = $$;
+    my $pid = fork and exit 0;
+    croak('Can\'t daemonize') unless defined $pid;
+    select undef, undef, undef, .001 while (kill 0, $ppid);
+    my $sid = setsid();
+    die() if $sid == -1;
+    chdir '/';
+    umask 00;
+    close STDIN or croak('Unable to close STDIN');
+    close STDOUT or croak('Unable to close STDOUT');
+    unless ($logfile) {
+        close STDERR or croak('Unable to close STDERR');
+    }
+    return $sid;
+}
+
+__END__
+
+=head1 NAME
+
+fusqlfs - FUSE file system to mount DB and provide tools to control and admin it
+
+=head1 SYNOPSIS
+
+fusqlfs [options] database directory
+
+=head1 EXAMPLES
+
+    fusqlfs dbname ./mnt
+    fusqlfs --host=localhost --port=5432 --engine=PgSQL --user=postgres --password=12345 dbname ./mnt
+    fusqlfs --database=dbname --user=postgres --mountpoint=./mnt
+    fusqlfs -d dbname -m ./mnt -u postgres -p 12345 -e PgSQL
+
+=head1 OPTIONS
+
+=head2 Basic options
+
+=over
+
+=item B<--host, -h>
+
+Host name to connect, defaults to localhost.
+
+=item B<--port, -P>
+
+Port number to connect to, default depends on database engine in use.
+
+=item B<--user, -u>
+
+Username to authorize.
+
+=item B<--password, -p>
+
+Password to authorize.
+
+=item B<--database, --db, -d>
+
+Database name to connect to. Mandatory.
+
+=item B<--mountpoint, -m>
+
+Mointpoint, must be an empty directory. Mandatory.
+
+=item B<--engine, -e>
+
+DB engine to use. Can be either PgSQL or MySQL for now. PgSQL is really
+implemented, MySQL is in my todo list. Defaults to PgSQL.
+
+=back
+
+=head2 Other options with values
+
+=over
+
+=item B<--logfile, -l>
+
+Filename to store debug output to in daemon mode. Doesn't have any meaning in
+foreground mode, as all debug output are sent to STDERR in this case.
+Default is don't store debug data anywhere.
+This option has sense only with L</--daemon> option set and at least one
+L<--debug|/--debug, -D> option in command line.
+
+=item B<--charset, -C>
+
+Default charset, used for tables creation, results display etc.
+Defaults to current locale's charset.
+
+=item B<--fnsep, -s>
+
+File name fields separator, used to compose filenames out from multi-field
+primary keys. If you have table with primary key like (obj_id, name), every
+record in DB will be visible as a file with its name composed of this two
+fields (like "12.odrie", "43.nanny" etc.) This option's value is used as a
+separator to glue field values together. Defaults to single dot (.). You may
+wish to change it if you have table with text fields in primary key with a dot
+in them.
+
+For tables without primary keys, see L<--namemap|/--namemap, -n> options below.
+
+=item B<--namemap, -n>
+
+Table-to-fields map to format filenames for data rows.
+Normally data records filenames are composed from primary key fields
+concatenated with fields separator (see L<--fnsep|/--fnsep, -s> option
+above). But sometimes you can have tables without primary keys, so
+this algorithm will not work and you won't be able to look inside such
+tables data. To enable data lookup feature for such tables you can
+use B<--namemap> options. This option can be repeated multiple times,
+each B<--namemap> option defines single table-to-fields mapping in format:
+C<tablename:fieldname1,fieldname2,...,fieldnamen>, so this fields list
+will be used for given table instead of primary key fields.
+
+For example there're a lot of tables without primary keys in C<INFORMATION_SCHEMA>
+database of MySQL, but mounting this system database can be very helpful
+to look inside MySQL schema definitions. You can use the following command
+to mount C<INFORMATION_SCHEMA> and be able to review C<TABLES> table
+with tables metadata:
+
+    fusqlfs --engine mysql --host localhost --database information_schema --mountpount ~/mnt/db --namemap TABLES:TABLE_SCHEMA,TABLE_NAME
+
+A few notices: 1) table and field names in these mappings are case sensitive,
+if you put C<--namemap tables:table_schema,table_name> option into command
+above you would end up with empty data directory for C<TABLES> table, 2)
+the field names per table you provide must identify each table row in a
+unique way (i.e. be real primary key, even if not marked so with C<PRIMARY KEY>
+in table definition), otherwise you will get unexpected behavior (for
+instance, you won't be able to edit each row consistently, as what "file"
+you read may not match the "file" you write to, so you can clobber your
+data in no time).
+
+=item B<--limit, -L>
+
+Integer, number of data rows to show in table's data subdir, defaults to 0
+(means all rows). Useful if you are going to browse really big databases, as
+listing all data records as files can be very slow and memory consuming.
+
+You can also try to change and tune your cache strategy with
+L<--cache|/--cache, -c> and L<--cache-limit|/--cache-limit, -M> options (see
+below).
+
+If this is an issue for you, use this option to limit number of listed table
+rows. You can still get record by requesting filename equal to primary key
+value (id usually) directly, if you know it, even if you don't see it in
+directory listing.
+
+=item B<--cache, -c>
+
+Cache strategy to choose. There're three strategies for now (in order of speed
+decreasing):
+
+=over
+
+=item memory
+
+store everything in memory, fastest but can be overkill for your
+memory in case of big databases,
+
+=item limited
+
+like memory, but number of stored elements is limited to some defined value,
+and cache is cleared down to this limit if it's exceeded (least used entries
+removed first); good if you have limited memory space (see
+L<FusqlFS::Cache::Limited> for details),
+
+=item file
+
+store some data in files, good if you are going to work with really big
+databases, e.g. with large blobs (see L<FusqlFS::Cache::File> for details).
+
+=back
+
+For details see L<--cache-limit|/--cache-limit, -M> option description below.
+
+=item B<--cache-limit, -M>
+
+Integer, threshold for cache strategy (see L<--cache|/--cache, -c> option
+for details), defaults to 0, which means back up to "memory" strategy. Meaning
+depends on chosen cache strategy.
+
+For "limited" cache strategy it means number of max cache items to store. If
+number of cached items exceeds this value, cache cleanup is forced, least used
+entries removed first.
+
+I recommend to set this value to at least 3/4 of total objects in your database
+(including all tables, sequences, views, data rows and other objects, browsable
+with this program), which is about 60% cache hits (~45% for 1/2 and ~56% for
+2/3). But this is just a basic recommendation based on educated guess and some
+tests with "entry" names generated with normally distributed random generator.
+Experiment is your best advisor in this case.
+
+For "file" strategy it means min entry size in bytes to store on disk (caches
+simple files only for now, dirs/symlinks and the like are not cached, which is
+ok in most cases). If file size is smaller then given size, then it is stored
+in memory. Useful if you are going to review big chucks of data in your
+database, e.g. large blobs etc.
+
+Common advice: set C<--cache-limit> above zero and L<--cache|/--cache, -c> to
+anything but "memory" only if you really have low memory issues with the
+program, as all other cache strategies are slower than simple memory access.
+"Limited" cache method has to support additional structures to analyze data
+usage, and so it's slower than simple "memory" cache strategy, while "file"
+cache method has to check and update real files on your disk, so both of them
+are slower than simple "memory" caching (they're still faster than database
+requests, however).
+
+See also L<FusqlFS::Cache>, L<FusqlFS::Cache::Base>, L<FusqlFS::Cache::File>
+and L<FusqlFS::Cache::Limited> for detailed description of cache strategies.
+
+=item B<--format, -f>
+
+Format used to output different text data, like rows, columns description etc.
+Can be "xml", "json", "yaml", "html", "htmltable" or "native" for now, defaults
+to "native".
+
+Note a special case of "native" format: it doesn't encode data into any
+specific text-based format, instead it preserves inner Perl structures. The
+effect is all formatted files are represented as directories, each field value
+being regular file with data. For details see L<FusqlFS::Formatter::Native>.
+
+Other special formats are "html" and "htmltable". They are dump-only formats,
+they produce HTML output (HTML lists for "html" or tables for "htmltable") but
+don't parse this format back into Perl structures, so you can't edit and save
+database data while using these formats. For details see
+L<FusqlFS::Formatter::Html> and L<FusqlFS::Formatter::Htmltable>.
+
+For writing your own formatters see L<FusqlFS::Formatter>.
+
+=back
+
+=head2 Boolean options
+
+=over
+
+=item B<--innodb>
+
+Boolean, MySQL specific. If set, new tables created by the program use InnoDB
+backend, MyISAM is used otherwise. Defaults to false (MyISAM).
+
+=item B<--debug, -D>
+
+Incremental, output debug info. You can repeat this option up to five times.
+There're following debug levels:
+
+=over
+
+=item 1. show critical DB errors,
+
+=item 2. show DB warnings as well,
+
+=item 3. show full SQL statements which caused errors,
+
+=item 4. show full stack trace on errors,
+
+=item 5. show FUSE debug tracing output (really noisy).
+
+=back
+
+Default is no debug messages. See also L<--logfile|/--logfile, -l> to enable
+debug output logging in daemon mode. If you don't set logfile in daemon mode
+you won't see any debug output, no matter how many C<-D>s you put in command
+line.
+
+=item B<--daemon>
+
+Boolean, if set the program will daemonize itself. Defaults to true. You may
+wish to use it as C<--nodeamon> to debug the program.
+
+=item B<--mkdir, -k>
+
+Boolean, if set the program will try to create mountpoint directory if it doesn't
+exist yet. Default is false.
+
+=item B<--rmdir, -K>
+
+Boolean, if set the program will try to remove mountpoint directory after exit.
+Default is false.
+
+=back
+
+=head2 Store options into configuration files
+
+FusqlFS leverages L<Getopt::ArgvFile> package to load configuration from files.
+
+Long story short, you can put C<@filename> on command line, it will interpolate
+contents of the file into command line. You can place as many @-clauses into
+command line as you want. This way you can store some common options into a
+file and use it in C<fusqlfs> invocation. For instance, you can place
+credentials and database name into F<databaserc> file and then just call
+C<fusqlfs @databaserc> to mount it.
+
+As an alternative to @-prefix you can use C<-r> option instead to load
+configuration from given file, so you can write C<-r filename> instead
+of C<@filename>. This is useful to put into shebang line in fusqlfs config
+file:
+
+    #!/usr/bin/fusqlfs -r
+    --user=root
+    --password=pa$$w0rd
+    --host=localhost
+    --engine=mysql
+
+Then you need to give execute permission to the config file with C<chmod a+x>
+and run it directly from anywhere.
+
+=head1 DESCRIPTION
+
+This FUSE-daemon allows to mount any DB as a simple filesystem. Unlike other
+similar "sqlfs" filesystem, it doesn't provide simple DB-backed file storage,
+but given you full interface to all database internals.
+
+Every table, view, function etc. is a directory, every single field, index,
+record etc. is a file, symlink or subdirectory in the mounted filesystem. You
+can create table "mkdir ./mnt/tables/tablename", and remove them with "rmdir"
+afterwards. You can edit fields as simple YAML-files. All your usual file
+utilities are at your service including "find", "rm", "ln", "mv", "cp" etc.
+
+Just mount your DB and enjoy!
+
+=head1 TODO
+
+=over
+
+=item * Implement MySQL support.
+
+=item * Implement PgSQL triggers.
+
+=item * Write better docs: describe FS structure, rules and precautions to use
+it as DB admin tool.
+
+=back
+
+=head1 AUTHOR
+
+E<copy> 2010, Konstantin Stepanov E<lt>I<mailto:me@kstep.me>E<gt>
+
+=head1 LICENSE
+
+This product is distributed AS IS without any warrantly under General Public
+License v.3 or higher in hope it will be useful for somebody.
+
+License text is included in F<LICENSE> file in this distribution.
+

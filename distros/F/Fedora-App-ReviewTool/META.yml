@@ -1,0 +1,112 @@
+---
+abstract: 'Application class for ReviewTool'
+author:
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fedora-App-ReviewTool
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Fedora::App::ReviewTool:
+    file: lib/Fedora/App/ReviewTool.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Bodhi:
+    file: lib/Fedora/App/ReviewTool/Bodhi.pm
+    version: 0.01
+  Fedora::App::ReviewTool::Bugzilla:
+    file: lib/Fedora/App/ReviewTool/Bugzilla.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::branch:
+    file: lib/Fedora/App/ReviewTool/Command/branch.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::check:
+    file: lib/Fedora/App/ReviewTool/Command/check.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::close:
+    file: lib/Fedora/App/ReviewTool/Command/close.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::import:
+    file: lib/Fedora/App/ReviewTool/Command/import.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::koji:
+    file: lib/Fedora/App/ReviewTool/Command/koji.pm
+  Fedora::App::ReviewTool::Command::review:
+    file: lib/Fedora/App/ReviewTool/Command/review.pm
+  Fedora::App::ReviewTool::Command::setup:
+    file: lib/Fedora/App/ReviewTool/Command/setup.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::status:
+    file: lib/Fedora/App/ReviewTool/Command/status.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::submit:
+    file: lib/Fedora/App/ReviewTool/Command/submit.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Command::take:
+    file: lib/Fedora/App/ReviewTool/Command/take.pm
+  Fedora::App::ReviewTool::Command::update:
+    file: lib/Fedora/App/ReviewTool/Command/update.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Config:
+    file: lib/Fedora/App/ReviewTool/Config.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Koji:
+    file: lib/Fedora/App/ReviewTool/Koji.pm
+    version: 0.10
+  Fedora::App::ReviewTool::Reviewer:
+    file: lib/Fedora/App/ReviewTool/Reviewer.pm
+  Fedora::App::ReviewTool::Submitter:
+    file: lib/Fedora/App/ReviewTool/Submitter.pm
+    version: 0.10
+  Fedora::Bugzilla::PackageReviewBug:
+    file: lib/Fedora/Bugzilla/PackageReviewBug.pm
+    version: 0.10
+requires:
+  Config::Tiny: 0
+  Crypt::OpenSSL::X509: 0
+  Data::Section: 0
+  Digest::SHA1: 0
+  Fedora::Bugzilla: 0.10
+  File::Slurp: 0
+  File::Temp: 0
+  FindBin: 0
+  IO::Prompt: 0
+  IPC::System::Simple: 0
+  LWP::Simple: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::App::Cmd: 0
+  MooseX::Role::XMLRPC::Client: 0
+  MooseX::Traits::Attribute::CascadeClear: 0
+  MooseX::Traits::Attribute::CascadeClearMaster: 0
+  MooseX::Types::DateTime: 0
+  MooseX::Types::Path::Class: 0
+  MooseX::Types::URI: 0
+  MooseX::Workers: 0.04
+  Path::Class: 0
+  Readonly: 0
+  Template: 0
+  Term::Completion: 0
+  Term::ProgressBar: 0
+  Term::Size: 0
+  Text::SimpleTable: 0
+  URI::Fetch: 0
+  URI::Find: 0
+  autodie: 0
+  namespace::clean: 0
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: 0.10

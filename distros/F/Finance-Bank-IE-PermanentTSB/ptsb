@@ -1,0 +1,237 @@
+#!/usr/bin/perl
+
+# this is a shell command the user can use to deal with his homebanking
+
+use FindBin;
+use lib "$FindBin::RealBin/lib"; # load modules from "lib" subdir relative to this script
+
+use ptsb_util;
+use Data::Dumper;
+
+use strict;
+use warnings;
+
+# main program
+sub main {
+
+    my $cf = {};
+
+    # parse and validate options
+    ptsb_util::parse_options($cf);
+    ptsb_util::validate_options($cf);
+
+    print "Parsing configuration file...\n";
+    # parse config file
+    ($cf->{open24_num}, $cf->{pass}, $cf->{pan}) = 
+        ptsb_util::parse_configfile($cf->{cfgfile});
+
+    print STDERR Dumper($cf) if($cf->{debug});
+
+    # execute options
+    if($cf->{balance}) {
+        print "\nConnecting...\n\n";
+        ptsb_util::balance($cf);
+    }
+    if($cf->{statement}) {
+        print "\nConnecting...\n\n";
+        ptsb_util::statement($cf);
+    }
+
+    # exit
+    exit 0;
+
+}
+
+main;
+
+__END__
+
+=head1 NAME
+
+ptsb - Interact with you Permanent TSB homebanking from your shell!
+
+=head1 SYNOPSIS
+
+ptsb [options] 
+
+=head2 Print accounts balance:
+
+=over
+
+=item C<ptsb [ -F F</path/of/conf/file> ] -b>
+
+=back
+
+=head2 Print account statement:
+
+=over
+
+=item C<ptsb [ -F F</path/of/conf/file> ] -s -a c -n <4digits> -f yyyy/mm/dd  -t yyyy/mm/dd>
+
+=back
+
+If your are running Linux you can use the F<date --date> command to simplify the date range definition.
+You can put these aliases on your F<~/.bashrc>:
+
+    alias ptsb_stat='ptsb --statement -a c -n xyzt'
+    alias ptst_last_month="statement_current -f `date +%Y/%m/%d --date='1 month ago'` -t `date +%Y/%m/%d`"
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-h | --help>
+
+this help usage message!
+
+=item B<-D | --debug>
+
+Enable debug. This will be more verbose and will leave html
+on the current working directory.
+
+=item B<-F F</path/to/config/file> | --file F</path/to/config/file>>      
+
+filename configuration file path (default: F<~/.ptsbrc>).
+Please refer to manual page to see how this file is built.
+
+=item B<-b | --balance>
+
+print account balance
+
+=item B<-s | --statement>
+
+print account statement
+
+=item B<-T type | --transation-type type>
+
+Type of transaction to look on the statement.
+Type can be: ALL, WITHDRAWAL, DEPOSIT
+
+=item B<-f | --from--date yyyy/mm/dd>
+
+from date
+
+=item B<-t | --to-date yyyy/mm/dd>
+
+to date
+
+=item B<-a [c | v] | --account-type [c | v]>
+
+account type: can be 'c' (current account) or 'v' for (visa card)
+
+=item B<-n digits | --account-num digits>
+
+4 digits representing the last 4 digits of the account number or visa
+card number.
+
+=item B<-N | --no-balance>
+
+Do not print balance when printing statement.
+
+=item B<-r | --regexp>
+
+When printing statement grep using the regexp provided
+
+=item B<-e | --expr>
+
+where expression is a mathematical expression like
+
+    '<300'
+
+    '=300'
+
+    '>=300'
+
+the expression will test the euro amount column
+only lines matching the expression will be printed
+
+=item B<-g | --graph>
+
+Print graph of the statement using gnuplot. Gnuplot is required!
+
+=item B<-i F<path> | --image F<path>>
+
+Save PNG image in path.
+
+=item B<-o F<filename> | --output F<filename>>
+
+Save the output of the statement inside a CSV file named F<filename>.
+CSV format is:
+
+date,description,amount,balance
+
+last field presence depends on the -N flag.
+
+=item B<-v | --version>
+
+Print version
+
+=back
+
+=head1 CONFIGURATION FILE
+
+Configuration file default location is F<~/.ptsbrc> and it looks like this:
+
+    -------8< -- ~/.ptsbrc -->8----------
+
+    open24_number=your_open24_number
+
+    password=your_internet_password
+
+    pan=your_personal_access_number
+
+    -------8< --------------->8----------
+
+However you can put wherever you want. Just remember to use then the
+option -F F</path/to/your/location>.
+
+Lines beginning with # will be interpreted as comment.
+
+Starting from release 0.08 ptsb will use GnuPG to encrypt the
+configuration file using the private key of the user.
+Therefore you'll have to create your key if you didn't do this yet.
+
+In case you want to decrypt your ptsbrc file use this command:
+
+    $ gpg -d /path/to/your/ptsbrc
+
+This will print the encrypted file on the standard output.
+
+=head1 SEE ALSO
+
+=over
+
+=item * B<Official CPAN page for Finance::Bank::IE::PermanentTSB>
+
+L<http://search.cpan.org/~pallotron/Finance-Bank-IE-PermanentTSB/lib/Finance/Bank/IE/PermanentTSB.pm>
+
+=item * B<Author homepage>
+
+L<http://www.pallotron.net>
+
+=item * B<Author Blog (italian)>
+
+L<http://www.vitadiunsysadmin.net>
+
+=item * B<Author homepage on CPAN>
+
+L<http://search.cpan.org/~pallotron/>
+
+=back
+
+=head1 AUTHOR
+
+Angelo "pallotron" Failla - <pallotron@freaknet.org>
+
+=head1 BUGS
+
+Please report bugs to the author, no bug tracking system is set up yet.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Angelo "pallotron" Failla
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

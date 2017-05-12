@@ -1,0 +1,394 @@
+NAME
+    File::Remote - Read/write/edit remote files transparently
+
+SYNOPSIS
+       #
+       # Two ways to use File::Remote
+       #
+       # First, the function-based style. Here, we can use the 
+       # special :replace tag to overload Perl builtins!
+       #
+       use File::Remote qw(:replace);       # special :replace tag
+
+       # read from a remote file
+       open(REMOTE, "host:/remote/file") or die $!;
+       print while (<REMOTE>);
+       close(REMOTE);
+
+       # writing a local file still works!
+       open(LOCAL, ">>/local/file");
+       print LOCAL "This is a new line.\n";
+       close(LOCAL); 
+ 
+       mkdir("host:/remote/dir", 0755);
+       unlink("host:/remote/file");
+       unlink("/local/file");               # still works too!
+       symlink("host:/remote/src", "host:/remote/dest");
+
+       chown("root", "other", "host:/remote/dir/file");
+       chmod(0600, "host:/remote/dir/file");
+
+       #  
+       # Next, the object-oriented style, if you don't want to
+       # mess with the builtins.
+       #
+       use File::Remote;
+       my $remote = new File::Remote;
+ 
+       # Standard filehandles
+       $remote->open(FILE, ">>host:/remote/file") or die $!;
+       print FILE "Here's a line that's added.\n";
+       $remote->close(FILE);
+ 
+       # Create a new file and change its permissions
+       $remote->mkdir("host:/remote/dir");
+       $remote->touch("host:/remote/dir/file");
+ 
+       # Move files around
+       $remote->copy("/local/file", "host:/remote/file") or warn $!;
+       $remote->move("host:/remote/file", "/local/file");
+ 
+       # Read and write whole files
+       my @file = $remote->readfile("host:/remote/file");
+       $remote->writefile("/local/file", @file);
+ 
+       # Backup a file with a suffix
+       $remote->backup("host:/remote/oldfile", "save");
+ 
+       # Use secure connection methods
+       my $secure = new File::Remote (rsh => "/usr/local/bin/ssh",
+                                      rcp => "/usr/local/bin/scp");
+       $secure->unlink("/local/file");
+       $secure->rmdir("host:/remote/dir");
+
+DESCRIPTION
+    This module takes care of dealing with files regardless of whether
+    they're local or remote. It allows you to create and edit files without
+    having to worry about their physical location on the network. If a file
+    passed into a function is of the form "host:/path/to/file", then
+    "File::Remote" uses rsh/rcp (or ssh/scp, depending on how you configure
+    it) to edit the file remotely. Otherwise, it assumes the file is local
+    and passes calls directly through to Perl's core functions.
+
+    The nice thing about this module is that you can use it for *all* your
+    file calls, since it handles both remote and local files transparently.
+    This means you don't have to put a whole bunch of checks for remote
+    files in your code. Plus, if you use the function-oriented interface
+    along with the ":replace" tag, you can actually redefine the Perl
+    builtin file functions. This means that your existing Perl scripts can
+    automatically handle remote files with no re-engineering(!).
+
+    There are two ways to program with "File::Remote", an object-oriented
+    style and a function-oriented style. Both methods work equally well,
+    it's just a matter of taste. One advantage of the object-oriented method
+    is that this allows you to read and write from different servers using
+    different methods (eg, rsh vs. ssh) simultaneously:
+
+       # Object-oriented method
+       use File::Remote;
+       my $remote = new File::Remote;
+       my $secure = new File::Remote (rsh => "/bin/ssh", rcp => "/bin/scp");
+
+       # Securely copy, write, and remove a file in one swoop...
+       $remote->open(LOCAL, "/local/file") or die "Open failed: $!\n";
+       $secure->open(REMOTE, "host:/remote/file") or die "Open failed: $!\n";
+       print REMOTE "$_" while (<LOCAL>);
+
+       $remote->close(LOCAL);
+       $secure->close(REMOTE);
+
+       # And let's move some files around securely
+       $secure->move("/local/file", "host:/remote/file");
+       $secure->copy("host:/remote/file", "/local/file");
+
+    To use the function-oriented interface, you must import the special tag
+    called ":replace" which will actually replace the Perl builtin
+    functions:
+
+       # Replace Perl's file methods with File::Remote's
+       use File::Remote qw(:replace);
+
+       open(FILE, ">host:/remote/file") or die "Open failed: $!\n";
+       print FILE "Hello, world!\n";
+       close(FILE) or die "Close failed: $!\n";
+
+       mkdir("/local/new/dir", "2775");
+       mkdir("host:/remote/new/dir");
+       chown("root", "other", "/local/new/dir");
+       unlink("host:/remote/file");
+
+    This is pretty neat; since "File::Remote" will pass calls to local files
+    straight through to Perl's core functions, you'll be able to do all this
+    "transparently" and not care about the locations of the files. Plus,
+    this has the big advantage of making your existing Perl scripts capable
+    of dealing with remote files without having to rewrite any code.
+
+    Because the names for the "File::Remote" methods clash with the Perl
+    builtins, if you use the function-oriented style with the ":standard"
+    tag there is an extra 'r' added to the front of the function names.
+    Thus, "<$remote-"open>> becomes 'ropen' in the ":standard"
+    function-oriented version:
+
+       # Function-oriented method
+       use File::Remote qw(:standard);      # use standard function names
+       setrsh("/share/bin/ssh");
+       setrcp("/share/bin/scp");
+
+       # same functionality, but there's an "r" prefix
+       ropen(FILE, "host:/remote/file") or die "Open failed: $!\n";
+       print while (<FILE>);
+       rclose(FILE) or die "Close failed: $!\n";
+
+       runlink("host:/remote/file");
+       rmkdir("host:/remote/dir");
+       rchmod("0700", "host:/remote/dir");
+
+    That's kinda nasty, though. I recommend you use the ":replace" tag,
+    personally.
+
+FUNCTIONS
+    Below are each of the functions you can make use of with "File::Remote".
+    Remember, for the function-oriented style, unless you use the ":replace"
+    tag you'll have to add an extra 'r' to the start of each function name.
+    For all functions, the file arg can be either local or remote.
+
+  new(opt => val, opt => val)
+
+    This is the main constructor when you're using the object-oriented
+    method of calling. You only need to use this if you're using the
+    object-oriented calling form. You can pass it three arguments which
+    change how it works:
+
+       rsh  -  path to your rsh or ssh program
+       rcp  -  path to your rcp or scp program
+       tmp  -  path to your tmp directory
+
+    So, for example:
+
+       use File::Remote;
+       my $secure = File::Remote->new(rsh => '/usr/local/bin/ssh',
+                                      rcp => '/usr/local/bin/scp',
+                                      tmp => '/var/run');
+       $secure->copy($src, $dest);
+
+    The above would setup your "$secure" object so that calls to methods on
+    it would use ssh and scp for connections.
+
+  setrsh(prog) ; setrcp(prog) ; settmp(dir)
+
+    These perform the equivalent functionality to setting the above flags,
+    for use in the function-oriented method of calling. So, if you were to
+    decide you didn't want to use the OO method, but instead wanted to use
+    the drop-in replacement function method (which I prefer):
+
+       use File::Remote qw(:replace);
+
+       setrsh('/usr/local/bin/ssh'); 
+       setrcp('/usr/local/bin/scp'); 
+       settmp('/var/run'); 
+
+       copy($src, $dest);
+
+    That chain of calls would have the exact same effect, only using the
+    function-oriented format instead of the object-oriented format.
+
+  open(HANDLE, file) ; close(HANDLE)
+
+    Used to open and close files just like the Perl builtins. These
+    functions accept both string filehandles and typeglob references, so any
+    valid Perl open calls:
+
+       open(FILE, ">> $file");
+       open(*FILE, ">$file");
+       open(\*FH, "< $file");
+
+    Should work, except for the 5.6 and later:
+
+       open(my $fh, $file);
+
+    This does not work when using "File::Remote". Patches to overcome this
+    are welcomed.
+
+  touch(file)
+
+    Updates the modification time on a file, or creates it if it doesn't
+    exist, just like the UNIX touch command.
+
+  mkdir(dir [, mode]) ; rmdir(dir [, recurse])
+
+    Create a dir with optional octal mode [mode]; remove a dir tree
+    optionally recursively. By default, rmdir works recursively, and the
+    mode of the new dir from mkdir depends on your umask.
+
+  copy(file1, file2)
+
+    Simply copies a file, just like File::Copy's function of the same name.
+    You can also address it as 'cp' (if you import the :aliases tag).
+
+  move(file1, file2)
+
+    Moves a file ala File::Copy. You can also address it as 'mv' (if you
+    import the :aliases tag).
+
+  chmod(mode, file) ; chown(owner, group, file)
+
+    Change the permissions or the owner of a file.
+
+  unlink(file)
+
+    Remove a file. You can also address it as 'rm' (if you import the
+    :aliases tag).
+
+  link(file1, file2)
+
+    Create a hard link between two files. The caveat to this function is
+    that both files must be local, or both files must be remote.
+
+  symlink(file1, file2)
+
+    Works just like link only creates symbolic instead of hard links.
+
+  readlink(file)
+
+    This reads what a symbolic link points to, just like the Perl builtin.
+
+  backup(file, [file|suffix])
+
+    This backs up a file, useful if you're going to be manipulating it. If
+    you just call it without the optional second filename or suffix, the
+    suffix 'bkup' will be added to the file. Either file can be local or
+    remote; this is really just a front-end to File::Remote::copy().
+
+  readfile(file) , writefile(file, @data)
+
+    These read and write whole files in one swoop, just like File::Slurp.
+    readfile() returns an array of the file, and writefile just returns
+    success or failure.
+
+  append(file, @data) , prepend(file, @data)
+
+    Similar to writefile(), only these don't overwrite the file, these
+    either append or prepend the data to the file.
+
+EXAMPLES
+    Here's some more examples of how to use this module:
+
+  1. Add a new user to /etc/passwd on your server
+
+    This might be useful if you've got some type of web-based newuser
+    program that runs on a host other than the one you have to edit
+    /etc/passwd on:
+
+       # Function-oriented method
+       use File::Remote qw(:replace);
+
+       $passwd = "server:/etc/passwd";
+       backup($passwd, 'old');              # back it up to be safe
+       open(PASSWD, ">>$passwd") or die "Couldn't write $passwd: $!\n";
+       print PASSWD "$newuser_entry\n";
+       close(PASSWD);
+
+  2. Securely copy over a bunch of files
+
+    Hopefully you would use loops and variable names to make any actual code
+    look much cleaner...
+
+       # Object-oriented method
+       use File::Remote
+       my $secure = File::Remote->new(rsh => "/share/bin/ssh",
+                                      rcp => "/share/bin/scp",
+                                      tmp => "/var/tmp");
+
+       # Move files
+       $secure->move("client:/home/bob/.cshrc", "client:/home/bob/.cshrc.old");
+       $secure->copy("/etc/skel/cshrc.user", "client:/home/bob/.cshrc");
+       $secure->copy("/etc/skel/kshrc.user", "client:/home/bob/.kshrc");
+   
+  3. Use rsync w/ ssh for really fast transfers
+
+    Here we're assuming we're getting some huge datastream from some other
+    process and having to dump it into a file in realtime. Note that the
+    remote file won't be updated until close() is called.
+
+       # Function-oriented, no :replace tag, so all functions
+       # will be prefixed with an 'r'
+       use File::Remote qw(:standard);
+
+       setrsh("/local/bin/ssh");
+       setrcp("/local/bin/rsync -z -e /local/bin/ssh");
+       settmp("/my/secure_tmp"); 
+
+       $file = "server:/local/dir/some/huge/file";
+       ropen(REMOTE, ">>$file") or die "Couldn't write $file: $!\n";
+       while(<DATASTREAM>) {
+          print REMOTE $_;
+       }
+       rclose(REMOTE);              # file is finally updated
+
+    Again, I don't like the ":standard" tag, but it's there if you want it.
+    The only difference between the different calling forms is syntax - the
+    functionality of all three is the same.
+
+NOTES
+    "File::Remote" only works on UNIX systems.
+
+    The main caveat to "File::Remote" is that you have to have rsh/rcp or
+    ssh/scp access to the hosts you want to manipulate files on. Make sure
+    you consider the security implications of this, especially if you live
+    outside a firewall.
+
+    Enabling autoflush ($|) won't have any effect on remote filehandles,
+    since the remote file is not synched until close() is called on the
+    filehandle.
+
+    "File::Remote" does not support remote pipes.
+
+    Because of speed, by default no checks are made as to whether or not
+    rsh/rcp or their equivalents are executable. To change this, see the
+    source.
+
+ANNOYANCES
+    When using the ":replace" tag and "-w", you may get warnings of the
+    form:
+
+       Name "main::FILE" used only once: possible typo
+
+    These result from the fact that Perl 5 uses bareword filehandles, and
+    can safely be ignored. If they're really annoying you, any of these
+    solutions will work:
+
+       use File::Remote qw(:replace);
+
+       { local $^W; open(FILE, $file) }     # there's more
+       open(*FILE, $file);                  # than one way
+       open(\*FILE, $file);                 # to do it
+
+    Using any of these will eliminate the warnings. If you know of a way to
+    make these disappear, I'd love to hear from you...
+
+BUGS
+    Because of the internal implementation of open() on remote files, it is
+    not possible to read from an ever-growing remote file ("tail" it).
+    Basically, a snapshot of the remote file is taken when you open it for
+    reading. Patches to overcome this limitation are welcomed.
+
+    Perl scripts that are tainted or setuid might not work with
+    "File::Remote" because of its reliance on system() calls, depending on
+    your %ENV. To work around this, simply add an "undef %ENV" statement to
+    the top of your script, which you should be doing anyways.
+
+    If you have a bug report or suggestion, please direct them to me (see
+    below). Please be specific and include the version of "File::Remote"
+    you're using.
+
+VERSION
+    $Id: Remote.pm,v 1.14 2001/05/04 20:54:22 nwiger Exp $
+
+AUTHOR
+    Copyright (c) 1998-2001 Nathan Wiger, Nateware <nate@nateware.com>. All
+    Rights Reserved.
+
+    This module is free software; you may copy this under the terms of the
+    GNU General Public License, or the Artistic License, copies of which
+    should have accompanied your Perl kit.
+

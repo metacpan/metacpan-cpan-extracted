@@ -1,0 +1,36 @@
+---
+abstract: 'Check your account balances at Charles Schwab'
+author:
+  - 'Mark Grimes <mgrimes@cpan.org>'
+build_requires:
+  File::Spec: 0
+  Test::More: 0.87
+configure_requires:
+  Module::Build: 0.4004
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Bank-Schwab
+provides:
+  Finance::Bank::Schwab:
+    file: lib/Finance/Bank/Schwab.pm
+    version: 2.03
+  Finance::Bank::Schwab::Account:
+    file: lib/Finance/Bank/Schwab.pm
+    version: 0
+  Finance::Bank::Schwab::Account::Positions:
+    file: lib/Finance/Bank/Schwab.pm
+    version: 0
+requires:
+  Carp: 0
+  HTML::TableExtract: 2
+  LWP::Protocol::https: 6.00
+  WWW::Mechanize: 1.00
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-Bank-Schwab
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mvgrimes/Finance-Bank-Schwab
+version: 2.03

@@ -1,0 +1,35 @@
+Revision history for Perl extension File::Finder.
+
+0.53 Fri Apr  8 12:45:22 PDT 2005
+     - added "use strict" to File::Finder::Steps
+     - added bug reporting address
+
+0.52 Sat Mar 26 10:21:50 PST 2005
+	- Fix all tests in t/05-steps.t!  Totally blown
+	- Add Test::Pod and Test::Pod::Coverage for better Kwalitee
+
+0.51 Wed Oct  6 18:13:37 PDT 2004
+	- Add stat(_) validator, stat $_ if not valid
+	- Fix tests related to decimal permission values
+	- added File::Find::Steps::contains (suggested by brian d foy)
+
+0.50  Wed Oct  6 10:04:10 PDT 2004
+	- Set $File::Find::dont_use_nlink rather than stat($_) in _run
+	  Recommended by PerlMonk tye
+	- refactored File::Find::Steps separately, and documented it
+	- added TODO
+
+0.03  Fri Dec 19 16:20:52 PST 2003
+
+	- Add ->ffr(File::Find::Rule->...)
+	  "You will be assimilated! Resistance is Futile!"
+
+0.02  Thu Dec 18 14:35:45 PST 2003
+
+	- Added ->comma method
+	- fixed stat()'ing bug reported by perlmonk YuckFoo
+
+0.01  Tue Dec 16 08:50:16 PST 2003
+	- original version; created by h2xs 1.23 with options
+		-b5.6.0 -AXn File::Finder
+

@@ -1,0 +1,2 @@
+dbcolrename: column `name' already exists in the output stream.
+ at blib/script/dbcolrename line 999.

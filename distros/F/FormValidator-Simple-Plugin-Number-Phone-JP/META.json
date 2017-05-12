@@ -1,0 +1,42 @@
+{
+   "abstract" : "Japanese phone number validation",
+   "author" : [
+      "Gosuke Miyashita <gosukenator@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FormValidator-Simple-Plugin-Number-Phone-JP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FormValidator::Simple" : "0.03",
+            "Number::Phone::JP" : "0.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

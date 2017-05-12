@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib './bin';
+use setup;
+
+use English qw(-no_match_vars);
+use Getopt::Long;
+use Pod::Usage;
+
+use FusionInventory::Agent::Task::NetDiscovery;
+use FusionInventory::Agent::Logger;
+use FusionInventory::Agent::Version;
+
+my $options = {
+    debug   => 0,
+    threads => 1
+};
+
+GetOptions(
+    $options,
+    'first=s',
+    'last=s',
+    'community=s@',
+    'credential=s@',
+    'entity=s',
+    'threads=i',
+    'timeout=i',
+    'control',
+    'debug+',
+    'help',
+    'version'
+) or pod2usage(-verbose => 0);
+
+if ($options->{version}) {
+    my $PROVIDER = $FusionInventory::Agent::Version::PROVIDER;
+    map { print $_."\n" }
+        "NetDiscovery task $FusionInventory::Agent::Task::NetDiscovery::VERSION",
+        "based on $PROVIDER Agent v$FusionInventory::Agent::Version::VERSION",
+        @{$FusionInventory::Agent::Version::COMMENTS}
+        ;
+    exit 0;
+}
+pod2usage(-verbose => 0, -exitval => 0) if $options->{help};
+
+pod2usage(
+    -message => "no first address, aborting\n", -verbose => 0
+) unless $options->{first};
+pod2usage(
+    -message => "no last address, aborting\n", -verbose => 0
+) unless $options->{last};
+
+my $verbosity =
+    $options->{debug} == 0 ? LOG_INFO   :
+    $options->{debug} == 1 ? LOG_DEBUG  :
+    $options->{debug} == 2 ? LOG_DEBUG2 :
+                             LOG_DEBUG2 ;
+
+my $discovery = FusionInventory::Agent::Task::NetDiscovery->new(
+    %setup,
+    target => FusionInventory::Agent::Task::NetInventory::Target->new(),
+    logger => FusionInventory::Agent::Logger->new(verbosity => $verbosity)
+);
+
+my $credentials_id = 1;
+my @credentials;
+if ($options->{community}) {
+    foreach my $community (@{$options->{community}}) {
+        push @credentials,
+            { ID => $credentials_id++, VERSION => 1, COMMUNITY => $community };
+    }
+} elsif ($options->{credential}) {
+    foreach my $specification (@{$options->{credential}}) {
+        my $credential = { ID => $credentials_id++ };
+        foreach my $parameter (split(',', $specification)) {
+            my ($key, $value) = split(':', $parameter);
+            $credential->{uc($key)} = $value;
+        }
+        push @credentials, $credential;
+    }
+} else {
+    push @credentials, {
+        ID => $credentials_id++, VERSION => 1, COMMUNITY => 'public'
+    };
+}
+
+$discovery->{jobs} = [
+    {
+        params => {
+            PID               => 1,
+            THREADS_DISCOVERY => $options->{threads},
+            TIMEOUT           => $options->{timeout},
+        },
+        ranges => [
+            {
+                ID      => 1,
+                IPSTART => $options->{first},
+                IPEND   => $options->{last},
+            }
+        ],
+        credentials => \@credentials
+    }
+];
+if (defined($options->{entity})) {
+    $discovery->{options}->{RANGEIP}->[0]->{ENTITY} = $options->{entity};
+}
+$discovery->{client} =
+    FusionInventory::Agent::Task::NetInventory::Client->new(
+        control => $options->{control}
+    );
+$discovery->{deviceid} = 'foo';
+
+$discovery->run();
+
+package FusionInventory::Agent::Task::NetInventory::Client;
+
+sub new {
+    my ($class, %params) = @_;
+
+    return bless {
+        control => $params{control}
+    }, $class;
+}
+
+sub send {
+    my ($self, %params) = @_;
+
+    # don't display control message by default
+    return unless $self->{control}
+        or $params{message}->{h}->{CONTENT}->{DEVICE};
+
+    print $params{message}->getContent();
+}
+
+package FusionInventory::Agent::Task::NetInventory::Target;
+
+sub new {
+    my ($class, %params) = @_;
+
+    return bless {}, $class;
+}
+
+sub getUrl {
+    my ($self, %params) = @_;
+
+    ## no critic (ExplicitReturnUndef)
+    return undef;
+}
+
+__END__
+
+=head1 NAME
+
+fusioninventory-netdiscovery - Standalone network discovery
+
+=head1 SYNOPSIS
+
+fusioninventory-netdiscovery [options] --first <start> --last <stop>
+
+  Options:
+    --first address IP range first address
+    --last address  IP range last address
+    --credential    SNMP credential (default: version:1,community:public)
+    --entity        GLPI entity
+    --threads nb    number of discovery threads (default: 1)
+    --timeout val   SNMP timeout (default: 1s)
+    --control       output control messages
+    --debug         debug output (execution traces)
+    -h --help       print this message and exit
+    --version       print the task version and exit
+
+=head1 DESCRIPTION
+
+F<fusioninventory-netdiscovery> allows to run a network discovery task without a
+GLPI server.

@@ -1,0 +1,8 @@
+[% textarea_rows = ''-%]
+[%- IF render_hints.rows -%][% textarea_rows = 'rows="' _ render_hints.rows _ '"' -%][% END -%]
+[%- textarea_cols = ''-%]
+[%- IF render_hints.cols -%][% textarea_cols = 'cols="' _ render_hints.cols _ '"' -%][% END %]
+<textarea type="text" id="[% css_prefix _ form.name %]_[% field_name %]_input" class="[% css_prefix %]input [% css_prefix _ field_type %]_input [% css_prefix _ field_name %]_input [% IF !field.editable %] noteditable" disabled="disabled[% END %]" name="[% field_name %]" [% textarea_rows %] [% textarea_cols %]>[% field.value %]</textarea>
+[%- IF !field.editable && field.value.defined %]
+[% INCLUDE hidden.tt %]
+[% END -%]

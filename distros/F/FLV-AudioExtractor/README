@@ -1,0 +1,28 @@
+NAME
+    FLV::AudioExtractor - Extract audio from Flash Videos
+
+SYNOPSIS
+        my $ae = new FLV::AudioExtractor(filename => 'video.flv');
+        $ae->extract('music.mp3');
+
+DESCRIPTION
+    Module to extract the audio from the flash video file (*.flv).
+
+METHODS
+  extract($output)
+    Extract audio from flv files and writes a new file.
+
+  SEE ALSO
+    Flash Video at Wikipedia <http://en.wikipedia.org/wiki/Flash_Video> FLV
+    Format Specification <http://www.adobe.com/devnet/f4v.html>.
+
+AUTHOR
+    Junior Moraes <fvox@cpan.org>. Special thanks to Elsio Antunes.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Junior Moraes
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,18 @@
+Artistic-2.0
+Changes
+Changes.pod
+examples/sls
+Makefile.PL
+MANIFEST
+README
+README.pod
+SamFS.pm
+SamFS.xs
+t/00use.t
+t/01version.t
+t/02stat.t
+t/03ndevstat.t
+t/04catalog.t
+const-c.inc
+const-xs.inc
+META.yml                                 Module meta-data (added by MakeMaker)

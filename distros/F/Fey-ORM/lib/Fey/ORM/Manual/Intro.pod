@@ -1,0 +1,543 @@
+=pod
+
+=head1 NAME
+
+Fey::ORM::Manual::Intro - Introduction to Fey::ORM
+
+=head1 DESCRIPTION
+
+This documentation will walk you through the steps needed to start
+using L<Fey::ORM>.
+
+You should go ahead and make sure you have L<Fey::Loader> installed if
+you want to follow along with this introduction.
+
+=head1 SAMPLE SCHEMA
+
+In these examples, we will use a very simple schema for a web forum
+type of application. Here is that schema, targeting SQLite:
+
+  CREATE TABLE User (
+      user_id   integer  not null  primary key autoincrement,
+      username  text     not null,
+      email     text     null,
+      group_id  integer  not null,
+      UNIQUE (username)
+  );
+
+  CREATE TABLE "Group" (
+      group_id   integer  not null  primary key autoincrement,
+      name       text     not null,
+      UNIQUE (name)
+  );
+
+  CREATE TABLE Message (
+      message_id    integer     not null  primary key autoincrement,
+      message       text        not null  default 'Some message ''" text',
+      message_date  date        not null  default current_date,
+      parent_message_id  integer  null,
+      user_id       integer     not null
+  );
+
+=head1 LOADING A SCHEMA
+
+To do anything with L<Fey::ORM>, you need to define a schema using
+L<Fey::Schema> and L<Fey::Table>. While you can do this by using the
+L<Fey> API directly, it's much easier to load a schema from a DBMS
+using L<Fey::Loader>:
+
+  my $schema = Fey::Loader->new( dbh => $dbh )->make_schema();
+
+The loader will create tables, columns, views, and foreign key objects
+that match the schema found in the DBMS.
+
+=head1 SCHEMA CLASS
+
+You need to define a schema class which is associated a L<Fey::Schema>
+object.
+
+Your schema class will also contain your L<Fey::DBIManager> object,
+which manages your database handle(s). L<Fey::ORM> is smart enough to
+connect a table-based class to your schema class automatically, and
+from that find an appropriate database handle when it needs to execute
+queries.
+
+To define your schema class you'll use L<Fey::ORM::Schema>:
+
+  package Forum::Model::Schema;
+
+  use Fey::ORM::Schema;
+
+  has_schema $schema;
+
+Of course, you need to create a L<Fey::Schema> object to pass to
+C<has_schema()>. You might as well create a L<Fey::DBIManager::Source>
+object along the way.
+
+  package Forum::Model::Schema;
+
+  use Fey::DBIManager::Source;
+  use Fey::Loader;
+  use Fey::ORM::Schema;
+
+  my $source = Fey::DBIManager::Source->new(
+      dsn => 'dbi:SQLite:dbname=/tmp/forum.sqlite' );
+
+  my $schema = Fey::Loader->new( dbh => $source->dbh() )->make_schema();
+
+  has_schema $schema;
+
+  __PACKAGE__->DBIManager()->add_source($source);
+
+Now you can use C<Forum::Model::Schema> in other classes to find
+L<Fey::Table> objects for each table in your schema.
+
+=head1 TABLE CLASSES
+
+With L<Fey::ORM>, each of your model classes has an associated
+L<Fey::Table> object. For example, the User table would be associated
+with the C<Forum::Model::User> class.
+
+  package Forum::Model::User;
+
+  use Forum::Model::Schema;
+
+  use Fey::ORM::Table;
+
+  has_table( Forum::Model::Schema->Schema()->table('User') );
+
+When you call C<has_table>, L<Fey::ORM> does a number of things behind
+the scenes. It defines Moose attributes for each column in the
+associated table and makes your class a subclass of
+L<Fey::Object::Table>. It also adds a few convenience methods directly
+to your class.
+
+At this point, we can start using C<Forum::Model::User> for basic CRUD
+operations. For example, to retrieve an existing user, you can simply
+pass any unique key to the constructor:
+
+  my $user = Forum::Model::User->new( user_id => 1 );
+  my $user = Forum::Model::User->new( username => 'faye' );
+
+L<Fey::Object::Table> knows that both of those columns represent
+unique keys for the associated table, and so will be able to load the
+associated user from the DBMS, if it exists.
+
+You can modify existing users:
+
+  $user->update( username => 'bubba' );
+
+When you call C<< $user->update() >>, attributes
+which are being set to a non-literal value (such as a the value of a
+function or some other SQL expression) will be cleared so they are
+reloaded from the DBMS when they are next accessed.
+
+You can also delete them:
+
+  $user->delete();
+
+Finally, you can create new users:
+
+  my $user = Fey::Model::User->insert(
+      username => 'autarch',
+      email    => 'autarch@urth.org',
+  );
+
+You'll notice that we didn't provide a C<user_id> value. When a column
+is auto-incremented, as is the case with C<User.user_id>,
+L<Fey::Object::Table> is smart enough to notice and simply retrieve
+the value after the insert.
+
+When your class calls C<has_table()>, it also gets a bunch of
+attributes for free, one for each column in the associated table:
+
+  print $user->username();
+
+These attributes are only loaded from the DBMS once, and then are
+cached in the object.
+
+Of course, L<Fey::ORM> actually loads all of the columns at once,
+rather than once per column, since anything else would be grossly
+inefficient.
+
+=head1 INFLATE/DEFLATE
+
+L<Fey::ORM> allows you to define an inflator and/or deflator for each
+column. An inflator is used to convert the value received from the
+database into some other type, usually an object. A deflator does the
+opposite, turning the object into a value suitable for the DBMS when
+doing updates or inserts. The inflator and deflator are both declared
+with C<transform()>:
+
+  package Forum::Model::User;
+
+  use Forum::Model::Schema;
+
+  use Email::Address;
+  use Fey::ORM::Table;
+
+  has_table( Forum::Model::Schema->Schema()->table('User') );
+
+  transform 'email'
+      => inflate { defined $_[1] ? Email::Address->new( $_[1] ) : undef }
+      => deflate { defined $_[1] && blessed $_[1] ? $_[1]->address() : $_[1] };
+
+The C<transform()> above inflates the email column's value to an
+C<Email::Address> object, if that value is defined. Similarly, the
+deflator takes an C<Email::Address> object and converts it back to a
+string.
+
+The inflator and deflator are both called as methods on the object or
+class, which is why they use C<$_[1]> to get at the email. The
+inflator has to handle the case where the email address is undefined,
+since the column is nullable. The deflator handles the case where it
+is passed a plain scalar, which allows you to pass a plain string or
+undef to C<< $user->update() >> or C<< $user->insert() >>.
+
+=head1 HAS-A RELATIONSHIPS
+
+With L<Fey::ORM>, you can also declare has-a relationships with other
+tables using C<has_one()> or C<has_many()>:
+
+  package Forum::Model::Message;
+
+  use Forum::Model::Schema;
+
+  use Fey::ORM::Table;
+
+  has_one( Forum::Model::Schema->Schema()->table('User') );
+
+This creates a C<< $message->user() >> attribute which returns the
+associated user object. If the column (or columns) which "connects" to
+the foreign table is nullable, the attribute may simply return
+false. In the case of this particular relationship, that should never
+happen, since C<Message.user_id> is not nullable.
+
+By default, the name of the attribute created via C<has_one()> is
+simply C<< lc $table->name() >>. Depending on your table naming
+scheme, this may or may not work. If the two tables have more than one
+foreign key between them, you must specify the foreign key explicitly:
+
+  has_one 'user' => (
+      table => Forum::Model::Schema->Schema()->table('User'),
+      fk    => ...,
+  );
+
+By default, C<has_one()> attributes cache the result of the lookup, so
+that future calls to the same attribute method return the object
+already created.
+
+The C<has_many()> declaration works more or less exactly like
+C<has_one()>:
+
+  package Forum::Model::User;
+
+  use Forum::Model::Schema;
+
+  use Fey::ORM::Table;
+
+  has_many( Forum::Model::Schema->Schema()->table('Message') );
+
+The default name is still C<< lc $table->name() >>. In the case of the
+naming scheme in this example, that doesn't really work, so we will
+provide an explicit name:
+
+  has_many 'messages' =>
+      ( table => Forum::Model::Schema->Schema()->table('Message') );
+
+Now we have a C<< $user->messages() >> method (not an
+attribute!). This method returns a
+L<Fey::Object::Iterator::FromSelect> which iterates over the user's
+messages.
+
+  my $messages = $user->messages();
+
+  while ( my $message = $messages->next() ) {
+      print $message->message_id();
+  }
+
+By default, C<has_many()> creates a I<non-caching> iterator. The
+reason for this is that it cannot know how many foreign objects could
+be created. If a large number of objects will be created, caching
+would use a huge amount of memory. However, you can turn caching on
+explicitly:
+
+  has_many 'messages' => (
+      table => Forum::Model::Schema->Schema()->table('Message'),
+      cache => 1,
+  );
+
+In this case, a C<< $user->messages() >> I<attribute> is created which
+returns a L<Fey::Object::Iterator::FromSelect::Caching>
+object. Subsequent calls to this attribute will return the same
+iterator, and that iterator in turn caches any objects it has already
+created.
+
+L<Fey::ORM> can also handle self-referential relationships:
+
+  package Forum::Model::Message;
+
+  use Forum::Model::Schema;
+
+  use Fey::ORM::Table;
+
+  has_one 'parent_message' =>
+      ( table => Forum::Model::Schema->Schema()->table('Message') );
+
+  has_many 'child_messages' =>
+      ( table => Forum::Model::Schema->Schema()->table('Message') );
+
+=head2 Arbitrary Relationships
+
+L<Fey::ORM>, also allows you to declare arbitrary relationships
+between any two tables by providing a SELECT statement to C<has_one()>
+or C<has_many()>, rather than a L<Fey::FK> object. Here is a
+straightforward example:
+
+  package Forum::Model::Message;
+
+  use Fey::Placeholder;
+  use Forum::Model::Schema;
+
+  use Fey::ORM::Table;
+
+  my $schema = Forum::Model::Schema->Schema();
+  my $message_table = $schema->table('Message');
+
+  #   SELECT *
+  #     FROM Message
+  #    WHERE parent_message_id = ?
+  # ORDER BY message_date DESC
+  #    LIMIT 1
+  my $select =
+      Forum::Model::Schema->SQLFactoryClass()->new_select()
+             ->select( $message_table )
+             ->from( $message_table )
+             ->where( $message_table->column('parent_message_id'),
+                      '=', Fey::Placeholder->new() )
+             ->order_by( $message_table->column('message_date'), 'DESC' )
+             ->limit(1);
+
+  has_one 'most_recent_child' => (
+      table       => $schema->table('Message') select => $select,
+      bind_params => sub { $_[0]->message_id() },
+  );
+
+With this declaration, the C<Forum::Model::Message> class now has a
+C<< $message->most_recent_child() >> attribute. This attribute will
+return the most recent child message of the C<$message> object, if
+there is one to return. You can enable or disable caching of this data
+just as with the other form of C<has_one()>.
+
+You can use this arbitrary declaration to traverse your schema in
+arbitrary ways. For example, we might want to find all the messages
+for a group:
+
+  package Forum::Model::Group;
+
+  use Fey::Placeholder;
+  use Forum::Model::Schema;
+
+  use Fey::ORM::Table;
+
+  my $schema = Forum::Model::Schema->Schema();
+  my $message_table = $schema->table('Message');
+
+  #   SELECT Message.*
+  #     FROM Message
+  #          JOIN User USING (user_id)
+  #          JOIN Group USING (group_id)
+  #    WHERE Group.group_id = ?
+  # ORDER BY Message.message_date DESC
+
+  my $select =
+      Forum::Model::Schema->SQLFactoryClass()->new_select()
+             ->select( $message_table )
+             ->from( $message_table, $user_table )
+             ->from( $user_table, $group_table )
+             ->where( $group_table->column('group_id'),
+                      '=', Fey::Placeholder->new() )
+             ->order_by( $message_table->column('message_date'), 'DESC' );
+
+  has_many 'messages' => (
+      table       => $message_table,
+      select      => $select,
+      bind_params => sub { $_[0]->group_id() },
+  );
+
+=head1 METHODS FROM A SELECT
+
+It is common to want to create a method in a class which executes a specific
+query based on the current object. For example, we might want to know how many
+messages a user has posted.
+
+The C<query> sugar function allows you to declare a C<SELECT>-based method.:
+
+  package Forum::Model::User;
+
+  my $count = Fey::Literal::Function->new(
+      'COUNT',
+      $message_table->column('message_id'),
+  );
+
+  #   SELECT COUNT( Message.message_id )
+  #     FROM Message
+  #    WHERE user_id = ?
+  my $select =
+      Forum::Model::Schema->SQLFactoryClass()->new_select()
+             ->select($count)
+             ->from( $message_table )
+             ->where( $message_table->column('user_id'),
+                      '=', Fey::Placeholder->new() );
+
+  query 'message_count' => (
+      select      => $select,
+      bind_params => sub { $_[0]->user->id() },
+  );
+
+This creates a C<< $user->message_count() >> method. When that method is
+called, the query is executed with the bound parameters returned from the
+C<bind_params> subroutine reference.
+
+=head1 FromSelect ATTRIBUTE METACLASS
+
+If you don't want to re-execute the query each time, you can instead associate
+a query with an attribute.
+
+L<Fey::ORM> provides an attribute metaclass,
+L<Fey::Meta::Attribute::FromSelect>, which manages the details of executing
+the query and sticking the value in an attribute. You just provide a query
+object and an optional subroutine reference for the bind parameters.
+
+  package Forum::Model::User;
+
+  my $count = Fey::Literal::Function->new(
+      'COUNT',
+      $message_table->column('message_id'),
+  );
+
+  #   SELECT COUNT( Message.message_id )
+  #     FROM Message
+  #    WHERE user_id = ?
+  my $select =
+      Forum::Model::Schema->SQLFactoryClass()->new_select()
+             ->select($count)
+             ->from( $message_table )
+             ->where( $message_table->column('user_id'),
+                      '=', Fey::Placeholder->new() );
+
+  has 'message_count' => (
+      metaclass   => 'FromSelect',
+      is          => 'ro',
+      isa         => 'Int',
+      select      => $select,
+      bind_params => sub { $_[0]->user - id() },
+  );
+
+When using an attribute is that the value is effectively cached after it is
+first retrieved. This could mean that it becomes inaccurate if something else
+updates the database after the attribute is populated.
+
+You can, of course, add a C<clearer> to the attribute, but you still have to
+know when to call the clearer.
+
+One advantage of using an attribute over a C<query> method is that the
+attribute's value can be set by passing a value to the constructor. This can
+be useful if you are going to fetch the attribute's value as part of a larger
+query.
+
+However, the downside is the possibility of stale, inaccurate data. Think
+carefully about how you will handle this problem. The best approach is
+probably to start with a C<query> method, and then switch to an attribute if
+needed to improve performance.
+
+=head1 USING Fey
+
+One of the advantages of using L<Fey::ORM> is that you can use the
+power of the core Fey SQL generation tools with your classes:
+
+  package Forum::Model::Message;
+
+  use DateTime;
+  use Fey::Object::Iterator::FromSelect;
+
+  sub RecentMessages {
+      my $class = shift;
+
+      my $schema = $class->SchemaClass()->Schema();
+
+      my $select = $class->SchemaClass()->SQLFactoryClass()->new_select();
+
+      my ( $message_t, $user_t ) = $schema->tables( 'Message', 'User' )
+
+      $select->select( $message_t, $user_t )
+             ->from( $message_t, $user_t )
+             ->where( $message_t->column('message_date'), '>=',
+                      DateTime->today()->subtract( days => 7 )->strftime( '%Y-%m-%d' ) );
+
+      my $dbh = $class->_dbh($select);
+
+      return Fey::Object::Iterator::FromSelect->new(
+          classes => [ $class->meta()->ClassForTable( $message_t, $user_t ) ],
+          dbh     => $dbh,
+          bind_params => [ $select->bind_params() ],
+      );
+  }
+
+This is all a bit verbose for now, but future versions of L<Fey::ORM>
+will probably provide sugar to trim it down.
+
+=head1 OBJECT CACHING
+
+L<Fey::ORM> provides a built-in simple in-memory object caching
+system. This system is very handy in a persistent environment, such as
+a webapp, where you may end up trying to load the same objects more
+than once in the same request.
+
+L<Fey::ORM>'s caching makes no attempt to expire objects, so you need
+to be careful to clear the object cache regularly to avoid stale
+data. In practice, I've found that a good way to do this is to simply
+clear the cache once per "request". In a web app environment, you can
+make this part of your request initialization.
+
+If you are writing a daemon or other long-running application, you
+will need to find a similar place to clear the cache. One good option
+could be to clear the cache on every commit. If your application does
+a lot more reading than writing, this policy should still be a win.
+
+You can turn on caching for all of your table-based classes through
+your schema class:
+
+  Forum::Model::Schema->EnableObjectCaches();
+
+Similarly, you can clear the cache for all the table-based classes
+through your schema class:
+
+  Forum::Model::Schema->ClearObjectCaches();
+
+You can also enable or disable caching on a per-class basis, as well
+as clear the cache for just one class at a time.
+
+=head2 Caching Under Catalyst
+
+If you were writing a Catalyst application and wanted to ensure that
+the cache was cleared at the beginning of each request, there are a
+number of places to do this. If you have a base controller class, you
+can do this in its C<begin()> method, as long as all your controllers
+inherit from that class:
+
+  package MyApp::Controller::Base;
+
+  sub begin : Private {
+      my $self = shift;
+      my $c    = shift;
+
+      MyApp::Model::Schema->ClearObjectCaches();
+
+      ...;
+  }
+
+You could also provide your own C<Catalyst::Request> subclass and do
+the cache clearing in its constructor, or in a plugin of some sort.
+
+=cut

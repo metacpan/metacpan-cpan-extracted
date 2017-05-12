@@ -1,0 +1,12 @@
+There's a bunch of attributes, functionality, etc that I've left out of this
+dist so far.
+
+* better documentation (any for some modules)
+* better attribute coverage
+* test suite needs to be expanded and refactored (to make sense!)
+
+Bugzilla:
+
+* attachment functionality
+* groups / privacy
+

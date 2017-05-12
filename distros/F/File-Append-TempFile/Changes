@@ -1,0 +1,57 @@
+Revision history for Perl extension File::Append::TempFile.
+
+0.07	2015/11/16
+	- switch from META.yml to META.json
+	- remove the $Ringlet version control tags
+	- rename the test files dropping the File-Append-Tempfile prefix
+	- drag the Perl source kicking and screaming into the Century of
+	  the Fruitbat:
+	  - bump the minimum Perl version to 5.010
+	  - use barewords as hash indices whenever possible
+	  - do not use parentheses unless really needed
+	  - convert the tests to use Test::More
+	  - use File::Temp for the handling of temporary files
+	- do not attempt to examine the return value of Pod::Checker's
+	  parse_from_file() method - it is not documented to return
+	  anything, and the return value seems to be a bit unreliable
+	  across Perl installations.  Let's just hope it dies on error.
+	  This should take care of RT#108984.
+	- switch to Module::Build::Tiny
+
+0.05  Thu Dec 27 17:02:59 GMT 2007
+	- make the podcheck test work with earlier Pod::Checker, too
+	- move the Debian packaging files and the webpage into trees of
+	  their own
+	- remove the MANIFEST.SKIP file, it's no longer needed
+	- remove an unneeded 5.005 conditional in Makefile.PL
+	- remove a leftover template comment from the end of a test file
+
+0.04  Mon Feb 13 15:57:32 GMT 2006
+	- add a simplistic webpage
+	- switch over to $Ringlet version control tags
+	- fix the module version in the README file
+	- add a mention of the website to the README file and to
+	  the SEE ALSO section of the module's perldoc
+	- yeesh - fix the author name in Makefile.PL!
+
+0.03  Fri Feb 10 15:05:58 GMT 2006
+	- add some Debian packaging files
+	- remove the test files in the "clean" target, not "realclean",
+	  duh!  Noticed while debianizing
+	- reorganized this log a bit
+	- add a MANIFEST.SKIP file listing the debian/ subdirectory
+
+0.02  Fri Jan 27 17:51:48 GMT 2006
+	- fix the perldoc package description in the NAME section
+	- allow derived classes to modify the file structure by
+	  overriding the new do_copy() method
+	- add a test for the actual contents of the test file
+	  after appending data to it
+	- the test suite displays debug messages if TEMPFILE_DEBUG is
+	  set in the environment
+	- add the diag() method to get or set the diagnostic output flag
+	- add a Test::Pod::Coverage and a Pod::Checker test
+
+0.01  Wed Jan 25 13:04:36 GMT 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.0 -n File::Append::TempFile --skip-exporter

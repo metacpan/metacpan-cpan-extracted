@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 319fa0b96199eb4bb6b7985a851b5196b2dadbd3 Build.PL
+SHA1 9fdb9fb05ad93d541e48ddc1b9c03182a612e8b9 Changes
+SHA1 7293e276711ec3ffb1a41f6b57387720d1cf3d24 LICENSE
+SHA1 4d2b4a974dd7a27c73fdb8b62c9116b8045ae057 MANIFEST
+SHA1 0a0a3f2c4878e10506896793b4b3124361f0a395 META.json
+SHA1 a997ddfd25185da8c46f058c12a559530f51377b META.yml
+SHA1 c21652ab583b4d5778ce716db69911bd09609728 README
+SHA1 5bf1d53107012ec6cf2a619f5c0d73e9a6d7ee4f lib/File/Gettext.pm
+SHA1 27ff5688f0b0b1ffca2b69a69be8d0be16b342f1 lib/File/Gettext/Constants.pm
+SHA1 0c4e2fbf383713f10dd75c501e9d78ac5eec6db7 lib/File/Gettext/ResultSource.pm
+SHA1 7b47c8fee3a60ca6d6df7cf3e95187b1ee2d0fdc lib/File/Gettext/Schema.pm
+SHA1 8794a0e2d1fa0beaac597f05701048cc481c7b70 lib/File/Gettext/Storage.pm
+SHA1 e6d639f20afb9157bef7517dedba6281bf02e5bb lib/File/Gettext/Storage/MO.pm
+SHA1 57a5bf7ced49b6dd4438e8daeb7b5c95516c2832 lib/File/Gettext/Storage/PO.pm
+SHA1 b878bcec672124c412a6bcf78645b23911b3419e t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 905a84ed4a01bba172b682620964560f04ff93d2 t/03podcoverage.t
+SHA1 c1c29d14c961c30f0ea1ff84dd3b6acb7f4d3e81 t/05kwalitee.t
+SHA1 8b1ef2c2000dda84911be6a6bf76d4de88a4d4dc t/06yaml.t
+SHA1 25b2172e2d42fe0f076fad64d40b78d914572505 t/07podspelling.t
+SHA1 3fed28f95eab5cd0f3fb26b5e107a5a623c9b26a t/10test_script.t
+SHA1 a267c0e501ff87a225bf4df0a39ae77abcd8abc6 t/20with-language.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA1 1a92cb2e0902264e56ec80bffedf5a8d5bd36590 t/default.json
+SHA1 1ae63cf740f5996faca6276363ff08ef57cd14da t/exceptions.dd
+SHA1 ea337409fe2dbceb2eec10bd3d279a9222ad45d8 t/existing.mo
+SHA1 e0b4528eb08ddca6f68d39495eabb3818d314d0c t/existing.po
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/locale/de/LC_MESSAGES/file1
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/locale/en/LC_MESSAGES/file1
+SHA1 9c79fb75758cb3f7df027b4863ae821575efa32c t/messages.po
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYt0JAAAoJEK492j4Im1BpDf8H/1nd5zhaPiVHouI9Qv/6XC0e
+gAMJF0w7SW6+LBdManzOLF0GjnjwD681iwVu4SpXbcvAuNHx4rOzjRucMypVJIvQ
+j8egHGrTpydJSWSDNZpAGBBy6lsJyiBGHMCrF7EA7F5oC4N0DvYm9zYeAuSZw94f
+BxW/aSbyA1SwdRe4muOWJeDpaTczzW2WcFpiGqxTeE03M+QlVyIm5LDz/CXH4eRr
+uA8QElXp+KbTazYiO51OOwx/wgt0/O1SS16dyaHiQ5yrTp8eANfklzSSd/b8ZtJs
+bI3hPq2Ox7pjFr39z6AzYW74BI5afM87/yruUPpgGJlux+pp/bYCQKpt4JN3y1A=
+=NuPd
+-----END PGP SIGNATURE-----

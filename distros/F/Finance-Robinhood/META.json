@@ -1,0 +1,126 @@
+{
+   "abstract" : "Trade Stocks and ETFs with Commission Free Brokerage Robinhood",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-Robinhood",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.36",
+            "DateTime" : "1.26",
+            "HTTP::Tiny" : "0.056",
+            "IO::Socket::SSL" : "2.020",
+            "JSON::Tiny" : "0.54",
+            "Moo" : "2.000002",
+            "Try::Tiny" : "0.24",
+            "namespace::clean" : "0.26",
+            "perl" : "5.012",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Finance::Robinhood" : {
+         "file" : "lib/Finance/Robinhood.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Account" : {
+         "file" : "lib/Finance/Robinhood/Account.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Fundamentals" : {
+         "file" : "lib/Finance/Robinhood/Fundamentals.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Instrument" : {
+         "file" : "lib/Finance/Robinhood/Instrument.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Instrument::Split" : {
+         "file" : "lib/Finance/Robinhood/Instrument/Split.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Market" : {
+         "file" : "lib/Finance/Robinhood/Market.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Market::Hours" : {
+         "file" : "lib/Finance/Robinhood/Market/Hours.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Order" : {
+         "file" : "lib/Finance/Robinhood/Order.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Portfolio" : {
+         "file" : "lib/Finance/Robinhood/Portfolio.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Position" : {
+         "file" : "lib/Finance/Robinhood/Position.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Quote" : {
+         "file" : "lib/Finance/Robinhood/Quote.pm",
+         "version" : "0.19"
+      },
+      "Finance::Robinhood::Watchlist" : {
+         "file" : "lib/Finance/Robinhood/Watchlist.pm",
+         "version" : "0.19"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Finance-Robinhood/issues"
+      },
+      "homepage" : "https://github.com/sanko/Finance-Robinhood",
+      "repository" : {
+         "url" : "git://github.com/sanko/Finance-Robinhood.git",
+         "web" : "https://github.com/sanko/Finance-Robinhood"
+      }
+   },
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

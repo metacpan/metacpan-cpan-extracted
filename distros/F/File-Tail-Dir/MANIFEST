@@ -1,0 +1,8 @@
+Changes
+lib/File/Tail/Dir.pm
+Makefile.PL
+MANIFEST
+README
+t/tail.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

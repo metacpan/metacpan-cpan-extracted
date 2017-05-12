@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 840e2d8a03fc0060bedd1de0d4716c8320c42aca Build.PL
+SHA1 d2424b97eb88dae402ad2f2667fcfaa890c5605c Changes
+SHA1 aa3908b6b3a5effa7c74037584a3af4a0274707f MANIFEST
+SHA1 d2e0209cd5bd9e6162324247bc0079a52b2a9b9a META.yml
+SHA1 ac00b61eb5fd39bf37f297aae207a05116501cc9 Makefile.PL
+SHA1 a223befb6b08b34aca0de7b29f0087c6139b2096 README
+SHA1 40d06127ceb2f805d4034b747accfa25ef6b4589 davdpap.pl
+SHA1 18a03ddfae2113ea2e837cef489f6c53efe74c29 lib/Filesys/Virtual/DPAP.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iGUEARECACUFAkI2DxkeGGhrcDovL2NnaS5zZnUuY2E6ODAvfmpkYmF0ZXMvAAoJ
+EDQq9j8F5ZSEbAQAoNvCdLCY6Cna9Bjv5er1z9ZQqvlLAKCOcyEuaGf75RfDEP8/
+Tho0YKVBcg==
+=btxm
+-----END PGP SIGNATURE-----

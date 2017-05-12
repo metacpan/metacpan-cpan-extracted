@@ -1,0 +1,208 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>Online Banking Ireland - Ireland's Retail Bank From Permanent TSB</title>
+		<meta content="JavaScript" name="vs_defaultClientScript" />
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema" />
+		
+
+<meta http-equiv="refresh" content="300;url=DoLogOff.aspx">
+
+		<script language="JavaScript" src="js/IndexCss.js"></script>
+	</head>
+	<body>
+		<div id="wrap_all">
+	<div id="top">
+		<img src="img/ptsb_logot44_wwq.gif" alt="Permanent TSB" class="l">
+		<div class="r">
+			<p>LoCall
+				<span>1890 500 121</span>
+				International
+				<span>+353 1 212 4101</span></p>
+			<p>Mon - Fri 8am - 10pm (Excl. bank hols.), Sat 10am - 2pm, or E-mail <a href="mailto:info@permanenttsb.ie">
+					info@permanenttsb.ie</a></p>
+			<p><br>
+			</p>
+			<table border="0">
+				<tr>
+					<td width="100%" align="center" bgcolor=white><font size="3" face="bold" color=#cc0033><b><span id="lblLstLogin" class="text">Your last successful logon was on 01 January 1970 at 00:00</span></b></font></td>
+				</tr>
+			</table>
+		</div>
+	</div> <!-- e top -->
+	<div class="clear"></div>
+	<div id="mainmenu" align="center">
+		<ul>
+		</ul>
+	</div> <!-- e mainmenu -->
+	<div class="clear"></div>
+
+			
+			<div class="inside" id="main">
+			
+                <div id="leftmenu">
+	<ul>
+		<li class="heading">
+		Your Account
+		<li class="subheading">
+		<li class="subheading">
+		Account Details
+		<li>
+			<a href="Account.aspx" onmouseover="self.status='Account Summary'; return true" onmouseout="self.status=''; return true">
+				Account Summary</a>
+		<li class="subheading">
+		Other
+		<li class="btm">
+			<a href="dologoff.aspx" onmouseover="self.status='Logoff'; return true" onmouseout="self.status=''; return true">
+				Logoff</a></li>
+	</ul>
+	<div class="clear"></div>
+</div> <!-- e leftmenu -->
+
+				
+			    <div id="rightcol">
+				    <div id="statement">
+					
+					    <h4>OPEN24 - MINI STATEMENT</h4>
+						
+						<form name="frmMiniStatement" method="post" action="StateMini.aspx?ref=0" id="frmMiniStatement">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="" />
+
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="" />
+						
+					    <table cellSpacing="0" cellPadding="0" width="100%" border="0">
+						    <tr><td class="Contentbold"><p><span id="lblTitle">Mini Statement - Z Account Type - 9999</span></p></td></tr>
+						    <tr>
+							    <td>
+								    <table cellpadding="4">
+									    <tr>
+										    <th align="left" width="18%">Date</th>
+										    <th align="left" width="46%">Description</th>
+										    <th align="right" width="18%">Euro Amount</th>
+										    <th align="right" width="18%">Balance</th>
+									    </tr>
+								    </table>
+							    </td>
+						    </tr>
+							<tr><td class="mini"><table id="tblTransactions" border="0" width="100%">
+	<tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">+ 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">+ 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">+ 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr><tr>
+		<td class="Content" align="left" valign="middle" colspan="1" width="18%">01/01/1970</td><td class="Content" align="left" valign="middle" colspan="1" width="46%">COMMENT</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">- 99.99</td><td class="Content" align="right" valign="middle" colspan="1" width="18%">99.99 +</td>
+	</tr><tr>
+
+	</tr>
+</table></td></tr>
+							<tr>
+								<td vAlign="top"><br>
+									<p class="note">Please Note:- The account balance may be adjusted in accordance 
+										with the <strong>permanent tsb</strong> Open24 Terms and Conditions of use.</p>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<table>
+										<tr>
+											<td class="submitret" align="center" width="50%">
+											    <a id="btnReturnToAccountSummary" tabindex="1" class="SubRet" href="javascript:__doPostBack('btnReturnToAccountSummary','')">RETURN TO ACCOUNT SUMMARY</a>
+											</td>
+											<td class="submit" align="center" width="50%">
+												<a id="btnAnotherStatement" tabindex="2" class="Subano" href="javascript:__doPostBack('btnAnotherStatement','')">ANOTHER STATEMENT</a>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+						
+						</form>
+					
+					</div> <!-- Statement -->
+			    </div> <!-- Rightcol -->
+			    
+			</div> <!-- Main -->
+			
+		<div class="clear"></div>
+<p class="print">To print this page use landscape settings for your printer</p>
+
+<div class="clear"></div>
+<div class="clear20"></div>
+
+		
+	</body>
+</html>

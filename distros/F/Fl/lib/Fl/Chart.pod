@@ -1,0 +1,342 @@
+class 'Fl::Chart';
+isa 'Fl::Widget';
+include 'FL/Fl_Chart.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Chart - Display Simple Chart Data
+
+=head1 Synopsis
+
+    use Fl qw[:color];
+    my $win = Fl::Window->new(1000, 480);
+    my $chart
+        = Fl::Chart->new(20, 20, $win->w() - 40, $win->h() - 40, 'Chart');
+    $chart->bounds(-125, 125);
+    for (my $t = 0; $t < 15; $t += 0.5) {
+        my $val = sin($t) * 125.0;
+        $chart->add($val,
+                    sprintf('%-.1f', $val),
+                    ($val < 0) ? FL_RED : FL_GREEN);
+    }
+    $win->resizable($win);
+    $win->show();
+    exit Fl::run();
+
+=head1 Description
+
+Fl::Chart can display data in one of several formats. The following are
+imported from Fl with the C<:chart> tag.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/charts.png" /></center>
+
+=head1 Methods
+
+Fl::Chart is a subclass of Fl::Widget but also supports these methods:
+
+=head2 new(...)
+
+The constructor creates a chart of a given size and position on screen or
+within the parent.
+
+    my $chart_a = Fl::Chart->new(100, 150, 300, 500);
+
+...or...
+
+    my $chart_b = Fl::Chart->new(100, 150, 300, 500, 'Daily Volume');
+
+In these examples, the new chart is placed 100 pixels from the left and 150
+pixels down from the top of either the display area or parent widget.
+
+The default boxtyle is C<FL_NO_BOX>.
+
+=begin TODO
+
+Ideally, we could also create windows with something like:
+
+    my $window = Fl::Group->new(
+        -position => [100, 100],
+        -size     => [380, 400],
+        -title    => 'NA'
+    );
+
+=end TODO
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Chart *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+The destructor I<also deletes all data>.
+
+=cut
+
+=pod
+
+=head2 C<add(...)>
+
+    $chart->add(60, 'March 13, 2016', FL_RED);
+    $chart->add(64.3);
+
+Add the data value with optional label and color to the chart.
+
+=cut
+
+xs {name        => 'add',
+    definitions => [
+        {required => [[qw[double value]],
+                      ['const char *', 'label'],
+                      ['Fl_Color',     'col']
+         ],
+         returns => 'void'
+        },
+        {required => [[qw[double value]]],   # TODO: col is randomly messed up
+         optional => [['const char *', 'label', '""'], ['Fl_Color', 'col']],
+         returns  => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<autosize(...)>
+
+    $chart->autosize(1);
+    my $resizing = $chart->autosize();
+
+Get whether the chart will automatically adjust bounds of the chart. Returns
+non-zero if the chart will automatically resize.
+
+=cut
+
+xs {name        => 'autosize',
+    definitions => [{required => [[qw[uchar autosize]]],
+                     returns  => 'void'
+                    },
+                    {returns => 'uchar'}
+    ]
+};
+
+=begin TODO
+
+I need to sort out returning AV * when we return more than a single value
+
+=pod
+
+=head2 bounds(...)
+
+    my ($upper, lower) = $chart->bounds();
+    $chart->bounds(100, -100);
+
+Gets or sets the lower and upper bounds of the char values
+
+#=cut
+
+void
+Fl_Chart::bounds(IN_OUTLIST double a = NO_INIT, IN_OUTLIST double b = NO_INIT)
+    CODE:
+        if (items == 3)
+            THIS->bounds(a, b);
+        if (GIMME_V != G_VOID)
+            THIS->bounds(&a, &b); // Don't bother if called in void context
+=cut
+
+xs {name        => 'bounds',
+    definitions => [{required => [[qw[int a]], [qw[int b]]],
+                     returns => 'void'
+                    },
+                    {code => <<'' }]};
+            double alpha; double beta;
+            ((Fl_Chart *)self->cp_ctx)->bounds( &alpha, &beta );
+            XSprePUSH;	EXTEND(SP,2);
+            PUSHs(sv_newmortal());
+            sv_setnv(ST(0), (double)alpha);
+            PUSHs(sv_newmortal());
+            sv_setnv(ST(1), (double)beta);
+            XSRETURN(2);
+
+
+=pod
+
+=head2 clear()
+
+    $chart->clear();
+
+Removes all values from the chart.
+
+=cut
+
+xs {name        => 'clear',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head2 insert(...)
+
+    $chart->insert(1, 60, 'March 13, 2016', FL_RED);
+    $chart->insert(2, 64.3);
+
+Inserts a value at the given position. Position 1 is the first data value.
+
+=cut
+
+xs {name        => 'insert',
+    definitions => [
+        {required => [[qw[int index]], [qw[double value]]],
+         optional =>
+             [['const char *', 'str', ' 0'], ['unsigned int', 'color', ' 0']],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<maxsize(...)>
+
+    $chart->maxsize(200);
+    my $limit = $chart->maxsize();
+
+Gets or sets the maximum number of data values for a chart.
+
+If you don't call this method, the chart will be allowed to grow to any size
+depending on available memory.
+
+=cut
+
+xs {name        => 'maxsize',
+    definitions => [{required => [[qw[int maxsize]]],
+                     returns  => 'void'
+                    },
+                    {returns => 'int'}
+    ]
+};
+
+=pod
+
+=head2 replace(...)
+
+    $chart->replace(1, 60, 'March 13, 2016', FL_RED);
+    $chart->replace(2, 64.3);
+
+Replaces a value at the given position. Position 1 is the first data value.
+
+=cut
+
+xs {name        => 'replace',
+    definitions => [
+        {required => [[qw[int index]], [qw[double value]]],
+         optional =>
+             [['const char *', 'str', ' 0'], ['unsigned int', 'color', ' 0']],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 size()
+
+    my $sample_size = $chart->size();
+
+Returns the number of data points in the chart.
+
+=cut
+
+xs {name        => 'size',
+    definitions => [{returns => 'int'}]
+};
+
+=pod
+
+=head2 textcolor(...)
+
+    $chart->textcolor(FL_BLACK);
+    my $color = $chart->textcolor();
+
+Gets or sets the chart's text color.
+
+=cut
+
+xs {name        => 'textcolor',
+    definitions => [{required => [[qw[Fl_Color color]]],
+                     returns  => 'void'
+                    },
+                    {returns => 'Fl_Color'}
+    ]
+};
+
+=pod
+
+=head2 textfont(...)
+
+    $chart->textfont(FL_COURIER_BOLD);
+    my $font = $chart->textfont();
+
+Gets or sets the chart's font.
+
+=cut
+
+xs {name        => 'textfont',
+    definitions => [{required => [[qw[Fl_Font color]]],
+                     returns  => 'void'
+                    },
+                    {returns => 'Fl_Font'}
+    ]
+};
+
+=pod
+
+=head2 textsize(...)
+
+    $chart->textsize(100);
+    $chart->textsize(FL_NORMAL_SIZE);
+
+Sets the chart's text size.
+
+=cut
+
+xs {name        => 'textsize',
+    definitions => [{required => [[qw[Fl_Fontsize size]]],
+                     returns  => 'void'
+                    },
+                    {returns => 'Fl_Fontsize'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

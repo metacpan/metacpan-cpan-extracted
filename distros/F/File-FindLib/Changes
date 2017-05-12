@@ -1,0 +1,15 @@
+Revision history for Perl extension File::FindLib
+
+0.001_004   2014-07-27
+  - Fix bug in UpdateInc() [s/0/-1/].
+  - More unit tests for UpdateInc().
+  - Prevent smoke test failures due to extraneous output.
+
+0.001_003   2014-07-26
+  - Add (un)license
+
+0.001_002   2014-06-28
+  - Prevent double-loading of modules.
+
+0.001_001   2011-12-07
+  - Initial developer release to CPAN.

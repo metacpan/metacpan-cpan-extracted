@@ -1,0 +1,20 @@
+---
+abstract: 'Transforms OpenType glyphs based on GSUB tables'
+author:
+  - 'Simon Cozens <simon@cpan.org>'
+build_requires:
+  Font::TTF::Font: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3623'
+license: Perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Font-TTF-OpenTypeLigatures
+provides:
+  Font::TTF::OpenTypeLigatures:
+    file: lib/Font/TTF/OpenTypeLigatures.pm
+    version: 0.01
+version: 0.01

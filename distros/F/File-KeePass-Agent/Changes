@@ -1,0 +1,24 @@
+2.01
+    2012-09-13
+        * Fix a bug in the save as prompt
+
+2.00
+    2012-09-12
+        * Support File::KeePass 2.00
+        * Add better interface
+        * Can read multiple databases at the same time
+        * Various other bug fixes and improvements
+
+0.03
+    2012-06-13
+        * No more X11::GUITest dependency - use native X11::Protocol
+        * Allow for passing in multiple filenames
+        * Prepare for reading other keys
+
+0.02
+    2010-07-05
+        * Make sure Config::INI::Simple isn't needed
+
+0.01
+    2010-07-02
+        * First release

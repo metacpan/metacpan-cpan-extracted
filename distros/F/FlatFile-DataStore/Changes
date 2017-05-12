@@ -1,0 +1,99 @@
+Revision history for Perl extension FlatFile::DataStore.
+
+1.03 Thu Jan 20 15:30:09 EST 2011
+    - major API change:
+      - FF::DS::Record::data() now returns a scalar (not a scalar ref)
+      - the new FF::DS::Record::dataref() returns a scalar ref
+      - both still accept a scalar or scalar ref when setting the data value
+    - FlatFile::DataStore::DBM:
+      - fix logic error wrt updates, w/ tests
+      - store dbm_* globals in object instance
+      - add extra "dbm specs" parameter to new()
+
+1.02 Thu Jan 20 15:20:48 EST 2011
+    - fix binmode in read_file() (to correct failing tests under windows)
+
+1.01 Fri Jan 14 18:42:32 EST 2011
+    - minor doc fixes
+
+1.00 Thu Jan 13 11:46:11 EST 2011
+    - removed Tutorial.pm (never used)
+    - added tests
+    - some code refactoring
+    - added FF::DS::DBM::get_keynum()
+    - moved into production
+
+0.17 Thu Dec 23 17:15:20 EST 2010
+    - major API change: parameters to create(), update(),
+      and delete() are now passed as record or a hashref
+      (incompatable with previous versions' conventions)
+    - added FlatFile::DataStore::DBM and tests
+    - added FlatFile::DataStore::locate_record_data()
+    - minor doc fixes
+    - added timestamp (tttttt or ttt) in preamble date
+    - DataStore.pm
+      - added exists() (for datastore)
+      - added untaint()
+      - minor logic changes
+      - locked_for_read may create an empty file
+    - Initialize.pm
+      - corrected some faulty defaults
+
+0.16 Mon Nov  1 09:16:56 EDT 2010
+    - minor doc fixes
+    - change 'xism' to '(?:\^|xism)' in regx test
+      -- Added (?^...) regex construct in Perl 5.13
+
+0.15 Mon Jun 21 14:54:56 EDT 2010
+    - discontinue the practice of caching file handles
+
+0.14 Sun Jun 20 06:53:53 EDT 2010
+    - close files in tests to avoid deadlocks
+
+0.13 Sat Jun 19 07:27:25 EDT 2010
+    - minor repair in MANIFEST
+
+0.12 Sat Jun 19 07:06:00 EDT 2010
+    - added missing tempdir for tests
+
+0.11 Fri Jun 18 20:00:00 EDT 2010
+    - added tests, pod
+    - fixed bugs, added features
+    - added Initialize, Tiehash, Utils
+    - added utils/migrate_validate and utils/flatfile-datastore.cgi
+
+0.10 Sun Mar 22 07:54:06 EDT 2009
+    - temporarily removed tests
+
+0.09 Fri Mar 20 21:20:12 EDT 2009
+    - add EXLOCK => 0 to tempdir calls in tests to see if this fixes BSD hangups
+
+0.08 Fri Mar 20 14:46:03 EDT 2009
+    - code remediation
+
+0.07 Tue Mar 17 23:40:25 EDT 2009
+    - properly recorded oldupd/olddel in appropriate toc file
+
+0.06 Tue Mar 17 22:53:43 EDT 2009
+    - added numrecs to toc file
+    - blocked delete if record already deleted
+
+0.05 Tue Mar 17 09:14:55 EDT 2009
+    - added prerequisites to Makefile.PL
+
+0.04 Mon Mar 16 23:43:04 EDT 2009
+    - added Tutorial.pm and FMTEYEWTK.pm to MANIFEST
+    - otherwise, no code changes from 0.02 below
+
+0.03 Mon Mar 16 16:19:22 EDT 2009
+    - corrected MANIFEST to include Toc.pm and additional tests
+    - otherwise no code changes from 0.02 below
+
+0.02  Mon Feb 23 14:17:54 EST 2009
+    - added POD
+    - added Toc.pm
+
+0.01  Mon Feb 23 14:16:56 2009
+    - original version; created by h2xs 1.23 with options
+        -AX --skip-exporter --use-new-tests -n FlatFile::DataStore
+

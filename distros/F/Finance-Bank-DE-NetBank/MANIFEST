@@ -1,0 +1,24 @@
+Changes
+lib/Finance/Bank/DE/NetBank.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+README.txt
+README.html
+rmoriz.pub
+SIGNATURE
+t/00signature.t
+t/01load.t
+t/02pod.t
+t/general.t
+t/methods/Debug.t
+t/methods/live/login.t
+t/methods/live/saldo.t
+t/methods/live/statement.t
+t/methods/live/transfer.t
+t/methods/new.t
+t/methods/Version.t
+Todo

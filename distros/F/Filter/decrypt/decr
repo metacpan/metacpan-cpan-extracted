@@ -1,0 +1,72 @@
+#!/usr/local/bin/perl
+
+# This script will decrypt a Perl script that has been encrypted using the
+# "encrypt" script. It cannot decrypt any other kind of encrypted Perl script.
+#
+# Usage is decr file...
+#
+
+use strict;
+use warnings;
+
+use vars qw($XOR $BLOCKSIZE $HEADERSIZE $CRYPT_MAGIC_1 $CRYPT_MAGIC_2
+            $size $mode $line $Fingerprint $file $block $sharp_bang $f
+           ) ;   
+$XOR             = 'Perl' ;
+$BLOCKSIZE       = length $XOR ;
+$HEADERSIZE      = 2 ;
+$CRYPT_MAGIC_1   = 0xff ;
+$CRYPT_MAGIC_2   = 0x00 ;
+my $Version         = 1 ;
+my $module_name     = 'Filter::decrypt' ;
+
+my $Fingerprint     = pack ("C*", $CRYPT_MAGIC_1, $CRYPT_MAGIC_2) ;
+
+die "Usage: decrypt file...\n"
+  unless @ARGV ;
+
+
+# Loop through each file in turn.
+foreach $file (@ARGV)
+{
+    if (! -f $file)
+    {
+        print "Skipping directory $file\n" if -d $file ;
+        #print "Skipping strange file $file\n" if ! -d $file ;
+        next ;
+    }
+
+    open (F, "<", $file) || die "Cannot open $file: $!\n" ;
+    binmode F;
+
+    # skip the #! line
+    $a = <F> ;
+    if ($a =~ /^#!/)
+    {
+        $sharp_bang = $a ;
+        $a = <F> ;
+    }
+
+    # skip "use decrypt;" line
+    die "No use $module_name in $file\n"
+        unless $a =~ /use\s+$module_name\s*;/ ;
+
+    read(F, $f, length($Fingerprint)) || die "Cannot read from $file: $!\n" ;
+    (print "skipping file '$file': not encrypted\n"), next
+        unless $f eq $Fingerprint ;
+
+    print "decrypting $file to $file.pd\n" ;
+    open (O, ">", ${file}.".pd") || die "Cannot open ${file}.pd: $!\n" ;
+    binmode O;
+    print O $sharp_bang if $sharp_bang ;
+    while ($size = read(F, $block, $BLOCKSIZE) )
+    {
+        print O ($block ^ substr($XOR, 0, $size)) ;
+    }
+
+
+    close F ;
+    close O ;
+
+}
+

@@ -1,0 +1,17 @@
+commit f11e6e1074f084684914b3c3c51663db1e4db32b (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:36:52 2009 +0100
+
+    FIXED: dependencies
+
+commit dfeffa6fbf2b3012820fcdd1b66d7d03216c012b
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 15:51:22 2008 +0100
+
+    FIXED: removed some PBP errors
+
+commit 7f707edbb21235b6600086e85dff6020409cab37
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 15:32:46 2008 +0100
+
+    ADDED: Initial commit

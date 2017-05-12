@@ -1,0 +1,199 @@
+---
+ASIAND:
+  id: 240
+  category: asian
+  display_name: asian down
+  other_side_code: ASIANU
+  payout_type: binary
+  payouttime: end
+  pricing_code: PUT
+  sentiment: down
+ASIANU:
+  id: 230
+  category: asian
+  display_name: asian up
+  other_side_code: ASIAND
+  payout_type: binary
+  payouttime: end
+  pricing_code: CALL
+  sentiment: up
+CALL:
+  id: 10
+  category: callput
+  display_name: higher
+  other_side_code: PUT
+  payout_type: binary
+  payouttime: end
+  pricing_code: CALL
+  sentiment: up
+CALLE:
+  id: 290
+  category: callput
+  display_name: higher
+  other_side_code: PUT
+  payout_type: binary
+  payouttime: end
+  pricing_code: CALL
+  sentiment: up
+DIGITDIFF:
+  id: 220
+  category: digits
+  display_name: differs
+  other_side_code: DIGITMATCH
+  payout_type: binary
+  payouttime: end
+  pricing_code: DIGITDIFF
+  sentiment: differ
+  base_commission: 0.01
+DIGITEVEN:
+  id: 260
+  category: digits
+  display_name: even
+  other_side_code: DIGITODD
+  payout_type: binary
+  payouttime: end
+  pricing_code: DIGITEVEN
+  sentiment: even
+  base_commission: 0.01
+DIGITMATCH:
+  id: 210
+  category: digits
+  display_name: matches
+  other_side_code: DIGITDIFF
+  payout_type: binary
+  payouttime: end
+  pricing_code: DIGITMATCH
+  sentiment: match
+  base_commission: 0.01
+DIGITODD:
+  id: 250
+  category: digits
+  display_name: odd
+  other_side_code: DIGITEVEN
+  payout_type: binary
+  payouttime: end
+  pricing_code: DIGITODD
+  sentiment: odd
+  base_commission: 0.01
+DIGITOVER:
+  id: 270
+  category: digits
+  display_name: over
+  other_side_code: DIGITUNDER
+  payout_type: binary
+  payouttime: end
+  pricing_code: DIGITOVER
+  sentiment: over
+  base_commission: 0.01
+DIGITUNDER:
+  id: 280
+  category: digits
+  display_name: under
+  other_side_code: DIGITOVER
+  payout_type: binary
+  payouttime: end
+  pricing_code: DIGITUNDER
+  sentiment: under
+  base_commission: 0.01
+EXPIRYMISS:
+  id: 180
+  category: endsinout
+  display_name: ends outside
+  other_side_code: EXPIRYRANGE
+  payout_type: binary
+  payouttime: end
+  pricing_code: EXPIRYMISS
+  sentiment: high_vol
+EXPIRYMISSE:
+  id: 310
+  category: endsinout
+  display_name: ends outside
+  other_side_code: EXPIRYRANGE
+  payout_type: binary
+  payouttime: end
+  pricing_code: EXPIRYMISS
+  sentiment: high_vol
+EXPIRYRANGE:
+  id: 170
+  category: endsinout
+  display_name: ends between
+  other_side_code: EXPIRYMISS
+  payout_type: binary
+  payouttime: end
+  pricing_code: EXPIRYRANGE
+  sentiment: low_vol
+EXPIRYRANGEE:
+  id: 320
+  category: endsinout
+  display_name: ends between
+  other_side_code: EXPIRYMISS
+  payout_type: binary
+  payouttime: end
+  pricing_code: EXPIRYRANGE
+  sentiment: low_vol
+NOTOUCH:
+  id: 140
+  category: touchnotouch
+  display_name: does not touch
+  other_side_code: ONETOUCH
+  payout_type: binary
+  payouttime: end
+  pricing_code: NOTOUCH
+  sentiment: low_vol
+ONETOUCH:
+  id: 130
+  category: touchnotouch
+  display_name: touches
+  other_side_code: NOTOUCH
+  payout_type: binary
+  payouttime: hit
+  pricing_code: ONETOUCH
+  sentiment: high_vol
+PUT:
+  id: 20
+  category: callput
+  display_name: lower
+  other_side_code: CALL
+  payout_type: binary
+  payouttime: end
+  pricing_code: PUT
+  sentiment: down
+PUTE:
+  id: 300
+  category: callput
+  display_name: lower
+  other_side_code: CALL
+  payout_type: binary
+  payouttime: end
+  pricing_code: PUT
+  sentiment: down
+RANGE:
+  id: 150
+  category: staysinout
+  display_name: stays between
+  other_side_code: UPORDOWN
+  payout_type: binary
+  payouttime: end
+  pricing_code: RANGE
+  sentiment: low_vol
+UPORDOWN:
+  id: 160
+  category: staysinout
+  display_name: goes outside
+  other_side_code: RANGE
+  payout_type: binary
+  payouttime: hit
+  pricing_code: UPORDOWN
+  sentiment: high_vol
+VANILLA_CALL:
+  category: vanilla
+  payout_type: non-binary
+  payouttime: end
+  pricing_code: VANILLA_CALL
+VANILLA_PUT:
+  category: vanilla
+  payout_type: non-binary
+  payouttime: end
+  pricing_code: VANILLA_PUT
+INVALID:
+  category: invalid

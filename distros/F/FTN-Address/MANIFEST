@@ -1,0 +1,16 @@
+lib/FTN/Address.pm
+Makefile.PL
+t/t1.t
+t/t2.t
+t/t3.t
+t/t4.t
+t/t5.t
+t/t6.t
+t/t7.t
+t/tpod.t
+t/tpodc.t
+README
+CHANGES
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+abstract: 'Watch for changed application files'
+author:
+  - 'Sebastian Riedel, <sri@cpan.org>'
+  - 'Andy Grundman, <andy@hybridized.org>'
+  - 'Mark Stosberg, <mark@summersault.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Monitor-Simple
+provides:
+  File::Monitor::Simple:
+    file: lib/File/Monitor/Simple.pm
+    version: 1.00
+requires:
+  Class::Accessor::Fast: 0
+  File::Find::Rule: 0
+  File::Modified: 0
+  File::Spec: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

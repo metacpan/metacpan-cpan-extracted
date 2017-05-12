@@ -1,0 +1,57 @@
+---
+abstract: unknown
+author:
+  - 'Andreas KÃ¶nig <andreas.koenig.7os6VVqR@franz.ak.mind.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1901, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Rsync-Mirror-Recent
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  File::Rsync::Mirror::Recent:
+    file: lib/File/Rsync/Mirror/Recent.pm
+    version: v0.4.3
+  File::Rsync::Mirror::Recentfile:
+    file: lib/File/Rsync/Mirror/Recentfile.pm
+    version: v0.0.8
+  File::Rsync::Mirror::Recentfile::Done:
+    file: lib/File/Rsync/Mirror/Recentfile/Done.pm
+    version: v0.0.8
+  File::Rsync::Mirror::Recentfile::FakeBigFloat:
+    file: lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm
+    version: v0.0.8
+requires:
+  Data::Float: '0'
+  Data::Serializer: '0'
+  ExtUtils::MakeMaker: '6.48'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::Path: '0'
+  File::Rsync: '0'
+  File::Spec: '0'
+  File::Temp: '0.21'
+  JSON: '2'
+  List::MoreUtils: '0'
+  List::Pairwise: '0'
+  Pod::Usage: '1.61'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  YAML::Syck: '0'
+  accessors: '0'
+  perl: '5.006'
+  version: '0'
+resources:
+  repository: git://repo.or.cz/rersyncrecent.git
+version: 0.4.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

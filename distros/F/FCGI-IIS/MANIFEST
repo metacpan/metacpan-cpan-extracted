@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/pod.t
+t/pod-coverage.t
+lib/FCGI/IIS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

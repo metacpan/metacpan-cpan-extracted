@@ -1,0 +1,23 @@
+Changes
+lib/File/Scan/ClamAV.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+LICENSE
+README
+t/00basic.t
+t/01ping.t
+t/02reload.t
+t/03quit.t
+t/04scan.t
+t/05streamscan.t
+t/mkconf.pl
+t/pod-coverage.t
+t/pod.t
+testfiles/clamavtest
+testfiles/clamavtest.gz
+testfiles/clamavtest.zip
+testfiles/innocent
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

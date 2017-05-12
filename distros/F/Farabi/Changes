@@ -1,0 +1,571 @@
+Changes for Farabi: The Modern Perl IDE
+
+0.47      2014-05-21 12:42:46+03:00 Asia/Jerusalem
+
+	* This release begins the road to a better DZIL/M:I/EU:MM project support
+
+[ADDED]
+    - Upgrade to jQuery 2.1.1
+    - Upgrade to CodeMirror 4.2
+    - #10: Install a CPAN module from inside Farabi.
+    - Added git status and log and all git operations are now under VCS menu.
+    - Added make, make clean & make test commands.
+    - Added dzil build and clean actions
+
+[CHANGED]
+    - Dist:Zilla support is enabled when the current project folder contains 'dist.ini'
+    - ExtUtils::MakeMaker and Module::Install support is enabled when the current
+      project folder contains 'Makefile.PL'
+    - Refactor make and dzil commands into build, clean and test commands under the build menu.
+    - Added SQL syntax highlighting support.
+    - Diff editor is also affected with whitespace (tab, space) toggle options.
+    - F1 displays perldoc help for the selected text or current token under the cursor in
+      the documentation tab.
+    - Remove Minilla support. It is literally too opinionated and not there yet.
+
+0.46      2014-05-17 15:09:03+03:00 Asia/Baghdad
+
+    * Please try Farabi and let me know what you like and what loathe :)
+    * SECURITY WARNING: Please do not think of deploying this release on the internet. 
+      You have been warned!
+
+[ADDED]
+    - Added 'minil test' and 'dzil test' to build menu for an initial seed for the Minilla and Dist::Zilla runtime project support.
+    - Alt-N: close file, Alt-O: open file, Alt-S: save file, Alt-W: close file, Alt-L: goto line
+    - Added 'ack' runtime support. Please press Ctrl-Alt-F to find selected text in current project folder
+    - Toggle full screen editor editing by F11 or F10. Some browser/OS combinations block some keyboard shortcuts.
+    - Added Markdown auto preview support. Pod tab is now called "Preview"
+    - Farabi can now auto preview POD (if the preview tab is visible) in 
+      cpan, metacpan, github CSS themes (Courtesy of "POD Web view" by Michał Wojciechowski).
+      Please use the "POD style" option in Tools/Options to change it.
+
+[CHANGED]
+    - Upgrade CodeMirror to 4.1
+    - Less installation dependencies; more runtime dependencies
+    - Added Spellunker runtime support now displays errors in problems. 
+    - Added App::midgen runtime support to generate Makefile.PL et all requires/recommends
+      and display results in search tab.
+    - Documentation updates
+    - Problems tab is the first tab now
+    - Fix codemirror mode error on plain text files
+    - "Changes/Git Diff" tab is now updated on an open/save file or mouse click when it is visible.
+    - Farabi is now using simple AJAX request instead of buggy websocket support
+    - Ping HTTP message is now sent every 5 seconds
+    - Run menu is now called Build
+    - Use runtime Code::CutNPaste support to find duplicate code
+    - Disable incomplete features like new project, help documentation/search
+    - git diff, and jshint are now enabled if you have their commands in your $PATH. 
+      Please note that JSHint is still executed in the client-side.
+    - Options dialog is more beautiful or at least to my eyes :)
+    - Spellunker::Pod runtime support is here for checking your POD spelling.
+    - Perl::Strip (to minify your Perl script) runtime support
+    - Added Perl::Tidy and Perl::Critic runtime support.
+    - TODO is now TODO.md
+    - Syntax/preview actions are triggered on editor focus and change
+    - Remove buggy auto bracket codemirror support.
+    - Remove Perl 6 (rakudo) and parrot support. Farabi will focus on Perl script and web-based development.
+    - Update theme list to contain CodeMirror's full list
+    - Debug is now "Documentation" tab. Currently it does not do anything useful.
+    - Diff tab is now called "Changes"
+    - POD tab is now called "Preview".
+    - If preview tab is visible, POD rendering on editor focus/change is active
+    - Remove plugin manager skeleton implementation. It sucked. Farabi is not Padre :)
+    - Show keyboard shortcuts in the menu and help dialog
+    - Remove selected text workaround patch. CodeMirror 4.x already include it in its themes
+    - Remove repetitive and slow dialog fade animation effect
+    - Auto Git differences when Git tab is open
+    - Remove incomplete Debig::Client; Debug::Client test suite stalled on some Travis CI build runs
+      Please note that is not truly fullscreen editing. It is an experiment in progress.
+
+    [FIXED]
+    - Utilize the theme specific active line and gutter from CodeMirror mode CSS
+
+0.45      2014-05-13 14:01:12+03:00 Asia/Jerusalem
+
+    [ADDED]
+    - TravisCI GitHub integration is now working
+    - Added initial Splunker Spell checking (IN PROGRESS)
+    - Various package dependencies on Minilla, Debug::Client and Reply (IN PROGRESS)
+
+    [CHANGED]
+    - Upgrade CodeMirror to 3.12
+
+    [FIXED]
+    - Merge pull #19 "pod fix" dsteinbrunner++
+    - Merge pull #20 "Mojolicious 4.91 no longer has 'secret' method" chorny++
+    - Various Documentation fixes (shlomif++)
+    - Require Parse::ErrorString::Perl 0.18 to get rid of the perl 5.18+ warning line noise
+
+0.44      2013-04-08 11:21:16 Asia/Baghdad
+
+    [CHANGED]
+    - Upgrade JSHint to 1.1.0
+    - Upgrade Bootstrap to 2.3.1
+    - Upgrade CodeMirror to 3.11
+
+0.43      2013-04-07 15:01:24 Asia/Baghdad
+
+    [ADDED]
+    - Added "Perl Strip" action in the tool menu to reduce script size by stripping
+      whitespace, comments, pod etc using Perl::Strip
+    - Add more documentation about the output tab
+    - No need for exit code at the end of a diff
+    - Added Diff tab along with a 'Git Diff' action in the tools menu
+    - Added various dummy debug actions
+
+    [FIXED]
+    - Fix JSHint version in About dialog
+    - Require mojolicious 3.89 to get the fix for dual life autodie under morbo
+    - Fix editor refresh bug in tabs.
+
+    [CHANGED]
+    - Sort prerequisties in dist.ini
+    - Enabled dummy 'New Project' action
+
+0.42      2013-03-04 16:44:55 Asia/Baghdad
+
+    [ADDED]
+    - Added the option to toggle the visibility of tabs and spaces (default: on)
+    - Added an input tab that allows input text to be sent as STDIN to the script when run.
+
+    [FIXED]
+    - Fix regression where editor is sometimes not visible when a file is opened.
+      This regression happened from the 3.1 CodeMirror upgrade.
+    - Fixed various JSHint warnings.
+
+    [CHANGED]
+    - Upgrade to JSHint 1.0.0 stable
+
+0.41      2013-02-25 17:50:34 Asia/Baghdad
+
+    [FIXED]
+    - Fix Test::MinimumVersion dependency typo
+
+0.40      2013-02-25 17:43:30 Asia/Baghdad
+
+    [ADDED]
+    - Added auto close brackets feature
+    - Added t/02-minimum-per.t to make sure post 5.10.1-isms do not creep into the code
+    - Added File::HomeDir 1.00 and Path::Tiny 0.013 to dependencies
+    - Add a disabled "New Project" action/dialog. This will be enabled once it is ready
+    - Added [Test::Compile] to dist.ini to make sure all files are syntax checked
+
+    [CHANGED]
+    - Upgrade to CodeMirror v3.1.
+    - Farabi SQLite database now reside in ~/.farabi/farabi.db
+    - $HOME/.farabi and $HOME/.farabi/projects are now created by default
+    - Reuse the new active line addon from CodeMirror 3.1
+    - Bump Perl::Tidy to 20121207 and Mojolicious 3.87
+    - Rewrite code to be simpler using Path::Tiny instead of arcane File::*
+    - Most forms are now horizontal instead of vertical (i.e. label beside the field)
+    - Selected text is now shown in a clear white over blue text using the 
+      new CodeMirror 3.1 selection marking addon
+    - When the "Farabi" link in the menu bar is clicked, the about dialog is shown
+
+    [FIXED]
+    - Fix a perl 5.14-ism in the menu generation code
+    - Fixed Module::Starter dependency to be 1.60 instead of 1.6
+    - Fix compilation errors in FP::PerlTidy
+    - Fix bug: find-file/find-action are fired too often on each key press
+
+    [REMOVED]
+    - Remove old code that is no longer needed because of the CodeMirror 3.1 upgrade
+
+0.39      2013-02-22 01:34:00 Asia/Baghdad
+
+    [ADDED]
+    - Added FEATURES documentation for Open file(s). 
+    - Added the new great action-based menu bar
+
+    [CHANGED]
+    - Fix Bug: q{farabi --version} returns q{Farabi v1}
+    - Fix #14 by adding the requested documentation warning
+    - Bumped Debug::Client to 0.24. bowtie++
+
+    [REMOVED]
+    - Removed unused test scripts. These were being installed by mistake. Sorry :)
+    - Remove unused POST routes
+
+0.38      2013-02-21 08:51:45 Asia/Baghdad
+
+    [ADDED]
+    - Added the match bracket feature
+    - Added Goto line dialog to jump to a specific line in the current editor
+    - Added the following command line switches: -host, --port and --version.
+      Port 3000 is used by default for development, and 4040 for production
+
+    [CHANGED]
+    - Fixed typo in abstract (Editor to IDE)
+    - Open and actions dialog now properly display help and path on startup
+      and on every item selection change
+    - Updated Documentation about the new new farabi command line options
+    - Resolved some JSHint hints in JS files
+    - Changes from now should display timezone
+    - Added [@Git] and [OurPkgVersion] to dist.ini
+    - Module::Starter is now a dependency
+
+    [REMOVED]
+    - Removed duplicate hardcoded abstract from dist.ini
+    - Removed Mojo default commands
+
+0.37  2013-02-16
+
+    [FIXED]
+    - Fixed Perl::Critic to work with the new problems tab
+
+    [CHANGED]
+    - Farabi is now a modern Perl IDE instead of an editor
+    - Add source column to problems table
+    - JSHint automatically analyzes statically javascript files and
+      adds JS problems to the problems tab
+    - Updated documentation
+    - Diff and Patch files extensions are shown in diff CodeMirror mode
+
+    [REMOVED]
+    - Remove the experimental note warning from the documentation
+
+0.36  2013-02-15
+
+    [FIXED]
+    - Fixed Firefox copy/paste regression; enabled text selection until CodeMirror Issue #1250 '-moz-user-select Firefox Copy/Paste bug' is fixed
+    - Fixed INI and LOG files to be shown in plain mode instead of Perl
+    - Fixed remaining Open file to Open file(s) missed text
+    - Fixed Problems tab to be scrollable
+    - Fixed various JS bugs by downgrade to jQuery 1.8.3 from buggy jQuery 1.9.1
+
+    [CHANGED]
+    - Problems are now sorted by line number
+    - Added 'perlbrew exec' run option
+    - Added CheckChangesHasContent to dist.ini
+    - Added JavaScript code documentation
+
+    [REMOVED]
+    - Removed unneeded files
+    - Cleanup old run dialog runtimes
+
+0.35  2013-02-09
+
+    [FIXED]
+    - Plugin manager is now websocket enabled
+    - About dialog now prints "development release" when there is no version
+    - ALT-A now trigger actions dialog when outside the editor focus
+    
+    [CHANGED]
+    - Syntax check action now works instead of "TODO"
+    - Add Problems tab and automatic syntax checking of Perl files
+    - Disable text selection with mouse drag
+    - About dialog table rows are now sorted
+    - Simplify editor statistics UI
+    - Problems status is shown in editor statistics and clicking on the red
+      problem button opens the problems tab
+    - Disabled automatic pod update until it works with syntax check
+    - Syntax check adds a line widget under the error/warning line. Clicking on it
+      opens the problems tab
+    - Problems table is now clickable and when clicked, the problematic line is focused
+    - POD tab is updated on each click of its it
+
+    [REMOVED]
+    - Removed useless pod checking
+    - Removed run coffeescript support
+    - Removed unfinished Niecza support
+    - Removed unfinished run Perlito6 support
+    - Removed unused sample script template
+    - Removed unneeded JavaScript test and HTML files from CodeMirror
+
+0.34  2013-02-09
+
+    [FIXED]
+    - Add missing package version that caused 0.33 to be broken
+    - Fixed abstract for bin/farabi
+
+0.33  2013-02-09
+
+    [FIXED]
+    - Bug fix: Exit code is now returned correctly when a script is run
+
+    [CHANGED]
+    - Moved to Dist::Zilla to save my time
+    - Upgrade Bootstrap to 2.3.0
+    - Add a "connection status" red/green button on the right
+    - The websocket connection is retried automatically upon close
+    - Actions link is now a blue button
+    - Better hover effect on close tab and add new tab icons
+
+0.32  2013.2.8
+
+    [CHANGED]
+    - Open File is now 'Open File(s)' and supports opening one or more files
+    - Farabi uses websockets instead of stateless POST requests
+    - When a file is opened, it is added or its timestamp is updated
+      in the recent list table
+    - Fix Firefox workaround: Escape key kills the websocket connection.
+
+    [FIXED]
+    - Fix: run dialog was not showing any output after a successful run
+
+    [REMOVED]
+    - Remove obsolete unsafe feature environment support
+    - Remove unimplemented "Open URL" action
+    - Remove old POST actions that were migrated to websockets
+
+0.31  2013.2.6
+    - Less left and right margin space. More horizontal space
+    - Less top/bottom/left space on the actions link. More vertical space.
+    - Focus on output tab when dump ppi or run Perl is used
+    - "POD Viewer?" on/off option is now "Right Side Shown?" on/off checkbox
+    - Output textarea is now a CodeMirror readonly editor
+    - Plugin manager now works but plugins fail to load because of a reload issue
+    - use Moo in all future plugins
+
+0.30  2013.2.6
+    - More vertical space to the left-side editor. Output and POD
+      Preview are right-side tabs to utilize wide-screen resolutions.
+    - Less module dependencies
+    - Farabi database is now created with the recent list table
+    - Started to remove help documentation index autocompletion. 
+      The feature will be replaced by a simple and standard perldoc lookup.
+      Each project will have a Perl runtime version and therefore will
+      use the runtime's perldoc command
+    - Plugin Manager is broken at the moment. A farabi plugin now reports
+      back required dependencies after creation.
+    - Upgrade to jQuery 1.9.1
+    - Added more documentation
+
+0.29  2013.1.29
+    - Fixed missing MANIFEST in 0.28
+
+0.28  2013.1.28
+    - Added Plugin Manager which displays the Farabi plugins at the moment.
+    - When a tab is shown, let us update current editor id.
+      This fixes a lot of file save/run bugs.
+    - Added dummy plugins for Perl::Critic and Perl::Tidy support
+    - Require Module::Pluggable 4.5 instead of 4.6 (Thanks to kevin dawson)
+    - Perl and Javascript code refactor
+
+0.27  2013.1.27
+    - Updated copyright for 2013
+    - Added more license documentation
+    - Added "Dump PPI Tree" action
+    - Added MediaWiki::API to dependencies for the future Rosetta
+      code browser feature
+
+0.26  2013.1.26
+    - Add Find duplicate code dialog
+    - Added Code::CutNPaste to dependencies
+    - Increased the size of the Run dialog runtime list
+      from 5 to 10 elements
+
+0.25  2013.1.26
+    - Run CoffeeScript in your browser using Farabi
+    - Default to 'Perl' instead of Perlito in the run dialog
+    - When there is no extension, default to 'plain' text
+    - Fixed redundant no_index entries and added lib/Farabi/files to it
+    - "what sri says - don't do it." Do not use internal mojo jquery :)
+    - Fix various focus after modal dialog fade in animations
+    - Less file extension regex weirdness
+    - Fix close file bug after closing an open file
+    - Fix package name for Farabi::Plugin::Debug
+
+0.24  2013.1.26
+    - Fix CREDITS markdown
+    - Fix Perl warning about variable redeclaration
+    - Upgrade to CodeMirror 3.02
+    - Remove the "Editor" line
+    - Added an empty Perl 5 Debugger plugin
+    - Added Module::Pluggable to list of dependencies
+    - Remove the '*' after the tab name after a successful save
+    - First implementation of a save file action
+    - Add modal dialog fade effect for all dialogs
+    - Fix a bug with icon remove
+    - Added the "new file" button which is shown to the right of the editor tabs (like chrome)
+    - Smaller tabs
+
+0.23  2013.1.2
+    - Devel::REPL is now supported if installed as an internal in-process REPL
+    - Disable all form submission to prevent UI from refreshing by mistake on ENTER key
+    - When the a file is closed and it not clean we need to popup a save confirmation dialog
+    - Various stability and refactorings into a better close file/files action
+    - More fixes to the REPL dialog
+    - Untitled editors are considered Perl by default
+    - Close the last editor tab create a new Untitled one
+    - Added * after an editor tab name if is modified
+    - Add the initial implementation of save file
+    - REPL command output is now readonly in REPL dialog
+    - Added Close File and Close All Files.
+    - Fix mode selection bug when open a file that is not perl
+    - Added a feature to accept a directory parameter to find-file
+
+0.22  2012.12.24
+    - New file opens an empty "Untitled %d" new tab
+    - Open file action opens a file in a new tab
+
+0.21  2012.12.24
+    - Refactored dialogs client-side JS code into their seperate files
+    - Implemented global window.ChangeMode and window.GetCurrentEditor
+    - Scroll always to the bottom in the REPL dialog
+    - Fix extra newline line in REPL dialog
+    - Add more source documentation
+    - Add New file (dummy at the moment) 
+    - ENTER in the open file or action dialog opens the file or action
+    - Prevent Action field from being autocompleted and fix weird 
+        event consumption bug with actions dialog
+    - Support Niecza, perl6 and re.pl (Devel::REPL)
+
+0.20  2012.12.23
+    - Read-Eval-Print-Loop (REPL) dialog is here and
+      currently support rakudo Perl 6
+    - Refactor each dialog HTML into its own dialog HTML template.
+    - Enter key in the actions dialog runs the action now.
+    - Added action help text to actions dialog.
+    - Added IPC::Run to dependencies for REPL feature.
+
+0.19  2012.12.21
+    - Actions dialog UI refactored.
+    - Dialog Close buttons are blue and cancel buttons are orange.
+    - Enable unsafe features by default. Yes we're unsecure by default :)
+    - HTTP actions should use hyphen instead of underscore.
+    - Perl Critic is not run by default on every change.
+    - Perl Critic command now says alerts the result after execution.
+    - Set proper editor syntax highlighting based on extension.
+    - Open file dialog is here (a farabi6 feature port).
+	- Update README about listening to a different TCP port.
+
+0.18  2012.12.20
+    - Fix experimental Actions dialog to actually work
+    - Remove tab-based look and feel
+    - Every action in Farabi can be triggered by the Actions dialog
+      (Alt-A).
+
+0.17  2012.12.16
+    - Remove unneeded CodeMirror mode tests html and css files.
+    - Fix RELEASE_TESTING=1 xt/eol.t bug.
+    - Experimental Actions dialog that has autocomplete (type-ahead)
+
+0.16  2012.12.13
+    - Fixed failure in `RELEASE_TESTING=1 make test`
+
+0.15  2012.12.10
+    - Allow scripts to be posted to Farabi (Thanks to Toby Inkster).
+    - Added File::Which and Debug::Client to dependencies.
+    - Ability to run PIR scripts on Parrot virtual machine.
+    - Updated to CodeMirror v3.0 stable
+
+0.14  2012.12.9
+    - Options tab is now a dialog
+    - Run with different Perl, Perl 6 runtimes under unsafe operations
+    - More farabi6 functionality backported: New file, Open URL, Open file, 
+      and syntax check.
+    - Update Bootstrap to version 2.2.2
+
+0.13  2012.12.9
+    - Added Perlito 6 javascript runtime and update Perlito 5 javascript runtime to 5.014001 (2012-12-09)
+    - Removed Humane.js notification library. Basically it becomes annoying
+    - Add Perl 6 mode to language mode selector
+    - Updated to CodeMirror 3.0rc2
+
+0.12  2012.12.9
+    - Removed git files from distribution that was introduced in 0.11
+    - Added CREDITS.md and LICENSE
+    - Added "POD Viewer" show/hide option (Thanks to Joel Berger)
+    - Added "Run on Server" option that is enabled by FARABI_UNSAFE environment variable
+      (Thanks to Toby Inkster)
+
+0.11  2012.12.9
+    - Moved to Github instead of Google Code
+
+0.10  2012.9.20
+    - Fix xt/eol.t for CPAN testers with RELEASE_TESTING enabled (CPAN testers; Thank you)
+
+0.09  2012.9.19
+    - Added missing File::Find::Rule to dependencies (Yuni Kim; Thank you)
+    - Added missing Test::EOL and Test::More dependencies
+    - Update CodeMirror to 20481c3 for more bug fixes
+
+0.08  2012.9.16
+    - Added a help icon over the annotated line
+    - Bigger side-by-side POD preview
+    - Bigger editor
+    - Perl mode is by default selected
+    - Dynamically load CodeMirror themes
+    - Run perl critic on severity option change
+    - Better editor statistics. More Humane :)
+    - Add POD checking using Pod::Checker
+    - Perl Critic and pod checking are performed on every editor change
+    - Removed pod check and critique code buttons. There are always run in the background.
+    - Removed humane.js notification noise from perl critic and checker
+    - Added proper POD check and Perl::Critic under-the-line annotations
+    - 20% smaller minified Perlito 5
+    - Improved documentation
+    - Perl::Critic violations are shown under the line where they occurred and when clicked
+      they open the detailed dialog for that violation.
+    - Switched to development CodeMirror v3 branch
+    - Updated sample script POD by Kevin dawson (bowtie++)
+    - Added Perl 5.10.1 requirement at the beginning because Mojolicious already defines that. We do not want to fail later.
+    - Added 'Learn' tab
+    - Updated humane.min.js to 3.0.5
+    - A better about dialog that shows more technologies used version information
+    - Added dummy Perlito IO API implementation. use Modern::Perl; does not croak anymore but does nothing at the same time :)
+    - F5 is now "Run in browser". Please note that it is only active when the editor is focused.
+    - Fixed long-line-in-editor layout bug
+    - xt/eol.t (release testing) now checks all files for UNIX newlines.
+
+0.07  2012.9.10
+    - Added POD tab that automatically shows editor POD as HTML in realtime
+    - Added Help and about dialog
+    - Various HTML fixes that fix the long editor bug
+    - Improved documentation
+
+0.06  2012.9.8
+    - Added a search engine selector: Local Help (current working), MetaCPAN and CPAN Search (for the future)
+    - Added an example on how to use a different port.
+    - Preserve newlines with <br/> for Perl::Critic diagnostics
+    - Remove breakpoints unused feature
+    - Trim whitespace while searching
+    - Display editor statistics at the bottom
+    - Changed the location of script/farabi into bin/farabi
+    - Added tab size numeric field
+    - New vertical UI for options and added line numbers on/off checkbox
+    - Added a simple line divider between perl critic results
+    - Better parameter validation
+    - Search autocompletion input is now visible above the editor
+    - Ability to change Perl::Critic severity in Options.
+    - Updated Perlito 5 runtime to fix some Perl compiler bugs. fglock++
+    - Add version information to header
+    - When a Perlito error occurs the log tab is shown.
+    - Added modules name search
+    - POD X<> index now includes all *.pm and *.pm on your local system instead of only the pod|pods folder
+    - Al-Farabi quote of the day is basically hidden after 8 seconds. bowtie++
+    - Refactored code
+    - Improved documentation
+
+0.05  2012.9.6
+    - Added missing META.yml information to Makefile.PL
+    - Autocomplete X<> references in your local perl documentation
+
+0.04  2012.9.5
+    - Stopped using jQuery UI. Frabi now uses Twitter Bootstrap
+    - Fixed output tab selection
+    - Better determination of perl POD/PODS path using @INC
+    - Lots of refactoring and UI changes
+    - Actions, options and help are shown on the left and the editor on the right
+    - In "Run in browser", Perlito 5 is now loaded at runtime instead of at startup
+    - Moved modes list creation into the Perl backend
+    - Rename Farabi::Controller into Farabi::Editor
+    - Remove ambiance theme since it changes the size of the view
+    - Completely remove "Compiled to JavaScript" tab
+    - Less dialogs. More simple perl critic and help search dialogs. They're modal now.
+    - Output and log is now visible in the lower pane
+    - Ctrl-1,... is not no longer used
+
+0.03  2012.9.3
+    - Removed the concept of selector and started using Ctrl-1, Ctrl-2,..etc to
+      open actions, output, options and help dialogs
+    - Perl::Critic results dialog
+
+0.02  2012.9.3
+    - More UI fixes
+    - Added Help about Frabi dialog
+    - F1 triggers a help search dialog that shows X<> references for that selection
+
+0.01  2012.9.3
+    - Initial release to CPAN

@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name: Froody
+version: 42.034
+author:
+  - You can reach the current maintainers by emailing us at C<cpan@fotango.com>,
+but if you're reporting bugs I<please> use the RT system mentioned above so
+we can track the issues you report.
+abstract: Yet another XML web API framework
+license: perl
+generated_by: Module::Build version 0.2609, without YAML.pm

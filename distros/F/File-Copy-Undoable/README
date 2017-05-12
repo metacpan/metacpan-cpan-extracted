@@ -1,0 +1,16 @@
+FAQ
+
+ Why do you use rsync? Why not, say, File::Copy::Recursive?
+
+    With rsync, we can continue interrupted transfer. We need this ability
+    for recovery. Also, rsync can handle hardlinks and preservation of
+    ownership, something which File::Copy::Recursive currently does not do.
+    And, being implemented in C, it might be faster when processing large
+    files/trees.
+
+SEE ALSO
+
+    Setup
+
+    Rinci::Transaction
+

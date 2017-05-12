@@ -1,0 +1,79 @@
+---
+abstract: 'DWIM file serialization/deserialization'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  Test::Warnings: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Serialize
+provides:
+  File::Serialize:
+    file: lib/File/Serialize.pm
+    version: v1.1.1
+  File::Serialize::Serializer:
+    file: lib/File/Serialize/Serializer.pm
+    version: v1.1.1
+  File::Serialize::Serializer::JSON::MaybeXS:
+    file: lib/File/Serialize/Serializer/JSON/MaybeXS.pm
+    version: v1.1.1
+  File::Serialize::Serializer::JSONY:
+    file: lib/File/Serialize/Serializer/JSONY.pm
+    version: v1.1.1
+  File::Serialize::Serializer::TOML:
+    file: lib/File/Serialize/Serializer/TOML.pm
+    version: v1.1.1
+  File::Serialize::Serializer::XML::Simple:
+    file: lib/File/Serialize/Serializer/XML/Simple.pm
+    version: v1.1.1
+  File::Serialize::Serializer::YAML::Tiny:
+    file: lib/File/Serialize/Serializer/YAML/Tiny.pm
+    version: v1.1.1
+  File::Serialize::Serializer::YAML::XS:
+    file: lib/File/Serialize/Serializer/YAML/XS.pm
+    version: v1.1.1
+recommends:
+  JSON::MaybeXS: '0'
+  YAML::Tiny: '0'
+requires:
+  Class::Load: '0'
+  Exporter::Tiny: '0'
+  List::AllUtils: '0'
+  List::MoreUtils: '0'
+  List::Util: '1.41'
+  Module::Info: '0'
+  Module::Pluggable: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::ClassAttribute: '0'
+  Path::Tiny: '0'
+  feature: '0'
+  parent: '0'
+  perl: v5.16.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/File-Serialize/issues
+  homepage: https://github.com/yanick/File-Serialize
+  repository: https://github.com/yanick/File-Serialize.git
+version: 1.1.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'John SJ Anderson <genehack@genehack.org>'

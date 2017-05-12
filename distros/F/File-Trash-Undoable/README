@@ -1,0 +1,28 @@
+SYNOPSIS
+
+     # use the trash-u script
+
+DESCRIPTION
+
+    This module provides routines to trash files, with undo/redo support.
+    Actual trashing/untrashing is provided by File::Trash::FreeDesktop.
+
+    Screenshots:
+
+SEE ALSO
+
+      * gvfs-trash
+
+      A command-line utility, part of the GNOME project.
+
+      * trash-cli, https://github.com/andreafrancia/trash-cli
+
+      A Python-based command-line application. Also follows freedesktop.org
+      trash specification.
+
+      * rmv, http://code.google.com/p/rmv/
+
+      A bash script. Features undo ("rollback"). At the time of this
+      writing, does not support per-filesystem trash (everything goes into
+      home trash).
+

@@ -1,0 +1,21 @@
+---
+abstract: 'Quasiquoting for Perl'
+author:
+  - 'Agent Zhang <agentzh@yahoo.cn>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Filter-QuasiQuote
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Filter::Util::Call: 1.07
+  perl: 5.6.1
+version: 0.07

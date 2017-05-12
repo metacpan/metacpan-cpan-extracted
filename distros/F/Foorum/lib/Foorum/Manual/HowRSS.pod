@@ -1,0 +1,23 @@
+
+=pod
+
+=head1 NAME
+
+Foorum::Manual::HowRSS - How we build RSS system
+
+=head1 How we build RSS system
+
+  * we don't use L<XML::RSS> or <XML::Feed> or anything else to build RSS, instead we just use TT2 to produce RSS XML.
+  * RSS URL is always add /rss at behind. like:
+    # /forum/FoorumLongLive has RSS: /forum/FoorumLongLive/rss
+    # /site/popular has RSS: /site/popular/RSS
+    # /forum/FoorumLongLive/72 has RSS: /forum/FoorumLongLive/72/rss
+  * since URL is so special, we have a stash: $c->stash->{isI<rss>template} = ( $path =~ /\/rss(\/|$)/ ) ? 1 : 0;
+    # Root.pm sub end {}. if res->redirect(), we raise RSS error.
+    # Root.pm sub end {}. if template is not RSS, raise RSS error.
+  * we have RSS and it's based URL in one sub. so it's pretty neat and easy to read.
+
+=head2 SEE ALSO
+L<Foorum::Manual::RULES>
+
+=cut

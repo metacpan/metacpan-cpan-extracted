@@ -1,0 +1,43 @@
+Revision history for Perl extension Finance::TickerSymbols.
+
+0.01  Tue Mar  7 12:00:22 2006
+	 - original version; created by h2xs 1.23 with options
+		-AX --use-new-tests -n Finance::TickerSymbols
+
+0.02 Wed Nov  8 11:57:07 EST 2006
+         - CPANTS compatible 
+
+0.03 Tue Nov 21 13:34:04 EST 2006
+         - changed regular expression to match www.nasdaq.com
+           format change
+         - added the 'all' option
+
+0.10 Wed Nov 29 11:24:17 EST 2006
+         - add industries query (biz.yahoo.com)
+         (special thanks to Laurent Cocea)
+
+0.11 same day
+         - bugfix
+
+1.00 Thu Nov 30 16:45:06 EST 2006
+         - documentation fix (thank you Robert)
+         - hopefully it's mature enough to become 1.00
+         
+1.02 Fri Oct 10 10:16:00 EST 2008
+           [reported and solved by Steffen Netz - Thank you]
+         - support proxy via environment variables
+
+1.03 Mon May  3 12:32:28 EDT 2010
+           [reported and solved by Martin Hurford - Thank you]
+          - adjust to http://www.nasdaq.com format changes
+
+1.04 Wed May  8 - 2013
+           [reported and solved by Matt W via RT]
+          - eliminate warning at premature use of prototyped function
+          
+1.041 Fri May 10 - 2013
+          - fix syntax warning in a test
+
+2.01  Tue May 13 - 2014
+          - adjust to http://www.nasdaq.com refusal to serve perl agenss. Is
+            that the humble beginning of a brain war? 

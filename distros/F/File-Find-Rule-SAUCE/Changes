@@ -1,0 +1,29 @@
+Revision history for Perl extension File::Find::Rule::SAUCE.
+
+0.06  Mon Feb 26 2007
+    - repackaged -- no functional changes
+
+0.05  Wed Mar 02 2005
+    - added pod_coverage test
+
+0.04  Fri Sep 24 2004
+    - uses File::SAUCE 0.1 API
+    - code and pod cleanup
+
+0.03  Sun Nov 30 2003
+    - must use File::SAUCE 0.04
+    - added has_sauce param
+    - implicit has_sauce check is done
+    - switched directory structure
+    - using Test::More to test
+    - added several tests
+
+0.02  Sun Aug 10 2003
+    - fixed bug that wouldn't allow you to find files with no
+      comments. (must use File::SAUCE 0.03)
+    - it now skips directories
+
+0.01  Tue Mar 11 10:48:00 2003
+    - original version; created by h2xs 1.21 with options
+        -AX File::Find::Rule::SAUCE
+

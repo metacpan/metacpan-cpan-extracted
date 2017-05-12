@@ -1,0 +1,2 @@
+TYPEMAP
+File::RsyncP::Digest	T_PTROBJ

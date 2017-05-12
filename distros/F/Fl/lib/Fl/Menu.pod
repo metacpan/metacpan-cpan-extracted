@@ -1,0 +1,753 @@
+class 'Fl::Menu';
+isa 'Fl::Widget';
+include 'FL/Fl_Menu.H';
+widget_type 'Fl_Menu_';
+
+=pod
+
+=head1 NAME
+
+Fl::Menu - Base Class of all Widgets that Have a Menu
+
+=head1 Description
+
+Currently Fl.pm provides you with Fl::MenuButton, Fl::MenuBar, and Fl::Choice.
+
+The class contains a pointer to an array of structures of type Fl::MenuItem.
+The array may either be supplied directly by the user program, or it may be
+"private": a dynamically allocated array managed by the Fl::Menu.
+
+=head1 Methods
+
+Fl::Menu inherits from Fl::Widget. On top of that, it exposes the following
+methods...
+
+=cut
+
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head2 add(...)
+
+    my $index = $mnu_b->add($label, $shortcut, $callback);
+       $index = $mnu_b->add($label, $shortcut, $callback, $userdata);
+       $index = $mnu_b->add($label, $shortcut, $callback, $userdata, $flags);
+
+Adds a new menu item. The return value is the index into the menu() array
+where the entry was added.
+
+If the menu array was directly set with menu(x), then copy() is done to make a
+private array.
+
+Since this method can change the internal menu array, any menu item pointers
+or indecies the application may have cached can become stale, and should be
+recalculated/refreshed.
+
+A menu item's callback must not add() items to its parent menu during the
+callback.
+
+The parameters are:
+
+=over
+
+=item C<$label>
+
+The text label for the menu item.
+
+The characters "&", "/", "\", and "_" are treated as special characters in the
+label string. The "&" character specifies that the following character is an
+accelerator and will be underlined. The "\" character is used to escape the
+next character in the string. Labels starting with the "_" character cause a
+divider to be placed after that menu item.
+
+A label of the form "File/Quit" will create the submenu "File" with a menu
+item called "Quit". The "/" character is ignored if it appears as the first
+character of the label string, e.g. "/File/Quit".
+
+The label string is copied to new memory and can be freed. The other arguments
+(including the shortcut) are copied into the menu item unchanged.
+
+If an item exists already with that name then it is replaced with this new
+one. Otherwise this new one is added to the end of the correct menu or
+submenu. The return value is the offset into the array that the new entry was
+placed at.
+
+=item C<$shortcut>
+
+Optional keyboard shortcut that can be an int or string (C<FL_CTRL + 'a'> or
+C<^a>). Default value is zero (C<0>) for none.
+
+The shortcut can either be a raw integer value (eg. FL_CTRL+'A') or a string
+(eg. "^c" or "^97").
+
+Raw integer shortcuts can be a combination of keyboard chars (eg. 'A') and
+optional keyboard modifiers (see Fl::event_state(), e.g. FL_SHIFT, etc). In
+addition, FL_COMMAND can be used to denote FL_META under Mac OS X and FL_CTRL
+under other platforms.
+
+String shortcuts can be specified in one of two ways:
+
+    [#+^]<ascii_value>    e.g. "97", "^97", "+97", "#97"
+    [#+^]<ascii_char>     e.g. "a", "^a", "+a", "#a"
+
+...where <ascii_value> is a decimal value representing an ascii character (eg.
+97 is the ascii code for 'a'), and the optional prefixes enhance the value
+that follows. Multiple prefixes must appear in the order below.
+
+    # - Alt
+    + - Shift
+    ^ - Control
+
+Internally, the text shortcuts are converted to integer values using
+fl_old_shortcut($shortcut).
+
+=item C<$callback>
+
+Optional callback invoked when the user click the item.
+
+=item C<$userdata>
+
+Optional user data passed as an argument to the C<$callback>.
+
+=item C<$flags>
+
+Optional flags that control the type of menu item. This parameter is optional
+and defaults to 0 to define a 'regular' menu item.
+
+These flags can be 'OR'ed together:
+
+=over
+
+=item FL_MENU_INACTIVE     - Deactivate menu item (gray out)
+
+=item FL_MENU_TOGGLE       - Item is a checkbox toggle (shows checkbox for on/off state)
+
+=item FL_MENU_VALUE        - The on/off state for checkbox/radio buttons (if set, state is 'on')
+
+=item FL_MENU_RADIO        - Item is a radio button (one checkbox of many can be on)
+
+=item FL_MENU_INVISIBLE    - Item will not show up (shortcut will work)
+
+=item FL_SUBMENU_POINTER   - Indicates user_data() is a pointer to another menu array
+
+=item FL_SUBMENU           - This item is a submenu to other items
+
+=item FL_MENU_DIVIDER      - Creates divider line below this item. Also ends a group of radio buttons.
+
+=back
+
+=back
+
+=cut
+
+xs {name        => 'add',
+    definitions => [
+                    {required => [['const char *', 'items']], # Do not document
+                     returns => 'int' # I don't really want anyone to use this
+                    },
+                    {required => [['const char *', 'label']],
+                     optional => [  ['int',  'shortcut', '0'],
+                                    ['SV *', 'coderef',  '(SV *) NULL'],
+                                    ['SV *', 'userdata', '(SV *) NULL'],
+                                    ['int',  'flags',    '0']
+                     ],
+                     returns => 'int',
+                     c_args => 'label, shortcut, _cb_w, (void *) new Callback( coderef, userdata ), flags'
+                    }
+    ]
+};
+
+=pod
+
+=head2 clear( )
+
+    $mnu_a->clear( );
+
+Same as menu(undef), set the array pointer to null, indicating a zero-length
+menu.
+
+Menus must not be cleared during a callback to the same menu.
+
+=cut
+
+xs {name        => 'clear',
+    definitions => [
+            {returns  => 'void'}
+    ]
+};
+
+=pod
+
+=head2 clear_submenu(...)
+
+    my $ok = $mnu_a->clear_submenu( 3 );
+
+Clears the specified submenu pointed to by index of all menu items.
+
+This method is useful for clearing a submenu so that it can be re-populated
+with new items. Example: a "File/Recent Files/..." submenu that shows the last
+few files that have been opened.
+
+The specified index must point to a submenu.
+
+The submenu is cleared with remove(). If the menu array was directly set with
+menu(x), then copy() is done to make a private array.
+
+The return value is zero (C<0>) on success and negative one (C<-1>) if the
+index is out of range of not a submenu.
+
+Example:
+
+    my $index = $menubar->find_index("File/Recent");    # get index of "File/Recent" submenu
+    if ( $index != -1 ) $menubar->clear_submenu($index);  # clear the submenu
+    $menubar->add("File/Recent/Aaa");
+    $menubar->add("File/Recent/Bbb");
+
+=cut
+
+xs {name        => 'clear_submenu',
+    definitions => [
+            {required => [[qw[int index]]],
+             returns  => 'int'
+            }
+    ]
+};
+
+=pod
+
+=head2 copy(...)
+
+    $mnu_a->copy($menu_item);
+
+Sets the menu array pointer with a copy of the menuitem that weill be
+automatically deleted.
+
+=cut
+
+xs {name        => 'copy',
+    definitions => [
+            {required => [['Fl_Menu_Item *', 'm']],
+             c_args   => '(const Fl_Menu_Item *) m',
+             returns  => 'void'
+            }
+    ]
+};
+
+=pod
+
+=head2 down_box( )
+
+    my $box = $mnu_a->down_box($menu_item);
+
+This box type is used to surround the currently-selected items in the menus.
+
+If this is FL_NO_BOX then it acts like FL_THIN_UP_BOX and selection_color()
+acts like FL_WHITE, for back compatibility.
+
+=cut
+
+xs {name        => 'down_box',
+    definitions => [
+            {returns  => 'Fl_Boxtype'}
+    ]
+};
+
+=pod
+
+=head2 find_index(...)
+
+    my $index = $mnu_a->find_index( 'File/Copy' );
+
+Find the menu item index for a given menu pathname, such as "Edit/Copy".
+
+This method finds a menu item's index position for the given menu pathname,
+also traversing submenus, but not submenu pointers.
+
+Returns the index of the matching item or C<-1> if not found.
+
+To get the menu item pointer for a pathname, use find_item().
+
+    my $index = $mnu_a->find_index( $item );
+
+Find the index the menu array for given item.
+
+A way to convert a menu item pointer into an index.
+
+Current implementation is fast and not expensive.
+
+    # Convert an index-to-item
+    my $index = 12;
+    my $item  = $mymenu->menu() + $index;
+    # Convert an item-to-index
+    $index = $mymenu->find_index($item);
+    if ( $index == -1 ) { print 'error'; ...; }
+
+Returns the index of the matching item or C<-1> if not found.
+
+=cut
+
+xs {name        => 'find_index',
+    definitions => [
+            {   required => [['const char *','pathname']],
+                andif    => 'SvPOK(ST(1)) && !sv_isobject(ST(1))',
+                returns  => 'int'},
+            {   required => [['Fl_Menu_Item *','item']],
+                c_args   => '(const Fl_Menu_Item *) item->cp_ctx',
+                returns  => 'int'}
+
+    ]
+};
+
+=pod
+
+=head2 find_item(...)
+
+    my $item = $mnu_a->find_item( 'File/Copy' );
+
+Find the Fl::MenuItem for a given menu pathname, such as "Edit/Copy".
+
+This method finds a menu item in the menu array, also traversing submenus, but
+not submenu pointers.
+
+    my $menubar = Fl::MenuBar->new(...);
+    $menubar->add("File/&Open");
+    $menubar->add("File/&Save");
+    $menubar->add("Edit/&Copy");
+    # ...
+    my $item;
+    if ( ( $item = (Fl_Menu_Item*) $menubar->find_item("File/&Open") ) ) {
+        $item->labelcolor(FL_RED);
+    }
+    if ( ( $item = (Fl_Menu_Item*) $menubar->find_item("Edit/&Copy") ) ) {
+        $item->labelcolor(FL_GREEN);
+    }
+
+To get the menu item's index, use find_index(...).
+
+=cut
+
+xs {name        => 'find_item',
+    definitions => [
+            {   required => [['const char *','pathname']],
+                returns  => 'const Fl_Menu_Item *'}
+    ]
+};
+
+=pod
+
+=head2 global( )
+
+    $mnu_a->global( );
+
+Make the shortcuts for this menu work no matter what window has the focus when
+you type it.
+
+This is done by using Fl::add_handler(). This Fl::Menu widget does not have to
+be visible (ie the window it is in can be hidden, or it does not have to be
+put in a window at all).
+
+Currently there can be only one global() menu. Setting a new one will replace
+the old one. There is no way to remove the global() setting (so don't destroy
+the widget!).
+
+=cut
+
+xs {name        => 'global',
+    definitions => [ { returns  => 'void' } ]
+};
+
+=pod
+
+=head2 insert(...)
+
+    my $index = $mnu_a->insert( $index, $label, $shortcut, $callback, $userdata, $flags );
+       $index = $mnu_a->insert( $index, $label, $shortcut, $callback, $userdata );
+       $index = $mnu_a->insert( $index, $label, $shortcut, $callback );
+       $index = $mnu_a->insert( $index, $label, $shortcut );
+       $index = $mnu_a->insert( $index, $label );
+
+Inserts a new menu item at the specified index position.
+
+If index is -1, the menu item is appended; same behavior as add().
+
+To properly insert a menu item, label must be the name of the item (eg.
+"Quit"), and not a 'menu pathname' (eg. "File/Quit"). If a menu pathname is
+specified, the value of index is ignored, the new item's position defined by
+the pathname.
+
+For more details, see add(). Except for the index parameter, add() has more
+detailed information on parameters and behavior, and is functionally
+equivalent.
+
+=cut
+
+xs {name        => 'insert',
+    definitions => [ {required => [['int', 'index'], ['const char *', 'label']],
+                     optional => [  ['int',  'shortcut', '0'],
+                                    ['SV *', 'coderef',  '(SV *) NULL'],
+                                    ['SV *', 'userdata', '(SV *) NULL'],
+                                    ['int',  'flags',    '0']
+                     ],
+                     returns => 'int',
+                     c_args => 'index, label, shortcut, _cb_w, (void *) new Callback( coderef, userdata ), flags'
+                    } ]
+};
+
+=pod
+
+=head2 item_pathname(...)
+
+    my $index = $mnu_a->item_pathname( $name );
+       $index = $mnu_a->item_pathname( $name, $finditem );
+
+Get the menu 'pathname' for the specified menuitem.
+
+If finditem==NULL, mvalue() is used (the most recently picked menuitem).
+
+    my $menubar;
+
+    sub my_menu_callback {
+        if ( $menubar->item_pathname($name)) { # recently picked item
+            if ( $name eq "File/&Open" ) { ... } # open invoked
+            if ( $name eq "File/&Save" ) { ... } #  save invoked
+            if ( $name eq "Edit/&Copy" ) { ... } #  copy invoked
+        }
+    }
+
+    ...
+    $menubar = Fl::MenuBar->new(...);
+    $menubar->add("File/&Open", 0, \&my_menu_callback);
+    $menubar->add("File/&Save", 0, \&my_menu_callback);
+    $menubar->add("Edit/&Copy", 0, \&my_menu_callback);
+    ...
+
+=cut
+
+xs {name        => 'item_pathname',
+    definitions => [ {required => [['const char *', 'name']],
+                     optional => [  ['Fl_Menu_Item *', 'finditem',    '0']
+                     ],
+                     returns => 'int',
+                     c_args => '(char *) name, sizeof(name)-1, (const Fl_Menu_Item *) finditem'
+                    } ]
+};
+
+=pod
+
+=head2 menu(...)
+
+    my $item = $mnu_a->menu( );
+
+Returns a pointer to the array of Fl::MenuItems.
+
+This will either be the value passed to menu($value) or the private copy.
+
+    $menu_b->menu( $item );
+
+Sets the menu array pointer directly.
+
+If the old menu is private it is deleted. NULL is allowed and acts the same as
+a zero-length menu. If you try to modify the array (with add(), replace(), or
+remove()) a private copy is automatically done.
+
+=cut
+
+xs {name        => 'menu',
+    definitions => [ {returns => 'const Fl_Menu_Item *'},
+                     {  required => [['Fl_Menu_Item *', 'm']],
+                        c_args   => '(const Fl_Menu_Item *) m',
+                        returns  => 'void'}
+                   ]
+};
+
+=pod
+
+=head2 mode(...)
+
+    $mnu_a->mode( $index, $flag );
+
+Set the flags of item C<$index>.
+
+For a list of flags, see Fl::MenuItem.
+
+    my $flags  = $menu_b->mode( $ndex );
+
+Get the flags of item C<$index>.
+
+For a list of flags, see Fl::MenuItem.
+
+=cut
+
+xs {name        => 'mode',
+    definitions => [ {  required => [['int', 'index'], ['int', 'fl']],
+                        returns => 'void'},
+                     {  required => [['int', 'index']],
+                        returns  => 'int'}
+                   ]
+};
+
+=pod
+
+=head2 mvalue(...)
+
+    my $item = $mnu_a->mvalue( );
+
+Returns a pointer to the last menu item that was picked.
+
+=cut
+
+xs {name        => 'mvalue',
+    definitions => [ { returns  => 'const Fl_Menu_Item *' } ]
+};
+
+=pod
+
+=head2 picked(...)
+
+    my $item = $mnu_a->picked( $item );
+
+When user picks a menu item, call this. It will do the callback.
+
+=cut
+
+xs {name        => 'picked',
+    definitions => [
+                     {  required => [['Fl_Menu_Item *', 'm']],
+                        c_args   => '(const Fl_Menu_Item *) m',
+                        returns  => 'const Fl_Menu_Item *' } ]
+};
+
+=pod
+
+=head2 remove(...)
+
+    $mnu_a->remove( $item );
+
+Deletes item from the menu.
+
+If the menu array was directly set with menu(x) then copy() is done to make a
+private array.
+
+No items must be removed from a menu during a callback to the same menu.
+
+=cut
+
+xs {name        => 'remove',
+    definitions => [
+                     {  required => [[qw[int index]]],
+                        returns  => 'void' } ]
+};
+
+=pod
+
+=head2 replace(...)
+
+    $mnu_a->replace( $index, $string );
+
+Changes the text of item C<$index>.
+
+This is the only way to get slash into an add()'ed menu item. If the menu
+array was directly set with menu($x) then copy() is done to make a private
+array.
+
+=cut
+
+xs {name        => 'replace',
+    definitions => [
+                     {  required => [[qw[int index]], ['const char *', 'string']],
+                        returns  => 'void' } ]
+};
+
+=pod
+
+=head2 shortcut(...)
+
+    $mnu_a->shortcut( $index, $shortcut );
+
+Changes the shortcut of item C<$index>.
+
+=cut
+
+xs {name        => 'shortcut',
+    definitions => [
+                     {  required => [[qw[int index]], [qw[int shortuct]]],
+                        returns  => 'void' } ]
+};
+
+=pod
+
+=head2 size(...)
+
+    my $ret = $mnu_a->size( );
+
+This returns the number of Fl::MenuItem structures that make up the menu,
+correctly counting submenus.
+
+This includes the "terminator" item at the end. If the menu is NULL this
+returns zero (an empty menu will return 1).
+
+=cut
+
+xs {name        => 'size',
+    definitions => [
+                     { returns  => 'int' } ]
+};
+
+=pod
+
+=head2 test_shortcut(...)
+
+    my $item = $mnu_a->test_shortcut( );
+
+Returns the menu item with the entered shortcut (key value).
+
+This searches the complete menu() for a shortcut that matches the entered key
+value. It must be called for a FL_KEYBOARD or FL_SHORTCUT event.
+
+If a match is found, the menu's callback will be called.
+
+=cut
+
+xs {name        => 'test_shortcut',
+    definitions => [
+                     { returns  => 'const Fl_Menu_Item *' } ]
+};
+
+=pod
+
+=head2 text(...)
+
+    my $title = $mnu_a->text( );
+
+Returns the title of the last item chosen.
+
+    $mnu_a->text( $index );
+
+Returns the title of item C<$index>.
+
+=cut
+
+xs {name        => 'text',
+    definitions => [
+                    { returns  => 'const char *',
+                      required => [[qw[int index]]] },
+                    { returns  => 'const char *'    }
+                   ]
+};
+
+=pod
+
+=head2 textcolor(...)
+
+    my $color = $mnu_a->textcolor( );
+
+Get the current color of menu item labels.
+
+    $mnu_a->textcolor( FL_RED );
+
+Sets the current color of menu item labels.
+
+=cut
+
+xs {name        => 'textcolor',
+    definitions => [
+                    { required => [[qw[Fl_Color color]]] },
+                    { returns  => 'Fl_Color'    }
+                   ]
+};
+
+=pod
+
+=head2 textfont(...)
+
+    my $font = $mnu_a->textfont( );
+
+Gets the current font of menu item labels.
+
+    $mnu_a->textfont( FL_HELVETICA );
+
+Sets the current font of menu item labels.
+
+=cut
+
+xs {name        => 'textfont',
+    definitions => [
+                    { required => [[qw[Fl_Font font]]] },
+                    { returns  => 'Fl_Font'            }
+                   ]
+};
+
+=pod
+
+=head2 textsize(...)
+
+    my $size = $mnu_a->textsize( );
+
+Gets the font size of menu item labels.
+
+    $mnu_a->textsize( 20 );
+
+Sets the font size of menu item labels.
+
+=cut
+
+xs {name        => 'textsize',
+    definitions => [
+                    { required => [[qw[Fl_Fontsize font]]] },
+                    { returns  => 'Fl_Fontsize'            }
+                   ]
+};
+
+=pod
+
+=head2 value(...)
+
+    my $alue = $mnu_a->value( );
+
+Returns the index into menu() of the last item chosen by the user.
+
+It is zero initially.
+
+    my $value = $mnu_a->value( 20 );
+
+The value is the index into menu() of the last item chosen by the user.
+
+It is zero initially. You can set it as an integer, or set it with a pointer
+to a menu item. The set routines return non-zero if the new value is different
+than the old one.
+
+    my $value = $mnu_a->value( $item );
+
+The value is the index into menu() of the last item chosen by the user.
+
+It is zero initially. You can set it as an integer, or set it with a pointer
+to a menu item. The set routines return non-zero if the new value is different
+than the old one.
+
+=cut
+
+xs {name        => 'value',
+    definitions => [
+                    { returns => 'int' },
+                    { returns => 'int', required => [['int', 'i']], andif => 'SvIOK(ST(1))' },
+                    { returns => 'int', required => [['Fl_Menu_Item *', 'm']], c_args   => '(const Fl_Menu_Item *) m' }
+                   ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

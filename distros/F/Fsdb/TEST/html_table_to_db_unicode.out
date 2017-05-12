@@ -1,0 +1,5 @@
+#fsdb -F S account passwd uid gid fullname homedir shell
+root  *  0  0  Root  /root  /bin/bash
+jose  *  2274  134  José  /home/johnh  /bin/bash
+lin  *  2275  134  林  /home/greg  /bin/bash
+#   | html_table_to_db

@@ -1,0 +1,44 @@
+Revision history for Form-Processor-Model-DBIC
+0.10001 02/22/2010
+        Ship correct db file
+
+0.10 12/08/2009
+        Remove multiple for has_many, which was broken anyway. Use Bill's 
+        init_value method. Update book.t test.
+
+0.09 09/17/2009
+        Actually ship fix
+
+0.08 09/15/2009
+        Fix bug creating row with Select where the Select column is not null
+
+0.07 02/16/2009
+        Add ability to use many-to-many relationships for multiple select fields
+        various bug fixes, tests
+
+0.06  08/06/2008
+        Actually PROVIDE the changed module
+
+0.05  08/06/2008
+        Fixed bug in the fix for handling "unique" fields
+        Added support for name_prefix
+
+0.04  08/05/2008
+        Fixed bug in handling "unique" fields
+        Added hashref for unique to allow setting messages per unique field
+
+0.03  03/16/2008
+        Moved initialization of schema to init_schema
+        Added source_name, to avoid splitting Result class names
+        Minor doc changes
+        Added doc of non-Catalyst-Plugin usage in the example
+             in BookDB/lib/Controller/Book.db
+
+0.02  03/15/2008
+        Using pre_load_form didn't work. Fixed in build_form.
+        Add "| html" to input example
+        Fixed incorrect use of f.type in templates
+        Add doc for field "id"
+
+0.01  03/13/2008 
+        First version, released on an unsuspecting world.

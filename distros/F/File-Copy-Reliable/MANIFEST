@@ -1,0 +1,9 @@
+lib/File/Copy/Reliable.pm
+Makefile.PL
+CHANGES
+MANIFEST			This list of files
+README
+t/pod.t
+t/pod_coverage.t
+t/simple.t
+META.yml

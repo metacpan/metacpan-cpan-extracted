@@ -1,0 +1,32 @@
+---
+abstract: 'Exclude files/directories for Version Control Systems'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0.82
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: File::Find::Rule::VCS
+name: File-Find-Rule-VCS
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Find::Rule: 0.20
+  Text::Glob: 0.08
+  perl: 5.00503
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/File-Find-Rule-VCS
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/File-Find-Rule-VCS
+version: 1.08

@@ -1,0 +1,16 @@
+# Change file for File::Hotfolder
+
+0.04  2015-03-26 11:53:22 CET
+    - improved filter and new option: filter_dir (issue #7)
+    - extended logging
+
+0.03  2015-03-24 14:34:48 CET
+    - fixed filter option
+    - new option: catch
+
+0.02  2015-03-24 12:29:01 CET
+    - improved documentation and examples
+    - new options: print, fullname, filter
+
+0.01  2015-03-23 17:14:18 CET
+    - inital release

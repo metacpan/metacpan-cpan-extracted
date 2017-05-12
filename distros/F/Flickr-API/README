@@ -1,0 +1,152 @@
+Flickr::API
+===========
+
+An interface to the Flickr API, including OAuth authentication.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test [ MAKETEST_OAUTH_CFG=config_file, 
+               MAKETEST_FLICKR_CFG=other_config, 
+               MAKETEST_VALUES=values_file, 
+               MAKETEST_PERMS={read, write, or delete},
+             [MAKETEST_OAUTH_AUTHED=1, MAKETEST_FLICKR_AUTHED=1]]
+   make install
+
+
+NOTES ON API CHANGES
+
+If you use key and secret when instantiating a new API object, be aware that
+the Flickr::API silently changes these to api_key and api_secret for use and
+configuration export. Since Flickr is (ambivalently) deprecating their own
+authentication in favor of OAuth, in time key and secret will become confusing,
+is key   api_key?   or consumer_key?
+
+For now, key and secret are silently changed. In future releases there will be
+a warning when they are used.
+
+
+NOTES ON TESTING
+
+Testing the Flickr::API can be a bit of a puzzle. You may wish to test
+features that require authentication to upload images. You may not want 
+to expose your key and permissions to a test written by someone you don't 
+know. To try and allow you to dial in the level of testing you want to 
+use, there are several environmental variables to work with.
+
+To interact with Flickr during testing, use either MAKETEST_OAUTH_CFG or
+MAKETEST_FLICKR_CFG or both. MAKETEST_OAUTH_AUTHED=1, MAKETEST_FLICKR_AUTHED=1 
+and MAKETEST_PERMS can be used to change aspects of the interactions with
+Flickr.
+
+Testing authenticated method calls requires a previously authenticated
+consumer key and secret (or api key and secret for Flickr's authentication) 
+saved in a configuration with the data in Storable.pm format that the tests 
+can read. Tests will need either 'read' or 'write' permissions. The tests
+do not use delete permission to delete. The tests default to 'read'. If you 
+want to test uploads, you will need a configuration with 'write' or 'delete' 
+permission. The variable MAKETEST_PERMS can be used to pass in requested 
+permissions other than 'read'.
+
+
+If you are testing a previously authenticated configuration, specifying
+MAKETEST_OAUTH_AUTHED=1 or MAKETEST_FLICKR_AUTHED=1 will bypass the 
+authentication tests.
+
+In addition, testing authentication requires, at minimum, your Flickr consumer_key 
+and consumer_secret; a file with some minimal configuration data in Storable.pm 
+format that the tests can read and write; the ability to open a url on Flickr; 
+and the ability to retrieve a redirectfrom Flickr. Since there is some user 
+interaction required, full authentication testing has to be done manually 
+with something like:
+
+make test MAKETEST_OAUTH_CFG=$HOME/oauth-testing.st [MAKETEST_PERMS=write] 
+[TEST_VERBOSE=1]
+
+or
+
+make test MAKETEST_FLICKR_CFG=$HOME/flickr-auth-testing.st [TEST_VERBOSE=1]
+
+or even
+
+make test MAKETEST_OAUTH_CFG=$HOME/oauth-testing.st \
+ MAKETEST_FLICKR_CFG=$HOME/flickr-auth-testing.st [TEST_VERBOSE=1]
+
+
+There are two scripts in the script directory that can be used to build
+and verify a Storable.pm format configuration file:
+
+script/flickr_make_stored_config.pl and 
+script/flickr_dump_stored_config.pl
+
+When using OAuth, the api_key and api_secret are called the consumer_key
+and consumer_secret respectively. When using the deprecated Flickr
+authentication, the api_key and api_secret are sometimes called key 
+and secret.
+
+It is possible to use authentication testing to produce a configuration
+in storable format that can be imported into the Flickr::API for future use.
+
+
+MORE ON AUTHENTICATION
+
+When using the original Flickr authentication, there are two methods:
+web-based and non-web-based. For web-based the developer defines a
+callback URL, which is where the Flickr will redirect the session,
+along with a frob.
+
+For non-webbased, you need to make a call to flickr.auth.getFrob to
+obtain the frob to exchange for a token. The tests only deal with
+web-based authentication. In general, since Flickr deprecated their
+original authentication in favor of OAuth, more effort is dedicated
+to OAuth.
+
+If you are using Flickr's authentication, and you receive an
+"Oops! Flickr can't find a valid callback URL." page, then you
+are calling an API that is not web-based.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  Data::Dumper
+  Digest::MD5
+  Encode
+  Getopt::Long
+  HTTP::Request
+  HTTP::Request::Common
+  HTTP::Response
+  LWP::UserAgent
+  Net::OAuth
+  parent
+  Scalar::Util
+  Storable
+  Term::ReadLine
+  URI
+  XML::Parser::Lite::Tree
+  XML::LibXML::Simple
+
+
+Testing this module and using the examples additionally require:
+
+  File::Temp
+  Test::More
+  Test::Script
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004-2013 Cal Henderson <cal@iamcal.com>
+License: Perl Artistic License 2.0
+
+OAuth patches and additions
+Copyright (C) 2014-2016 Louis B. Moore <lbmoore@cpan.org>
+License: Perl Artistic License 2.0
+
+

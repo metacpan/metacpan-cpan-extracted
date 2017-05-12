@@ -1,0 +1,16 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test1d.nml -- Sample namelist containing dubious (but plausible)
+!                constructs like arrays starting in single and continuing
+!                in double precision.
+!                Not necessarily endorsed by the standard.
+!  $Id: test1d.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $
+!
+&nlist                                 ! Name of namelist 
+  string_var    = 'A simple string',   ! string
+  int_var =14, real_var= -0.5 , double_var = 1.D4
+  double_array=1.20, .272E1,
+               314.D-2, 24
+  real_array = 0, 1,                   ! we _can_ put a comment here
+               2, 3.e0,
+/

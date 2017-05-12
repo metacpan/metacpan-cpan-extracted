@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl -s
+
+use strict;
+use warnings;
+
+use FlatFile::DataStore::Utils;
+
+our( $from_dir, $from_name, $to_dir, $to_name );
+
+die "usage: $0 -from_dir=/from/dir -from_name=ds1 -to_dir=/to/dir -to_name=ds2\n"
+    unless $from_dir and $from_name and $to_dir and $to_name;
+
+#---------------------------------------------------------------------
+# main
+
+validate( $from_dir, $from_name                    );
+migrate ( $from_dir, $from_name, $to_dir, $to_name );
+validate(                        $to_dir, $to_name );
+compare ( $from_dir, $from_name, $to_dir, $to_name );
+
+
+__END__

@@ -1,0 +1,92 @@
+NAME
+    File::Pid - Pid File Manipulation
+
+SYNOPSIS
+      use File::Pid;
+  
+      my $pidfile = File::Pid->new({
+        file => '/some/file.pid',
+      });
+  
+      $pidfile->write;
+  
+      if ( my $num = $pidfile->running ) {
+          die "Already running: $num\n";
+      }
+
+      $pidfile->remove;
+
+DESCRIPTION
+    This software manages a pid file for you. It will create a pid file,
+    query the process within to discover if it's still running, and remove
+    the pid file.
+
+  new
+      my $pidfile = File::Pid->new;
+
+      my $thisfile = File::Pid->new({
+        file => '/var/run/daemon.pid',
+      });
+
+      my $thisfileandpid = File::Pid->new({
+        file => '/var/run/daemon.pid',
+        pid  => '145',
+      });
+
+    This constructor takes two optional paramters.
+
+    "file" - The name of the pid file to work on. If not specified, a pid
+    file located in "File::Spec->tmpdir()" will be created that matches
+    "(File::Basename::basename($0))[0] . '.pid'". So, for example, if $0 is
+    ~/bin/sig.pl, the pid file will be /tmp/sig.pl.pid.
+
+    "pid" - The pid to write to a new pidfile. If not specified, $$ is used
+    when the pid file doesn't exist. When the pid file does exist, the pid
+    inside it is used.
+
+  file
+      my $pidfile = $pidfile->file;
+
+    Accessor/mutator for the filename used as the pid file.
+
+  pid
+      my $pid = $pidfile->pid;
+
+    Accessor/mutator for the pid being saved to the pid file.
+
+  write
+      my $pid = $pidfile->write;
+
+    Writes the pid file to disk, inserting the pid inside the file. On
+    success, the pid written is returned. On failure, "undef" is returned.
+
+  running
+      my $pid = $pidfile->running;
+      die "Service already running: $pid\n" if $pid;
+
+    Checks to see if the pricess identified in the pid file is still
+    running. If the process is still running, the pid is returned. Otherwise
+    "undef" is returned.
+
+  remove
+      $pidfile->remove or warn "Couldn't unlink pid file\n";
+
+    Removes the pid file from disk. Returns true on success, false on
+    failure.
+
+  program_name
+    This is a utility method that allows you to determine what "File::Pid"
+    thinks the program name is. Internally this is used when no pid file is
+    specified.
+
+SEE ALSO
+    perl.
+
+AUTHOR
+    Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+      Copyright (c) 2005 Casey West.  All rights reserved.
+      This module is free software; you can redistribute it and/or modify it
+      under the same terms as Perl itself.
+

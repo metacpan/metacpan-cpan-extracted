@@ -1,0 +1,40 @@
+Revision history for Finance-Bank-NetBranch
+
+0.01    2006-06-13T23:00-0500
+        First version, released on an unsuspecting world.
+
+0.02    2006-06-14T23:06-0500
+        Cleaned up some POD, added support for getting transaction history.
+        Currently, every action requires a login and a logout, now performed by
+        private helpers; I would like to see a way to handle the session
+        timeout and login only when necessary.
+
+0.03    2006-06-15T12:30-0500
+        Fixed silly bug in regular expression parsing of balances that would
+        have failed for negative numbers; added "non-greedy" attribute to some
+        regex atoms in transaction parser (not really necessary, but slightly
+        safer and parallel with balance parser). Made method PODs parallel
+        throughout.
+
+0.04    2006-06-16T10:46-0500
+        I think this fixes the Test::Pod::Coverage test breakage.
+
+0.05    2006-06-18T17:52-0500
+        Bothered to read the test failure report and realized I hadn't covered
+        pad0() and that my POD was broken. If I would just get
+        Test::Pod::Coverage and Test::Pod installed on this machine, I suppose
+        this might not happen.
+
+0.06    2006-06-27T22:33-0500
+        One of these days I'll get the test-before-deployment idea down. Read
+        cpan-testers failure report, fixed POD bug.
+
+0.07    2007-04-08T17:17-0500
+        Don't parse (as much) HTML by hand (a really bad idea, as I should have
+        known, it caused this module to break very easily). Update LICENSE in
+        Makefile.PL; remove seconds from Changes timestamp (silly me doing such
+        things by hand), checked this into the http://svn.kulp.ch/cpan/
+        Subversion repository, make other piddling changes to the code. More
+        code needs to be moved away from manual parsing, but the critical
+        sections have been fixed.
+

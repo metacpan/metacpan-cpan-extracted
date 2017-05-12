@@ -1,0 +1,450 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			
+
+	
+	<HTML>
+		<HEAD>
+			<TITLE>Printer-Friendly Paystub</TITLE>
+			<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+			<META HTTP-EQUIV="Expires" CONTENT="-1">
+			<META HTTP-EQUIV="Cache-Control" VALUE="no-cache, no-store, must-revalidate">
+			<META HTTP-EQUIV="Cache-Control" VALUE="post-check=0, pre-check=0">
+		
+			
+
+
+
+
+
+
+
+			<link rel="stylesheet" href="/style/container.css" type="text/css">
+			<link rel="stylesheet" href="/style/calendar.css" type="text/css"> 
+			<link rel="stylesheet" href="/style/button.css" type="text/css">
+
+			<link rel="stylesheet" href="/style/qbosso.css" type="text/css" />
+
+		
+
+
+            
+<script type="text/javascript"  language="JavaScript" src="/util/input_validators.js"></script>
+
+			<script language="JavaScript" src="/util/apphelper.js"></script>
+			<script language="JavaScript" src="/util/calendar.js"></script>
+			<script language="JavaScript" src="/util/numbers.js"></script>
+		</HEAD>
+
+		<BODY>
+	
+
+	
+	<table width="100%" >
+	<td class="mainBody" valign="top" width="100%">
+
+	
+	<table>
+		<tr><td>
+			
+
+
+
+
+
+
+
+
+<style>
+	TABLE.paycheck {
+		margin : 3px;
+		border: 1px solid #8080a0;
+		background-color : white;
+	}
+	
+	TABLE.checkPart {
+		margin : 0px;
+		border: medium double #DDEAE2;
+		background-color : #f8fffc;
+	}
+	
+	TABLE.detailsPart {
+		border-collapse: collapse;
+		margin : 0px;
+		border: 1px solid #a0a0a0;
+		background-color : white;
+	}
+	
+	TABLE.detailsWages {
+		border-collapse: collapse;
+		margin : 0px;
+		margin-bottom : 3px;	
+		border: 1px solid #a0a0a0;
+		background-color : white;
+	}
+	
+	TH.detailsPart {
+		align: left;
+		font-size: 8pt;
+		font-weight: normal;
+		background-color: #e0e0e0;
+	}
+	
+	.checksmall {
+		font-size=8pt
+	}
+	
+</style>
+
+
+
+<table width="100%" id="paystub_form_tbl">
+	<tr>
+		<td align=right>
+				Pay stub for period:
+					12/15/2012 - 12/28/2012
+
+		</td>
+	</tr>
+</table>
+<table width="100%" class="paycheck">
+	<tr>
+		<td colspan=3 align=right>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<!------------------------------------- pseudo check --------------------------------------->
+			<table width="100%" class="checkPart">
+				<tr>
+					<td>
+						<table width=100%>
+							<tr>
+								<td class="paystubCompanyAddr">
+
+									Big Employer<br/>
+									123 Any St.<br/>
+	
+									Big City, ST 12345
+								</td>
+								<td>
+									<span style="text-transform:uppercase;font-size:11pt;color:#bbc8c0">
+										<b></b>
+									</span>
+								</td>
+								<td nowrap align="right">
+
+											Check # 3456<br/>
+									Date:
+										01/04/2013
+
+								</td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td valign="top" colspan=2>
+
+									John Q. Public<br>
+									789 Main St.<br>
+
+										Apt. 234<br>
+	
+									My Town, ST 12567
+								</td>
+								<td nowrap align="right" valign="top">
+									Net Pay: $ <u>1111.11 &nbsp; &nbsp; </u>
+								</td>
+							</tr>
+							<tr>
+								<td class="checksmall" colspan=3><br/>
+
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
+
+	<tr>
+		<td width="50%" valign=top>
+			<table class="detailsWages" width="100%" valign="top" id="paystub_pay_tbl">
+				<tr>
+					<th class="detailsPart" width="40%" align="left"><B>PAY</b></th>
+					<th class="detailsPart" width="12%" align="right">Hours</th>
+					<th class="detailsPart" width="12%" align="right">Rate</th>
+					<th class="detailsPart" width="18%" align="right">Current</th>
+					<th class="detailsPart" width="18%" align="right">YTD</th>
+				</tr>
+
+				 
+						<tr>
+							<td>
+								Salary
+							</td>
+
+									<td>
+										<div align="center">
+											 
+										</div>
+									</td>
+
+									<td>
+										<div align="center">
+											 
+										</div>
+									</td>					
+
+									<td>
+										<div align="right">
+											&nbsp;1766.65
+										</div>
+									</td>
+
+							<td>
+								<div align="right">
+									&nbsp;1766.65
+								</div>
+							</td>
+						</tr>
+
+				
+
+			</table>
+
+
+		</td>
+		<td></td>
+		<td width="50%" valign=top>
+			<table class="detailsPart" width="100%" valign="top" id="paystub_ee_taxes_tbl">
+				<tr>
+					<th class="detailsPart" width="64%" align=left><B>TAXES WITHHELD</b></th>
+					<th class="detailsPart" width="18%" align="right">Current</th>
+					<th class="detailsPart" width="18%" align="right">YTD</th>
+
+				</tr>
+
+				
+
+						<tr>
+							<td>
+								Federal Income Tax
+							</td>
+
+
+									<td>
+										<div align="right">
+											&nbsp;333.33
+										</div>
+									</td>
+
+
+							<td>
+								<div align="right">
+									&nbsp;333.33
+								</div>
+							</td>
+
+						</tr>
+
+				
+
+				
+
+						<tr>
+							<td>
+								Social Security
+							</td>
+
+
+									<td>
+										<div align="right">
+											&nbsp;222.22
+										</div>
+									</td>
+
+
+							<td>
+								<div align="right">
+									&nbsp;222.22
+								</div>
+							</td>
+
+						</tr>
+
+				
+
+				
+
+						<tr>
+							<td>
+								Medicare
+							</td>
+
+
+									<td>
+										<div align="right">
+											&nbsp;99.99
+										</div>
+									</td>
+
+
+							<td>
+								<div align="right">
+									&nbsp;99.99
+								</div>
+							</td>
+
+						</tr>
+
+				
+
+				
+
+				
+
+				
+
+				
+			</table>
+		</td>
+	</tr>
+
+	<tr>
+		<td width="50%" colspan=2 align="left" valign="bottom">
+
+
+		</td>
+		<td width="50%" align=right valign=bottom>
+
+			<table class="detailsPart" width="100%" id="paystub_summary_tbl">
+				<tr>
+					<th class="detailsPart" width="64%" align="left"><b>SUMMARY</b></th>
+					<th class="detailsPart" width="18%" align="right">Current</th>
+					<th class="detailsPart" width="18%" align="right">YTD</th>
+				</tr>
+				<tr>
+					<td>Total Pay</td>
+					<td>
+						<div align="right">
+							1766.65
+						</div>
+					</td>
+					<td>
+						<div align="right">
+							1766.65
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>Deductions</td>
+					<td>
+						<div align="right">
+							0.00
+						</div>
+					</td>
+					<td>
+						<div align="right">
+							0.00
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>Taxes</td>
+					<td>
+						<div align="right">
+							655.54
+						</div>
+					</td>
+					<td>
+						<div align="right">
+							655.54
+						</div>
+					</td>
+				</tr>
+			</table>
+			<table width="100%" border="0" cellpadding="0" cellspacing="0" id="paystub_net_tbl">
+				<tr>
+					<td align="right">
+						Net This Check: &nbsp;
+					</td>
+					<td width="8%" align="right">
+						$1,111.11
+					</td>
+				</tr>
+
+			</table>
+
+		
+
+
+
+		</td>
+	</tr>
+</table>
+
+
+
+
+
+		</td></tr>
+	</table>
+	
+
+	
+	</table>
+	</BODY>
+	</HTML>
+
+

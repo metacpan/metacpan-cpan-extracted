@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+# Takes an index name and a stream of content 
+# of the form <DOC NAME=name>[words]</DOC> and indexes them in
+# that index. Usage: 
+# tokenize *.txt | indexstream indexname
+
+use strict;
+use Freq;
+
+my $usage = <<"EOU";
+
+Usage: indexstream corpus_dir
+
+Pipe a stream of text to indexstream and it will incrementally 
+augment an existing index or create a new one if one does not 
+already exist. After that you can perform queries on it with 'stats'.
+
+EOU
+
+my @help = grep /^--/, @ARGV;
+@ARGV = grep !/^--/, @ARGV;
+
+if( @help ){
+	print $usage;
+	exit 0;
+}
+
+my $which_index = shift;
+
+my $index = Freq->open_write( $which_index );
+
+$/ = '</DOC>';
+
+my $john_doe = 0;
+my $doc_count = 0;
+my $word_count = 0;
+my $anoncount = 0;
+while(<>){
+
+	my $doc_name = '';
+	if( s|<DOCNO>([^>]+)</DOCNO>|| ){
+		$doc_name = $1;
+	}
+	else {
+		$anoncount++;
+		next;
+	}
+	
+	s|<[^>]+>||msg;
+
+	print STDERR chr(13), "INDEXING: $doc_name ($.)\t\t";
+        #if ( $doc_count%50 == 0 );
+ 	$word_count += $index->index_document( $doc_name, $_ );
+	$doc_count++;
+
+}
+
+$index->close_index();
+
+print "Doc count this run = $doc_count.\n";
+print "Word count this run = $word_count.\n";
+exit 0;
+

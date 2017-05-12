@@ -1,0 +1,7 @@
+Changes
+FromHTML.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+example/htmltofm.pl

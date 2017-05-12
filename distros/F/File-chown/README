@@ -1,0 +1,55 @@
+SYNOPSIS
+
+     use File::chown; # exports chown() by default
+    
+     # chown by user-/group names
+     chown "ujang", "ujang", @files;
+    
+     # numeric ID's still work
+     chown -1, 500, "myfile.txt";
+    
+     # option: use a reference file's owner/group instead of specifying directly,
+     # like the Unix chown command's --reference=FILE.
+     chown({ref => "/etc/passwd"}, "mypasswd");
+    
+     # option: use lchown instead of chown, like Unix chown command's --no-derefence
+     # (-h).
+     chown({deref=>0}, "nobody", "nobody", "/home/user/www");
+
+DESCRIPTION
+
+    File::chown provides chown() which overloads the core version with one
+    that groks user-/group names, as well as some other extra features.
+
+FUNCTIONS
+
+ chown([ \%opts, ] LIST) => bool
+
+    Changes the owner (and group) of a list of files. Like the core version
+    of chown(), The first two elements of the list must be $user and $group
+    which can be numeric ID's (or -1 to mean unchanged) or string which
+    will be looked up using getpwnam and getgrnam. Function will die if
+    lookup fails.
+
+    It accepts an optional first hashref argument containing options. Known
+    options:
+
+      * ref => str
+
+      Like --reference option in the chown Unix command, meaning to get
+      $user and $group from a specified filename instead of from the first
+      two elements of the argument list.
+
+      * deref => bool (default: 1)
+
+      If set to 0 then, like the --no-dereference (-h) option of the chown
+      Unix command, will use File::lchown instead of the core chown(). This
+      is to set ownership of a symlink itself instead of the symlink
+      target.
+
+SEE ALSO
+
+    chown in perlfunc
+
+    The chown Unix command
+

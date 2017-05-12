@@ -1,0 +1,11 @@
+Revision history for File-Stat-OO
+
+0.03    28 October 2009
+        Changes "keys" tests to use "can"
+
+0.02    02 September 2009
+        Added the owner and group functions
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

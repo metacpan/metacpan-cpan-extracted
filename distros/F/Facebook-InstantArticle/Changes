@@ -1,0 +1,45 @@
+Revision history for Facebook-InstantArticle
+
+0.12    2016-12-09
+        - Removed 'description' field in the InstantArticle object, as Facebook
+          wants the article description/ingress/preamble as 'subtitle' (which is
+          tagged with 'h2').
+
+0.11    2016-09-21
+        - Fixed an error in the documentation.
+
+0.10    2016-09-20
+        - Relaxed version dependencies.
+
+0.09    2016-09-19
+        - Better validation when adding elements to the article; Mojo::Log is
+          used for spitting out warnings when appropriate.
+        - Improved tests.
+        - Improved documentation.
+
+0.08    2016-09-17
+        - Ignore empty paragraphs.
+        - Corrected validation logic, but still no overall validation.
+        - Improved tests.
+
+0.07    2016-09-16
+        - Allow automatic ad placement meta setting.
+
+0.06    2016-09-12
+        - Added 'add_analytics'.
+
+0.05    2016-08-30
+        - Added 'add_map'.
+        - Improved 'add_embed'.
+
+0.04    2016-08-23
+        - Added 'add_heading'.
+
+0.03    2016-08-22
+        - Minor fixes.
+
+0.02    2016-08-22
+        - Added 'add_embed'.
+
+0.01    2016-08-22
+        - Initial release.

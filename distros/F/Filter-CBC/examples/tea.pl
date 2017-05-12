@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+# Please don't encrypt me!
+# This space is left blank intentionally  
+use Filter::CBC "TEA","my secret key";
+RandomIVüÌøĞ"ÜÄ¢åOÕSA0—PŠšYYÖçzâ’è‡›`7kê»•Tı;€¯ì!O…eoÿ 4q/ûpÅ¥‰<İEÍĞ³éÄ®œù«ÀB'[V‰Í€Ñ0ØØ=Æ8œò|•Ùr%ÔPÕB^ÊÊ·‚nrên´fÜâÅ&»ÃLe"n`y,/^ıì@ZíîÏÁ¡

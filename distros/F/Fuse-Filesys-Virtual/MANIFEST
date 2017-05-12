@@ -1,0 +1,18 @@
+.cvsignore
+Changes
+lib/Fuse/Filesys/Virtual.pm
+lib/Fuse/Filesys/Virtual/FSWrapper.pm
+lib/Fuse/Filesys/Virtual/HandleCache.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-load.t
+t/plain-lock.t
+t/plain-notseekable.t
+t/plain-rename.t
+t/plain.t
+t/pod-coverage.t
+t/pod.t
+t/unimpl.t
+t/unsupported.t

@@ -1,0 +1,194 @@
+Revision history for Perl extension Finance::QuoteHist.
+
+1.24  Mon Aug  3 15:55:29 EDT 2015
+    - removed some deprecated Date::Manip config statements
+    - removed outmoded fetchers
+
+1.23  Thu May 21 11:48:11 EDT 2015
+    - fixed divident/split entanglement for yahoo
+    - patched quotes test to properly skip tests
+      without network connectivity (RT #104358)
+
+1.22  Mon Apr 20 14:15:32 EDT 2015
+    - fixed dividend/split entanglement on yahoo
+      rt.cpan.org #103759
+
+1.21  Fri Jan  9 11:25:10 EST 2015
+    - fixed splits on yahoo
+    - removed BusinessWeek
+
+1.20  Tue Oct  8 14:54:48 EDT 2013
+    - added DailyFinance
+    - removed QuoteMedia, MSN, Investopedia
+
+1.19  Mon Aug 29 11:08:08 EDT 2011
+    - fixed test data window (1.17 was a little *too*
+      recent for reliable monthly tests)
+    - 1.18 skipped, CPAN version appeasement
+
+1.17  Fri Aug 26 19:31:05 EDT 2011
+    - Updated tests with more recent data
+
+1.16  Thu Sep 30 01:00:27 EDT 2010
+    - Fixed tests so that they no longer rely upon historical adjusted
+      quotes since these appear to change every now and then whenever
+      Yahoo decides to tweak their algorithm.
+    - typo fix
+
+1.14  Mon Jun  7 18:36:30 EDT 2010
+    - Fixed several syntax issues that were tripping up -w
+    - Fixed the utf8 Byte Order Mark issues with google csv
+    - Added modules for Investopedia.com and StockNod.com
+    - Expanded site-specific tests (for development mostly)
+    - Test data updated, docs refreshed and tweaked
+
+1.12  Mon Aug  3 18:40:15 EDT 2009
+    - Fixed various site-specific modules
+    - F::Q::Yahoo_AU is deprecated in favor of
+      F::Q::Yahoo::Australia (though the old package
+      is still around for backwards compat)
+    - moved CSV class discovery to package level (thanks
+      to Edmond Shum)
+    - fixed the 'unsigned integer' problem with volumes
+      (thanks to 'o kite')
+    - fixed some undef warnings and typos (thanks to
+      Jim Miner)
+
+1.11  Mon Jun 25 19:21:21 EDT 2007
+    - Added Google and Yahoo_AU
+    - Rewrote BusinessWeek, decodes from javascript channels now,
+      since they changed how their site operates. No more intraday
+      quotes though.
+
+1.10  Tue Mar 13 13:57:07 EDT 2007
+
+    - Tweaked Yahoo test data yet again (they seem to be rounding off
+      their volumes now)
+    - Fixed undefined error for symbols with no closing (thanks to
+      Terry Gliedt)
+    - Added BusinessWeek to lineup, including intraday functionality.
+    - Flattened champion delegation.
+    - Added labels() documentation
+    - Implemented user-defined row filtering callback (thanks to Manoj
+      Bhatti for the suggestion)
+    - Added 'shares' as possible label for 'vol' (thanks again to Manoj)
+
+1.09  Thu Jun  8 16:19:57 EDT 2006
+    - Fixed ^DJI test data (again) since yahoo keeps changing how they
+      represent volume (thanks to Ivo Welch)
+
+1.08  Sat May  6 15:16:11 EDT 2006
+    - Fixed ^DJI test data for quote tests (Yahoo switched to the volume
+      for each anchor date rather than aggregate volumes)
+    - splits() now returns ref properly in scalar context for
+      F::QH::Yahoo. Thanks to Raymond de Leon for spotting.
+
+1.07  Thu Mar 16 00:44:24 EST 2006
+    - Internal restructure to date iterators where appropriate.
+    - Doc fix for MSN.
+    - Various minor edge cases fixed.
+
+1.06  Fri Mar 10 15:59:05 EST 2006
+    - Added MSN quote source.
+    - Fixed some edge cases involving null-queries on splits.
+    - Various minor fixes, including proper business-day calculations
+      for end of month dates on montly resolutions, plus proper newline
+      stripping (chomp didn't work on MSN csv).
+
+1.05  Tue Feb 28 16:47:57 EST 2006
+    - Splits now have no dependencies on dividend queries
+    - Daily, Weekly, Monthly granularities available
+    - Restored quote_source(), dividend_source(), and
+      split_source() methods
+    - More tests added
+
+1.04  Fri Jan  6 12:18:59 EST 2006
+    - Compensated for yahoo symbol switch from ^DJA to ^DJI, which was
+      causing some tests to fail.
+    - Updated quotemedia url.
+
+1.03  Wed Nov  2 16:52:30 EST 2005
+    - Minor bug fixes
+    - Forced date calcs to GMT to avoid some cygwin/win errors
+    - Added auto_proxy, enabled during tests so that if $ENV{HTTP_PROXY}
+      is present $ua->env_proxy will be automatically invoked
+    - Tests will skip if network connectivity cannot be established
+
+1.02  Wed Aug  3 14:46:43 EDT 2005
+    - Fixed Date::Manip requirement that was inadvertently dropped.
+
+1.01  Thu Jul 21 13:29:54 EDT 2005
+    - Added conditional support for Text::CSV_PP in cases where
+      Text::CSV_XS is not installed
+    - Split out tests
+
+1.00  Thu Jun 23 16:25:53 EDT 2005
+    - Reworked Yahoo! queries for new interface
+    - Added quotes from QuoteMedia (they supply SiliconInvestor, so that
+      was dropped)
+    - Date constraints relaxed. No end date defaults to 'today', no
+      start date defaults to inception. Having neither date grabs
+      entire history.
+    ! Internal API changed from symbolic dereferencing to supplying
+      closures and iterators for particular targets and parse modes.
+
+0.33
+    - Broke up Yahoo! csv queries into blocks of 1000, as apparently
+      Yahoo! sometimes puts a cap on these sort of queries (thanks to
+      Jay Strauss)
+
+0.32  Thu Aug 14 13:37:36 EDT 2003
+    - Fixed csv parsing for Yahoo dividend data after they fixed
+      their format
+    - Updated test data
+
+0.31  Thu Jan 16 19:20:31 GMT 2003
+    - Rolled back some 5.6 specific syntax
+
+0.30  Fri Nov  8 16:47:07 EST 2002
+    - adjusted volume fix (column labeling snafu)
+    - extraneous status messages fixed for split extrations
+    - added filtered split and filtered dividend tests
+
+0.29  Thu Oct 17 04:36:05 EDT 2002
+    - Patched Yahoo URL interface since they switched to January = 00
+      rather than 01.
+
+0.28  Thu Feb 28 08:23:08 CST 2002
+    - Updated Yahoo interface, incorporating new changes.
+    - added proxy_env parameter and method to ease proxy handling via
+      LWP::UserAgent
+    - Added WallStreetCity.pm (basic source)
+    - Removed FinancialWeb.pm (apparently defunct)
+    - Removed MotleyFool.pm (no longer offers tabular data, plus login
+      now required for historical info)
+
+0.25  Mon Jan  8 19:35:00 CST 2001
+    - Doc cleanup
+
+0.24  Wed Nov 29 02:28:59 CST 2000
+    - Replaced FinancialWeb with SiliconInvestor in order to provide
+      information on defunct ticker symbols -- FinancialWeb ceased
+      coverage of these symbols.
+
+0.23  Thu Nov  2 15:19:00 CST 2000
+    - Fixed cache bug with Yahoo::source_type()
+    - Documentation revisions and fixes
+
+0.21  Wed Sep 13 13:25:35 CDT 2000
+    - Splits and dividends added
+    - Much faster queries, primarily due to taking advantage of Yahoo
+      and CSV-formatted data, when available
+    - Supports grabbing non-adjusted data, as well as notification when
+      transitioning to a site that cannot provide non-adjusted data
+    - Supports auto-adjusting of non-adjusted quotes for tables that
+      include an adjusted column (like Yahoo in HTML mode)
+    - Information pedigree support -- i.e., from which site did the
+      quote/split/dividend data come for a particular ticker symbol
+    - Revised interface, although the old one is mostly still supported
+      (read the docs!)
+    - Defunct ticker symbols still supported (quotes only, no
+      split/dividend)
+
+0.01  Wed Feb  2 18:24:07 CST 2000
+    - Initial version.

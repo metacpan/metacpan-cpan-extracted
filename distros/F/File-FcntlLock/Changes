@@ -1,0 +1,116 @@
+Revision history for Perl extension File::FcntlLock
+
+0.22  Thu July 31 2014
+	- Exports still didn't work from the XS, Pure and Inline modules,
+	  hopefully fixed.
+
+0.21  Thu July 31 2014
+	- Missing @EXPORT of constants fixed with patch supplied by
+	  Raphaël Hertzog <hertzog@debian.org> (thank you;-)
+
+0.20  Tue May 27 2014
+    - Problem on GNU Hurd hopefully fixed and some cosmetic changes.
+
+0.19  Tue May 27 2014
+    - Builds failed on 32-bit systems due to missing CFLAGS derived
+      from the Perl installation.
+
+0.18  Mon May 26 2014
+    - CPAN didn't find the version number in FcntlLock.pm which
+      was derived from that of Core.pm:-(
+
+0.17  Mon May 26 2014
+    - CPAN testing showed that there are 32-bit systems where the
+      off_t member of the flock struct is a 64-bit integer but Perl
+      doesn't support the 'q' format for pack() and unpack(). On these
+      systems there seem to be no good way of assembling a flock
+      structure useing "pure Perl" and thus the File::FcntlLock::Pure
+       and File::FcntlLock::Inline modules won't get installed.
+
+0.16  Sun May 25 2014
+    - Missing file in 0.15, Pure.pm, in MANIFEST added.
+
+0.15  Thu May 20 2014
+    - Module rewritten as three modules, one working
+      exactly as before, and two new ones that instead of
+      being XS-based use Perl code. For the first one the
+      Perl code for packing/unpacking the C flock struct is
+      generated when 'perl Makefile.PL' is run. For the other
+      a C program is created, compiled and run each time the
+      module gets loaded. This is in response to some concerns
+      the Debian dpkg package managers (who use the module) had
+      for certain circumstances when new Perl versions need to
+      be installed (as far as I understand;-)
+
+0.14  Thu Oct 29 2011
+    - Changed the test script to get it to pass under GNU Hurd,
+      using only the rather limited fcntl() locking capabilities
+      available on that system. Thanks to Julián Moreno Patiño
+      for bringing the problem to my attention and helping me
+      to set up a virtual GNU Hurd system for testing.
+
+0.13  Thu Oct 11 2011
+    - Spelling errors fixed in the documentation, thanks to
+      Julián Moreno Patiño (Debian Package Maintainer).
+
+0.12  Thu Oct 8 2009
+    - Stupid bug in Makefile removed that assumed a certain
+      layout of the flock structure - thanks to Glenn Herteg
+      for spotting this.
+
+0.11  Wed Oct 7 2009
+    - Module did use only 32-bit flock structure, making it
+      impossible to obtain locks on parts of files above
+      4 GB. Now it also should work for large files.
+    - Mistakes in documentation removed as pointed out by
+      FANY and Glenn Herteg.
+
+0.10  Wed May 14 2008
+    - Removed an issue in Makefile.PL that kept the module
+      from being built on some systems
+
+0.09  Sun Aug 26 2007
+    - Renamed module from Fcntl_Lock to FcntlLock to make it
+      fit into the namespace newly allocated on CPAN
+
+0.08  Sun Aug 12 2007
+    - Changes in error handling within the module
+    - Makefile.PL changed so that it hopefully won't fail on
+      (Net|Free|Open)BSD (and perhaps Cygwin) where locks on
+      STDIN and STDOUT are not supported
+    - Tests changed for the same reasons
+
+0.07  Sun Aug 5 2007
+    - Module made ready for upload to CPAN
+    - Changed name from Fcntl_Lock to File::Fcntl_Lock
+    - Renamed some methods
+    - Corrected some of the test cases
+    - Updated documentation
+
+0.06  Sun Apr 28 2002
+    - Error texts changed to reflect SUSv3
+    - Documentation updated
+
+0.05  Mon Apr 22 2002
+    - Error texts changed to reflect TRUE64 man page
+    - Internal module errors now call die instead of setting errno to EINVAL
+    - Small bug fixes
+
+0.04  Mon Apr 22 2002
+    - Added further test cases
+    - Improved check on availability of fcntl(2) in Makefile.PL
+    - Methods for simpler error determination
+    - Update of documentation
+
+0.03  Sat Apr 20 2002
+    - Removed a bug in Makefile.PL pointed out by "Frodo Baggins"
+    - Added checks in Makefile.PL for compiler and <fcntl.h>
+
+0.02  Sat Apr 20 2002
+    - Added tests in test.pl
+    - Some changes in Makefile.PL thanks to Mark Jason Dominus
+    - Module now recognizes file handles and descriptors correctly
+    - Update of documentation
+
+0.01  Thu Apr 18 2002
+    - original version; created by h2xs 1.21 with options -A -n Fcntl_Lock

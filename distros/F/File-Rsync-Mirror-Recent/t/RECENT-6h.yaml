@@ -1,0 +1,385 @@
+--- 
+meta: 
+  Producers: 
+    File::Rsync::Mirror::Recentfile: 0.0.1
+  aggregator: 
+    - 1d
+    - 1W
+    - 1M
+    - 1Q
+    - 1Y
+    - Z
+  canonize: naive_path_normalize
+  comment: These 'RECENT' files are part of a test of a new CPAN mirroring concept. Please ignore them for now.
+  filenameroot: RECENT
+  interval: 6h
+  protocol: 1
+recent: 
+  - 
+    epoch: 1216707414.87588
+    path: id/D/DU/DUNCAND/Muldis-D-0.42.0.meta
+    type: new
+  - 
+    epoch: 1216707414.87099
+    path: id/D/DU/DUNCAND/Muldis-D-0.42.0.readme
+    type: new
+  - 
+    epoch: 1216707414.81693
+    path: id/D/DU/DUNCAND/Muldis-D-0.42.0.tar.gz
+    type: new
+  - 
+    epoch: 1216707414.81123
+    path: id/D/DU/DUNCAND/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706568.84721
+    path: id/W/WY/WYANT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706568.67189
+    path: id/W/WO/WONKO/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706568.24939
+    path: id/T/TU/TURNSTEP/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706566.99051
+    path: id/S/ST/STRUAN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706566.62354
+    path: id/S/SR/SREZIC/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706565.4684
+    path: id/S/SK/SKAUFMAN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706565.4572
+    path: id/S/SJ/SJSZ/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706564.90228
+    path: id/S/SC/SCHWIGON/acme-unicode/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706564.69337
+    path: id/S/SA/SAMV/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706564.09408
+    path: id/R/RS/RSAVAGE/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706563.97794
+    path: id/R/RP/RPETTETT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706563.35835
+    path: id/R/RE/RENEEB/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706563.28207
+    path: id/R/RE/REDEN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706562.96744
+    path: id/P/PO/POTYL/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706562.77026
+    path: id/P/PJ/PJF/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706562.21935
+    path: id/P/PE/PEVANS/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706561.72022
+    path: id/O/OL/OLIVER/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706561.50729
+    path: id/N/NU/NUFFIN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706560.79259
+    path: id/M/MS/MSROTH/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706560.32705
+    path: id/M/MO/MORITZ/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706560.18714
+    path: id/M/ML/MLEHMANN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706558.91557
+    path: id/M/MA/MARKOV/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706558.67322
+    path: id/M/MA/MARKLE/A2C/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706558.16278
+    path: id/L/LM/LMC/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706557.78589
+    path: id/L/LA/LAMMEL/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706557.63601
+    path: id/K/KR/KROKI/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706557.5279
+    path: id/K/KO/KOHA/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706557.23439
+    path: id/K/KA/KARMAN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706555.44193
+    path: id/I/IV/IVAN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706555.17699
+    path: id/I/IN/INA/Sjis/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706554.12319
+    path: id/G/GP/GPHAT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706553.47884
+    path: id/F/FG/FGLOCK/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706552.9627
+    path: id/E/EL/ELLIOTJS/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706552.661
+    path: id/E/EB/EBASSI/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706552.38315
+    path: id/D/DR/DRRHO/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706551.93899
+    path: id/D/DM/DMUEY/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706551.76975
+    path: id/D/DM/DMAKI/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706548.70028
+    path: id/C/CJ/CJONES/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706548.35228
+    path: id/C/CA/CAMELCASE/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706547.82985
+    path: id/B/BK/BKENDI/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706547.34859
+    path: id/A/AV/AVIAN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706546.72265
+    path: id/A/AN/ANDYA/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706545.87839
+    path: id/A/AG/AGENT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706545.37223
+    path: id/A/AC/ACMCMEN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216706545.316
+    path: id/A/AC/ACCARDO/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216702986.09073
+    path: id/M/MT/MTHURN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216702985.67108
+    path: id/M/MR/MRDVT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216701666.6949
+    path: id/R/RS/RSAVAGE/Set-Array-0.15.meta
+    type: new
+  - 
+    epoch: 1216701666.69002
+    path: id/R/RS/RSAVAGE/Set-Array-0.15.readme
+    type: new
+  - 
+    epoch: 1216701666.67053
+    path: id/R/RS/RSAVAGE/Set-Array-0.15.tgz
+    type: new
+  - 
+    epoch: 1216700343.24697
+    path: id/A/AA/AAU/MRIM/Net-MRIM-1.03.meta
+    type: delete
+  - 
+    epoch: 1216700343.24277
+    path: id/A/AA/AAU/MRIM/Net-MRIM-1.03.readme
+    type: delete
+  - 
+    epoch: 1216700343.23024
+    path: id/A/AA/AAU/MRIM/Net-MRIM-1.03.tar.gz
+    type: delete
+  - 
+    epoch: 1216700342.74534
+    path: 00whois.xml
+    type: new
+  - 
+    epoch: 1216700342.73843
+    path: 00whois.html
+    type: new
+  - 
+    epoch: 1216700217.06407
+    path: id/A/AG/AGENT/OpenResty-0.3.18.meta
+    type: new
+  - 
+    epoch: 1216700217.05944
+    path: id/A/AG/AGENT/OpenResty-0.3.18.readme
+    type: new
+  - 
+    epoch: 1216700216.92695
+    path: id/A/AG/AGENT/OpenResty-0.3.18.tar.gz
+    type: new
+  - 
+    epoch: 1216699368.25701
+    path: id/N/NO/NOTBENH/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216699349.22998
+    path: id/D/DA/DANNY/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216698766.34696
+    path: id/I/IV/IVAN/Business-OnlinePayment-3.00_09.tar.gz
+    type: new
+  - 
+    epoch: 1216695771.28455
+    path: id/R/RR/RRA/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216695052.86324
+    path: id/E/EL/ELLIOTJS/Perl-Critic-1.089.meta
+    type: new
+  - 
+    epoch: 1216695052.8585
+    path: id/E/EL/ELLIOTJS/Perl-Critic-1.089.readme
+    type: new
+  - 
+    epoch: 1216695052.59929
+    path: id/E/EL/ELLIOTJS/Perl-Critic-1.089.tar.gz
+    type: new
+  - 
+    epoch: 1216693222.39634
+    path: id/S/SA/SAMV/Set-Object-1.25.meta
+    type: new
+  - 
+    epoch: 1216693222.39117
+    path: id/S/SA/SAMV/Set-Object-1.25.readme
+    type: new
+  - 
+    epoch: 1216693222.30523
+    path: id/S/SA/SAMV/Set-Object-1.25.tar.gz
+    type: new
+  - 
+    epoch: 1216689846.5538
+    path: id/L/LB/LBR/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216689807.776
+    path: id/D/DM/DMAKI/Data-Valve-0.00006.meta
+    type: new
+  - 
+    epoch: 1216689805.72034
+    path: id/D/DM/DMAKI/Data-Valve-0.00006.tar.gz
+    type: new
+  - 
+    epoch: 1216689425.86331
+    path: id/B/BR/BRONG/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216688776.76392
+    path: id/A/AN/ANDYA/Devel-DTrace-0.10.meta
+    type: new
+  - 
+    epoch: 1216688776.75811
+    path: id/A/AN/ANDYA/Devel-DTrace-0.10.readme
+    type: new
+  - 
+    epoch: 1216688776.73622
+    path: id/A/AN/ANDYA/Devel-DTrace-0.10.tar.gz
+    type: new
+  - 
+    epoch: 1216688547.26755
+    path: id/A/AS/ASPINDLER/CHECKSUMS
+    type: new
+  - 
+    epoch: 1216688456.55819
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.101.101.meta
+    type: new
+  - 
+    epoch: 1216688456.55251
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.101.101.readme
+    type: new
+  - 
+    epoch: 1216688456.51925
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.101.101.tar.gz
+    type: new
+  - 
+    epoch: 1216687835.59636
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.51.01.meta
+    type: new
+  - 
+    epoch: 1216687835.59096
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.51.01.readme
+    type: new
+  - 
+    epoch: 1216687835.55785
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.51.01.tar.gz
+    type: new
+  - 
+    epoch: 1216687441.73175
+    path: id/W/WY/WYANT/Games-Sudoku-General-0.009.meta
+    type: new
+  - 
+    epoch: 1216687441.72641
+    path: id/W/WY/WYANT/Games-Sudoku-General-0.009.readme
+    type: new
+  - 
+    epoch: 1216687441.70148
+    path: id/W/WY/WYANT/Games-Sudoku-General-0.009.tar.gz
+    type: new
+  - 
+    epoch: 1216687273.39014
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.4.3.meta
+    type: new
+  - 
+    epoch: 1216687273.38476
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.4.3.readme
+    type: new
+  - 
+    epoch: 1216687273.35179
+    path: id/M/MA/MARKLE/A2C/Apache2-Controller-0.4.3.tar.gz
+    type: new

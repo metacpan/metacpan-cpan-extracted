@@ -1,0 +1,16 @@
+#! /bin/sh
+#
+# msword doc file to txt.
+# 2013-02-08, jw
+#
+
+source_path=$1
+destfile=$2
+destination_path=$3
+mimetype=$4
+description=$5
+config_dir=$6
+
+outfile=$(basename $source_path).txt
+antiword -r -s "$source_path" > "$outfile"
+# TODO: test how antiword dumps images...

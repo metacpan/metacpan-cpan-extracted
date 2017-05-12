@@ -1,0 +1,11 @@
+#fsdb low histogram noshare
+1	47	7
+2	82	39
+3	97	86
+4	85	137
+5	59	150
+6	36	101
+7	10	38
+8	7	13
+9	0	6
+#   | dbjoin -S -e 0 -a --input TEST/dbjoin_missing_last_1.in-2 low

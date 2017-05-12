@@ -1,0 +1,27 @@
+# -*- Makefile -*-
+
+# Run as "make -f example/Makefile.par"
+# Mac-specific PAR builder for Fuse-PDF
+
+ARCH := $(shell /usr/bin/arch)
+
+TARGET = example/mount_pdf.$(ARCH)
+
+MYPWD := $(shell pwd)
+
+all:    $(TARGET)
+
+# This is used so I can build the PPC version on my iMac and the x86
+# version on my MacBook and sync them back and forth
+rsync:	$(TARGET)
+	rsync -v --progress files.devel/mount_pdf.i386 192.168.0.4:$(MYPWD)/files.devel
+	rsync -v --progress 192.168.0.4:$(MYPWD)/files.devel/mount_pdf.ppc  files.devel
+
+PP = pp
+
+PM_FILES := $(shell find lib -name '*.pm' | grep -v svn)
+
+INC = -I lib
+
+$(TARGET): bin/mount_pdf $(PM_FILES) example/Makefile.par
+	$(PP) $(INC) -M Fuse::PDF::MountPDF -d -o $@ $<

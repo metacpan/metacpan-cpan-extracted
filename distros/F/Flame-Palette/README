@@ -1,0 +1,37 @@
+Flame-Palette version 0.02
+==========================
+
+This module provides facilities to create and manipulate palette
+files, usually used in fractal flames created by flam3.
+
+It is written in pure perl and just needs Perl itself and the modules
+listed below "DEPENDENCIES".
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Interpolator::Linear
+  XML::Parser
+  XML::Writer
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by David Kroeber
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

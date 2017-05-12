@@ -1,0 +1,32 @@
+Finance-SE-OMX version 1.00
+===========================
+
+This Perl module provides an object oriented interface to the
+swedish stock exchange. It can get the stock information based
+on the shortname of the stock, or it can get a complete stock
+listing.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires LWP::Simple to function properly.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Sebastian Cato
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

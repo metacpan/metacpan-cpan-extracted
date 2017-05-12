@@ -1,0 +1,2445 @@
+
+!Option:AutoSwitch
+!Account
+NAsset
+DSample Asset
+X
+ANote on Asset
+TOth A
+B25,000.00
+^
+NBank
+DSample Bank
+X
+ANotes on Sample
+TBank
+B1,465.00
+^
+NCash
+DSample Cash
+X
+ANote on Cash
+TCash
+B0.00
+^
+NCredit Card
+DSample Card
+L15,000.00
+X
+ANote on Card
+TCCard
+B0.00
+^
+NLiability
+DSample Liability
+X
+ANote on Liability
+TOth L
+B50,000.00
+^
+NMutual Fund
+DSample Fund
+X
+ANote on Fund
+TMutual
+B672.87
+^
+NPortfolio
+DSample Portfolio
+X
+ANote on portfolio
+TPort
+B2,651.00
+^
+!Clear:AutoSwitch 
+!Type:Security
+NIntuit
+SINTU
+TStock
+GHigh Risk
+^
+NMutual Fund
+SPGRWX
+TMutual Fund
+GCollege Fund
+^
+!Type:Payee
+PSafeway
+A0Safeway Address
+A1
+A2
+CCity
+SSC
+Z99999     
+Y
+N3333333333
+#123456789
+^
+!Type:Cat
+NAuto
+DAutomobile Expenses
+E
+^
+NAuto:Fuel
+DAuto Fuel
+E
+^
+NAuto:Insurance
+DAuto Insurance
+E
+^
+NAuto:Registration
+DAuto Registration
+E
+T
+R8560
+^
+NAuto:Service
+DAuto Service
+E
+^
+NBank Charge
+DBank Charge
+E
+^
+NBonus
+DBonus Income
+I
+T
+R7360
+^
+NCash
+DMisc Cash
+E
+^
+NCharity
+DCharitable Donations
+E
+T
+R4480
+^
+NChild Care
+DChild Care Expenses
+E
+T
+R6416
+^
+NClothing
+DClothing
+E
+^
+NDining
+DDining Out
+E
+^
+NDiv Income
+DDividend Income
+I
+^
+NEducation
+DEducation
+E
+^
+NEntertainment
+DEntertainment
+E
+^
+NGift Received
+DGift Received
+I
+^
+NGifts Given
+DGift Expenses
+E
+^
+NGroceries
+DGroceries
+E
+^
+NHome Repair
+DHome Repair
+E
+^
+NHousehold
+DHousehold Misc. Expenses
+E
+^
+NInsurance
+DInsurance
+E
+^
+NInsurance:Home
+DHomeowner's Insurance
+E
+^
+NInterest Inc
+DInterest Income
+B1.00
+B0.00
+B0.00
+B1.00
+B0.00
+B0.00
+B1.00
+B0.00
+B0.00
+B0.00
+B0.00
+B1.00
+I
+T
+R4592
+^
+NInvestment Exp
+D
+E
+T
+R4512
+^
+NInvestment Inc
+DInvestment Income
+I
+T
+^
+NIRA Contrib
+DIRA Contribution
+E
+T
+R4192
+^
+NIRA Contrib Spouse
+DIRA Contribution Spouse
+E
+T
+R7696
+^
+NMedical
+D
+E
+T
+R4368
+^
+NMedical:Doctor
+DDoctor & Dental Visits
+E
+T
+R7744
+^
+NMedical:Health Insurance
+DHealth Insurance
+E
+T
+R7744
+^
+NMedical:Hospital
+DHospital Expenses
+E
+T
+R7744
+^
+NMedical:Medicine
+DMedicine & Drugs
+E
+T
+R4368
+^
+NMisc
+DMiscellaneous
+E
+^
+NMortgage Int
+DMortgage Interest Paid
+E
+T
+R4528
+^
+NOther Inc
+DOther Income
+I
+T
+^
+NPayroll Taxes, Self
+D
+E
+T
+^
+NPayroll Taxes, Self:Federal
+DFederal Withholding
+E
+T
+R7376
+^
+NPayroll Taxes, Self:Medicare
+DMedicare Tax Withholding
+E
+T
+R7680
+^
+NPayroll Taxes, Self:SDI
+DState Disability Insurance
+E
+T
+R7408
+^
+NPayroll Taxes, Self:Soc Sec
+DSoc Sec Tax Withholding
+E
+T
+R7392
+^
+NPayroll Taxes, Self:State
+DState Withholding
+E
+T
+R7424
+^
+NPayroll Taxes, Spouse
+D
+E
+T
+^
+NPayroll Taxes, Spouse:Federal
+DFederal Withholding
+E
+T
+R8112
+^
+NPayroll Taxes, Spouse:Medicare
+DMedicare Tax Withholding
+E
+T
+R8160
+^
+NPayroll Taxes, Spouse:SDI
+DState Disability Insurance
+E
+T
+R8144
+^
+NPayroll Taxes, Spouse:Soc Sec
+DSoc Sec Tax Withholding
+E
+T
+R8128
+^
+NPayroll Taxes, Spouse:State
+DState Withholding
+E
+T
+R8176
+^
+NPension
+D
+I
+T
+^
+NRecreation
+DRecreation Expense
+E
+^
+NRent
+DHousing Rent
+E
+^
+NSalary
+D
+I
+T
+R7360
+^
+NSalary Spouse
+DSalary Income, Spouse
+I
+T
+R8096
+^
+NSubscriptions
+DSubscriptions
+E
+^
+NTax Refund
+DState/Local Tax Refund
+I
+T
+R4160
+^
+NTaxes
+DTaxes
+E
+T
+^
+NTaxes:Other
+DMisc. Taxes
+E
+T
+R4432
+^
+NTaxes:Property
+DProperty Tax
+E
+T
+R4416
+^
+NTravel
+DTransportation Exp
+E
+^
+NUnemployment Inc
+DUnemployment Compensation
+I
+T
+R7664
+^
+NUtilities
+DWater, Gas, Electric
+E
+^
+NUtilities:Cable TV
+DCable TV
+E
+^
+NUtilities:Gas & Electric
+DGas and Electricity
+E
+^
+NUtilities:Telephone
+DTelephone Expense
+E
+^
+NUtilities:Water
+DWater
+E
+^
+NVacation
+DVacation Expenses
+E
+^
+NVacation:Lodging
+DMotel/Hotel Costs
+E
+^
+N Canada Expense
+D
+E
+^
+N Canada Expense:GST
+DGoods and Services Tax
+E
+T
+^
+N Canada Expense:Private Health
+DPrivate Health Care
+E
+T
+^
+N Canada Expense:Prov Health
+DProvincial Health Care
+E
+T
+^
+N Canada Expense:PST
+DProvincial Sales Tax
+E
+T
+^
+N Canada Expense:RPP Contrib
+DRegistered Pension Plan
+E
+T
+^
+N Canada Expense:RRSP
+DRegistered Ret. Savings Plan
+E
+T
+^
+N Canada Income
+D
+I
+^
+N Canada Income:CPP QPP
+DCanada/Quebec Pension Plan
+I
+T
+^
+N Canada Income:RRIF Income
+DRRIF Income
+I
+T
+^
+N Canada Income:RRSP Income
+DReg Retirement Plan Income
+I
+T
+^
+N Canada Taxes
+D
+E
+^
+N Canada Taxes:CPP QPP Premium
+DCPP QPP Contribution
+E
+T
+^
+N Canada Taxes:Income Tax
+DIncome Tax Deducted
+E
+T
+^
+N Canada Taxes:UIC
+DUnemployment Ins. Commission
+E
+T
+^
+N¥Accrued Int
+DAccrued Interest
+E
+T
+R4592
+^
+N¥Accrued Int NT
+DNon-Tax Accrued Interest
+E
+^
+N¥Div Income
+DDividend
+I
+T
+R4576
+^
+N¥Div Income NT
+DNon-Tax Dividend
+I
+^
+N¥Int Expense
+DInvestment Interest Exp
+E
+T
+^
+N¥Int Expense NT
+DNon-Tax Inv Interest Exp
+E
+^
+N¥Int Income
+DInvestment Interest Inc
+I
+T
+R4592
+^
+N¥Int Income NT
+DNon-Tax Investment Interest Inc
+I
+^
+N¥Long CapGnDst
+DLong Term Cap Gain Dist
+I
+T
+R7808
+^
+N¥Long CapGnDst NT
+DNon-Tax Long Term Cap Gain Dist
+I
+^
+N¥Realized Gain
+DRealized Gain/Loss
+I
+T
+^
+N¥Realized Gain NT
+DNon-Tax Realized Gain/Loss
+I
+^
+N¥Short CapGnDst
+DShort Term Cap Gain Dist
+I
+T
+R4576
+^
+N¥Short CapGnDst NT
+DNon-Tax Short Cap Gain Dist
+I
+^
+N¥Unrealized Gn
+DUnrealized Gain/Loss
+I
+^
+!Type:Budget
+NAuto
+DAutomobile Expenses
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NAuto:Fuel
+DAuto Fuel
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NAuto:Insurance
+DAuto Insurance
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NAuto:Registration
+DAuto Registration
+T
+R8560
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NAuto:Service
+DAuto Service
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NBank Charge
+DBank Charge
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NBonus
+DBonus Income
+I
+T
+R7360
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NCash
+DMisc Cash
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NCharity
+DCharitable Donations
+T
+R4480
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NChild Care
+DChild Care Expenses
+T
+R6416
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NClothing
+DClothing
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NDining
+DDining Out
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NDiv Income
+DDividend Income
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NEducation
+DEducation
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NEntertainment
+DEntertainment
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NGift Received
+DGift Received
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NGifts Given
+DGift Expenses
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NGroceries
+DGroceries
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+B-100.00
+^
+NHome Repair
+DHome Repair
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NHousehold
+DHousehold Misc. Expenses
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NInsurance
+DInsurance
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NInsurance:Home
+DHomeowner's Insurance
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NInterest Inc
+DInterest Income
+I
+T
+R4592
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NInvestment Exp
+D
+T
+R4512
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NInvestment Inc
+DInvestment Income
+I
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NIRA Contrib
+DIRA Contribution
+T
+R4192
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NIRA Contrib Spouse
+DIRA Contribution Spouse
+T
+R7696
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NMedical
+D
+T
+R4368
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NMedical:Doctor
+DDoctor & Dental Visits
+T
+R7744
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NMedical:Health Insurance
+DHealth Insurance
+T
+R7744
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NMedical:Hospital
+DHospital Expenses
+T
+R7744
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NMedical:Medicine
+DMedicine & Drugs
+T
+R4368
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NMisc
+DMiscellaneous
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NMortgage Int
+DMortgage Interest Paid
+T
+R4528
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NOther Inc
+DOther Income
+I
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Self
+D
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Self:Federal
+DFederal Withholding
+T
+R7376
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Self:Medicare
+DMedicare Tax Withholding
+T
+R7680
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Self:SDI
+DState Disability Insurance
+T
+R7408
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Self:Soc Sec
+DSoc Sec Tax Withholding
+T
+R7392
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Self:State
+DState Withholding
+T
+R7424
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Spouse
+D
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Spouse:Federal
+DFederal Withholding
+T
+R8112
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Spouse:Medicare
+DMedicare Tax Withholding
+T
+R8160
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Spouse:SDI
+DState Disability Insurance
+T
+R8144
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Spouse:Soc Sec
+DSoc Sec Tax Withholding
+T
+R8128
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPayroll Taxes, Spouse:State
+DState Withholding
+T
+R8176
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NPension
+D
+I
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NRecreation
+DRecreation Expense
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NRent
+DHousing Rent
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NSalary
+D
+I
+T
+R7360
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+B1,700.00
+^
+NSalary Spouse
+DSalary Income, Spouse
+I
+T
+R8096
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NSubscriptions
+DSubscriptions
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NTax Refund
+DState/Local Tax Refund
+I
+T
+R4160
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NTaxes
+DTaxes
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NTaxes:Other
+DMisc. Taxes
+T
+R4432
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NTaxes:Property
+DProperty Tax
+T
+R4416
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NTravel
+DTransportation Exp
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NUnemployment Inc
+DUnemployment Compensation
+I
+T
+R7664
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NUtilities
+DWater, Gas, Electric
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NUtilities:Cable TV
+DCable TV
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NUtilities:Gas & Electric
+DGas and Electricity
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NUtilities:Telephone
+DTelephone Expense
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NUtilities:Water
+DWater
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NVacation
+DVacation Expenses
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+NVacation:Lodging
+DMotel/Hotel Costs
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Expense
+D
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Expense:GST
+DGoods and Services Tax
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Expense:Private Health
+DPrivate Health Care
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Expense:Prov Health
+DProvincial Health Care
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Expense:PST
+DProvincial Sales Tax
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Expense:RPP Contrib
+DRegistered Pension Plan
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Expense:RRSP
+DRegistered Ret. Savings Plan
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Income
+D
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Income:CPP QPP
+DCanada/Quebec Pension Plan
+I
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Income:RRIF Income
+DRRIF Income
+I
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Income:RRSP Income
+DReg Retirement Plan Income
+I
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Taxes
+D
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Taxes:CPP QPP Premium
+DCPP QPP Contribution
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Taxes:Income Tax
+DIncome Tax Deducted
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N Canada Taxes:UIC
+DUnemployment Ins. Commission
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Accrued Int
+DAccrued Interest
+T
+R4592
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Accrued Int NT
+DNon-Tax Accrued Interest
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Div Income
+DDividend
+I
+T
+R4576
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Div Income NT
+DNon-Tax Dividend
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Int Expense
+DInvestment Interest Exp
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Int Expense NT
+DNon-Tax Inv Interest Exp
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Int Income
+DInvestment Interest Inc
+I
+T
+R4592
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Int Income NT
+DNon-Tax Investment Interest Inc
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Long CapGnDst
+DLong Term Cap Gain Dist
+I
+T
+R7808
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Long CapGnDst NT
+DNon-Tax Long Term Cap Gain Dist
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Realized Gain
+DRealized Gain/Loss
+I
+T
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Realized Gain NT
+DNon-Tax Realized Gain/Loss
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Short CapGnDst
+DShort Term Cap Gain Dist
+I
+T
+R4576
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Short CapGnDst NT
+DNon-Tax Short Cap Gain Dist
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+N¥Unrealized Gn
+DUnrealized Gain/Loss
+I
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+B0.00
+^
+!Type:Class
+NClass
+DClass Description
+^
+NClass:Subclass
+DDescription of subclass of class
+^
+!Account
+NAsset
+DSample Asset
+X
+ANote on Asset
+TOth A
+B25,000.00
+^
+!Type:Oth A
+D1/10/06
+POpening Balance
+M
+T0.00
+A
+A
+A
+A
+A
+A
+CX
+L[Asset]
+^
+D1/10/06
+PFord
+MCar
+T25,000.00
+A
+A
+A
+A
+A
+A
+L[Asset]
+^
+!Account
+NBank
+DSample Bank
+X
+ANotes on Sample
+TBank
+B1,465.00
+^
+!Type:Bank
+D1/10/06
+POpening Balance
+M
+T0.00
+A
+A
+A
+A
+A
+A
+CX
+L[Bank]
+^
+D1/10/06
+PPaycheck
+M
+T1,690.00
+A
+A
+A
+A
+A
+A
+LSalary
+SSalary
+E
+$2,000.00
+SPayroll Taxes, Self:Federal
+E
+$-250.00
+SPayroll Taxes, Self:Soc Sec
+$-50.00
+SPayroll Taxes, Self:Medicare
+E
+$-10.00
+^
+D1/17/06
+PSafeway
+M
+T-100.00
+A
+A
+A
+A
+A
+A
+LGroceries
+^
+D2/17/06
+PSafeway
+M
+T-125.00
+A
+A
+A
+A
+A
+A
+N>>>>>
+LGroceries
+SGroceries
+E
+$-100.00
+SMisc
+E
+$-25.00
+^
+D3/17/06
+PSafeway
+M
+T-100.00
+U-100.00
+A
+A
+A
+A
+A
+A
+LGroceries
+^
+D3/17/06
+P  QFC  
+M
+T-100.00
+U-100.00
+A
+A
+A
+A
+A
+A
+LGroceries
+^
+!Account
+NCash
+DSample Cash
+X
+ANote on Cash
+TCash
+B0.00
+^
+!Type:Cash
+D1/10/06
+POpening Balance
+M
+T0.00
+A
+A
+A
+A
+A
+A
+CX
+L[Cash]
+^
+!Account
+NCredit Card
+DSample Card
+L15,000.00
+X
+ANote on Card
+TCCard
+B0.00
+^
+!Type:CCard
+D1/10/06
+POpening Balance
+M
+T0.00
+A
+A
+A
+A
+A
+A
+CX
+L[Credit Card]
+^
+!Account
+NLiability
+DSample Liability
+X
+ANote on Liability
+TOth L
+B50,000.00
+^
+!Type:Oth L
+D1/10/06
+POpening Balance
+M
+T-50,000.00
+A
+A
+A
+A
+A
+A
+CX
+L[Liability]
+^
+!Account
+NMutual Fund
+DSample Fund
+X
+ANote on Fund
+TMutual
+B672.87
+^
+!Type:Invst
+D1/10/06
+NShrsIn
+YMutual Fund
+Q33
+^
+!Account
+NPortfolio
+DSample Portfolio
+X
+ANote on portfolio
+TPort
+B2,651.00
+^
+!Type:Invst
+D1/10/06
+NShrsIn
+YIntuit
+Q50
+MInitial Move
+^
+!Type:Prices
+"INTU",55.400,"12/12/05",55.560,53.660,3120461
+"INTU",55.570,"12/13/05",55.740,54.600,2437647
+"INTU",54.920,"12/14/05",55.940,54.210,1884946
+"INTU",54.430,"12/15/05",55.240,53.530,1610655
+"INTU",53.190,"12/16/05",54.290,53.100,4344145
+"INTU",52.520,"12/19/05",53.500,52.430,1593831
+"INTU",52.810,"12/20/05",53.090,52.380,1496008
+"INTU",53.200,"12/21/05",53.370,52.750,1026326
+"INTU",53.730,"12/22/05",53.940,53.110,1079007
+"INTU",53.980,"12/23/05",54.300,53.690,774293
+"INTU",53.550,"12/27/05",54.490,53.300,930070
+"INTU",53.600,"12/28/05",53.800,53.080,1067931
+"INTU",53.660,"12/29/05",53.970,53.600,847535
+"INTU",53.300,"12/30/05",53.980,53.280,1000959
+"INTU",54.080,"1/3/06",54.410,51.870,2053047
+"INTU",54.160,"1/4/06",54.160,53.570,1626743
+"INTU",53.360,"1/5/06",54.160,53.200,1603426
+"INTU",53.950,"1/6/06",53.950,52.890,1914459
+"INTU",53.140,"1/9/06",53.790,52.930,1486963
+"INTU",53.020,"1/10/06",53.620,52.560,1450376
+^
+"PGRWX",19.740,"12/12/05",19.740,19.740,0
+"PGRWX",19.880,"12/13/05",19.880,19.880,0
+"PGRWX",20.010,"12/14/05",20.010,20.010,0
+"PGRWX",19.960,"12/15/05",19.960,19.960,0
+"PGRWX",19.900,"12/16/05",19.900,19.900,0
+"PGRWX",19.800,"12/19/05",19.800,19.800,0
+"PGRWX",19.810,"12/20/05",19.810,19.810,0
+"PGRWX",19.880,"12/21/05",19.880,19.880,0
+"PGRWX",19.990,"12/22/05",19.990,19.990,0
+"PGRWX",20,"12/23/05",20,20,0
+"PGRWX",19.810,"12/27/05",19.810,19.810,0
+"PGRWX",19.840,"12/28/05",19.840,19.840,0
+"PGRWX",19.800,"12/29/05",19.800,19.800,0
+"PGRWX",19.730,"12/30/05",19.730,19.730,0
+"PGRWX",20.030,"1/3/06",20.030,20.030,0
+"PGRWX",20.110,"1/4/06",20.110,20.110,0
+"PGRWX",20.130,"1/5/06",20.130,20.130,0
+"PGRWX",20.290,"1/6/06",20.290,20.290,0
+"PGRWX",20.380,"1/9/06",20.380,20.380,0
+"PGRWX",20.390,"1/10/06",,,0
+^
+"WIN",19.740,"12/12/05"
+"WIN",19.880,"12/13/05"
+"WIN",20.010,"12/14/05"
+"WIN",19.960,"12/15/05"
+^
+!Type:Memorized
+T-50.00
+PSafeway
+M
+KC
+^
+T-1,140.17
+PBank
+M
+A
+L[Liability]
+S[Liability]
+Eprincipal
+$-952.67
+SMortgage Int
+Einterest
+$-187.50
+12/1/06
+24
+30
+412
+54.5
+625,000.00
+725,000.00
+KP
+^
+NSellX
+YIDS New D A
+I22.096936
+Q158.393
+U3,500.00
+T3,500.00
+MInvestment
+L[Invest]
+$3,500.00
+KI
+^

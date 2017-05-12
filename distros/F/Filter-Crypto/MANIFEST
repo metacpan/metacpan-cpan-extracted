@@ -1,0 +1,40 @@
+Artistic                                 The "Artistic License"
+Changes                                  Differences from previous version
+Copying                                  The GNU General Public License
+CryptoCommon-c.inc                       Filter::Crypto::* extensions common C code
+CryptoCommon-xs.inc                      Filter::Crypto::* extensions common external subroutines
+INSTALL                                  Detailed installation instructions
+LICENCE                                  The Licence
+Makefile.PL                              Filter::Crypto makefile writer
+MANIFEST                                 This list of files
+MANIFEST.SKIP                            Manifest skip specs
+README                                   The Instructions
+ppport.h                                 Perl/Pollution/Portability header
+CryptFile/CryptFile.xs                   Filter::Crypto::CryptFile extension external subroutines
+CryptFile/Makefile.PL                    Filter::Crypto::CryptFile extension makefile writer
+CryptFile/typemap                        Filter::Crypto::CryptFile extension interface types
+CryptFile/fallback/const-c.inc           Filter::Crypto::CryptFile extension constants fallback file
+CryptFile/fallback/const-xs.inc          Filter::Crypto::CryptFile extension constants fallback file
+CryptFile/lib/Filter/Crypto/CryptFile.pm Filter::Crypto::CryptFile extension Perl module
+Decrypt/Decrypt.xs                       Filter::Crypto::Decrypt extension external subroutines
+Decrypt/Makefile.PL                      Filter::Crypto::Decrypt extension makefile writer
+Decrypt/lib/Filter/Crypto/Decrypt.pm     Filter::Crypto::Decrypt extension Perl module
+lib/Filter/Crypto.pm                     Filter::Crypto Perl module
+lib/PAR/Filter/Crypto.pm                 PAR::Filter::Crypto Perl module
+script/crypt_file                        Perl script to encrypt (and decrypt) Perl modules
+t/01_imports_01.t                        See if import options work
+t/01_imports_02.t                        See if import options work
+t/01_imports_03.t                        See if import options work
+t/01_imports_04.t                        See if import options work
+t/02_function.t                          See if crypt_file() function (and decryption filter) works
+t/03_script.t                            See if crypt_file script (and decryption filter) works
+t/04_par.t                               See if PAR::Filter::Crypto module (and decryption filter) works
+t/05_errstr.t                            See if $ErrStr variable works
+t/06_changes.t                           See if Changes file format is OK
+t/07_critic.t                            See if coding style is OK
+t/08_pod.t                               See if POD is OK
+t/09_pod_coverage.t                      See if POD coverage is OK
+t/cryptfile-leaktest.pl                  Manually see if crypt_file() function leaks
+t/decrypt-leaktest.pl                    Manually see if decryption filter leaks
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

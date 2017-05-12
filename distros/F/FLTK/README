@@ -1,0 +1,75 @@
+
+Perl Wrappers for the FLTK library
+----------------------------------
+
+This package provides a Perl module which will allow you to create graphical
+user interfaces in Perl using the Fast Light ToolKit. Note that this module
+wraps the development version of FLTK (i.e. FLTK2), don't even think about 
+trying to compile this against a FLTK 1.0.x release. I don't plan on making 
+anything back compatible with FLTK 1.
+
+What you need to build this module:
+-----------------------------------
+  Perl 5 (duh...)
+    http://www.perl.com/
+  A FLTK 2 CVS snapshot (known to work with fltk-cvs-20000920)
+    http://www.agilinux.net/fltk/
+
+Prep Work:
+----------
+
+Before you build this module you need to patch and rebuild your FLTK sources.
+There are 3 diff files in the patches subdirectory of this package. These
+patches fix a bug in Fl_Text_Display and modify Fl_Text_Editor to allow perl
+access to its key binding methods. These patches are completely backwards 
+compatible, you'll probably need to recompile any apps using Fl_Text_Editor,
+but the API is not affected. Apply the patches thusly:
+
+    patch /path/to/Fl_Text_Display.cxx ./patches/Fl_Text_Display.cxx.diff
+    patch /path/to/Fl_Text_Editor.cxx ./patches/Fl_Text_Editor.cxx.diff
+    patch /path/to/Fl_Text_Editor.H ./patches/Fl_Text_Editor.H.diff
+
+Then rebuild FLTK.
+
+Hopefully I can bribe the FLTK developers into accepting these patches into 
+the main FLTK source, because this patch nonsense really sucks...
+
+Building this module:
+---------------------
+
+Compiling this module is pretty straight forward and follows the standard
+Perl module build process. Simply run:
+
+    perl Makefile.PL
+    make
+    make test (optional, but recommended)
+    make install (as root)
+
+The Makefile.PL should be able to find your FLTK headers and library ok, but if
+it fails to locate them, you may have to specify their location. If that's 
+the case, run the Makefile.PL with the following arguments:
+
+    perl Makefile.PL --with-fltk-libs=/path/to/fltk/lib/dir \
+                     --with-fltk-includes=/path/to/fltk/include/dir
+
+Note that the --with-fltk-includes argument assumes your identifying the 
+directory that the FL directory is in. For example, if your FLTK stuff is 
+sitting in the FLTK source tree at $HOME/fltk-cvs-20000920 then you'd use the
+following command:
+
+    perl Makefile.PL --with-fltk-libs=$HOME/fltk-cvs-20000920/lib \
+                     --with-fltk-includes=$HOME/fltk-cvs-20000920
+
+Documentation
+-------------
+
+Documentation for this module is currently non-existant. There are several 
+example scripts in the examples directory of this package. Many of these are 
+exact counterparts of the C++ examples that come with FLTK. This module 
+attempts to emulate the C++ approach of using FLTK as closely as possible, so 
+consult the FLTK documentation on how to use specific widgets, since most of 
+that is as relevant to the Perl bindings as it is to the C++ library itself.
+
+Matt Kennedy <matt@jumpline.com>
+Last Updated Thu Sep 27, 2000
+

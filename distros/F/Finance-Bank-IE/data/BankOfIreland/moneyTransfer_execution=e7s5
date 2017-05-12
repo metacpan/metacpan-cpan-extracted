@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+        <head>
+            <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" />
+
+            <meta http-equiv="pragma" content="no-cache" />
+            <meta http-equiv="Cache-Control" content="no-cache" />
+            <meta http-equiv="Expires" content="-1" />
+            <meta name="DownloadOptions" content="noopen" />
+            <meta http-equiv="refresh" content="615; URL=/online365/spring/logout" />
+            
+            <!--  IE9 / RichFaces 3 Fix -->
+            <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" />
+            
+            <link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/basic_classes.xcss/DATB/eAELXT5DOhSIAQ!sA18_" rel="stylesheet" type="text/css" /><link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/extended_classes.xcss/DATB/eAELXT5DOhSIAQ!sA18_" media="rich-extended-skinning" rel="stylesheet" type="text/css" /><script src="/online365/spring/resource/org.ajax4jsf.javascript.AjaxScript" type="text/javascript"></script><script src="/online365/spring/resource/org/ajax4jsf/javascript/scripts/form.js" type="text/javascript"></script><script src="/online365/spring/resource/org.ajax4jsf.javascript.PrototypeScript" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/available.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/jquery/jquery.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/script/controlUtils.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/utils.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/browser_info.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/modalPanel.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/modalPanelBorders.js" type="text/javascript"></script><link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/modalPanel.xcss/DATB/eAELXT5DOhSIAQ!sA18_" rel="stylesheet" type="text/css" /><script type="text/javascript">window.RICH_FACES_EXTENDED_SKINNING_ON=true;</script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/skinning.js" type="text/javascript"></script><script src="/online365/js/browserDetection.js" type="text/javascript"></script><link rel="icon" href="/online365/favicon.ico" type="image/x-icon" />
+            <link rel="SHORTCUT ICON" href="/online365/favicon.ico" />
+            
+            <link rel="stylesheet" type="text/css" href="/online365/css/boi_online.css" />
+            <link rel="stylesheet" type="text/css" href="/online365/css/date_picker.css" />
+            <link rel="stylesheet" type="text/css" href="/online365/css/tabs.css" />
+            <link rel="stylesheet" type="text/css" href="/online365/css/forms.css" />
+            
+            <!--[if IE 7]>
+                <link rel="stylesheet" type="text/css" href="/online365/css/styles_ie7.css" />
+            <![endif]-->
+            <!--[if IE 8]>
+                <link rel="stylesheet" type="text/css" href="/online365/css/styles_ie8.css" />
+            <![endif]-->
+            
+            <link rel="stylesheet" type="text/css" href="/online365/css/print.css" media="print" />
+            
+            <script type="text/javascript" src="/online365/js/autoTab.js"></script>
+            <script type="text/javascript" src="/online365/js/browserDetection.js"></script>
+            <script type="text/javascript" src="/online365/js/loadMonitor.js"></script>
+        <meta name="keywords" content="Bank of Ireland, 365 Online , Your Accounts , Add a Payee, Confirmation" />
+        <meta name="description" content="Bank of Ireland 365 Online, Your Accounts" />
+            <title>Bank of Ireland 365 Online | Domestic Transfer | Confirmation</title>
+            
+            <script type="text/javascript"> <!-- REMOVE DIV ONCLICK FUNCTION -->
+                function hide_element(element_name) {
+                    element = document.getElementById(element_name);  
+                    element.style.display = 'none';
+                }
+
+            </script>
+        </head>
+ 
+        <body onload="pageIsLoaded();location.href = location.href + '#';" onbeforeunload="pageUnloaded()"><form id="form" name="form" method="post" action="/online365/spring/moneyTransfer?execution=e7s5">
+        		<label class="hidden_label" for="form:ajaxRequestStatus">Please ignore ajax request</label><input id="form:ajaxRequestStatus" type="hidden" name="form:ajaxRequestStatus" value="AJAX REQUEST PROCESSOR INACTIVE" />
+	            <div id="container">
+					<label class="hidden_label" for="ieBug">Please ignore fix for ie bug</label><input type="text" style="display: none;" disabled="disabled" size="1" id="ieBug" />
+	            
+		            <ul id="hide">
+		                <li><a href="#content">skip navigation</a></li>
+		                <li><a href="/online365/spring/accessibility">Accessibility</a></li>
+		            </ul>
+   
+        <div id="container">
+	        <div id="masthead">
+<script type="text/javascript" src="/online365/spring/com_sun_faces_sunjsf.js"></script>
+<a id="form:j_id14:homePage" href="#" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:j_id14:homePage':'form:j_id14:homePage'},'');}return false"><img src="/online365/images/header/bankofireland_online.gif" alt="Bank of Ireland 365 Online" /></a>
+	            <p>For more information
+	            	<img src="/online365/images/extras/icon_popup.gif" alt="Contact Us opens up in a new window" /><a id="form:j_id14:contactLink" name="form:j_id14:contactLink" href="#" class="strong"> Contact Us<script type="text/javascript">Richfaces.componentControl.attachAvailable('#form\\:j_id14\\:contactLink','onclick','#form\\:j_id110\\:j_id125\\:contactPanel','show')</script></a>
+	            </p>
+			</div>
+        </div>
+	                
+	                <div id="shade">
+	    <div class="left">
+	        <ul class="nav" id="ul">
+	                <li class=""><a id="form:leftHandNavSubview:accountSummary" href="#" title="accountSummary" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:leftHandNavSubview:accountSummary':'form:leftHandNavSubview:accountSummary'},'');}return false">365 Home</a></li>
+	           	    <li class=""><a id="form:leftHandNavSubview:statements" href="#" title="statements" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:leftHandNavSubview:statements':'form:leftHandNavSubview:statements'},'');}return false">Statements</a></li>
+	            	<li class="selected"><a id="form:leftHandNavSubview:moneyTransfer" href="#" title="moneyTransfer" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:leftHandNavSubview:moneyTransfer':'form:leftHandNavSubview:moneyTransfer'},'');}return false">Money Transfer</a></li>
+	                <li class="left4"><a id="form:leftHandNavSubview:manageAccounts" href="#" title="manageAccounts" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:leftHandNavSubview:manageAccounts':'form:leftHandNavSubview:manageAccounts'},'');}return false">Manage Accounts</a></li>	             
+	                <li class="left5"><a id="form:leftHandNavSubview:applyOnline" href="#" title="applyOnline" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:leftHandNavSubview:applyOnline':'form:leftHandNavSubview:applyOnline'},'');}return false">Apply Online</a></li>	 
+	       </ul>
+	   </div>
+    
+    <div class="right"><a name="content"></a>
+        <div>
+                <h1 class="content_title">Domestic Transfer</h1>
+
+    <div class="login_details">
+	            <a id="logoutLink" href="/online365/spring/confirmLogout">Logout</a>
+            <span>
+                Last Login 01/01/1970 00:00
+	                |  Last Payee Added 01/01/1970
+            </span>
+        </div> 
+           <br class="clear" />
+        </div>
+        <div class="content_body">
+            <div class="inner_content_body">
+                   <div class="acc_container">
+                       <div class="acc_container_inner">
+                           <h2 class="section_title">Confirmation</h2>
+                           <br class="clear" />
+						<p><strong>Please Note - </strong> Your balance may not update immediately.</p>
+						<br class="clear" />
+						<p>Payments that are requested after the daily cut-off time Monday to Friday, or at any time on a Saturday, Sunday or Bank Holiday will be processed on the next working day.</p>
+						<br class="clear" />
+						<p>12/04/2012, 11:42</p>
+                       </div>
+                    </div>
+
+    <div class="form_actions">
+    	    <div class="form_actions_left"><a id="form:formActions:print" name="form:formActions:print" href="JavaScript:window.print();" tabindex="20" class="print">Print</a>             
+       		</div>       
+         	<div class="form_actions_right"><input id="form:formActions:home" type="submit" name="form:formActions:home" value="365 Home" tabindex="19" title="365 Home" class="submit_button" /><input id="form:formActions:continue" type="submit" name="form:formActions:continue" value="Make another transfer" onblur="(isIE6() || isIE7()) ? this.style.border='none' :this.style.outline='none';" onfocus="(isIE6() || isIE7()) ? this.style.border='#000000 dashed 1px' : this.style.outline='#000000 dotted thin';" title="Make another transfer" class="submit_button" />                                    
+        	</div>
+	
+		<br class="clear" />
+	</div>
+
+        <div class="custom_message">
+	            <h2 class="section_title">Clear credit card</h2>
+	            <img class="img_left" src="../images/supp_images/Clear-Card.gif" alt="Clear credit card" title="Clear credit card" />
+		        <p>For one of the lowest APR rates apply online today.</p>
+  	            <p></p>
+	            <p><a id="form:j_id95:externalAd" href="#" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:j_id95:externalAd':'form:j_id95:externalAd'},'');}return false">Find out more</a> </p>
+        </div>
+	             
+             <br class="clear" />
+
+            </div>
+            
+        </div>
+    </div>
+	                
+	                </div>
+
+	<br class="clear" />
+
+	<div class="container">
+	<div class="hr_blue"></div>
+
+	<div id="footer">
+	<span class="server">J7
+	</span>
+	<ul>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="About Us opens up in a new window" /> <a href="/online365/spring/about" target="_blank">About
+		Us</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Security opens up in a new window" /> <a href="/online365/spring/security" target="_blank">Security</a>
+		|</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Privacy Policy opens up in a new window" /> <a href="/online365/spring/privacy" target="_blank">Cookie and Privacy Policy</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Terms and Conditions opens up in a new window" /> <a href="/online365/spring/termsAndConditions" target="_blank">Terms and Conditions</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="FAQs opens up in a new window" /> <a href="/online365/spring/faqs" target="_blank">FAQs</a>
+		|</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Accessibility opens up in a new window" /> <a href="/online365/spring/accessibility" target="_blank">Accessibility</a></li>
+
+	</ul>
+	
+	</div>
+	</div><div id="form:j_id110:j_id125:contactPanel" style="display: none;"><input autocomplete="off" id="form:j_id110:j_id125:contactPanelOpenedState" name="form:j_id110:j_id125:contactPanelOpenedState" type="hidden" /><div class="rich-modalpanel sortable" id="form:j_id110:j_id125:contactPanelContainer" style="position: absolute; display: none; z-index: 100; background-color: inherit;"><div class="rich-mpnl-mask-div-opaque rich-mpnl-mask-div" id="form:j_id110:j_id125:contactPanelDiv" style="z-index: -1;"><button class="rich-mpnl-button" id="form:j_id110:j_id125:contactPanelFirstHref"></button></div><div class="rich-mpnl-panel"><div class="rich-mp-container" id="form:j_id110:j_id125:contactPanelCDiv" style="position: absolute; left: 0px; top: 0px; z-index: 9;"><div class="rich-mpnl-shadow" id="form:j_id110:j_id125:contactPanelShadowDiv"></div><div class="rich-mpnl-ovf-hd rich-mpnl-trim rich-mpnl-content" id="form:j_id110:j_id125:contactPanelContentDiv"><div class="rich-mpnl-text rich-mpnl-controls ">
+				<a href="#" id="hideContactUs" class="calc_close">Close</a><script type="text/javascript">Richfaces.componentControl.attachAvailable('#hideContactUs','onclick','#form\\:j_id110\\:j_id125\\:contactPanel','hide')</script></div><table border="0" cellpadding="0" cellspacing="0" class="rich-mp-content-table" id="form:j_id110:j_id125:contactPanelContentTable" style="height: 100%; width: 100%;"><tr style="height: 1%;"><td class="rich-mpnl-header-cell"><div class="rich-mpnl-text rich-mpnl-header " id="form:j_id110:j_id125:contactPanelHeader" style="white-space: nowrap;">
+				<h2>Contact Us</h2></div></td></tr><tr style="height: 99%"><td class="rich-mpnl-body" valign="top">
+		
+		<div class="container">
+   			<div class="content">
+       			<div class="height">
+           			<a name="content"></a>
+         			<br class="clear" />
+					<h2 class="contact_details">From Republic of Ireland:   <span>0818 365 365</span></h2>
+					<h2 class="contact_details">From Northern Ireland:          <span> 0845 7 365 555</span></h2>
+					<h2 class="contact_details">From Great Britain:            <span>0845 7 365 333</span></h2>
+					<h2 class="contact_details">Outside these locations:      <span>+ 353 1 404 4000</span></h2>
+					<p>
+						<strong>Opening Hours:</strong> 8am to Midnight, Monday to Friday or 10am to 2pm on Saturdays
+							(excluding Bank / Public Holidays).
+					</p>
+					<br class="clear" />
+				</div>
+			</div>    
+		</div></td></tr></table></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerN" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerE" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerS" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerW" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerNWU" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerNEU" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerNEL" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerSEU" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerSEL" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerSWL" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerSWU" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id110:j_id125:contactPanelResizerNWL" style="height: 40px; width: 4px;"></div></div></div><div class="rich-mpnl-mask-div rich-mpnl-mask-div-transparent" id="form:j_id110:j_id125:contactPanelCursorDiv" style="z-index: -200;"><button class="rich-mpnl-button" id="form:j_id110:j_id125:contactPanelLastHref"></button></div><script type="text/javascript">new ModalPanel('form:j_id110:j_id125:contactPanel',
+				{
+					width: 700,
+					height: 300,
+
+					minWidth: -1,
+					minHeight: -1,
+
+					resizeable: true,
+					moveable: true,
+
+					left: "auto",
+					top: "auto",
+
+					zindex: 100,onresize: '',onmove: '',onshow: '',onhide: '',onbeforeshow: '',onbeforehide: '',
+					domElementAttachment: "",				
+					keepVisualState: false,
+					showWhenRendered: false,
+					selectBehavior: "disable",
+
+					autosized: false,
+					overlapEmbedObjects: false});</script></div><script type="text/javascript"></script></div>
+	            </div><input type="hidden" autocomplete="off" name="form" value="form" /><input type="hidden" autocomplete="off" name="autoScroll" value="" /><input type="hidden" autocomplete="off" name="form:j_idcl" value="" /><input type="hidden" autocomplete="off" name="form:_link_hidden_" value="" /><script type="text/javascript">function clear_form() {
+_clearJSFFormParameters('form','',['form:j_idcl','form:_link_hidden_']);
+}
+function clearFormHiddenParams_form(){clear_form();}
+function clearFormHiddenParams_form(){clear_form();}
+clear_form();</script><input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="e7s5" autocomplete="off" /></form>
+            
+        </body>
+</html>

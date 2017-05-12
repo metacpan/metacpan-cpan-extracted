@@ -1,0 +1,31 @@
+Fax::Hylafax::Client version 1.02
+=================================
+
+This is a simple Perl client for HylaFAX fax server (www.hylafax.org). 
+It communicates with the server directly through FTP-like protocol and 
+thus does not require any HylaFAX software components to be installed 
+on the client machine.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::FTP 2.65 or higher
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003,2006 Alex Rak (arak@cpan.org).  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

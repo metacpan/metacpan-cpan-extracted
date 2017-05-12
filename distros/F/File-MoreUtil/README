@@ -1,0 +1,63 @@
+SYNOPSIS
+
+     use File::MoreUtil qw(file_exists l_abs_path dir_empty);
+    
+     print "file exists" if file_exists("/path/to/file/or/dir");
+     print "absolute path = ", l_abs_path("foo");
+     print "dir exists and is empty" if dir_empty("/path/to/dir");
+
+DESCRIPTION
+
+FUNCTIONS
+
+    None are exported by default, but they are exportable.
+
+ file_exists($path) => BOOL
+
+    This routine is just like the -e test, except that it assume symlinks
+    with non-existent target as existing. If sym is a symlink to a
+    non-existing target:
+
+     -e "sym"             # false, Perl performs stat() which follows symlink
+
+    but:
+
+     -l "sym"             # true, Perl performs lstat()
+     -e _                 # false
+
+    This function performs the following test:
+
+     !(-l "sym") && (-e _) || (-l _)
+
+ l_abs_path($path) => STR
+
+    Just like Cwd::abs_path(), except that it will not follow symlink if
+    $path is symlink (but it will follow symlinks for the parent paths).
+
+    Example:
+
+     use Cwd qw(getcwd abs_path);
+    
+     say getcwd();              # /home/steven
+     # s is a symlink to /tmp/foo
+     say abs_path("s");         # /tmp/foo
+     say l_abs_path("s");       # /home/steven/s
+     # s2 is a symlink to /tmp
+     say abs_path("s2/foo");    # /tmp/foo
+     say l_abs_path("s2/foo");  # /tmp/foo
+
+    Mnemonic: l_abs_path -> abs_path is analogous to lstat -> stat.
+
+    Note: currently uses hardcoded / as path separator.
+
+ dir_empty($dir) => BOOL
+
+    Will return true if $dir exists and is empty.
+
+FAQ
+
+ Where is file_empty()?
+
+    For checking if some path exists, is a regular file, and is empty
+    (content is zero-length), you can simply use the -z filetest operator.
+

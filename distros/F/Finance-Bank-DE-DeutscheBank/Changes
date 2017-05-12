@@ -1,0 +1,34 @@
+Revision history for Perl extension Finance::Bank::DE::DeutscheBank.
+
+0.06 Sat Mar 13 18:50:19 CET 2010
+  - changes due to modified weblayout of Deutsche Bank
+  - switching to en/en-us does not work via GET parameter any more; now done via ACCEPT-LANGUAGE http header
+
+0.05 Tue Jan 12 19:41:17 CET 2010
+  - changes due to modified weblayout of Deutsche Bank
+  - to not get into problems with German Umlauts the english version of Deutsche Bank page is used
+  - translations into German are done where necessary
+  - error in manual page corrected Waehrung -> Währung
+  - sub function transfer removed from documentation and Perl coder
+    ( iTANs are interactive anyway; if there is a need to implement this feature please let me know )
+  - updated requirements for required Perl modules to reflect the development environment
+
+0.04 Sun Apr 01 15:59:48 2007
+  - changes due to modified weblayout of Deutsche Bank
+    ( key words for total balance were changed )
+  - should now be possible to return balances for subaccounts
+    ( untested due to lack of existing subaccounts )
+
+0.03 Sun Jul 03 20:16:03 2005
+  - changes due to warnings caused by missing onclick attribute
+    thanks to Thomas George and Sven Erbe
+  - white spaces are already handled by as_trimmed_text
+    thanks to Thomas George
+  - warnings are turned on/off locally now
+
+0.02 Mon Feb 28 11:17:04 2005
+  - changes for new html layout applied
+  - more error checking
+
+0.01 Wed Dec  3 21:14:37 2003
+  - first version derived from Finance::Bank::Postbank_de and others

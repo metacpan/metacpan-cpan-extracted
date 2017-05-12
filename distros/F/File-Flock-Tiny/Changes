@@ -1,0 +1,49 @@
+0.14 Thu Jul  3 2014 Pavel Shaydo <zwon@cpan.org>
+    - add keywords to META
+    - fix links in documentation, #2, reported by @heytitle
+
+0.13 Wed Oct 24 2012 Pavel Shaydo <zwon@cpan.org>
+    - improve documentation
+    - move author tests to xt/
+
+0.12 Thu Sep 20 2012 Pavel Shaydo <zwon@cpan.org>
+    - add write_pid method to the lock object
+
+0.11 Thu Apr 12 2012 Pavel Shaydo <zwon@cpan.org>
+    - Get rid of Module::Install, I had a problem building a package
+      with dh-make-perl because of ExtUtils::MakeMaker dependency
+
+0.10 Sat Feb 25 2012 Pavel Shaydo <zwon@cpan.org>
+    - Skip PID file subtest on Windows
+
+0.09 Wed Feb 22 2012 Pavel Shaydo <zwon@cpan.org>
+    - Require Test::More 0.94
+
+0.08 Fri Feb 17 2012 Pavel Shaydo <zwon@cpan.org>
+    - Fix test for Solaris (again)
+    - Fix write_pid test for Windows
+    - Document some caveats
+
+0.07 Thu Feb 16 2012 Pavel Shaydo <zwon@cpan.org>
+    - Fix test for Solaris
+
+0.06 Wed Feb 15 2012 Pavel Shaydo <zwon@cpan.org>
+    - Do not unlock pid file automatically in
+      child processes
+    - Improve documentation
+
+0.05 Tue Feb 14 2012 Pavel Shaydo <zwon@cpan.org>
+    - Add write_pid method
+
+0.04 Mon Dec 19 2011 Pavel Shaydo <zwon@cpan.org>
+    - Document close method and behaviour on forking
+
+0.03 Fri Dec  9 2011 Pavel Shaydo <zwon@cpan.org>
+    - Fix tests on Solaris
+
+0.02 Sat Dec  3 2011 Pavel Shaydo <zwon@cpan.org>
+    - Add 'parent' to dependencies
+
+0.01 Fri Dec  2 2011 Pavel Shaydo <zwon@cpan.org>
+    - First version, released on an unsuspecting world.
+

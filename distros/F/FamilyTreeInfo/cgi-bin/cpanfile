@@ -1,0 +1,47 @@
+use 'perl', '5.008005';
+use 'DBI';
+use 'Digest::MD4';
+use 'Digest::MD5';
+use 'Digest::Perl::MD4';
+use 'Encode';
+use 'File::Temp';
+use 'Gedcom', '1.15';
+use 'Config::General', '2.58';
+
+use 'Class::Std', '0.013';
+use 'Class::Std::Storable', '0.0.1';
+#use 'Date::Tiny', '1.0.4';
+use 'IO::Stringy', '2.110';
+use 'List::MoreUtils', '0.413';
+use 'OLE::Storage_Lite', '0.19';
+use 'Perl6::Export::Attrs', '0.0.3';
+use 'Set::Scalar', '1.29';
+use 'Spreadsheet::ParseExcel';
+use 'version', '0.9912';
+
+
+use 'Gedcom::Comparison', '1.15';
+use 'Gedcom::Event', '1.15';
+use 'Gedcom::Family', '1.15';
+use 'Gedcom::Grammar', '1.15';
+use 'Gedcom::Individual', '1.15';
+use 'Gedcom::Item', '1.15';
+use 'Gedcom::Record', '1.15';
+use 'Jcode';
+use 'List::Util';
+use 'Params::Validate';
+use 'Parse::RecDescent';
+use 'Scalar::Util';
+use 'Time::Local';
+use 'Unicode::Map';
+use 'Switch', '2.17';
+use 'Log::Log4perl', '1.46';
+use 'Plack', '1.0037';
+use 'CGI::Emulate::PSGI', '0.21';
+use 'CGI::Compile', '0.19';
+use 'Dist::Milla', '1.0.15';
+use 'FamilyTreeInfo', '2.3.20';
+
+on test => sub {
+    use 'Test::More';
+};

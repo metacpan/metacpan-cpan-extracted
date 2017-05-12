@@ -1,0 +1,124 @@
+Revision history for FrameNet-WordNet-Detour
+
+1.1    09/11/09
+     - Added documentation
+     - Made testing more robust
+
+1.0
+     - Fixed a bug in the weighting algorithm
+     - Introduced the method version().
+
+0.99c 10/14/06 
+     - Fixed a bug in the documentation: get_message and get_name
+       did not work.
+
+0.99b 10/11/06
+     - VERY small (but important) bugfix ...
+
+0.99 10/10/06
+     - Implemented a couple of helper methods in the Frame and 
+       Data class to get rid of the dependency on
+       Class::MethodMaker. 
+     - Testing stops if $WNHOME or $FNHOME is not set and gives
+       a readable error message.
+     - Fixed a bug in the limited condition. In the division for 
+       making the results comparable in different runs, the factor
+       was wrongly calculated in limited mode.
+
+0.98 02/25/06
+     - Switched to the named parameter style
+       (-wnhome => "..."). This means, that old scripts have to be
+       updated. Additionally, one can give the whole QueryData object
+       (-wnquerydata => $obj).
+     - due to licensing problems, the LU cache is removed from the
+       package. Again, one needs FrameNet to install the detour.
+     - removed all the Growl code (well, it was mostly useless...).
+       Along with that, we removed the customize-script to make it 
+       more reliable and easy to maintain - we're approaching 1.0, you
+       know ;-)
+
+
+0.97 10/11/05
+     - Using of File::Spec for platform independency
+     - the command line script now has growl capabilities 
+       if running on Mac OS X. Just install the perl module Mac::Growl
+       and use the parameter "--growl". Find out more about Growl
+       on http://www.growl.info/. The growl code is automatically
+       included at make time if the module Mac::Growl is present       
+     - Redesign of FrameNet::WordNet::Detour::Frame with usage 
+       of Class::MethodMaker
+     - Redesign of FrameNet::WordNet::Detour::Data with usage 
+       of Class::MethodMaker
+     - More documentation
+     - the command line script is now able to print also the
+       frame evoking element and its similarity
+     - Cache is now on Version 0.91 (due to the Changes in
+       Detour::Frame and Detour::Data)
+     - detour is no more static script, but can be configured while
+       installing (make) using the Customizer. It is a pattern that
+       allows the customization of perl code with make. More
+       information about this can be found on
+       www.coli.uni-saarland.de/~reiter/index.php4?action=perl#custom. 
+     - (a lot) more reliable and wide tests
+     - the LU cache (based on FrameNet 1.2) is now part of the
+       module (script/make-luhash.PL). Therefore, it can be installed 
+       without FrameNet. The hash will be created with the
+       installation
+
+0.96 09/27/05
+     - Fixed several bugs in the demo code
+     - get_all_framenames in the Data class now works and returns a reference
+     - Fixed a bug in Detour.pm that causes WordNet::QueryData to produce
+       a lot of error messages	
+     - Fixed a bug: 'word#pos' now returns a list reference with 
+       "empty result" if no result found  
+     - query() now recognizes immediately if no synset is given and returns a nice
+       error message
+     - updated documentation of the detour script
+
+0.95 08/22/05
+     - Fixed bug, which resulted in choosing the wrong cache
+     - Better Accessibility of the interesting properties via the
+       Data-object. Additional methods:
+       * get_number_of_frames
+       * get_weight 
+       * get_fees
+       * get_frame
+       * get_best_weight
+     - Better documentation of the Data-object
+     - Fixed a bug in the command line script ("-l" did not run
+       the detour in limited mode)
+     - Fixed a bug in the verbose output
+     - Command line interface is now called "detour" instead of "Detour"
+
+0.94 08/02/05
+     - Fixed Makefile bugs
+     - It is now possible to give the path to WordNet and FrameNet 
+       as arguments to new()
+
+0.93 07/23/05
+     - Improved Caching
+     - Semantics of WNHOME is now identically with it in other 
+       WordNet-related modules
+     - Detour can now initialize its own QueryData and Similarity
+       objects. In the new-method, they should left out by now. This
+       improves the performance of your scripts severly, since queries
+       that are already cached are answered now without need of the
+       QueryData-object, which takes around 15 seconds to load
+
+0.92 07/22/05
+     - More documentation
+     - Introduced a command-line interface called Detour:
+       * located in bin/
+       * shows the basic use of the Detour
+       * requires additional modules: Getopt::Long and Pod::Usage
+     - Improvements on the robustness of the Detour
+
+0.91 07/22/05
+     - Better testing capabilities
+     - More compatibility with CPAN
+     - More (and better) documentation
+
+0.90 07/21/05
+     - Initial Release
+

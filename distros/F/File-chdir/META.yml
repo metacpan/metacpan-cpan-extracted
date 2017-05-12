@@ -1,0 +1,55 @@
+---
+abstract: 'a more sensible way to change directories'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Michael G. Schwern <schwern@pobox.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-chdir
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  File::chdir:
+    file: lib/File/chdir.pm
+    version: '0.1010'
+  File::chdir::ARRAY:
+    file: lib/File/chdir.pm
+    version: '0.1010'
+  File::chdir::SCALAR:
+    file: lib/File/chdir.pm
+    version: '0.1010'
+requires:
+  Carp: '0'
+  Cwd: '3.16'
+  Exporter: '0'
+  File::Spec::Functions: '3.27'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: https://github.com/dagolden/File-chdir/issues
+  homepage: https://github.com/dagolden/File-chdir
+  repository: https://github.com/dagolden/File-chdir.git
+version: '0.1010'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Joel Berger <joel.a.berger@gmail.com>'

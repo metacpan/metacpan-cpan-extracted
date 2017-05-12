@@ -1,0 +1,14 @@
+#!/bin/env perl
+########################################################################
+# locate a config file in the first etc dir using the basename of this
+# file with '.conf' added to it.
+########################################################################
+
+use File::Basename;
+
+use FindBin::libs   qw( base=etc export=conf_dir scalar );
+
+my $base    = basename $0;
+my $path    = "$conf_dir/$base.conf";
+
+-e $path or die "Missing config file: '$path'";

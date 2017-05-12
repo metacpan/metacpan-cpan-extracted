@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::Loan.
+
+0.01  Sat Feb  6 19:00:34 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn Finance::Loan
+

@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Plack::Runner;
+
+sub version {
+    require Fliggy;
+    print "Fliggy $Fliggy::VERSION\n";
+}
+
+my $runner = Plack::Runner->new(
+    server     => 'Fliggy',
+    env        => 'deployment',
+    version_cb => \&version
+);
+$runner->parse_options(@ARGV);
+$runner->run;

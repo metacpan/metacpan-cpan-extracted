@@ -1,0 +1,9 @@
+This files contains a list of contributors to Fwctl.
+
+Bernd Eckenfels <ecki@debian.org> 	Debian packaging, flush patch and a
+					handful of nice suggestions.
+
+Tommy Essebo <tommy.essebo@otorn.org>	Helpful bug reports.
+
+Jason Burnett <jburnett@questlink.com>  Bug reports and suggestions for 
+					interface specification in alias.

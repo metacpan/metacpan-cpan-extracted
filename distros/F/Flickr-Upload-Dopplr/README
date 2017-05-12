@@ -1,0 +1,168 @@
+NAME
+    Flickr::Upload::Dopplr - Flickr::Upload subclass to assign location
+    information using Dopplr
+
+SYNOPSIS
+     use Flickr::Upload::Dopplr;
+
+     my %dp_args = ('auth_token' => 'JONES!!!!',
+                    'tagify' => 'delicious');
+
+     my %fl_args = ('key' => 'OH HAI',
+                    'secret' => 'OH NOES',,
+                    'dopplr' => \%dp_args);
+
+     my $uploadr = Flickr::Upload::Dopplr->new(\%fl_args);
+
+     my $photo_id = $uploadr->upload('photo' => "/path/to/photo",
+                                     'auth_token' => 'O RLY');
+
+DESCRIPTION
+    Flickr::Upload subclass to assign location information using Dopplr.
+
+    Specifically, the package will query Dopplr for the current location of
+    the user associated with *$dopplr_authtoken* and assign the following
+    tags for the name of the city a machinetag representing the Geonames.org
+    ID for that city.
+
+    If the package is able to query a photo's EXIF data and read the
+    *DateTimeOriginal* field that value will be used to query Dopplr for
+    your location on that day.
+
+    It will also try to resolve a corresponding Flickr Places ID for the
+    Geonames city ID returned by Dopplr. For example, Geonames ID *5391959*
+    becomes *San Francisco, California, United States* which becomes Flickr
+    Places ID *kH8dLOubBZRvX_YZ*.
+
+    (Or in machinetag-speak, *places:locality=kH8dLOubBZRvX_YZ*)
+
+    If, when the photo is uploaded, the Dopplr API thinks that it is a
+    "travel day" another machine tag (dopplr:trip=) will be added containing
+    the numeric identifier for that trip.
+
+    If an upload is successful, the package will attempt to assign latitude
+    and longitude information for the photo with a Flickr accuracy of 11 (or
+    "city").
+
+ERROR HANDLING
+    Flickr::Upload::Dopplr subclasses Error.pm to catch and throw
+    exceptions. Although this is still a mostly un-Perl-ish way of doing
+    things, it seemed like the most sensible way to handle the variety of
+    error cases. I don't love it but we'll see.
+
+    This means that the library will throw fatal exceptions and you will
+    need to code around it using either *eval* or - even better - *try* and
+    *catch* blocks.
+
+    There are four package specific exception handlers :
+
+    * FUDException
+        An error condition specific to *Flickr::Upload::Dopplr* was
+        triggered.
+
+    * FlickrUploadException
+        An error condition specific to *Flickr::Upload* was triggered.
+
+    * FlickrAPIException
+        An error condition specific to calling the Flickr API (read :
+        *Flickr::API*) was triggered.
+
+        This is the only exception handler that defines its own additional
+        methods. They are :
+
+        * error_code
+            The numeric error code returned by the Flickr API.
+
+        * error_message
+            The textual error message returned by the Flickr API.
+
+    * NetDopplrException
+        An error condition specific to *Net::Dopplr* was triggered.
+
+CAVEATS
+    *   Asynchronous uploads are not support and will trigger an exception.
+
+    *   At the moment, the package does not check to see whether geo
+        information was already assigned (for example, via GPS EXIF data)
+        nor does it issue and error reporting if there was a problem
+        assigning geo information.
+
+PACKAGE METHODS
+  __PACKAGE__->new(\%args)
+    All the same arguments required by the *Flickr::Upload* constructor plus
+    the following :
+
+    * dopplr
+        A hash reference containing the following keys :
+
+        * auth_token
+            String. *required*
+
+            A valid Dopplr API authentication token.
+
+        * tagify
+            String.
+
+            An optional flag to format tags for cities, specific to a
+            service. Valid services are :
+
+            * delicious
+                City names are lower-cased and spaces are removed.
+
+            * flickr
+                City names are wrapped in double-quotes if they contain
+                spaces.
+
+            The default value is *flickr*
+
+    Returns a *Flickr::Upload::Dopplr* object.
+
+OBJECT METHODS YOU SHOULD CARE ABOUT
+  $obj->upload(%args)
+    Nothing you wouldn't pass the Flickr::Upload *upload* method. Except the
+    *async* flag which is not honoured yet. I'm working on it.
+
+    In additional, you may pass an optional *geo* parameter. It must be a
+    hash reference with the following keys :
+
+    * perms
+        Itself a hash reference containing is_public, is_contact, is_family
+        and is_friend keys and their boolean values to set the geo
+        permissions on your uploaded photo.
+
+        If this is not defined then your default viewing settings for geo
+        data will be left in place.
+
+    Returns a photo ID!
+
+VERSION
+    0.3
+
+DATE
+    $Date: 2008/03/13 16:35:15 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    Flickr::API
+
+    Flickr::Upload
+
+    Net::Dopplr
+
+    Error
+
+    <http://www.aaronland.info/weblog/2007/08/24/aware/#reduced>
+
+    <http://laughingmeme.org/2008/01/18/flickr-place-ids/>
+
+BUGS
+    Please report all bugs via http://rt.cpan.org/
+
+LICENSE
+    Copyright (c) 2007-2008 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

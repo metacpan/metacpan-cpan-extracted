@@ -1,0 +1,195 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+our $VERSION = '0.02';
+
+=head1 NAME
+
+filter-heredoc - Search and filter embedded here documents
+
+=cut
+
+use Filter::Heredoc::App qw( run_filter_heredoc );
+run_filter_heredoc();
+exit (0);
+
+=head1 SYNOPSIS
+
+filter-heredoc [B<--debug>] [B<--interactive>] [B<--list>] 
+    [B<--list-unique>] [B<--match>=I<delimiter>] [B<--quiet>] 
+    [B<--rules>] [B<--syntax>=I<rule>] [B<--version>] I<input>
+    
+filter-heredoc B<--help>
+
+=head1 DESCRIPTION
+
+B<filter-heredoc> search and extracts here documents from POSIX
+IEEE Std 1003.1-2008 compliant shell scripts and is the front-end
+for L<Filter::Heredoc>.
+
+B<filter-heredoc> input is given by the I<input> text file.
+If I<input> isn't given, it defaults to C<STDIN>. The extracted heredoc
+is written to C<STDOUT>. Several files can be processed in the same
+B<filter-heredoc> invocation by providing multiple of I<input> files
+or wild cards on the command line.
+
+B<--list> and B<--list-unique> can be used to find what delimiters
+exist in the I<input> file. When B<--match>=I<delimiter> is specified,
+only lines that match the I<delimiter> region of the here document
+is printed.
+
+Perl and other scripting languages have derived a similar syntax as
+POSIX but is at the same time different in many details.
+
+B<--syntax>=I<rule> adds rules to enhance the here document extraction.
+To list available rules, use B<--rules>. Perls simple to use markup
+documentation language (i.e. POD) can be embedded in shell scripts in
+the form of a here document (SEE ALSO). 
+
+The option B<--quiet> removes printed file information when e.g. the
+output is piped for spell checking in an external program such as
+I<hunspell>, I<aspell> or I<ispell>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>, B<--debug>
+
+Prints out the complete file with each line prefixed with a label
+code to indicate what context B<filter-heredoc> has assigned it to.
+
+B<S]> Source script line which is outside the here document region.
+
+B<I]> Ingress line (i.e. the line with the opening I<delimiter>).
+
+B<H]> Here document line which is printed (inside region).
+
+B<E]> The line which have the closing I<delimiter>.
+
+=item B<-h>, B<--help>
+
+Print out usage information.
+
+=item B<-i|->, B<--interactive>
+
+Enter interactive mode. This is only used to debug B<filter-heredoc>
+internals. To terminate this mode use Ctrl-D (*nix-like systems).
+
+=item B<-l>, B<--list>
+
+List all I<delimiters> in the I<input> file.
+
+=item B<-u>, B<--list-unique>
+
+List all unique I<delimiters> in the I<input> file.
+
+=item B<-m> I<delimiter>, B<--match>=I<delimiter>
+
+Print only the here documents that is enclosed by the specified
+I<delimiter>.
+
+=item B<-q>, B<--quiet>
+
+By default, B<filter-heredoc> prepend the file name and the line
+number before the here document line is printed, for each file
+processed. This option suppress this information to reduce screen
+clutter or when piping C<STDOUT> to an external program.
+
+=item B<-r>, B<--rules>
+
+Rules can be added to enhance extraction of here documents.
+
+C<pod> is a helper rule when POD is embedded in shell scripts
+
+If the word C<none> is given as a rule all rules are deactivated. 
+The rule C<pod> is enabled by default. Perl scripts with embedded
+here documents that uses a near POSIX like coding constructs may
+print correct. A rule C<perl> is planned to address Perls
+variations in syntax.
+
+=item B<-v>, B<--version>
+
+Display the version information.
+
+=back
+
+=head1 DIAGNOSTICS
+
+If B<filter-heredoc> fails with fatal errors, see I<Filter::Heredoc>
+for information about what those errors might mean. Please, improve
+B<filter-heredoc> by sending a Bug report and how to reproduce the error.
+
+=head1 EXAMPLES
+
+Prints the here document from files:
+
+    filter-heredoc *.sh
+    filter-heredoc --quiet < file.sh
+    
+Spell checking here documents with e.g. I<ispell>:
+    
+    cat file.sh | filter-heredoc --quiet | ispell -l
+
+To spell check when multiple delimiters exist, find the delimiters:
+
+    filter-heredoc --list file.sh
+    
+Now match the script verbatim output with option --match (-m):
+
+    filter-heredoc -q -m END_MAIL file.sh | hunspell -d sv_SE -l
+
+If POD text have been embedded it can be extracted with I<podspell>:
+    
+    podspell diskusage | aspell list -l en
+    podspell diskusage | ispell -a | grep \&
+
+=head1 AUTHOR
+
+Bertil Kronlund, C<< <bkron at cpan.org> >>
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Filter-Heredoc> or at
+C<< <bug-filter-heredoc at rt.cpan.org> >>.
+
+=head1 SEE ALSO
+
+The IEEE Std 1003.1-2008 standards can be found here:
+L<http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html>
+
+L<Filter::Heredoc::Cookbook> discuss e.g. how to embed POD as
+here documents in shell scripts to carry their own documentation.
+
+L<Filter::Heredoc>, L<perlpod(1)>,  L<podspell(1)>, 
+L<aspell(1)>, L<ispell(1)>, L<hunspell(1)>.
+
+On Debian systems, find international L<hunspell> dictionaries at
+L<http://packages.debian.org/stable/hunspell>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011-12, Bertil Kronlund
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=head1 DISCLAIMER OF WARRANTY
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=head1 VERSION
+
+The version of B<filter-heredoc> described by this manual page is 
+Version 0.02.
+
+=cut

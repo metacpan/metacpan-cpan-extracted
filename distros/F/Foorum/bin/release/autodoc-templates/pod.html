@@ -1,0 +1,30 @@
+=pod
+
+=head1 NAME
+
+[% source.class %] - Table '[% source.table %]'
+
+=head1 COLUMNS
+
+=over 4
+[% FOR col IN source.columns %]
+=item [% FILTER collapse %][% col.name %][% IF col.label %]([% col.label %])[% END %][% END %]
+
+[% FILTER collapse %][% col.data_type -%][%- IF col.exists( 'size' ) AND col.size %]([% col.size %])[% END %][%# col.exists is to keep .size from being interpreted as a vmethod #%][% END %]
+
+[% FILTER collapse %][% FILTER remove('\s*,\s*$') %]
+    [% UNLESS col.is_nullable %]NOT NULL,[% END %]
+    [% IF col.is_primary %]PRIMARY KEY,[% END %]
+    [% IF col.default_value %]DEFAULT VALUE '[% col.default_value %]',[% END %]
+    [% IF col.is_auto_increment %]AUTO_INCREMENT,[% END %]
+    [% IF col.is_inflated %]INFLATED,[% END %]
+    [% IF col.is_foreign_key %]FOREIGN KEY,[% END %]
+[% END %][% END %]
+[% END %]
+=back
+
+=head1 AUTHOR
+
+Fayland Lam <fayland at gmail.com>
+
+=cut

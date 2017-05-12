@@ -1,0 +1,25 @@
+---
+abstract: 'Fliggy is Twiggy with inlined flash policy server'
+author:
+  - 'Viacheslav Tykhanovskyi <vti@cpan.org>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.112150'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fliggy
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Twiggy: 0
+  perl: 5.008007
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/vti/fliggy
+version: 0.009003

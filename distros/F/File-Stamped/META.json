@@ -1,0 +1,79 @@
+{
+   "abstract" : "time stamped log file",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.1.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Stamped",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "File::Stamped" : {
+         "file" : "lib/File/Stamped.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "ssh://git@github.com/tokuhirom/File-Stamped/issues"
+      },
+      "homepage" : "ssh://git@github.com/tokuhirom/File-Stamped",
+      "repository" : {
+         "url" : "ssh://git@github.com/tokuhirom/File-Stamped.git",
+         "web" : "ssh://git@github.com/tokuhirom/File-Stamped"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "kan fushihara <kan.fushihara@gmail.com>"
+   ]
+}

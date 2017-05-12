@@ -1,0 +1,69 @@
+NAME
+    File::Find::Upwards - Look for a file in the current directory and
+    upwards
+
+VERSION
+    version 1.102030
+
+SYNOPSIS
+        use File::Find::Upwards qw(file_find_upwards);
+
+        my $filename = file_find_upwards('myconfig.yaml');
+        if ($filename) { rand() }
+
+DESCRIPTION
+    Provides functions that can find a file in the current or a parent
+    directory.
+
+FUNCTIONS
+  file_find_upwards
+    Takes a list of filenames and looks for these file in the current
+    directory. If there is no such file, it traverses up the directory
+    hierarchy until it finds at least one of those files or until it reaches
+    the topmost directory. If one of these files is found, the full path to
+    the file is returned. The filenames are checked in the order they are
+    given, so if several of those files exist, the first one will be
+    returned. If none of the given files are found, undef is returned.
+
+    The result is memoized, so repeated calls to the function with the same
+    list of filenames will return the result of the first call for that
+    filename.
+
+    This function is exported automatically.
+
+  find_containing_dir_upwards
+    Like "file_find_upwards()", but reports the directory that contains one
+    of the given filenames. A "Path::Class::Dir" object is returned.
+
+    This function is exported automatically.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/File-Find-Upwards/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/File-Find-Upwards/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2008 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

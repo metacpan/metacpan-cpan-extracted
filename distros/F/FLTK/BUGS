@@ -1,0 +1,8 @@
+
+Known Bugs
+----------
+
+  Only one Style Table is allowed for highlighting data for Fl_Text_Display.
+  Probably leaks memory.
+  May eat your disk, ram, cpu cycles, money, dog, and sanity.
+

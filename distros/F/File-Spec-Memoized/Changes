@@ -1,0 +1,15 @@
+Revision history for Perl extension File::Spec::Memoized
+
+1.00 2010-12-01 02:29:44
+    - More documentations
+    - Performance improvoment
+
+0.003 Sat Jan  9 15:11:41 2010
+    - Support older perls (suggested by Uwe Voelker)
+
+0.002 Wed Jan  6 13:24:53 2010
+    - No functionality change
+    - Fix the epository information
+
+0.001 Tue Jan  5 09:54:45 2010
+    - original version; created by Module::Setup

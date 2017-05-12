@@ -1,0 +1,30 @@
+---
+abstract: 'Guess File Type With XS (a la mod_mime_magic)'
+author:
+  - 'Copyright 2005-2007 Daisuke Maki <daisuke@endeworks.jp>.'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+  ExtUtils::ParseXS: 3.18
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-MMagic-XS
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/lestrrat/File-MMagic-XS.git
+version: '0.09008'

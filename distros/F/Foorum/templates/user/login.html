@@ -1,0 +1,83 @@
+[% USE Math %]
+
+[% c.load_once("jquery.ui.js") %]
+[% c.load_once("jquery.ui.css") %]
+
+<form method='post'>
+<input type='hidden' name='referer' value='[% c.req.param('referer') %]' />
+<div id='login_tabs' class='ftabs'>
+    <ul>
+        <li><a href='#username'><span>[% c.loc("Login By Username") %]</span></a></li>
+        <li><a href='#email'><span>[% c.loc("Login By Email") %]</span></a></li>
+    </ul>
+    <div id='username'>
+
+    <div class='one'>
+    <table align='center'>
+    	<tbody>
+    	[% IF error %]
+    	<tr class='misc2'><td colspan='2'><span style='color:red'>
+    	[% SWITCH error %]
+    	    [% CASE 'ERROR_ALL_REQUIRED' %]
+    	    ALL is required.
+    	    [% CASE 'ERROR_AUTH_FAILED' %]
+    	    incorrect password or username.
+    	    [% CASE 'ERROR_CAPTCHA' %]
+    	    Wrong captcha, please try again.
+    	    [% CASE %]
+    	    [% error %]
+    	[% END %]
+    	</span></td></tr>
+    	[% END %]
+    	<tr class='misc1'><td width='20%' align='right'><label for="username">[% c.loc('Username') %]</label></td><td><input type='text' name='username' value='[% c.req.param('username') %]' size='12' /></td></tr>
+    	<tr class='misc1'><td align='right'><label for="password">[% c.loc('Password') %]</label></td><td><input type='password' name='password' size='12' /> <a href='/profile/forget_password'>[% c.loc('Forget password?') %]</a></td></tr>
+    	</tbody>
+    </table>
+    </div>
+
+    </div>
+    <div id='email'>
+        
+    <div class='one'>
+    <table align='center'>
+    	<tbody>
+    	[% IF error %]
+    	<tr class='misc2'><td colspan='2'><span style='color:red'>
+    	[% SWITCH error %]
+    	    [% CASE 'ERROR_ALL_REQUIRED' %]
+    	    ALL is required.
+    	    [% CASE 'ERROR_AUTH_FAILED' %]
+    	    incorrect password or email.
+    	    [% CASE 'ERROR_CAPTCHA' %]
+    	    Wrong captcha, please try again.
+    	    [% CASE %]
+    	    [% error %]
+    	[% END %]
+    	</span></td></tr>
+    	[% END %]
+    	<tr class='misc1'><td width='20%' align='right'><label for="email">[% c.loc('Email') %]</label></td><td><input type='text' name='email' value='[% c.req.param('email') %]' size='12' /></td></tr>
+    	<tr class='misc1'><td align='right'><label for="email_password">[% c.loc('Password') %]</label></td><td><input type='password' name='email_password' id="email_password" size='12' /> <a href='/profile/forget_password'>[% c.loc('Forget password?') %]</a></td></tr>
+    	</tbody>
+    </table>
+    </div>
+     
+    </div>
+<div class='one'>
+    <table align='center'>
+    	<tbody>
+    	[% IF failure_login_times > 2 %]
+        <tr class='misc2'><td align='right'>[% c.loc('Captcha') %]</td><td><input type='text' name='captcha' size='12' style="vertical-align: middle;" /><img src='/captcha?stupidie=[% Math.rand(100000) %]' style="vertical-align: middle;" /></td></tr>
+        [% END %]
+    	<tr width='20%' class='misc2'><td> </td><td><input type='checkbox' name='remember_me' id='remember_me' value='1' /> <label for='remember_me'>[% c.loc("Remember me?") %]</label></td></tr>
+    	<tr class='misc2'><td> </td><td><input type='submit' /></td></tr>
+    	</tbody>
+    </table>
+</div>
+</div>
+</form>
+
+<script>
+    $().ready(function() {
+        $('#login_tabs').tabs( { selected: [% IF c.req.param('email') %]1[% ELSE %]0[% END %] } );
+    });
+</script>

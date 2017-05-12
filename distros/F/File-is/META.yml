@@ -1,0 +1,27 @@
+---
+abstract: 'file is older? oldest? is newer? newest? similar? the same?'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  File::Path: 0
+  File::Temp: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-is
+provides:
+  File::is:
+    file: lib/File/is.pm
+    version: 0.03
+requires:
+  Carp: 0
+  File::Spec: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

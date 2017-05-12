@@ -1,0 +1,50 @@
+{
+   "abstract" : "Utilities for handling Byte Order Marks",
+   "author" : [
+      "Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-BOM",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.20",
+            "Test::Exception" : "0.20",
+            "Test::More" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "1.99",
+            "Readonly" : "0.06",
+            "perl" : "v5.8.3"
+         }
+      }
+   },
+   "provides" : {
+      "File::BOM" : {
+         "file" : "lib/File/BOM.pm",
+         "version" : "0.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.15"
+}

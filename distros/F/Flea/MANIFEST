@@ -1,0 +1,13 @@
+Changelog
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Flea.pm
+lib/Flea/Parser/Method.pm
+lib/Flea/Parser/Route.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/simple.t

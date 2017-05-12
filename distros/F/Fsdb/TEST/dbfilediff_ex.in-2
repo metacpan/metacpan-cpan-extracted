@@ -1,0 +1,10 @@
+#fsdb event clock absdiff pctdiff
+_null_getpage+128	815812813.281756	0	0
+_null_getpage+128	815812813.328709	0.046953	5.7554e-09
+_null_getpage+128	815812813.353830	0.025121	3.0793e-09
+_null_getpage+128	815812813.357169	0.003339	4.0929e-10
+_null_getpage+128	815812813.375844	0.018675	2.2891e-09
+_null_getpage+128	815812813.378358	0.002514	3.0816e-10
+#  | /home/johnh/BIN/DB/dbrow 
+#  | /home/johnh/BIN/DB/dbcol event clock
+#   | dbrowdiff -I clock

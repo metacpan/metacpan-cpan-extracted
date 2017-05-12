@@ -1,0 +1,11 @@
+CacheDir.pm
+Changes
+MANIFEST
+README
+Makefile.PL
+t/01_load.t
+t/02_hash_ref_call.t
+t/03_array_call.t
+t/04_taint.t
+t/05_no_fork.t
+META.yml                                 Module meta-data (added by MakeMaker)

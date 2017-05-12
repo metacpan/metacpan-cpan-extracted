@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a6aaa337bb3fe61537e06e6453cdc0e984e6723a Changes
+SHA1 f63b55c4fba757aab1e2028940314463a21ad21e MANIFEST
+SHA1 406826977f0054250fb358bc95525afa4ffacb13 META.yml
+SHA1 d22c300afe4a5bec6a5195d0faafd3a3e8360448 Makefile.PL
+SHA1 742706e06d21db7d221cd4de15c0430178d69ad5 README
+SHA1 9b2f9d83bcf77860f53a0c07c90a4a59ad9f5df1 inc/Module/Install.pm
+SHA1 abe32855d75ab13747cf65765af9947b7a8c3057 inc/Module/Install/Base.pm
+SHA1 95b81d1e91bd634467bf633571eff4420e9c04eb inc/Module/Install/Can.pm
+SHA1 1fe98c63cf9d7271c8cb4183ba230f152df69e26 inc/Module/Install/Fetch.pm
+SHA1 2249171a2b72cd73ff2c0a06597d29f86e5df456 inc/Module/Install/Makefile.pm
+SHA1 381bb98ea3877bba49ae85e7a7ea130645fd3dbf inc/Module/Install/Metadata.pm
+SHA1 0c2118868ef82ac517eb6d9c3bd93e6eb9bbf83e inc/Module/Install/Win32.pm
+SHA1 e827d6d43771032fa3df35c0ad5e5698d0e54cda inc/Module/Install/WriteAll.pm
+SHA1 5ed43325c5a8e085c355458fe4341756bb35ad56 lib/Filter/Simple/Compile.pm
+SHA1 5c16ff7c5dc4740808699062c8e6a56d8c5d47a1 t/TestFilterSimple.pm
+SHA1 680e897c3ff23714ee925bb4680bcb4116d03cda t/TestFilterSimple2.pm
+SHA1 7a7043a20d95e6cb4bee552d5a010303bc6f28b0 t/TestFilterSimple3.pm
+SHA1 4d3b580c997cc55670eb02a7cad349841117794e t/filter.t
+SHA1 5c344838e56cbeb1fdeef1080f69e651d9b12e6f t/filter2.t
+SHA1 9233f255e0cd9b2329ffb4ddee02f990adc590b5 t/filter3.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (Darwin)
+
+iD8DBQFFBCLJtLPdNzw1AaARAi6UAKCYFJULzoIbk+8ycFc5uj+wP7yjRQCeOqjP
+iCys0z3fNBDE9BtEkekZ3TY=
+=52mL
+-----END PGP SIGNATURE-----

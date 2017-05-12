@@ -1,0 +1,13 @@
+#fsdb -F S row desc example
+#  | dbroweval -b '{ binmode STDOUT, ":utf8"; }'  '{ _row++; print join("  ", @$fref), "\n";  }'
+2  simple ascii  foo
+3  latin-1  Réno
+4  cyrillic  Кириллица
+5  greek  Ελληνικό αλφάβητο
+6  katakana  カタカナ
+7  korean  한글
+8  chinese  中文
+9  traditional chinese  正體字
+9  hebrew  אָלֶף־בֵּית עִבְרִי
+10  arabic  أَبْجَدِيَّة عَرَبِيَّة‎
+11  devanagari  देवनागरी

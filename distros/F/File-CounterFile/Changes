@@ -1,0 +1,69 @@
+2004-01-23   Gisle Aas <gisle@activestate.com>
+
+   Release 1.04
+
+   Restore compatibility with perl5.004 and perl5.005.
+
+
+
+2004-01-08   Gisle Aas <gisle@activestate.com>
+
+   Release 1.03
+
+   Documentation fixes by Paul Croome <Paul.Croome@softwareag.com>.
+
+   Use more Fcntl constants instead of hardcoded values.
+
+
+
+2003-11-21   Gisle Aas <gisle@activestate.com>
+
+   Release 1.02
+
+   Gurusamy Sarathy found that the 'race' test failed on platforms
+   which don't manage to autoflush before fork.  The workaround
+   applied is to enable perl level autoflush in that test script.
+
+
+
+2003-10-06   Gisle Aas <gisle@activestate.com>
+
+   Release 1.01
+
+   Various fixes by Jan Dubois to make the module work better on Windows.
+
+        - Unlock the file before croak()ing in dec() method
+        - seek() after reading to EOF.  Otherwise we cannot write (on Windows)
+        - unlink() counterfile at the beginning of tests to protect against
+          leftovers from previous failures
+        - test for fork() availability in race.t
+        - warn on failed unlink() because Windows will not unlink open files
+
+
+
+2002-07-30   Gisle Aas <gisle@activestate.com>
+
+   Release 1.00
+
+   Fix possible race condition if multiple processes tries to create
+   the counter file at the same time.  Based on patch from
+   Philipp Gühring <p.guehring@futureware.at>.
+
+
+
+1998-06-09   Gisle Aas <aas@sn.no>
+
+   Release 0.12
+
+
+
+1998-05-16   Gisle Aas <aas@sn.no>
+
+   Fix problem with 'Ambiguous use of {value} resolved to {"value"}' warnings
+   when the module is reloaded.
+
+
+
+1998-03-25   Gisle Aas <aas@sn.no>
+
+   Release 0.11, unbundled from libwww-perl-5.22.

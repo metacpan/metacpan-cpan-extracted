@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+
+use v5.10.1;
+use strict;
+use warnings;
+
+use FreeMind::Document;
+
+say "FreeMind::Document"->load(
+	@ARGV ? (location => shift) : (IO => \*STDIN),
+)->toText;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+mm2txt - output a mind-map as plain text
+
+=head1 SYNOPSIS
+
+   mm2txt myfile.mm >outfile.txt
+   mm2txt <infile.mm >outfile.txt
+
+=head1 SEE ALSO
+
+L<FreeMind::Document>, L<FreeMind::Map>, L<FreeMind::Node>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

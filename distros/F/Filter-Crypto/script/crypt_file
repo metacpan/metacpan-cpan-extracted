@@ -1,0 +1,1124 @@
+#!perl
+#===============================================================================
+#
+# script/crypt_file
+#
+# DESCRIPTION
+#   Script providing the means to convert Perl files into/from an encrypted, yet
+#   still runnable, format to hide the source code from casual prying eyes.
+#
+# COPYRIGHT
+#   Copyright (C) 2004-2006, 2012, 2014 Steve Hay.  All rights reserved.
+#
+# LICENCE
+#   You may distribute under the terms of either the GNU General Public License
+#   or the Artistic License, as specified in the LICENCE file.
+#
+#===============================================================================
+
+use 5.008001;
+
+use strict;
+use warnings;
+
+use Config qw(%Config);
+use Cwd qw(cwd);
+use ExtUtils::MakeMaker qw();
+use File::Basename qw(basename fileparse);
+use File::Copy qw(copy);
+use File::Find qw(find);
+use File::Spec::Functions qw(canonpath catfile file_name_is_absolute rel2abs);
+use File::Temp qw(tempfile);
+use Filter::Crypto;
+use Filter::Crypto::CryptFile qw(:DEFAULT $ErrStr);
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+use Text::ParseWords qw(shellwords);
+use Text::Wrap qw(wrap);
+
+use constant EDIT_MODE_IN_MEMORY => 0;
+use constant EDIT_MODE_TEMP_FILE => 1;
+
+use constant WARNING_TYPE_NORMAL => 0;
+use constant WARNING_TYPE_SEVERE => 1;
+
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
+
+sub get_input_files($$$);
+sub resolve_file_expr($$);
+sub show_result();
+sub show_warning($$$@);
+sub exit_with_version();
+sub exit_with_help();
+sub exit_with_manpage();
+sub exit_with_usage();
+sub exit_with_error(@);
+
+#===============================================================================
+# INITIALIZATION
+#===============================================================================
+
+our($VERSION, $YEAR);
+
+BEGIN {
+    $VERSION = '2.07';
+    $YEAR    = '2004-2006, 2012, 2014';
+}
+
+#===============================================================================
+# MAIN PROGRAM
+#===============================================================================
+
+MAIN: {
+    my($list_file, @dirs, $recurse, $test, $silent);
+    my($in_place, $edit_mode, $bak_file_expr, $out_file_expr, $crypt_mode);
+
+    # Allow options to be introduced with a "/" character on Windows, as is
+    # common on those OSes, as well as the default set of characters.
+    if ($^O eq 'MSWin32') {
+        Getopt::Long::Configure('prefix_pattern=(--|-|\+|\/)');
+    }
+
+    # Add any options from the relevant environment variable (interpreted in the
+    # same way as the Bourne shell would interpret the corresponding command-
+    # line as far as quoting and escaping is concerned) onto the front of @ARGV
+    # before calling GetOptions().
+    if (exists $ENV{PERL_CRYPT_FILE_OPTS}) {
+        unshift @ARGV, shellwords($ENV{PERL_CRYPT_FILE_OPTS});
+    }
+
+    my $ok = GetOptions(
+        'list-file=s'     => \$list_file,
+        'dir|d=s@'        => \@dirs,
+        'recurse'         => \$recurse,
+        'test'            => \$test,
+        'silent'          => \$silent,
+        'in-place'        => \$in_place,
+        'edit-mode=s'     => \$edit_mode,
+        'bak-file-expr:s' => \$bak_file_expr,
+        'out-file-expr=s' => \$out_file_expr,
+        'crypt-mode=s'    => \$crypt_mode,
+        'version|v'       => \&exit_with_version,
+        'help|?'          => \&exit_with_help,
+        'manpage|doc'     => \&exit_with_manpage
+    );
+
+    exit_with_usage() unless $ok;
+
+    # Complete the list of input file specifiers (that is, the remaining
+    # arguments, if any) from the list file, if one was specified.
+    my @in_file_specs = @ARGV;
+    if (defined $list_file) {
+        my $list_fh;
+        unless (open $list_fh, '<', $list_file) {
+            exit_with_error(5,
+                "Can't open list file '%s' for reading: %s", $list_file, $!
+            );
+        }
+
+        my @list_file_lines;
+        chomp(@list_file_lines = <$list_fh>);
+        push @in_file_specs, @list_file_lines;
+
+        close $list_fh or
+            warn "Can't close list file '$list_file' after reading: $!";
+    }
+
+    # Allow multiple directories to be specified either with one --dir option,
+    # or via multiple --dir options.  Use the current working directory if no
+    # directories have been specified.
+    if (@dirs) {
+        @dirs = (split /$Config{path_sep}/, join $Config{path_sep}, @dirs);
+    }
+    else {
+        @dirs = (cwd());
+    }
+
+    if (defined $edit_mode) {
+        if ($edit_mode =~ /^mem(?:ory)?$/io) {
+            $edit_mode = EDIT_MODE_IN_MEMORY;
+        }
+        elsif ($edit_mode =~ /^temp(?:file)?$/io) {
+            $edit_mode = EDIT_MODE_TEMP_FILE;
+        }
+        else {
+            exit_with_usage();
+        }
+        $in_place = 1;
+    }
+    else {
+        $edit_mode = EDIT_MODE_IN_MEMORY;
+    }
+
+    if (defined $bak_file_expr) {
+        $bak_file_expr = '*.bak' if $bak_file_expr eq '';
+        $in_place = 1;
+    }
+
+    if (defined $crypt_mode) {
+        if ($crypt_mode =~ /^auto$/io) {
+            $crypt_mode = CRYPT_MODE_AUTO;
+        }
+        elsif ($crypt_mode =~ /^enc(?:rypt)?$/io) {
+            $crypt_mode = CRYPT_MODE_ENCRYPT;
+        }
+        elsif ($crypt_mode =~ /^dec(?:rypt)?$/io) {
+            $crypt_mode = CRYPT_MODE_DECRYPT;
+        }
+        elsif ($crypt_mode =~ /^encrypted$/io) {
+            $crypt_mode = CRYPT_MODE_ENCRYPTED;
+        }
+        elsif ($crypt_mode =~ /^decrypted$/io) {
+            $crypt_mode = CRYPT_MODE_DECRYPTED;
+        }
+        else {
+            exit_with_usage();
+        }
+    }
+    else {
+        $crypt_mode = CRYPT_MODE_AUTO;
+    }
+
+    # Wait on STDIN if there were no input file specifiers, or if there was a
+    # single input file specifier consisting of '-'.
+    if ( @in_file_specs == 0 or
+        (@in_file_specs == 1 and $in_file_specs[0] eq '-'))
+    {
+        my $out_file;
+        if (defined $out_file_expr) {
+            $out_file = $out_file_expr;
+        }
+        else {
+            $out_file = \*STDOUT;
+            binmode $out_file;
+        }
+
+        binmode STDIN;
+        if (crypt_file(\*STDIN, $out_file, $crypt_mode)) {
+            show_result() unless $silent;
+        }
+        else {
+            show_warning($silent, WARNING_TYPE_SEVERE, '-',
+                "crypt_file() failed: %s", $ErrStr
+            );
+        }
+    }
+    else {
+        my $in_files = get_input_files(\@in_file_specs, \@dirs, $recurse);
+
+        foreach my $file (@$in_files) {
+            print STDOUT "$file\n" and next if $test;
+            print STDERR "$file: " unless $silent;
+
+            if (defined $in_place) {
+                my $bak_file;
+                if (defined $bak_file_expr) {
+                    $bak_file = resolve_file_expr($file, $bak_file_expr);
+
+                    unless (copy($file, $bak_file)) {
+                        show_warning($silent, WARNING_TYPE_SEVERE, $file,
+                            "Can't copy to backup file '%s': %s", $bak_file, $!
+                        );
+                        next;
+                    }
+                }
+
+                if ($edit_mode == EDIT_MODE_IN_MEMORY) {
+                    unless (crypt_file($file, $crypt_mode)) {
+                        show_warning($silent, WARNING_TYPE_SEVERE, $file,
+                            "crypt_file() failed: %s", $ErrStr
+                        );
+                        next;
+                    }
+                }
+                elsif ($edit_mode == EDIT_MODE_TEMP_FILE) {
+                        my($temp_fh, $temp_file);
+
+                        # Install a temporary SIGINT handler to clean up the
+                        # temporary file that we are about to create (if it
+                        # still exists) before exiting.
+                        local $SIG{INT} = sub {
+                            warn "\nCaught SIGINT. Cleaning up temporary " .
+                                 "files before exiting";
+
+                            if (defined $temp_fh and defined fileno $temp_fh) {
+                                close $temp_fh or
+                                    warn "Can't close temporary file " .
+                                         "'$temp_file': $!";
+                            }
+
+                            if (defined $temp_file and -f $temp_file) {
+                                unlink $temp_file or
+                                    warn "Can't delete temporary file " .
+                                         "'$temp_file': $!";
+                            }
+
+                            exit 0;
+                        };
+
+                        # Create the temporary file in same directory as the
+                        # input file to be sure the rename() done later works.
+                        ($temp_fh, $temp_file) = tempfile("$file.XXXXXXXX");
+
+                        my $num_bytes =
+                            crypt_file($file, $temp_fh, $crypt_mode);
+
+                        unless (defined $num_bytes) {
+                            show_warning($silent, WARNING_TYPE_SEVERE, $file,
+                                "crypt_file() failed: %s", $ErrStr
+                            );
+                            close $temp_fh;
+                            unlink $temp_file;
+                            next;
+                        }
+
+                        unless (close $temp_fh) {
+                            show_warning($silent, WARNING_TYPE_NORMAL, $file,
+                                "Can't close temporary file '%s' after " .
+                                "writing: %s", $temp_file, $!
+                            );
+                        }
+
+                        # If no output was written because the file was already
+                        # in the requested state then just remove the temporary
+                        # file; there is nothing more to do.
+                        if ($num_bytes == 0 and
+                                ($crypt_mode == CRYPT_MODE_ENCRYPTED or
+                                $crypt_mode == CRYPT_MODE_DECRYPTED))
+                        {
+                            show_result() unless $silent;
+                            unless (unlink $temp_file) {
+                                show_warning($silent, WARNING_TYPE_NORMAL,
+                                    $file, "Can't delete temporary file " .
+                                    "'%s': %s", $temp_file, $!
+                                );
+                            }
+                            next;
+                        }
+
+                        # Get the input file's permissions and set them on the
+                        # temporary file, so that when it is renamed to the
+                        # input file the new input file has the same permissions
+                        # as it originally did.
+                        my @stat;
+                        unless (@stat = stat $file) {
+                            show_warning($silent, WARNING_TYPE_SEVERE, $file,
+                                "Can't stat file: %s", $!
+                            );
+                            unlink $temp_file;
+                            next;
+                        }
+
+                        my $mode = $stat[2];
+
+                        unless (chmod $mode, $temp_file) {
+                            show_warning($silent, WARNING_TYPE_NORMAL, $file,
+                                "Can't set permissions on temporary file " .
+                                "'%s': %s", $temp_file, $!
+                            );
+                        }
+
+                        # On Win32 (only) it is necessary for the target file in
+                        # the following rename() to be writable, so make sure it
+                        # is.  (On other systems this is controlled by the
+                        # permissions on the parent directory.)
+                        if ($^O eq 'MSWin32' and not -w $file) {
+                            ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
+                            unless (chmod $mode | 0200, $file) {
+                                show_warning($silent, WARNING_TYPE_SEVERE,
+                                    $file, "Can't make file writable: %s", $!
+                                );
+                                unlink $temp_file;
+                                next;
+                            }
+                        }
+
+                        unless (rename $temp_file, $file) {
+                            show_warning($silent, WARNING_TYPE_SEVERE, $file,
+                                "Can't rename temporary file '%s' to input " .
+                                "file: %s", $temp_file, $!
+                            );
+                            unlink $temp_file;
+                            next;
+                        }
+                }
+                else {
+                    exit_with_error(4, "Unknown edit mode '%s'", $edit_mode);
+                }
+            }
+            else {
+                my $out_file;
+                if (defined $out_file_expr) {
+                    $out_file = resolve_file_expr($file, $out_file_expr);
+                }
+                else {
+                    $out_file = \*STDOUT;
+                    binmode $out_file;
+                }
+
+                unless (crypt_file($file, $out_file, $crypt_mode)) {
+                    show_warning($silent, WARNING_TYPE_SEVERE, $file,
+                        "crypt_file() failed: %s", $ErrStr
+                    );
+                    next;
+                }
+            }
+
+            show_result() unless $silent;
+        }
+    }
+
+    exit 0;
+}
+
+#===============================================================================
+# SUBROUTINES
+#===============================================================================
+
+sub get_input_files($$$) {
+    my($in_file_specs, $dirs, $recurse) = @_;
+
+    # Process each input file specifier and add the corresponding file(s) to the
+    # input file list.
+    my @in_files = ();
+    foreach my $spec (@$in_file_specs) {
+        if (file_name_is_absolute($spec)) {
+            if (-f $spec) {
+                push @in_files, canonpath($spec);
+            }
+            else {
+                warn "No such file '$spec'\n";
+            }
+        }
+        elsif ($spec !~ /(?<!\\)[?*[]/o) {
+            my $found = 0;
+            foreach my $dir (@$dirs) {
+                my $file = rel2abs($spec, $dir);
+                if (-f $file) {
+                    push @in_files, $file;
+                    $found = 1;
+                    last;
+                }
+            }
+
+            unless ($found) {
+                warn "No such file '$spec'\n";
+            }
+        }
+        else {
+            my @new_files = ();
+            foreach my $dir (@$dirs) {
+                if ($recurse) {
+                    find(sub {
+                        return unless -d;
+                        my $cwd = cwd();
+                        unless (chdir $_) {
+                            warn "Can't cd to '$_' from '$cwd': $!";
+                            return;
+                        }
+                        push @new_files, map { rel2abs($_) } glob $spec;
+                        unless (chdir $cwd) {
+                            exit_with_error(6, "Can't cd back to '$cwd': $!");
+                        }
+                    }, $dir);
+                }
+                else {
+                    my $cwd = cwd();
+                    unless (chdir $dir) {
+                        warn "Can't cd to '$dir' from '$cwd': $!";
+                        next;
+                    }
+                    push @new_files, map { rel2abs($_) } glob $spec;
+                    unless (chdir $cwd) {
+                        exit_with_error(7, "Can't cd back to '$cwd': $!");
+                    }
+                }
+            }
+
+            if (@new_files) {
+                push @in_files, @new_files;
+            }
+            else {
+                warn "No such file '$spec'\n";
+            }
+        }
+    }
+
+    # Remove any duplicate entries from the list, but keeping the list in the
+    # same order.
+    my @return_in_files = ();
+    my %seen_in_files   = ();
+    foreach my $file (@in_files) {
+        unless (exists $seen_in_files{$file}) {
+            push @return_in_files, $file;
+            $seen_in_files{$file} = 1;
+        }
+    }
+
+    return \@return_in_files;
+}
+
+sub resolve_file_expr($$) {
+    my($file, $expr) = @_;
+
+    my $filename = basename($file);
+    my($basename, $extension) = (fileparse($file, '\..*?'))[0, 2];
+    $extension =~ s/^\.//o;
+
+    my $new_file = $expr;
+    $new_file =~ s/(?<!\\)\[/$extension/g;
+    $new_file =~ s/\\\[/[/go;
+    $new_file =~ s/\*/$filename/g;
+    $new_file =~ s/\?/$basename/g;
+
+    return $new_file;
+}
+
+sub show_result() {
+    print STDERR "OK";
+
+    # There may be a message left in $ErrStr even after crypt_file() completes
+    # successfully, so output that too if there is.
+    print STDERR " ($ErrStr)" if $ErrStr ne '';
+
+    print STDERR "\n";
+}
+
+sub show_warning($$$@) {
+    my($silent, $type, $file, $msg) = splice @_, 0, 4;
+
+    $msg = sprintf $msg, @_ if @_;
+
+    my $hdr = '';
+    $hdr = "$file: " unless $silent;
+    if ($type == WARNING_TYPE_NORMAL) {
+        $hdr .= "Warning: ";
+    }
+    elsif ($type == WARNING_TYPE_SEVERE) {
+        $hdr .= "Error: ";
+    }
+    else {
+        exit_with_error(8, "Unknown warning type '%s'", $type);
+    }
+
+    warn "$hdr$msg";
+}
+
+sub exit_with_version() {
+    printf "This is %s %s (using Filter::Crypto %s).\n\n",
+           basename($0), $VERSION, $Filter::Crypto::VERSION;
+
+    print "Copyright (C) $YEAR Steve Hay.  All rights reserved.\n\n";
+
+    print wrap('', '',
+        "This script is free software; you can redistribute it and/or modify " .
+        "it under the same terms as Perl itself, i.e. under the terms of " .
+        "either the GNU General Public License or the Artistic License, as " .
+        "specified in the LICENCE file.\n\n"
+    );
+
+    exit 1;
+}
+
+sub exit_with_help() {
+    pod2usage(
+        -exitval => 1,
+        -verbose => 1
+    );
+}
+
+sub exit_with_manpage() {
+    # Tell pod2usage() not to use perldoc if it doesn't exist, at least until
+    # CPAN RT#75598 is resolved.  It looks for perldoc in $Config{scriptdirexp}
+    # (if set) from 1.50 onwards; otherwise in $Config{scriptdir}.
+    my $script_dir;
+    if ($Pod::Usage::VERSION >= 1.50) {
+       $script_dir = $Config{scriptdirexp} || $Config{scriptdir};
+    }
+    else {
+       $script_dir = $Config{scriptdir};
+    }
+    my $perldoc = catfile($script_dir, 'perldoc');
+    pod2usage(
+        -exitval => 1,
+        -verbose => 2,
+        -noperldoc => MM->maybe_command($perldoc) ? 0 : 1
+    );
+}
+
+sub exit_with_usage() {
+    pod2usage(
+        -exitval => 2,
+        -verbose => 0
+    );
+}
+
+sub exit_with_error(@) {
+    my($num, $msg) = splice @_, 0, 2;
+    $msg = sprintf $msg, @_ if @_;
+    $! = $num;
+    die "Error ($num): $msg";
+}
+
+__END__
+
+#===============================================================================
+# DOCUMENTATION
+#===============================================================================
+
+=head1 NAME
+
+crypt_file - Encrypt (and decrypt) Perl files
+
+=head1 SYNOPSIS
+
+    crypt_file [--list-file=<file>]
+               [--dir=<dir>]... [--recurse]
+               [--test] [--silent]
+               [--in-place] [--edit-mode=<mode>] [--bak-file-expr[=<expr>]]
+               [--out-file-expr=<expr>]
+               [--crypt-mode=<mode>]
+               [--version] [--help] [--manpage]
+               [<file-spec>...]
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item E<lt>file-specE<gt>
+
+Specify one or more files on which to perform the encryption or decryption.
+Each file specifier may be one of:
+
+=over 4
+
+=item *
+
+An absolute file path;
+
+=item *
+
+A relative file path;
+
+=item *
+
+A shell-style file glob expression.
+
+=back
+
+This list of file specifiers, together with any more read from the file
+specified by the B<--list-file> option (if present), is used to build the input
+file list as follows:
+
+=over 4
+
+=item *
+
+Each absolute file path is added directly to the input file list;
+
+=item *
+
+Each relative file path is tested against each directory in the search directory
+list in turn until the first existing file path is found, which is then added to
+the input file list;
+
+=item *
+
+Each file glob expression is expanded against every directory in the search
+directory list in turn, and all the resulting file paths are then added to the
+input file list.
+
+Note that typical UNIX shells will expand glob expressions before calling the
+program unless the expressions are quoted (normally with single quotes).  The
+default Win32 B<cmd.exe> shell does not do this, and does not remove single
+quotes from arguments either, so beware!
+
+=back
+
+By default, the search directory list is just the current working directory, but
+other directories may be specified instead by using one or more B<--dir>
+options.
+
+=back
+
+If there are no file specifiers given, or if there is a single input file
+specifier consisting of just a single dash given, then input is read from
+<STDIN> instead.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-l E<lt>fileE<gt>>, B<--list-file=E<lt>fileE<gt>>
+
+Specify a file that lists file specifiers to use in building the input file list
+(one file specifier per line).
+
+This file may be used as well as, or instead of, file specifiers given as
+arguments to this script.
+
+See L<"ARGUMENTS"> for more details on file specifiers.
+
+=item B<-d E<lt>dirE<gt>>, B<--dir=E<lt>dirE<gt>>
+
+Specify one or more directories to assign to the search directory list that is
+used to resolve relative file paths and/or expand file glob expressions in the
+list of input file specifiers.
+
+Multiple directories can be assigned to the list by specifying multiple B<--dir>
+options and/or specifying multiple directories separated by the path separator
+character with a single B<--dir> option.
+
+To determine what the path separator character is on your system type the
+following:
+
+    perl -V:path_sep
+
+By default, the search directory list is just the current working directory.  If
+one or more directories are specified via this option then they replace the
+default, so if you want to include the current working directory as well as
+other directories then you will have to explicitly specify that too.
+
+=item B<-r>, B<--recurse>
+
+Specify that when expanding any file glob expressions in the list of input file
+specifiers, each glob should be expanded in all sub-directories (recursively) of
+each directory in the search directory list.
+
+This option does not affect the resolution of relative file paths in the list
+of input file specifiers.
+
+=item B<-t>, B<--test>
+
+Run the script in test-only mode.
+
+The input file list will be printed to C<STDOUT>, but no other action is taken.
+No input files are edited, and no backup files or output files are created.
+
+=item B<-s>, B<--silent>
+
+Run the script in silent mode.
+
+The name of each input file is normally printed on C<STDERR> before it is
+processed, followed by an "OK" message (and/or a warning or error message if
+anything went wrong) when the processing of that file is complete.  Running in
+silent mode suppresses the output of the filename and "OK" message; any relevant
+warnings and/or error messages are still output.
+
+=item B<-i>, B<--in-place>
+
+Specify that each input file should be processed "in-place", i.e. the input file
+is overwritten with the output, rather than the output being sent either to
+C<STDOUT> or else to an output file as specified by the B<--out-file-expr>
+option.
+
+This option is ignored if the input file list is empty and input is being read
+from C<STDIN> instead.
+
+=item B<-e E<lt>modeE<gt>>, B<--edit-mode=E<lt>modeE<gt>>
+
+Specify how in-place editing should be performed:
+
+=over 4
+
+=item memory
+
+The entire contents of the input file are read into memory, processed in memory,
+and then written back out to the input file.
+
+=item tempfile
+
+The contents of the input file are processed and written out to a temporary file
+in chunks of at most C<BUFSIZ> bytes at a time, and then the temporary file is
+renamed to the input file.
+
+=back
+
+The default mode is "memory", which should be safe for most purposes given that
+Perl source code files are typically not very large, but the "tempfile" mode
+should be considered instead if this is likely to cause out-of-memory errors due
+to the size of the files, e.g. if the files have very large C<__DATA__>
+sections.
+
+The "tempfile" mode also has another useful advantage when combined with the
+"encrypted" or "decrypted" B<--crypt-mode> option values:  The file processing
+becomes safely re-runnable in the event of any errors on a first run because
+each input file is not touched until the final step in its processing when the
+temporary file that has been used up until then is renamed to it.  Renaming a
+file is normally an atomic operation at the filesystem level, so even if the
+processing is interrupted or killed part-way through, each input file will be
+left either untouched or else fully encrypted or decrypted; there will be no
+partially written files left (other than temporary files, which are cleaned up
+if at all possible).  Combined with, say, B<--crypt-mode=encrypted>, this mode
+can therefore safely be used to run, and, if necessary, re-run, on a set of
+input files until they have all be successfully encrypted.
+
+This option only applies when input files are being processed "in-place", and
+implies the B<--in-place> option if that is not already present.
+
+=item B<-b [E<lt>exprE<gt>]>, B<--bak-file-expr[=E<lt>exprE<gt>]>
+
+Specify an expression from which to determine the name of a backup file to
+create before processing each input file.
+
+The optional B<expr> value works in a similar way to the value for B<perl>'s own
+B<-i> option, with a couple of enhancements:
+
+=over 4
+
+=item *
+
+If the B<expr> contains one or more "*", "?" or "[" characters then
+
+=over 4
+
+=item *
+
+Each "*" character is replaced with the input file's basename (i.e. with the
+directory path removed from the start);
+
+=item *
+
+Each "?" character is replaced with the input file's basename minus the
+extension (i.e. the same as the basename used above, but with whatever matches
+C</\..*?$/> removed from the end);
+
+=item *
+
+Each "[" character is replaced with the input file's extension (i.e. the part
+that was removed from the basename above).
+
+=back
+
+The resulting expression is then used as the name of the backup file.
+
+=item *
+
+Otherwise, the B<expr> is appended to the input filename to make the name of the
+backup file.
+
+=back
+
+In each case, the backup file is created in the same directory as the input file
+itself.
+
+The default B<expr> value is "*.bak".
+
+This option only applies when input files are being processed "in-place", and
+implies the B<--in-place> option if that is not already present.
+
+=item B<-o E<lt>exprE<gt>>, B<--out-file-expr=E<lt>exprE<gt>>
+
+Specify an expression from which to determine the name of an output file to
+send the output to when processing each input file.
+
+The mandatory B<expr> value works in exactly the same way as the B<expr> value
+to the B<--bak-file-expr> option described above, except that if the input file
+list is empty and input is being read from C<STDIN> instead then the B<expr> is
+used as the actual path (either absolute or relative to the current directory)
+of the output file itself.
+
+This option is mutually exclusive with the B<--in-place> option; if both options
+are specified then B<--in-place> will be used and B<--out-file-expr> is ignored.
+
+The output is written to C<STDOUT> by default.
+
+=item B<-c E<lt>modeE<gt>>, B<--crypt-mode=E<lt>modeE<gt>>
+
+Specify what action, if any, to perform on each file:
+
+=over 4
+
+=item auto
+
+The crypt mode is determined automatically on a per-file basis by reading the
+beginning of the file.  If the beginning is
+
+    use Filter::Crypto::Decrypt;
+
+then the file is presumed to be in an encrypted state already so the mode will
+be set to "decrypt"; otherwise the mode will be set to "encrypt".
+
+=item encrypt
+
+Each input file is encrypted.  Produces a warning if a file looks like it is
+already in an encrypted state, i.e. already begins with a
+C<use Filter::Crypto::Decrypt;> statement.
+
+=item decrypt
+
+Each input file is decrypted.  Produces a warning if a file looks like it is
+already in a decrypted state, i.e. does not begin with a
+C<use Filter::Crypto::Decrypt;> statement.
+
+=item encrypted
+
+Each input file is encrypted unless it looks like it is already in an encrypted
+state, i.e. already begins with a C<use Filter::Crypto::Decrypt;> statement.
+
+=item decrypted
+
+Each input file is decrypted unless it looks like it is already in a decrypted
+state, i.e. does not begin with a C<use Filter::Crypto::Decrypt;> statement.
+
+=back
+
+The default mode is "auto".
+
+=item B<-v>, B<--version>
+
+Display the script name and version, and then exit.
+
+=item B<-h>, B<--help> | B<--?>
+
+Display a help page listing the arguments and options, and then exit.
+
+=item B<-m>, B<--manpage> | B<--doc>
+
+Display the entire manual page, and then exit.
+
+=back
+
+Options may be introduced with a double dash, a single dash, a plus sign or
+(on Win32) a forward slash; case does not matter; an equals sign may be used or
+omitted between option names and values; long option names may be abbreviated to
+uniqueness.
+
+Options may also be placed between non-option arguments, and option processing
+may be stopped at any point in the command-line by inserting a double dash.
+
+=head1 EXIT STATUS
+
+    0   The script exited normally.
+
+    1   The script exited after printing the version, help or manpage.
+
+    2   Invalid command-line arguments.
+
+    >2  An error occurred.
+
+=head1 DIAGNOSTICS
+
+=head2 Warnings and Error Messages
+
+This script may produce the following diagnostic messages.  They are classified
+as follows (a la L<perldiag>):
+
+    (W) A warning (optional).
+    (F) A fatal error (trappable).
+    (I) An internal error that you should never see (trappable).
+
+Warnings of the format C<%s: Error: ...> and C<%s: Warning: ...> are produced
+from within the main loop over the input file list.  Those that say "Error:" are
+severe warnings that result in the processing of the specified input file to be
+aborted; in such cases, the script moves onto the next file in the list.  Those
+that say "Warning:" are less serious warnings; in those cases, the script
+continues the processing of the file concerned.  Other messages come from
+elsewhere in the script.
+
+=over 4
+
+=item Can't cd back to '%s': %s
+
+(F) Could not change back to the specified directory after changing into one of
+its sub-directories during a (possibly recursive) scan of the search directory
+list while attempting to expand a file glob expression in the list of input file
+specifiers.  The system error message corresponding to the standard C library
+C<errno> variable is also given.
+
+=item Can't cd to '%s' from '%s': %s
+
+(W) Could not change directory as indicated during a (possibly recursive) scan
+of the search directory list while attempting to expand a file glob expression
+in the list of input file specifiers.  The search down that particular branch of
+the directory tree will be aborted, but other branches and search directories
+will continue to be scanned.  The system error message corresponding to the
+standard C library C<errno> variable is also given.
+
+=item Can't close list file '%s' after reading: %s
+
+(W) The specified list file (i.e. the file given by the B<--list-file> option)
+could not be closed after reading the list of input file specifiers from it.
+The system error message corresponding to the standard C library C<errno>
+variable is also given.
+
+=item Can't close temporary file '%s': %s
+
+(W) The specified temporary file could not be closed during the clean up of
+temporary files just before exiting when a SIGINT has been caught.  The system
+error message corresponding to the standard C library C<errno> variable is also
+given.
+
+=item Can't delete temporary file '%s': %s
+
+(W) The specified temporary file could not be deleted during the clean up of
+temporary files just before exiting when a SIGINT has been caught, or when
+removing an unneeded temporary file when an input file was found to already be
+in the requested state.  The system error message corresponding to the standard
+C library C<errno> variable is also given.
+
+=item Can't open list file '%s' for reading: %s
+
+(F) The specified list file (i.e. the file given by the B<--list-file> option)
+from which to read the list of input file specifiers could not be opened for
+reading.  The system error message corresponding to the standard C library
+C<errno> variable is also given.
+
+=item Caught SIGINT. Cleaning up temporary files before exiting
+
+(W) The script has received an "interrupt" signal, e.g. the user may have
+pressed Ctrl+C.  The signal is caught so that temporary files, used when editing
+files in-place with B<--edit-mode=tempfile>, can be cleaned up before exiting.
+
+=item %s: Error: Can't copy to backup file '%s': %s
+
+(W) The specified input file could not be copied to the specified backup file.
+The system error message corresponding to the standard C library C<errno>
+variable is also given.
+
+=item %s: Error: Can't make file writable: %s
+
+(W) [Win32 only.]  The specified input file could not be made writable.  On
+Win32 (only), the input file must be writable when editing files in-place using
+temporary files in order for the final step (in which the temporary file is
+renamed to the input file) to succeed.  (On other systems, the ability to
+perform a rename is controlled by the permissions on the parent directory.)  The
+system error message corresponding to the standard C library C<errno> variable
+is also given.
+
+=item %s: Error: Can't rename temporary file '%s' to input file: %s
+
+(W) The specified temporary file could not be renamed to the specified input
+file.  This is the final step of the process when editing files in-place using
+temporary files.  The system error message corresponding to the standard C
+library C<errno> variable is also given.
+
+=item %s: Error: Can't stat file: %s
+
+(W) Could not retrieve file information about the specified input file.  This
+information is required when editing files in-place using temporary files in
+order to set the same file permissions on the temporary file as are on the input
+file before renaming the temporary file to the input file.  The system error
+message corresponding to the standard C library C<errno> variable is also given.
+
+=item %s: Error: crypt_file() failed: %s
+
+(W) The call to the C<crypt_file()> function to perform the actual encryption or
+decryption failed.  The last error message from the Filter::Crypto::CryptFile
+module is also given.
+
+=item No such file '%s'
+
+(W) The specified input file specifier could not be resolved, either as an
+absolute file path, or as a relative file path or a file glob expression with
+respect to the current working directory or any of the directories specified
+with the B<--dir> option.
+
+=item Unknown edit mode '%s'
+
+(I) The mode specified for editing files in-place (i.e. the mode given by the
+B<--edit-mode> option) was not recognized and was not caught by the option
+processing code run at the start of the script, causing an unexpected error
+later on.
+
+=item Unknown warning type '%s'
+
+(I) The subroutine called internally when outputting warning messages was passed
+a warning type that it does not recognize.
+
+=item %s: Warning: Can't close temporary file '%s' after writing: %s
+
+(W) The filehandle opened on the temporary file being used to edit the specified
+input file in-place could not be closed after writing data to it.  The system
+error message corresponding to the standard C library C<errno> variable is also
+given.
+
+=item %s: Warning: Can't set permissions on temporary file '%s': %s
+
+(W) Could not set the file permissions on the temporary file to be the same as
+are on the specified input file.  This is done when editing files in-place using
+temporary files so that the file permissions are left unchanged after the
+editing has been completed.  The system error message corresponding to the
+standard C library C<errno> variable is also given.
+
+=back
+
+=head1 EXAMPLES
+
+These examples assume standard UNIX shell quoting and redirection syntax apply.
+On Win32, you should replace single-quoted arguments with double-quoted
+arguments.  (The redirection syntax is unchanged.)
+
+=over 4
+
+=item Process B<test.pl>, writing output to B<testenc.pl>:
+
+    crypt_file <test.pl >testenc.pl
+
+    crypt_file test.pl >testenc.pl
+
+    crypt_file -o '?enc.pl' test.pl
+
+=item Process B<test.pl> in-place, making a backup copy as B<test.pl.bak>:
+
+    crypt_file -i -b '*.bak' test.pl
+
+=item Process B<test.pl> in-place, with no backup copy:
+
+    crypt_file -i test.pl
+
+=item Process all B<*.pl> files within F</tmp> and all sub-directories in-place:
+
+    crypt_file -i -d /tmp -r '*.pl'
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item PERL_CRYPT_FILE_OPTS
+
+Specify options to be prepended to the list of command-line options before the
+option processing takes place.
+
+Note that as far as quoting and escaping is concerned, the environment variable
+value is interpreted in the same way as the Bourne shell would interpret the
+corresponding command-line.
+
+=back
+
+=head1 SEE ALSO
+
+L<Filter::Crypto>,
+L<Filter::Crypto::CryptFile>.
+
+=head1 AUTHOR
+
+Steve Hay E<lt>shay@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004-2006, 2012, 2014 Steve Hay.  All rights reserved.
+
+=head1 LICENCE
+
+This script is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself, i.e. under the terms of either the GNU General Public
+License or the Artistic License, as specified in the F<LICENCE> file.
+
+=head1 VERSION
+
+Version 2.07
+
+=head1 DATE
+
+28 Feb 2015
+
+=head1 HISTORY
+
+See the F<Changes> file.
+
+=cut
+
+#===============================================================================

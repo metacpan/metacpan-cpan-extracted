@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Flickr-Simple2
+version:            0.03
+abstract:           A XML::Simple based Perl Flickr API. 
+author:
+    - Jason L. Froebe <jason@froebe.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Digest::MD5:          0
+    Exception::Class::TCF:  0.03
+    Iterator::Simple:     0.05
+    LWP::Simple:          5.8
+    URI:                  1.3
+    XML::Simple:          2.18
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,260 @@
+#!/usr/bin/perl
+
+use strict;
+use Font::TTF::Font;
+use IO::String;
+use Getopt::Std;
+use Pod::Usage;
+use Compress::Zlib;
+
+my %opts;
+our ($if);
+my ($string);
+our ($CHAIN_CALL);
+my ($ofh);
+
+unless ($CHAIN_CALL)
+{
+    getopts('chm:p:v:', \%opts);
+
+    unless (defined $ARGV[1] || defined $opts{'h'})
+    {
+        pod2usage(1);
+        exit;
+    }
+
+    if ($opts{'h'})
+    {
+        pod2usage( -verbose => 2, -noperldoc => 1);
+        exit;
+    }
+
+    $if = Font::TTF::Font->open($ARGV[0]);
+}
+
+my $iswoff = exists $if->{' WOFF'};
+# For now, just quit if input font is already a woff.
+# Someone else may want to add this functionality later
+# but it will involve decompressing tables to confirm the checksums
+
+die "input font is already a woff font\n" if $iswoff;
+
+if ($opts{'c'})
+{
+	# Force checksum recalcuation by copying font
+	
+	# If font has non-empty DSIG, delete it first:
+	my $dsig = $if->{'DSIG'};
+	delete $if->{'DSIG'} if ($dsig && !$dsig->isempty);
+	
+	#Copy the rest of the font to string file:
+    my ($tfh) = IO::String->new($string);
+    my (@tlist) = sort {$if->{$a}{' OFFSET'} <=> $if->{$b}{' OFFSET'}}
+                    grep(length($_) == 4, keys %{$if});
+    $if->out($tfh, @tlist);
+    
+    # release original font to free up memory:
+    $if->{'DSIG'} = $dsig if $dsig;
+    $if->release;
+    
+    # Now open copied font:
+    $tfh = IO::String->new($string);
+    $if = Font::TTF::Font->open($tfh);
+}
+
+my $cWarnings = 0;
+
+$ofh = IO::File->new("> $ARGV[1]") || die "Can't open $ARGV[1] for writing";
+binmode $ofh;
+
+# re-read the header to initialize font-wide csum
+
+my ($msum);
+
+my $ntables = 0;
+map {$ntables++ if length($_) == 4} keys %{$if};
+$if->{' INFILE'}->seek($if->{' OFFSET'}, 0);
+$if->{' INFILE'}->read($msum, 12 + $ntables * 16);
+$msum = unpack('%32N*', $msum); 
+
+my (%whdr);
+my (@tlist) = sort {$if->{$a}{' OFFSET'} <=> $if->{$b}{' OFFSET'}}
+                    grep(length($_) == 4, keys %{$if});
+my (@trmap) = sort {$tlist[$a] cmp $tlist[$b]} (0 .. $#tlist);
+my ($t, @tmap);
+foreach (@trmap) { $tmap[$_] = $t++; }
+$whdr{'num'} = scalar @tlist;
+$whdr{'total'} =  12 + $whdr{'num'} * 16;
+if ($opts{'v'})
+{
+    ($whdr{'major'}, $whdr{'minor'}) = ($opts{v} =~ /(\d+)(?:\.(\d+))/);
+}
+out_whdr($ofh, \%whdr);
+my ($curroffset) = align4($ofh, $ofh->tell());
+for (my $i = 0; $i < $whdr{'num'}; $i++)
+{
+    my (%d);
+    my ($n) = $tlist[$i];
+    my ($t) = $if->{$n};
+    my ($idat, $odat);
+    my ($csum);
+
+    $whdr{'dir'}[$tmap[$i]] = \%d;
+    $whdr{'total'} += ($t->{' LENGTH'} + 3) & ~3;
+    $d{'tag'} = $n;
+    $d{'offset'} = $curroffset;
+    $d{'orglen'} = $t->{' LENGTH'};
+    $d{'csum'} = $t->{' CSUM'};
+    if ($t->{' OFFSET'} & 3)
+    { warn "table '$n' isn't long-aligned\n"; $cWarnings++;}
+    $t->{' INFILE'}->seek($t->{' OFFSET'}, 0);
+    $t->{' INFILE'}->read($idat, $t->{' LENGTH'});
+    # Pad string and verify checksum:
+    $odat = $idat;
+    $odat .= substr("\000" x 4, $t->{' LENGTH'} & 3) if  $t->{' LENGTH'} & 3; 
+    $csum = unpack('%32N*', $odat); 
+    if ($n eq 'head')
+    {
+        # for head table, need to remove checksumAdjustment from calculated value
+        $csum -= $if->{'head'}{'checkSumAdjustment'};
+        while ($csum < 0) { $csum += 0xffffffff; $csum++; }
+    }
+    if ($csum != $t->{' CSUM'})
+    { warn "invalid checksum in '$n' table\n"; $cWarnings++;}
+    $msum += $csum;
+    while ($msum > 0xffffffff) { $msum -= 0xffffffff; $msum--; }
+    
+    $odat = compress($idat, 9);
+    $d{'len'} = length($odat);
+    if ($d{'len'} < $d{'orglen'})
+    { $ofh->print($odat);}
+    else
+    { 
+        # Compression doesn't save space -- mustn't use it:
+        $d{'len'} = $d{'orglen'};
+        $ofh->print($idat);
+    }
+    # Per spec, all sfnt tables are padded -- not just the non-final tables:
+    $curroffset = align4($ofh, $ofh->tell());
+}
+
+# We should now have the full checksum of the input font... verify it.
+if (defined $if->{'head'})
+{
+    my $lsum = 0xB1B0AFBA - $msum;
+    while ($lsum < 0) { $lsum += 0xffffffff; $lsum++; } 
+    if ($lsum != $if->{'head'}{'checkSumAdjustment'})
+    { warn "invalid font-wide checksum\n"; $cWarnings++; }
+}
+
+if ($cWarnings)
+{
+    $ofh->close;
+    unlink $ARGV[1];
+    die "Input font has $cWarnings checksum- or structure-related errors.\nSee ttf2woff -c for possible workaround.\n";
+}
+
+if ($opts{'m'})
+{
+    my ($mfh) = IO::File->new("< $opts{'m'}") || die "Can't open $opts{'m'} for reading";
+    local $/;
+    my ($idat) = <$mfh>;
+    $mfh->close();
+    # Per spec, meta data is *always* compressed:
+    my ($odat) = compress($idat, 9);
+    $curroffset = align4($ofh, $curroffset);
+    $whdr{'moffset'} = $curroffset;
+    $whdr{'mlen'} = length($odat);
+    $whdr{'morglen'} = length($idat);
+    $ofh->print($odat);
+    # Per spec, meta data need not be padded if it is the last thing in the font:
+    $curroffset = $ofh->tell();
+}
+
+if ($opts{'p'})
+{
+    my ($pfh) = IO::File->new("< $opts{'p'}") || die "Can't open $opts{'p'} for reading";
+    binmode $pfh;
+    local $/;
+    my ($idat) = <$pfh>;
+    $curroffset = align4($ofh, $curroffset);
+    $whdr{'poffset'} = $curroffset;
+    $whdr{'plen'} = length($idat);
+    $ofh->print($idat);
+    # Per spec, private data is never padded: its end must coincide w/ end of file:
+    $curroffset = $ofh->tell();
+}
+$whdr{'len'} = $curroffset;
+$ofh->seek(0, 0);
+out_whdr($ofh, \%whdr);
+$ofh->close();
+
+sub out_whdr
+{
+    my ($ofh, $whdr) = @_;
+    $ofh->print(pack("NNNnnNnnNNNNN", 0x774F4646, 0x00010000, $whdr->{'len'}, 
+                    $whdr->{'num'}, 0, $whdr->{'total'}, $whdr->{'major'}, $whdr->{'minor'},
+                    $whdr->{'moffset'}, $whdr->{'mlen'}, $whdr->{'morglen'},
+                    $whdr->{'poffset'}, $whdr->{'plen'}));
+    for (my $i = 0; $i < $whdr->{'num'}; $i++)
+    {
+        my ($d) = $whdr->{'dir'}[$i];
+        $ofh->print(pack("A4NNNN", $d->{'tag'}, $d->{'offset'}, $d->{'len'},
+                        $d->{'orglen'}, $d->{'csum'}));
+    } 
+}
+
+sub align4
+{
+    my ($ofh, $curroffset) = @_;
+
+    if (($curroffset & 3) != 0)
+    {
+        $ofh->print("\000" x (4 - $curroffset & 3)) if ($ofh);
+        $curroffset = ($curroffset & ~3) + 4;
+    }
+    return $curroffset;
+}
+
+__END__
+
+=head1 NAME
+
+ttf2woff - create WOFF file from TTF file
+
+=head1 SYNOPSIS
+
+  ttf2woff [-m metadatafile] [-p privatefile] infile.ttf outfile.woff
+
+Converts a TTF file into a WOFF file appending optional metadata and private data.
+
+=head1 OPTIONS
+
+  -c                Recompute all checksums
+  -m file           File containing XML WOFF metadata
+  -p file           File containing arbitrary data
+  -v major.minor    WOFF version number
+  -h                Prints help
+
+=head1 DESCRIPTION
+
+Does what it says on the tin. 
+
+By default ttf2woff fails if the input font has checksum errors.
+
+If -c is specified, all font checksums are recalculated. In this case if 
+the input font has a non-null DSIG table it will omitted from output.
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

@@ -1,0 +1,30 @@
+---
+abstract: 'In-Memory filesystem using the Filesys::Virtual::Async API'
+author:
+  - 'Apocalypse <APOCAL@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Filesys-Virtual-Async-inMemory
+provides:
+  Filesys::Virtual::Async::inMemory:
+    file: lib/Filesys/Virtual/Async/inMemory.pm
+    version: 0.02
+requires:
+  Errno: 0
+  Fcntl: 0
+  File::Spec: 0
+  Filesys::Virtual::Async: 0
+  IO::Scalar: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filesys-Virtual-Async-inMemory
+  homepage: http://search.cpan.org/dist/Filesys-Virtual-Async-inMemory
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/apocalypse/perl-filesys-virtual-async-inmemory
+version: 0.02

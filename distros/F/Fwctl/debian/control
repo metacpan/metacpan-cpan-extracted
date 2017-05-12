@@ -1,0 +1,14 @@
+Source: fwctl
+Section: net
+Priority: optional
+Maintainer: Bernd Eckenfels <ecki@lina.inka.de>
+Standards-Version: 2.5.1
+
+Package: fwctl
+Architecture: all
+Depends: ${perl:Depends}, ipchains-perl, libnetwork-ipv4addr-perl, data-dumper, logrotate
+Description: configure ipchains firewall using higher level abstraction
+ This Perl Module and the script is used to generate ipchains rules from
+ config files which are easy to use. It also handles accounting.
+ .
+ The rules will be installed from init and accounting data is dumped daily.

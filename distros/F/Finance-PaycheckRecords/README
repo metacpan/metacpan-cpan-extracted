@@ -1,0 +1,46 @@
+Finance-PaycheckRecords version 1.001, released October 24, 2015
+
+
+This module can parse paystubs from PaycheckRecords.com, so you can
+extract the information from them.  It also includes a function to
+generate a Quicken Interchange Format (QIF) record from a paystub.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package             Minimum Version
+  ------------------- ---------------
+  perl                 5.10.0
+  Carp                 
+  Exporter             5.57
+  HTML::TableExtract   2.10
+  List::Util
+
+
+
+CHANGES
+    Here's what's new in version 1.001 of Finance-PaycheckRecords:
+    (See the file "Changes" for the full revision history.)
+
+	- Add 20-example-deposit.t and example direct deposit paycheck
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

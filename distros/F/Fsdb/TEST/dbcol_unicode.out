@@ -1,0 +1,13 @@
+#fsdb -F S desc example
+simple ascii  foo
+latin-1  Réno
+cyrillic  Кириллица
+greek  Ελληνικό αλφάβητο
+katakana  カタカナ
+korean  한글
+chinese  中文
+traditional chinese  正體字
+hebrew  אָלֶף־בֵּית עִבְרִי
+arabic  أَبْجَدِيَّة عَرَبِيَّة‎
+devanagari  देवनागरी
+#   | dbcol desc example

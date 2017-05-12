@@ -1,0 +1,38 @@
+---
+abstract: 'Run chmod recursively against directories'
+author:
+  - 'Mithun Ayachit <mithun@cpan.org>'
+build_requires:
+  Test::More: '0'
+  version: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - chmod
+  - stat
+  - permissions
+  - mode
+  - file
+  - recursive
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-chmod-Recursive
+provides:
+  File::chmod::Recursive:
+    file: lib/File/chmod/Recursive.pm
+    version: v1.0.3
+requires:
+  Cwd: '0'
+  File::Find: '0'
+  File::chmod: '0.42'
+resources:
+  bugtracker: https://github.com/mithun/perl-file-chmod-recursive/issues
+  homepage: https://github.com/mithun/perl-file-chmod-recursive
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mithun/perl-file-chmod-recursive.git
+version: v1.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

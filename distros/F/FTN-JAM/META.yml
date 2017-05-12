@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               FTN-JAM
+version:            0.30
+abstract:           A Perl extension for handleing JAM messagebases.
+author:
+    - Robert James Clay <jame@rocasa.us>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Readonly:             0
+    Test::More:           0
+    Test::Pod:            1.22
+    Test::Pod::Coverage:  1.08
+    Time::Local:          0
+    Time::Zone:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

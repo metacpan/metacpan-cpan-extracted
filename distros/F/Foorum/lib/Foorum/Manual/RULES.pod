@@ -1,0 +1,35 @@
+
+=pod
+
+
+=head1 NAME
+
+Foorum::Manual::RULES - Foorum rules
+
+=head2 General Rules
+
+  * Release Early and Release Often
+  * Keep it Simple, Stupid (KISS)
+  * Don't Repeat Yourself (DRY)
+  * Design for change
+  * Don't rely on trick
+  * Fast is better
+
+=head2 Catalyst Rules
+
+  * Don't raise error in model class (no detach('/print_error'))
+
+=head2 Datebase Rules
+
+  * use INT(11) UNSIGNED instead of DATETIME (no DATETIME please)
+
+=head2 Default Rules In Foorum
+
+  * Raise non-exists error in Controller/Get.pm
+
+=head2 HTML Rules
+
+  * css at begin while js at end
+
+
+=cut

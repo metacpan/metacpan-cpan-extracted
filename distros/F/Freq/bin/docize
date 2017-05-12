@@ -1,0 +1,15 @@
+#!perl -w
+
+my @files = @ARGV;
+for my $file (@files){
+    print "<DOC>\n<DOCNO>$file</DOCNO>\n";
+    open FILE, "<$file" or die $!;
+    while(<FILE>){
+        print;
+    }
+    close FILE;
+    print "</DOC>\n";
+}
+
+exit;
+

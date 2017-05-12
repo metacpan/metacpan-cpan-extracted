@@ -1,0 +1,64 @@
+[% USE FillInForm %]
+[% PROCESS sub/date.html %]
+[% title = c.loc('Search') %]
+
+[% FILTER fillinform fdat => fdat || c.req.params %]
+<div class='one'>
+<form method='GET'>
+<table align='center'>
+    <tr>
+        <td colspan='2' class='title'>Search on [% forum.name %]</td>
+    </tr>
+    <tr class='misc1'>
+        <td align='right'>Title contains: </td><td><input type='text' name='title' />
+            [% IF error_title %]<div class='highlight'>[% error_title %]</div>[% END %]
+            </td>
+    </tr>
+    <tr class='misc2'>
+        <td align='right'>Author is:</td><td><input type='text' name='author' /> username please
+            [% IF error_author %]<div class='highlight'>[% error_author %]</div>[% END %]
+            </td>
+    </tr>
+    <tr class='misc1'>
+        <td align='right'>Date</td><td>
+            <select name='date'>
+                <option value='0'>Whenever</option>
+                <option value='2'>Last 2 days</option>
+                <option value='7'>Last 7 days</option>
+                <option value='30'>Last 30 days</option>
+                <option value='999'>More than 30 days</option>
+            </select>
+        </td>
+    </tr>
+    <tr class='misc2'>
+        <td align='right'>Sort By</td><td>
+            <input type='radio' name='order_by' value='last_update_date' checked='checked' /> Last Update
+            <input type='radio' name='order_by' value='post_on' /> Post On
+        </td>
+    </tr>
+    <tr class='misc1'>
+        <td>&nbsp;</td><td><input type='submit' /></td>
+    </tr>
+</table>
+</form>
+</div>
+[% END %]
+
+<div style='clear:both'></div>
+
+<div class='one'>
+	<table align='center'>
+[% IF topics.size == 0 %]
+<tr><td class='misc1'>No Result. please try another.</td></tr>
+[% ELSE %]
+		<tr class='title'><td>Title</td><td>Author</td><td width='200'>Date</td></tr>
+		[% FOREACH t IN topics %]
+		<tr class='misc[% IF loop.count MOD 2; '1'; ELSE; '2'; END; %]'>
+			<td><a href='/forum/[% t.forum_id %]/topic/[% t.topic_id %]'>[% t.title %]</a></td>
+			<td><a href='/u/[% t.author.username %]'>[% t.author.nickname %]</a></td>
+			<td><span class='date'>[% date_format(t.last_update_date) %]</span></td>
+		</tr>
+		[% END %]
+[% END %]
+	</table>
+</div>

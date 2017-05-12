@@ -1,0 +1,15 @@
+lib/Games/Freelancer/UTF.pm
+MANIFEST
+Makefile.PL
+Changes
+LICENSE
+META.yml
+README
+t/0_basic.t
+xt/meta.t
+xt/pod.t
+xt/pod_coverage.t
+example/extractTextures.pl
+example/HardpointCopy.pl
+example/HardpointMaxAngle.pl
+example/MoveHardpoint.pl

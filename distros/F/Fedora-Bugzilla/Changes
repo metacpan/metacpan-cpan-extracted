@@ -1,0 +1,53 @@
+Revision history for Fedora-Bugzilla
+
+0.13 Fri Sep 25 2009
+- minor update: NewBug/alias type is now Maybe[Str]
+
+0.12 Mon Sep 21 2009 
+- Switch to MooseX::CascadeClearing
+
+0.11 Fri Sep 11 2009
+- metadata updates
+- fix the Types '=>' issues
+
+0.10 Sat Apr 25 2009
+- aaaand fix our $VERSIONs
+
+0.09 Sat Apr 25 2009
+- minor login tweaks (still needs work)
+- enhance Bug's uri/flags attributes handling
+
+0.08 Sun Mar 22 2009
+- fix uris builder
+- add additional metadata to META.yml (repository)
+- refactor some bug attributes to better leverage MX::AH
+
+0.07 Sun Mar 08 2009
+- mark DateTime::Format::Pg as a requires
+
+0.06 Fri Mar 06 2009
+- drop DateTime::Format::Bugzilla
+- more pod and pod fixes
+
+0.05 Fri Feb 06 2009 
+- fix our login, passwd attributes and callbacks (their builders, really)
+
+0.04 Wed 28 Jan 2009
+- Subclass RPC::XML::Client to handle logins
+- rewrite the login bits in Fedora/Bugzilla.pm
+- some test tweaks
+
+0.03 Sun Jan 25 2008
+- add methods to decode/access attachment data (and tests)
+- more documentation in Fedora/Bugzilla/Bug/Attachment.pm
+
+0.02 Sat Jan 25 2008 
+- significant documentation updates
+- add attachments functionality (the beginnings of it, at least), as well as
+  some tests.
+- add Fedora::Bugzilla::Role::NewHash, so we don't keep repeating the same
+  to_hash() code in all our New* classes
+
+0.01  Tue Oct  7 17:19:42 2008
+- Initial release.
+

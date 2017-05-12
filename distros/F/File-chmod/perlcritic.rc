@@ -1,0 +1,6 @@
+theme    = core
+severity = 3
+verbose  = 9
+exclude  = ProhibitLeadingZeros RequireFinalReturn RequireArgUnpacking ProhibitCommaSeparatedStatements RequireExtendedFormatting
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 37

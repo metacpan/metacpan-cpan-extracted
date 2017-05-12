@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/File/Queue.pm
+lib/File/Queue.pod
+t/00-load.t
+t/01-simple.t.save
+t/pod-coverage.t
+t/pod.t

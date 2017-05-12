@@ -1,0 +1,75 @@
+{
+   "abstract" : "MAC Address validation",
+   "author" : [
+      "Ryo Okamoto <ryo@aquahill.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FormValidator-Simple-Plugin-NetAddr-MAC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FormValidator::Simple" : "0",
+            "NetAddr::MAC" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CGI" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "FormValidator::Simple::Plugin::NetAddr::MAC" : {
+         "file" : "lib/FormValidator/Simple/Plugin/NetAddr/MAC.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://git@github.com/ryochin/p5-formvalidator-simple-plugin-netaddr-mac/issues"
+      },
+      "homepage" : "https://git@github.com/ryochin/p5-formvalidator-simple-plugin-netaddr-mac",
+      "repository" : {
+         "url" : "git://git@github.com/ryochin/p5-formvalidator-simple-plugin-netaddr-mac.git",
+         "web" : "https://git@github.com/ryochin/p5-formvalidator-simple-plugin-netaddr-mac"
+      }
+   },
+   "version" : "0.01"
+}

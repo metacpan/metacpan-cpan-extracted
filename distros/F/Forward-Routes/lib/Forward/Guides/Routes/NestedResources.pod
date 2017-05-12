@@ -1,0 +1,52 @@
+=head1 Name
+
+Forward::Guides::Routes::NestedResources - Routes for Nested Resources for
+Plack web framework developers (Perl)
+
+=head1 Description
+
+L<Forward::Routes> supports nested resource routing. Take a look at
+L<Forward::Guides::Routes::Resources> for more in depth
+documentation on resource routing.
+
+    # Routes root object
+    $r = Forward::Routes->new;
+
+    # Create a nested resource
+    $ads = $r->add_resources('magazines')->add_resources('ads');
+
+    # IN ADDITION TO ! to the magazine resource routes, the following routes
+    # are generated:
+
+    HTTP     Path                                 Controller Action        Route name
+    request                                       parameter  parameter
+    method          
+
+    GET      magazines/:magazine_id/ads/new        Ads       create_form   magazines_ads_create_form
+    GET      magazines/:magazine_id/ads/:id        Ads       show          magazines_ads_show
+    GET      magazines/:magazine_id/ads/:id/edit   Ads       update_form   magazines_ads_update_form
+    GET      magazines/:magazine_id/ads/:id/delete Ads       delete_form   magazines_ads_delete_form
+    GET      magazines/:magazine_id/ads            Ads       index         magazines_ads_index
+    POST     magazines/:magazine_id/ads            Ads       create        magazines_ads_create
+    PUT      magazines/:magazine_id/ads/:id        Ads       update        magazines_ads_update
+    DELETE   magazines/:magazine_id/ads/:id        Ads       delete        magazines_ads_delete
+
+The placeholder name for the parent resource id is singularized. That way, it
+can easily be used to search the "ads" database table with "id" and
+"magazine_id" columns (typical column naming in case of has_many
+relationships).
+
+    # resource (plural):      magazines
+    # placeholder (singular): :magazine_id
+
+The C<singularize> method is very basic, but it can be overwritten:
+
+    $routes = Forward::Routes->new;
+
+    # pass a code ref via singularize method
+    $routes->singularize( sub {
+        require Lingua::EN::Inflect::Number;
+        return &Lingua::EN::Inflect::Number::to_S($value);
+    });
+
+=cut

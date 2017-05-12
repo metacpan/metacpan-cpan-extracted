@@ -1,0 +1,23 @@
+---
+abstract: 'Map a directory recursively'
+author:
+  - 'Eugene Grigoriev <perl@sizur.com>'
+build_requires:
+  File::Path: 2.08
+  Test::More: 0
+  common::sense: 3.1
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Dir-Map
+provides:
+  File::Dir::Map:
+    file: lib/File/Dir/Map.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

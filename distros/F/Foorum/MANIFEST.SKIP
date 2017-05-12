@@ -1,0 +1,40 @@
+conf/mail.yml
+conf/scraper.yml
+conf/sphinx.conf
+conf/theschwartz.yml
+foorum_local.yml
+lib/Foorum/Controller/Test.pm
+root/upload/\d+
+root/upload/pdf/\d+
+data/sphinx/
+
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+.gitignore
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+
+# Avoid Devel::Cover files.
+\bcover_db\b

@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::CaVirtex::API.
+
+0.01  Wed June 13 23:13:38 2014
+	- original version; created by h2xs 1.23 with options
+		-AX Finance::CaVirtex::API
+

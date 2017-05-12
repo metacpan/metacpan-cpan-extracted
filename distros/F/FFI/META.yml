@@ -1,0 +1,30 @@
+---
+abstract: 'Perl Foreign Function Interface based on GNU ffcall'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Paul Moore <gustav@morpheus.demon.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Alien::FFCall: '0.02'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/FFI/issues
+  homepage: https://github.com/plicease/FFI
+  repository: https://github.com/plicease/FFI.git
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

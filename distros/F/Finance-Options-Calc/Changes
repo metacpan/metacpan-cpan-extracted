@@ -1,0 +1,10 @@
+Revision history for Perl extension Finance::Options::Calc.
+
+0.90 Wed Dec  6 15:50:58 2000
+	- many more subroutines return useful info
+	  for option analysis
+
+0.7  Sun Dec  3 18:35:10 2000
+        - original version; created by h2xs 1.19
+
+

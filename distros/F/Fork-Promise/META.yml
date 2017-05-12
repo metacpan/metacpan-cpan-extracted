@@ -1,0 +1,41 @@
+---
+abstract: 'run a code in a subprocess and get a promise that it ended'
+author:
+  - 'Miroslav Tynovsky <tynovsky@avast.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Fork-Promise
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Fork::Promise:
+    file: lib/Fork/Promise.pm
+    version: v0.1.0
+requires:
+  AnyEvent: '0'
+  Class::Tiny: '0'
+  Promises: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/tynovsky/Fork-Promise/issues
+  homepage: https://github.com/tynovsky/Fork-Promise
+  repository: git://github.com/tynovsky/Fork-Promise.git
+version: 0.1.0
+x_authority: cpan:TYNOVSKY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,51 @@
+The File::Tail module is designed for reading files which are continously
+appended to (the name comes from the tail -f directive). Usualy such files are
+logfiles of some description.
+
+The module tries hard not to busy wait on the file, dynamicaly calcultaing 
+how long it should wait before it pays to try reading the file again.
+
+The module should handle normal log truncations ("close; move; open"
+or "cat /dev/null >file") transparently, without losing any input.
+
+Currently this package requires Time::HiRes, because it often needs to sleep
+for less than one second. (I don't beleive one should busy wait on a file
+just because it gets more than one line/second).
+
+The file logwatch is a simple example of use. Try it with 
+./logwatch /var/log/syslog 1 if you want to see how File::Tail works.
+
+This version now returns a tied filehandle, but it can also be used as 
+a normal object.
+
+A feature added in 0.81 is tail -n functionality: you can demand to read the 
+last n lines, reading from the current end of file, or reading from the start
+of file.
+
+Select was added in version 0.90. It allows you to simoultaneously read from
+several File::Tail objects at the same time, while also reading from pipes.
+This is a new implementation, so if you notice any bugs, please let me know.
+*************************************************************************
+Version 0.90 had a bug in "select" which caused it to sometimes overlook
+input waiting on ordinary files until there was input on tailed files.
+*************************************************************************
+NOTE: Select functionality is currently experimental. Consider this a public 
+beta. If you notice any new problems, let me know. I will also entertain 
+suggestions for changes in the select interface - but only until I release
+the next version.
+
+To build this module, enter
+perl Makefile.PL
+make
+make test
+make install
+
+If you have any problems, contact me at matija.grabnar@arnes.si
+
+Copyright (c) 1997,1998,1999 Matija Grabnar. 
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself. 
+
+
+

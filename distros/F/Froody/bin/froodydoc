@@ -1,0 +1,2 @@
+#!/bin/sh
+perl -Ilib -MFroody::Pod -e "Froody::Pod->run(qw( $* ));" | pod2man -c 'Froody API Documentation' -n $1 | nroff -man 2> /dev/null | less

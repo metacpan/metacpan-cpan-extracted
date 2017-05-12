@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+# - aggregate_monthly
+# - utility script for FreeRADIUS::Database
+
+use strict;
+use warnings;
+
+use FreeRADIUS::Database;
+use Getopt::Long;
+Getopt::Long::Configure qw( bundling );
+use Pod::Usage;
+
+my ( $month, $help, $man, $verbose ) = 0;
+
+my $result = GetOptions(
+                'month|m=s' => \$month,
+                'help|h'    => \$help,
+                'man|M'     => \$man,
+                'verbose|v' => \$verbose,
+            );
+
+pod2usage({ -verbose => 1 }) if $help;
+pod2usage({ -verbose => 2 }) if $man;
+
+if ( $month && $month !~ m{ \A \d{4}-(0|1)\d \z }xms ) {
+
+    pod2usage({ 
+        -msg        => "\n\n--month argument requires a parameter in the form YYYY-MM\n\n",
+        -verbose    => 1,
+    });
+}
+
+my $radius = FreeRADIUS::Database->new();
+
+if ( $month ) {
+
+    my $agg_result = $radius->aggregate_monthly( { month => $month } );
+
+    if ( $verbose && $agg_result ) {
+        print "aggregate_monthly failed during the manual run for $month!: $!";
+    }
+}
+else {
+    
+    my $agg_result = $radius->aggregate_monthly();
+
+    if ( $verbose && $agg_result ) {
+        print "aggregate_monthly failed during the automated run!: $!";
+    }
+}
+
+if ( $verbose ) {
+    print "aggregate_monthly completed successfully\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+aggregate_monthly - Utility script for use with FreeRADIUS::Database
+
+=head1 SYNOPSIS
+
+    # specify month to work on
+
+    aggregate_monthly --month|-m 2009-06
+
+    # display help
+
+    aggregate_monthly --help|-h
+
+    # display the manual page
+
+    aggregate_monthly --man|-M
+
+    # be verbose
+    
+    aggregate_monthly --verbose|-v
+
+=head1 OPTIONS
+
+=over 8
+
+=item --month | -m
+
+Specify the month in which you want to work on in the form YYYY-MM. If
+the month parameter is not supplied, we will work on the month that was
+existent yesterday.
+
+=back
+
+=head1 DESCRIPTION
+
+aggregate_monthly is a utility script for the FreeRADIUS::Database module.
+
+It aggregates the entries from the aggregate_daily database table into
+the aggregate_monthly table, creating one row per user, per NAS.
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012 by Steve Bertrand
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

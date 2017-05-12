@@ -1,0 +1,186 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+use Finnigan;
+
+my $option_help = 0;
+my $option_man = 0;
+my $option_dump = 0;
+my $option_html = 0;
+my $option_wiki = 0;
+my $option_size = 0;
+my $option_preamble = 0;
+my $option_relative = 0;
+
+Getopt::Long::Configure ("bundling");
+GetOptions(
+           'help|?' => \$option_help,
+           'man' => \$option_man,
+           'dump|d' => \$option_dump,
+           'size|s' => \$option_size,
+           'html|h' => \$option_html,
+           'wiki|w' => \$option_wiki,
+           'preamble|p' => \$option_preamble,
+           'relative|r' => \$option_relative,
+          ) or pod2usage(2);
+pod2usage(1) if $option_help;
+pod2usage(-existstatus => 0, -verbose => 2) if $option_man;
+
+@ARGV == 1 or do{ say STDERR "Expecting a single input file\n"; pod2usage(2) };
+
+my $file = shift @ARGV;
+
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $header->version);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+my $rfi = Finnigan::RawFileInfo->decode(\*INPUT, $header->version);
+
+if ( $option_size ) {
+  if ( $option_preamble ) {
+    say "size: " . $rfi->preamble->size;
+  }
+  else {
+    say "size: " . $rfi->size;
+  }
+}
+
+if ( $option_dump ) {
+  if ( $option_html ) {
+    if ( $option_preamble ) {
+      $rfi->preamble->dump(style => 'html', relative => $option_relative);
+    }
+    else {
+      $rfi->dump(style => 'html', relative => $option_relative);
+    }
+  }
+  elsif ( $option_wiki ) {
+    if ( $option_preamble ) {
+      $rfi->preamble->dump(style => 'wiki', relative => $option_relative);
+    }
+    else {
+      $rfi->dump(style => 'wiki', relative => $option_relative);
+    }
+  }
+  else {
+    if ( $option_preamble ) {
+      $rfi->preamble->dump(relative => $option_relative);
+    }
+    else {
+      $rfi->dump(relative => $option_relative);
+    }
+  }
+}
+else {
+  say "$file: $rfi";
+}
+
+__END__
+=head1 NAME
+
+uf-rfi - decode the RawFileInfo structure in a Finnigan raw file
+
+=head1 SYNOPSIS
+
+uf-rfi [options] file
+
+ Options:
+   --help            brief help message
+   --man             full documentation
+   --html            request html formatting of the dump
+   --wiki            format as a wiki table
+   --size            tell object size
+   --preamble        dump the content of RawFileInfoPreamble instead of RawFileInfo itself
+   --relative        show relative addresses
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the manual page and exit.
+
+=item B<--dump>
+
+Prints the table listing all header fields with their seek addresses,
+sizes, acess keys and values.
+
+=item B<--html>
+
+Dump as html table.
+
+=item B<--wiki>
+
+Dump as a wiki table.
+
+=item B<--size>
+
+Show structure size in bytes.
+
+=item B<--preamble>
+
+Dump the contents of RawFileInfoPreamble, instead of the parent object.
+
+=item B<--relative>
+
+Show relative addresses of all itmes. The default is to show the
+absolute seek address.
+
+=back
+
+=head1 DESCRIPTION
+
+B<uf-rfi> displays the contents of the RawFileInfo structure, or its
+component RawFileInfoPreamble.
+
+It will return an error message if its input is not a Finnigan raw
+file.
+
+By default, it prints a summary of the object's data on a single line.
+
+=head1 SEE ALSO
+
+Finnigan::RawFileInfo
+
+Finnigan::RawFileInfoPreamble
+
+
+Finnigan::Runheader
+
+=head1 EXAMPLES
+
+=over 4
+
+=item Display a single line with file creation date, followed by the data and RunHeader addresses:
+
+  uf-rfi sample.raw
+
+=item Dump the entire RawFileInfo structure with absolute addresses:
+
+  uf-rfi -d sample.raw
+
+=item Dump the RawFileInfoPreamble structure with relative addresses:
+
+  uf-rfi -dpr sample.raw
+
+=back
+
+=cut

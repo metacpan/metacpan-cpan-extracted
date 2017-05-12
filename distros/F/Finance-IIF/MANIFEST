@@ -1,0 +1,9 @@
+Changes
+lib/Finance/IIF.pm
+Makefile.PL
+MANIFEST
+README
+t/Finance-IIF.t
+t/iifdumper
+t/sample.iif
+META.yml                                 Module meta-data (added by MakeMaker)

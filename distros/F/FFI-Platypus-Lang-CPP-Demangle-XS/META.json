@@ -1,0 +1,61 @@
+{
+   "abstract" : "Demangle C++ symbols using the C++ ABI API",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FFI-Platypus-Lang-CPP-Demangle-XS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0",
+            "Module::Build" : "0.28",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "base" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/FFI-Platypus-Lang-CPP-Demangle-XS",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS.git",
+         "web" : "https://github.com/plicease/FFI-Platypus-Lang-CPP-Demangle-XS"
+      }
+   },
+   "version" : "0.02"
+}
+

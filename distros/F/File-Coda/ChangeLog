@@ -1,0 +1,121 @@
+2010-06-05  Jim Meyering  <meyering@redhat.com>
+
+	Version 1.94
+	* Coda.pm (Version): Increment.
+
+	tests: work around failures when run on Windows
+	* t/01-basic.t: Skip tests if shell does not recognize ">&-".
+	* t/02-noclobber.t: Likewise.
+	* t/03-nointerfere.t: Don't use /dev/null, to accommodate Windows.
+	Instead, redirect to a real file, and verify its contents.
+
+2010-01-23  Jim Meyering  <meyering@redhat.com>
+
+	Version 1.93
+	* Coda.pm (Version): Increment
+	* ChangeLog: Fix stale and inaccurate ChangeLog (the git
+	log was accurate).
+
+	Version 1.92
+	* Coda.pm (Version): Increment
+
+	avoid spurious test failure due to LC_MESSAGES != C
+	* t/01-basic.t: Use LC_ALL=C only in the parent.
+	Also use setlocale(LC_ALL, 'C'), to ensure English diagnostics.
+	* t/02-noclobber.t: Likewise.
+	* t/03-nointerfere: Likewise.
+
+2009-12-11  Jim Meyering  <meyering@redhat.com>
+
+	Version 1.91
+	* Coda.pm (VERSION): Increment.
+
+	Version 1.10
+	* Coda.pm (VERSION): Increment.
+
+	tests: accommodate a system with unwritable /dev/full
+	* t/01-basic.t: Test for writability, not just existence of /dev/full.
+
+2009-12-10  Jim Meyering  <meyering@redhat.com>
+
+	tests: work around difference in Solaris' spelling of strerror(EBADF)
+	* t/01-basic.t: Don't hard-code spelling of Linux's strerror(EBADF).
+	* t/02-noclobber.t: Likewise.
+
+2009-12-03  Jim Meyering  <meyering@redhat.com>
+
+	build: sign the tarball
+	* Build.PL: Add sign => 1 option.
+	Remove useless quotes on RHS '0's.
+
+2009-12-01  Jim Meyering  <meyering@redhat.com>
+
+	Version 1.9
+	* Coda.pm ($VERSION): Increase to 1.9.
+
+2009-11-30  Jim Meyering  <meyering@redhat.com>
+
+	make t/01 work even without /dev/full
+	* t/01-basic.t: Without /dev/full, just skip that sub-test.
+
+	make t/02 work even without /dev/full
+	* t/02-noclobber.t: Eliminate FIXME: provoke failure
+	with closed stdout rather than relying on /dev/full.
+
+2009-11-29  Jim Meyering  <meyering@redhat.com>
+
+	doc: say that we use "warn" for the diagnostic
+	* Coda.pm: Say that we use "warn", rather than mentioning STDERR.
+	Mention that "1" is just the default exit status.
+
+2009-11-28  Jim Meyering  <meyering@redhat.com>
+
+	Coda.pm: fix a subtle taint-related bug
+	* Coda.pm: Don't use $ME (aka $0) *inside* double quotes.
+	Its taintedness in that context would cause $! to expand to a
+	number rather than to a string, thus making tests 01 and 02 fail.
+	* t/01-basic.t: Reenable taint-checking, now that the
+	problem is resolved.
+	* t/02-noclobber.t: Likewise.
+
+2009-11-27  Jim Meyering  <meyering@redhat.com>
+
+	Version 1.8.
+	* Coda.pm (VERSION): Increment.
+
+	use Module::Build
+	* Build.PL: New file.
+	* Makefile.PL: Remove.
+	* t/98-pod-coverage.t: New file.
+	* t/99-pod.t: Likewise.
+
+	maint: add LICENSE
+	* LICENSE: New file.
+	* MANIFEST: Add it.
+
+2009-11-26  Jim Meyering  <meyering@redhat.com>
+
+	build: include all tests in tarball
+	* MANIFEST: Add t/02*, t/03* and t/99*.
+
+2007-02-11  Jim Meyering  <jim@meyering.net>
+
+	Version 1.4.
+	* Coda.pm ($VERSION): Increase to 1.4.
+
+	* Makefile.PL (WriteMakefile): Use gzip's --rsyncable option,
+	if possible.
+
+	* t/0*.t: Use "$ENV{LC_ALL} = 'C';".  That is simpler,
+	should work just as well, and may even be more portable.
+
+	Use setlocale to ensure we get English diagnostics.
+	* t/01basic.t, t/02noclobber.t, t/03nointerfere.t: Use setlocale,
+	in case the system default language is not "C" or en_*.
+	This is necessary for some MacOS X configurations.
+	Also fix typo: s/email line/stderr line/.
+	Suggestions from Ed Santiago.
+
+2007-01-19  Jim Meyering  <jim@meyering.net>
+
+	Version 1.3.

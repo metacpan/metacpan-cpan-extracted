@@ -1,0 +1,469 @@
+#!/usr/bin/perl
+#
+#    fwctlacctreport:   Generates text report from the accounting logs.
+#
+#    This file is part of Fwctl.
+#
+#    Author: Francis J. Lacoste <francis.lacoste@iNsu.COM>
+#
+#    Copyright (C) 2000 iNsu Innovations Inc.
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+
+use strict;
+
+use Fwctl::AcctReport;
+use Getopt::Long;
+
+use constant GIG => 1024 ** 3;
+use constant MEG => 1024 ** 2;
+use constant K   => 1024;
+
+use constant COLS   => 72;
+
+use POSIX qw( strftime );
+
+sub usage(;$) {
+print <<EOFU;
+usage: fwctlacctreport [--start report_start]
+		       [--end report_end | --period report_period ]
+		       [--sample day | hour ]
+		       [--help]
+		       [--names chains ... ]
+		       [--report reports ... ]
+		       fwctl_acct
+EOFU
+    exit defined $_[0] ? $_[0] : 1;
+}
+
+sub packets_count {
+        my $packets = shift;
+
+	my ( $div, $units );
+	if ( $packets > 1_000_000 ) {
+	    $div = 1_000_000;
+	    $units = "M";
+	} elsif ($packets > 1_000 ) {
+	    $div = 1_000;
+	    $units = "k";
+	} else {
+	    $div = 1;
+	    $units = "";
+	}
+	my ( $quot, $rem ) = $packets->bdiv( $div );
+
+	$quot = substr( "$quot", 1 );
+	$rem  = substr( "$rem", 1, 1 );
+	return $rem == 0 ? $quot . $units : $quot . "." . $rem . $units;
+}
+
+sub bytes_count {
+        my $bytes = shift;
+
+	my ( $div, $units );
+	if ( $bytes > GIG ) {
+	    $div = GIG;
+	    $units = "G";
+	} elsif ($bytes > MEG ) {
+	    $div = MEG;
+	    $units = "M";
+	} elsif ( $bytes > K ) {
+	    $div = K;
+	    $units = "k";
+	} else {
+	    $div = 1;
+	    $units = "";
+	}
+	my ( $quot, $rem ) = $bytes->bdiv( $div );
+
+	$quot = substr( "$quot", 1 );
+	$rem  = substr( "$rem", 1, 1 );
+	return $rem == 0 ? $quot . $units : $quot . "." . $rem . $units;
+}
+
+sub centerf {
+    my ($cols, $format, @args ) = @_;
+    my $s = sprintf $format, @args;
+
+    my $spacing = int( ($cols - length $s) / 2 );
+    return $s . "\n"  if $spacing <= 0;
+    return " " x $spacing . $s . " " x $spacing . "\n";
+}
+
+sub center {
+    centerf( $_[0], '%s', @_[1..$#_]);
+}
+
+sub summary_report {
+    my ( $report, $sample_unit ) = @_;
+
+    print center( COLS, "SUMMARY" ), "\n";
+    printf "%-15s %8s %8s %8s %8s\n", "Name", "Pkts", "Pkts/$sample_unit", "Bytes", "Bytes/$sample_unit";
+
+    my $records = $report->summary_report();
+    unless ( @$records ) {
+	print center( COLS, "NO RECORDS" ), "\n\n";
+	return;
+    }
+
+    foreach my $s ( @$records ) {
+	printf "%-15s %8s %8s %8s %8s\n", $s->{name}, packets_count( $s->{packets_sum} ), packets_count( $s->{packets_avg} ),
+	  bytes_count( $s->{bytes_sum} ), bytes_count( $s->{bytes_avg} );
+    }
+    print "\n\n";
+}
+
+sub print_daily_header {
+    my $date = shift;
+    printf "%-12s", "Chain";
+    for ( 1 .. 7) {
+	my ($day,$mon) = (localtime $date)[3,4];
+	$mon++;
+	printf " %02d-%02d ", $mon, $day;
+	$date += 24 * 3600;
+    }
+    printf "%6s %6s\n",  "Avg", "Total";
+}
+
+sub daily_report {
+    my ( $report, $what, $field, $func ) = @_;
+
+    print centerf( COLS, '%s PER DAY', $what );
+    print "\n";
+
+    my $chains = $report->sample_report;
+    my @samples = sort { $a->[0] cmp $b->[0] } map { [ $_, $chains->{$_} ] } keys %$chains;
+
+    unless ( @samples ) {
+	print center( COLS, "NO RECORDS" ), "\n\n";
+	return;
+    }
+
+    my $num_samples = @{$samples[0][1]};
+    my $start  = $samples[0][1][0]{start};
+
+    my $wday = (localtime $start)[6];
+    my $start = $wday ? $start - $wday * 24 * 3600 : $start;
+    my $skip = $wday;
+
+    my $i = 0;
+    while ( $i < $num_samples ) {
+	my $monday;
+
+	if ($i == 0) {
+	    $monday = $start;
+	} else {
+	    $monday = $samples[0][1][$i]{start};
+	}
+	print_daily_header( $monday );
+	my $index;
+	foreach my $s ( @samples ) {
+	    $index = $i;
+	    my $total = 0;
+	    printf "%-12s", $s->[0];
+	    if ( $i == 0 ) {
+		if ( $skip ) {
+		    for ( 0 .. $skip - 1 ) {
+			printf "%6s ", "";
+		    }
+		}
+		for ( $skip .. 6 ) {
+		    if ( $index < $num_samples ) {
+			my $x = $s->[1][$index++]{$field};
+			printf "%6s ", $func->( $x );
+			$total += $x;
+		    } else {
+			printf "%6s ", "";
+		    }
+		}
+	    } else {
+		for ( 0 .. 6 ) {
+		    if ( $index < $num_samples ) {
+			my $x = $s->[1][$index++]{$field};
+			printf "%6s ", $func->( $x );
+			$total += $x;
+		    } else {
+			printf "%6s ", "";
+		    }
+		}
+	    }
+	    printf "%6s ", $func->(  $total / $num_samples );
+	    printf "%6s ", $func->(  $total );
+	    print "\n";
+	}
+	$i = $index;
+	print "\n";
+    }
+
+}
+
+sub print_hourly_header {
+    my $hour = shift;
+    printf "%-12s", "Chain";
+    for ( 1 .. 6) {
+	printf " %02d:00 ", $hour++;
+    }
+    printf "%6s %6s\n",  "Avg", "Total";
+}
+
+sub hourly_report {
+    my ( $report, $what, $field, $func ) = @_;
+
+    print centerf( COLS, '%s PER HOUR', $what );
+    print "\n";
+
+    my $chains = $report->sample_report;
+    my @samples = sort { $a->[0] cmp $b->[0] } map { [ $_, $chains->{$_} ] } keys %$chains;
+
+    unless ( @samples ) {
+	print center( COLS, "NO RECORDS" ), "\n\n";
+	return;
+    }
+
+    my $num_samples = @{$samples[0][1]};
+
+    my $start = $samples[0][1][0]{start};
+    my $hour  = (localtime $start)[2];
+    my $skip  = $hour % 6;
+    my $hour  = $hour % 6 ? $hour - ($hour % 6) : $hour;
+
+    print centerf( COLS, 'STATS FOR %s', strftime( '%y-%m-%d', localtime $start) );
+    print "\n";
+    my $i = 0;
+    while ( $i < $num_samples ) {
+	if ($hour > 23) {
+	    print centerf( COLS, 'STATS FOR %s', strftime( '%y-%m-%d', localtime ($start += 24 * 3600) ) );
+	    print "\n";
+	    $hour = 0
+	};
+
+	print_hourly_header( $hour );
+	my $index;
+	foreach my $s ( @samples ) {
+	    $index = $i;
+	    my $total = 0;
+	    printf "%-12s", $s->[0];
+	    if ( $i == 0 ) {
+		if ( $skip ) {
+		    for ( 0 .. $skip - 1 ) {
+			printf "%6s ", "";
+		    }
+		}
+		for ( $skip .. 5 ) {
+		    if ( $index < $num_samples ) {
+			my $x = $s->[1][$index++]{$field};
+			printf "%6s ", $func->( $x );
+			$total += $x;
+		    } else {
+			printf "%6s ", "";
+		    }
+		}
+	    } else {
+		for ( 0 .. 5 ) {
+		    if ( $index < $num_samples ) {
+			my $x = $s->[1][$index++]{$field};
+			printf "%6s ", $func->( $x );
+			$total += $x;
+		    } else {
+			printf "%6s ", "";
+		    }
+		}
+	    }
+	    printf "%6s ", $func->(  $total / $num_samples );
+	    printf "%6s ", $func->(  $total );
+	    print "\n";
+	}
+	$i = $index;
+	print "\n";
+	$hour += 6;
+    }
+
+}
+
+my $sample_unit;
+my %opts = ( sample => "day" );
+GetOptions( \%opts, "start=s", "end=s", "period=s", "sample=s",
+	    "names=s@", "report=s@", "help"
+	  )
+  or usage;
+
+usage(0) if $opts{help};
+
+push @{$opts{report}}, "summary" unless exists $opts{report};
+
+if ( exists $opts{sample} && $opts{sample} =~ /^d[ay]*$/i ) {
+    $opts{sample} = "1d";
+    $sample_unit = "d";
+} elsif ( exists $opts{sample} && $opts{sample} =~ /^h[our]*$/i || ! exists $opts{sample} ) {
+    $opts{sample} = "1h";
+    $sample_unit = "h";
+} else {
+    die <<EOF;
+fwctlacctreport: unknown sample unit: $opts{sample}. (should be hour or day)
+EOF
+}
+
+$opts{files} = [ @ARGV ];
+my $report = new Fwctl::AcctReport( %opts );
+
+my $report_start = strftime "%y-%m-%d %H:%M", localtime $report->start();
+my $report_end   = strftime "%y-%m-%d %H:%M", localtime $report->end();
+
+print center( COLS, "IP ACCOUNTING REPORT" );
+print center( COLS, "$report_start - $report_end" );
+print "\n\n";
+
+foreach my $r ( @{ $opts{report} } ) {
+    if ( $r =~ /^s[umary]*/i ) {
+	summary_report( $report, $sample_unit );
+    } elsif ( $r =~ /^p[ackets]*/i ) {
+	if ( $sample_unit eq "h" ) {
+	    hourly_report( $report, "PACKETS", "packets", \&packets_count);
+	} else {
+	    daily_report( $report, "PACKETS", "packets", \&packets_count );
+	}
+    } elsif ( $r =~ /^b[ytes]*/i ) {
+	if ( $sample_unit eq "h" ) {
+	    hourly_report( $report, "BYTES", "bytes", \&bytes_count );
+	} else {
+	    daily_report( $report, "BYTES", "bytes", \&bytes_count );
+	}
+    } else {
+	print STDERR "unknown report type: $r\n";
+    }
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fwctlacctreport - Generates text reports from the fwctl_acct file.
+
+=head1 SYNOPSIS
+
+fwctlacctreport [--start report_start]
+		[--end report_end | --period report_period ]
+		[--sample day|hour]
+		[--names chain...]
+		[--reports report ...]
+		logfile ...
+
+fwctlacctreport --help
+
+=head1 DESCRIPTION
+
+B<fwctlacctreport> can be use to generates reports from the output of
+the C<fwctl dump-acct> command. It will generates either summary or
+histogram-like report for the accounting data.
+
+=head1 INPUT OPTIONS
+
+The records on which the report will be generated can be customized
+with the following options.
+
+=over
+
+=item start
+
+Sets the start of the report's period. If the Date::Manip(3) module is
+installed, you can use any format that this module can parse. If that
+module isn't installed you must use the following format YYYY-MM-DD
+HH:MM:SS or any meaningful subset of that format.
+
+If this option is not used, the report will start with the first
+record.
+
+=item end
+
+Sets the end of the report's period. If the Date::Manip(3) module is
+installed, you can use any format that this module can parse. If that
+module is'nt installed you must use the following format YYYY-MM-DD
+HH:MM:SS or any meaningful subset of that format.
+
+If this option is not used, the report will end with the last record.
+
+=item period
+
+Sets the length of the report's period. This length is interpreted
+relative to the report's start. This option has priority over the
+B<end> option.
+
+If you have the Date::Manip module installed, you can use any format
+that this module can parse. If that module isn't available, you can
+use a subset of the following format X weeks X days X hours X mins X
+secs.
+
+=item names
+
+Restrict the report to the chains specified by this option.
+
+You can use this parameter multiple times to specify multiple
+possibility. The record will be included if it matches any of those.
+
+=head1 OUTPUT OPTIONS
+
+To customize output you can use the following options :
+
+=over
+
+=item sample
+
+This option can be set to I<day> or I<hour>. This determines if the
+program will report hourly sample or daily sample.
+
+=item report
+
+You can use this option to specify the reports that will be generated.
+By default, the I<summary> report is generated.
+
+=back
+
+=head1 REPORT
+
+Here are the reports that can be generated :
+
+=over
+
+=item summary
+
+Report that shows the total packets and bytes for each chains.
+
+=item packets
+
+Report that number of packets received by each chain for each hours or
+days (depending on the setting of the I<sample> option).
+
+
+=item bytes
+
+Report that number of bytes received by each chain for each hours or
+days (depending on the setting of the I<sample> option).
+
+=back
+
+=head1 AUTHOR
+
+Francis J. Lacoste <francis.lacoste@iNsu.COM>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000 iNsu Innovations Inc.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+Fwctl(3) Fwctl::RuleSet(3) fwctl(8) fwctllog(8) Fwctl::AcctReport(3).
+
+=cut
+

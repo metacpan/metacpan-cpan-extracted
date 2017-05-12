@@ -1,0 +1,162 @@
+use strict;
+use Win32::TieRegistry(Delimiter => '/');
+use Win32::API;
+use Cwd qw(getcwd abs_path);
+use Getopt::Std;
+use Pod::Usage;
+use Font::TTF::Font;
+
+our ($opt_h, $opt_f, $opt_r, $VERSION);
+
+$VERSION = "1.200";
+
+getopts("hfr");
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2, -noperldoc => 1);
+}
+unless ($ARGV[0])
+{
+	pod2usage (1);
+}
+
+####  MagicAPI would say: user32::SendMessage_IIIN(-1, 0x1D, 0, 0)
+my $PostMessage = new Win32::API('user32', 'PostMessage', 'NNNP', 'N') or die "Couldn't create SendMessage: $!\n";
+
+####  MagicAPI would say: GDI32::RemoveFontResource_P("$fname")
+my $RemoveFontResource = new Win32::API('gdi32', 'RemoveFontResource', 'P', 'N') or die "Couldn't create RemoveFontResource: $!\n";
+
+####  MagicAPI would say: GDI32::AddFontResource_P($fname)
+my $AddFontResource = new Win32::API('gdi32', 'AddFontResource', 'P', 'N') or die "Couldn't create AddFontResource: $!\n";
+
+my $regFont = $Registry->{'HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows' . (Win32::IsWinNT() ? ' NT' : '') . '/CurrentVersion/Fonts/'}
+  or  die "Can't access Windows registry: You probably need to run as Administrator.\n";
+
+my $changed = 0;
+
+foreach my $f (map {glob} @ARGV)           # unpack command line Unix style
+{ &process($f); }
+
+# tell everyone that life has changed (0x1D = WM_FONTCHNG) (-1 = HWND_TOPWINDOW)
+# note we post and not send otherwise we hang everything!
+    my $RetVal = $PostMessage->Call(-1,0x1D,0,0) if $changed;
+
+sub process
+{
+    my ($f) = @_;
+
+    my ($fname, $name, $val);
+        
+# first track down the full path name of the font file (we need it later)
+	if ($f =~ m|^(.:)[^\\/]|oi)
+	{
+		# User specified drive letter but not full path -- might be on another drive
+		# abs_path() doesn't seem to work in this case, 
+		my $target_drive = uc($1);
+		my $curr_drive = uc(substr(getcwd, 0, 2));
+		die ("Can't use relative paths across drives\n") unless $target_drive eq $curr_drive;
+	}
+	$fname = abs_path($f);
+	$fname =~ s|/|\\|go;				# abs_path returns Unix-style path separators, so fix them.
+	
+    $name = getname($fname);                            # dig around in the font for the name
+    $val = $regFont->{"$name (TrueType)"};				# Filename of already installed font
+
+# uninstall any installed font with this name
+    if ($opt_r || $opt_f || ($val ne "" && $val ne $fname))
+    {
+        if ($val ne "" && $val ne $fname)
+        {
+            print "Removing font $name -> $val\n";
+            $RemoveFontResource->Call("$val")
+                || warn "Failed to remove resource $val";
+        } else {
+            print "Removing font $name -> $fname\n";
+            $RemoveFontResource->Call("$fname")
+                || warn "Failed to remove resource $fname";
+        }
+        delete $regFont->{"$name (TrueType)"};
+        $val = '';
+        $changed = 1;
+    }
+
+    if (!$opt_r && $val ne $fname)
+    {
+        print "Adding $fname";    
+        $AddFontResource->Call($fname) || die "Failed to add resource";
+        # Now insert into registry
+        $regFont->{"$name (TrueType)"} = $fname;
+        print " as $name\n";
+        $changed = 1;
+    }
+
+}
+
+# scrabble around inside the .ttf file for a name
+sub getname
+{
+    my ($fname) = @_;
+    
+    my $f = Font::TTF::Font->open($fname) || die "Cannot open font '$fname'";
+    my $name = $f->{'name'}->read->find_name(4);
+    die "Can't find font name in '$fname'\n" unless length($name);
+    $f->release;
+    return $name;
+}
+
+
+=head1 NAME
+
+addfont.bat - Installs and uninstalls fonts in Windows
+
+=head1 SYNOPSIS
+
+    # Add fonts if not already present
+    addfont *.ttf
+    
+    # Remove fonts
+    addfont -r *.ttf
+    
+    # Remove and reinstall ("force" install) fonts.
+    addfont -f *.ttf
+    
+    # Help
+    addfont -h
+
+=head1 DESCRIPTION
+
+A Windows utility that installs fonts in place. That is it installs 
+(or uninstalls) fonts without copying them to your Windows\Fonts directory. This is
+an essential utility for those who are installing and uninstalling fonts all
+day and can't be bothered to wait for the Windows\Fonts directory to build
+itself in your Explorer. Instead you need to be willing for Perl to start up
+and run - but that is in the background.
+
+Notice that you can use wildcards on the command line, which is useful if you
+are working with different font sets.
+
+Some versions of Windows (e.g., Windows 7) require adminstrator rights.
+
+=head1 OPTIONS
+
+    -r      uninstall (remove) named fonts
+    -f      install fonts, removing first if already installed.
+
+If the named fonts are already installed, addfont does not remove and re-install
+unless -f is supplied. 
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut
+

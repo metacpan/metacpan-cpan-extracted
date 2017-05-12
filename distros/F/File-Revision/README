@@ -1,0 +1,830 @@
+SYNOPSIS
+     #######
+     # Subroutine interface
+     #
+     use File::Revision qw(new_revision num2revision parse_options revision2num revision_file rotate);
+
+     ($file_name, $next_revsion) = new_revision($file, @options);
+     ($file_name, $next_revsion) = new_revision($file, \@options);
+     ($file_name, $next_revsion) = new_revision($file, \%options);
+
+     $revision_letter = num2revision($revision_number); 
+
+     $options = parse_options($file, @options);
+     $options = parse_options($file, \@options);
+     $options = parse_options($file, \%options);
+
+     $revision_number = revision2num($revision_letter; 
+
+     $file_name = revision_file($revision_number, $options);
+
+     $file_name = rotate($file, @options);
+     $file_name = rotate($file, \@options);
+     $file_name = rotate($file, \%options);
+
+     #######
+     # Object interface
+     #  
+     $self = 'File::Revision'; # or
+     $self = new $class; # where $class::@ISA contains 'File::Revision'
+
+     ($file_name, $next_revsion) = $self->new_revision($file, @options);
+     ($file_name, $next_revsion) = $self->new_revision($file, \@options);
+     ($file_name, $next_revsion) = $self->new_revision($file, \%options);
+
+     $revision_letter = $self->num2revision($revision_number); 
+
+     $options = $self->parse_options($file, @options);
+     $options = $self->parse_options($file, \@options);
+     $options = $self->parse_options($file, \%options);
+
+     $revision_number = $self->revision2num($revision_letter; 
+
+     $file_name = $self->revision_file($revision_number, $options);
+
+     $file_name = $self->rotate($file, @options);
+     $file_name = $self->rotate($file, \@options);
+     $file_name = $self->rotate($file, \%options);
+
+DESCRIPTIONS
+    The "File::Revision" program modules provides the name of a non-existing
+    file with a revision identifier based on the a file name $file. This has
+    many uses backup file uses. There are no restrictions on the number of
+    backup files or the time to live of the backup files.
+
+    A typical use would be to create a backup file for If the revised file
+    passes does not pass all validity checks, use the backup file to replace
+    or repair the revised file. This minimizes loses import data when
+    revising files.
+
+    Better yet, create a temporary file, using one of the temp file name
+    program modules. Revise the temp file. Once it passes all valitity
+    checks, rename the original file to the backup file and rename the temp
+    file to the original file. This allows full use of the original file
+    until a validated revison is ready to replace it.
+
+    The "File::Revision" program module also supports limiting the backup
+    files and delete the oldest once "File::Revision" reaches the rotation
+    limit.
+
+SUBROUTINES
+  new_revision
+
+     ($file_name, $next_revsion) = new_revision($file, @options);
+
+    The "new_revision" subroutine returns the name of a non-existing file by
+    appending revision letters to the base name of a supplied file. The
+    supplied file usually exists.
+
+  num2revsion
+
+     $revision = num2revsion($number)
+
+    The "num2revision" is the inverse of "revision2num" as described below.
+
+  parse_options
+
+     $options = parse_options($file, @options);
+
+    The "parse_options" subroutine pre-process the options and used
+    internally by the other routines. The only external ues is as an input
+    to the "revision_file" subroutine.
+
+    The "rotate" and "new_revision" subroutine embeds the revision in the
+    "$file" input to produce the "$file_name" output as follows:
+
+     "$vol$dir$base$pre_revision$lead_revision$revision$ext"
+
+    The "$vol $dir $base $ext" are obtained from the "$file" input but may
+    be overrided by the options "vol dir base ext". The $pre_revision is the
+    "pre_revision" option and has a default of '-'. The "$lead_revision"
+    comes in play when a the "places" option has a number. It contains just
+    enough characters so that "places" revision is exactly
+
+     length(($lead_revision$revision")
+
+    The "lead_revision" default to a '_' for drafing style letter revisions
+    and '0' for numeric revisions.
+
+     options       description
+     ----------------------------------------------------------
+     base          overide the $file_name base
+     dir           overide the $file_name dir
+     ext           overide the $file_name ext
+
+     lead_places   fill for places
+
+     places        the maximum places of the embedded revision
+
+     revision      the lowest revision embedded in $file_name
+                   (new_revision subroutine only)
+
+     rotate        the highest revision embeded in $file_name
+                   (rotate subroutine only)
+
+     vol           overide the $file_name vol
+
+  revision2num
+
+     $number = revision2num($revision)
+
+    The "revision2num" subroutine converts a drawing revision letter(s) that
+    complies to American industry, US DOD, and International drawing
+    practices to a number, where 0 is the drawing release, 1 the 1st
+    revision, 2 the 2nd revision and so forth.
+
+    The old DOD-STD-100C which itself cited a slew of American National
+    Standards, may itself been superceded by an American National Standard.
+    Anyway drawing revisions are pretty the same across commerical, military
+    and national boundaries. The US Navy provides DOD-STD-100C free.
+    However, comericalized American Nation Standards are not so generous.
+    They do not have the American taxpayer to support their generosity.
+
+    DOD-Std-100C 5003.2, Drawing Practices, states
+
+    '5003.2 Revision Letters. Upper-case letters shall be used in
+    alphabetical sequence. The letters "I", "O", "Q", "S', "X" and "Z" shall
+    be omitted. When revisions are numberous enough to exhaust the alphabet
+    the revision following Y shall be "AA" and the next "AB", the "AC", etc.
+    Revision letters shall not exceed two characters. The first revision to
+    a drawing shall be assigned the letter A. Release (initial issue) of a
+    drawing does not constitute a need for a revision letter.'
+
+    The convention is to use rev - for the initial release. The requirement
+    that the revision does not exceed two letters, maximum of 400 revisions,
+    is not realistic for automation of drawings. The revision for index
+    drawings that index large databases can easy exceed this very quickly.
+
+    During the development of software programs, there can easily be more
+    than 400 builds. When this happens, for strcit compliance, the drawing
+    had to be rolled over to a new drawing and start out with rev -. Isn't
+    more sensible to allow more than two letters for revisions, especially
+    since it is easy to convert revision letters into a number.
+
+    When using hard paper media, 400 revisions never exist. Management
+    lowers the hammer about revision MN. They fire the development team and
+    bring in a new one.
+
+    Once there was a software engineer (SE) working on a Laser Printer and
+    the lead mechanical engineer (ME) came it and starting examining a part.
+    The SE asked him why he was looking so intensely at that part. The ME
+    replied that they where going to revise it. SE: "Whey are you revising
+    it?" ME: "It is the only part that has not been changed." That is funny
+    unless you are the manager paying for it.
+
+    The standard drawing revision conventions is an interesting number
+    system with no symbol for zero (absence of a revision is zero) and is
+    base 20. The Persians successfully argued that the lack of a zero makes
+    the arith twisted back in what is now Iran, Iraq around 600 A.D.
+    However, the drafing disciplines never went along with this concept.
+    Maybe they feel a symbol for zero makes the arith twisted. Anyway with
+    non-zero digit arith there are additions and subtractions of one to
+    shift around numbers to line up with the computer arith which uses arith
+    with a zero symbol.
+
+    Actually this is being unkind. The reason drafting uses letters is
+    because they are trying to make it hard to confuse the drawing revision
+    with the drawing number. Then again, the American drafting standards and
+    Internationl drafting standards allow letters in the drawing number. In
+    other words, do not tried to understand drafting standards or make sense
+    out of them. Just live with them.
+
+    Take a look at a base 4 number system without zero.
+
+        digits 1 2 3 4
+
+        Weights  zero base ten
+        16 4 1   number 
+       --------------------------
+                     0
+             1       1   
+             2       2
+             3       3
+             4       4
+           1 1       5
+           1 2       6
+           1 3       7
+           1 4       8
+           2 1       9
+           2 4      12 
+           3 1      13
+           3 4      16
+           4 1      17
+           4 4      20
+         1 1 1      21
+
+        base 10 non-zero digit 
+        digits 1 2 3 4 5 6 7 8 9 A
+
+        Weights     zero base ten
+        100 10  1   number 
+         9A  A  1
+       --------------------------
+                        0
+                1       1   
+                2       2
+                3       3
+                4       4
+                A      10
+             1  1      11
+             9  A     100
+             A  1     101
+             A  A     110
+          1  1  1     111 
+          A  A  A    1110
+
+       base 20 non-zero digit
+
+                 1111111112
+       12345678901234567890
+       ABCDEFGHJKLMNPRTUVWY   
+
+                      non-zero digit 
+       400   20   1   number 
+                  -       0
+                  A       1
+                  Y      20
+              A   A      21
+              A   Y      40
+              W   Y     400
+              Y   A     401
+              Y   Y     420  
+  
+  revision_file
+
+      $file_name = revision_file($revision_number, parse_options($file, @options));
+
+    The "revision_file" subroutine returns the backup file name for "$file"
+    with the "$revision_number" embedded. This subroutine does not check to
+    see if the "$file_name" exists. The "rotate" and "new_revision"
+    subroutines use it extensively internally.
+
+  rotate
+
+     $file_name = rotate($file, @options);
+
+    The "rotate" subroutine returns is similar to the "new_file" subroutine
+    except that it uses "rotate" as the highest revision that will be
+    embedded in $file_name. When the subroutine finds that the highest
+    revision file exists, it unlinks the oldest revision and rotates the
+    rest of the files by renaming them to the next lowest revision. The
+    subroutine returns the a "$file_name" with the vacated "rotate" revision
+    embedded in the name.
+
+REQUIREMENTS
+    Someday.
+
+DEMONSTRATION
+     #########
+     # perl Revision.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::AnySpec;
+         use File::Package;
+         use File::Path;
+         use File::Copy;
+         my $fp = 'File::Package';
+         my $uut = 'File::Revision';
+         my ($file_spec, $from_file, $to_file);
+         my ($backup_file, $rotate) = ('','');
+         my $loaded = '';
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package($uut)
+
+     # ''
+     #
+
+     ##################
+     # revision2num('-')
+     # 
+
+     File::Revision->revision2num(-)
+
+     # 0
+     #
+
+     ##################
+     # num2revision('0')
+     # 
+
+     File::Revision->num2revision(0)
+
+     # '-'
+     #
+
+     ##################
+     # revision2num('Y')
+     # 
+
+     File::Revision->revision2num(Y)
+
+     # 20
+     #
+
+     ##################
+     # num2revision('20')
+     # 
+
+     File::Revision->num2revision(20)
+
+     # 'Y'
+     #
+
+     ##################
+     # revision2num('AA')
+     # 
+
+     File::Revision->revision2num(AA)
+
+     # 21
+     #
+
+     ##################
+     # num2revision('21')
+     # 
+
+     File::Revision->num2revision(21)
+
+     # 'AA'
+     #
+
+     ##################
+     # revision2num('WY')
+     # 
+
+     File::Revision->revision2num(WY)
+
+     # 400
+     #
+
+     ##################
+     # num2revision('400')
+     # 
+
+     File::Revision->num2revision(400)
+
+     # 'WY'
+     #
+
+     ##################
+     # revision2num('YY')
+     # 
+
+     File::Revision->revision2num(YY)
+
+     # 420
+     #
+
+     ##################
+     # num2revision('420')
+     # 
+
+     File::Revision->num2revision(420)
+
+     # 'YY'
+     #
+
+     ##################
+     # revision2num('AAA')
+     # 
+
+     File::Revision->revision2num(AAA)
+
+     # 421
+     #
+
+     ##################
+     # num2revision('421')
+     # 
+
+     File::Revision->num2revision(421)
+
+     # 'AAA'
+     #
+
+     ##################
+     # revision_file( 7, parse_options( 'myfile.myext', pre_revision => '', revision => 'AA') )
+     # 
+
+          File::Revision->revision_file( 7, File::Revision->parse_options( 'myfile.myext',
+          pre_revision => '', revision => 'AA'))
+
+     # 'myfileG.myext'
+     #
+
+     ##################
+     # new_revision(ext => '.bak', revision => 1, places => 6, pre_revision => '')
+     # 
+
+     $file_spec = File::AnySpec->fspec2os('Unix', '_Drawings_/Erotica.pm')
+         [File::Revision->new_revision(_Drawings_\Erotica.pm, ext => '.bak', revision => 1,
+         places => 6, pre_revision => '')]
+
+     # [
+     #          '_Drawings_\Erotica000001.bak',
+     #          '2'
+     #        ]
+     #
+
+     ##################
+     # new_revision(ext => '.htm' revision => 5, places => 6, pre_revision => '')
+     # 
+
+     [File::Revision->new_revision(_Drawings_\Erotica.pm,  revision => 1000, places => 3, )]
+
+     # [
+     #          undef,
+     #          'Revision number 1000 overflowed limit of 1000.
+     #'
+     #        ]
+     #
+
+     ##################
+     # new_revision(base => 'SoftwareDiamonds', ext => '.htm', places => 6, pre_revision => '')
+     # 
+
+          [File::Revision->new_revision(_Drawings_\Erotica.pm,  base => 'SoftwareDiamonds', 
+          ext => '.htm', revision => 5, places => 6, pre_revision => '')]
+
+     # [
+     #          '_Drawings_\SoftwareDiamonds000005.htm',
+     #          '6'
+     #        ]
+     #
+     $file_spec = File::AnySpec->fspec2os('Unix', '_Drawings_/original.htm')
+
+     ##################
+     # new_revision(_Drawings_\original.htm, revision => 0,  pre_revision => '')
+     # 
+
+     [File::Revision->new_revision(_Drawings_\original.htm, revision => 0,  pre_revision => '')]
+
+     # [
+     #          '_Drawings_\original.htm',
+     #          '1'
+     #        ]
+     #
+          rmtree( '_Revision_');
+          mkpath( '_Revision_');
+          $from_file = File::AnySpec->fspec2os('Unix', '_Drawings_/Erotica.pm');
+          $to_file = File::AnySpec->fspec2os('Unix', '_Revision_/Erotica.pm');
+
+     ##################
+     # File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2) 1st time
+     # 
+
+     [(,) = File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2, pre_revision => '')]
+
+     # [
+     #          '_Revision_\Erotica0.pm',
+     #          0
+     #        ]
+     #
+     copy($from_file,$backup_file)
+
+     ##################
+     # File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2) 2nd time
+     # 
+
+     [(_Revision_\Erotica0.pm,0) = File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2, pre_revision => '')]
+
+     # [
+     #          '_Revision_\Erotica1.pm',
+     #          '1'
+     #        ]
+     #
+     copy($from_file,$backup_file)
+
+     ##################
+     # File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2) 3rd time
+     # 
+
+     [(_Revision_\Erotica1.pm,1) = File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2, pre_revision => '')]
+
+     # [
+     #          '_Revision_\Erotica2.pm',
+     #          '2'
+     #        ]
+     #
+     copy($from_file,$backup_file)
+
+     ##################
+     # File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2) 4th time
+     # 
+
+     [(_Revision_\Erotica2.pm,2) = File::Revision->rotate(_Revision_\Erotica.pm, rotate => 2, pre_revision => '')]
+
+     # [
+     #          '_Revision_\Erotica2.pm',
+     #          '2'
+     #        ]
+     #
+     rmtree( '_Revision_');
+
+QUALITY ASSURANCE
+    Running the test script "Revision.t" verifies the requirements for this
+    module. The "tmake.pl" cover script for Test::STDmaker automatically
+    generated the "Revision.t" test script, "Revision.d" demo script, and
+    "t::File::Revision" STD program module POD, from the "t::File::Revision"
+    program module contents. The "tmake.pl" cover script automatically ran
+    the "Startup.d" demo script and inserted the results into the
+    'DEMONSTRATION' section above. The "t::File::Revision" program module is
+    in the distribution file File-Revision-$VERSION.tar.gz.
+
+NOTES
+  Author
+
+    The holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  Copyright Notice
+
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  Binding Requirements Notice
+
+    Binding requirements are indexed with the pharse 'shall[dd]' where dd is
+    an unique number for each header section. This conforms to standard
+    federal government practices, STD490A 3.2.3.6. In accordance with the
+    License, Software Diamonds is not liable for any requirement, binding or
+    otherwise.
+
+  License
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    SOFTWARE DIAMONDS, http::www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE ALSO
+    Docs::Site_SVD::File_Revision
+    Test::STDmaker
+    ExtUtils::SVDmaker
+Title Page
+     Software Version Description
+
+     for
+
+      File::Revision - return a name of non-existing backup file with a revision id
+
+     Revision: B
+
+     Version: 0.03
+
+     Date: 2004/05/03
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright © 2004 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The "File::Revision" program modules provides the name of a non-existing
+    file with a revision identifier based on the a file name $file. This has
+    many uses backup file uses.
+
+    The "File::Revision" program module provides options for many different
+    capabilites.
+
+    There can no restrictions on the number of backup files or the time to
+    live of the backup files. The revision identifier may limited to a
+    maximum number of places or unlimited. The revision identifier may be
+    numeric or comply to the capital letter drafting revision standards.
+
+  1.3 Document overview.
+
+    This document releases File::Revision version 0.03 providing a
+    description of the inventory, installation instructions and other
+    information necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     File-Revision-0.03.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright © 2004 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/File_Revision.pm                           0.03    2004/05/03 revised 0.02
+     MANIFEST                                                     0.03    2004/05/03 generated, replaces 0.02
+     Makefile.PL                                                  0.03    2004/05/03 generated, replaces 0.02
+     README                                                       0.03    2004/05/03 generated, replaces 0.02
+     lib/File/Revision.pm                                         1.04    2004/05/03 revised 1.03
+     t/File/Revision.d                                            0.03    2004/05/03 revised 0.02
+     t/File/Revision.pm                                           0.01    2004/04/29 unchanged
+     t/File/Revision.t                                            0.01    2004/04/29 unchanged
+     t/File/_Drawings_/Erotica.pm                                 0.02    2004/05/03 revised 0.01
+     t/File/File/Package.pm                                       1.16    2004/05/03 unchanged
+     t/File/File/AnySpec.pm                                       1.14    2004/05/03 revised 1.13
+     t/File/File/Where.pm                                         1.15    2004/05/03 unchanged
+     t/File/Test/Tech.pm                                          1.22    2004/05/03 unchanged
+     t/File/Data/Secs2.pm                                         1.19    2004/05/03 revised 1.18
+     t/File/Data/SecsPack.pm                                      0.04    2004/05/03 revised 0.03
+     t/File/Data/Startup.pm                                       0.04    2004/05/03 revised 0.03
+
+  3.3 Changes
+
+    The changes to the previous version are as follows:
+
+    File-Revision-0.01
+        Originated.
+
+    File-Revision-0.02
+        Bad problems with "$options" being init. Seems running with Exporter
+        masks problems. Need to make sure make a dry run without Exporter
+        between final distribution run, and triple check with Exporter.
+
+    File-Revision-0.03
+        In the "parse_options" subroutine, supply an revision if there is
+        none. Also make sure pick out a valid revision when from the
+        revision string.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'File-Revision-0.03.tar.gz' and download to a
+        temporary installation directory. Enter the following where $make is
+        'nmake' for microsoft windows; otherwise 'make'.
+
+         gunzip File-Revision-0.03.tar.gz
+         tar -xf File-Revision-0.03.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install "unxutils" from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         'Data::Startup' => '0.03'
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/File/Revision.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There is still much work needed to ensure the quality of this module as
+    follows:
+
+    *   State the functional requirements for each method including not only
+        the GO paths but also what to expect for the NOGO paths
+
+    *   All the tests are GO path tests. Should add NOGO tests.
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+    POD Plain Old Documentation
+
+2.0 SEE ALSO
+    File::Revision
+    Docs::US_DOD::SVD
+    Extutils::SVDmaker

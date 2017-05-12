@@ -1,0 +1,68 @@
+class 'Fl::HorSlider';
+isa 'Fl::Slider';
+include 'FL/Fl_Hor_Slider.H';
+widget_type 'Fl_Hor_Slider';
+
+=pod
+
+=head1 NAME
+
+Fl::HorSlider - Horizontal Slider
+
+=head1 Description
+
+The Fl::HorSlider draws a horizontal slider, useful as a progress meter.
+
+=head1 Methods
+
+Fl::HorSlider inherits from Fl::Slider, Fl::Valuator and Fl::Widget. On top of
+that, it exposes the following methods...
+
+=head2 new(...)
+
+    my $val_a = Fl::HorSlider->new(0, 0, 250, 500, 'Important Stuff');
+    my $val_b = Fl::HorSlider->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default boxtype is FL_DOWN_BOX.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Hor_Slider *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,150 @@
+[% PROCESS sub/date.html %]
+
+[% title = forum.name %]
+[% IF forum.policy == 'public' %]
+[% RSS_URL = forum.forum_url _ '/rss' %]
+[% END %]
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='[% forum.forum_url %]'><span>Topics</span></a></li>
+        [% IF c.config.function_on.poll %]
+        [% UNLESS poll_count == 0 AND forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/polls'><span>Polls ([% poll_count %])</span></a></li>
+        [% END %]
+        [% END %]
+        [% UNLESS forum.settings.can_post_threads AND forum.settings.can_post_threads == 'N' %]
+        <li><a href='[% forum.forum_url %]/topic/new'><span>[% c.loc("New Topic") %]</span></a></li>
+        [% END %]
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/poll/new'><span>[% c.loc("New Poll") %]</span></a></li>
+        [% END %]
+        [% END %]
+        <li><a href='[% forum.forum_url %]/action_log'><span>View Action Logs</span></a></li>
+        <li><a href='[% forum.forum_url %]/about'><span>About</span></a></li>
+        [% IF c.user_exists AND roles.is_admin %]
+        <li><a href='/forumadmin/[% forum.forum_id %]'><span>[% c.loc('Forum Admin') %]</span></a></li>
+        [% END %]
+    </ul>
+    <div>
+
+[% IF forum.policy == 'private' %]
+<div class='one'>
+<table align='center'>
+<tr><td class='title' width='40'>[% c.loc("Status") %]</td><td class='forum1'>We have <a href='[% forum.forum_url %]/members'>[% forum.total_members %] users</a> and <a href='[% forum.forum_url %]/members/pending'>[% pending_count %] pending users</a>.
+[% IF pending_count AND roles.is_moderator %]
+<div class='highlight' style='font-weight: bolder'>Tips: You need approval the <a href='[% forum.forum_url %]/members/pending'>pending requests</a></div>
+[% END %]
+</td></tr>
+</table>
+</div>
+[% END %]
+
+[% IF announcement %]
+<div class="one">
+<table align="center">
+<tr>
+    <td class='title' width='100' valign="top">[ [% c.loc("Announcement") %] ]: [% announcement.title %]</td>
+</tr>
+<tr><td class='forum1'>
+    [% announcement.text %]
+</td></tr>
+</table>
+</div>
+[% END %]
+
+<div class='none'>
+<table align='center'>
+<tr><td width='*' align='right' valign='bottom'>
+Admin: <a href='/u/[% forum_roles.${forum.forum_id}.admin.username %]'>[% forum_roles.${forum.forum_id}.admin.nickname %]</a>
+[% FOREACH moderator IN forum_roles.${forum.forum_id}.moderator %]
+[% IF loop.first %], [% END %]<a href='/u/[% moderator.username %]'>[% moderator.nickname %]</a>[% UNLESS loop.last %], [% END %]
+[% END %]
+<td></tr>
+</table>
+</div>
+
+<div class='one'>
+<table height='28' align='center'>
+	<tr class="title" align='center'>
+	<td width='42'>[% c.loc("Status") %]</td>
+	<td width='*'>[% c.loc("Subject") %]</td>
+	<td width='80'>[% c.loc("Author") %]</td>
+	<td width='40'>[% c.loc("Reply") %]</td>
+	<td width='40'>[% c.loc("Hit") %]</td>
+	<td width='200'>[% c.loc("Last Update") %]</td>
+	</tr>
+</table>
+[% FOREACH t IN topics %]
+<div class='multi'>
+<table align='center'>
+	<tr align='center'>
+	<td class='forum1' width='42'>[% IF t.sticky %]<img src='[% c.config.dir.images %]/site/top.gif' />[% ELSIF t.closed %]<img src='[% c.config.dir.images %]/site/locked.gif' />[% END %]</td>
+	<td class='forum2' valign='top' width='*'>
+		<table>
+			<tr>
+			<td align="left">
+			    [% IF t.elite %]
+			    <a href='[% forum.forum_url %]/elite'><img src='[% c.config.dir.images %]/site/elite.gif' /></a> 
+			    [% END %]
+			    <a href='[% forum.forum_url %]/topic/[% t.topic_id %]/t[% t.topic_id %]-[% t.title | be_url_part %]'><span class='semilight'>[% t.title %]</span></a>
+			    [% IF c.user_exists AND NOT is_visited.topic.${t.topic_id} %]
+			    <img src='[% c.config.dir.images %]/site/new.gif' />
+			    [% END %]
+			    [% IF roles.is_moderator %]
+            	<div style='float:right'>
+            	    <a href='[% forum.forum_url %]/topic/[% t.topic_id %]/[% IF t.sticky %]unsticky[% ELSE %]sticky[% END %]'>[% IF t.sticky %][% c.loc('Unsticky') %][% ELSE %][% c.loc('Sticky') %][% END %]</a> |
+                    <a href='[% forum.forum_url %]/topic/[% t.topic_id %]/[% IF t.closed %]unlock[% ELSE %]lock[% END %]'>[% IF t.closed %][% c.loc('Unlock') %][% ELSE %][% c.loc('Lock') %][% END %]</a> |
+                    <a href='[% forum.forum_url %]/topic/[% t.topic_id %]/[% IF t.elite %]unelite[% ELSE %]elite[% END %]'>[% IF t.elite %][% c.loc('Unelite') %][% ELSE %][% c.loc('Elite') %][% END %]
+                </div>
+                [% END %]
+			</td>
+			</tr>
+    	</table>
+	</td>
+	<td class='forum1' width='80'><a href='/u/[% t.author.username %]'>[% t.author.nickname %]</a></td>
+	<td class='forum2' width='40'><span class='highlight'>[% t.total_replies  	 %]</span></td>
+	<td class='forum2' width='40'><span class='highlight'>[% t.hit %]</span></td>
+	<td class='forum1' width='200' align='right'><a href='/u/[% t.last_updator.username %]'>[% t.last_updator.nickname %]</a> | <span class='date'>[% date_format(t.last_update_date) %]</span></td>
+	</tr>
+</table>
+</div>
+[% END %]
+
+<div class='none'>
+<table align='center'>
+    <tr>
+        <td>[% INCLUDE 'sub/pager.html' url_prefix = forum.forum_url %]</td>
+    </tr>
+</table>
+</div>
+
+[% IF forum_links.size %]
+<div class="one">
+<table align="center">
+    <tr><td colspan='5' class="title">Forum Links</td></tr>
+    <tr>
+        [% FOREACH forum_link IN forum_links %]
+        <td width="20%" align="center"><a href="[% forum_link.url %]" target="_blank">[% forum_link.text %]</a></td>
+        [% IF loop.count == 5 AND forum_links.size > 5 %]</tr><tr>[% END %]
+        [% END %]
+        [% IF forum_links.size != 5 AND forum_links.size != 10 %]
+        [% cols = 10 - forum_links.size; cols = cols - 5 IF cols > 5 %]
+        <td colspan="[% cols %]">&nbsp;</td>
+        [% END %]
+    </tr>
+</table>
+</div>
+[% END %]
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs', 0);
+    });
+</script>

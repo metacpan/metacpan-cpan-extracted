@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Flickr-License.t
+t/pod.t
+t/pod-coverage.t
+lib/Flickr/License.pm
+lib/Flickr/License/Helper.pm
+examples/license_eg.pl
+examples/license_helper_eg.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+If you want better support for older Perls, use Test::Reporter.
+CPAN::Reporter is also required if you are using CPAN shell.
+Also you can run cpan smoking. That way module can be fixed even before
+you'll find that you need it. See CPAN::YACSmoke.
+
+
+Generally, you should use Test::Reporter - it's the only way to measure popularity
+of distribution. Why do anything with it, if it is not used.
+
+
+Patches welcome. Please write tests for error you found.

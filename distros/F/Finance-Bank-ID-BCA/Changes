@@ -1,0 +1,288 @@
+Revision history for Finance-Bank-ID-BCA
+
+0.43    2015-09-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove debugging statement, d'oh.
+
+
+0.42    2015-09-08 (PERLANCAR)
+
+	- Update regex for matching transaction: allow whitespaces.
+
+	- Tweak example code.
+
+
+0.41    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+        - Re-release.
+
+
+0.40    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.39    2015-08-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- Specify minimum prereq version [RT#106757].
+
+
+0.38    2015-08-17 (PERLANCAR)
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.37    2015-06-09 (PERLANCAR)
+
+	- Fix/tweak check regex.
+
+
+0.36    2015-04-29 (PERLANCAR)
+
+	- (Temporarily) downgrade total credit/debit check (sometimes the
+	  statement returned by the server fails this check, e.g. probably when
+	  the total credit already includes a transaction, but that transaction
+	  has not shown up in the statement). UPDATE: this is caused by recent
+	  update in KlikBCA system where apparently the mutation page is no
+	  longer real-time (there is probably a 15 minute delay or maybe more).
+	  So the total credit is already updated with some very recent
+	  transactions, but the transactions have not shown up yet in the
+	  mutation page. So now this check is no longer mandatory.
+
+
+0.35    2015-04-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Split CLIs to its own dist: App-IndonesianBankingUtils to reduce
+	  deps.
+
+
+0.34    2015-03-28 (PERLANCAR)
+
+	- [Incompatible change] Become more standard by formatting datetime
+	  as iso8601 (2001-02-03T04:05:06) instead of '2001-02-03
+	  04:05:06'.
+
+
+0.33    2015-02-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to Perinci::CmdLine -> Perinci::CmdLine::Classic.
+
+
+0.32    2014-12-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed/split module SHARYANTO::String::Util ->
+	  String::Indent.
+
+
+0.31    2014-09-09 (PERLANCAR)
+
+        - Update regex of Sun/Sat transaction list. There is now "DR KOREKSI
+          BUNGA" (aside from "CR KOREKSI BUNGA").
+
+
+0.30    2014-08-26 (SHARYANTO)
+
+        - bin/download-bca: Replace App::Options with Perinci::CmdLine. Location
+          of config file is now changed, as per Perinci::CmdLine, from
+          ~/.app/download-bca.conf to ~/download-bca.conf. The syntax of the
+          configuration is the same (it's actually now IOD, but IOD supports the
+          App::Options configuration syntax).
+
+        - [Incompat] bin/download-bca: --profile is now --config-profile.
+
+
+0.29    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.28    2013-11-03 (SHARYANTO)
+
+        - No functional changes.
+
+        - Relax the request id regex a bit.
+
+
+0.27    2013-11-03 (SHARYANTO)
+
+        [NEW FEATURES]
+
+        - Add simulation mode and save dir, for help in debugging. In
+          non-simulation mode, if save_dir is specified, will save HTTP
+          responses as YAML files in this dir. When in simulation mode, instead
+          of actually sending requests to network, will use this saved
+          responses.
+
+        [ENHANCEMENTS]
+
+        - Get error message from BCA error page, e.g. the "MAAF UNTUK SEMENTARA
+          TRANSAKSI TIDAK DAPAT DILAKUKAN" message.
+
+
+0.26    2013-07-17 (SHARYANTO)
+
+        - No functional changes. Tweaks to documentation to guide casual new
+          users. Convert download-bca script to use Perinci::CmdLine.
+
+
+0.25    2012-05-03 (SHARYANTO)
+
+        - No functional changes whatsoever. Reupload to CPAN since apparently I
+          accidentally deleted the release from CPAN.
+
+
+0.24    2012-03-14 (SHARYANTO)
+
+        - No functional changes. Remove 'use Crypt::SSLeay' statement that
+          causes test failure reports from CT.
+
+
+0.23    2012-03-13 (SHARYANTO)
+
+        [FIXES]
+
+        - Fix recent few weeks' connection reset problem with KlikBCA servers
+          due to rejection of TE request header. We now instruct LWP to avoid
+          sending TE header.
+
+
+0.22    2012-02-08 (SHARYANTO)
+
+        - Add script: parse-bca-statement (a simple script that calls
+          parse_statement() and dumps result to YAML)
+
+        - Add option to parse_statement(): return_datetime_obj, to allow
+          returning dates as 'YYYY-MM-DD HH:mm:SS' strings instead of DateTime
+          objects.
+
+        - Add note that parsing copy-pasted text from GUI browser is deprecated.
+
+
+0.21    2011-06-29 (SHARYANTO)
+
+        - No functional changes. Avoid warning in WWW::Mechanize due to setting
+          an environment variable (HTTPS_CA_DIR) to undef.
+
+
+0.20    2011-06-17 (SHARYANTO)
+
+        - No functional changes. Add missing dependencies to App::Options [CT].
+
+
+0.19    2011-06-15 (SHARYANTO)
+
+        - No functional changes. Fixed missing dependencies [CT].
+
+
+0.18    2011-06-10 (SHARYANTO)
+
+        - No functional changes. Moved script from examples/ to bin/.
+
+
+0.17    2011-03-08 (SHARYANTO)
+
+        - switch from Moose to Moo
+
+
+0.16    2010-12-21 (SHARYANTO)
+
+        - more helpful error messages when checking total debit/credit
+
+
+0.15    2010-12-16 (SHARYANTO)
+
+        - add skip_NEXT
+
+
+0.14    2010-12-03 (SHARYANTO)
+
+        - change example script to use Log::Any::App
+
+
+0.13    2010-10-14 (SHARYANTO)
+
+        - also count skipped transactions when totalling debit/credit
+
+
+0.12    2010-09-23 (SHARYANTO)
+
+        - enable verify_https in example script
+
+        - minor doc update
+
+
+0.10    2010-09-23 (SHARYANTO)
+
+        - add verify_https option (suggested by William Shallum, RT#61409)
+
+
+0.09    2010-06-17 (SHARYANTO)
+
+        - build fixes
+
+
+0.08    2010-06-11 (SHARYANTO)
+
+        - INCOMPATIBLE CHANGE: parse_statement now always returns 3-element
+          arrayref instead of depending on list/scalar context. Sorry for this,
+          I'm trying make all my HTTP-style interface consistent.
+
+
+0.07    2010-02-17 (SHARYANTO)
+
+        - Switch from Moose to Any::Moose (+Mouse as dependency)
+
+
+0.06    2010-01-13 (SHARYANTO)
+
+        - Remove "use Log::Log4perl" in test script
+
+
+0.05    2010-01-07 (SHARYANTO)
+
+        - Switch from Log::Log4perl to Log::Any
+
+        - Switch from MakeMaker to Module::Builder
+
+
+0.04    2009-11-26 (SHARYANTO)
+
+        - Handle float round-off error on matching total credit vs debit.
+
+
+0.03    2009-11-11 (SHARYANTO)
+
+        - Now also parses copy-pasted text from Chrome (4.0 Linux) for KlikBCA
+          Personal.
+
+        - BIAYA ADM is also possible outside Mon-Fri for Personal accounts.
+
+
+0.02    2009-10-20 (SHARYANTO)
+
+        - Now also parses the English version of KlikBCA Personal.
+
+        - A few minor fixes.
+
+
+0.01    2009-10-14 (SHARYANTO)
+
+        - First release.

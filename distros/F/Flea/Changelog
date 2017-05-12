@@ -1,0 +1,15 @@
+0.01
+	Initial release
+
+0.02
+	Pod fixes
+	added uri helper
+
+0.03
+	Some basic (still incomplete) tests
+	Taking advantage of some new Exporter::Declare sugar (thanks exodist!)
+
+0.04
+	Exporter::Declare doesn't technically depend on Devel::Declare::Parser,
+	but we use bits of it that do, so we have to depend on that. Fixes RT
+	#62539.

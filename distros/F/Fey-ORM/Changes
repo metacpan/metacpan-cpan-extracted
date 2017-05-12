@@ -1,0 +1,403 @@
+0.47     2015-07-12
+
+- Changes in Fey broke has_many() relationships, causing many test failures.
+
+
+0.46   2013-11-28
+
+- Removed used of deprecated Class::MOP::load_class().
+
+
+0.45   2013-02-22
+
+- Fix test failure from hash randomization changes in 5.17.x Perl.
+
+
+0.44   2012-05-18
+
+- Work around breakage introduced in MooseX::Types 0.32.
+
+
+0.43   2011-02-26
+
+- This release provides forward compatibility with Moose 1.99+. It will still
+  work with Moose 1.23 as well.
+
+
+0.42   2011-02-26
+
+- The most recent release of MooseX::StrictConstructor did not work with this
+  module. This has been fixed, and Fey::ORM now requires the latest
+  MooseX::StrictConstructor.
+
+
+0.41   2011-02-25
+
+- A small internal refactoring on Fey::Object::Iterator::FromSelect to make it
+  easier to override some of its behavior.
+
+
+0.40   2011-01-25
+
+- A stray extends statement left in from a refactoring in 0.39 caused test
+  failures unless a previous version of Fey::ORM was already installed.
+
+
+0.39   2011-01-25
+
+- When you explicitly provide a Fey::FK object for a has_one or has_many
+  relationship, Fey::ORM will now invert the direction of that relationship if
+  needed to generate the proper SQL. In the past, this was done as needed if
+  the Fey::FK _wasn't_ explicitly provided. Now it is done regardless.
+
+
+0.38   2011-01-07
+
+- Allow the use of SQL queries as insert & update values.
+
+
+0.37   2010-11-30
+
+- The caching added in 0.34 had some subtle heisenbugs because it used object
+  refaddrs as cache keys. Now we use Object::ID, which is slower but will not
+  cause false positive cache hits.
+
+
+0.36   2010-10-22
+
+- Some packaging tweaks so that the Fey::ORM::Manual::Intro docs show up on
+  search.cpan.
+
+
+0.35   2010-10-05
+
+- Changes to work with Moose 1.15.
+
+
+0.34   2010-09-09
+
+- Added caching for commonly used stringified SQL queries. This speeds up
+  common operations like selecting a single object.
+
+
+0.33   2010-06-04
+
+- When loading an object's data from the dbms, Fey::ORM now always reloads the
+  key. This should impose a minimal cost, and is important in some corner
+  cases, like Postgres's citext column, which does a case-insensitive
+  match. In that case, simply using the user-provided data can cause the
+  object to end up with the wrong value for the column in question.
+
+
+0.32   2010-03-06
+
+- Added a new sugar function to Fey::ORM::Table - query(). This allows you to
+  declare a method based on a select. This is preferable to an attribute in
+  many cases, where you don't want to cache the return value of the SELECT in
+  the object.
+
+
+0.31   2010-02-12
+
+- Fey::ORM::Table tried to load a module that no longer exists with the newer
+  versions of MooseX::ClassAttribute.
+
+
+0.30   2009-10-25
+
+- The Fey::Object::Iterator::FromSelect class used to expect that the number
+  of elements in the select object's select clause matched the number of items
+  actually returned by the select in each row. However, if you used a Term to
+  do a "SELECT *" this assumption was broken. The assumption meant that even
+  providing an explicit attribute map in this case did not work.
+
+- As a corrolary, Fey::Object::Iterator::FromSelect used to attempt to merge
+  an explicit attribute map with what was implied by any columns in the select
+  object's select clause. This was never actually documented, and has been
+  removed.
+
+  Now, providing an explicit map means you must provide a mapping for every
+  select clause element you want to pass to an object.
+
+- Added Fey::Object::Iterator::FromSelect->raw_row(). This method lets you get
+  the raw data for a row after calling ->next(). This is handy if the select
+  contained data that does not fit into a particular class.
+
+0.29   2009-10-10
+
+- Allow any classes to be passed to an Iterator's constructor. However, unless
+  all the classes have a Table() method, you cannot get hashes back from the
+  iterator (next_as_hash(), etc.).
+
+
+0.28   2009-09-15
+
+- When a Fey::ORM::Table using class's constructor does not return an object,
+  the error message is no longer set in $@. Instead, you can call
+  MyClass->ConstructorError() to get the error. The value of $@ is preserved
+  in the constructor as whatever it was before the constructor was called.
+
+- Added a $VERSION to every .pm file that matches Fey::ORM.
+
+- Doc fixes - RT #48484 (Terrence Brannon) and #49595 (Guoying Qi)
+
+
+0.27   2009-08-18
+
+- Changed all code that checked for a Fey::SQL::Select object to instead check
+  that the object does the Fey;:Role::SQL::ReturnsData role. This lets you
+  pass a union to an object iterator, among other things.
+
+
+0.26   2009-07-03
+
+- Changes to work with the latest Moose (0.86).
+
+
+0.25   2009-06-21
+
+- Changes to work with the latest Moose (0.82).
+
+
+0.24   2009-04-20
+
+- Shut up a warning from the latest Moose that it will not inline a
+  constructor for Fey::Object::Table.
+
+
+0.23   2009-04-07
+
+- Changes to work with the latest Moose (0.73_01+).
+
+
+0.22   2009-03-23
+
+- If a table consisted of _just_ its key, then trying to call new()
+  for the associated class blew up, but they could be created via an
+  iterator. Test case provided by Andrew Baumhauer.
+
+
+0.21   2009-02-25
+
+* This release contains several backwards incompatible changes.
+
+* Fey::Object::Iterator has been renamed to
+  Fey::Object::Iterator::FromSelect. Fey::Object::Iterator::Caching is
+  now has Fey::Object::Iterator::FromSelect::Caching. This was done to
+  allow for a new class, Fey::Object::Iterator::FromArray. There is
+  now a Fey::ORM::Role::Iterator role which all of these classes
+  do. Based on a patch from Bryan Deeney and Will Weaver.
+
+* The iterator methods all and all_as_hashes now really return _all_
+  of the data, which means they will reset the iterator if needed.
+
+- Added remaining and remaining_as_hashes methods to iterators. These
+  do what all and all_as_hashes did previously. Thanks 
+
+- The transform feature now supports passing delegation for the
+  inflated object. See Fey::ORM::Table for details.
+
+
+0.20   2009-02-06
+
+- Use MooseX::Params::Validate instead of the no-longer-in-Fey
+  Fey::Validate.
+
+
+0.19   2009-01-18
+
+- Added attribute metaclasses for attributes created based on columns
+  (Fey::Meta::Attribute::FromColumn), and attributes based on an
+  inflated column value (Fey::Meta::Attribute::FromInflator).
+
+- When a column attribute with an inflator was written, the inflated
+  value would stay the same, rather than reflecting the new raw value.
+
+- Added Fey::ORM::Policy, which lets you set policies for column
+  transforms and foreign key method naming.
+
+
+0.18   2008-12-24
+
+- The handling of caching iterators in 0.17 was still broken. It
+  attempted to share the cached results between multiple objects as an
+  optimization, but that ended up causing some very weird bugs. For
+  now, we have a less efficient but correct version.
+
+
+0.17   2008-12-24
+
+- In previous release, a has_many method returned the same iterator
+  each time it was called, which could cause confusing bugs. Now each
+  call returns a new iterator. However, if the has_many relationship
+  is cached, the new iterator will share a cache with any previously
+  made iterator, preventing unnecessary trips to the DBMS.
+
+
+0.16   2008-12-23
+
+- A caching object iterator could cause an exception if you tried to
+  call ->next() or ->all() on it after exhausting the underlying
+  statement handle. This only happens with some drivers (DBD::Pg is
+  one, DBD::SQLite is not). Reported by Edward Long.
+
+
+0.15   2008-12-22
+
+- There was a serious bug in 0.14 where all objects of a class shared
+  the same iterator object for a given has_many relationship. Reported
+  by Edward Long.
+
+
+0.14   2008-12-15
+
+- The Fey::Meta::Attribute::FromSelect class now stores the select and
+  bind_params parameters it receives, for more introspectability.
+
+- There are new metaclasses for introspection of has-one and has-many
+  relationships. See Fey::Meta::HasOne and Fey::Meta::HasMany for
+  details, as well as Fey::Meta::Class::Table.
+
+
+0.13   2008-12-08
+
+- Updated to work with Moose 0.63.
+
+
+0.12   2008-11-07
+
+* WARNING: This release contains a few backwards
+  incompatibilities. See below for details.
+
+* Removed Fey::Object::Table->_pk_vals().
+
+- Added Fey::Object::Table->pk_values_hash() and ->pk_values_list().
+
+* The parameters for constructing a Fey::Object::Iterator object have
+  been changed quite a bit. This fixes a problem where an iterator
+  could be iterating over a set of results that contained a column
+  which matched an attribute in two different classes, but was only
+  valid for one classes.
+
+  For example, if you had a Contact.note and ContactHistory.note
+  columns and your iterator was returning objects for both tables,
+  then _one_ of the note columns would get passed to the constructor
+  for _both_ tables.
+
+  With the changes, Fey::Object::Iterator figures out which item in
+  the returned row belongs to which class positionally, so if two
+  columns have the same name, they are passed to the correct classes.
+
+  You can also provide explicit mappings from an item in the result
+  rows to a class's attribute, which is handy if you want to map the
+  results of an arbitrary query to a set of classes. See the
+  Fey::Object::Iterator docs for more details.
+
+- Fey::Object::Table->insert_many() Would modify the hash references
+  it received when a table had auto-incremented columns.
+
+
+0.11   2008-09-20
+
+- Fixes to work with Moose 0.58.
+
+
+0.10   2008-09-07
+
+- Moose 0.57 broke Fey::ORM somehow. Fixed for Moose 0.57.
+
+
+0.09   2008-09-01
+
+- Changes to work with the latest Moose and Fey.
+
+
+0.08   2008-06-27
+
+- Changes to the immutable bits to work with the latest Moose (0.51).
+
+
+0.07   2008-06-22
+
+- Cached has_one and has_many attributes now have a private clearer.
+
+- Various internals changes so that the meta classes now have more
+  attributes, rather than creating lots of class attributes in the
+  classes which use Fey::ORM::{Table,Schema}.
+
+- Added Fey::Meta::Attribute::FromSelect. This allows you to easily
+  define an attribute's default based on a SELECT query.
+
+
+0.06   2008-05-25
+
+- Factored part of Fey::ORM::Table->_get_column_values into a separate
+  method, _set_column_values_from_hashref, since this piece is
+  something that subclasses may want to reuse.
+
+- Added a horrible hack to make Postgres BYTEA columns work. Needs
+  some serious refactoring. This may well disappear in a future
+  version.
+
+- Fixed to work with the most recent versions of Moose, which are now
+  prereqs.
+
+
+0.05   2008-04-18   
+
+- Fey::Object::Table called a method on Fey::Meta::Class::Table
+  without loading it, which could cause problems in some cases.
+
+- Moved exceptions to Fey::ORM::Exceptions so you can use them in your
+  classes, notably the NoSuchRow exception.
+
+- Made Fey::Object::Table and Fey::Object::Schema extend
+  MooseX::Object::StrictConstructor rather than Moose::Object.
+
+
+0.04   2008-03-06
+
+- Add a private writers for accessors created via has_one() and
+  has_many() - this still needs docs.
+
+- Make sure that the schema class's RunInTransaction() method returns
+  values of the sub it runs, respecting the caller's context.
+
+- has_one() can now accept a "handles" parameter which work just as
+  it does for any Moose attribute.
+
+- has_one() also accepts a new "undef" parameter to allow you to
+  explicitly say that the attribute can have an undef as its value.
+
+
+0.03    2008-02-24
+
+- Fix tests so that they skip without blowing up when DBD::SQLite is
+  not installed.
+
+- Fey::Object::Table would always issue a SELECT immediately after an
+  INSERT. Now this will be delayed until it is needed. In some cases
+  it will never be needed.
+
+
+0.02    2008-02-21
+
+- Renamed Fey::Object to Fey::Object::Table and added Fey::Object::Schema.
+
+- Also created a Fey::Object::Schema->RunInTransaction() 
+
+- Fey::Object::Schema lets you control caching for all table classes
+  in a schema at once.
+
+- Added support for arbitrary select statements being used with
+  has_one() and has_many(). See Fey::ORM::Manual::Intro for some
+  examples.
+
+- Fixed various bits of code to work properly when multiple schema
+  classes exist.
+
+
+0.01    2008-02-09
+
+- First version, released on an unsuspecting world.
+

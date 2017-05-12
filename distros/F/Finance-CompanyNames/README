@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+    24 October 2002                 GGHC Skunkworks <cpan@gghcwest.com>
+
+---------------------------------------------------------------------------
+
+DESCRIPTION
+-----------
+
+This is Finance::CompanyNames 1.0.  This module can find company names and
+their many variants in arbitrary English text.
+
+INSTALLATION
+------------
+
+perl -MCPAN -e 'install Finance::CompanyNames'
+
+AUTHORS
+-------
+
+Finance::CompanyNames is a product of Gilder, Gagnon, Howe, & Co. LLC.
+Mail GGHC Skunkworks <cpan@gghcwest.com> regarding this software.
+
+LICENSE
+-------
+
+Finance::CompanyNames is distributed under the Artistic License, the same
+terms under which Perl itself is distributed.

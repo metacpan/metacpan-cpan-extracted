@@ -1,0 +1,36 @@
+bin/rrr
+bin/rrr-aggregate
+bin/rrr-client
+bin/rrr-fsck
+bin/rrr-init
+bin/rrr-news
+bin/rrr-overview
+bin/rrr-server
+bin/rrr-update
+Changes
+HOWTO.mirrorcpan
+lib/File/Rsync/Mirror/Recent.pm
+lib/File/Rsync/Mirror/Recentfile.pm
+lib/File/Rsync/Mirror/Recentfile/Done.pm
+lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/00-load.t
+t/01-util.t
+t/02-aurora.t
+t/02-operation.t
+t/03-done.t
+t/04-run.t
+t/05-bugtracker.t
+t/70_critic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+t/RECENT-1h.yaml
+t/RECENT-6h.yaml
+Todo
+META.json                                Module JSON meta-data (added by MakeMaker)

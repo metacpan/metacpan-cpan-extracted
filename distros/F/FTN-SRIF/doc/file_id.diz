@@ -1,0 +1,5 @@
+FTN::SRIF   
+Perl extension and an associated script
+that enables the processing of an FTN SRIF
+received by a mailer. See README for
+more info.

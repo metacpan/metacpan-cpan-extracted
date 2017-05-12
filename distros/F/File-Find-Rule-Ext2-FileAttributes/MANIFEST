@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/files/appendable
+examples/files/appendable2
+examples/files/immutable
+examples/files/immutable2
+examples/files/none
+examples/find_immutable.pl
+lib/File/Find/Rule/Ext2/FileAttributes.pm
+MANIFEST			This list of files
+README
+t/File-Find-Rule-Ext2-FileAttributes.t
+t/pod-coverage.t
+t/pod.t
+t/test-kwalitee.t
+META.yml
+Makefile.PL

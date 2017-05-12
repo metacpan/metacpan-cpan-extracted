@@ -1,0 +1,6 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+Handle.pm
+META.yml                                 Module meta-data (added by MakeMaker)

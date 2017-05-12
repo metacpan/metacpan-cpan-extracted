@@ -1,0 +1,35 @@
+---
+abstract: 'A simple, sane and efficient file slurper [DISCOURAGED]'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Slurp-Tiny
+provides:
+  File::Slurp::Tiny:
+    file: lib/File/Slurp/Tiny.pm
+    version: '0.004'
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  File::Spec::Functions: '0'
+  FileHandle: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurp-Tiny
+  repository: git://github.com/Leont/file-slurp-tiny.git
+version: '0.004'
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Matt Phillips <mattp@cpan.org>'

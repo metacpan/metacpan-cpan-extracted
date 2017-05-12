@@ -1,0 +1,13 @@
+MANIFEST
+LICENSE
+README
+Changes
+Makefile.PL
+lib/Fuse/TagLayer.pm
+lib/Fuse/TagLayer/PurePerl.pm
+lib/Fuse/TagLayer/SQLite.pm
+t/001_load.t
+t/old_tests.todo
+bin/taglayer
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

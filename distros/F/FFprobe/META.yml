@@ -1,0 +1,28 @@
+---
+abstract: 'probes information from multimedia files using C<ffprobe>'
+author:
+  - 'Diogo Franco (Kovensky) <diogomfranco@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+  common::sense: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FFprobe
+provides:
+  FFprobe:
+    file: lib/FFprobe.pm
+    version: v0.0.3
+requires:
+  Carp: 0
+  Encode: 0
+  common::sense: 0
+  perl: v5.10.0
+  version: 0.77
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.3

@@ -1,0 +1,10 @@
+#fsdb -R C mean stddev
+mean: 37.25
+stddev: 0.070711
+
+mean: 271.2
+stddev: 9.4752
+
+#  | /home/johnh/BIN/DB/dbmultistats experiment duration
+#  | /home/johnh/BIN/DB/dblistize 
+#   | dbcol mean stddev

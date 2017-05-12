@@ -1,0 +1,524 @@
+2010-04-08  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Corrected for use of mirror that needed the parent class of
+	FramesReady.pm to process so check was added to request().
+
+	* t/net/mirror.t:
+	Complete remake to get the RC_NOT_MODIFIED response and implement
+	tests with Test::More for maintainability.
+
+2010-04-07  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* t/net/cgi-bin/moved:
+	Altered to be perl script for possible mod_perl equiped Apache
+	installation.
+
+	* t/net/moved.t:
+	Rewrote to use Test::More for better maintainability and
+	modularization.
+
+	* t/live/cpan.t:
+	Removed cpan.t as it served no purpose in test either the FramesReady.pm or
+	the Tree.pm module.
+
+	* MANIFEST:
+	Drop long commented out entries and live/cpan.t as it serves no
+	purpose in testing either the LWP/UserAgent/FramesReady.pm or the
+	HTTP/Response/Tree.pm module.
+
+2010-04-06  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* t/local/http.t:
+	Modified to to cleanup and not leave the temporary file behind.
+
+	* t/local/frames.t:
+	Rewrote to use Test::More for more flexibility and enhancement
+	capability.  Added cat_all_content for frame concatenation for the
+	prime use of scraping frames type harvests.
+
+	* t/net/http-timeout.t:
+	Rewrote to use Test::More expediting additions and changes.
+
+	* t/net/http-post.t: Rewrote to use Test::More and enhanced testing.
+
+	* t/net/http-get.t: Rewrote to use Test::More module and enhance tests.
+
+2010-04-05  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* t/local/frames.t:
+	Re-implement testing using the Test::More moodule for better coverage
+	of modules being tested.
+
+	* t/local/autoload.t:
+	Re-implement testing with the Test::More module to help increase
+	coverage of modules being tested.
+
+2010-04-02  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* t/local/http.t:
+	Extend timeout to allow by hand testing and allow close down to find
+	active running daemon.
+
+2010-03-31  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* Makefile.PL:
+	Hopefully requiring TAP::Formatter::File will eliminate the CPAN
+	testers problem on Windows (ActivePerl) installations.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Leave a few comments for anyone that looks for a reason that something
+	didn't work but also the TEST script changed requiring a CVS assigned
+	release number this module supplies.
+
+	* t/TEST:
+	Corrected change to eliminate warnings that disabled the 0 verbose
+	parameter.
+
+	* ChangeLog:
+	Update for recent work to hopefully satisfy the build on Windows boxes
+	running ActivePerl.
+
+	* Makefile.PL:
+	Added Test::Harness version that will satisfy the requirement for
+	TAP::Formatter::File on a ActivePerl installation.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Probably shouldn't have but the indent was bugging me and the
+	transition to get() instead of request() was signified in the
+	comments.
+
+	* t/live/cpan.t:
+	Slight burden to www.cpan.org but we probably can assume that it will
+	only was respond where llarian.com and activestate.com may not.  Of
+	course, the check needed to change with the URL being used.
+
+	* t/TEST:
+	Look for clean output by adding a check that there is input instead of
+	assuming there will.
+
+2010-03-31  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Leave a few comments for anyone that looks for a reason that something
+	didn't work but also the TEST script changed requiring a CVS assigned
+	release number this module supplies.
+
+	* t/TEST:
+	Corrected change to eliminate warnings that disabled the 0 verbose
+	parameter.
+
+	* ChangeLog:
+	Update for recent work to hopefully satisfy the build on Windows boxes
+	running ActivePerl.
+
+	* Makefile.PL:
+	Added Test::Harness version that will satisfy the requirement
+	for TAP::Formatter::File on a ActivePerl installation.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Probably shouldn't have but the indent was bugging me and the
+	transition to get() instead of request() was signified in the
+	comments.
+
+	* t/live/cpan.t:
+	Slight burden to www.cpan.org but we probably can assume that it will
+	only was respond where llarian.com and activestate.com may not.  Of
+	course, the check needed to change with the URL being used.
+
+	* t/TEST:
+	Look for clean output by adding a check that there is input instead of
+	assuming there will.
+
+2010-03-31  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Probably shouldn't have but the indent was bugging me and the
+	possible transition to get() instead of request() was
+	signified in the comments.  Leave a few comments for anyone
+	that looks for a reason that something didn't work but also
+	the TEST script changed requiring a CVS assigned release
+	number this module supplies.
+
+	* ChangeLog:
+	Update for recent work to hopefully satisfy the build on Windows boxes
+	running ActivePerl.
+
+	* Makefile.PL:
+	Added Test::Harness version that will satisfy the requirement for
+	TAP::Formatter::File on a ActivePerl installation.
+
+	* t/live/cpan.t:
+	Slight burden to www.cpan.org but we probably can assume that it will
+	only was respond where llarian.com and activestate.com may not.  Of
+	course, the check needed to change with the URL being used.
+
+	* t/TEST:
+	Look for clean output by adding a check that there is input
+	instead of assuming there will.  Corrected change to eliminate
+	warnings that disabled the 0 verbose parameter.
+
+2010-03-31  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* Makefile.PL:
+	Added Test::Harness version that will satisfy the requirement for
+	TAP::Formatter::File on a ActivePerl installation.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Probably shouldn't have but the indent was bugging me and the
+	transition to get() instead of request() was signified in the
+	comments.
+
+	* t/live/cpan.t:
+	Slight burden to www.cpan.org but we probably can assume that it will
+	always respond where llarian.com and activestate.com may not.  Of
+	course, the check needed to change with the URL being used.
+
+	* t/TEST:
+	Look for clean output by adding a check that there is input instead of
+	assuming there will.
+
+	* lib/HTTP/Response/Tree.pm:
+	Added confirmation that this is part of the FramesReady packaging.
+
+2009-01-05  Alan E Derhaag  <aederhaag@alansys.newerasoftdevel.com>
+
+	* ChangeLog:
+	Updated for historical reasons not knowing if this is still a
+	requirement or anticipated element in the package.
+
+	* META.yml:
+	Editted by hand as it was unknown whether this file is any longer
+	needed and ExtUtils::MakeMaker does not seem to any longer replace or
+	update it.  The version was updated in any case.
+
+2009-01-05  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* META.yml:
+	Editted by hand as it was unknown whether this file is any longer
+	needed and ExtUtils::MakeMaker does not seem to any longer replace or
+	update it.  The version was updated in any case.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	The LWP::Debug usage was removed as it was not effectively deployed in
+	perl-libwww installations on all platforms.  The seemingly obsolete
+	'use vars' was replaced by making globals ours.  Class hash elements
+	were quoted to avoid clashes with internal names.  An
+	$self->{'errstring'} was a crippled LWP::Debug replacement for
+	testing.  Missing documentation for the nomax() getter and setter and
+	new documentation for the errors.
+
+	* t/net/cgi-bin/timeout, t/net/cgi-bin/test, t/net/cgi-bin/slowread, t/net/cgi-bin/nph-slowdata, t/net/cgi-bin/moved, t/net/cgi-bin/frametst, t/net/cgi-bin/frame1, t/net/proxy.t, t/net/moved.t, t/net/mirror.t, t/net/http-timeout.t, t/net/http-post.t, t/net/http-get.t, t/net/frames.s, t/net/config.pl.dist, t/local/protosub.t, t/local/http.t, t/local/frames.t, t/local/autoload.t, t/live/cpan.t, t/html/form.t, t/TEST, t/README, t/base/ua.t:
+	Restore testing facilities into CVS repository.
+
+	* MANIFEST:
+	Modified to remove LWP::Debug since it is not always distributed with
+	perl-libwww module in all platforms.
+
+	* META.yml:
+	Restore CVS repository to the version distributed with FramesReady 1.19
+
+	* README:
+	Removed the libnet and libwww requires along with LWP::Debug usage.
+
+2009-01-04  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* README:
+	Corrected email response address since n2h2 is defunct.  Added more
+	requirements to cover those covered in the Makefile.PL file.
+
+	* Makefile.PL:
+	Rewrite of WriteMakefile structure to drop the requirement for
+	LWP::Debug since some platforms do not include it with perl-libwww.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Restore CVS repository to the current level deployed at version 1.19
+
+2008-12-24  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* README:
+	The prerequisites were slimmed down removing the LWP::Debug since CPAN
+	testing does not implement it on a number of platforms.  The libwww
+	should supply LWP::UserAgent or at least it used to.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Evidently CPAN testing no longer uses LWP::Debug even though it
+	appears perl-libwww still comes with that module so to enable a clean
+	CPAN testing it is now commented out but available for uncomment if
+	the need arises.
+
+2008-12-23  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	It was missed that the very first character in the file was an
+	unquoted 'c' prefixing the comment--an obvious fat finger situation.
+
+2008-12-22  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Comments were enhanced and clarified when describing the callback.
+	There should be a note that callbacks cannot be undefined as built
+	into the process is the following out of redirects and refreshes.
+
+	* Makefile.PL:
+	Update with more required modules that are not part of the CORE
+	distribution so CPAN testing should work.
+
+2008-12-14  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* t/net/config.pl.dist:
+	Restore config.pl.dist missing from the archive.
+
+	* MANIFEST:
+	Swapped activestate.t with cpan.t as the activestate.com site is
+	obsolete.
+
+	* t/net/frames.s: Restore frames.s missing from archive.
+
+	* lib/LWP/UserAgent/FramesReady.pm:
+	Revised the documentation for the default performance to return an
+	HTTP::Responce object in the event the return code is outside the
+	range of 200-399 as suggested by Jason Novak.
+
+2008-12-12  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* README:
+	Modified the long wrong email address for bug reports and suggestions.
+
+	* TODO: Added an addition entry for supporting user requests.
+
+	* t/live/cpan.t:
+	Replace ftp://activestate.com with ftp://cpan.llarian.com access.
+
+2008-12-11  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* t/TEST, t/README, t/net/proxy.t, t/net/moved.t, t/net/mirror.t, t/net/http-timeout.t, t/net/http-post.t, t/net/http-get.t, t/local/protosub.t, t/local/http.t, t/local/frames.t:
+	Initial check in for replacement code version archive.
+
+	* t/local/autoload.t, t/html/form.t:
+	Initial Check in for replacement code version archive.
+
+	* t/base/ua.t: Initial check in for replacement code version archive.
+
+2007-10-25  Alan E Derhaag  <aederhaag@alanhp.newerasoftdevel.com>
+
+	* lib/HTTP/Response/Tree.pm, lib/LWP/UserAgent/FramesReady.pm, META.yml, MANIFEST, TODO:
+	Initial repository add at higher revision number for start repository recovery
+
+	* README:
+	Initial repository add at higher version for start repository recovery
+
+	* Makefile.PL: Makefile.PL initiation of install
+
+	* ChangeLog: Inserting ChangeLog while opening repository for checkin.
+
+2004-03-06  Alan E Derhaag  <aderhaa@n2n2.com>
+
+	* FramesReady.pm:
+	Require a 2.001 version of LWP::UserAgent for setting of @redirects
+	allowed.  Explicitly use the URI::URL module for abs().  Supply the
+	missing @schema array missing since 1.10 version.  Drop the default
+	UserAgent setting of Mozilla/5.0 for 302 redirects instead a list of
+	URLs.  Enhanced pod documentation.  Added further Debug trace
+	information.  Fix use of explicit use of internal callback in favor of
+	that supplied by user or undef..  also the size.
+
+2003-12-11  Alan E Derhaag  <aderhaa@n2h2.com>
+
+	* Tree.pm: Initialize it to the 1.14 revision.
+
+	* Tree.pm: Import of Tree v. 1.014
+
+	* Tree.pm: New file.
+
+2002-04-27  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Added missing check for a $tree->code < 200.
+
+2002-04-19  ewippre  <ewippre>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Added variable declaration to avoid errors from some
+	URLs during scan_page operation.
+
+2002-04-16  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Optimize immediate return if content-type is not HTML.
+
+2002-04-11  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Correct to not attempt reclassing and populating any
+	response content if frames are not even possible w/code for errors
+	greater or equal to 400.
+
+2002-04-01  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Switch from TreeBuilder to TokeParser for ease of tag search
+	and manipulation.  Corrected for the non-populate of a content-type
+	header for FTP, GOPHER and other protocols the module may encounter.
+	Correct to not try to track frames on an error page.  Added addendum
+	to copyright notice for possible CPAN release.
+
+2002-03-27  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Correct for problem with tracking frames when an error
+	return exited early and didn't populate conditionally checked
+	structure elements.
+
+2002-03-22  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Correct for check of requested URI to first check for a 503
+	(WAIT) error that causes the request method to not populate the field.
+
+2002-03-21  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Better correction made that doesn't depend on assumed order
+	of processing that an OR will return TRUTH on the first conditional
+	check.  Arrays are checked as arrays and scalars as scalars.
+
+2002-03-19  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Corrected for header Content-type being array or scalar
+	values and not just as an array.
+
+2002-03-15  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Added check of each/every content-type header for test/html
+	content for without it multiple content-types would not pass the test.
+
+2002-03-11  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Added check for early return of HTTP::Response to request if
+	the URL was for a robots.txt file--short changes 404 and redirects.
+
+2002-03-08  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Implement IFRAMEs and FRAMEs processing with fine tuning of
+	the tree traversal.
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Initialized *uris variables sooner in the
+	extract_frame_uris() so that an iframe in a body can set children to
+	follow rather than only frames within framesets.  Optimized the code
+	to release memory by the delete the $html structure with an error exit
+	as well as a correct one.
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Dropped leading white space trim for every iteration of the
+	loop.
+
+2002-03-07  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Made ready for production with a proper heading and fine
+	tuning of class method.
+
+2002-03-06  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Changed header (pragma) to 'no_wait' rather than
+	'child_proc' to be more specific to its use.
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	The cat_all_content() now concatenates both content and meta
+	labels within the class.  The child responses are removed after the
+	contenation.  Content is striped of leading and trailing white space
+	to conserve on data space.
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Strip leading and trailing white space from content and meta
+	fields.  Remove children when through concatenating their content to
+	the main response.
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Corrected typo (missing line terminator).
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Added x-meta-keywords to the concatenation but directly into
+	the $self->headers->{'x-meta-keywords'} rather than passing it back.
+
+2002-03-05  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Embellished frameset search in body so if no more content is
+	found an additional search does not bomb.  Added header
+	'pragma' to disable wait state for requests in
+	RobotUA::simple_request.
+
+2002-03-03  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Modified request() to return earily if the content-type is
+	not text/[s]html.
+
+2002-03-02  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Temporary fix for disabling frames search on a text/plain
+	results as expected by robots.txt file request.
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Modifications to request() function necessary to allow
+	following redirects and other things that the extra parameters allowed
+	the base class object to use.
+
+2002-03-01  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Corrected calls and use of blessed HTTP::Response::Tree
+	objects.
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Ahh..  finally a working version but
+	LWP::UserAgent::FramesReady needs better method of finding framesets.
+
+2002-02-28  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Corrected possible blessed HTTP::Request::Tree child
+	initialization but this should be handled within that module probably.
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Recursion in member needs fixing while child
+	($self->{_hrt_children}) appears to be fixed.
+
+2002-02-27  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Added head information for tracking release versions.
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Added header information so version information is visible.
+
+2002-02-26  Alan E. Derhaag  <aderhaa@n2h2.com>
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	Checkin for Larry's latest version found on his machine.
+
+2002-02-05  larry  <larry@noctis.ops.n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	Stomped a subtle bug that prevented all frames from
+	being returned in a frameset
+
+2002-02-01  larry  <larry@noctis.ops.n2h2.com>
+
+	* /cvsroot/lib/LWP/UserAgent/FramesReady.pm:
+	LWP::UserAgent::FramesReady is a version of
+	LWP::UserAgent that is capable of following frames
+
+	* /cvsroot/lib/HTTP/Response/Tree.pm:
+	HTTP::Response::Tree - for holding collections of
+	HTTP::Response objects
+

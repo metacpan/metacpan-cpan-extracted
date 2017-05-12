@@ -1,0 +1,2 @@
+dbcolcreate: attempt to create pre-existing column foo.
+ at blib/script/dbcolcreate line 999.

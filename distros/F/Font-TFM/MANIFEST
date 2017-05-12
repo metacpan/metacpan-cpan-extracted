@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TFM.pm.PL
+backup/TFM.pm
+backup/TFM.pm.src
+cmr10.tfm
+cmsy10.tfm
+cmex10.tfm
+t/tfm.t
+META.yml                                 Module meta-data (added by MakeMaker)

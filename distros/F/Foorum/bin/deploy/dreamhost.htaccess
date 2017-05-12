@@ -1,0 +1,12 @@
+AddHandler fastcgi-script .fcgi
+Options +FollowSymLinks +ExecCGI
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} ^/static/(.*)$ [OR]
+RewriteCond %{REQUEST_URI} ^/stats/(.*)$ [OR]
+RewriteCond %{REQUEST_URI} ^/upload/(.*)$
+RewriteRule ^.*$ - [L]
+
+RewriteCond %{REQUEST_URI} !^/?dispatch.fcgi
+RewriteRule ^(.*)$ dispatch.fcgi/$1 [PT,L]

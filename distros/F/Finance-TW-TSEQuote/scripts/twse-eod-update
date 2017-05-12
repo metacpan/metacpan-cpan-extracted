@@ -1,0 +1,27 @@
+#!perl
+use strict;
+use warnings;
+use Finance::TW::TSEQuote;
+use File::Temp;
+
+my $product = shift || '0050';
+my $dir = shift || 'daily';
+mkdir($dir);
+
+my $quote = Finance::TW::TSEQuote->new($product);
+my ($year, $month);
+$month = 12;
+$year = shift || 2012;
+
+for my $m (1..$month) {
+    my $file = sprintf('%s/%s-%d-%02d.txt', $dir, $product, $year, $m);
+    next if -e $file;
+
+	my $result = $quote->fetchMarketFile($product, $year, $m);
+    if ($result) {
+        open my $fh, '>', $file or die $!;
+        print $fh $result;
+        close $fh;
+    }
+    sleep 1;
+}

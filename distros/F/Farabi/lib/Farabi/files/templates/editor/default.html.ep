@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Farabi: Modern Perl IDE</title>
+
+<!-- jQuery -->
+<script src="assets/jquery/jquery-2.1.1.min.js"></script>
+
+<!-- Bootstrap -->
+<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+
+<!-- Farabi -->
+<link rel="stylesheet" href="farabi.css" type="text/css" />
+<script src="farabi.js"></script>
+<script src="about_dialog.js"></script>
+<script src="actions_dialog.js"></script>
+<script src="find_duplicate_perl_code_dialog.js"></script>
+<script src="new_project_dialog.js"></script>
+<script src="open_file_dialog.js"></script>
+<script src="perl_critic_dialog.js"></script>
+<script src="options_dialog.js"></script>
+<script src="repl_dialog.js"></script>
+<script src="run_dialog.js"></script>
+<script src="save_question_dialog.js"></script>
+<script src="goto_line_dialog.js"></script>
+
+<!-- CodeMirror editor -->
+<link rel="stylesheet" href="assets/codemirror/lib/codemirror.css"
+	type="text/css" />
+<script src="assets/codemirror/lib/codemirror.js"></script>
+
+<!-- CodeMirror addons -->
+<link rel="stylesheet" href="assets/codemirror/addon/dialog/dialog.css" />
+<script src="assets/codemirror/addon/mode/loadmode.js"></script>
+<script src="assets/codemirror/addon/search/searchcursor.js"></script>
+<script src="assets/codemirror/addon/search/match-highlighter.js"></script>
+<script src="assets/codemirror/addon/selection/mark-selection.js"></script>
+<script src="assets/codemirror/addon/selection/active-line.js"></script>
+<script src="assets/codemirror/addon/search/search.js"></script>
+<script src="assets/codemirror/addon/dialog/dialog.js"></script>
+<script src="assets/codemirror/addon/edit/matchbrackets.js"></script>
+
+
+<link rel="stylesheet" href="assets/codemirror/addon/display/fullscreen.css">
+<script src="assets/codemirror/addon/display/fullscreen.js"></script>
+
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div id="action_button_div">
+				<div class="navbar">
+              <div class="navbar-inner">
+                <div class="container">
+                  <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-inverse-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </a>
+                  <a class="brand" href="#">Farabi</a>
+                  <div class="nav-collapse collapse navbar-inverse-collapse">
+                    <ul class="nav">
+						<li><button class="actions-button btn btn-primary" type="button"><b>A</b>ctions</button><li>
+							<li><%
+								my $menus = $self->menus;
+								for my $menu_key (sort keys %$menus) {
+									my $menu_name = $menu_key;
+									$menu_name =~ s/^\d{2}\.//;
+							    %>
+                      <li id="<%= $menu_name %>-dropdown" class="dropdown">
+						  
+						  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= $menu_name %> <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+							<%
+							my $menu = $menus->{$menu_key};
+							for my $menu_item (@$menu) {
+								
+							%>
+                          <li><a id="<%=$menu_item->{action}%>" href="#"><%=$menu_item->{name}%></a></li>
+								<%
+								}
+								%>
+                        </ul>
+                      </li>
+								
+								<%
+								}
+								%>
+                    </ul>
+                    <ul class="nav pull-right">
+						<li><button id="connection-status" class="btn btn-danger" type="button" disabled="disabled">Closed</button></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>				
+			</div>
+			<div class="row-fluid">
+				<div class="span6 left-side">
+					<ul id="myTab" class="nav nav-tabs"></ul>
+					<div id="myTabContent" class="tab-content"></div>
+				</div>
+				<div class="span6 right-side">
+					<ul id="rightTab" class="nav nav-tabs">
+						<li><a href="#problems-tab" data-toggle="tab">Problems</a></li>
+						<li class="active"><a href="#input-tab" data-toggle="tab">Input</a></li>
+						<li><a href="#output-tab" data-toggle="tab">Output</a></li>
+						<li><a href="#diff-tab" data-toggle="tab">Changes</a></li>
+						<li><a href="#doc-tab" data-toggle="tab">Documentation</a></li>
+						<li><a href="#preview-tab" data-toggle="tab">Preview</a></li>
+						<li><a href="#search-tab" data-toggle="tab">Search</a></li>
+					</ul>
+					<div id="rightTabContent" class="tab-content">
+						<div class="tab-pane" id="problems-tab">
+							<div class="farabi-bordered">
+								<div id="problems">
+									<table class="table table-bordered table-hover"></table>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane active" id="input-tab">
+							<div class="farabi-bordered">
+								<textarea id="input"></textarea>
+							</div>
+						</div>
+						<div class="tab-pane" id="output-tab">
+							<div class="farabi-bordered">
+								<textarea id="output"></textarea>
+							</div>
+						</div>
+						<div class="tab-pane" id="preview-tab">
+							<div class="farabi-bordered">
+								<iframe id="pod" src="about:blank"></iframe>
+							</div>
+						</div>
+						<div class="tab-pane" id="doc-tab">
+							<div class="farabi-bordered">
+								<iframe id="doc" src="about:blank"></iframe>
+							</div>
+						</div>
+						<div class="tab-pane" id="diff-tab">
+							<div class="farabi-bordered">
+								<textarea id="diff"></textarea>
+							</div>
+						</div>
+						<div class="tab-pane" id="search-tab">
+							<div class="farabi-bordered">
+								<textarea id="search"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<%= include "editor/about_dialog"%>
+<%= include "editor/actions_dialog"%>
+<%= include "editor/perl_critic_dialog"%>
+<%= include "editor/about_dialog"%>
+<%= include "editor/help_dialog"%>
+<%= include "editor/run_dialog"%>
+<%= include "editor/options_dialog"%>
+<%= include "editor/new_project_dialog"%>
+<%= include "editor/open_file_dialog"%>
+<%= include "editor/perl_doc_dialog"%>
+<%= include "editor/repl_dialog"%>
+<%= include "editor/save_question_dialog"%>
+<%= include "editor/find_duplicate_perl_code_dialog"%>
+<%= include "editor/goto_line_dialog"%>
+
+</body>
+</html>

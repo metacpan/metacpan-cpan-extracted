@@ -1,0 +1,13 @@
+Build.PL
+ChangeLog
+LICENSE
+MANIFEST
+META.yml
+README
+Coda.pm
+t/01-basic.t
+t/02-noclobber.t
+t/03-nointerfere.t
+t/98-pod-coverage.t
+t/99-pod.t
+SIGNATURE    Added here by Module::Build

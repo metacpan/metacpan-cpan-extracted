@@ -1,0 +1,200 @@
+Exemple of writing a signature for binary file:
+Henrique Dias <hdias@aesbuc.pt>
+Last Change: Tue Sep 30 11:24:13 WEST 2003
+
+This document provides suggestions for write signatures for viruses.
+
+pico -> editor (you can use vim, emacs or another editor)
+xxd  -> hex dump of a given file
+
+-> Change to directory where you have the infected file or virus
+
+$ cd virus/W32_Yaha.u_MM
+$ ls
+
+specimen.zip
+
+$ unzip specimen.zip
+$ xxd setup.exe > hex.txt
+$ more hex.txt
+
+-> Get the application signature from the begin of the hex file:
+
+application signatures
+----------------------
+e9
+474554
+4d534654
+49545346
+7f454c46
+4d5a000002
+4d5a420002
+4d5a500002
+4d5a900003
+4d5a930001
+d0cf11e0a1b11ae1
+----------------------
+
+     application signature
+              |
+              |
+         |----------|
+0000000: 4d5a 9000 0300 0000 0400 0000 ffff 0000  MZ..........ÿÿ..
+0000010: b800 0000 0000 0000 4000 0000 0000 0000  ........@.......
+0000020: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+0000030: 0000 0000 0000 0000 0000 0000 e000 0000  ............à...
+0000040: 0e1f ba0e 00b4 09cd 21b8 014c cd21 5468  ..º....Í!..LÍ!Th
+0000050: 6973 2070 726f 6772 616d 2063 616e 6e6f  is program canno
+0000060: 7420 6265 2072 756e 2069 6e20 444f 5320  t be run in DOS
+0000070: 6d6f 6465 2e0d 0d0a 2400 0000 0000 0000  mode....$.......
+0000080: d1e9 2b6c 9588 453f 9588 453f 9588 453f  Ñé+l..E?..E?..E?
+0000090: ee94 493f 9488 453f 1694 4b3f 8588 453f  î.I?..E?..K?..E?
+...
+
+-> Look at the file for a good signature:
+
+...
+
+0009190: 6b6c 6d41 7172 7775 7677 78ff 09fa ff79  klmAqrwuvwxÿ.úÿy
+00091a0: 7a30 3132 3334 3536 3738 392b c63c 2f42  z0123456789+Æ</B
+00091b0: 4f44 595e 76c1 bf3e 0d48 544d 4c3e c93c  ODY^vÁ.>.HTML>É<
+00091c0: 170b 45fb 76d9 9dc7 300d 4a3c 3c46 4f4e  ..EûvÙ.Ç0.J<<FON
+00091d0: 5428 6010 ee32 0d56 0738 a7ff 6070 ed74  T(`.î2.V.8.ÿ`pít
+00091e0: 91d9 6f2d 3838 3539 2db9 62b8 4414 4be8  .Ùo-8859-.b.D.Kè <-- Start
+00091f0: 07eb e9a7 1525 742f ad6d 7777 23e1 3558  .ëé..%t/.mww#á5X
+0009200: 2a8f 274d 4b29 a021 fa4d 494d 452d 493a  *.'MK).!úMIME-I:
+0009210: cacd 5a5a a171 aafe 2f5a 5818 ee6d 6978  ÊÍZZ.qªþ/ZX.îmix --> End
+0009220: d764 3755 b8bb 827e bb3d cee4 9e62 9c5d  .d7U...~.=Îä.b.]
+0009230: 9d0a f681 d66f 0d00 3ee3 bd06 3a26 1e11  ..ö.Öo..>ã..:&..
+0009240: 2220 97eb dd6f 1348 48a1 1973 2748 6cbe  " .ëÝo.HH..s'Hl.
+0009250: 03be 6401 2c64 0901 2079 0044 6880 6f24  ..d.,d.. y.Dh.o$
+0009260: 4556 4441 5fb1 71ef ffd0 5243 5054 2054  EVDA_.qïÿÐRCPT T
+0009270: 4f3a 3c19 3e1e 0180 15d2 fe4c 2046 524f  O:<.>....ÒþL FRO
+...
+
+Signature (you can choose another signature):
+
+91d96f2d383835392db962b844144be8
+07ebe9a71525742fad6d777723e13558
+2a8f274d4b29a021fa4d494d452d493a
+cacd5a5aa171aafe2f5a5818ee6d6978
+
+-> Change to File-Scan directory after extract the compressed file:
+
+$ cd File-Scan-X.XX
+
+-> Now, add the signature to the file signature database.
+
+$ pico files/signatures.txt
+
+date::app_signature::Virus_Name::Position::signature
+ |        |              |           |          |
+ |        +----+         |           |          +--------+
+ |             |         |           |                   |
+20030730::4d5a900003::W32/Yaha.u@MM::0::91d96f2d383835392db962b844144be807ebe9a71525742fad6d777723e135582a8f274d4b29a021fa4d494d452d493acacd5a5aa171aafe2f5a5818ee6d6978
+
+-> Edit the Makefile.PL and change the value of $debug to 1.
+
+$ pico Makefile.PL
+
+---Makefile.PL-------------------------------
+
+use strict;
+
+my $debug = 0; --> Change to 1
+my $bufflen = 1024;
+
+---------------------------------------------
+
+$ perl Makefile.PL
+$ make test
+$ sudo make install
+$ make clean
+
+-> Scan the infected file with example scanner:
+
+$ examples/scan.pl ../../virus/W32_Yaha.u_MM/setup.exe
+
+-----------------------------------------------------------------------
+...
+
+31744
+32768
+33792
+34816
+35840
+36864
+37888 <--- Position
+../../virus/W32_Yaha.u_MM/setup.exe Infection: W32/Yaha.u@MM
+
+Results of virus scanning:
+--------------------------
+Objects scanned: 1 
+        Skipped: 0
+     Suspicious: 0
+       Infected: 1
+      Scan Time:  0 wallclock secs ( 0.01 usr +  0.01 sys =  0.02 CPU)
+
+-----------------------------------------------------------------------
+
+$ pico files/signatures.txt
+
+-> Now, change the position to the new position:
+
+date::app_signature::Virus_Name::Position::signature
+ |        |              |          |          |
+ |        +----+         |          +--+       +-----------+
+ |             |         |             |                   |
+20030730::4d5a900003::W32/Yaha.u@MM::eq37888::91d96f2d383835392db962b844144be807ebe9a71525742fad6d777723e135582a8f274d4b29a021fa4d494d452d493acacd5a5aa171aafe2f5a5818ee6d6978
+
+Conditions:
+--------------------------------------------------------
+0               Scan all file
+lt/le n         Scan after read n bytes
+gt/ge n         Scan only before read n bytes
+eq n            Scan if n is equal to the bytes read
+ne n            Scan if n is not equal to the bytes read
+or              logical OR operation
+and             logical AND operation
+--------------------------------------------------------
+
+$ pico Makefile.PL
+
+-> Change again the value of $debug to 0.
+
+---Makefile.PL-------------------------------
+
+use strict;
+
+my $debug = 1; --> Change to 0
+my $bufflen = 1024;
+
+---------------------------------------------
+
+$ perl Makefile.PL
+$ make test
+$ sudo make install
+$ make clean
+
+-> Test the signature with the example scanner:
+
+$ examples/scan.pl ../../virus/W32_Yaha.u_MM/specimen.zip
+
+---Result------------------------------------
+
+/tmp/setup.exe Infection: W32/Yaha.u@MM
+../../virus/W32_Yaha.u_MM/specimen.zip ZIP archive
+
+Results of virus scanning:
+--------------------------
+Objects scanned: 1 
+        Skipped: 0
+     Suspicious: 0
+       Infected: 1
+      Scan Time:  0 wallclock secs ( 0.02 usr  0.00 sys +  0.00 cusr  0.01 csys =  0.03 CPU)
+
+
+For better virus name look at:
+http://vil.nai.com/vil/default.asp
+http://www.antivirus.com/vinfo/virusencyclo/
+http://www.viruslist.com/

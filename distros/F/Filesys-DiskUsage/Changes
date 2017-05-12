@@ -1,0 +1,43 @@
+Revision history for Filesys::DiskUsage
+
+0.10  2016-12-08 MANWAR
+      - Updated Makefile.PL with regard to github repo details.
+      - Added MANIFEST file.
+
+0.09  2016.08.19
+      - global filehandle DIR locks directory RT #48227 (BOLDRA)
+      - Added extra check for preventing warning when file is deleted
+        between -f and -s tests GitHub #2 (Pablo Rodríguez González)
+      - added blocks support as well as file length.  RT #20848 (Dominic Mitchell)
+
+0.08  2014.10.15
+      - Add fdu script to installation list (Brian Wightman)
+
+0.07  2014.09.10
+      - Fix tests:
+        skip count on Windows
+        eliminate locale dependence on other OS-es.
+
+0.06  2014.09.09
+      - New maintainer. Link to GitHub.
+      - Remove the need for File::Slurp
+
+0.05  2010.08.17
+      - fix for when a directory isn't openable (kudos to J.T. Conklin
+        for spotting the problem and providing a patch)
+      - added some tests
+
+0.04  Mon Nov 05 10:31:00 2005
+      - added sector-size and symlink-size patch, thanks to Darin McBride
+      - fixed a couple of things on fdu
+
+0.03  Mon Oct 24 17:21:00 2005
+      - added the fdu command
+      - directory excluding now works (thanks to Hussein Patni for pointing
+        this out)
+
+0.02  Wed Jan 19 10:53:00 2005
+      - fixed a bug regarding links, thanks to Steve Cleveland
+
+0.01  Mon Dec 27 16:42:00 2004
+      - first version

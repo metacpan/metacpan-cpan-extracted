@@ -1,0 +1,7 @@
+do { my $x = {
+       'a20-olinuxino' => '232359a8-b894-11e6-8e0f-c2f830785f04',
+       'davids-macbook-pro-2.local' => '18d8a57e-0a22-11e5-9d49-e60ed23c8333',
+       'virtua.com.br' => '83ce8732-3d01-11e6-a5ff-abe4273a1f7f'
+     };
+  $x;
+ }

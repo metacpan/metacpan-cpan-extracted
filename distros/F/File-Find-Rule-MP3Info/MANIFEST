@@ -1,0 +1,12 @@
+Changes
+INSTALL
+MANIFEST
+MP3Info.pm
+Makefile.PL
+README
+t/File-Find-Rule-MP3Info.t
+t/test1.mp3
+t/test2.mp3
+t/test3.mp3
+t/test4.mp3
+

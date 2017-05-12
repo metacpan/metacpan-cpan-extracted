@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib '../blib/lib';
+
+use Finance::Amortization;
+use HTML::Table;
+
+# this program generates a 30 year amortization table on a $200,000
+# loan at 7%
+
+my $am = Finance::Amortization->new(principal => 200000, rate => .07,
+	 periods => 30*12, compounding => 12, precision => 2);
+
+
+#balance, interest, payment
+
+my @cols = qw(Period Payment Interest Principal Balance);
+
+my $table = HTML::Table->new(0, 5);
+
+$table->addRow(@cols);
+$table->setRowHead(1);
+
+my $pmt = $am->payment;
+
+for(1 .. 30*12) {
+	my ($int, $bal) = ($am->interest($_),$am->balance($_));
+	$table->addRow($_, $pmt, $int, $pmt-$int, $bal);
+}
+
+$table->print;

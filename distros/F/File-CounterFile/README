@@ -1,0 +1,56 @@
+NAME
+    File::CounterFile - Persistent counter class
+
+SYNOPSIS
+     use File::CounterFile;
+     $c = File::CounterFile->new("COUNTER", "aa00");
+
+     $id = $c->inc;
+     open(F, ">F$id");
+
+DESCRIPTION
+    This module implements a persistent counter class. Each counter is
+    represented by a separate file in the file system. File locking is
+    applied, so multiple processes might try to access the same counters at
+    the same time without risk of counter destruction.
+
+    You give the file name as the first parameter to the object constructor
+    ("new"). The file is created if it does not exist.
+
+    If the file name does not start with "/" or ".", then it is interpreted
+    as a file relative to $File::CounterFile::DEFAULT_DIR. The default value
+    for this variable is initialized from the environment variable "TMPDIR",
+    or /usr/tmp is no environment variable is defined. You may want to
+    assign a different value to this variable before creating counters.
+
+    If you pass a second parameter to the constructor, that sets the initial
+    value for a new counter. This parameter only takes effect when the file
+    is created (i.e. it does not exist before the call).
+
+    When you call the "inc()" method, you increment the counter value by
+    one. When you call "dec()" the counter value is decrementd. In both
+    cases the new value is returned. The "dec()" method only works for
+    numerical counters (digits only).
+
+    You can peek at the value of the counter (without incrementing it) by
+    using the "value()" method.
+
+    The counter can be locked and unlocked with the "lock()" and "unlock()"
+    methods. Incrementing and value retrieval is faster when the counter is
+    locked, because we do not have to update the counter file all the time.
+    You can query whether the counter is locked with the "locked()" method.
+
+    There is also an operator overloading interface to the File::CounterFile
+    object. This means that you might use the "++" operator for incrementing
+    the counter, "--" operator for decrementing and you can interpolate
+    counters diretly into strings.
+
+COPYRIGHT
+    Copyright (c) 1995-1998,2002,2003 Gisle Aas. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Gisle Aas <gisle@aas.no>
+

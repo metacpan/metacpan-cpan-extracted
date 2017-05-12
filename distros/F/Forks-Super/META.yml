@@ -1,0 +1,39 @@
+---
+abstract: 'extensions and convenience methods to manage background processes'
+author:
+  - "Marty O'Brien <mob@cpan.org>"
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Forks-Super
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Sys::CpuAffinity
+    - Signals::XSIG
+    - Signals::XSIG::Default
+    - Signals::XSIG::TieArray56
+    - Forks::Super::SysInfo
+recommends:
+  DateTime::Format::Natural: '0.89'
+  Net::OpenSSH: '0.64'
+  PerlIO::gzip: '0'
+  Sys::CpuAffinity: '1.00'
+  Sys::CpuLoadX: '0.02'
+  Test::SSH: '0'
+  YAML: '0.62'
+requires:
+  Test::More: '0'
+  Time::HiRes: '1.30'
+  URI: '0'
+version: '0.89'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

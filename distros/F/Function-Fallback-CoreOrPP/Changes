@@ -1,0 +1,45 @@
+0.08    2017-01-14 (PERLANCAR)
+
+	- unbless(): Support unblessing coderef.
+
+
+0.07    2016-01-16 (PERLANCAR)
+
+	- Add clone_list().
+
+
+0.06    2014-09-16 (PERLANCAR)
+
+	- Move non-core XS deps from requires to recommends [RT#98886,
+	  suggested by KENTNL].
+
+
+0.05    2014-04-10 (SHARYANTO)
+
+        - Add unbless().
+
+
+0.04    2014-04-10 (SHARYANTO)
+
+        - No functional changes.
+
+        - Require the non-core XS modules as deps. We only need optional deps
+          when building fatpacked app.
+
+
+0.03    2014-04-10 (SHARYANTO)
+
+        - No functional changes.
+
+        - Rename distribution from SHARYANTO-MaybeXS to
+          Function::Fallback::CoreOrPP.
+
+
+0.02    2014-04-09 (SHARYANTO)
+
+        - Replace Storable::dclone with Clone::PP::clone.
+
+
+0.01    2014-04-07 (SHARYANTO)
+
+        - First release.

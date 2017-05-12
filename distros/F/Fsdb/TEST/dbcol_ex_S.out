@@ -1,0 +1,6 @@
+#fsdb -F S account
+johnh
+greg
+root
+# this is a simple database
+#   | dbcol account

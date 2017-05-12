@@ -1,0 +1,5 @@
+0.2   26th January 2009
+      - Added dep in Build.PL for File::Find::Rule
+      - tidied up some prose
+0.01  30th October 2008
+      - initial release

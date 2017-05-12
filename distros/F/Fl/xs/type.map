@@ -1,0 +1,89 @@
+TYPEMAP
+
+Object                  *   O_Class
+Fl_Box                  *   O_Class
+Fl_Button               *   O_Class
+Fl_Chart                *   O_Class
+Fl_Check_Button         *   O_Class
+Fl_Group                *   O_Class
+Fl_Input                *   O_Class
+Fl_Multiline_Input      *   O_Class
+Fl_Int_Input            *   O_Class
+Fl_Float_Input          *   O_Class
+Fl_Secret_Input         *   O_Class
+Fl_Light_Button         *   O_Class
+Fl_Radio_Button         *   O_Class
+Fl_Radio_Light_Button   *   O_Class
+Fl_Radio_Round_Button   *   O_Class
+Fl_Repeat_Button        *   O_Class
+Fl_Return_Button        *   O_Class
+Fl_Round_Button         *   O_Class
+Fl_Toggle_Button        *   O_Class
+Fl_Widget               *   O_Class
+Fl_Window               *   O_Class
+Fl_Boxtype                  T_ENUM
+Fl_Color                    T_ENUM
+Fl_Font                     T_ENUM
+Fl_Fontsize                 T_ENUM
+Fl_Labeltype                T_ENUM
+Fl_When                     T_ENUM
+
+
+Fl__Input                   O_PtrClass
+
+# Defaults
+const char                  *   T_PV
+const char                  **  T_PV
+char                        **  T_PV
+uchar                           T_U_CHAR
+uchar                       *   T_PV
+float                           T_FLOAT
+const void                  *   T_PTR
+int                         *   T_IPTR
+const int                   *   T_IPTR
+const uchar                 *   T_PV
+AV                      *   T_AVREF_REFCOUNT_FIXED
+
+OUTPUT
+O_Class
+    /*sv_setref_pv( $arg, CLASS, (void*)$var );*/
+    if ($var != NULL) {
+        //sv_setref_pv( $arg, object2package($var), (void*) $var );
+          sv_setref_iv( $arg, object2package($var), PTR2IV($var) );
+    }
+    else {
+        $arg = newSV(0);
+    }
+
+INPUT
+O_Class
+    if ( sv_isobject( $arg ) && ( SvTYPE( SvRV( $arg ) ) == SVt_PVMG ) ) {
+        $var = ($type) SvIV( (SV*) SvRV( $arg ));
+        if ($var == NULL)
+            XSRETURN_UNDEF;
+    }
+    else {
+        warn ( \"${Package}::$func_name() -- $var is not a blessed reference\" );
+        XSRETURN_UNDEF;
+    }
+
+
+
+
+
+
+INPUT
+O_PtrClass
+    if ( sv_isobject( $arg ) && ( SvTYPE( SvRV( $arg ) ) == SVt_PVMG ) ) {
+	//if (SvROK($arg) && sv_derived_from($arg, object2package($var->cp_ctx))) { // \"${ntype}\"
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak_nocontext(\"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+
+OUTPUT
+O_PtrClass
+	sv_setref_pv($arg, object2package($var->cp_ctx), (void*)$var); // \"${ntype}\"

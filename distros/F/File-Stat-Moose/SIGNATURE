@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4e59c046ccbd9b62450d0c5169ffcd8da8d0afda Build.PL
+SHA1 ff169d1855f2e154fba78473801c00e784bcf01e Changes
+SHA1 84728790069873439b343ee5ad320ed421e74e81 Incompatibilities
+SHA1 74b1c398020b9c1e8849b7982751cb70ecc5de8d LICENSE
+SHA1 ef88bad3737e4fc08104c706440af825e441afec MANIFEST
+SHA1 7d9037725a8f8c9c65eff1e091819c215f55c650 MANIFEST.SKIP
+SHA1 fe544418e2189d64d16a57baa438048ca5f42bf7 META.yml
+SHA1 4d68dc3c0ad9bb745a7f3845ec71d1eaf449afc2 Makefile.PL
+SHA1 31f99c5b203825c6ed93b8d4065c90bbd57dac99 README
+SHA1 5055c99749d4bd7b474c10f35b146696f899cdde eg/stat.pl
+SHA1 046369f3a09519a1b37444b2d566b52a4f52e864 lib/Exception/IO.pm
+SHA1 8f0eff0ed6760562c41f4ce514e92c72de58cd98 lib/File/Stat/Moose.pm
+SHA1 d75b3fdbbe9d0f55976993f8d646928410e873f5 lib/MooseX/Types/CacheFileHandle.pm
+SHA1 c84e1ecef92d76c47511b37c194dbdf976e825ec lib/MooseX/Types/OpenHandle.pm
+SHA1 384296ed58916d7cd806ad6b64f51c70889718f8 t/all_tests.t
+SHA1 b4c5786028fbfcd734f8d611cbac572a70a5868a t/test.pl
+SHA1 6eed9bb39a0c9e6d57602cf43f73930ed03ac534 t/tlib/File/Stat/MooseFunctionTest.pm
+SHA1 2f069eaa9dbf13b1fb34f161353567256f9dc077 t/tlib/File/Stat/MooseTest.pm
+SHA1 833eba00bf9bbc1522e98194f3d9d17c21a5f807 xt/benchmark.pl
+SHA1 a56d0c02b6c992e04a77d13a6ee89504bd718572 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 0cc035a7059d85dbe3345dd77ab3bfcb26747eea xt/distribution.t
+SHA1 ce95b12540d6fa64569e97e3bc58142d567a9109 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 8625d867e8834f8d88abc5b1d81ce455d8001b04 xt/perlcritic.t
+SHA1 be492092e9cf8bf9dbcab866485a5018b6b6172b xt/perlcriticrc
+SHA1 775b3ac02805b6d703614f42608732fb43af2a41 xt/pod_coverage.t
+SHA1 16e9afa9772ffd0c1b51dbd7ee4c1a51957c0369 xt/pod_spell.xt
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod_syntax.t
+SHA1 bad56d08059d19ec71fddf0a0f6435ada6a84f9f xt/profile.pl
+SHA1 ba6c23d9e3cf4628adf79aa7d463d64223177e85 xt/trace.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkmC/XUACgkQhMHHe8CxClvYUACglGuFnIc4CPybJLyLBm6RPqhz
+eGwAn2gSEUWexgLK+XEpQJt2Yjyq/jNq
+=XKk6
+-----END PGP SIGNATURE-----

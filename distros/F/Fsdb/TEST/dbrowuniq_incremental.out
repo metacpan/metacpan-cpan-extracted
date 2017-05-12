@@ -1,0 +1,6 @@
+#fsdb event count
+_null_getpage+128	12
+#  /home/johnh/BIN/DB/dbcol	event
+#  | /home/johnh/BIN/DB/dbrowuniq -c
+_null_getpage+4	12
+#   | dbrowuniq -I -c event

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:                File-Maintenance
+version:             0.03
+abstract:            Maintain files based on their age.
+license:             ~
+author:              
+    - Dan Horne <dhorne@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Accessor:               0
+    DateTime:                      0
+    File::Basename:                0
+    File::Copy:                    0
+    File::Find::Rule:              0
+    File::Path:                    0
+    File::Stat::OO:                0
+    IO::Compress::Bzip2:           2.012
+    IO::Compress::Gzip:            2.012
+    IO::Compress::Zip:             2.012
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

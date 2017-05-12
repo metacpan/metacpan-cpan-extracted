@@ -1,0 +1,6 @@
+#fsdb slope intercept confcoeff n
+# Anscombe's Quartet
+# from F.J. Anscombe, "Graphs in Statistical Analysis," American Statistician, 27 (February 1973), 17-21.
+# via http://en.wikipedia.org/wiki/Anscombe%27s_quartet
+0.50009 3.0001 0.81642 11
+#   | dbcolsregression i_x i_y

@@ -1,0 +1,16 @@
+Revision history for Finance-Bank-DE-DTA-Create
+
+1.03	24 Feb 2012
+	It is now possible to ad an execution date.
+	Retrieving the sums of account numbers and/or bank codes for control purposes
+
+1.02    10 Jun 2010
+        Minor changes to addExchange().
+        Changes to the pod documentation.
+
+1.01    09 Jun 2010
+        Changes to the pod documentation.
+
+1.00    08 Jun 2010
+        First version, released on an unsuspecting world.
+

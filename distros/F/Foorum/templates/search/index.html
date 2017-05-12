@@ -1,0 +1,46 @@
+[% title = c.loc('Search') %]
+
+[% c.load_once("jquery.ui.js") %]
+[% c.load_once("jquery.ui.css") %]
+
+<div id='search_tabs'>
+    <ul>
+        <li><a href='#forum'><span>Search Forum</span></a></li>
+        <li><a href='#topic'><span>Search Topic</span></a></li>
+        <li><a href='#user'><span>Search User</span></a></li>
+    </ul>
+
+    <div id='forum'>
+        <form action='/search/forum' method='get'>
+        <table border='0'>
+            <tr><td>Forum Name</td><td><input type='text' name='forum_name' /></td></tr>
+            <tr><td></td><td><input type='submit' /></td></tr>
+        </table>
+        </form>
+    </div>
+    
+    <div id='topic'>
+        <form action='/search/topic' method='get'>
+        <table border='0'>
+            <tr><td>Topic Title</td><td><input type='text' name='topic_title' /></td></tr>
+            <tr><td></td><td><input type='submit' /></td></tr>
+        </table>
+        </form>
+    </div>
+    
+    <div id='user'>
+        <form action='/search/user' method='get'>
+        <table border='0'>
+            <tr><td>User Name</td><td><input type='text' name='user_name' /></td></tr>
+            <tr><td></td><td><input type='submit' /></td></tr>
+        </table>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    $(function() {
+        $('#search_tabs').tabs( { selected: [% IF c.req.path.match('/topic(\/|$)') %]1[% ELSIF c.req.path.match('/user(\/|$)') %]2[% ELSE %]0[% END %] } );
+    });
+</script>

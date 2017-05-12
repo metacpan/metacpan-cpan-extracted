@@ -1,0 +1,294 @@
+class 'Fl::Valuator';
+isa 'Fl::Widget';
+include 'FL/Fl_Valuator.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Valuator - Controls a Single Floating-Point Value
+
+=head1 Description
+
+The Fl::Valuator controls a single floating-point value and provides a
+consistent interface to set the value, range, and step, and insures that
+callbacks are done the same for every object.
+
+There are probably more of these classes in FLTK than any others:
+
+=begin text
+
+=over
+
+=item Fl::Slider
+
+=item Fl::Scrollbar
+
+=item Fl::Adjuster
+
+=item Fl::Counter
+
+=item Fl::Dial
+
+=item Fl::ValueSlider
+
+=item Fl::Roller
+
+=item Fl::ValueOutput
+
+=item Fl::ValueInput
+
+=back
+
+=end text
+
+=begin html
+
+<center><img src="http://www.fltk.org/doc-1.3/valuators.png" /></center>
+
+In the above diagram each box surrounds an actual subclass. These are further
+differentiated by setting the C<type()> of the widget to the symbolic value
+labeling the widget. The ones labelled "0" are the default versions with a
+C<type(0)>. For consistency the symbol FL_VERTICAL is defined as zero.
+
+=end html
+
+=head1 Methods
+
+Fl::Valuator inherits from Fl::Widget. On top of that, it exposes the
+following methods...
+
+=cut
+
+# Can't create object; draw() is virtual. Subclasses only
+
+=pod
+
+=head2 C<bounds(...)>
+
+    $val->bounds(0, 100);
+
+Set the minimum and maximum values for the valuator widget.
+
+=cut
+
+xs {name        => 'bounds',
+    definitions => [
+        {required => [[qw[double a]], [qw[double b]]
+         ],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<clamp(...)>
+
+    my $in_range = $val->clamp(500);
+
+Clamps the passed value to the valuator range.
+
+=cut
+
+xs {name        => 'clamp',
+    definitions => [
+        {required => [[qw[double v]]
+         ],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<maximum(...)>
+
+    $val->maximum(100);
+
+Set the maximum value for the valuator widget.
+
+    my $max = $val->maximum( );
+
+Get the maximum value for the valuator widget.
+
+=cut
+
+xs {name        => 'maximum',
+    definitions => [
+        {required => [[qw[double max]]],
+         returns => 'void'
+        },
+        {returns => 'double'}
+    ]
+};
+
+=pod
+
+=head2 C<minimum(...)>
+
+    $val->minimum(0);
+
+Set the minimum value for the valuator widget.
+
+    my $min = $val->minimum( );
+
+Get the minimum value for the valuator widget.
+
+=cut
+
+xs {name        => 'minimum',
+    definitions => [
+        {required => [[qw[double max]]],
+         returns => 'void'
+        },
+        {returns => 'double'}
+    ]
+};
+
+=pod
+
+=head2 C<precision(...)>
+
+    $val->precision(3);
+
+Set the step value to C<1/10^digits>.
+
+=cut
+
+xs {name        => 'precision',
+    definitions => [
+        {required => [[qw[int p]]],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<range(...)>
+
+    $val->range(20, 50);
+
+Sets the minimum and maximum values for the valuator.
+
+When the user manipulates the widget, the value is limited to this range. This
+clamping is done after rounding to the step value (this makes a difference if
+the range is not a multiple of the step).
+
+The minimum may be greater than the maximum. This has the effect of
+"reversing" the object so the larger values are in the opposite direction.
+This also switches which end of the filled sliders is filled.
+
+Some widgets consider this a "soft" range. This means they will stop at the
+range, but if the user releases and grabs the control again and tries to move
+it further, it is allowed.
+
+The range may affect the display. You must C<redraw()> the widget after
+changing the range.
+
+=cut
+
+xs {name        => 'range',
+    definitions => [
+        {required => [[qw[double min]],[qw[double max]]],
+         returns => 'void'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<round(...)>
+
+    my $value = $val->round(50.45);
+
+Round the passed value to the nearest step increment.
+
+Does nothing if step is zero.
+
+=cut
+
+xs {name        => 'round',
+    definitions => [
+        {required => [[qw[double v]]],
+         returns => 'double'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<step(...)>
+
+    my $value = $val->step(50.45);
+
+Gets or sets the step value.
+
+As the user moves the mouse, the value is rounded to the nearest multiple of
+the step value. This is done before clamping it to the range. For most widgets
+the default step is zero.
+
+For precision the step is stored as the ratio of two integers, A/B. You can
+set these integers directly. Currently setting a floating point value sets the
+nearest A/1 or 1/B value possible.
+
+=cut
+
+xs {name        => 'step',
+    definitions => [
+        {required => [[qw[double v]]],
+         returns => 'void'
+        },
+        {returns => 'double'
+        }
+    ]
+};
+
+=pod
+
+=head2 C<value(...)>
+
+    $val->(155);
+
+Sets the current value.
+
+The new value is not clamped or otherwise changed before storing it. Use
+C<clamp()> or C<round()> to modify the value before calling C<value()>. The
+widget is redrawn if the new value is different than the current one. The
+initial value is zero.
+
+C<changed()> will return true if the user has moved the slider, but it will be
+turned off by C<value($x)> and just before doing a callback (the callback can
+turn it back on if desired).
+
+    my $value = $val->value( );
+
+Gets the floating point value.
+
+=cut
+
+xs {name        => 'value',
+    definitions => [
+        {required => [[qw[double v]]],
+         returns => 'int'
+        },
+        {returns => 'double'
+        }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,15 @@
+Changes
+examples/excel_export.txt
+examples/taqman_export.txt
+examples/turner_modulo--kinetics.csv
+examples/turner_modulo--single.csv
+lib/File/Convert/CSV.pm
+lib/File/Convert/Taqman.pm
+lib/File/Convert/Turner_Modulo.pm
+Makefile.PL
+MANIFEST
+README
+t/File-Convert-CSV.t
+t/File-Convert-Taqman.t
+t/File-Convert-Turner_Modulo.t
+META.yml                                 Module meta-data (added by MakeMaker)

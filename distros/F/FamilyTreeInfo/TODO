@@ -1,0 +1,34 @@
+Features to add(mishin):
+-  установить пароль!
+- При выводе дней рождений - сделать сортировку по дате
+- Сделать вывод молитвы о живых и успоших на странице с деревом,
+чтобы ограничить этот список текущим деревом,
+а то читать все имена - слишком долго.
+
+Позволь высказать мои соображения по идентификации персон: 
+- всех, даже малявок, подписывать полными именами-отчествами с указанием фамилии;
+-  для женщин писать девичью фамилию, в скобках, например (ур.Чумакова);
+
+- Make adapter for xlsx !
+- Read Gene data from Googlespreadsheet
+- Move pictures to http://s1182.photobucket.com/ :
+http://i1182.photobucket.com/albums/x454/mishin_jet/i28.jpg
+
+- Move from CGI to PSGI (part)+
+- Repaire pod documentation+
+- Make distributive for Windows 7, simple installation for All+
+- Realize HTML::Template
+- Run ftree under strawberry-perl-5.20.0.1-64bit-portable+
+- Write article about Dist::Milla in pragmaticperl.ru
+- Make the remembrance of the dead and living at morning and evening prayer+
+- Make config in file - done!+
+
+Features to add(old):
+- employing HTML::Template to decouple code from output
+- photo gallery
+
+Would be good to have:
+- document scripts with Getopt::Euclid
+- for consistency use Class::Std for class Place and Cemetery
+- fix a bug in displaying the family tree
+- redesign code to follow MVC pattern

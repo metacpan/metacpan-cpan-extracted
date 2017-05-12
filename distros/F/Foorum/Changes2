@@ -1,0 +1,190 @@
+This file documents the revision history for Foorum.
+
+1.0.0 Mon Nov 3  10:10:00 2008
+		- for a new version, seriously.
+
+0.3.1 Mon Nov 3
+        - add developer tool Acme::PlayCode
+        - use our $VERSION instead of a Foorum::Version module.
+
+0.3.0 Sat Oct 25 18:52:00 2008
+        - previous/next topic link
+
+0.2.9 Sat Oct 11 10:22:00 2008
+        - fix test breaks for wrong MANIFEST
+        - a new table 'security_code', and change the way to forget/reset password
+
+0.2.8 Sat Oct 4  19:19:00 2008
+        - add Test::Pod (Files=31, Tests=380)
+        - forum links
+        - bug fixes for make test
+
+0.2.7 Tur Oct 2  10:50:00 2008
+        - perltidy cols 78
+        - more test cases (Files=28, Tests=216)
+        - User Point System
+        - Fix bugs in Private Forum
+
+0.2.6 Tue Sep 23 13:38:00 2008
+        - ubb fix: http://code.google.com/p/foorum/issues/detail?id=84
+        - Pod updates with Pod::From::GoogleWiki 0.05
+        - (EXPERIMENTAL) add un-tested bin/db/foorum.pg.sql and bin/db/theschwartz.pg.sql for PostgreSQL
+        - a welcome email after register activation
+
+0.2.5 Sat Sep 20 7:11:00 2008
+        - manual and doc updates!
+
+0.2.4 Fri Sep 19 13:27:00 2008
+        - add Foorum::Manual::
+
+0.2.3 Tue Sep 16 13:06:00 2008
+        - convert 'stat' table 'DATE' column to INT(8)
+        - TheSchwartz bug fix
+
+0.2.2 Mon Sep 15 12:03:00 2008
+        - use Catalyst::Plugin::PageCache '0.19' and key_maker
+        - split Model/Validation.pm into ResultSet and remove it
+        - use 'MooseX::TheSchwartz' and 'TheSchwartz::Simple' to replace 'TheSchwartz'
+
+0.2.1 Tue Aug 18 12:20:00 2008
+        - Topic URL with title(url-ize) for Search sites like Google
+        - docs/Upgrade.html
+        - 5.10.x fixes (File::Spec->splitpath with Cwd->abs_path)
+
+0.2.0 Sun Jul 27 12:48:00 2008
+        - poll optional fix
+        - Forum Announcement fix
+        - FIX scraper bot user's threads and replies count
+
+0.1.9 Sun Jun 29 20:31:00 2008
+        - ban user bug fix.
+        - forum rss no text fix.
+        - make poll optional (set in foorum.yml function_on: poll)
+        - trying to support Mac OS
+
+0.1.8 Fri Jun 20 22:15:00 2008
+        - TheSchwartz::ResendActivation to real use
+        - use stardard Session::Store::DBIC
+
+0.1.7 Tue Jun 17 9:32:00 2008
+        - use Catalyst::Plugin::Config::YAML::XS instead of Catalyst::Plugin::Config::YAML
+        - new jQuery UI 1.5
+        - add SQLite SQL files bin/db/foorum.sqlite.sql and theschwartz.sqlite.sql
+        - add 'post_on' column in 'topic' table + Sort by post_on for Search Topic
+        - DBICx::AutoDoc support
+
+0.1.6 Mon Jun 16 7:29:00 2008
+        - fix login Captcha bug
+        - TheSchwartz cron job: resend activation email
+        - better document
+
+0.1.5 Sun Jun 15 15:37:00 2008
+        - Sphinx::Search improvements
+        - change DATETIME to INT(11) for tables.
+        - because 'mark ResultSetManager as deprecated and undocument it' in DBIx-Class, we switch back to ResultSet/*.pm
+        - Foorum::Search with Database or Sphinx backend
+
+0.1.4 Sat Apr 12 14:26:00 2008
+        - $topic->url/print
+        - Sphinx::Search support (EXPERIMENTAL)
+
+0.1.3 Mon Jan 28 9:17:21 2008
+        - copy index.html to new created upload dir (protection)
+        - add requires 'Sub::Install'; # thanks for sai
+        - move some Model/ module into ResultSet/ scope and add tests for them
+        - new t/lib/Foorum/TestUtils.pm and schema/*.t
+        - use URI::Find::UTF8 instead of URI::Find
+        - more Model/ modules to ResultSet/ (Visit, Message, Upload etc.) with more test cases.
+        - use HTML::BBCode::Strict by vti
+
+0.1.2 Sat Jan 12 9:39:21 2008
+        - preview function
+        - use jquery.lightbox for comments photos
+        - options for create threads or replies
+        - send request email for private forum
+        - add require Authentication verion (thanks for viacheslav.t)
+        - Scraper::MailMan, hmm, just a scrapper test
+        - thread mode for Topic/Comments
+        - configurable PageCache
+        - add CSS::Minifier
+
+0.1.1 Sun Dec 30 16:19:11 2007
+        - use Perl::Critic to fix some errors, bin/misc/perlcritic.pl
+        - use JavaScript::Minifier to minify js files, bin/misc/js-min.pl
+        - bug fix for message permission check (r160)
+        - add requires 'Cache::FileCache'; in Makefile.PL (reported by hotsnow)
+        - use Config::YAML instead of ConfigLoader because Config::YAML is simpler and faster
+        - new table 'user_settings' & /settings for 'SendUpdateNotification for MyStarredItems' (r208)
+        - new settings 'show_email_public': can hide email from public (r215)
+        - Topic RSS && RSS title bug fix.
+        - What's New page
+        - Site Admin Settings: /admin/settings to change foorum_local.yml
+
+0.1.0 Fri Dec 24 20:56:00 2007
+        - move trunk to http://foorum.googlecode.com/svn/trunk/
+        - use jQuery to deal with browser time zone
+        - UBB js localize
+        - use Catalyst::Plugin::Cache instead of Catalyst::Plugin::Cache::Memcached
+        - use jQuery validate.js for register etc. (add validate/messages_cn.js)
+        - rewrite Model/Email.pm to send email after compose a message
+        - add Plain/Textile Formatter to post/reply/edit
+        - add Text::GooglewikiFormat
+        - new language: Chinese Traditional
+        - add =pod formatter supports
+        - My Shared Items
+
+0.08  Sun Dec 9 16:30:30 2007
+        - I18N encoding fix
+        - use the lastest Catalyst::Plugin::Authentication (Store::FromSub::Hash)
+        - use jQuery flot to do daily chart
+        - bin/setup.pl
+        - RSS text fix
+
+0.07  Fri Oct 5 18:33:21 2007
+        - use TheSchwartz to queue cron scirpt.
+        - resize profile photo using Foorum::TheSchwartz::Worker::ResizeProfilePhoto
+        - cache topic and a new controller Get.pm
+        - daily report cron
+        - ban user
+        - remove RSS.pm and use template to create RSS feed.
+
+0.06  Mon Oct 1 21:02:00 2007
+        - Plugin::FoorumUtils load_once in TT. (5/8/2007)
+        - db Schema improvements.
+        - use jquery.ui tabs
+        - profile photo
+        - email login
+
+0.05  Sat Aug 4 09:10:15 2007
+        - use Net::IP::Match::Regexp to ban IP range from registration (5/6/2007)
+        - an admin tool for ban ip (17/6/2007)
+        - perltidy -b -ci=4 *.pm (17/6/2007)
+        - User cache (17/6/2007)
+        - change email add 'password' check
+        - js minifier
+        - use jquery instead of prototype
+
+0.04  Sat Jun 3 15:55:55 2007
+        - add log_error table and Foorum::Log for both Model and /bin/cron (20/5/2007)
+        - move script/foorum_server.pl to bin/foorum_server.pl (20/5/2007)
+        - add a new INSTALL file (20/5/2007)
+        - Admin tool for log_error (20/5/2007)
+        - bin/cron/remove_db_old_data.pl and conf/cron.yml to remove old db data (20/5/2007)
+        - add a new Model/Validation.pm and remove 'FormValidator::Simple::Plugin::DBIC::Unique' (26/5/2007)
+        - add cache for comments (26/5/2007)
+        - Foorum::Filter: add textile support and remove 'Template::Plugin::HTML::BBCode' (26/5/2007)
+        - more sane change_email (2/6/2007)
+
+0.03  Sat May 19 13:24:00 2007
+        - remove Plugin::Email. insert into table scheduled_email and use a cron script to send. (19/5/2007)
+        - remove Plugin::Scheduler. all cron scripts goes to /bin/cron (19/5/2007)
+        - bug fixes (19/5/2007)
+        - add /word/$word step one! (DEPERCATED) (19/5/2007)
+
+0.02  Fri Apr 20 12:00:00 2007
+        - Message.pm sub delete (20/4/2007)
+        - PageCache with I18N (7/5/2007)
+        - Merge Forums in Admin Interface (7/5/2007)
+
+0.01  Thu Feb 23 16:32:50 2006
+        - initial revision, generated by Catalyst

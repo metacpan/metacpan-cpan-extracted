@@ -1,0 +1,54 @@
+0.09 20170116
+    + Support single-line functions
+      In fact, we simply don't require the subroutine declaration to be on a
+      separate line from other code.
+      This adresses RT #119843
+
+0.08 20161219
+    ! Make signature-less subroutines work again instead of warning
+
+0.07 20161218
+    + Actually allow for empty parameter lists
+    + Allow for unnamed/ignored parameters sub ($foo,$,$bar) { ... }
+    . Adresses Github issue #1
+
+0.06 20161107
+    + Don't crash on empty function parameter lists.
+	+ Make module internals more testable
+	. Add a test that verifies function default parameters actually parse
+	  as we expect. Thanks to Rolf Langsdorf for the discussion.
+
+0.05 20160929
+    . Bump Filter::Simple prerequisite to 0.91
+      Earlier versions gave problems with some of my modules
+      If it works for you, no need to upgrade
+
+0.04 20160906
+    + Add support for defaults, and our own, very, _very_
+      simplicistic "expression parser" (which blindly splits on comma.
+      This means that the following is now supported:
+        sub foo( $bar, $baz='default' ) {
+          return $baz
+        };
+        print foo("two","parameters"); # parameters
+        print foo("one");              # default
+
+      The following will still fail horribly, because we don't parse expressions:
+        sub foo( $bar, $baz=bar(1,2) ) {
+          print $baz # "default"
+        };
+
+0.03 20160519
+    + Add our own fake 'experimental::signatures' warning category
+      if we install our filter so that "no warnings 'experimental::signatures'"
+      doesn't raise an error on Perl versions where we install our filter
+
+0.02 20160423
+    + Check does now not use the version of Perl but checks
+      `use feature 'signatures'`
+    + You can force the use of the module using an environment variable
+      (not that you should)
+
+0.01 20160414
+    . Released on an unsuspecting world
+    . Spun out of App::StarTraders (unreleased)

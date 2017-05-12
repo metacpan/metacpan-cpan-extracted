@@ -1,0 +1,74 @@
+Revision history for Finance-QuoteDB
+
+0.18      2015-11-10 08:44:06+01:00 Europe/Brussels
+          Some more changes for maintenance and documentation
+
+0.17      9.11.2015
+          Work on dzil release manager
+
+0.16      9.11.2015
+          BUGFIXES
+
+0.15      23.2.2011
+          Evolution in percentage added in add_yahoo_quotes
+          BUGFIX: Error in Makefile.PL corrected
+
+0.14      23.2.2011
+          BUGFIX: Date::Manip used in compatibility mode 5 in Finance::QuoteHist
+          BUGFIX: RT #55510 : workaround for backpopulate issue in Finance::QuoteHist
+          BUGFIX: Added missing dependencies in Finance::QuoteHist. Regexp::Common.pm and Date::Manip
+          FEATURE: --searchlist added to fqdb as frontend to add_yahoo_stocks
+          FEATURE: add_yahoo_stocks added to autoretrieve stocks from yahoo
+
+0.13      3.5.2009
+          Some required default values set
+          BUGFIX: Geniustrader config file corrected
+          \n added to generated config file
+
+0.12      3.5.2009
+          Log enabled only when FQDBDEBUG is set. Replaced some INFO with print.
+          WriteConfig sql_name added
+
+0.11      3.5.2009
+          BUGFIX: package named badly
+          Geniustrader.pm returns 1
+
+0.10      3.5.2009
+          Geniustrader WriteConfig added
+          method dumpstocks added
+
+0.09      2.5.2009
+          Extracted dumpquotes from getquotes
+
+0.08      27.4.2009
+          Added inc dir in releases
+
+0.07      27.4.2009
+          Bug in POD corrected
+
+0.06      26.4.2009
+          Added function getquotes
+
+0.05      17.4.2009
+          Option names modified (--startdate and --enddate) in fqdb
+
+0.04      16.4.2009
+          Code cleanup.
+          Stabilized release.
+
+0.03      13.4.2009
+          Schema modified to hold user symbols and market info.
+          Not backwards compatible !
+
+0.02      13.4.2009
+          support for dsn user and password added
+
+0.01      2.11.2008
+          stabelized version
+          function backpopulate created
+
+0.00_51   29.10.2008
+          function delstock created
+
+0.00_50   29.10.2008
+          First version

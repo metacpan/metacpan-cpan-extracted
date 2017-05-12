@@ -1,0 +1,57 @@
+;	============================================================
+;	File:	PWD
+;	Author:	daveo@obernet.com
+;	Date:	Feb 2002
+;	Use:	Test defaults for FameHLI
+;	============================================================
+;	Use this file as an example to create your own PWD file in
+;	this directory or up to 2 levels up from here.
+;	============================================================
+;	HOSTNAME=localhost
+;	SERVICE=mcadbs
+;	USERNAME=
+;	PASSWORD=
+;	SITESERVER=mcaserv@server
+;
+HOSTNAME=none
+SERVICE=none
+USERNAME=
+PASSWORD=
+SITESERVER=none
+;
+;	============================================================
+;	FAMEDB is a database where the two ensuing objects can
+;			be found
+;	FAMESERIES is a time series
+;	FAMEISSUER is a string scalar
+;	============================================================
+;	In some MCADBSs, "prc.db" is called "prc".  In others,
+;	it is called "pr1".  Go figure...  Just make sure that you
+;	have it right for your installation.
+;	============================================================
+;	FAMEDB=prc
+;	FAMESERIES=ibm.close
+;	FAMEISSUER=ibm.issuer
+;
+FAMEDB=none
+FAMESERIES=none
+FAMEISSUER=none
+;
+;	============================================================
+;	The SPINDEX and SPINDATE values are optional.  If null, the
+;	extra test in 17_Misc will not be run and will simply pass.
+;	Please note that SPINDATE must be BUSINESS freq and the
+;	spindex file must exist. (Oh, really?...)
+;
+;	Also, note that you must have "frdb_m" defined in your
+;	etc/services file (whether that be on Unix or Windows)
+;	and in Windows you need to leave off the "Escaping" back-
+;	slash for "$PRC_TARGET".
+;	============================================================
+;	SPINDEX=frdb_m@server \$PRC_TARGET/spindex010320.db
+;		or for Windows
+;	SPINDEX=frdb_m@server $PRC_TARGET/spindex010320.db
+;	SPINDATE=20010320
+;
+SPINDEX=none
+SPINDATE=none

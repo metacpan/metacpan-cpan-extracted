@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+# Please don't encrypt me!
+# This space is left blank intentionally  
+use Filter::CBC "DES","my secret key";
+RandomIVîë†ÚóË¿¿‘Æa¸å©€Ÿ½úÇTK(ü0ÃÌ¸<4oòÆÑÙËµíñ)¡
+¢NoiÁò_ßT"­ñqÔyŞ.¿ÆÊhOÖ¢Tó•iÍ³‘©EJ!/¸2Ì£¡|Göëx%Í|z/+«=?ùõMs¿vŸ/;‰IT‡ŠVˆj?ß½½q¿´

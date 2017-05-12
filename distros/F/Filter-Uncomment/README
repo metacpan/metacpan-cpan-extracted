@@ -1,0 +1,17 @@
+Uncomment
+=========
+
+Efficiently uncomment sections of your code.
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

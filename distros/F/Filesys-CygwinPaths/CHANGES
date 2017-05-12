@@ -1,0 +1,6 @@
+
+May 31 2003 16:30:21: Bumped VERSION up to 0.04, even though no real changes have been
+made to the module itself; in order to upload to CPAN must be a new release version.
+
+May 30 2003 05:18:30: Got this under CVS, finally. Made several edits to fix a build
+bug (reported by Gerrit Haase: thanks Gerrit!) ... created this file.

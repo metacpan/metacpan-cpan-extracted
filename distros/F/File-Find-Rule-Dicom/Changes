@@ -1,0 +1,15 @@
+0.04 2015-09-28T11:28:15+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.03 2014-08-07T09:34:00+02:00
+ - Add DESCRIPTION section to doc.
+
+0.02 2014-08-07T08:29:31+02:00
+ - Add examples/ directory.
+ - Fix dependencies.
+
+0.01 2014-08-06T10:48:52+02:00
+ - First version.

@@ -1,0 +1,291 @@
+#
+# Scan.pm
+# Last Modification: Wed May  4 16:31:36 WEST 2005
+#
+# Copyright (c) 2005 Henrique Dias <hdias@aesbuc.pt>. All rights reserved.
+# This module is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+#
+package File::Scan;
+
+require 5;
+use strict;
+
+require Exporter;
+use File::Copy;
+use SelfLoader;
+
+use vars qw($VERSION @ISA @EXPORT $ERROR $SKIPPED $SUSPICIOUS $CALLBACK);
+
+@ISA = qw(Exporter);
+$VERSION = '1.43';
+
+($ERROR, $SKIPPED, $SUSPICIOUS, $CALLBACK) = ("", 0, 0, "");
+
+SelfLoader->load_stubs();
+
+sub new {
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
+	my $self  = {
+		extension    => "",
+		delete       => 0,
+		move         => "",
+		copy         => "",
+		mkdir        => 0,
+		max_txt_size => 5120,
+		max_bin_size => 10240,
+		@_,
+	};
+	bless ($self, $class);
+	return($self);
+}
+
+sub scan {
+	my $self = shift;
+	my $file = shift;
+
+	&_set_error();
+	&_set_skip();
+	&_set_suspicious();
+	&ret_callback();
+
+	(-e $file) or return(&_set_error("No such file or directory: $file"));
+	my $fsize = -s $file;
+	$fsize or return(&_set_skip(2));
+	my $res = "";
+	if(-f $file && -T $file) {
+		return(&_set_skip(3)) if($fsize < $min_txt_size);
+		return(&_set_skip(4))
+			if($self->{'max_txt_size'} && ($fsize > $self->{'max_txt_size'} * 1024));
+		$res = &scan_text($self, $file);
+	} else {
+		return(&_set_skip(5))
+			if($self->{'max_bin_size'} && ($fsize > $self->{'max_bin_size'} * 1024));
+		$res = &scan_binary($self, $file);
+	}
+	if($res) {
+		if($self->{'extension'} && $file !~ /\.$self->{'extension'}$/o) {
+			my $newname = join("\.", $file, $self->{'extension'});
+			if(move($file, $newname)) { $file = $newname; }
+			else { &_set_error("Failed to move '$file' to '$newname'"); }
+		}
+		if($self->{'copy'}) {
+			if(!(-d $self->{'copy'}) && $self->{'mkdir'}) {
+				mkdir($self->{'copy'}, $self->{'mkdir'}) or &_set_error(join("", "Failed to create directory '", $self->{'copy'}, "' $!"));
+			}
+			my ($f) = ($file =~ /([^\/]+)$/o);
+			my $cpdir = join("/", $self->{'copy'}, $f);
+			copy($file, $cpdir) or &_set_error("Failed to copy '$file' to $cpdir");
+		}
+		if($self->{'move'}) {
+			if(!(-d $self->{'move'}) && $self->{'mkdir'}) {
+				mkdir($self->{'move'}, $self->{'mkdir'}) or &_set_error(join("", "Failed to create directory '", $self->{'move'}, "' $!"));
+			}
+			my ($f) = ($file =~ /([^\/]+)$/o);
+			my $mvfile = join("/", $self->{'move'}, $f);
+			if(move($file, $mvfile)) { $file = $mvfile; }
+			else { &_set_error("Failed to move '$file' to '$mvfile'"); }
+		}
+		if($self->{'delete'}) {
+			if($file =~ /^(.+)$/s) {
+				unlink($1) or &_set_error("Could not delete $1: $!");
+			}
+		}
+	}
+	return($res);
+}
+
+sub set_callback {
+	my $self = shift;
+	my $subref = shift || undef;
+
+	if(defined($subref) && ref($subref) eq "CODE") {
+		$self->{'callback'} = $subref;
+	} elsif(exists($self->{'callback'})) {
+		delete($self->{'callback'});
+	}
+	return();
+}
+
+sub _set_error {
+	$ERROR = shift || "";  
+	return();
+}
+
+sub _set_skip {
+	$SKIPPED = shift || 0;
+	return();
+}
+
+sub _set_suspicious {
+	$SUSPICIOUS = shift || 0;
+	return();
+}
+
+sub ret_callback {
+	$CALLBACK = shift || "";
+	return();
+}
+
+sub error { $ERROR; }
+sub skipped { $SKIPPED; }
+sub suspicious { $SUSPICIOUS; }
+sub callback { $CALLBACK; }
+
+1;
+
+__DATA__
+
+__END__
+
+=head1 NAME
+
+File::Scan - Perl extension for Scanning files for Viruses
+
+=head1 SYNOPSIS
+
+  use File::Scan;
+
+  $fs = File::Scan->new([, OPTION ...]);
+  $fs->set_callback(
+    sub {
+      my $filename = shift;
+      my $bytes = shift;
+      ...
+      return("Callback Value");
+    }
+  );
+  $fs->scan([FILE]);
+  if(my $e = $fs->error) { print "$e\n"; }
+  if(my $c = $fs->skipped) { print "file skipped ($c)\n"; }
+  if($fs->suspicious) { print "suspicious file\n"; }
+  if(my $res = $fs->callback) { print "$res\n"; }
+
+=head1 DESCRIPTION
+
+This module is designed to allows users to scan files for known viruses.
+The purpose is to provide a perl module to make plataform independent
+virus scanners.
+
+=head1 METHODS
+
+=head2 new([, OPTION ...])
+
+This method create a new File::Scan object. The following keys are 
+available:
+
+=over 7
+
+=item callback => 'subroutine reference'
+
+if the item is set then use a callback subroutine reference to provide
+extra information and functionalities. The callback subroutine have two
+arguments: filename and first 1024 bytes read from the file. This only
+work for binary files.
+
+=item extension => 'string'
+
+add the specified extension to the infected file
+
+=item move => 'directory'
+
+move the infected file to the specified directory
+
+=item copy => 'directory'
+
+copy the infected file to the specified directory
+
+=item mkdir => octal_number
+
+if the value is set to octal number then make the specified directories
+(example: mkdir => 0755).
+
+=item delete => 0 or 1
+
+if the value is set to 1 delete the infected file
+
+=item max_txt_size => 'size in kbytes'
+
+scan only the text file if the file size is less then max_txt_size. The
+default value is 5120 kbytes. Set to 0 for no limit.
+
+=item max_bin_size => 'size in kbytes'
+
+scan only the binary file if the file size is less then max_bin_size. The
+default value is 10240 kbytes. Set to 0 for no limit.
+
+=back
+
+=head2 scan([FILE])
+
+This method scan a file for viruses and return the name of virus if a
+virus is found.
+
+=head2 set_callback([SUBREF])
+
+This method is another way to install a callback subroutine reference. 
+Take a look in callback kay.
+
+=head2 skipped()
+
+This method return a code number if the file was skipped and 0 if not. The
+following skipped codes are available:
+
+=over 6
+
+=item 0
+
+file not skipped 
+
+=item 1
+
+file is not vulnerable
+
+=item 2
+
+file has zero size
+
+=item 3
+
+the size of file is small
+
+=item 4
+
+the text file size is greater that the 'max_txt_size' argument
+
+=item 5
+
+the binary file size is greater that the 'max_bin_size' argument
+
+=back
+
+=head2 suspicious()
+
+This method return 1 if the file is suspicious and 0 if not.
+
+=head2 callback()
+
+This method return the result from the callback subroutine.
+
+=head2 error()
+
+This method return a error message if a error happens.
+
+=head1 AUTHOR
+
+Henrique Dias <hdias@aesbuc.pt>
+
+=head1 CREDITS
+
+Thanks to Rui de Castro, Sergio Castro, Ricardo Oliveira, Antonio
+Campelo, Branca Silveira, Helena Gomes and Anita Afonso for the help.
+
+Thanks to Fernando Martins for the personal collection of viruses.
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

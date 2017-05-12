@@ -1,0 +1,105 @@
+FFmpeg version 5704
+====================
+FFmpeg (in this module, referred to here as FFmpeg-Perl) is a Perl
+interface to the base project FFmpeg (referred to here as FFmpeg-C).
+From the FFmpeg-C homepage:
+
+FFmpeg-C is a complete solution to record, convert and stream audio and
+video. It includes libavcodec, the leading audio/video codec library.
+FFmpeg-C is developed under Linux, but it can compiled under most OSes,
+including Windows.
+
+FFmpeg-Perl currently only supports the functionality of the ffmpeg and
+libavformat components  of the FFmpeg-C suite.  That is, functions
+exist for extracting metadata from media streams and transforming one
+media stream format to another, but no effort is (yet) made to port
+HTTP broadcasting or playback functionality (provided by the ffserver
+and ffplay components, respectively).
+
+PREREQUISITES
+=============
+
+Library        Language               Recommended way to get it
+===========================================================================
+Image::PBMlib         Perl            CPAN - http://search.cpan.org
+ImageMagick           C               RPM  - ImageMagick, ImageMagick-devel
+ImageMagick           Perl            RPM  - ImageMagick-perl
+ImageMagick::Iterator Perl            CPAN - http://search.cpan.org
+JPEG                  C               RPM  - libjpeg, libjpeg-devel
+Lame                  C               RPM  - liblame, liblame-devel
+Ogg Vorbis            C               RPM  - libvorbis, libvorbis-devel,
+                                             libogg, libogg-devel
+Faad2                 C               RPM  - faad2, faad2-devel
+Faac                  C               RPM  - faac, faac-devel
+A52dec                C               RPM  - a52dec
+
+On my system this does the trick to get prerequisites ready to go:
+
+% rpm -Uvh lame-devel libvorbis-devel ImageMagick-perl
+% perl -MCPAN -e 'install Image::PBMlib ImageMagick::Iterator'
+
+BUILD FFMPEG
+============
+
+FFmpeg is under active development.  This library was developed and 
+tested on the FFmpeg SVN HEAD tag as of June 10, 2006, or version 5704.
+
+Download and install the SVN version of FFmpeg.  The installation must
+be configured with shared library support so libavformat and libavcodec
+can be dynamically linked.  Make sure the install path of the shared
+libraries is in the dynamic link path.  On a Linux system, this means
+locating the libavformat.so and libavcodec.so files, and making sure
+their path is specified in ld.so.conf.  Be sure to run "ldconfig"
+*twice* after editing /etc/ld.so.conf.
+
+Now you're ready to build the FFmpeg-C library.  I test against an
+FFmpeg configured and installed like this (note that I have installed
+the optional AMR patches, see ./configure --help for details):
+
+./configure \
+  --prefix=/usr \
+  --enable-shared \
+  --enable-mp3lame \
+  --enable-libogg \
+  --enable-vorbis \
+  --enable-faad \
+  --enable-faac \
+  --enable-a52 \
+  --enable-pthreads \
+  --enable-pp \
+  --enable-amr_nb \
+  --enable-amr_nb-fixed \
+  --enable-amr_wb \
+  --enable-amr_if2 \
+  --enable-gpl ;
+
+Then:
+
+% make && make install ; ldconfig ; ldconfig
+
+FFmpeg's "make test" failed for me with this configuration because the
+regression test suite doesn't like having shared libraries enabled.
+If you experience problems with FFmpeg-perl or FFmpeg-C, try recompiling
+without the shared library support to see if regression tests pass.
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Previous versions of this library required that the path to the FFmpeg-C
+CVS checkout be given in environmental variable $FFMPEG_ROOT.  For simplicity
+sake (?), I've opted to bundle the two files needed from the checkout: 
+ffmpeg.c and config.h.  You'll need to specify -L lib and -I include paths,
+or tweak the Makefile.PL if you haven't installed FFmpeg-C to --prefix=/usr
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003-2006 by Allen Day
+
+This library is released under GPL, the Gnu Public License

@@ -1,0 +1,58 @@
+v2.016 - Mar 18 2014
+    * Bugfix for 2.015 issue
+
+v2.015 - Mar 18 2014
+    * Better subclass support
+
+V2.014 - Mar 17 2014
+    * Support FENNEC_PARALLEL=0 env var.
+
+V2.009 - Better mocking scoping
+ * Make it so that Mock::Quick control objects can be implicitly captured by
+   Fennec scopes.
+
+V2.008 - Supress messages on syntax check
+
+V2.007 - Supress never run message on syntax check
+
+V2.002-V2.006 - Minor Bugfixes
+
+V2.001 - May 18 2013
+    * Add 'class' import argument
+
+v2.000 - May 18 2013
+    * Replaced listener system with collector system
+    * Removed evil auto-run hack
+    * LOTS of bugfixes
+    * Fixed win32 (!!!)
+    * Added Child.pm as a default import
+    * Lots of new features
+    * Architecture overhaul
+    * Removed dead code
+    * Lots of simplifications
+    * Additional testing
+
+v1.014 - May 07 2013
+    * Fixed more ordering issues
+
+v1.013 - May 06 2013
+    * Add 2 test files for badly broken behavior
+    * Fixed broken behavior
+     * Nested test structures did not run in proper separate procs
+     * test_sort => 'ordered' did not run any tests
+
+vXXXX - Lots
+    * Missed a lot :-(
+
+v1.008 - May 12, 2011 - Chad Granum:
+    * Fix? hisenbug in TB listener.
+
+v1.002-v1.007
+    * Forgot to fill this out when I made the changes :-(
+
+v1.001 - Feb 18, 2011 - Chad Granum:
+    * Create shortcut for using runner, improve runner re-exec command
+    * Remove verbose messages from STDERR, using STDOUT they cause less spam
+
+v1.000 - Jan 24, 2011 - Chad Granum
+    First stable release, API is now set.

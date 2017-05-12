@@ -1,0 +1,17 @@
+abstract: Access UNIX extended filesystem
+author: Jonathan Rockway <jrockway@cpan.org>
+build_requires: 
+  Directory::Scratch: 0.05
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: Perl
+name: File-Attributes-Extended
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  File::Attributes: 0.04
+  File::ExtAttr: 0
+version: 0.01

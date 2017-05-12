@@ -1,0 +1,71 @@
+Revision history for Perl extension Finance::QIF.
+
+3.02  Wed Sep 29 21:04:00 PDT 2010
+        - Fixed bugs with write support for splits with partial data.
+
+3.01  Thu Apr 08 12:30:00 EDT 2010
+	- Corrected documentation for Account and Type:Memorized
+        - Updated code separators based on perlport "NEWLINES" recommendation
+	- Use binmode in more compatible manner (older IO::File missing method)
+
+3.00  Thu Jul 24 12:17:00 2008
+	- Added support for Quicken 2006 new Memorized Investment fields
+	- Added support for Quicken 2006 Price format
+	- The changes for the Memorized investment created a conflict with
+          naming to get things consistent and to hopefully avoid future
+          issues some value names have changed. This is the reason for a 3.00.
+          Old code may require modification this map will help in porting
+	  Old Name                   New Name
+	  noninvestment:amount       noninvestment:transaction
+	  memorized:transaction      memorized:type
+	  memorized:amount           memorized:transaction
+
+2.07  Tue Mar 18 12:06:00 2008
+        - No changes to actual code other than version number and COPYRIGHT
+          update.
+        - Added Requirement for IO::File 1.13
+        - Fixed tests so new test using "<:crlf" format is only done for
+          perl 5.008
+        - These changes should allow this module to play nicer in perl 5.006
+          configurations
+
+2.06  Sat Apr 28 10:25:00 2007
+        - Fixed bug 1704960 win32 line end /record sep test failed
+        - Added pod and pod-coverage tests
+        - Adjustments to MANIFEST and Makefile.PL for better compatibility
+          with current versions of ExtUtils::MakeMaker
+
+2.05  Sun Feb 04 13:00:00 2007
+	- Better recognition of headers that have trailing white space
+	- Added support for budget ("B") item in category type
+	- Added support for total ("U") item in memorized type
+	- Number of documentation changes/corrections
+
+2.04  Wed Jul 19 9:00:00 2006
+	- Added autodetect option
+	- Fixed bug that caused wrong separator to be used on output files
+        - Added support for standard file open options
+        - Changed separator support to move to single record_separator
+
+2.03  Mon Apr 17 09:33:00 2006
+	- Added support for "U" in investment and non-investment accounts.
+	- Added support for trim_white_space.
+
+2.02  Mon Mar 19 13:06:00 2006
+	- Fixed [rt.cpan.org #18246] Splits don't always have memo fields.
+
+2.01  Mon Mar 3 15:25:00 2006
+	- Fixed bug that returned empty record in some cases.
+	- Fixed a few typos in documentation.
+
+2.00  Mon Feb 22 15:45:00 2006
+	- Initial 2.0 release of Finance::QIF this version supports all know
+          QIF record types and values. The API's have changed since 1.X.
+
+2.00B Mon Jan 26 19:14:00 2006
+	- Beta version of Finance::QIF that should be able to read and
+          write exports from Quicken.
+
+0.01  Mon Jan  9 12:07:56 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Finance::QIF

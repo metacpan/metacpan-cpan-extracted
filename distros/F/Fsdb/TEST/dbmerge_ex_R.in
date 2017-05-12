@@ -1,0 +1,8 @@
+#fsdb -R C cid cname
+cid: 11
+cname: numanal
+
+cid: 10
+cname: pascal
+
+#   | dbfilealter -R C

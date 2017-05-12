@@ -1,0 +1,58 @@
+Revision history for Perl distribution File-Copy-Link.
+$Id: Changes 354 2014-07-03 19:42:34Z robin $
+
+0.14	2014-07-04
+	Changed AUTHOR email - no longer @npl.co.uk 
+
+	Fixed C<or> precendence issue with C<return> in File::Copy::Link,
+	as reported on CPAN RT #87227
+
+
+0.113	2011-09-23
+	Fixed a typo in Cwd->VERSION() call in t/linked.t
+	Added META.json, updated META.yml, changed author email.
+
+0.112	2008-06-12
+	Add examples/ and other changes to meet kwalitee metrics.
+	Fixed a typo in error message when linked() fails, with test.
+
+0.111	2007-12-30
+0.110	2007-12-28
+	Handle old Cwd, where abs_path only accepts directories
+
+0.100 	2006-07-20
+	Meet (some) Perl Best Practices, as indicated by perlcritic.
+
+0.800	2006-01-12
+	Add t/pod{,-coverage}.t and added POD to pass tests!
+	
+0.061	2005-02-25
+	Reimplemented linked, chopfile, resolve, resolve_all 
+	 using a File::Spec::Link object to store the path.
+	 This avoids readlink('dir/') which may be causing test 
+	 failures; ultimately trying to avoid cpan-testers failures.
+	Rewrote README to update to 0.06 (can build using M::B)
+	 and then marking 0.061 as tester fodder.
+
+0.06	2005-02-01
+	Added skip to tests for 'symlink' not implemented.
+	Added resolve_path and resolve_all
+	Build using Module::Build or make (ExtUtils::MakeMaker)
+
+0.05	2003-08-10
+	Added full_resolve, following email from Jasper Cramwinckel
+
+0.04	2003-05-09
+	Calculates dist VERSION using both File/*/Link.pm
+	Renamed copylink as safecopylink
+	 and reimplemented copylink using open-and-delete.
+
+0.02	2003-05-06
+	Added File::Spec::Link->resolve
+	Added tests (and renamed 1.t and copylink.t)
+	Added documentation
+ 
+0.01  Tue Apr 29 16:42:12 2003
+	- original version; created by h2xs 1.22 with options
+		-XAn File::Copy::Link
+

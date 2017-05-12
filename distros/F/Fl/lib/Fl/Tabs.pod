@@ -1,0 +1,380 @@
+class 'Fl::Tabs';
+isa 'Fl::Group';
+include 'FL/Fl_Tabs.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Tabs - "File Card Tabs" interface widget
+
+=head1 Description
+
+The Fl::Tabs is the "file card tabs" interface that allows you to put lots
+and lots of buttons and switches in a panel, as popularized by many toolkits.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/tabs.png" /></center>
+
+A full example of this widget can be found in C<eg/tabs.pl>
+
+Clicking the tab makes a child visible() by calling show() on it, and all
+other children are made invisible by calling hide() on them. Usually the
+children are Fl::Group widgets containing several widgets themselves.
+
+Each child makes a card, and its label() is printed on the card tab, including
+the label font and style. The selection color of that child is used to color
+the tab, while the color of the child determines the background color of the
+pane.
+
+The size of the tabs is controlled by the bounding box of the children (there
+should be some space between the children and the edge of the Fl::Tabs), and
+the tabs may be placed "inverted" on the bottom - this is determined by which
+gap is larger. It is easiest to lay this out in fluid, using the fluid browser
+to select each child group and resize them until the tabs look the way you
+want them to.
+
+The background area behind and to the right of the tabs is "transparent",
+exposing the background detail of the parent. The value of Fl::Tabs->box()
+does not affect this area. So if Fl::Tabs is resized by itself without the
+parent, force the appropriate parent (visible behind the tabs) to redraw() to
+prevent artifacts.
+
+See "L<Resizing Caveats|/"Resizing Caveats>" below on how to keep tab heights
+constant. See "L<Callback's Use Of when()|/"Callback's Use Of when()">" on how
+to control the details of how clicks invoke the callback().
+
+A typical use of the Fl::Tabs widget:
+
+    my $tabs = Fl::Tabs->new(10, 10, 300, 200);
+    my $grp1 = Fl::Group->new(20, 30, 280, 170, 'Tab1');
+        # Widgets that go in tab #1
+        $grp1->end;
+    my $grp2 = Fl::Group->new(20, 30, 280, 170, 'Tab2');
+        # Widgets that go in tab #2
+        $grp21->end;
+    $tabs->end;
+
+=head2 Default Appearance
+
+The appearance of each "tab" is taken from the label() and color() of the
+child group corresponding to that "tab" and panel. Where the "tabs" appear
+depends on the position and size of the child groups that make up the panels
+within the Fl_Tab, i.e. whether there is more space above or below them. The
+height of the "tabs" depends on how much free space is available.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/tabs_default.png" /></center>
+
+=head2 Highlighting The Selected Tab
+
+The selected "tab" can be highlighted further by setting the selection_color()
+of the Fl::Tab itself, e.g.
+
+    $tabs = Fl::Tabs->new(...);
+    $tabs->selection_color(FL_DARK3);
+
+The result of the above looks like:
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/tabs_selection.png" /></center>
+
+=head2 Uniform Tab and Panel Appearance
+
+In order to have uniform tab and panel appearance, not only must the color()
+and selection_color() for each child group be set, but also the
+selection_color() of the Fl::Tab itself any time a new "tab" is selected. This
+can be achieved within the Fl::Tab callback, e.g.
+
+
+    use Fl;
+
+    sub myTabsCallback{
+        my ($tabs, $data) = @_;
+        # When tab changed, make sure it has same color as its group
+        $tabs->selection_color( ($tabs->value())->color() );
+    }
+
+    #
+    my $w = Fl::Window->new(...);
+    # Define tabs widget
+    my $tabs = Fl::Tabs->new(...);
+    $tabs->callback(\&myTabsCallback);
+    # Create three tabs each colored differently
+    my $grp1 = Fl::Group->new(..., "One");
+        $grp1->color(9);
+        $grp1->selection_color(9);
+    $grp1->end();
+    my $grp2 = Fl::Group->new(..., "Two");
+        $grp2->color(10);
+        $grp2->selection_color(10);
+    $grp2->end();
+    my $grp3 = Fl::Group->new(..., "Three");
+        $grp3->color(14);
+        $grp3->selection_color(14);
+    $grp3->end();
+    # Make sure default tab has same color as its group
+    $tabs->selection_color( ($tab->value())->color() );
+    exit Fl::run();
+
+The result of the above looks like:
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/tabs_uniform.png" /></center>
+
+=head2 Resizing Caveats
+
+When Fl::Tabs is resized vertically, the default behavior scales the tab's
+height as well as its children. To keep the tab height constant during
+resizing, set the tab widget's resizable() to one of the tab's child groups,
+i.e.
+
+    my $tabs = Fl::Tabs->new(...);
+    my $grp1 = Fl::Group->new(...);
+    # ...
+    my $grp2 = Fl::Group->new(...);
+    # ...
+    $tabs->end();
+    $rabs->resizable($grp1); # keeps tab height constant
+
+=head2 Callback's Use Of when()
+
+Fl::Tabs supports the following flags for when():
+
+=over
+
+=item FL_WHEN_NEVER - callback never invoked (all flags off)
+
+=item FL_WHEN_CHANGED - if flag set, invokes callback when a tab has been changed (on click or keyboard navigation)
+
+=item FL_WHEN_NOT_CHANGED - if flag set, invokes callback when the tabs remain unchanged (on click or keyboard navigation)
+
+=item FL_WHEN_RELEASE - if flag set, invokes callback on RELEASE of mouse button or keyboard navigation
+
+=back
+
+Notes:
+
+=over
+
+=item 1. The above flags can be logically OR-ed (|) or added (+) to combine
+behaviors.
+
+=item 2. The default value for when() is FL_WHEN_RELEASE (inherited from
+Fl::Widget).
+
+=item 3. If FL_WHEN_RELEASE is the only flag specified, the behavior will be
+as if (FL_WHEN_RELEASE|FL_WHEN_CHANGED) was specified.
+
+=item 4. The value of changed() will be valid during the callback.
+
+=item 5. If both FL_WHEN_CHANGED and FL_WHEN_NOT_CHANGED are specified, the
+callback is invoked whether the tab has been changed or not. The changed()
+method can be used to determine the cause.
+
+=item 6. FL_WHEN_NOT_CHANGED can happen if someone clicks on an already
+selected tab, or if a keyboard navigation attempt results in no change to the
+tabs, such as using the arrow keys while at the left or right end of the tabs.
+
+=back
+
+=head1 Methods
+
+Fl::Tabs inherits from Fl::Group and Fl::Widget. On top of that, it exposes
+the following methods...
+
+=head2 new(...)
+
+    my $tab_a = Fl::Tabs->new(0, 0, 250, 500, 'Important Stuff');
+    my $tab_b = Fl::Tabs->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default boxtype is FL_THIN_UP_BOX.
+
+Use add($widget) to add each child, which are usually Fl::Group widgets. The
+children should be sized to stay away from the top or bottom edge of the
+Fl::Tabs widget, which is where the tabs will be drawn.
+
+All children of Fl::Tabs should have the same size and exactly fit on top of
+each other. They should only leave space above or below where that tabs will
+go, but not on the sides. If the first child of Fl::Tabs is set to
+"resizable()", the riders will not resize when the tabs are resized.
+
+The destructor also deletes all the children. This allows a whole tree to be
+deleted at once, without having to keep a pointer to all the children in the
+user code. A kludge has been done so the Fl::Tabs and all of its children can
+be automatic (local) variables, but you must declare the Fl::Tabs widget first
+so that it is destroyed last.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Tabs *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 client_area()
+
+    my ($rx, $ry, $rw, $rh) = $tabs_a->client_area();
+       ($rx, $ry, $rw, $rh) = $tabs_a->client_area( $tabh );
+
+Returns the position and size available to be used by its children.
+
+If there isn't any child yet the tabh parameter will be used to calculate the
+return values. This assumes that the children's labelsize is the same as the
+Fl::Tabs' labelsize and adds a small border.
+
+If there are already children, the values of child(0) are returned, and $tabh
+is ignored.
+
+I<Note>: Children should always use the same positions and sizes.
+
+C<$tabh> can be one of:
+
+=over
+
+=item * 0: calculate label size, tabs on top
+
+=item * -1: calculate lavel size, tabs on bottom
+
+=item * >0: use given C<$tabh> value, tabs on top (height = $tabh)
+
+=item * <-1: use given <$tabh> value, tabs on bottom (height = -$tabh)
+
+=back
+
+=cut
+
+xs {name        => 'client_area',
+    definitions => [{optional => [[qw[int tabh 0]]],
+                    code => <<'' }]};
+            int rx, ry, rw, rh;
+            ((Fl_Tabs *)self->cp_ctx)->client_area( rx, ry, rw, rh, tabh );
+            XSprePUSH;	EXTEND(SP,4);
+            PUSHs(sv_newmortal());sv_setiv(ST(0), (int)rx);
+            PUSHs(sv_newmortal());sv_setiv(ST(1), (int)ry);
+            PUSHs(sv_newmortal());sv_setiv(ST(2), (int)rw);
+            PUSHs(sv_newmortal());sv_setiv(ST(3), (int)rh);
+            XSRETURN(4);
+
+=pod
+
+=head2 push()
+
+    my $group = $tabs_a->push();
+
+Returns the tab group for the tab the user has currently down-clicked on and
+remains over until FL_RELEASE.
+
+Otherwise, returns C<undef>.
+
+While the user is down-clicked on a tab, the return value is the tab group for
+that tab. But as soon as the user releases, or drags off the tab with the
+button still down, the return value will be NULL.
+
+    my $int = $tabs_a->push( $widget );
+
+This would be called by a custom tab widget's handle() method to set the tab
+group widget the user last FL_PUSH'ed on.
+
+Set back to zero on FL_RELEASE.
+
+As of this writing, the value is mainly used by draw_tab() to determine
+whether or not to draw a 'down' box for the tab when it's clicked, and to turn
+it off if the user drags off it.
+
+=cut
+
+xs {name        => 'push',
+    definitions => [
+    {   required => [['Fl_Widget *', 'o']],
+        c_args   => '(Fl_Widget *) o->cp_ctx',
+        returns => 'int'},
+    {returns => 'Fl_Widget *'}]
+};
+
+=pod
+
+=head2 value()
+
+    my $tab = $tabs_a->value();
+
+Gets the currently visible widget/tab.
+
+The value() is the first visible child (or the last child if none are visible)
+and this also hides any other children. This allows the tabs to be deleted,
+moved to other groups, and show()/hide() called without it screwing up.
+
+    my $changed = $tabs_b->value( $widget );
+
+Sets the widget to become the curent visible widget/tab.
+
+Setting the value hides all other children and makes this one visible if it
+really is a child.
+
+Returns C<1> if there was a change (new value is different than previous) or
+C<0> if there was no change (new value is already set).
+
+=cut
+
+xs {name         => 'value',
+    definitions  => [
+    {   required => [['Fl_Widget *', 'o']],
+        c_args   => '(Fl_Widget *) o->cp_ctx',
+        returns  => 'int'},
+    {returns => 'Fl_Widget *'}]
+};
+
+=pod
+
+=head2 which()
+
+    my $widget = $tabs_a->which($event_x, $event_y);
+
+Return the widget of the tab the user clicked on at C<$event_x> / C<$event_y>.
+
+This is used for event handling (clicks) and by fluid to pick tabs.
+
+Returns the child widget of the tab the user clicked on, or C<undef> if there
+are no children or if the event is outside of the tabs area.
+
+=cut
+
+xs {name        => 'which',
+    definitions => [
+    {   required => [[qw[int event_x]], [qw[int event_y]]],
+        returns => 'Fl_Widget *'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

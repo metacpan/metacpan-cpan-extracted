@@ -1,0 +1,39 @@
+---
+abstract: 'Query a FreeBSD system for the list of mounted filesystems'
+author:
+  - 'Athanasios Douitsis <aduitsis@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: v5.20.0
+configure_requires:
+  Module::Build: '0.28'
+  perl: v5.20.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FreeBSD-FsStat
+provides:
+  FreeBSD::FileSystem:
+    file: lib/FreeBSD/FileSystem.pm
+    version: '0.107'
+  FreeBSD::FsStat:
+    file: lib/FreeBSD/FsStat.pm
+    version: '0.107'
+requires:
+  DynaLoader: '0'
+  Exporter: '0'
+  Moose: '0'
+  perl: v5.20.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/aduitsis/perl-freebsd-fsstat
+  repository: https://github.com/aduitsis/perl-freebsd-fsstat.git
+version: '0.107'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,30 @@
+---
+abstract: 'slurp a JSON file into a data structure, and the reverse'
+author:
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Const::Fast: '0'
+  Test::More: '0.88'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-JSON-Slurper
+requires:
+  Exporter: '0'
+  File::Slurper: '0'
+  JSON::MaybeXS: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/File-JSON-Slurper
+  repository: https://github.com/neilb/File-JSON-Slurper.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.62'

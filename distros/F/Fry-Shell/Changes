@@ -1,0 +1,23 @@
+0.15 Wed Jan 12 2005
+	- made a few Fry::Lib methods, included Fry::Developer.pod, slight documentation tweaks
+0.14 Sun Jan  9 2005
+	- added documentation for developers
+	- made Fry::Error a plugin
+	- added 3 more shell components: Fry::Sub, Fry::Obj and Fry::Type
+	- library interface Fry::ShellI defined
+	- public methods of all nonlibrary classes documented!
+	- better test coverage
+0.11 Fri Oct 14 2004
+	-Major major revision! Plugins, clean OO framework implemented,divided shell into 4 main
+	components,readline support,minimal autoloaded libraries
+0.09 Wed Jul 7 2004
+	-turned off debug (accidently left on), changed 'quit' logic to be more flexible, added support for requiring a
+	global file,warning clean
+0.08 Fri Jul 2 2004
+	- fixed Dumper to work for debug, made loading class data more flexible
+	  with &check_or_mk_global
+0.07 Thu Jul 1 2004	  
+	- added several more core shell functions: extensive help, printing and setting data,listing options and functions
+	- cleaner pod
+0.02 Thu Jun 17 2004
+	Initial	release

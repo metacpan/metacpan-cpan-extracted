@@ -1,0 +1,37 @@
+File-ReadSimple version 1.1
+============================
+
+This module is designed for easy filehandling or handling command output without knowing how to open or close 
+a file.The main reason to have such a module is to help not so good Perl users to use filehandling/Command 
+output handling with ease and efficiently.It can be used to perform most of the filehandling tasks in day to day's work.This is first release of the module.
+
+Please do report bugs and suggestions to nitin.harale@yahoo.com.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None....
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2006 by Super-User
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+

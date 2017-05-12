@@ -1,0 +1,3 @@
+#fsdb -F S username firstname lastname id email
+johnh  John  Heidemann  134  johnh@isi.edu
+#   | sqlselect_to_db

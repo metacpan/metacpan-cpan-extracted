@@ -1,0 +1,20 @@
+#!/usr/local/bin/perl
+
+use Finance::YahooChart;
+
+($foo{'symbol'},$foo{'type'},$foo{'size'},$foo{'include'}) = @ARGV;
+
+@types = ("i","w","3","1","2","5");
+@sizes = ("b","s");
+@includes = ("","s","m");
+
+$sym = "AAPL";
+foreach $type (@types) {
+    foreach $size (@sizes) {
+	foreach $include (@includes) {
+	    %img = Finance::YahooChart::getchart(symbol => $sym, type => $type, size => $size, include => $include);
+	    print "<P>$sym / $type / $size / $include<BR>\n<IMG SRC=\"$img{'url'}\" WIDTH=\"$img{'width'}\" HEIGHT=\"$img{'height'}\"></P>\n";
+	    print "ERROR = ".$Finance::YahooChart::ERROR."\n" if $Finance::YahooChart::ERROR;
+	}
+    }
+}

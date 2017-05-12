@@ -1,0 +1,8 @@
+---
+scraper:
+  # for mailman
+  mailman:
+    - name: china-pm
+      url: 'http://mail.pm.org/pipermail/china-pm/'
+      forum_id: 0
+      user_id: 1

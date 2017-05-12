@@ -1,0 +1,4 @@
+#fsdb test foo
+a	-
+b	-
+#   | dbcolcreate --no-recreate-fatal foo foo

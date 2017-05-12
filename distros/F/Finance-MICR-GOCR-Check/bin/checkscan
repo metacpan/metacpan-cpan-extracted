@@ -1,0 +1,198 @@
+#!/usr/bin/perl -w
+use Cwd;
+use lib './lib';
+use strict;
+use warnings;
+use Carp;
+use Finance::MICR::GOCR::Check;
+use File::Type;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.1.1.1 $ =~ /(\d+)/g;
+
+my $DEBUG = 0;
+sub DEBUG : lvalue { $DEBUG }
+
+
+my $o = gopts('D:S:dvhqpb:o:i:x:r');
+$o->{d}||=0;
+$DEBUG = $o->{d};
+
+if (DEBUG){
+	print STDERR "debug is on\n";
+	$Finance::MICR::GOCR::DEBUG = 1;
+	$Finance::MICR::GOCR::Check::DEBUG=1;
+}
+
+
+my $custom_increment = $o->{i}; $custom_increment ||=0;
+my $custom_steps = $o->{x}; $custom_steps ||=0;
+
+
+
+scalar @ARGV or man();
+($o->{q} or $o->{p} ) or $o->{s} = 1;
+
+for (@ARGV){
+	my $abs_check = resolve($_) or next; 
+	require_mime($abs_check,'image') or warn ("$0, [$abs_check] not image") and next;
+	
+	
+	my $check = new Finance::MICR::GOCR::Check({ 
+		abs_check => $abs_check,
+		abs_path_gocrdb => ($o->{b} or undef),
+		d => ( $o->{D} or undef ),
+		s => ( $o->{S} or undef ),
+	});
+
+	if ($custom_increment or $custom_steps ){
+		$check->crop_increment($custom_increment) if $custom_increment;
+		$check->crop_iterations($custom_steps) if $custom_steps;
+		print STDERR "custom steps [$custom_steps] custom increment [$custom_increment]\n" if DEBUG;
+	}
+
+	$check->crop_sides($o->{o}) if $o->{o};
+
+	
+	if ($o->{q}){
+		if ($check->found_valid){
+			print STDERR " found valid micr line\n" if DEBUG;
+		}
+	
+		print $abs_check.' '. $check->parser->micr_pretty."\n";		
+
+		if ($o->{r}){
+			$check->save_report;
+		}
+		next;
+	}	
+	
+	elsif ($o->{p}){			
+		$check->prep_check;
+		next;
+	}	
+	
+	else {
+		man() and exit;
+	}
+
+	
+}
+
+exit;
+
+
+
+
+
+
+
+sub resolve {
+	my $path = shift;
+	$path=~/^\// or $path = cwd().'/'.$path;		
+	$path = Cwd::abs_path($path) or 
+		warn "$path does not resolve" and return;	
+	return $path;
+}
+
+sub require_mime {
+	my $abs = shift;
+	my $mime = shift;
+	my $ft = new File::Type;
+	my $mime_type = $ft->mime_type($abs) or return;
+	$mime_type=~/$mime/ or return 0;
+	return 1;
+}
+
+sub gopts {
+	require Getopt::Std;	
+	my $opts = shift;
+	$opts ||= 'vh';
+	my $o = {};
+	Getopt::Std::getopts($opts, $o); 
+	print $VERSION and exit if $o->{v};
+	man() if $o->{h}; 
+	return $o;	
+}
+sub man {
+	print STDERR "please consult manual for checkscan\n" and exit;
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+checkscan - work with a scanned check image
+
+=head1 USAGE
+
+	checkscan -q /path/to/check.png
+
+=head1 PARAMETERS
+
+	-i increment pixels per iteration, default is 5
+	-x how many iterations, default is 12 if you set the pixel increment yourself
+	-o crop sides when iterating, value is percent in the form 0.15 where 1 is 100%
+	-b path to micr database, dafaults to /usr/share/micrdb/
+	-D dust size, default is 20
+	-S spacing, default is 80
+
+=head1 OPTIONS
+
+	-p prep   		
+	-v version	
+	-h help
+	-d debug messages, default is off
+
+=head1 USAGE EXAMPLES
+
+	checkscan -q ./t/checks_hard/hard1.png
+
+For a hard to read check you may want to try changing iterations:
+
+	checkscan -q -x 15 -i 2 ./t/checks_hard/hard1.png
+	
+
+
+=head1 CHANGING THE ITERATIONS
+
+The program crops from the bottom up to look for a valid micr line in the image
+by default the steps are something like:
+
+	70 75 80 85 90 95 100 105 110 115 120 130 140 150 160 170 180 190 200 210 220 230 240 250 300
+
+If a valid line is found, it stops.
+
+If you want to change the increment value and the number of steps:
+
+	checkscan -q -i 2 -x 20 ./UxxxxxxU_TxxxxxxT_xxxxxxU.png
+
+Would make 20 steps of 2 pix diff- also stops if valid found.
+To see debug ..
+
+	checkscan -d -q -i 2 -x 20 ./UxxxxxxU_TxxxxxxT_xxxxxxU.png
+
+
+=head1 SEE ALSO
+
+L<Finance::MICR::GOCR::Check>
+L<Finance::MICR::LineParser>
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,12 @@
+Changes
+foundaationdb.i
+Fdb.c
+lib/Fdb.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-connect.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

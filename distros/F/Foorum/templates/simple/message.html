@@ -1,0 +1,14 @@
+<style>
+	A:visited{text-decoration: underline}
+	A:link{text-decoration: underline;}
+</style>
+<div class='message'>
+    [% message.msg %]
+	[% IF message.url %]
+	    <br><br>
+		(<a href="[% message.url %]"><u>Please click here[% IF NOT message.stay_in_page %] if the page doesn't reload in [% message.refresh_time || 4 %] seconds[% ELSE %] to countinue[% END %]!</u></a>)
+	[% END %]
+</div>
+[% IF message.url AND NOT message.stay_in_page %]
+<meta http-equiv="refresh" content="[% message.refresh_time || 4 %]; url=[% message.url %]">
+[% END %]

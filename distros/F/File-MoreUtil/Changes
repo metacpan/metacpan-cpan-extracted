@@ -1,0 +1,37 @@
+Revision history for File-MoreUtil
+
+0.60    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.59    2014-12-05 (PERLANCAR)
+
+	- Rename module/dist from SHARYANTO-File-Util to File-MoreUtil.
+
+	- Split SHARYANTO::File::Flock to its own dist and rename it to
+          File::Flock::Retry.
+
+
+0.58    2014-11-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- Skip unreadable test when running as root [RT#100497].
+
+
+0.57     2014-05-17 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.56    2013-09-11 (SHARYANTO)
+
+        - No functional changes. Split from SHARYANTO-Utils to minimize
+          dependencies (I'm trying to make Perinci::CmdLine work under Windows).

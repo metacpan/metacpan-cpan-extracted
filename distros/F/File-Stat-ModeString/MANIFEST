@@ -1,0 +1,11 @@
+MANIFEST
+MANIFEST.SKIP
+VERSION
+README
+INSTALL
+Makefile.PL
+t/MakeMakerFix.pm
+t/0.t
+ModeString.pm
+perl-File-Stat-ModeString.spec
+

@@ -1,0 +1,64 @@
+# test3a.hash                             -*-cperl-*-
+#
+# Name and hashref for the namelist in test3a.nml
+#
+
+$name = 'nlist1';
+
+$hashref =
+  {
+   # From nlist1:
+   'string_var1'   => { value => [ 'A simple string' ],
+                        stype => 'single-quote string',    type => 1 },
+   'int_var1'      => { value => [ 14 ],
+                        stype => 'integer',                type => 4 },
+   'real_var1'     => { value => [ -0.5 ],
+                        stype => 'unspecified float',      type => 5 },
+   'double_var1'   => { value => [ '1.D4' ],
+                        stype => 'double precision float', type => 7 },
+   'complex_var1'  => { value => [ '(1.234,5.678)' ],
+                        stype => 'complex number',         type => 8 },
+   'dcompl_var1'   => { value => [ '(3.14D0, 2.718D0)' ],
+                        stype => 'double precision complex number',
+                        type => 9 },
+   'repeated_var'  => { value => [ 7 ],
+                        stype => 'integer',                type => 4 },
+
+   # From nlist2:
+   'string_var2'   => { value => [ 'A simple string' ],
+                        stype => 'single-quote string',    type => 1 },
+   'int_var2'      => { value => [ 14 ],
+                        stype => 'integer',                type => 4 },
+   'real_var2'     => { value => [ -0.5 ],
+                        stype => 'unspecified float',      type => 5 },
+   'double_var2'   => { value => [ '1.D4' ],
+                        stype => 'double precision float', type => 7 },
+   'complex_var2'  => { value => [ '(1.234,5.678)' ],
+                        stype => 'complex number',         type => 8 },
+   'dcompl_var2'   => { value => [ '(3.14D0, 2.718D0)' ],
+                        stype => 'double precision complex number',
+                        type => 9 },
+   'repeated_var'  => { value => [ 7 ],
+                        stype => 'integer',                type => 4 },
+
+   # From nlist3:
+   'string_var3'   => { value => [ 'A simple string' ],
+                        stype => 'single-quote string',    type => 1 },
+   'int_var3'      => { value => [ 14 ],
+                        stype => 'integer',                type => 4 },
+   'real_var3'     => { value => [ -0.5 ],
+                        stype => 'unspecified float',      type => 5 },
+   'double_var3'   => { value => [ '1.D4' ],
+                        stype => 'double precision float', type => 7 },
+   'complex_var3'  => { value => [ '(1.234,5.678)' ],
+                        stype => 'complex number',         type => 8 },
+   'dcompl_var3'   => { value => [ '(3.14D0, 2.718D0)' ],
+                        stype => 'double precision complex number',
+                        type => 9 },
+   'repeated_var'  => { value => [ 7 ],
+                        stype => 'integer',                type => 4 }
+  };
+
+
+$nslots = (keys %$hashref) + 0.;
+

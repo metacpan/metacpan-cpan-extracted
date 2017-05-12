@@ -1,0 +1,62 @@
+Formatter::HTML::MPS
+====================
+
+Formatter::HTML::MPS is a tool for writing presentations. You can
+write your slides in a single file using the lightweight markup
+language Markdown, adding some simple markup to identify slides and do
+misc configuration.
+
+Your file will then be converted to a single HTML file, with a default
+CSS file for @media projection that will show your single file as a
+set of slides.
+
+The module comes with the command line utility mpslidemaker.pl that
+uses the module to convert MPS files to HTML, and has a few options.
+
+
+Format
+------ 
+Each slide is formatted using the Markdown format. In
+addition to that, a simple format is used to set variables and to
+denote new slides. 
+
+All MPS directives start with ';'. Comments start with ';;'.
+
+To indicate a new slide, use the 'newslide' directive. I.e., start the
+line with:
+
+  ; newslide
+
+To set a configuration variable, use the 'set' directive. I.e.:
+
+  ; set VAR = VALUE
+
+Currently, supported variables are:
+
+ * output_format: only 'xhtml1.0_strict' is supported. Example:
+
+        ; set output_format = xhtml1.0_strict
+
+ * title: the title of the presentation.
+
+
+Usage
+-----
+
+$ mpslidemaker.pl test.mps
+
+
+
+Supported browsers
+------------------
+In theory, the default CSS should be usable with all HTML viewers that
+support the projection media type in CSS. In practice, this has only
+been tested with the Opera browser (where you can press F11 to enter
+"projection mode").
+
+
+
+More information
+----------------
+Markdown: <URL: http://daringfireball.net/projects/markdown/ >
+OperaShow: <URL: http://www.opera.com/support/tutorials/operashow/ >

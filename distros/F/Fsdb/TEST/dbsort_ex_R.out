@@ -1,0 +1,12 @@
+#fsdb -R C cid cname
+cid: 11
+cname: numanal
+
+cid: 12
+cname: os
+
+cid: 10
+cname: pascal
+
+#   | dbfilealter -R C
+#   | dbsort cname

@@ -1,0 +1,5 @@
+ToDo List for Perl extension Math::Fraction.
+
+2 Feb 97
+  Fix bug where frac(.001) would come out 0/1 instead of 1/1000 like it
+  should.  To Work aroud this problem try frac(.001*2)/2.

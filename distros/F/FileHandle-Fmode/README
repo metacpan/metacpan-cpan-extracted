@@ -1,0 +1,11 @@
+Use this module to check whether a filehandle is readable, writable, or
+readable/writable.
+
+Build in the usual way:
+
+perl Makefile.PL
+make test
+make install
+
+Cheers,
+Rob

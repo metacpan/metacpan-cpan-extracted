@@ -1,0 +1,104 @@
+Revision history for FFI-TinyCC
+
+0.24      2017-01-31 00:04:51 -0500
+  - Mark executable output as possibly not supported.  Anywhere.
+  - Remove deprecated FFI::Raw support
+
+0.23      2017-01-06 15:12:55 -0500
+  - Updated documentation to reflect FFI::Platypus preference for
+    not using Declare interface
+
+0.22      2015-08-06 09:37:59 -0400
+  - Refinement of detect_sysinclude_path
+  - libtcc.so is built during the build stage instead of the configure
+    stage during dist install
+  - Numerous small but important documentation corrections
+  - Add link to #native irc channel in dist meta data
+    (join us for Alien and FFI discussions)
+
+0.21      2015-03-11 22:24:12 -0400
+  - Fix bug where get_symbol method was not correctly throwing an exception
+    on error (gh#4 pipcet++
+
+0.20      2015-03-11 12:57:12 -0400
+  - Fix bug in detect_sysinclude_path on Perl 5.18 and earlier introduced
+    in 0.19
+
+0.19      2015-03-11 09:19:47 -0400
+  - detect_sysinclude_path returns the directories added to the system
+    include path (gh#3 suggested by calid++)
+
+0.18      2015-03-11 06:44:56 -0400
+  - Production release identical to 0.17_02
+
+0.17_02   2015-03-10 09:17:52 -0400
+  - Removed unintended linux system include path from detect_sysinclude_path.t
+
+0.17_01   2015-03-10 05:48:35 -0400
+  - Added method detect_sysinclude_path, which attempts to find the correct
+    sysinclude path for you (so that TinyCC can find things like <stdio.h>)
+
+0.17      2015-01-27 21:47:45 -0500
+  - Update FFI::Platypus syntax in examples and documentation
+    A couple of places were using conventions that were removed
+    from Platypus before it went to CPAN.
+
+0.16      2015-01-25 03:58:01 -0500
+  - FFI::TinyCC::Inline options is not supported on Perl 5.8
+    a useful diagnostic will be printed if you try to use it on 5.8
+    tests that test options will skip on 5.8
+
+0.15      2015-01-23 17:03:42 -0500
+  - use FFI::Platypus::Type::StringArray instead of reinventing it ourselves
+
+0.14      2015-01-22 06:38:34 -0500
+  - CPAN release identical to 0.12
+
+0.12      2015-01-19 03:15:27 -0500
+  - FFI::Platypus 0.09 compatability
+  - Development release not posted on CPAN
+
+0.11      2015-01-15 18:51:26 -0500
+  - migrate to FFI::Platypus.  Should still interact with FFI::Raw
+    as before.
+  - Your FFI::Raw code may break if you are not explicitly using
+    FFI::Raw, and depending on FFI::TinyCC to pull it in for you.
+    Stop doing that.
+  - Development release not posted on CPAN
+
+0.10      2015-01-08 10:09:47 -0500
+  - get_ffi_raw method is deprecated and will issue a warning
+    use FFI::Raw->new_from_ptr instead
+  - FFI::Raw will be removed as a prerequisite in the near future
+    if you are using both FFI::Raw and FFI::TinyCC then you need
+    to explicitly declare BOTH as prerequisites.
+
+0.09      2014-11-17 06:31:51 -0500
+  - Skip unsupported tests on arm linux
+
+0.08      2014-11-09 07:47:07 -0500
+  - add Debian kFreeBSD support (skip some unsupported tests)
+
+0.07      2014-11-05 20:53:30 -0500
+  - add OS X support
+    remove trailing null characters from libtcc.a members (possible Archive::Ar bug)
+    skip dll and exe tests for features not supported on OS X
+
+0.06      2014-11-05 18:07:06 -0500
+  - skip t/output_file_exe.t test on *BSD and darwin
+    that doesn't seem to be supported there at the moment
+
+0.05      2014-11-05 07:22:26 -0500
+  - fixed Windows breakage due to hard coded path (doh!)
+
+0.04      2014-11-04 16:58:12 -0500
+  - better test diagnostics
+
+0.03      2014-11-04 05:31:55 -0500
+  - testing improvements
+
+0.02      2014-10-28 15:16:44 -0400
+  - added tcc_eval and tcc_inline interfaces in FFI::TinyCC::Inline
+
+0.01      2014-10-28 09:29:55 -0400
+  - initial version

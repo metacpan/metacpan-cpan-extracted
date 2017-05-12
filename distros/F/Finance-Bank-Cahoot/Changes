@@ -1,0 +1,64 @@
+1.07    16 September 2010
+        Cahoot web application has changed name to AquariusSecurity and
+        a number of URLs are now also different.
+
+1.06    4 July 2010
+        Direct debits format on cahoot.com has changed again.
+
+1.05    17 September 2009
+        Updated Finance::Bank::Cahoot::DirectDebit to cope with new Cahoot
+        direct debit page format.
+
+1.04    06 February 2009
+        Compressed test pages after Google flagged them as a phishing scam.
+
+1.03    30 September 2008
+        New debits() method for Finance::Bank::Cahoot that returns a
+        list of active direct debits.
+
+1.02    18 August 2008
+        No functional changes to modules. Fixed invocation of isa() in
+        tests to isa_ok() to resolve module @INC ordering issue.
+
+1.01    16 August 2008
+        Replaced use of Date::Parse in statement line extraction as it
+        often gets confused by US vs. American date formats. Replaced
+        by a conversion that assumes DD/MM/YY dates (safe since this
+        is a UK bank after all) supplied by Nick Woolley.
+
+1.00    15 April 2008
+        Bumping version number since the module has now successfully
+        connected to 3 independent Cahoot accounts, so seems to be
+        stabilising.
+
+0.07    11 March 2008
+        Fixed extraction of password character numbers greater than 9.
+        Added check for incorrect login: now croaks when detected. Fixed
+        WWW::Mechanize warning (via HTML::Form) for read-only input.
+
+0.06    03 March 2008
+        Corrected parsing of statement lists to include the first on the
+        list.
+
+0.05    26 February 2008
+        No use-visible changes. Added test for examples. Corrected META.yml.
+
+0.04    24 February 2008
+        Replaced text for file not found error in 05-cryptfile.t to be
+        locale agnostic.
+
+0.03    22 February 2008
+        Fixed return value of the accounts method of Finance::Bank::Cahoot
+        to be a reference to a list, as documented. Added tests for system
+        error pages returning from the Cahoot server for better diagnostics.
+
+0.02    19 December 2007
+        Added new classs Finance::Bank::Cahoot::Statement and
+        Finance::Bank::Cahoot::Statement::Entries which are now used as
+        return types from the snapshot and statement methods of
+        Finance::Bank::Cahoot.
+
+        POD documentation has been tidied in a number of areas.
+
+0.01    16 December 2007
+        Initial release

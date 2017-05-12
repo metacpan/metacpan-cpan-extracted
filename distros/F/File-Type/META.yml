@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: File-Type
+version: 0.22
+license: perl
+distribution_type: module
+requires:
+  IO::File: 0.01
+  Test::More: 0.01
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  File::Type:
+    file: lib/File/Type.pm
+    version: 0.22
+  File::Type::Builder:
+    file: lib/File/Type/Builder.pm
+    version: 0.11
+generated_by: Module::Build version 0.21

@@ -1,0 +1,35 @@
+Revision history for Perl module Finance::Currency::Convert::WebserviceX
+
+0.07001 Sun May 2410:32:43 2009
+    - Fixed problem with result cache: #RT46216 - (DELTA) Christian Lackas
+
+0.07000 Tue June 3 19:36:46 2008
+    - Added caching of webservice results; default of 300 seconds per from/to
+        pair of currency codes
+
+0.06002 Sun Jan 20 12:51:43 2007
+    - Updated broken META.yml
+    - Added convert mock tests. Live converts use TEST_AUTHOR
+
+0.06001 Fri July 13 21:53:47 2007
+    - Fixed MANIFEST.SKIP for missing README
+
+0.06000 Sat June 30 17:54:56 2007
+    - Converted to Module::Install
+    - Added more culted tests
+
+0.05 Mon Mar 21 18:56:24 2005
+    - Added Test::Strict warnings_ok tests
+
+0.04 Mon Mar 14 19:00:23 2005
+    - Added Test::Strict tests
+
+0.03 Thur Mar 10 20:19:27 2005
+    - Fixed bug where converting from XXX to XXX yielded a price of 0
+        since the rate returned was also 0
+
+0.02 Web Mar 09 22:45:13 2005
+    - Added missing convert example to pod
+
+0.01 Wed Mar 09 20:21:35 2005
+    - Initial release

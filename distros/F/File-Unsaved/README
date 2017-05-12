@@ -1,0 +1,10 @@
+SYNOPSIS
+
+     use File::Unsaved qw(check_unsaved_file);
+     die "Can't modify foo.txt because it is being opened and modified in an editor"
+         if check_unsaved_file(path => "foo.txt");
+
+DESCRIPTION
+
+SEE ALSO
+

@@ -1,0 +1,18 @@
+# NAME
+
+Facebook::Graph::Cmdline - Extends Facebook::Graph with embedded HTTP for Oauth and token saving
+
+# VERSION
+
+version 0.123490
+
+# AUTHOR
+
+Andrew Grangaard <spazm@cpan.org> [![endorse](http://api.coderwall.com/spazm/endorsecount.png)](http://coderwall.com/spazm)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andrew Grangaard.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

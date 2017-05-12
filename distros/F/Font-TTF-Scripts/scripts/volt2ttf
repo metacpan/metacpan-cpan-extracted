@@ -1,0 +1,978 @@
+#!/usr/bin/perl
+
+use strict;
+use Font::TTF::Scripts::Volt;
+use Data::Dumper;
+use Pod::Usage;
+use Getopt::Std;
+
+# don't forget Font::TTF::GDEF
+
+our $DEBUG = 0;
+my %opts;
+my $VERSION;
+our $CHAIN_CALL;
+our ($if, $of);
+
+$VERSION = 0.01;    # MJPH      11-OCT-2007     First release
+
+unless ($CHAIN_CALL)
+{
+    getopts('a:d:f:hirt:x:', \%opts);
+
+    unless (defined $ARGV[1] || defined $opts{h})
+    {
+        pod2usage(1);
+        exit;
+    }
+
+    if ($opts{h})
+    {
+        pod2usage( -verbose => 2, -noperldoc => 1);
+        exit;
+    }
+
+    $if = Font::TTF::Scripts::Volt->read_font($ARGV[0], $opts{a}) || die "Can't read font $ARGV[0]";
+    foreach my $t (qw(GPOS GSUB GDEF))
+    { delete $if->{'font'}{$t}; }
+}
+
+Font::TTF::Scripts::Volt::main($if, %opts);
+
+unless ($CHAIN_CALL)
+{ $if->{'font'}->update->out($ARGV[1]) || die "Can't write to font file $ARGV[1]. Do you have it installed?" unless ($DEBUG > 1);}
+
+if ($opts{'d'} || $DEBUG)
+{
+    foreach (qw(GSUB GPOS))
+    {
+        delete $if->{'font'}{$_}{' PARENT'};
+        print Dumper($if->{'font'}{$_});
+    }
+    print Dumper($if->{'voltdat'});
+}
+
+die $if->{'WARNINGS'} if $if->{'cWARNINGS'};
+
+package Font::TTF::Scripts::Volt;
+
+use Font::TTF::Coverage;
+use Font::TTF::GSUB;
+use Font::TTF::GPOS;
+use Font::TTF::GDEF;
+use IO::File;
+
+sub main
+{
+    my ($fv, %opts) = @_;
+    
+    my ($volt_text, $font);
+    
+    $font = $fv->{'font'};
+    
+    if ($opts{'t'})
+    {
+        my ($inf) = IO::File->new("< $opts{'t'}") || die "Can't open file $opts{'t'}";
+        while (<$inf>)
+        { $volt_text .= $_; }
+        $inf->close;
+    }
+    elsif (defined $font->{'TSIV'})
+    { $volt_text = $font->{'TSIV'}->read->{' dat'}; }
+    else
+    { die "No VOLT table in the font, nothing to do"; }
+    delete $font->{'TSIV'} unless $opts{'r'};        # remove the volt source
+
+    if ($opts{'d'})
+    {
+        $::RD_HINT = 1;
+        $::RD_TRACE = $opts{'d'} if ($opts{'d'} > 1);
+    }
+
+    $fv->{'voltdat'} = $fv->parse_volt($volt_text);
+
+    $font->{'GSUB'} = Font::TTF::GSUB->new(PARENT => $font, read => 1) unless (defined $font->{'GSUB'});
+    $font->{'GSUB'}{'Version'} = 1;
+    $font->{'GPOS'} = Font::TTF::GPOS->new(PARENT => $font, read => 1) unless (defined $font->{'GPOS'});
+    $font->{'GPOS'}{'Version'} = 1;
+    $fv->features_ttf(%opts);
+    foreach my $t (qw(GSUB GPOS))
+    {
+        next unless (defined $font->{$t}{'FEATURES'});
+        $font->{$t}{'FEATURES'}{'FEAT_TAGS'} = [sort {$fv->{'featmap'}{$a} cmp $fv->{'featmap'}{$b}} @{$font->{$t}{'FEATURES'}{'FEAT_TAGS'}}];
+        $fv->lookups_ttf($t);
+        $font->{$t}->dirty;
+    }
+    $fv->add_gdef();
+#    $font->{'OS/2'}->read->{'maxLookups'} = $fv->{'maxcontext'};
+#    print STDERR "maxcontext=$fv->{'maxcontext'}\n";
+    return unless ($opts{'x'});
+    
+    my ($pre, $post, $indent);
+    $indent = '    ';
+    if ($opts{'f'})
+    {
+        # Slurp in the entire master TypeTuner file.
+        local $/;
+        my ($xfh) = IO::File->new("< $opts{'f'}") || die "Can't open $opts{'f'} for reading";
+        $_ = <$xfh>;
+        $xfh->close;
+        # Look for a place to insert the aliases:
+        #    - replacing an empty <aliases/> tag
+        #    - replacing an existing <aliases> ... </aliases> section
+        #    - replacing an xml comment including the word "aliases"
+        #    - just preceding the closing </all_features> tag.
+        if (/\n([ \t]*)<aliases(?:[^>]*\/>|.*<\/aliases\s*>)/so || /\n([ \t]*)<!--\s+[^>]*aliases[^>]*-->/soi)
+        {
+            $pre = "$`\n";
+            $post = $'; #'
+            $indent = $1;
+        }
+        elsif (/<\/all_features\s*>/so)
+        {
+            $pre = "$`\n";
+            $post = "$&$'"; #'
+        }
+    }
+    
+    my ($xfh) = IO::File->new("> $opts{'x'}") || die "Can't open $opts{'x'} for writing";
+    my (%feattags, %multis);
+    if ($opts{'f'})
+    {   $xfh->print($pre); }
+    else
+    {   $xfh->print("<?xml version='1.0' encoding='UTF-8'?>\n"); }
+    $xfh->print("$indent<aliases>\n");
+    foreach my $t(qw(GSUB GPOS))
+    {
+        foreach my $f (@{$font->{$t}{'FEATURES'}{'FEAT_TAGS'}})
+        {
+            my ($val) = $fv->{'featmap'}{$f};
+            if (defined $feattags{$val})
+            {
+                if ($feattags{$val} eq "")
+                { $feattags{$val} = "0"; }
+                else
+                { $feattags{$val}++; }
+                $val = "$val _$feattags{$val}";
+            }
+            else
+            { $feattags{$val} = ""; }
+            $xfh->print("$indent$indent<alias name='$f' value='$val'/>\n");
+        }
+    }
+    foreach my $l (@{$fv->{'voltdat'}{'lookups'}})
+    {
+        my ($id) = $l->{'id'};
+        next unless ($id);
+        my ($multi);
+        if ($id =~ s/\\.*$//o)
+        {
+            if ($multis{$id})
+            { next; }
+            else
+            { $multis{$id} = 1; }
+        }
+        $xfh->print("$indent$indent<alias name='$id' value='$l->{' index'}'/>\n");
+    }
+    # If the Graphite Feat table is present, make aliases for any alphanumeric feature tags
+    if (exists $font->{'Feat'})
+    {
+        my ($feat, $feat_id, $gdl_tag);
+        
+        foreach $feat (@{$font->{'Feat'}->read->{'features'}})
+        {
+            $feat_id = $feat->{'feature'};
+            next if $feat_id == 1;  #skip over weird last feature in Feat table
+            $gdl_tag = Font::TTF::GrFeat->num_to_tag($feat_id);
+            next if $gdl_tag == $feat_id;  # If the same, then not alphanumeric
+            $xfh->print("$indent$indent<alias name='gr_$gdl_tag' value='$feat_id'/>\n");
+        }
+    }
+    $xfh->print("$indent</aliases>\n");
+    $xfh->print($post) if $opts{'f'};
+    $xfh->close;
+}
+
+sub features_ttf
+{
+    my ($self, %opts) = @_;
+    my ($dat) = $self->{'voltdat'};
+    my ($font) = $self->{'font'};
+    my (%multis);
+    my ($t, $s, $l, $ft, $k);    # Script tag, script struct, lang struct, feature tag, lookup name.
+
+    # Lookups don't actually have tags (they are just numbered). Volt users give lookups names, however,
+    # and these names link features to lookups, so we have to be able to find lookups by name.
+    # So first time through this we create a hash to map lookup names to lookup:
+    $dat->{'lookuptags'} = {map {$_->{'id'} => $_} @{$dat->{'lookups'}}} unless (defined $dat->{'lookuptags'});
+    
+    if ($opts{'i'})
+    {
+        foreach (@{$dat->{'lookups'}})
+        { $_->{' include'} = 1 unless is_omitted($_); }
+    }
+    else
+    {
+        # There can be unused lookups in the VOLT source, i.e., lookups which aren't tied to a feature.
+        # Mark the needed lookups by setting ' include' on the lookup.
+        foreach $t (sort keys %{$dat->{'scripts'}}) # For each script name in VOLT source (in alpha order)
+        {
+            my ($s) = $dat->{'scripts'}{$t};
+            foreach $l (@{$s->{'langs'}})    # For each VOLT lang within this script
+            {
+                foreach $ft (sort keys %{$l->{'features'}}) # For each VOLT feature tag within this lang
+                {
+                    foreach $k (@{$l->{'features'}{$ft}{'lookups'}}) # For each VOLT lookup name within this feature
+                    { $dat->{'lookuptags'}{$k}{' include'} = 1 unless is_omitted($dat->{'lookuptags'}{$k}); }
+                }
+            }
+        }
+    }
+
+    # Calculate lookup indicies, assign to ' index'.
+    # GSUB and GPOS lookups are numbered independently, starting at 0.
+    # VOLT lookups can be grouped, e.g. lookup\0, lookup\1, lookup\2, to create sub-tables of a single OT lookup. 
+    # If a lookup group is detected, set the ' sub' field on all but first of group.
+    foreach $l (@{$dat->{'lookups'}})
+    {
+        next unless ($l->{' include'});
+        my ($multi);
+        if ($l->{'id'} =~ m/^([^\\]+)\\/o)
+        { $multi = $1; }
+        if (defined $multi && defined $multis{$multi})
+        {
+            $l->{' index'} = $multis{$multi};
+            $l->{' sub'} = 1;
+        }
+        else
+        {
+            if ($l->{'lookup'}[0] eq 'sub')
+            { $l->{' index'} = $dat->{'GSUB_counters'}++; }
+            else
+            { $l->{' index'} = $dat->{'GPOS_counters'}++; }
+            $multis{$multi} = $l->{' index'} if (defined $multi);
+        }
+    }
+    
+    
+    # Initialize OT script/lang/feature structure
+    foreach $t (sort keys %{$dat->{'scripts'}})
+    {
+        my ($s) = $dat->{'scripts'}{$t};
+        foreach $l (@{$s->{'langs'}})
+        {
+            foreach $ft (sort keys %{$l->{'features'}})
+            {
+                my ($type);
+                foreach $k (@{$l->{'features'}{$ft}{'lookups'}})
+                {
+                    next if ($dat->{'lookuptags'}{$k}{' sub'} || is_omitted($dat->{'lookuptags'}{$k}));
+                    if ($dat->{'lookuptags'}{$k}{'lookup'}[0] eq 'sub')
+                    { $type = 'GSUB'; }
+                    else
+                    { $type = 'GPOS'; }
+                    $self->append_feat($font, $s->{'tag'}, $l->{'tag'}, $ft, $dat->{'lookuptags'}{$k}{' index'}, $type);
+                }
+            }
+        }
+    }
+}
+
+sub append_feat
+{
+    my ($self, $font, $script, $lang, $feat, $lindex, $type) = @_;
+    my ($fname) = "${feat}_${script}_${lang}";
+    my ($othertype) = ($type eq 'GSUB') ? 'GPOS' : 'GSUB';
+
+    $self->{'featmap'}{$fname} = $feat;
+    
+    if ($lang eq 'dflt')
+    {
+        # There is no 'dflt' language tag registered -- this is a figment of VOLT's imagination.
+        # Instead features associated with 'dflt' tag should be attached to the 'DEFAULT' language
+        $lang = 'DEFAULT';
+    }
+    elsif (!defined $font->{$type}{'SCRIPTS'}{$script}{$lang})
+    {
+        push (@{$font->{$type}{'SCRIPTS'}{$script}{'LANG_TAGS'}}, $lang);
+    }
+
+    unless (defined $font->{$type}{'FEATURES'}{$fname})
+    { push (@{$font->{$type}{'FEATURES'}{'FEAT_TAGS'}}, $fname); }
+
+    unless (grep {$_ eq $fname} @{$font->{$type}{'SCRIPTS'}{$script}{$lang}{'FEATURES'}})
+    { push (@{$font->{$type}{'SCRIPTS'}{$script}{$lang}{'FEATURES'}}, $fname); }
+    
+    push (@{$font->{$type}{'FEATURES'}{$fname}{'LOOKUPS'}}, $lindex);
+}
+
+sub lookups_ttf
+{
+    my ($self, $type) = @_;
+    my ($dat) = $self->{'voltdat'};
+    my ($font) = $self->{'font'};
+    my ($ltype) = lc($type);
+    my ($clr, @clr);
+    my ($l, $c, $lk, $g, $i, $e, $index);
+    
+    $ltype =~ s/^g//o;
+
+    foreach $l (sort {$a->{' index'} <=> $b->{' index'}}
+            grep {$_->{'lookup'}[0] eq $ltype && defined $_->{' index'} && $_->{' include'}}
+            @{$dat->{'lookups'}})
+    {
+        my ($flags);
+        $flags |= 1 if ($l->{'dir'} =~ /RTL/oi);
+        $flags |= 6 if ($l->{'base'} =~ /SKIP/oi);		# VOLT doesn't have separate SKIP_LIGATURES info.
+        $flags |= 8 if ($l->{'marks'} =~ /SKIP/oi);
+
+        if ($l->{'all'} and $l->{'all'} ne 'ALL')
+        {
+            if ($l->{'marks'} =~ m/GLYPH_SET/oi)
+            {
+                # Use mark filter sets
+                if (!defined $self->{'alls'}{'*'.$l->{'all'}})  # '*', as in VOLT UI, used here to differentiate marksets from mark classes (below)
+                {
+                    push @{$self->{'marksets'}}, $self->make_coverage(@{$dat->{'groups'}{$l->{'all'}}});
+                    $self->{'alls'}{'*'.$l->{'all'}} = $#{$self->{'marksets'}};
+                }
+                $flags |= 0x10;
+                $font->{$type}{'LOOKUP'}[$l->{' index'}]{'FILTER'} = $self->{'alls'}{'*'.$l->{'all'}};
+            }
+            else
+            {
+                # Use mark classes
+                if (!defined $self->{'alls'}{$l->{'all'}})
+                {
+                    $self->{'alls'}{$l->{'all'}} = ++$self->{'max_all'};
+                    foreach $g (@{$self->or_context_glyphs(@{$dat->{'groups'}{$l->{'all'}}})})
+                    { $dat->{'glyphs'}[$g]{'mark_class'} = $self->{'alls'}{$l->{'all'}}; }
+                }
+                $flags |= $self->{'alls'}{$l->{'all'}} << 8;
+            }
+        }
+
+        $font->{$type}{'LOOKUP'}[$l->{' index'}]{'FLAG'} = $flags;
+        $font->{$type}{'LOOKUP'}[$l->{' index'}]{' index'} = $l->{' index'};
+        if (defined $l->{'contexts'}[0][1])
+        {
+            $font->{$type}{'LOOKUP'}[$l->{' index'}]{'TYPE'} = $type eq 'GSUB' ? 6 : 8;
+# use a context chaining subrule and then add a new lookup for the action
+# always use format 3, it's simpler (same as VOLT does)
+            if ($type eq 'GSUB')
+            {
+                $clr = {'MATCH' => [],
+                        'ACTION' => [[0, $dat->{"${type}_counters"}]]};
+                @clr = ({%$clr});
+                foreach $lk (@{$l->{'lookup'}[1]})
+                {
+                    for ($i = 0; $i < @{$lk->[0]}; $i++)
+                    {
+                        my ($glyphs) = $self->scon_glyphs($lk->[0][$i]);
+                        if (!defined $clr->{'MATCH'}[$i])
+                        { $clr->{'MATCH'}[$i] = Font::TTF::Coverage->new(1); }
+                        foreach (@{$glyphs})
+                        { $clr->{'MATCH'}[$i]->add($_); }
+                        $clr->{'MATCH'}[$i]->sort;
+                    }
+                }
+            }
+            else
+            {
+                @clr = ();
+                foreach $lk (@{$l->{'lookup'}[1]})
+                {
+                    my (@match);
+                    if ($lk->{'type'} eq 'ATTACH')
+                    {
+                        # Can't use make_coverage() because $lk->{'to'} is different
+                        my ($cover) = Font::TTF::Coverage->new(1);
+                        foreach my $c (@{$lk->{'to'}})
+                        {
+                            foreach my $g (@{$self->scon_glyphs($c->[0])})
+                            { $cover->add($g); }
+                        }
+                        $cover->sort;
+                        push (@match, $cover);
+                    }
+                    elsif ($lk->{'type'} eq 'ADJUST_PAIR')
+                    {
+                        push (@match, $self->make_coverage(@{$lk->{'first'}}),
+                                $self->make_coverage(@{$lk->{'second'}}));
+                    }
+                    elsif ($lk->{'type'} eq 'ATTACH_CURSIVE')
+                    {
+                        push (@match, $self->make_coverage(@{$lk->{'exits'}}),
+                                $self->make_coverage(@{$lk->{'enters'}}));
+                    }
+                    else        # ADJUST_SINGLE
+                    {
+                        push (@match, $self->make_coverage(@{$lk->{'context'}}));
+                    }
+                    push (@clr, {MATCH => [@match], ACTION => [[0, $dat->{"${type}_counters"}]]});
+                }
+            }
+            
+            # NOTE: Normally @clr will contain a single item. However, there is
+            # a now-prohibited syntax in the GPOS lookups that utilized multiple 
+            # ADJUST, etc., specifications. e.g.:
+            #        DEF_LOOKUP "name" PRO...
+            #        AS_POSITION
+            #        ADJUST_SINGLE GROUP "group1" BY POS ADV 50 DX 100 END_POS
+            #        END_ADJUST
+            #        ADJUST_SINGLE GLYPH "glyph1" BY POS ADV 50 DX 100 END_POS
+            #        END_ADJUST
+            #        END_POSITION
+            #
+            # Each such ADJUST generates a separate entry in @clr, and these are then
+            # supposed to end up in separate subtables.
+            # But it isn't clear how this should interact with multiple context strings
+            # (especially the EXCEPT type) which also build multiple sub-tables.
+            #
+            # In any case, the code in this block was originally written to handle
+            # any number of @clr entries, but it didn't work for the case of a single @clr
+            # and two context strings, the first being EXCEPT context. In this case there
+            # should be no extra subtable that matches the core string.
+            # The code related to $wantAnother fixes this case, but only when there is
+            # a single entry in @clr. 
+            
+            my $wantAnother;
+            foreach $c (@{$l->{'contexts'}})        # multiple context subrules
+            {
+                my ($contlength);
+                my ($clr1) = {};
+                foreach $e (@{$c}[1..$#{$c}])
+                { push (@{$clr1->{$e->[0] eq 'LEFT' ? 'PRE' : 'POST'}}, $self->make_coverage(@{$e}[1..$#{$e}])); }
+                if (exists $clr1->{'PRE'} && @{$clr1->{'PRE'}})
+                {
+                    $clr1->{'PRE'} = [reverse (@{$clr1->{'PRE'}})];
+                    $contlength = scalar @{$clr1->{'PRE'}};
+                }
+                $contlength += scalar @{$clr1->{'POST'}} if exists $clr1->{'POST'};
+
+                foreach (@clr)
+                {
+                    if ($c->[0] =~ m/^EXCEPT/o)
+                    {
+                        # first the full context match that does nothing
+                        push (@{$font->{$type}{'LOOKUP'}[$l->{' index'}]{'SUB'}}, {'FORMAT' => 3,
+                            'MATCH_TYPE' => 'o',
+                            'ACTION_TYPE' => 'l',
+                            'RULES' => [[{'MATCH' => $_->{'MATCH'}, 'ACTION' => [], %$clr1}]]});
+                        if (scalar(@clr) > 1)
+                        {
+                            # match the core string and do the lookup
+                            push (@{$font->{$type}{'LOOKUP'}[$l->{' index'}]{'SUB'}}, {'FORMAT' => 3,
+                                'MATCH_TYPE' => 'o',
+                                'ACTION_TYPE' => 'l',
+                                'RULES' => [[{%$_}]]});
+                            $wantAnother = 0;                       
+                        }
+                        else
+                        { $wantAnother = 1;}
+                    }
+                    else
+                    {
+                        push (@{$font->{$type}{'LOOKUP'}[$l->{' index'}]{'SUB'}}, {'FORMAT' => 3,
+                            'MATCH_TYPE' => 'o',
+                            'ACTION_TYPE' => 'l',
+                            'RULES' => [[{%$_, %$clr1}]]});
+                        $wantAnother = 0;
+                    }
+                }
+                $contlength += scalar @{$clr->{'MATCH'}} if exists $clr->{'MATCH'};
+                $self->{'maxcontext'} = $contlength if ($contlength > $self->{'maxcontext'});
+#                print STDERR "cl=$contlength ($ltype $l->{' index'})\n";
+            }
+            if ($wantAnother)
+            {
+                # match the core string and do the lookup
+                push (@{$font->{$type}{'LOOKUP'}[$l->{' index'}]{'SUB'}}, {'FORMAT' => 3,
+                    'MATCH_TYPE' => 'o',
+                    'ACTION_TYPE' => 'l',
+                    'RULES' => [[{%{$clr[0]}}]]});
+            }
+   
+            # Compute index for the chained lookup; be sure to copy flag word and MarkFilter to chained lookup
+            $index = $dat->{"${type}_counters"}++;
+            $font->{$type}{'LOOKUP'}[$index]{'FLAG'} = $flags;
+            $font->{$type}{'LOOKUP'}[$index]{'FILTER'} = $font->{$type}{'LOOKUP'}[$l->{' index'}]{'FILTER'};
+
+        }
+        else
+        { $index = $l->{' index'}; }
+
+        if ($type eq 'GSUB')
+        { $self->add_gsub_lookup($index, $l); }
+        else
+        { $self->add_gpos_lookup($index, $l); }
+    }
+}
+
+sub add_gsub_lookup
+{
+    my ($self, $index, $l) = @_;
+    my ($dat) = $self->{'voltdat'};
+    my ($font) = $self->{'font'};
+    my ($s, $maxi, $maxo, @map, $sub, $i, $j);
+
+# which of the 3 types of subst are we? 1:1, 1:many, many:1
+    foreach $s (@{$l->{'lookup'}[1]})
+    {
+        my ($sm) = scalar @{$s->[1]};
+        $maxo = $sm if ($sm > $maxo);
+        my ($m) = scalar @{$s->[0]};
+        $maxi = $m if ($m > $maxi);
+    }
+    $self->{'maxcontext'} = $maxi if ($maxi > $self->{'maxcontext'});
+#    print STDERR "cl=$maxi (gsub $index)\n";
+
+
+    if ($maxi == 1 && $maxo == 1)
+    {
+        $sub = {'ACTION_TYPE' => 'g', 'FORMAT' => 2, ' index' => $index};
+        $font->{'GSUB'}{'LOOKUP'}[$index]{'TYPE'} = 1;
+        $sub->{'COVERAGE'} = Font::TTF::Coverage->new(1);
+        foreach $s (@{$l->{'lookup'}[1]})
+        {
+            my (@input) = @{$self->scon_glyphs($s->[0][0])};
+            my (@output) = @{$self->scon_glyphs($s->[1][0])};
+            for ($i = 0; $i < @input; $i++)
+            {
+                my ($j) = $sub->{'COVERAGE'}->add($input[$i]);
+                push (@{$sub->{'RULES'}[$j][0]{'ACTION'}}, $output[$i]);
+                if ($sub->{'ACTION_TYPE'} eq 'g' && scalar @{$sub->{'RULES'}[$j][0]{'ACTION'}} > 1)
+                {
+                    $font->{'GSUB'}{'LOOKUP'}[$index]{'TYPE'} = 3;
+                    $sub->{'ACTION_TYPE'} = 'a';
+                    $sub->{'FORMAT'} = 1;
+                }
+            }
+        }
+    }
+    elsif ($maxi == 1)
+    {
+        $sub = {'ACTION_TYPE' => 'g', 'FORMAT' => 1, ' index' => $index};
+        my ($i);
+        $font->{'GSUB'}{'LOOKUP'}[$index]{'TYPE'} = 2;
+        $sub->{'COVERAGE'} = Font::TTF::Coverage->new(1);
+
+        foreach $s (@{$l->{'lookup'}[1]})
+        {
+            my ($input) = $self->scon_glyphs($s->[0][0]);
+            my (@output) = $self->context_glyphs(@{$s->[1]});
+            for ($i = 0; $i < @{$input}; $i++)
+            { $sub->{'RULES'}[$sub->{'COVERAGE'}->add($input->[$i])][0]{'ACTION'} = $output[$i]; }
+        }
+    }
+    else        # ligature - many:1
+    {
+        $sub = {'ACTION_TYPE' => 'g', 'MATCH_TYPE' => 'g', 'FORMAT' => 1, ' index' => $index};
+        my (@input, @new_input);
+        $font->{'GSUB'}{'LOOKUP'}[$index]{'TYPE'} = 4;
+        $sub->{'COVERAGE'} = Font::TTF::Coverage->new(1);
+
+        foreach $s (@{$l->{'lookup'}[1]})
+        {
+            my ($first) = $self->scon_glyphs($s->[0][0]);
+            my (@all) = $self->context_glyphs(@{$s->[0]});
+            my (@output) = $self->context_glyphs(@{$s->[1]});
+            for ($i = 0; $i < @{$first}; $i++)
+            {
+                my (@i) = grep {$all[$_][0] == $first->[$i]}(0 .. $#all);
+                foreach $j (@i)
+                {
+                    push (@{$sub->{'RULES'}[$sub->{'COVERAGE'}->add($first->[$i])]}, {'ACTION' => $output[$j], 'MATCH' => [@{$all[$j]}[1..$#{$all[$j]}]]});
+                }
+            }
+        }
+    }
+    @map = $sub->{'COVERAGE'}->sort;
+    $sub->{'RULES'} = [map {$sub->{'RULES'}[$map[$_]]} (0 .. @map-1)];
+    push (@{$font->{'GSUB'}{'LOOKUP'}[$index]{'SUB'}}, $sub);
+    return;
+}
+
+
+sub add_gpos_lookup
+{
+    my ($self, $index, $l) = @_;
+    my ($dat) = $self->{'voltdat'};
+    my ($font) = $self->{'font'};
+    my ($s, $i, $g, $r, $c, $k, $contlength, @map);
+
+    foreach $s (@{$l->{'lookup'}[1]})
+    {
+        if ($s->{'type'} eq 'ADJUST_SINGLE')
+        {
+            my ($cover) = Font::TTF::Coverage->new(1);
+            my (@rules);
+            $font->{'GPOS'}{'LOOKUP'}[$index]{'TYPE'} = 1;
+            my ($sub) = {
+                'FORMAT' => 2,
+                'ACTION_TYPE' => 'v',
+                'COVERAGE' => $cover};
+            for ($i = 0; $i < @{$s->{'context'}}; $i++)
+            {
+                foreach $g (@{$self->scon_glyphs($s->{'context'}[$i])})
+                {
+                    next unless ($cover->add($g) > $#rules);
+                    push (@rules, [{'ACTION' => [{make_value(%{$s->{'adj'}[$i]})}]}]);
+                }
+            }
+            @map = $sub->{'COVERAGE'}->sort;
+            $sub->{'RULES'} = [map {$rules[$map[$_]]} (0 .. @map-1)];
+            push (@{$font->{'GPOS'}{'LOOKUP'}[$index]{'SUB'}}, $sub);
+            $contlength = 1;
+        }
+        elsif ($dat->{'info'}{'ppfmt2'} && $s->{'type'} eq 'ADJUST_PAIR')
+        {
+            my ($cover1) = Font::TTF::Coverage->new(0);
+            my ($cover2) = Font::TTF::Coverage->new(0);
+            my ($cover) = Font::TTF::Coverage->new(1);
+            my (@rules, @firsts, @seconds);
+            $font->{'GPOS'}{'LOOKUP'}[$index]{'TYPE'} = 2;
+            my ($sub) = {
+                'FORMAT' => 2,
+                'ACTION_TYPE' => 'p',
+                'MATCH_TYPE' => 'c',
+                'COVERAGE' => $cover,
+                'CLASS' => $cover1,
+                'MATCH' => [$cover2]};
+            my ($c, $g, $count);
+            for ($i = 0; $i < @{$s->{'first'}}; $i++)
+            {
+                foreach $g (@{$self->scon_glyphs($s->{'first'}[$i])})
+                { $cover1->add($g, $i+1); }
+            }
+            foreach $g (sort {$a <=> $b} keys %{$cover1->{'val'}})
+            { $cover->add($g); }
+            for ($i = 0; $i < @{$s->{'second'}}; $i++)
+            {
+                foreach $g (@{$self->scon_glyphs($s->{'second'}[$i])})
+                { $cover2->add($g, $i+1); }
+            }
+            foreach $r (@{$s->{'adj'}})
+            {
+                $sub->{'RULES'}[$r->[0]][$r->[1]]{'ACTION'} = 
+                    [{make_value(%{$r->[2][0]})}, {make_value(%{$r->[2][1]})}];
+            }
+            push (@{$font->{'GPOS'}{'LOOKUP'}[$index]{'SUB'}}, $sub);
+            $contlength = 2;
+        }
+        elsif ($s->{'type'} eq 'ADJUST_PAIR')
+        {
+            my (@rules);
+            my ($cover) = Font::TTF::Coverage->new(1);
+            $font->{'GPOS'}{'LOOKUP'}[$index]{'TYPE'} = 2;
+            $font->{'GPOS'}{'LOOKUP'}[$index]{'SUB'} = [{
+                'FORMAT' => 1,
+                'ACTION_TYPE' => 'p',
+                'MATCH_TYPE' => 'g',
+                'COVERAGE' => $cover}];
+            foreach $r (@{$s->{'adj'}})
+            {
+                my (@seconds) = @{$self->scon_glyphs($s->{'second'}[$r->[1]-1])};
+                my ($action) = [{make_value(%{$r->[2][0]})}, {make_value(%{$r->[2][1]})}];
+                foreach (@seconds)
+                { push (@{$rules[$r->[0]-1]}, {'MATCH' => [$_], 'ACTION' => $action}); }
+            }
+            for ($i = 0; $i < @{$s->{'first'}}; $i++)
+            {
+                next unless ($rules[$i]);
+                $rules[$i] = [sort {$a->{'MATCH'}[0] <=> $b->{'MATCH'}[0]} @{$rules[$i]}];
+                foreach $g (@{$self->scon_glyphs($s->{'first'}[$i])})
+                { $font->{'GPOS'}{'LOOKUP'}[$index]{'SUB'}[0]{'RULES'}[$cover->add($g)] = $rules[$i]; }
+            }
+            $contlength = 2;
+        }
+        elsif ($s->{'type'} eq 'ATTACH_CURSIVE')
+        {
+            my ($cover) = Font::TTF::Coverage->new(1);
+            $font->{'GPOS'}{'LOOKUP'}[$index]{'TYPE'} = 3;
+            my ($sub) = {
+                    'FORMAT' => 1,
+                    'ACTION_TYPE' => 'e',
+                    'COVERAGE' => $cover};
+            foreach $g (@{$self->or_context_glyphs(@{$s->{'enters'}})})
+            { $sub->{'RULES'}[$cover->add($g)][0]{'ACTION'}[0] = make_anchor($dat->{'glyphs'}[$g]{'anchors'}{'entry'}[0]); }
+            foreach $g (@{$self->or_context_glyphs(@{$s->{'exits'}})})
+            { $sub->{'RULES'}[$cover->add($g)][0]{'ACTION'}[1] = make_anchor($dat->{'glyphs'}[$g]{'anchors'}{'exit'}[0]); }
+            push (@{$font->{'GPOS'}{'LOOKUP'}[$index]{'SUB'}}, $sub);
+            $contlength = 2;
+        }
+        elsif ($s->{'type'} eq 'ATTACH')
+        {
+            my ($basec) = Font::TTF::Coverage->new(1);
+            my ($markc) = Font::TTF::Coverage->new(1);
+            my ($acount, %anchors, @marks, @rules, $type);
+            foreach $c (@{$s->{'to'}})
+            {
+                $anchors{$c->[1]} = $acount++ unless (defined $anchors{$c->[1]});
+                foreach $g (@{$self->scon_glyphs($c->[0])})
+                { $marks[$markc->add($g)] = [$anchors{$c->[1]}, make_anchor($dat->{'glyphs'}[$g]{'anchors'}{"MARK_$c->[1]"}[0])] if ($g); }
+            }
+            foreach $g (sort {$a <=> $b} @{$self->or_context_glyphs(@{$s->{'context'}})})
+            {
+                next unless ($g);
+                my ($i) = $basec->add($g);
+                my $thistype = 
+                    ($dat->{'glyphs'}[$g]{'type'} eq 'MARK') ? 6 :      # mark-to-mark
+                    ($dat->{'glyphs'}[$g]{'type'} eq 'LIGATURE') ? 5 :  # mark-to-ligature
+                    4;                                                  # mark-to-base
+                if ($type)
+                { $self->error("Mix of base character types in lookup $l->{'id'} for glyph $dat->{'glyphs'}[$g]{'name'}\n") if $type != $thistype; }
+                else
+                { $type = $thistype; }
+                
+                foreach my $comp (0 .. ($dat->{'glyphs'}[$g]{'component_num'} || 1) -1)
+                {
+                    foreach $k (sort {$anchors{$a} <=> $anchors{$b}} keys %anchors)
+                    {
+                        # avoiding auto-vivication..
+                        if (defined $dat->{'glyphs'}[$g]{'anchors'} && 
+                            defined $dat->{'glyphs'}[$g]{'anchors'}{$k} && 
+                            defined $dat->{'glyphs'}[$g]{'anchors'}{$k}[$comp])
+                        { $rules[$i][$comp]{'ACTION'}[$anchors{$k}] = make_anchor($dat->{'glyphs'}[$g]{'anchors'}{$k}[$comp]); }
+                        else
+                        {
+                            $self->error("anchor $k not defined on component", $comp+1, "for glyph $dat->{'glyphs'}[$g]{'name'}\n"); 
+                            $rules[$i][$comp]{'ACTION'}[$anchors{$k}] = Font::TTF::Anchor->new(x=>0, y=>0); 
+                        }
+                    }
+                }
+            }
+            $font->{'GPOS'}{'LOOKUP'}[$index]{'TYPE'} = $type;
+            push (@{$font->{'GPOS'}{'LOOKUP'}[$index]{'SUB'}}, {
+                    'FORMAT' => 1,
+                    'COVERAGE' => $basec,
+                    'MATCH' => [$markc],
+                    'MARKS' => [@marks],
+                    'RULES' => [@rules]});
+            $contlength = 2;
+        }
+    }
+    $self->{'maxcontext'} = $contlength if ($contlength > $self->{'maxcontext'});
+#    print STDERR "cl=$contlength (gpos $index\n";
+
+}
+
+
+sub add_gdef
+{
+    my ($self) = @_;
+    my ($font) = $self->{'font'};
+    my ($dat) = $self->{'voltdat'};
+    my ($gdc) = Font::TTF::Coverage->new(0);       # glyph types
+    my ($gdm) = Font::TTF::Coverage->new(0);
+    my %types = (
+        'BASE' => 1, 'LIGATURE' => 2, 'MARK' => 3, 'COMPONENT' => 4
+    );
+    my ($g);
+
+    foreach $g (@{$dat->{'glyphs'}})
+    {
+        $gdc->add($g->{'gnum'}, $types{$g->{'type'}});
+        $gdm->add($g->{'gnum'}, $g->{'mark_class'}) if (defined $g->{'mark_class'});
+    }
+
+    $font->{'GDEF'} = Font::TTF::GDEF->new('parent' => $font, 'read' => 1);
+    # $font->{'GDEF'}{'Version'} = 1.0;  # Let GDEF.pm figure out version
+    $font->{'GDEF'}{'GLYPH'} = $gdc;
+    $font->{'GDEF'}{'MARKS'} = $gdm if ($gdm->{'max'} > 0);
+    $font->{'GDEF'}{'MARKSETS'} = [ @{$self->{'marksets'}} ] if exists $self->{'marksets'};
+    $font->{'GDEF'}->dirty;
+}
+
+
+=begin comment
+
+Takes a lookup context list (as from IN_CONTEXT) and returns an array of flattened arrays of glyph ids that
+map to the context list.
+
+=end comment
+
+=cut
+
+sub context_glyphs
+{
+    my ($dat, @list) = @_;
+    my (@input, @new_input, $l, $g);
+
+    foreach $l (@list)
+    {
+        my ($glyphs) = $dat->scon_glyphs($l);
+        my (@new_input) = ();
+        foreach $g (@$glyphs)
+        { push (@new_input, @input ? (map {[@$_, $g]} @input) : [$g]); }
+        @input = @new_input;
+    }
+    return @input;
+}
+
+
+=begin comment
+
+Takes a context list and returns a flattened array of glyph ids, duplicates removed
+and sorted in order of appearance in the context list. (If a glyph appears multiple
+times, the earliest one is kept).  [This is very un-VOLTish since order within a group
+does not matter. Need to investigate. -bh]
+
+=end comment
+
+=cut
+
+sub or_context_glyphs
+{
+    my ($dat, @list) = @_;
+    my ($l, $g, %res, $c);
+
+    foreach $l (@list)
+    {
+        my ($glyphs) = $dat->scon_glyphs($l);
+        foreach $g (@{$glyphs})
+        { $res{$g} = ++$c unless (defined $res{$g}); }
+    }
+    return [sort {$res{$a} <=> $res{$b}} keys %res];
+}
+
+=begin comment
+
+Takes single C<context_item> and returns a array of glyph ids.
+The array is normally sorted by glyph id, but not so in the
+case of an ENUM -- this might be a bug.
+
+=end comment
+
+=cut
+
+sub scon_glyphs
+{
+    my ($dat, $context) = @_;
+
+    if ($context->[0] eq 'GLYPH')
+    { return defined $context->[1] ? [$context->[1]] : do {warn("Undefined glyph"); []}; }
+    elsif ($context->[0] eq 'GROUP')
+    { return defined $dat->{'voltdat'}{'groups'}{$context->[1]} ? [sort {$a <=> $b} @{$dat->or_context_glyphs(@{$dat->{'voltdat'}{'groups'}{$context->[1]}})}] : do {warn "Unknown glyph group $context->[1]"; []}; }
+    elsif ($context->[0] eq 'RANGE')
+    { return [$context->[1] .. $context->[2]]; }
+    elsif ($context->[0] eq 'ENUM')
+    { return $dat->or_context_glyphs(@{$context->[1]}); }
+    return [];
+}
+
+sub make_coverage
+{
+    my ($self, @contexts) = @_;
+    my ($cover) = Font::TTF::Coverage->new(1);
+    my ($c);
+
+    foreach $c (@contexts)
+    {
+        my ($glyphs) = $self->scon_glyphs($c);
+
+        foreach (@{$glyphs})
+        { $cover->add($_); }
+    }
+    $cover->sort;
+    return $cover;
+}
+
+sub make_value
+{
+    my (%pos) = @_;
+    my (%res, $s);
+    my %map = (
+        'x' => ['XPlacement', 'XPlaDevice'],
+        'y' => ['YPlacement', 'YPlaDevice'],
+        'adv' => ['XAdvance', 'XAdvDevice']);
+
+    foreach $s (qw(x y adv))
+    {
+        if (defined $pos{$s})
+        {
+            $res{$map{$s}[0]} = $pos{$s}[0];
+            if (defined $pos{$s}[1])
+            {
+#                $res{$map{$s}[1]} = make_delta($pos{$s}[1]);
+            }           
+        }
+    }
+    %res
+}
+
+sub make_anchor
+{
+    my ($point) = @_;
+    my (%res, $s, $r);
+    
+    return undef unless (defined $point->{'pos'});
+    return ($point->{'anchor'}) if defined ($point->{'anchor'});
+
+    foreach $s (qw(x y))
+    { $res{$s} = $point->{'pos'}{$s}[0] + 0; }
+    $r = Font::TTF::Anchor->new(%res);
+    $point->{'anchor'} = $r;
+    return $r;
+}
+
+# Debugging tool: 
+# If a lookup comment includes the string '#omit#' then it will
+# be omitted from the font. 
+#
+# is_omitted() checks the supplied lookup for this condition,
+# returning true if the lookup should be omitted.
+
+sub is_omitted
+{
+    my ($lookup) = @_;
+    return $lookup->{'comment'} =~ /#omit#/oi;
+}
+
+__END__
+
+=head1 NAME
+
+volt2ttf - compiles volt code into OT tables in a font
+
+=head1 SYNOPSIS
+
+  volt2ttf [-a attach.xml] [-t volt.txt] infile.ttf outfile.ttf
+
+Compiles volt source into OT tables in the font.
+
+=head1 OPTIONS
+
+  -a file     Attachment point database [only needed for anchor attachment]
+  -i          Include all lookups even those not referenced by a used feature
+  -r          Do not delete Volt source table in the font
+  -t file     Volt source as text file to use instead of what is in the font
+  -h          Help
+  -x file     Generate TypeTuner xml file including aliases
+  -f file     TypeTuner features xml source file
+
+=head1 DESCRIPTION
+
+volt2ttf is like loading a font into VOLT and hitting compile and saving the
+result. Note that it does not compile a new cmap, though. Just the OT tables
+are built.
+
+If -x is supplied, feature and lookup aliases are written in
+TypeTuner xml format to the file. If -f is also supplied, the aliases are
+first merged with the features source file: any existing <aliases> element
+(including the empty element, <aliases/> is replaced with the new
+alias definitions.
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

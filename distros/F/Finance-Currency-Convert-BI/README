@@ -1,0 +1,14 @@
+SYNOPSIS
+
+     use Finance::Currency::Convert::BI qw(get_jisdor_rates);
+    
+     my $res = get_jisdor_rates();
+
+DESCRIPTION
+
+    EARLY RELEASE.
+
+SEE ALSO
+
+    http://www.bi.go.id/
+

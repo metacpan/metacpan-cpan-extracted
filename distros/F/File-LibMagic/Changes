@@ -1,0 +1,244 @@
+1.15     2015-09-19
+
+- Fix the Makefile.PL so that we don't install the LibMagic.xs and typemap
+  files. Based on a patch from Petr Pisar. RT #107081.
+
+
+1.14     2015-09-16
+
+- Fixed handling of extra include dirs passed to Makefile.PL via the -I
+  flag. This wasn't working properly in previous releases. Reported by Andy
+  Jack. GH #6.
+
+
+1.13     2015-07-12
+
+- Fix failing tests with some versions of libmagic. PR #5 by E. Choroba.
+
+
+1.12     2015-03-07
+
+- The constructor now accepts named params. In addition to a magic_file param,
+  it now accepts follow_symlinks and uncompress params. These do what you'd
+  expect, tell the object to follow symlinks and/or uncompress files when
+  getting info from them. The old single parameter constructor is still
+  supported, but is no longer documented.
+
+- The old APIs are now called "discouraged" rather than "deprecated" in the
+  documentation. I have no plan to remove these APIs any time soon or to make
+  them warn, so "deprecated" was too strong a word.
+
+- Changed a test to hopefully skip rather than fail on OpenBSD systems.
+
+
+1.11     2015-03-01
+
+- The info_from_handle() method did not handle binary data correctly, which
+  could lead to incorrect results.
+
+- The info_from_*() methods returned a full mime type with encoding in the
+  "mime_type" key rather than just the mime type alone.
+
+- Allow File::LibMagic->new() to accept an array reference containing multiple
+  magic file paths.
+
+
+1.10     2015-02-01
+
+- Fixed Makefile.PL to actually use --lib and --include properly. Previously
+  it did the wrong thing with both of these arguments, and they were
+  essentially ignored. Reported by WATANABE Hiroaki. Patch by Mithun
+  Ayachit. RT #101715.
+
+
+1.09     2014-12-20
+
+- No code changes. This release just removes some junk that accidentally ended
+  up in the last release's tarball. Reported by Alexander Bluhm. RT #101015.
+
+
+1.08     2014-12-17
+
+- Fix generated Makefile.PL so it's compatible with older versions of
+  ExtUtils::MakeMaker. The previous release accidentally required EUMM 6.83_04
+  or newer without declaring this in configure_requires. Reported by Nick
+  Peterson and solved by Slaven Rezic. RT #100975.
+
+
+1.07     2014-12-14
+
+- No changes from 1.06.
+
+[SUMMARY OF USER-FACING CHANGES SINCE 1.03]
+
+- Added yet another OO API to File::LibMagic. This provides a simpler and more
+  future-proof API which can be expanded on later. The new methods are
+  info_from_string(), info_from_filename(), and info_from_handle(). The latter
+  method allows you to get info about an open filehandle. These new methods
+  return the description, MIME type, and character encoding in one call. This
+  addresses RT #54843 and partially addresses RT #99470.
+
+- Fix compilation with a threaded Perl.
+
+
+1.06     2014-12-13 (TRIAL RELEASE)
+
+- Guard against older versions of libmagic that don't provide magic_version().
+
+- Fix compilation with a threaded Perl.
+
+
+1.05     2014-12-13 (TRIAL RELEASE)
+
+- Added a test that outputs the return value of magic_version() to help me
+  debug test failures.
+
+
+1.04     2014-12-13 (TRIAL RELEASE)
+
+- Added yet another OO API to File::LibMagic. This provides a simpler and more
+  future-proof API which can be expanded on later. The new methods are
+  info_from_string(), info_from_filename(), and info_from_handle(). The latter
+  method allows you to get info about an open filehandle. These new methods
+  return the description, MIME type, and character encoding in one call. This
+  addresses RT #54843 and partially addresses RT #99470.
+
+
+1.03     2014-08-30
+
+- The shipped Makefile.PL now accepts --lib and --include command line
+  arguments so you can specify additional lib and include directories. This
+  should make this package easier to build on BSD systems, among
+  others. Reported by Alexander Bluhm. RT #97945.
+
+
+1.02     2014-07-26
+
+- Added instructions for installing libmagic.so and magic.h to the POD and
+  INSTALL.md file. Requested by Gabor Szabo. RT #97391.
+
+- Switched from using Devel::CheckLib to Config::AutoConf with the hope that
+  the latter will work with more compilers. Requested by Jens Rehsack. RT
+  #46543.
+
+- Switched the primary git repo to github
+  (https://github.com/autarch/File-LibMagic).
+
+
+1.01     2014-05-04
+
+- Fixed repository metadata. Reported by Jens Rehsack. RT #89200.
+
+- A File::LibMagic object would not close one of the handles it might have
+  opened, leading to leaks. Reported by Alexander Zaitsev. RT #93512.
+
+
+1.00     2013-09-02
+
+- Don't get all excited about this being 1.00. It's just what comes after
+  0.99.
+
+- The checktype_contents() and describe_contents() methods now accept a scalar
+  ref in addition to a plain scalar. RT #28747.
+
+
+0.99     2013-08-26
+
+- More test changes to try to get tests passing on midnightbsd.
+
+
+0.98     2013-08-25
+
+- Fix test failures on midnightbsd (I hope) by relaxing a MIME type check in
+  one of the tests.
+
+
+0.97     2013-06-23
+
+- Updated to the latest Devel::CheckLib, which should fix error reported by
+  Perl 5.18 against the old CheckLib we were shipping. Reported by Dominic. RT
+  #85210.
+
+- We no longer link against libz, since this module doesn't need it. Reported
+  by Ansgar Burchardt. RT #56479.
+
+- Fixed tests to work with the latest libmagic. Patch by Gregor Herrmann. RT
+  #75457.
+
+- Attempted to make the tests work with various versions of libmagic. Please
+  report failures and your file/libmagic package versions.
+
+0.96     2009-05-23
+     Upgraded Devel::CheckLib
+     see bug 46044, 46295 in rt.cpan.org
+
+0.95     2009-05-18
+      try to make test work in netbsd and solaris 9
+
+0.94     2009-05-13
+      small error in t/6-oo.t
+
+0.93     2009-05-12
+      using Devel::CheckLib as suggested in 
+      http://wiki.cpantesters.org/wiki/CPANAuthorNotes
+
+0.92     2009-05-12
+      "normalisation"-problem -> changed t/6-oo.t
+
+0.91     2009-05-12
+      Changed t/6-oo.t in order to pass 'make test' for file-5.x
+
+0.90     2008-11-26
+      removed some debugging code I accidently left in
+
+0.89     2008-08-06
+      added -lz to Makefile.PL in order to compile under 
+      FreeBSD
+
+0.88     2008-05-18
+      more experiments
+
+0.87     2008-05-18
+      experimenting with magic_buffer_offset
+
+0.86     2008-05-18
+      'file' version 4.24 returns slightly different filetypes.
+      this makes 'make test' fail. fixed it for the new 
+      version. But I'm afraid this breaks the 'make test' for
+      older versions of the package 'file'.
+
+0.85     2007-08-28
+      Minor cleanup of the MANIFEST to avoid warnings (Michael Hendricks)
+
+0.84     2006-06-28
+      (all implemented by Michael Hendricks)
+      some XS-Code cleanup,
+      import of constants like MAGIC_NONE from magic.h,
+      much improved error handling.
+      additional OO-Interface
+
+0.83     2006-06-14
+      Small documentation update
+
+0.82     2005-04-24
+      Found two bugs
+
+0.81     2005-04-24
+      Port to AMD-64, thanks to Nathan Hawkins <utsl@quic.net>
+
+0.80     2004-07-21
+      some improvements in colaboration with James Olin Oden <joden@lee.k12.nc.us> 
+
+0.10     2004-04-19
+      some cleanup
+
+0.03     2004-03-23
+      hacked magic_open & magic_load but it's not mature enough
+
+0.02     2004-03-23
+      magic_file implemented
+
+0.01     2004-03-15
+	- original version; created by h2xs 1.22 with options
+		--skip-ppport File::LibMagic
+

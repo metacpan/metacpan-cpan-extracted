@@ -1,0 +1,94 @@
+NAME
+    Finance::Bank::LaPoste - Check your "La Poste" accounts from Perl
+
+SYNOPSIS
+     use Finance::Bank::LaPoste;
+
+     my @accounts = Finance::Bank::LaPoste->check_balance(
+        username => "0120123456L",  # your main account is something like 
+                                    # 0123456 L 012, stick it together with the region first
+        password => "123456",       # a password is usually 6 numbers
+     );
+
+     foreach my $account (@accounts) {
+        print "Name: ", $account->name, " Account_no: ", $account->account_no, "\n", "*" x 80, "\n";
+        print $_->as_string, "\n" foreach $account->statements;
+     }
+
+DESCRIPTION
+    This module provides a read-only interface to the Videoposte online
+    banking system at <https://www.videoposte.com/>. You will need either
+    Crypt::SSLeay installed.
+
+    The interface of this module is similar to other Finance::Bank::*
+    modules.
+
+WARNING
+    This is code for online banking, and that means your money, and that
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the source
+    of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to me,
+    but is provided under NO GUARANTEE, explicit or implied.
+
+METHODS
+  new(username => "0120123456L", password => "123456", feedback => sub { warn "Finance::Bank::LaPoste: $_[0]\n" })
+    Return an object . You can optionally provide to this method a
+    LWP::UserAgent object (argument named "ua"). You can also provide a
+    function used for feedback (useful for verbose mode or debugging)
+    (argument named "feedback")
+
+  check_balance(username => "0120123456L", password => "123456")
+    Return a list of account (F::B::LaPoste::Account) objects, one for each
+    of your bank accounts.
+
+Account methods
+  sort_code()
+    Return the sort code of the account. Currently, it returns an undefined
+    value.
+
+  name()
+    Returns the human-readable name of the account.
+
+  account_no()
+    Return the account number, in the form "XXXXXXXXX YY", where X and Y are
+    numbers.
+
+  balance()
+    Returns the balance of the account.
+
+  statements()
+    Return a list of Statement object (Finance::Bank::LaPoste::Statement).
+
+  currency()
+    Returns the currency of the account as a three letter ISO code (EUR,
+    CHF, etc.)
+
+Statement methods
+  date()
+    Returns the date when the statement occured, in DD/MM/YY format.
+
+  description()
+    Returns a brief description of the statement.
+
+  amount()
+    Returns the amount of the statement (expressed in Euros or the account's
+    currency). Although the Crédit Mutuel website displays number in
+    continental format (i.e. with a coma as decimal separator), amount()
+    returns a real number.
+
+  as_string($separator)
+    Returns a tab-delimited representation of the statement. By default, it
+    uses a tabulation to separate the fields, but the user can provide its
+    own separator.
+
+COPYRIGHT
+    Copyright 2002-2009, Pascal 'Pixel' Rigaux. All Rights Reserved. This
+    module can be redistributed under the same terms as Perl itself.
+
+AUTHOR
+    Thanks to Cédric Bouvier for Finance::Bank::CreditMut (and also to Simon
+    Cozens and Briac Pilpré for various Finance::Bank::*)
+
+SEE ALSO
+    Finance::Bank::BNPParibas, Finance::Bank::CreditMut
+

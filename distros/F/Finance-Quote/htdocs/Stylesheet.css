@@ -1,0 +1,24 @@
+ul { font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 12pt;
+font-style: normal; color: #FFFFFF}
+p,li { font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 12pt; 
+font-style: normal; color: #FFFFFF}
+h1 { font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 18pt; 
+font-style: normal; 
+color: #FFFFFF; 
+background-position: center}
+h2 { font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 16pt; 
+font-style: normal; color: #FFFFFF}
+h3 { font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 14pt; 
+font-style: normal; color: #FFFFFF}
+.footer {  font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 9pt; 
+color: #FFFFFF}
+a {  font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 12pt; 
+color: #AAAA77}
+h2[class^=new], p[class^=new], li[class^=new] { color : red }

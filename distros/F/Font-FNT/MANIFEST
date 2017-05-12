@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+FNT.pm
+t/00use.t
+t/10misc.t
+t/1252_13x8_OEM.yml

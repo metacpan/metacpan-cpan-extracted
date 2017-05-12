@@ -1,0 +1,11 @@
+#fsdb a b c
+a1	b1	c1
+# comment at beginning, will come before
+a2	b2	c2
+# comment second line, will come before
+a3	b3	c3
+# comment after end, will still come before
+a3	b3	c3
+# no trailing blank line (should still work); comment will come before
+a4	b4	c4
+#   | dbfilealter -R D

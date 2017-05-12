@@ -1,0 +1,103 @@
+NAME
+    File::LocalizeNewlines - Localize the newlines for one or more files
+
+DESCRIPTION
+    For people that routinely work with a mixture of different platforms
+    that have conflicting newline formats (mainly *NIX and Win32) there are
+    a number of different situations that can result in files having their
+    newlines get corrupted.
+
+    File::LocalizeNewlines provides a mechanism for one off or bulk
+    detection and conversion of these files to the newline style for the
+    local platform.
+
+    The module implements the conversion using a standard "universal line
+    seperator" regex, which ensures that files with any of the different
+    newlines, plus a couple of common "broken" newlines, including multiple
+    different types mixed in the same file, are all converted to the local
+    platform's newline style.
+
+METHODS
+  new param => value, ...
+    The "new" constructor creates a new conversion object.
+
+    By default, the conversion object will process all files and convert
+    them to the local platform's newline format.
+
+    Takes some optional parameters
+
+    filter => File::Find::Rule
+        The "filter" param allows you to provide an instantiate
+        File::Find::Rule object, that will used to determine the list of
+        files to check or process.
+
+    newline => $newline
+        The "newline" option allows you to provide an alternative newline
+        format to the local one. The newline format should be provided as a
+        literal string.
+
+        For example, to force Win32 newlines, you would use
+
+          my $Object = File::LocalizeNewlines->new( newline => "\015\012" );
+
+    verbose => 1
+        The "verbose" option will cause the "File::LocalizeNewlines" object
+        to print status information to "STDOUT" as it runs.
+
+    Returns a new "File::LocalizeNewlines" object.
+
+  Find
+    The "Find" accessor returns the File::Find::Rule object that will be
+    used for the file search.
+
+  newline
+    The "newline" accessor returns the newline format that will be used in
+    the localisation process.
+
+  localized $file
+    The "localized" method takes an argument of a single file name or file
+    handle and tests it to see it is localized correctly.
+
+    Returns true if localized correctly, false if not, or "undef" on error.
+
+  find $dir
+    The "find" method takes the path for a dir (or file) and returns a list
+    of relative files names for all of the files that do not have their
+    newlines correctly localized.
+
+    Returns a list of file names, or the null list if there are no files, or
+    if an incorrect path was provided.
+
+  localize $file | $dir
+    The "localize" method takes a file, file handle or directory as argument
+    and localizes the newlines of the file, or all files within the
+    directory (that match the filter if one was provided).
+
+    Returns the number of files that were localized, zero if no files needed
+    to be localized, or "undef" on error.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-LocalizeNewlines>
+
+    For other issues, contact the maintainer.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+ACKNOWLEDGEMENTS
+    Thank you to Phase N (<http://phase-n.com/>) for permitting the open
+    sourcing and release of this distribution.
+
+    FileHandle support added by David Dick <ddick@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

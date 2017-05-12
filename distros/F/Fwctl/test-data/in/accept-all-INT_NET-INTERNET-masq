@@ -1,0 +1,64 @@
+Chain acct-in :
+Chain acct-fwd :
+Chain acct-out :
+Chain tcp-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-in     tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-in     tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ACCEPT     tcp  ------ 0xFF 0x00  eth1                           192.168.1.0/24       0.0.0.0/0             * ->   *
+Chain tcp-fwd :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-fwd    tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-fwd    tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+MASQ       tcp  ------ 0xFF 0x00  ppp0                           192.168.1.0/24       0.0.0.0/0             * ->   *
+Chain tcp-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-out    tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-out    tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ACCEPT     tcp  ------ 0xFF 0x00  ppp0                           172.16.1.1           0.0.0.0/0             61000:65096 ->   *
+Chain udp-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     udp  ------ 0xFF 0x00  eth1                           192.168.1.0/24       0.0.0.0/0             * ->   *
+ACCEPT     udp  ------ 0xFF 0x00  ppp0                           0.0.0.0/0            172.16.1.1            * ->   61000:65096
+Chain udp-fwd :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+MASQ       udp  ------ 0xFF 0x00  ppp0                           192.168.1.0/24       0.0.0.0/0             * ->   *
+Chain udp-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     udp  ------ 0xFF 0x00  ppp0                           172.16.1.1           0.0.0.0/0             61000:65096 ->   *
+ACCEPT     udp  ------ 0xFF 0x00  eth1                           0.0.0.0/0            192.168.1.0/24        * ->   *
+Chain icmp-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     icmp ------ 0xFF 0x00  eth1                           192.168.1.0/24       0.0.0.0/0             * ->   *
+ACCEPT     icmp ------ 0xFF 0x00  ppp0                           0.0.0.0/0            172.16.1.1            * ->   *
+Chain icmp-fwd :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+MASQ       icmp ------ 0xFF 0x00  ppp0                           192.168.1.0/24       0.0.0.0/0             * ->   *
+Chain icmp-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     icmp ------ 0xFF 0x00  ppp0                           172.16.1.1           0.0.0.0/0             * ->   *
+ACCEPT     icmp ------ 0xFF 0x00  eth1                           0.0.0.0/0            192.168.1.0/24        * ->   *
+Chain all-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     all  ------ 0xFF 0x00  eth1                           192.168.1.0/24       0.0.0.0/0             n/a
+ACCEPT     all  ------ 0xFF 0x00  ppp0                           0.0.0.0/0            172.16.1.1            n/a
+Chain all-fwd :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+MASQ       all  ------ 0xFF 0x00  ppp0                           192.168.1.0/24       0.0.0.0/0             n/a
+Chain all-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     all  ------ 0xFF 0x00  ppp0                           172.16.1.1           0.0.0.0/0             n/a
+ACCEPT     all  ------ 0xFF 0x00  eth1                           0.0.0.0/0            192.168.1.0/24        n/a
+Chain syn-in :
+Chain syn-fwd :
+Chain syn-out :
+Chain ack-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     tcp  !y---- 0xFF 0x00  ppp0                           0.0.0.0/0            172.16.1.1            * ->   61000:65096
+Chain ack-fwd :
+Chain ack-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     tcp  !y---- 0xFF 0x00  eth1                           0.0.0.0/0            192.168.1.0/24        * ->   *
+Chain oth-in :
+Chain oth-fwd :
+Chain oth-out :

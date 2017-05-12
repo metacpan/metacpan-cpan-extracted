@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Finance-Bank-Bundesschatz
+version: 1.01
+license: perl
+distribution_type: module
+requires:
+  Class::MethodMaker: 1.06
+  HTML::TokeParser: 2.24
+  WWW::Mechanize: 0.57
+  perl: 5.6.1
+recommends:
+  IO::Socket::SSL: 0.92
+build_requires: {}
+conflicts: {}
+provides:
+  Finance::Bank::Bundesschatz:
+    file: lib/Finance/Bank/Bundesschatz.pm
+    version: 1.01
+generated_by: Module::Build version 0.20

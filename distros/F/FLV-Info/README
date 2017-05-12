@@ -1,0 +1,112 @@
+NAME
+    FLV::Info - Extract metadata from Adobe Flash Video files
+
+SYNOPSIS
+        use FLV::Info;
+        my $reader = FLV::Info->new();
+        $reader->parse('video.flv');
+        my %info = $reader->get_info();
+        print "$info{video_count} video frames\n";
+        print $reader->report();
+
+DESCRIPTION
+    This module reads Adobe Flash Video (FLV) files and reports metadata
+    about those files.
+
+LEGAL
+    This work is based primarily on the file specification provided by
+    Adobe. Use of that specification is governed by terms indicated at the
+    licensing URL specified below.
+
+    http://www.adobe.com/devnet/flv/
+
+LICENSE
+    Copyright 2006 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+    Copyright 2007-2009 Chris Dolan, <cdolan@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+METHODS
+    $pkg->new()
+        Creates a new instance.
+
+    $self->parse($filename)
+    $self->parse($filehandle)
+        Reads the specified file. If the file does not exist or is an
+        invalid FLV stream, an exception will be thrown via croak().
+
+        There is no return value.
+
+    $self->get_info()
+        Returns a hash with all FLV metadata. Any fields that are
+        multivalued are concatenated with a slash (`/') with the most common
+        values specified first. For example, a common case is the
+        `video_type' which is often `interframe/keyframe' since interframes
+        are more common than keyframes. A less common case could be
+        `audio_type' of `mono/stereo' if the FLV was mostly one-channel but
+        had some packets of two-channel audio.
+
+    $self->report()
+        Returns a summary of all FLV metadata as a string. This is a
+        human-readable version of the data returned by get_info().
+
+    $self->get_file()
+        Returns the FLV::File instance. This will be `undef' until you call
+        parse().
+
+SEE ALSO
+    FLVTool2
+        This is a rather nice Ruby implementation that can read and write
+        FLV files. This code helped me figure out that the FLV documentation
+        was wrong for the order of attributes in video tags. It also helped
+        me understand the meta tags.
+
+        http://inlet-media.de/flvtool2
+
+    AMF::Perl
+        This is a Perl implementation of the http://www.amfphp.org/ project
+        to create an open source representation of the Flash remote
+        communication protocol. This module leverages a small part of
+        AMF::Perl to parse FLV meta tags.
+
+    FFmpeg
+        FFmpeg is a powerful media conversion utility. It is capable of
+        reading and writing FLVs and SWFs. However as of this writing
+        (2006), I believe it does not support fast transcoding between FLV
+        and SWF formats. Please correct me if I'm mistaken.
+
+        http://ffmpeg.mplayerhq.hu/
+
+COMPATIBILITY
+    This module should work with FLV v1.0 and FLV v1.1 files. Any other
+    versions (none known as of this writing) will certainly fail.
+
+    Interaction with FLVs using the screen video codec or using alpha
+    channels is not yet tested. If someone has short videos employing those
+    features that can be released with the FLV::Info test suite, please
+    contact me.
+
+    The AVC support comes from an external patch and reading documentation.
+    I have not personally tested this code on any AVC FLV files.
+
+AUTHOR
+    Chris Dolan
+
+    This module was originally developed by me at Clotho Advanced Media Inc.
+    as part of our MediaLandscape project. Now I maintain it in my spare
+    time. I do not anticipate adding new features without external input.
+
+ACKNOWLEDGMENTS
+    The FLV::Splice feature was created with financial support from John
+    Drago (CPAN:JOHND). Thanks!
+
+QUALITY
+    I care about code quality. The FLV-Info distribution complies with the
+    following quality metrics:
+
+    * Perl::Critic v1.098 passes
+    * Devel::Cover test coverage almost 90%
+    * Pod::Coverage at 100%
+    * Test::Spelling passes

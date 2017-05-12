@@ -1,0 +1,259 @@
+msgid "Forum Name"
+msgstr "论坛名称"
+
+msgid "Last Update"
+msgstr "最后更新"
+
+msgid "Moderators"
+msgstr "版主"
+
+msgid "Replies"
+msgstr "回复"
+
+msgid "Reply"
+msgstr "回复"
+
+msgid "Edit"
+msgstr "编辑"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid "Action"
+msgstr "操作"
+
+msgid "Hit"
+msgstr "点击"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Threads"
+msgstr "主题"
+
+msgid "Poll"
+msgstr "投票"
+
+msgid "Author"
+msgstr "作者"
+
+msgid "User"
+msgstr "用户"
+
+msgid "Subject"
+msgstr "标题"
+
+msgid "Title"
+msgstr "标题"
+
+msgid "Content"
+msgstr "内容"
+
+msgid "Upload Attachment"
+msgstr "上传附件"
+
+msgid "Date"
+msgstr "日期"
+
+msgid "Register"
+msgstr "注册"
+
+msgid "Log in"
+msgstr "登录"
+
+msgid "Log out"
+msgstr "退出"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "Forum Admin"
+msgstr "管理论坛"
+
+msgid "Message"
+msgstr "我的消息"
+
+msgid "What's New?"
+msgstr "最近更新"
+
+msgid "Edit Profile"
+msgstr "编辑个人资料"
+
+msgid "Forget password?"
+msgstr "忘记密码"
+
+msgid "Recent Topics"
+msgstr "最近新帖"
+
+msgid "Recent Elite Topics"
+msgstr "最近精华帖"
+
+msgid "My Panel"
+msgstr "我的控制面板"
+
+msgid "My Recent Topics"
+msgstr "我发表的最新帖子"
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "Who is viewing this Page?"
+msgstr "谁在查看这个页面？"
+
+msgid "You have new messages (%1)"
+msgstr "您有%1条新短消息"
+
+# footer
+msgid "About Us"
+msgstr "关于我们"
+
+msgid "Contact Us"
+msgstr "联系我们"
+
+msgid "Terms of Service"
+msgstr "服务条款"
+
+msgid "Privacy Statement"
+msgstr "隐私策略"
+
+msgid "Help Center"
+msgstr "帮助中心"
+
+# error message
+msgid "Illegal Request."
+msgstr "非法访问"
+
+msgid "Permission Denied."
+msgstr "权限禁止"
+
+msgid "User non-exist"
+msgstr "用户不存在"
+
+msgid "User is blocked"
+msgstr "用户被禁"
+
+msgid "Your status is pending"
+msgstr "你的状态为“等待批准”"
+
+msgid "Your status is rejected"
+msgstr "你的状态为“被拒绝”"
+
+msgid "URL WRONG HERE"
+msgstr "URL 地址错误"
+
+msgid "IT'S CLOSED"
+msgstr "已关闭"
+
+msgid "The requested URL is not found on this server."
+msgstr "您访问的地址不存在"
+
+# forum/topic action
+msgid "New Topic"
+msgstr "新帖子"
+
+msgid "New Poll"
+msgstr "新投票"
+
+msgid "Lock"
+msgstr "锁定"
+
+msgid "Unlock"
+msgstr "解除锁定"
+
+msgid "Sticky"
+msgstr "固顶"
+
+msgid "Unsticky"
+msgstr "解除固顶"
+
+msgid "Elite"
+msgstr "设置精华"
+
+msgid "Unelite"
+msgstr "取消精华"
+
+# message page
+msgid "Menu"
+msgstr "菜单"
+
+msgid "Compose New Message"
+msgstr "撰写新的短消息"
+
+msgid "Inbox"
+msgstr "收件箱"
+
+msgid "Outbox"
+msgstr "发件箱"
+
+# forumadmin page
+msgid "Basic Setting"
+msgstr "基本设置"
+
+msgid "Style Setting"
+msgstr "风格设置"
+
+msgid "Delete Style"
+msgstr "删除风格"
+
+msgid "Members Settings"
+msgstr "会员设置"
+
+msgid "Announcement Setting"
+msgstr "公告设置"
+
+# topic page
+msgid "Threads:"
+msgstr "发新帖数："
+
+msgid "Replies:"
+msgstr "回复帖数："
+
+msgid "Register on"
+msgstr "注册时间"
+
+# login/profile
+msgid "Username"
+msgstr "用户名"
+
+msgid "Nickname"
+msgstr "昵称"
+
+msgid "Email"
+msgstr "电子邮件"
+
+msgid "Gender"
+msgstr "性别"
+
+msgid "Birthday"
+msgstr "生日"
+
+msgid "Homepage"
+msgstr "主页"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "Confirm Password"
+msgstr "密码确认"
+
+msgid "Captcha"
+msgstr "验证码"
+
+msgid "Country/Territory"
+msgstr "国家或地区"
+
+msgid "Location Information"
+msgstr "地区信息"
+
+msgid "Contact Information"
+msgstr "联系信息"
+
+# login
+msgid "Login By Username"
+msgstr "用户名登陆"
+
+msgid "Login By Email"
+msgstr "电子邮件登陆"
+
+msgid "Remember me?"
+msgstr "记住我的登陆状态？"

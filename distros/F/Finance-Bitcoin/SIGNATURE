@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 0d721e6cdaebcb4bf849be9895da0e402946c8ea COPYRIGHT
+SHA1 08c27f336b391e32d0b0e7af5a4159302ceb2638 CREDITS
+SHA1 2692efbb166a853b0b87138c7175647a708caa8a Changes
+SHA1 06b097252b7644fc199abfcd17bfd8fb2c2076b0 INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 fb42c20943599a4509463037273a9b147927e068 MANIFEST
+SHA1 795226459e756612350d2ac65e40a1fe6d12ea10 META.json
+SHA1 fb120c3cfa8ec6377709bb316d31e5b95e367c88 META.yml
+SHA1 b35660ddb645e047b5650ed156f7da59ff763910 Makefile.PL
+SHA1 d8204e430c41e73e2e9fae278ba1ef2bce3372b6 README
+SHA1 a8e74deb9ea3ddb60b6385baeeff9d85fa2d693c TODO
+SHA1 fdc6267b751984f73d4e06c527414bf7d0d87e19 dist.ini
+SHA1 444c8b84ac4dd7a40dd424f19eb50d4c526be289 doap.ttl
+SHA1 11b378b3511f761e64810c595db5cbd859aa9ff3 examples/FB_high_level_api.pl
+SHA1 b4b8e406e5595ffbd7c62aba2c90757900a90771 examples/FB_low_level_api.pl
+SHA1 d9f289777ae8aa0c07b4cbbff1b7c29dcff9f14c lib/Finance/Bitcoin.pm
+SHA1 c03e0202e36b53a3e4113bac52ebf7c75c1140ba lib/Finance/Bitcoin/API.pm
+SHA1 45c610d72efa35fb8e77135a36c12495859e201d lib/Finance/Bitcoin/Address.pm
+SHA1 afda466679aa9fc8d1d38e9b5cfcdf58dfc34ed4 lib/Finance/Bitcoin/Role/HasAPI.pm
+SHA1 d553a7a9e770fbdba74098265889b18190a6f51e lib/Finance/Bitcoin/Wallet.pm
+SHA1 c265facdc2053784bd7500afb7aa8e9350580a68 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlMdoOMACgkQzr+BKGoqfTmblACggSrNP1JVjqCOsUPChT7vGzv5
+4ukAnR0LzK83O5VPfSHKDfKF6Nej7jjx
+=b4Li
+-----END PGP SIGNATURE-----

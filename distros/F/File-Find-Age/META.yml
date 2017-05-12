@@ -1,0 +1,31 @@
+---
+abstract: 'mtime sorted files to easily find newest or oldest'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+keywords:
+  - file
+  - mtime
+  - age
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Find-Age
+provides:
+  File::Find::Age:
+    file: lib/File/Find/Age.pm
+    version: 0.01
+requires:
+  File::Find::Rule: 0
+  File::Spec: 0
+resources:
+  bugtracker: http://github.com/jozef/File-Find-Age/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jozef/File-Find-Age
+version: 0.01

@@ -1,0 +1,14 @@
+Revision history for Perl extension File::Strmode.
+
+0.03  May 11, 2009
+      - older perls were unable to parse the ternary operators as used
+        in this module without parents around the condition parts.
+      - protect against unexistent Fcntl constants
+
+0.02  May 10, 2009
+      - fix companion files
+
+0.01  Sun May 10 10:02:15 2009
+	- original version; created by h2xs 1.23 with options
+		-AXn File::Strmode
+

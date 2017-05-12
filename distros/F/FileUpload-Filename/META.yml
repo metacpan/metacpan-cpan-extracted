@@ -1,0 +1,18 @@
+abstract: Return the name of an uploaded file
+author: 'Florian Merges <fmerges@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: FileUpload-Filename
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  File::Basename: 2.73
+  HTTP::BrowserDetect: 0.98
+  List::Util: 1.18
+version: 0.02

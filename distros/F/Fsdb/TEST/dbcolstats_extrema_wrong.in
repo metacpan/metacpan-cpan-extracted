@@ -1,0 +1,7 @@
+#h x
+# mean should be 0.5, but is zero because of floating point roundoff error
+# see discussion at http://code.activestate.com/recipes/393090/
+1
+1e20
+1
+-1e20

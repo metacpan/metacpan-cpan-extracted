@@ -1,0 +1,15 @@
+    <input type='file' size='40' name='upload' /> 
+    <select><option value=''>[% c.loc('Supported Types:') %]</option><option>----------</option>
+    [% FOREACH attach_type IN c.config.upload.valid_types %]
+    <option value='[% attach_type %]'>[% attach_type %]</option>
+    [% END %]
+    </select> [% c.loc('Size Limit:') %] [% c.config.upload.max_size %] K
+    [% IF c.form.error('upload') %]<div class='highlight'>
+    [% IF c.form.error('upload', 'EXCEED_MAX_SIZE') %]
+    Your Attachment is larger than [% c.config.upload.max_size %].
+    [% ELSIF c.form.error('upload', 'UNSUPPORTED_FILETYPE') %]
+    Your Attachment filetype is not supported yet.
+    [% ELSE %]
+    Unknown reason.
+    [% END %]
+    </div>[% END %]

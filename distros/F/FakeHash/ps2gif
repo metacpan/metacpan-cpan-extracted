@@ -1,0 +1,2 @@
+PATH=$PATH:/usr/local/bin:/usr/local/bin/pbm
+gs -q -dSAFER -r120 -sDEVICE=pbmraw -dNOPAUSE -sOutputFile=- - | pnmcrop | ppmtogif

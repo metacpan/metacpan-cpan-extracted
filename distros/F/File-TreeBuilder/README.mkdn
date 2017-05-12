@@ -1,0 +1,78 @@
+# NAME
+
+File::TreeBuilder - Build simple trees of files and directories.
+
+# VERSION
+
+version 0.02
+
+# SYNOPSIS
+
+    use File::TreeBuilder qw(build_tree);
+
+    our $contents_str = 'Bla';
+
+    build_tree($some_dir, q{
+        / "D2"
+            . "F_in_D2", "contents"
+        . "F_in_top"
+        / "D1 with spaces"
+            . "F_in_D1", $contents_str
+            . "F with spaces in D1", $contents_str
+    });
+
+That creates the following directory structure:
+
+    $some_dir/
+        "D1 with spaces"/
+            F_in_D1    # Contains 'Bla'.
+            "F with spaces in D1" # Contains 'Bla'.
+        D2/
+            F_in_D2    # Contains 'contents'.
+        F_in_top       # Empty file (0 bytes).
+
+# DESCRIPTION
+
+This module is used for building small trees of files and directories
+by describing what is needed in a text string.
+
+# FUNCTIONS
+
+## build_tree ($dir, $str)
+
+Builds a tree of directories and files under $dir according to the
+given `$str`. Returns an empty string if successful, an error message
+otherwise. See the SYNOPSIS for example usage.
+
+In `$str`, blank or empty lines or lines whose first non-blank
+character is a pound sign (`#`) are ignored.  Lines beginning with a
+slash (`/`) indicate directories to be created, while dots
+(`.`) indicate files. Directories are created hierarchically,
+according to the indentation. Files are created in the directory
+hierarchically above them. Anything that follows the filename on the
+line will be evaluated and placed in the file as its contents.
+
+Important:
+
+- Evaluated strings must not use lexicals, only package variables:
+    use `our` instead of `my`.
+
+- If lines are indented bizarrely, you may get bizarre results.
+
+- Use spaces only or tabs only to indent. Mixing the two may confuse
+    the parser.
+
+# EXPORT
+
+None by default.
+
+# AUTHOR
+
+Luc St-Louis <lucs@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Luc St-Louis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

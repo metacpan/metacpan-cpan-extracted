@@ -1,0 +1,21 @@
+@media projection {
+
+.screen {
+	display:none;
+	}
+
+.projection {
+	display: block; 
+	padding:65px 200px 0px 24px;
+	page-break-after: always;
+	}
+
+body    {
+	background:#47557b url(operashowbg.jpg) fixed;
+	padding:0;
+	margin:0;
+	font-family:'trebuchet ms',arial,sans-serif;
+	font-size:150%;
+	color:#fff;
+	}
+}

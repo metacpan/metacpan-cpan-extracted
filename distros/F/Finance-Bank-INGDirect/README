@@ -1,0 +1,117 @@
+Finance::Bank::INGDirecUts(e3r)Contributed Perl DocumentFaitniaonnce::Bank::INGDirect(3)
+
+
+
+NNAAMMEE
+       Finance::Bank::INGDirect -  Check your "ING Direct France" accounts
+       from Perl
+
+SSYYNNOOPPSSIISS
+         use Finance::Bank::INGDirect;
+
+         my @accounts = Finance::Bank::INGDirect->check_balance(
+                        ACN => "167845",
+                        PIN => "1234",
+                        JOUR => "25", # Day of birthday
+                        MOIS => "8",  # month of birthday
+                        ANNEE => "1952" # year of birthday
+                        );
+
+         foreach my $account (@accounts) {
+                       print "Name: ", $account->name, " Account_no: ", $account->account_no, "\n", "*" x 80, "\n";
+                       print $_->as_string, "\n" foreach $account->statements;
+         }
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides a read-only interface to the INGDirect online
+       banking system at <https://www.ingdirect.fr/>. You will need either
+       Crypt::SSLeay installed.
+
+       The interface of this module is similar to other Finance::Bank::* mod-
+       ules.
+
+WWAARRNNIINNGG
+       This is code for oonnlliinnee bbaannkkiinngg, and that means yyoouurr mmoonneeyy, and that
+       means BBEE CCAARREEFFUULL. You are encouraged, nay, expected, to audit the
+       source of this module yourself to reassure yourself that I am not doing
+       anything untoward with your banking data. This software is useful to
+       me, but is provided under NNOO GGUUAARRAANNTTEEEE, explicit or implied.
+
+MMEETTHHOODDSS
+       nneeww(( AACCNN ==>> ""116677884455"",, PPIINN ==>> ""11223344"",, JJOOUURR ==>> ""2255"",, MMOOIISS ==>> ""88"",, AANNNNEEEE
+       ==>> ""11995522""  ffeeeeddbbaacckk ==>> ssuubb {{ wwaarrnn ""FFiinnaannccee::::BBaannkk::::IINNGGDDiirreecctt :: $$__[[00]]\\nn""
+       }}))
+
+       Return an object . You can optionally provide to this method a
+       LWP::UserAgent object (argument named "ua"). You can also provide a
+       function used for feedback (useful for verbose mode or debugging)
+       (argument named "feedback")
+
+       cchheecckk__bbaallaannccee(( AACCNN ==>> ""116677884455"",, PPIINN ==>> ""11223344"",, JJOOUURR ==>> ""2255"",, MMOOIISS ==>>
+       ""88"",, AANNNNEEEE ==>> ""11995522""  ffeeeeddbbaacckk ==>> ssuubb {{ wwaarrnn ""FFiinnaannccee::::BBaannkk::::IINNGGDDiirreecctt
+       :: $$__[[00]]\\nn"" }}))
+
+       Return a list of account (F::B::INGDirect::Account) objects, one for
+       each of your bank accounts.
+
+AAccccoouunntt mmeetthhooddss
+       ttyyppee(( ))
+
+       Returns the human-readable name of the account.
+
+       aaccccoouunntt__nnoo(( ))
+
+       Return the account number, in the form "0123456L012".
+
+       bbaallaannccee(( ))
+
+       Returns the balance of the account.
+
+       ssttaatteemmeennttss(( ))
+
+       Return a list of Statement object (Finance::Bank::INGDirect::State-
+       ment).
+
+       ccuurrrreennccyy(( ))
+
+       Returns the currency of the account as a three letter ISO code (EUR,
+       CHF,etc.).
+
+SSttaatteemmeenntt mmeetthhooddss
+       ddaattee(( ))
+
+       Returns the date when the statement occured, in DD/MM/YY format.
+
+       ddeessccrriippttiioonn(( ))
+
+       Returns a brief description of the statement.
+
+       aammoouunntt(( ))
+
+       Returns the amount of the statement (expressed in Euros or the
+       account’s currency).  Although the Crédit Mutuel website displays num-
+       ber in continental format (i.e. with a coma as decimal separator),
+       _a_m_o_u_n_t_(_) returns a real number.
+
+       aass__ssttrriinngg(( $$sseeppaarraattoorr ))
+
+       Returns a tab-delimited representation of the statement. By default, it
+       uses a tabulation to separate the fields, but the user can provide its
+       own separator.
+
+CCOOPPYYRRIIGGHHTT
+       Copyright 2005, Jean-Marie Renouard. All Rights Reserved. This module
+       can be redistributed under the same terms as Perl itself.
+
+AAUUTTHHOORR
+       Thanks to Pixel for Finance::Bank::LaPoste, Cédric Bouvier for
+       Finance::Bank::CreditMut (and also to Simon Cozens and Briac Pilpré for
+       various Finance::Bank::*)
+
+SSEEEE AALLSSOO
+       Finance::Bank::BNPParibas, Finance::Bank::CreditMut,
+       Finance::Bank::LaPoste, ...
+
+
+
+perl v5.8.6                       2005-08-18       Finance::Bank::INGDirect(3)

@@ -1,0 +1,9 @@
+lib/File/Pairtree.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+pt
+README
+t/i2p2.t
+t/pt.t
+VERSION

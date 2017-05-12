@@ -1,0 +1,47 @@
+---
+abstract: 'File logger supports log rotation'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Capture::Tiny: '0.23'
+  Test::MockTime: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  Time::HiRes: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-RotateLogs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  File::RotateLogs:
+    file: lib/File/RotateLogs.pm
+    version: '0.08'
+requires:
+  File::Path: '2.12'
+  Mouse: '1.02'
+  Proc::Daemon: '0.14'
+resources:
+  bugtracker: https://github.com/kazeburo/File-RotateLogs/issues
+  homepage: https://github.com/kazeburo/File-RotateLogs
+  repository: git://github.com/kazeburo/File-RotateLogs.git
+version: '0.08'
+x_contributors:
+  - 'SUZUKI Masashi <m15.suzuki.masashi@gmail.com>'
+  - 'masartz <masartz@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

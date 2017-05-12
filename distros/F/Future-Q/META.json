@@ -1,0 +1,68 @@
+{
+   "abstract" : "a Future (or Promise or Deferred) like Q module for JavaScript",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Future-Q",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Devel::GlobalDestruction" : "0",
+            "Future" : "0.29",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "FindBin" : "0",
+            "Scalar::Util" : "0",
+            "Test::Identity" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::MockModule" : "0.05",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/Future-Q/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Future-Q.git",
+         "web" : "https://github.com/debug-ito/Future-Q"
+      }
+   },
+   "version" : "0.110"
+}

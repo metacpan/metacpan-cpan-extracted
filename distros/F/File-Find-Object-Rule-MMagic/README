@@ -1,0 +1,9 @@
+README for File::Find::Object::Rule::MMagic:
+
+To build use:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+

@@ -1,0 +1,8 @@
+# Interface definition for the testing
+EXT	ppp0 172.16.1.1/32
+PERIM	eth0 192.168.10.1/24
+INT	eth1 192.168.1.1/24 192.168.4.0/24 192.168.5.0/24
+INT1	eth1 192.168.1.2/32
+VPN1	ipsec0 172.16.1.1/32
+VPN2	ipsec1 172.16.1.1/32
+

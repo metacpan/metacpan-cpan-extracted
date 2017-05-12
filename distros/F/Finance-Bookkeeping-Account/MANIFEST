@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Finance/Bookkeeping/Account.pm
+t/00-DebitCredit.t
+t/01-Aliases.t
+t/basic.t
+t/release-pod-syntax.t

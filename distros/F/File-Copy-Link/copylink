@@ -1,0 +1,46 @@
+#!perl
+
+use strict;
+use warnings;
+use File::Copy::Link qw(copylink);
+
+warn "$0: no links\n" unless @ARGV;
+
+copylink for @ARGV;
+__END__
+
+=head1 NAME
+
+copylink - replace a link with a copy of the linked file
+
+=head1 SYNOPSIS
+
+copylink [link ...]
+
+=head1 DESCRIPTION
+
+Each of the links on the command line is replaced by a copy of the file
+that the link points too, so the copy can be edited without changing
+the original.
+
+The command is intended for modifying perl source files created by
+C<./Configure -Dmksymlinks>.
+ 
+=head1 SEE ALSO
+
+File::Copy::Link(3)
+
+=head1 AUTHOR
+
+Robin Barker, <RMBarker@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003 by Robin Barker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+$Id: copylink 278 2011-09-24 00:27:05Z robin $

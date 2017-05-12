@@ -1,0 +1,27 @@
+# local defaults for perlcritic
+severity = 3
+verbose = 4
+
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 5
+
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 30
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = abstract contract get no record set
+
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 70
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 75
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 40
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs subs vars
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = ambiguous bareword closed closure debugging deprecated digit exec exiting glob inplace internal io layer malloc misc newline numeric once overflow pack parenthesis pipe portable precedence printf prototype qw recursion redefine regexp reserved semicolon severe signal substr syntax taint threads uninitialized unopened unpack untie utf8 void y2k

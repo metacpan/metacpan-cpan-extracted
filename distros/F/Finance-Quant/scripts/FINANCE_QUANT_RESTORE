@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use diagnostics;
+use Storable;
+use Data::Dumper;
+use Finance::Quant;
+use Test;
+use Time::HiRes qw(usleep);
+use Cache::Memcached;
+
+
+BEGIN { plan tests => 42 }
+
+###################
+
+#my $self = Finance::Quant->recommended;
+
+#print Dumper [$self->{config}];
+
+#$self->Home();
+
+#DONE DATA GOES TO TMP DIRECTORY
+
+
+#HERE WAYS TO KEEP DATA UNDER CONTROLL AND MINIMIZE RECALCULATION
+
+
+#store $self, 'master-run';
+#store $self, 'master-run-BACKUP';
+my $self = retrieve('../../Finance-Quant/master-run');
+
+#I have 1GB ASSIGNED
+my $memd = new Cache::Memcached {
+'servers' => [ "127.0.0.1:11211"],
+'debug' => 0,
+'compress_threshold' => 10_000,
+} or warn($@);
+
+
+$memd->set("master-run",$self);
+$memd->set("master-run-BACKUP",$self);
+
+
+$memd->set("master-run-SYMBOLS",[keys %{$self->{result}}]);
+
+my @symbols = $memd->get("master-run-SYMBOLS");
+
+
+print Dumper @symbols;
+1;
+
+__DATA__
+#system('for i in `ls /tmp/Finance-Quant/2012-Jan-27-Fri/ibes-strong-buy/ | replace ".jpg" ""`; do perl ~/myperl/charter.pm $i; done');

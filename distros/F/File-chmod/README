@@ -1,0 +1,208 @@
+NAME
+
+    File::chmod - Implements symbolic and ls chmod modes
+
+VERSION
+
+    version 0.42
+
+SYNOPSIS
+
+      use File::chmod;
+      $File::chmod::UMASK = 0;
+      # It is recommended that you explicitly set $File::chmod::UMASK
+      # as the default will change in the future
+      #
+      # 0 is recommended to behave like system chmod
+      # 1 if you want File::chmod to apply your environment set umask.
+      # 2 is how we detect that it's internally set, undef will become the
+      # default in the future, eventually a lexicaly scoped API may be designed
+    
+      # chmod takes all three types
+      # these all do the same thing
+      chmod(0666,@files);
+      chmod("=rw",@files);
+      chmod("-rw-rw-rw-",@files);
+    
+      # or
+    
+      use File::chmod qw( symchmod lschmod );
+    
+      chmod(0666,@files);           # this is the normal chmod
+      symchmod("=rw",@files);       # takes symbolic modes only
+      lschmod("-rw-rw-rw-",@files); # takes "ls" modes only
+    
+      # more functions, read on to understand
+
+DESCRIPTION
+
+    File::chmod is a utility that allows you to bypass system calls or bit
+    processing of a file's permissions. It overloads the chmod() function
+    with its own that gets an octal mode, a symbolic mode (see below), or
+    an "ls" mode (see below). If you wish not to overload chmod(), you can
+    export symchmod() and lschmod(), which take, respectively, a symbolic
+    mode and an "ls" mode.
+
+    An added feature to version 0.30 is the $UMASK variable, explained in
+    detail below; if symchmod() is called and this variable is true, then
+    the function uses the (also new) $MASK variable (which defaults to
+    umask()) as a mask against the new mode. This mode is on by default,
+    and changes the behavior from what you would expect if you are used to
+    UNIX chmod. This may change in the future.
+
+    Symbolic modes are thoroughly described in your chmod(1) man page, but
+    here are a few examples.
+
+      chmod("+x","file1","file2");  # overloaded chmod(), that is...
+      # turns on the execute bit for all users on those two files
+    
+      chmod("o=,g-w","file1","file2");
+      # removes 'other' permissions, and the write bit for 'group'
+    
+      chmod("=u","file1","file2");
+      # sets all bits to those in 'user'
+
+    "ls" modes are the type produced on the left-hand side of an ls -l on a
+    directory. Examples are:
+
+      chmod("-rwxr-xr-x","file1","file2");
+      # the 0755 setting; user has read-write-execute, group and others
+      # have read-execute priveleges
+    
+      chmod("-rwsrws---","file1","file2");
+      # sets read-write-execute for user and group, none for others
+      # also sets set-uid and set-gid bits
+
+    The regular chmod() and lschmod() are absolute; that is, they are not
+    appending to or subtracting from the current file mode. They set it,
+    regardless of what it had been before. symchmod() is useful for
+    allowing the modifying of a file's permissions without having to run a
+    system call or determining the file's permissions, and then combining
+    that with whatever bits are appropriate. It also operates separately on
+    each file.
+
+FUNCTIONS - EXPORT
+
+ chmod(MODE,FILES)
+
+    Takes an octal, symbolic, or "ls" mode, and then chmods each file
+    appropriately.
+
+ getchmod(MODE,FILES)
+
+    Returns a list of modified permissions, without chmodding files.
+    Accepts any of the three kinds of modes.
+
+      @newmodes = getchmod("+x","file1","file2");
+      # @newmodes holds the octal permissions of the files'
+      # modes, if they were to be sent through chmod("+x"...)
+
+FUNCTIONS - EXPORT_OK
+
+ symchmod(MODE,FILES)
+
+    Takes a symbolic permissions mode, and chmods each file.
+
+ lschmod(MODE,FILES)
+
+    Takes an "ls" permissions mode, and chmods each file.
+
+ getsymchmod(MODE,FILES)
+
+    Returns a list of modified permissions, without chmodding files.
+    Accepts only symbolic permission modes.
+
+ getlschmod(MODE,FILES)
+
+    Returns a list of modified permissions, without chmodding files.
+    Accepts only "ls" permission modes.
+
+ getmod(FILES)
+
+    Returns a list of the current mode of each file.
+
+VARIABLES
+
+ $File::chmod::DEBUG
+
+    If set to a true value, it will report warnings, similar to those
+    produced by chmod() on your system. Otherwise, the functions will not
+    report errors. Example: a file can not have file-locking and the
+    set-gid bits on at the same time. If $File::chmod::DEBUG is true, the
+    function will report an error. If not, you are not warned of the
+    conflict. It is set to 1 as default.
+
+ $File::chmod::MASK
+
+    Contains the umask to apply to new file modes when using getsymchmod().
+    This defaults to the return value of umask() at compile time. Is only
+    applied if $UMASK is true.
+
+ $File::chmod::UMASK
+
+    This is a boolean which tells getsymchmod() whether or not to apply the
+    umask found in $MASK. It defaults to true.
+
+PORTING
+
+    This is only good on Unix-like boxes. I would like people to help me
+    work on File::chmod for any OS that deserves it. If you would like to
+    help, please email me (address below) with the OS and any information
+    you might have on how chmod() should work on it; if you don't have any
+    specific information, but would still like to help, hey, that's good
+    too. I have the following information (from "perlport"):
+
+    Win32
+
+      Only good for changing "owner" read-write access, "group", and
+      "other" bits are meaningless. NOTE: Win32::File and
+      Win32::FileSecurity already do this. I do not currently see a need to
+      port File::chmod.
+
+    MacOS
+
+      Only limited meaning. Disabling/enabling write permission is mapped
+      to locking/unlocking the file.
+
+    RISC OS
+
+      Only good for changing "owner" and "other" read-write access.
+
+SEE ALSO
+
+      Stat::lsMode (by Mark-James Dominus, CPAN ID: MJD)
+      chmod(1) manpage
+      perldoc -f chmod
+      perldoc -f stat
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/xenoterracide/file-chmod/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+CONTRIBUTORS
+
+      * David Steinbrunner <dsteinbrunner@pobox.com>
+
+      * Slaven Rezic <slaven@rezic.de>
+
+      * Steve Throckmorton <arrestee@gmail.com>
+
+      * Tim <oylenshpeegul@gmail.com>
+
+AUTHORS
+
+      * Jeff Pinyan <japhy.734+CPAN@gmail.com>
+
+      * Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Caleb Cushing and Jeff Pinyan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

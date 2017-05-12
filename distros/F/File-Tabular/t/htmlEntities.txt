@@ -1,0 +1,68 @@
+Num|Name|Char|Description
+38|amp|&|ampersand 
+62|gt|>|greater than
+60|lt|<|less than
+34|quot|"|double quote
+39|apos|'|single quote
+198|AElig|Æ|capital AE diphthong (ligature)
+193|Aacute|Á|capital A, acute accent
+194|Acirc|Â|capital A, circumflex accent
+192|Agrave|À|capital A, grave accent
+197|Aring|Å|capital A, ring
+195|Atilde|Ã|capital A, tilde
+196|Auml|Ä|capital A, dieresis or umlaut mark
+199|Ccedil|Ç|capital C, cedilla
+208|ETH|Ğ|capital Eth, Icelandic
+201|Eacute|É|capital E, acute accent
+202|Ecirc|Ê|capital E, circumflex accent
+200|Egrave|È|capital E, grave accent
+203|Euml|Ë|capital E, dieresis or umlaut mark
+205|Iacute|Í|capital I, acute accent
+206|Icirc|Î|capital I, circumflex accent
+204|Igrave|Ì|capital I, grave accent
+207|Iuml|Ï|capital I, dieresis or umlaut mark
+209|Ntilde|Ñ|capital N, tilde
+211|Oacute|Ó|capital O, acute accent
+212|Ocirc|Ô|capital O, circumflex accent
+210|Ograve|Ò|capital O, grave accent
+216|Oslash|Ø|capital O, slash
+213|Otilde|Õ|capital O, tilde
+214|Ouml|Ö|capital O, dieresis or umlaut mark
+222|THORN|Ş|capital THORN, Icelandic
+218|Uacute|Ú|capital U, acute accent
+219|Ucirc|Û|capital U, circumflex accent
+217|Ugrave|Ù|capital U, grave accent
+220|Uuml|Ü|capital U, dieresis or umlaut mark
+221|Yacute|İ|capital Y, acute accent
+225|aacute|á|small a, acute accent
+226|acirc|â|small a, circumflex accent
+230|aelig|æ|small ae diphthong (ligature)
+224|agrave|à|small a, grave accent
+229|aring|å|small a, ring
+227|atilde|ã|small a, tilde
+228|auml|ä|small a, dieresis or umlaut mark
+231|ccedil|ç|small c, cedilla
+233|eacute|é|small e, acute accent
+234|ecirc|ê|small e, circumflex accent
+232|egrave|è|small e, grave accent
+240|eth|ğ|small eth, Icelandic
+235|euml|ë|small e, dieresis or umlaut mark
+237|iacute|í|small i, acute accent
+238|icirc|î|small i, circumflex accent
+236|igrave|ì|small i, grave accent
+239|iuml|ï|small i, dieresis or umlaut mark
+241|ntilde|ñ|small n, tilde
+243|oacute|ó|small o, acute accent
+244|ocirc|ô|small o, circumflex accent
+242|ograve|ò|small o, grave accent
+248|oslash|ø|small o, slash
+245|otilde|õ|small o, tilde
+246|ouml|ö|small o, dieresis or umlaut mark
+223|szlig|ß|small sharp s, German (sz ligature)
+254|thorn|ş|small thorn, Icelandic
+250|uacute|ú|small u, acute accent
+251|ucirc|û|small u, circumflex accent
+249|ugrave|ù|small u, grave accent
+252|uuml|ü|small u, dieresis or umlaut mark
+253|yacute|ı|small y, acute accent
+255|yuml|ÿ|small y, dieresis or umlaut mark

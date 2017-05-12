@@ -1,0 +1,16 @@
+params:
+  name:
+    name: '名前'
+    validators:
+      - Blank#not_blank
+  evalval:
+    name: 'evalval'
+    validators:
+      - Blank#evaluation:
+          code: "$value%5 == 1"
+  notblank_evalval:
+    name: 'notblank_evalval'
+    validators:
+      - NotBlank#evaluation:
+          code: "$value%5 == 1"
+

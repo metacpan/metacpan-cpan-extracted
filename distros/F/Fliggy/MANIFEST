@@ -1,0 +1,16 @@
+app.psgi
+bin/fliggy
+Changes
+lib/Fliggy.pm
+lib/Fliggy/Server.pm
+lib/Plack/Handler/Fliggy.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/flash-policy-server.t
+t/normal-request.t
+xt/changes.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

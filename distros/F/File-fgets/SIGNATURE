@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 893aa2038b35266055d32e4906a6e5227df41327 .perlcriticrc
+SHA1 b1792a796e85dfbf8a74b4d1ad41ad32ddea48bb .perltidyrc
+SHA1 e05d9b536077a59ce85666c5d3acf5a59810abb6 Build.PL
+SHA1 d23340f487a72170baba4531991e40775e01b610 Changes
+SHA1 e7bc66fca43fc9dba4c777e7a60ef6fc102a8b02 LICENSE
+SHA1 20f58aaeef5dea759b321e8d3b693b6246ae157f MANIFEST
+SHA1 35fc4af8679a515447fdc4d8f84229ab99de0e35 MANIFEST.SKIP
+SHA1 7f88357b2a6b8524297e644356aa57d6b3c8ebf3 META.yml
+SHA1 0970b84863429deafbed81de827248e703f9eca0 README
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 lib/File/.new
+SHA1 eb8a8c4052d993f7bde23cbc0ecb644efe0d732d lib/File/fgets.pm
+SHA1 e3c7191268e4c1c899b8058c548db1805879230b lib/File/fgets.xs
+SHA1 74b2bc53bf2503b21d7480da208a065c1d447d2c lib/File/ppport.h
+SHA1 2fd760b122e33595d34ebf18f809b8b5c4467932 t/fgets.t
+SHA1 3eabdcb6e430311d35fb408ba310ab29e3dd8452 t/scalar_ref_fh.t
+SHA1 97bcc65e84cc34305574bb13260fb6b4da65fa2f t/tie.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.13 (Darwin)
+
+iEYEARECAAYFAkwFcIAACgkQWMohlhD1QycVowCfTq4+vfykyp82QuC/JLh9acjd
+ICQAoJh4qRy+GSg3d3ZnEWF5/CMbhWmG
+=nEBW
+-----END PGP SIGNATURE-----

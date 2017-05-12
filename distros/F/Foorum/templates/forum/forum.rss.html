@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+[% USE date %]
+[% PROCESS sub/date.html %]
+[% forum.forum_url = c.req.base _ forum.forum_url %]
+<rss version="2.0">
+<channel>
+<title><![CDATA[[% forum.name %]]]></title>
+<link>[% forum.forum_url %]</link>
+<description><![CDATA[[% forum.description %]]]></description>
+<pubDate>[% date.format(date.now, '%Y-%m-%dT%H:%M:%S+00:00') %]</pubDate>
+<lastBuildDate>[% date.format(date.now, '%Y-%m-%dT%H:%M:%S+00:00') %]</lastBuildDate>
+<generator>Foorum RSS Generator</generator>
+
+[% FOREACH t IN topics %]
+<item>
+<title><![CDATA[[% t.title %]]]></title>
+<link>[% forum.forum_url _ '/topic/' _ t.topic_id %]</link>
+<description><![CDATA[[% t.text %]]]></description>
+<guid isPermaLink="true">[% forum.forum_url _ '/topic/' _ t.topic_id %]</guid>
+<pubDate>[% date_format(t.last_update_date, '%Y-%m-%dT%I:%M:%S') %]</pubDate>
+</item>
+[% END %]
+
+</channel>
+</rss>

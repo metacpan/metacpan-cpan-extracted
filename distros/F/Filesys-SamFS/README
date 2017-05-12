@@ -1,0 +1,65 @@
+Filesys::SamFS
+  Description
+    Filesys::SamFS makes the SamFS API available to Perl. SamFS is a HSM
+    (Hierarchical Storage Management) Filesystem; it manages files in two
+    storage levels - a cache on disks and an archive on removable media like
+    magneto-optical disks or tapes.
+
+    SamFS is a product of Sun Microsystems, Inc. For more information,
+    please refer to
+
+          http://www.sun.com/storagetek/management_software/data_management/sam/
+
+  Copying
+    Copyright (c) 2000,2001,2008 Lupe Christoph. All rights reserved.
+
+  License
+    This software is covered by the Artistic license 2.0, see the file
+    Artistic-2.0 included in the distribution.
+
+  Download
+        You can download Filesys::SamFS from CPAN and from my website at
+        http://www.lupe-christoph.de/Personal/Perl/Filesys-SamFS/
+
+  Prerequisites
+    perl 5.005_03  While it is quite possible that this module will work
+                   with earlier versions, it has only been tested with this
+                   version.
+
+    SamFS          Tested with versions 3.3.0-40, 3.3.1-15, and 3.5.0-28.
+                   NOT TESTED WITH 4.x by the author!
+
+  NOTE
+    The author does not have access to a SamFS installation anymore. It is
+    thus vitally important for him to receive YOUR feedback about any if
+    small problem you encounter.
+
+    Because it is very hard to develop test code without the ability to test
+    it, additional test code written by YOU is very welcome.
+
+  Build/Installation
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    If you run into problems because you older SamFS does not define some of
+    the new features, try running
+
+            perl Makefile.PL -DOLD_SAMFS
+
+    Note that the ndevstat() call in the API only works for the superuser.
+    Consequently, t/03ndevstat.t will fail unless it is run by root. You can
+    do this with this command:
+
+            su root -c '/usr/ccs/bin/make test'
+
+  Author
+        Lupe Christoph <lupe@lupe-christoph.de>
+
+  Webpage
+        Filesys::SamFS has its own webpage at
+        http://www.lupe-christoph.de/Personal/Perl/Filesys-SamFS/ .
+

@@ -1,0 +1,124 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use lib '../lib', 'lib';
+use Mojo::Base -strict;
+use File::Basename 'dirname';
+use File::Spec::Functions 'splitdir';
+use Flower;
+use Mojo::Server::Daemon;
+use AnyEvent;
+use EV;
+use JSON;
+use Getopt::Long;
+use Flower::Files;
+use Flower::Nodes;
+use Flower::Chronos;
+use File::Which 'which';
+use Data::Dumper;
+use Data::Printer;
+use Mojo::UserAgent;
+
+my $ua = Mojo::UserAgent->new;
+
+
+
+
+push @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib');
+my @paths = which('xprintidle');
+if (!@paths) {
+    die "xprintidle is not installed";
+}
+
+# Check if Mojolicious is installed;
+die <<EOF unless eval 'use Mojolicious::Commands; 1';  ## no critic
+It looks like you don't have the Mojolicious framework installed.
+Please visit http://mojolicio.us for detailed installation instructions.
+
+EOF
+
+# Application
+$ENV{MOJO_APP} ||= 'Flower';
+
+# Command line options
+
+my $ip;
+my $port = 2222;
+my $filepath;
+
+our $opts = GetOptions ("ip=s"    => \$ip,
+       "port=i"  => \$port,
+       "filepath=s" => \$filepath);
+
+die "need --ip" unless $ip;
+die "need --filepath" unless $filepath;
+die "$filepath is not a directory" unless -d $filepath;
+
+# Create the Files and Nodes handlers
+my $nodes = Flower::Nodes->new($ip, $port);
+my $files = Flower::Files->new();
+$nodes->self->set_files($files);
+
+# Add our local files
+$files->update_all_in_path($filepath);
+
+# Remind us who we are
+say "We are " . $nodes->self();
+
+# Add any more nodes
+while (my $arg = shift) {
+  my ($ip, $port) = split /:/, $arg;
+  $nodes->add_if_necessary( { ip => $ip, port => $port } );
+}
+
+
+
+my $chronos = Flower::Chronos->new(
+        logger        => 'stdout',
+        idle_timeout  => 3600*24,
+        flush_timeout => 3600*24
+    );
+
+
+# Initialise the app and daemon.
+my $app = Flower->new();
+
+$app->config->{ nodes } = $nodes;
+
+my $daemon = Mojo::Server::Daemon->new(app => $app, listen => ['https://*:'.$port]);
+$daemon->start;
+
+
+my $x = 1;
+# Start EV stuff
+my $nodes_timer = AE::timer 5, 10, sub { $nodes->update() };
+my $files_timer = AE::timer 5, 30, sub { $files->update_all_in_path($filepath) };
+
+  my $activity_timer = AE::timer 5, 1, sub {
+  my $last = $chronos->{last};
+
+  if($chronos->{t_end} < $last->{_end})
+  {
+
+        # insert a record
+        # insert a record
+$chronos->{last}->{user} = "app";
+my $json_text = JSON::encode_json($chronos->{last});
+my $tx = $ua->post('http://localhost:9200/flower/rows/'.$chronos->{last}->{_end} => json =>
+$chronos->{last}
+ => sub {
+    my ($ua, $tx) = @_;
+      say $tx->res->body;
+    });
+
+    $x++;
+    #print $json_text;
+    $chronos->{t_end} =  $last->{_end};
+  }
+  $chronos->track;
+};
+
+my $cv = AE::cv;
+$cv->recv;

@@ -1,0 +1,8 @@
+# something that looks like a configuration file
+# with a few comments, and some empty lines
+
+# enable debug
+debug = 1
+
+# be verbose
+verbose = 1

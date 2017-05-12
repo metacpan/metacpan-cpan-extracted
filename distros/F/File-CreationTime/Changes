@@ -1,0 +1,28 @@
+Revision history for File-CreationTime
+
+2.04    16 September 2007
+        Now returns the real creation time on OS X!  Thanks
+        to Dave Cardwell for his help adding this feature.
+
+2.03	8 July 2006
+	Now retrieves mtime properly.
+
+2.02	7 July 2006
+	No longer needs File::ExtAttr.  Uses File::Attributes instead.
+
+2.01    22 January 2006
+        Bugfixes in documentation.  Better error handling when dealing with
+        non-writable files.
+
+2.00	15 January 2006
+	Now uses BSD extended filesystem attributes instead of a dirty hack.
+
+1.03    2  December 2005
+	Added File::Attribute as a prereq in the makefile.	
+
+1.02    30 November 2005
+	Rewrote to use File::Attribute to store creation time.
+
+1.00	14 November 2005
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+SmbClientParser.pm
+t/01load.t
+t/02new.t
+t/03arg.t
+t/51test.t
+README

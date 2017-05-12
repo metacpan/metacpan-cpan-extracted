@@ -1,0 +1,54 @@
+INSTALL
+	perl Makefile.PL; make; make test; make install;
+	Do 'make install' as root if installing into root-protected directories
+Description
+	Flexible shell framework which encourages using loadable libraries of functions.
+Features
+        - Loading/unloading shell components at runtime.
+        - Flexible framework for using shell features via plugins.       
+                You can even set up a bare minimum shell needing no external modules! Currently
+                plugins exist for dumping data,readline support,reading shell configurations and
+                viewing shell output. 
+        - Commands and options can be aliased for minimal typing at the commandline.
+        - Commands can have help and usage defined. 
+        - Commands can have user-defined argument types. 
+                One defines argument types by subroutines or tests that they should pass.
+                These tests are then applied to a command's defined argument(s).
+                With defined argument types, one can also define autocompletion
+                routines for a command's arguments.
+        - Options can modify variables.
+                Since variables exist for almost every aspect of the shell, options
+                can change many core shell functions. A handy example is 'parsecmd'
+                which names the current parse subroutine for the current line.
+                Changing this var would change how the input after the options is
+                parsed.
+        - Options can have different behaviors defined including the ability to invoke
+                subroutines when called or to maintain a value for a specified amount of iterations. 
+        - Default options include 'menu' which numbers output and allows the next command to
+        reference them by number.
+        - Page output with preferred pager.
+        - Multiline mode.
+        - Comes with a decent default library,Fry::Lib::Default, to dump,list or
+                unload any shell component, run system commands,evaluate perl statements
+                and execute methods of autoloaded libraries.
+FAQ
+	What are some good uses for this module?
+		- Making a shell around different modules by loading libraries.
+		  WWW::Mechanize and DBI modules come to mind.
+		- An organizer of small scripts: If you start amassing several scripts
+		  around a common module or theme, put them in the same library to see
+		  what common features they have in order to modularize them. You can
+		  still call any of them from the commandline since a fry-shell script
+		  takes a command and its arguments as initial arguments.
+		- A tool for doing repetitive,tedious tasks easily. With the menu
+		  option, it's easy to alias several often-used arguments to numbers
+		  and perform commands on the numbers more easily.
+	What this shell is not for?
+		Not a replacement for your shell. This is more like a handy shell I
+		keep open in one of my terminal tabs to be used when needed.  Look to
+		other well developed perl shells like Zoidberg and Psh to replace your
+		shell.
+License
+	Perl's
+	
+Have fun!

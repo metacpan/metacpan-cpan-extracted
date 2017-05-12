@@ -1,0 +1,57 @@
+SYNOPSIS
+
+     use Filesys::Cap qw(fs_has_attr_x fs_is_ci fs_is_cs fs_can_symlink);
+    
+     say "Filesystem has x attribute"     if fs_has_attr_x();
+     say "Filesystem is case-insensitive" if fs_is_ci("/tmp");
+     say "Filesystem is case-sensitive"   if fs_is_cs("/tmp");
+     say "Filesystem can do symlinks"     if fs_can_symlink("/tmp");
+
+FUNCTIONS
+
+ fs_has_attr_x([ $dir ]) => bool
+
+    Return true if filesystem has x attribute, meaning it can have files
+    that pass -x Perl file test operator as well as files that fail it.
+    This is done by actually creating two temporary files under $dir, one
+    chmod-ed to 0644 and one to 0755 and test the two files.
+
+    If $dir is not specified, will use a temporary directory created by
+    tempdir().
+
+    Will return undef on failure (e.g.: permission denied, etc).
+
+ fs_is_ci([ $dir ]) => bool
+
+    Return true if filesystem is case-insensitive, meaning it is impossible
+    to create two files with the same name but differing case (e.g. "foo"
+    and "Foo"). This is done by actually creating two temporary files under
+    $dir.
+
+    If $dir is not specified, will use a temporary directory created by
+    tempdir().
+
+    Will return undef on failure (e.g.: permission denied, etc).
+
+ fs_is_cs([ $dir ]) => bool
+
+    The opposite of fs_is_ci, will return true if filesystem is
+    case-sensitive.
+
+ fs_can_symlink([ $dir ]) => bool
+
+    Return true if filesystem can do symlinks. This is tested by creating
+    an actual temporary symlink. Note that this check is performed first:
+
+     return undef unless eval { symlink("",""); 1 };
+
+    If $dir is not specified, will use a temporary directory created by
+    tempdir().
+
+    Will return undef on failure (e.g.: permission denied, etc).
+
+SEE ALSO
+
+    To list filesystems and their properties (so, the more proper/rigorous
+    version), see Sys::Filesystem.
+

@@ -1,0 +1,11 @@
+<h1>Friends</h1>
+<ul>
+[% FOREACH friend IN friends %]
+	<li>[% friend.name %]</li>
+[% END %]
+</li>
+
+[% IF response %]
+	<h3>Facebook Response</h3>
+	<textarea style="width: 500px; height: 250px;">[% response %]</textarea>
+[% END %]

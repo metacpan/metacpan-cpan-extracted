@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::Quant::Quotes.
+
+0.01  Tue Jan 24 05:07:14 2012
+	- original version; created by h2xs 1.23 with options
+		-XA Finance::Quant::Quotes
+

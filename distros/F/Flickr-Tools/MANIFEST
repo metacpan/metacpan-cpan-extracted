@@ -1,0 +1,25 @@
+Changes
+ignore.txt
+examples/flickr_cameras.pl
+examples/flickr_reflection.pl
+lib/Flickr/Photo.pm
+lib/Flickr/Photoset.pm
+lib/Flickr/Tools/Cameras.pm
+lib/Flickr/Tools/Reflection.pm
+lib/Flickr/Tools.pm
+lib/Flickr/Types/Tools.pm
+lib/Flickr/Roles/Permissions.pm
+lib/Flickr/Roles/Caching.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-types-tools.t
+t/02-tools.t
+t/03-cameras.t
+t/03-reflection.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

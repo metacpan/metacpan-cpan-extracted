@@ -1,0 +1,10 @@
+Changes
+lib/File/KeePass.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00_base.t
+t/01_kdbx.t
+t/05_convert.t

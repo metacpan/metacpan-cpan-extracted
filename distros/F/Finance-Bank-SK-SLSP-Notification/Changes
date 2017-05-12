@@ -1,0 +1,10 @@
+Revision history for Finance-Bank-SK-SLSP-Notification
+
+0.02    28.5.2014
+    - missing transactions non-fatal
+    - transaction amount in cent
+    - without iban, the whole line is an account name
+
+0.01    29.1.2014
+        First version, released on an unsuspecting world.
+

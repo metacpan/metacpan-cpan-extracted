@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Finance::Bank::DE::NetBank - Check your NetBank Bank Accounts with Perl</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#my__account___finance__bank__de__netbank_new__values_">my $account = Finance::Bank::DE::NetBank-&gt;<code>new(%values)</code></a></li>
+		<li><a href="#_account_version__">$account-&gt;<code>Version()</code></a></li>
+		<li><a href="#_account_debug__value_">$account-&gt;<code>Debug($value)</code></a></li>
+		<li><a href="#_account_connect__">$account-&gt;<code>connect()</code></a></li>
+		<li><a href="#_account_login__values_">$account-&gt;<code>login(%values)</code></a></li>
+		<li><a href="#_account_saldo__values_">$account-&gt;<code>saldo(%values)</code></a></li>
+		<li><a href="#_account_statement__values_">$account-&gt;<code>statement(%values)</code></a></li>
+		<li><a href="#_account_transfer__">$account-&gt;<code>transfer()</code></a></li>
+		<li><a href="#_account_logout__">$account-&gt;<code>logout()</code></a></li>
+	</ul>
+
+	<li><a href="#tests">TESTS</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#history">HISTORY</a></li>
+	<li><a href="#thank_you">THANK YOU</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Finance::Bank::DE::NetBank - Check your NetBank Bank Accounts with Perl</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Finance::Bank::DE::NetBank;
+    
+    my $account = Finance::Bank::DE::NetBank-&gt;new(
+        CUSTOMER_ID =&gt; '12345678',
+        ACCOUNT =&gt; '12345678',
+        PASSWORD =&gt; 'ROUTE66',
+    );
+    
+    if ($account-&gt;login()) {
+        print $account-&gt;saldo();
+        $account-&gt;logout();
+    } 
+    else {
+        print 'login failed. manual interaction needed';
+    }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module provides a very limited interface to the webbased online banking
+interface of the German ``NetBank e.G.'' operated by Sparda-Datenverarbeitung e.G..</p>
+<p><strong>WARNING!</strong> This module is neither offical nor is it tested to be 100% save! 
+Because of the nature of web-robots, <strong>everything may break from one day to
+the other</strong> when the underlaying web interface changes.</p>
+<p>This is code for <strong>online banking</strong>, and that means <strong>your money</strong>, and
+that means <strong>BE CAREFUL</strong>. You are encouraged, nay, expected, to audit
+the source of this module yourself to reassure yourself that I am not
+doing anything untoward with your banking data. This software is useful
+to me, but is provided under <strong>NO GUARANTEE</strong>, explicit or implied.</p>
+<p>You can find tests in the <code> t </code> subdirectory. See <a href="#tests"> TESTS </a> for more details.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="my__account___finance__bank__de__netbank_new__values_">my $account = Finance::Bank::DE::NetBank-&gt;<code>new(%values)</code></a></h2>
+<p>This constructor will set the default values and/or user provided values for
+connection and authentication.</p>
+<pre>
+    my $account = Finance::Bank::DE::NetBank-&gt;new (
+        CUSTOMER_ID =&gt; 'demo',    
+        PASSWORD =&gt; '',      
+        ACCOUNT =&gt; '2777770',   
+        @_);</pre>
+<p>If you don't provide any values the module will automatically use the demo account.</p>
+<p>CUSTOMER_ID is your ``Kundennummer'' and ACCOUNT is the ``Kontonummer'' 
+(if you have only one account you can skip that)</p>
+<p>
+</p>
+<h2><a name="_account_version__">$account-&gt;<code>Version()</code></a></h2>
+<p>returns the module version</p>
+<p>
+</p>
+<h2><a name="_account_debug__value_">$account-&gt;<code>Debug($value)</code></a></h2>
+<p>Provide a true  <code> $value </code> get some Data::Dumper outputs on STDERR.</p>
+<p>
+</p>
+<h2><a name="_account_connect__">$account-&gt;<code>connect()</code></a></h2>
+<p>deprecated. use only $account-&gt;<code>login()</code></p>
+<p>
+</p>
+<h2><a name="_account_login__values_">$account-&gt;<code>login(%values)</code></a></h2>
+<p>This method will try to log in with the provided authentication details. If
+nothing is specified the values from the constructor or the defaults will be used.</p>
+<pre>
+    $account-&gt;login(ACCOUNT =&gt; '1234');</pre>
+<p>Returns <code> undef </code> on error.</p>
+<p>
+</p>
+<h2><a name="_account_saldo__values_">$account-&gt;<code>saldo(%values)</code></a></h2>
+<p>This method will return the current account balance called ``Saldo''.
+The method uses the account number if previously set.</p>
+<p>You can override/set it:</p>
+<pre>
+    $account-&gt;saldo(ACCOUNT =&gt; '5555555');</pre>
+<p>Returns <code> undef </code> on error.</p>
+<p>
+</p>
+<h2><a name="_account_statement__values_">$account-&gt;<code>statement(%values)</code></a></h2>
+<p>This method will retrieve an account statement (Kontoauszug) and return a hashref.</p>
+<p>You can specify the timeframe of the statement by passing different arguments:
+The value of TIMEFRAME can be ``1'' (last day only), ``30'' (last 30 days only), ``alle'' (all possible) or ``variable'' (between
+START_DATE and END_DATE only).</p>
+<pre>
+    $account-&gt;statement(
+        TIMEFRAME =&gt; 'variabel',
+        START_DATE =&gt; '10.04.2005',
+        END_DATE =&gt; '02.05.2005',
+    );</pre>
+<p>Returns <code> undef </code> on error.</p>
+<p>
+</p>
+<h2><a name="_account_transfer__">$account-&gt;<code>transfer()</code></a></h2>
+<p>Returns <code> undef </code> on error.</p>
+<p>
+</p>
+<h2><a name="_account_logout__">$account-&gt;<code>logout()</code></a></h2>
+<p>well - every login method should have a logout method</p>
+<p>
+</p>
+<hr />
+<h1><a name="tests">TESTS</a></h1>
+<p>Since version 1.04 <code>Finance::Bank::DE::NetBank</code> comes with a testsuite.
+It's located in the subdirectory <code> t </code> of the distribution.</p>
+<p>To run the tests against the live NetBank demo account use this:</p>
+<pre>
+    perl Makefile.PL --livetest
+    make test TEST_VERBOSE=1</pre>
+<p>The default behaviour is not to test against the live website:</p>
+<pre>
+    perl Makefile.PL
+    make test</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Please report bugs via 
+<a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-Bank-DE-NetBank">http://rt.cpan.org/NoAuth/Bugs.html</a>
+or email the author.</p>
+<p>
+</p>
+<hr />
+<h1><a name="history">HISTORY</a></h1>
+<p>see file 'Changes'</p>
+<p>
+</p>
+<hr />
+<h1><a name="thank_you">THANK YOU</a></h1>
+<p>Torsten Mueller (updated URL, <code>saldo()</code> bug reporting)</p>
+<p>Sascha Stock (reported bad example in POD)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Roland Moriz (RMORIZ) &lt;<a href="mailto:rmoriz@cpan.org">rmoriz@cpan.org</a>&gt;</p>
+<p><a href="http://www.perl-freelancer.de/">http://www.perl-freelancer.de/</a></p>
+<p><a href="http://www.roland-moriz.de/">http://www.roland-moriz.de/</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>WWW::Mechanize
+
+</p>
+
+</body>
+
+</html>

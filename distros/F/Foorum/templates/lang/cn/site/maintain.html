@@ -1,0 +1,13 @@
+[% maintain_msg = BLOCK %]
+
+<b>此论坛暂时关闭</b>，原因如下<br /><br />
+
+The borad is under maintain. Sorry for any inconvenience.
+
+<br /><br />如果您有管理权限,请<a href="/login">登入</a>
+
+[% END %]
+
+[% INCLUDE 'simple/message.html' message = {
+    msg => maintain_msg,
+} %]

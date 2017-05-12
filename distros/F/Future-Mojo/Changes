@@ -1,0 +1,9 @@
+0.003     2015-11-28 15:34:30 EST
+  - $loop parameter to constructors is now optional
+
+0.002     2015-09-30 13:05:41 EDT
+  - await() will now throw an exception if the event loop is already running,
+    to avoid event loop recursion in a get() or failure()
+
+0.001     2015-09-28 21:45:38 EDT
+  - First release

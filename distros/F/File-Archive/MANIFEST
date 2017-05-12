@@ -1,0 +1,10 @@
+Archive.pm
+Changes
+README.txt
+MANIFEST
+Makefile.PL
+test.pl
+compressed.Z
+gzipped.gz
+tarfile.tar
+targz.file.tar.gz

@@ -1,0 +1,30 @@
+Revision history for File-StatCache
+
+0.06    CHANGES:
+         * Various small updates to keep CPANTS happy
+
+0.05    CHANGES:
+         * Create Makefile.PL out of Build.PL
+         * Declare dependence on Test::More to keep perl 5.6.1 happy
+
+0.04  Tue Jan 02 16:10:42 2007  <leonerd@leonerd.org.uk>
+
+  - Relicenced as perl (GPL+Artistic) rather than GPL
+
+  - Updated to use Module::Build rather than ExtUtils::MakeMaker
+
+0.03  Mon Jul 24 22:09:53 2006  <leonerd@leonerd.org.uk>
+
+  - Use touchfile in all test files rather than /dev/null
+
+  - Added unlink() test in t/04cache.t
+
+  - POD update - use =head2 for functions
+
+0.02  Sun Jul 16 22:11:57 2006  <leonerd@leonerd.org.uk>
+
+  - Added Changes, MANIFEST
+
+  - Updated code style using perltidy
+
+  - Updated POD style to be more like other CPAN modules

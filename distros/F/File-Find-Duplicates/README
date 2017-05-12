@@ -1,0 +1,57 @@
+NAME
+    File::Find::Duplicates - Find duplicate files
+
+SYNOPSIS
+      use File::Find::Duplicates;
+
+      my @dupes = find_duplicate_files('/basedir1', '/basedir2');
+
+      foreach my $dupeset (@dupes) { 
+        printf "Files %s (of size %d) hash to %s\n",
+          join(", ", @{$dupeset->files}), $dupeset->size, $dupeset->md5;
+      }
+
+DESCRIPTION
+    This module provides a way of finding duplicate files on your system.
+
+FUNCTIONS
+  find_duplicate_files
+      my %dupes = find_duplicate_files('/basedir1', '/basedir2');
+
+    When passed a base directory (or list of such directories) it returns a
+    list of objects with the following methods:
+
+  files
+    A listref of the names of the duplicate files.
+
+  size
+    The size of the duplicate files.
+
+  md5
+    The md5 sum of the duplicate files.
+
+TODO
+    Check the contents of tars, zipfiles etc to ensure none of these also
+    exist elsewhere (if so requested).
+
+SEE ALSO
+    File::Find.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-File-Find-Duplicates@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2001-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

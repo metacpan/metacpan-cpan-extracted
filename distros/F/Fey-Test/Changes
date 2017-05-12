@@ -1,0 +1,56 @@
+0.10    2011-09-14
+
+- Shut up some uninit value warnings.
+
+
+0.09   2011-02-06
+
+- Pg and mysql tests are now run when Fey::Loader tests are run via dzil.
+
+
+0.08   2010-09-10
+
+- Added a missing dep on Test::MockObject. Reported by Phillip Moore. RT
+  #61247.
+
+
+0.07   2009-11-17
+
+- Made some changes to the schema definitions used to test Fey::Loader in
+  order to test its handling of upper and lower case identifiers.
+
+
+0.06   2008-12-09
+
+- Entirely internal changes now that I've moved the repo from svn to
+  hg.
+
+
+0.05   2008-08-25
+
+- Tweaks to handle Fey 0.10 API changes.
+
+
+0.04   2008-02-20
+
+- Fix a bug in the dsn() method.
+
+
+0.03   2008-02-07
+
+- The one test that ran failed if Fey wasn't already installed,
+  leading to a circular dependency. Now the one test that runs will
+  always succeed.
+
+
+0.02   2008-02-06
+
+- Make sure at least one test runs so I don't get UNKNOWN reports from
+  CPAN testers.
+
+- Add proper prereqs.
+
+
+0.01   2008-02-05
+
+- First version, released on an unsuspecting world.

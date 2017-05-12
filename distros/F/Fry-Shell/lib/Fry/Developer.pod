@@ -1,0 +1,74 @@
+=head1 NAME
+
+Fry::Developer - Documentation for Developers
+
+=head1 MY STORY
+
+My interest in shells began with databases and mind management software. I've been
+fascinated with these for some time.  Mind management software are programs providing an intuitive
+interface to storing and retrieving personal data. I soon got tired of being limited by
+rigid,feature-frozen programs and so I began writing my own. I began with storing basic information
+via DBI. Eventually I yearned for a more intuitive API and began using Class::DBI. As I wrote
+wrappers around Class::DBI commands, I noticed the basic steps for writing one: parse the user input
+for flags and options,expand abbreviations in the input, and convert input into a data structure to
+pass to the desired method. As my list of commands grew, I broke them up into libraries to avoid
+overcongestion. As I learned of the amazing variety of useful CPAN modules, I expanded the shell to
+load any module. If you're wondering how loading any module could lead to its interactive use
+without writing any additional view code, check out &autoView. This method automatically handles the
+views of common data structures. So what began as my own really tiny newbie database interface has
+grown into a gargantuan,mega-flexible,meta-executing shell or ... just simply a handy shell capable
+of loading most perl modules ;).
+
+=head1 GOALS
+
+While scratching my own feature itches, I've strived to make the shell modular, lean and run-time
+manipulable. My later goal has recently led to an interesting shift in this shell's usage. By
+creating pre and post subs around the call of a command, the parsing of a command and viewing its
+results become automated for common data structures (ie hash,array,hashref).  This allows me to call
+object and class methods directly from the commandline using the commands &objectAct and &classAct
+in L<Fry::Lib::Default>. Soon, I aim to load a module without predefining libraries for it. I'll try
+to autodetect as many class and object methods.  Object methods won't be easy to autodetect unless
+there's a consistent pod format for describing them. The next best thing I can do is show the user
+all methods and let them choose whom they belong to via a menu. 
+
+What ramifications does this have on using new modules? Instant interaction, the best way to learn
+what a module does! A user could load a library (or maybe just the module) with a command ie `\lL :DBI`
+and in the next command be able to autocomplete available methods for the specified class or object.
+Naturally, I'd extend autocompletion to a method's options. Having this level of interactivity would
+help create demos and handy mini-apps.
+
+In summary here are the main goals of this shell framework:
+
+	Be as lightweight,modular and run-time manipuable as possible.
+	Load any module and use all of its methods from the commandline with minimal to no hard-coded
+		configurations.
+	Make the usage of methods and modules as easy as possible by autocompleting known
+		options to methods, known methods to a module and ...
+	View output in several ways, commandline and web for starters.
+
+=head1 Miscellaneous
+
+=head2 Abbreviations
+
+In comments throughout I consistently use abbreviations, usually followed
+by a colon ie 'td:'.  Here they are:
+
+	td: todo items
+	?: questions I have of surrounding code
+	h: hacked items, usually an ugly hack that I should redo
+	w: warning items, likely culprits if nearby code causes errors
+	d: description items, describing a nearby subroutine usually 
+
+=head2 Contributing
+	
+I welcome anoyone who would like to help develop this shell. Currently, the only way to contribute
+code is through diff patches. 
+
+The TO DO section of Fry::Shell is an up-to-date list of features I plan on implementing. If you are
+fairly experienced in developing some of the features, I'd appreciate any advice or code
+you can give. For now, I'm looking for help with ReadLine modules, regular expression insight on
+creating grammar for parsing the commandline (similar to Zoidberg), logging and creating a cgi or
+mod_perl view.
+
+If interest picks up, I'll sourceforge this project, mainly for use of
+the mailing list and online repository.

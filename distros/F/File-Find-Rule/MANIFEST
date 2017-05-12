@@ -1,0 +1,15 @@
+MANIFEST
+Changes
+Makefile.PL
+META.yml
+lib/File/Find/Rule.pm
+lib/File/Find/Rule/Extending.pod
+lib/File/Find/Rule/Procedural.pod
+t/File-Find-Rule.t
+t/findrule.t
+testdir/File-Find-Rule.t
+testdir/findrule.t
+testdir/foobar
+testdir/lib/File/Find/Rule/Test/ATeam.pm
+findrule
+META.json                                Module JSON meta-data (added by MakeMaker)

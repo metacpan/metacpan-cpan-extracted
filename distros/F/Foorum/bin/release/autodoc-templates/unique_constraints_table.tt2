@@ -1,0 +1,16 @@
+<h3 name="[% source.moniker %]-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    [% FOREACH source.unique_constraints %]
+        [% SET class = loop.count % 2 ? 'odd' : 'even' %]
+        [% FILTER collapse %]
+            <tr class="[% class %]">
+            <td>[% name %]</td>
+            <td>[% columns.join( ', ' ) %]</td>
+            </tr>
+            [% INCLUDE table_comment.tt2 %]
+        [% END %]
+    [% END %]
+</table>
+[%# $Id: unique_constraints_table.tt2 22 2007-11-21 15:17:51Z jason $ #%]

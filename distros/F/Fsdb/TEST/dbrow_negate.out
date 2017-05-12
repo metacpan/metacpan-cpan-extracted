@@ -1,0 +1,4 @@
+#fsdb account passwd uid gid fullname homedir shell
+root	*	0	0	Root	/root	/bin/bash
+# this is a simple database
+#   | dbrow -v '_fullname =~ /John/'

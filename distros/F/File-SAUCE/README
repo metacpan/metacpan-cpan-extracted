@@ -1,0 +1,233 @@
+NAME
+    File::SAUCE - A library to manipulate SAUCE metadata
+
+SYNOPSIS
+        use File::SAUCE;
+
+        # Read the data...
+        # file, handle or string
+        my $sauce = File::SAUCE->new( file => 'myansi.ans' );
+
+        # Does the file have a SAUCE record?
+        print $sauce->has_sauce ? "has SAUCE" : "does not have SAUCE";
+
+        # Print the metadata...
+        $sauce->print;
+
+        # Get a value...
+        my $title = $sauce->title;
+
+        # Set a value...
+        $sauce->title( 'ANSi is 1337' );
+
+        # Get the SAUCE record as a string...
+        my $output = $sauce->as_string;
+
+        # Write the data...
+        # file, handle or string
+        $sauce->write( file => 'myansi.ans' );
+
+        # Clear the in-memory data...
+        $sauce->clear;
+
+        # Read the data...
+        # file, handle or string
+        $sauce->read( file => 'myansi.ans' );
+
+        # Remove the data...
+        # file, handle or string
+        $sauce->remove( file => 'myansi.ans' );
+
+DESCRIPTION
+    SAUCE stands for Standard Architecture for Universal Comment Extentions.
+    It is used as metadata to describe the file to which it is associated.
+    It's most common use has been with the ANSI and ASCII "art scene."
+
+    A file containing a SAUCE record looks like this:
+
+        +----------------+
+        | FILE Data      |
+        +----------------+
+        | EOF Marker     |
+        +----------------+
+        | SAUCE Comments |
+        +----------------+
+        | SAUCE Record   |
+        +----------------+
+
+    The SAUCE Comments block holds up to 255 comment lines, each 64
+    characters wide. It looks like this:
+
+        +----------------+------+------+---------+-------------+
+        | Field          | Size | Type | Default | set / get   |
+        +----------------+------+------+---------+-------------+
+        | ID             | 5    | Char | COMNT   | commment_id |
+        +----------------+------+------+---------+-------------+
+        | Comment Line 1 | 64   | Char |         | comments*   |
+        +----------------+------+------+---------+-------------+
+        | ...                                                  |
+        +----------------+------+------+---------+-------------+
+        | Comment Line X | 64   | Char |         | comments    |
+        +----------------+------+------+---------+-------------+
+
+    * Comments are stored as an array ref
+
+    And lastly, the SAUCE Record. It is exactly 128 bytes long:
+
+        +----------------+------+------+---------+-------------+
+        | Field          | Size | Type | Default | set / get   |
+        +----------------+------+------+---------+-------------+
+        | ID             | 5    | Char | SAUCE   | sauce_id    |
+        +----------------+------+------+---------+-------------+
+        | SAUCE Version  | 2    | Char | 00      | version     |
+        +----------------+------+------+---------+-------------+
+        | Title          | 35   | Char |         | title       |
+        +----------------+------+------+---------+-------------+
+        | Author         | 20   | Char |         | author      |
+        +----------------+------+------+---------+-------------+
+        | Group          | 20   | Char |         | group       |
+        +----------------+------+------+---------+-------------+
+        | Date           | 8    | Char |         | date        |
+        +----------------+------+------+---------+-------------+
+        | FileSize       | 4    | Long |         | filesize    |
+        +----------------+------+------+---------+-------------+
+        | DataType       | 1    | Byte |         | datatype_id |
+        +----------------+------+------+---------+-------------+
+        | FileType       | 1    | Byte |         | filetype_id |
+        +----------------+------+------+---------+-------------+
+        | TInfo1         | 2    | Word |         | tinfo1      |
+        +----------------+------+------+---------+-------------+
+        | TInfo2         | 2    | Word |         | tinfo2      |
+        +----------------+------+------+---------+-------------+
+        | TInfo3         | 2    | Word |         | tinfo3      |
+        +----------------+------+------+---------+-------------+
+        | TInfo4         | 2    | Word |         | tinfo4      |
+        +----------------+------+------+---------+-------------+
+        | Comments       | 1    | Byte |         | comments    |
+        +----------------+------+------+---------+-------------+
+        | Flags          | 1    | Byte |         | flags_id    |
+        +----------------+------+------+---------+-------------+
+        | Filler         | 22   | Byte |         | filler      |
+        +----------------+------+------+---------+-------------+
+
+    For more information see ACiD.org's SAUCE page at
+    http://www.acid.org/info/sauce/sauce.htm
+
+WARNING
+    From the SAUCE documenation:
+
+        SAUCE was initially created for supporting only the ANSi
+        & RIP screens. Since both ANSi and RIP are in effect
+        text-based and have no other form of control but the
+        End-Of-File marker, SAUCE should never interfere with the
+        workings of a program using either ANSi or RIP. If it does,
+        the program is not functionning the way it should. This is
+        NOT true for the other types of files however. Adding SAUCE
+        to some of the other filetypes supported in the SAUCE
+        specifications may have serious consequences on the proper
+        functionning of programs using those files, In the worst
+        case, they'll simply refuse the file, stating it is invalid.
+
+    The author(s) of this software take no resposibility for loss of data!
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+PUBLIC METHODS
+  new( [ %OPTIONS ] )
+    Creates a new File::SAUCE object. All arguments are optional. You can
+    pass one of two groups of options (as a hash). If you wish to read a
+    SAUCE record from a source, you can pass a file, handle or string.
+
+        my $sauce = File::SAUCE->new( file   => 'filename.ext' );
+        my $sauce = File::SAUCE->new( handle => \*FILEHANDLE );
+        my $sauce = File::SAUCE->new( string => $string );
+
+    If you want to create a new record with certain metadata values, just
+    pass them in as a hash.
+
+        my $sauce = File::SAUCE->new(
+            author => 'Me',
+            title  => 'My Work',
+            group  => 'My Group'
+        );
+
+  clear( )
+    Resets the in-memory SAUCE data to the default information.
+
+  read( %OPTIONS )
+    Tries to read a SAUCE record from a source. Uses the same options as
+    "new()".
+
+  write( %OPTIONS )
+    Writes the in-memory SAUCE data to a destination. Uses the same options
+    as "new". It calls "remove" before writing the data.
+
+  remove( %OPTIONS )
+    Removes any SAUCE data from the destination. This module enforces spoon
+    (ftp://ftp.artpacks.acid.org/pub/artpacks/programs/dos/editors/spn2d161.
+    zip) compatibility. The following calculation is used to determine how
+    big the file should be after truncation:
+
+        if( Filesize on disk - Filesize in SAUCE rec - Size of SAUCE rec ( w/ comments ) == 0 or 1 ) {
+            truncate to Filesize in SAUCE rec
+        }
+        else {
+            truncate to Filesize on disk - Size of SAUCE rec - 1 (EOF char)
+        }
+
+  as_string( )
+    Returns the SAUCE record (including EOF char and comments) as a string.
+
+  print( )
+    View the SAUCE structure (including comments) in a "pretty" format.
+
+  datatype( )
+    Return the string version of the file's datatype. Use datatype_id to get
+    the integer version.
+
+  filetype( )
+    Return the string version of the file's filetype. Use filetype_id to get
+    the integer version.
+
+  flags( )
+    Return the string version of the file's flags. Use flags_id to get the
+    integer version.
+
+  tinfo1_name( )
+    Return an english description of what this info value represents
+    (returns undef if there isn't one)
+
+  tinfo2_name( )
+    Return an english description of what this info value represents
+    (returns undef if there isn't one)
+
+  tinfo3_name( )
+    Return an english description of what this info value represents
+    (returns undef if there isn't one)
+
+  tinfo4_name( )
+    Return an english description of what this info value represents
+    (returns undef if there isn't one)
+
+  date( [ $date ] )
+    This is an overloaded date accessor. It accepts two types of dates as
+    inputs: a Time::Piece object or a string in the format of 'YYYYMMDD'. It
+    always returns a Time::Piece object.
+
+PRIVATE METHODS
+  _create_io_object( { OPTIONS }, MODE )
+    Generates an IO object. Uses FileHandle or IO::String.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

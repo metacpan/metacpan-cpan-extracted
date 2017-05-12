@@ -1,0 +1,33 @@
+---
+abstract: 'Tail all matching files in a given set of directories'
+author:
+  - 'Jon Schutz <jon at jschutz.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Tail-Dir
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config: 0
+  Cwd: 0
+  Digest::MD5: 0
+  File::ChangeNotify: 0
+  File::Spec: 0
+  File::Temp: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  POSIX: 0
+  Test::More: 0
+  Time::HiRes: 0
+  YAML::Any: 0
+version: 0.16

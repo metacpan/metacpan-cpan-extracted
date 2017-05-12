@@ -1,0 +1,5 @@
+Port chattr/lsattr to XS; more efficient and avoid PATH mess
+
+Slice @files?
+
+Global configuration of PATH?

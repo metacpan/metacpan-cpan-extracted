@@ -1,0 +1,5 @@
+$Id$
+TODO list for Perl module Finance::Currency::Convert::WebserviceX
+
+    - Mimic various ::Convert APIs to facilitate drop-in replacement
+    - Use Locale::Currency to verify from/to param values

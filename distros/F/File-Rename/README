@@ -1,0 +1,56 @@
+File-Rename version 0.20
+========================
+
+File::Rename provides an implementation of Larry Wall's eg/rename
+command.  All I have done is add some error checking and (more recently)
+add the File/Rename.pm module.
+
+An earlier version of the script is out in the Internet and is included
+with some linuxes, and the original eg/rename is not included in the
+Perl distribution, so I have put this up on CPAN.
+
+A revised version of the earlier script is now on the Internet,
+which includes more options.  This script, distinguished by
+"Getopt::Long::Configure('bundling')", was not written by me; I think
+the author is Aristotle Pagaltzis.  Version 0.10 of this distribution
+has similar options to the revised script.
+
+For Windows, the script is called file-rename to avoid clashes with
+existing rename command.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or if you have Module::Build
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+    
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+File::Basename File::Path File::Spec Getopt::Long
+(all included with Perl). 
+
+Testing requires File::Temp and Test::More which are
+available with perl 5.6.0.  I have successfully installed
+those modules for perl 5.005_05 and tested this module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, 2006, 2007, 2011 by Robin Barker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

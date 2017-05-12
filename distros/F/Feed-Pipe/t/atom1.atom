@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Webquills.net</title>
+    <subtitle>Develop effective web sites</subtitle>
+    <id>tag:www.webquills.net,2008-06-29:/scroll//4</id>
+    <updated>2009-11-24T23:52:51Z</updated>
+    <link rel="alternate" type="text/html" href="http://www.webquills.net/" />
+    <link rel="self" href="http://www.webquills.net/feed/index.atom" type="application/atom+xml" />
+    <link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-nd/3.0/" />
+    <logo>http://creativecommons.org/images/public/somerights20.gif</logo>
+
+<entry>
+    <title>I Replaced Movable Type with HTML::Mason</title>
+    <link rel="alternate" type="text/html" href="http://www.webquills.net/web-strategy/blogging/replaced-movable-type-mason.html" />
+    <id>tag:www.webquills.net,2009-07-08:replaced-movable-type-mason</id>
+    <published>2009-06-19T16:50:00Z</published>
+    <updated>2009-07-08T00:00:00Z</updated>
+    <summary>Although Movable Type is a fine blogging tool, I decided to build my own. Here&#x27;s why.  </summary>
+    <author>
+        <name>Vince Veselosky</name>
+    </author>
+    <category term="blogging" label="Blogging" />
+    <content type="xhtml" xml:lang="en" xml:base="http://www.webquills.net/web-strategy/blogging/">
+    <div xmlns="http://www.w3.org/1999/xhtml"><h1 id="ireplacedmovabletypewithhtml::mason">I Replaced Movable Type with HTML::Mason</h1>
+<p>A few weeks ago I wrote about some of the things I <a href="http://www.webquills.net/web-development/perl/10-things-i-lovehate-about-mov.html">love and hate about Movable Type</a> as a content management system. I still think <a href="http://www.movabletype.org/">Movable Type</a> is a great blogging tool, but as I tried to adapt it to my own need for a more general content management system, I kept running into road blocks. For web sites <em>not</em> laid out in the traditional blog format, Movable Type just didn't seem the best fit.</p>
+<p>Being a Perl developer myself, I naturally started thinking about what I would do differently. I realized that many of the things I loved about Movable Type had to do with its potential rather than the way I wanted to use it in practice. The subset of functionality I used was pretty small. In real life, MT was too much code for me, and solved too many problems I didn't have. With the <a href="http://en.wikipedia.org/wiki/Larry_Wall#Virtues_of_a_programmer">hubris of a Perl programmer</a>, I decided I could re-implement just the parts I needed, and thereby achieve better customization for Webquills using less code. </p>
+<p>While I'm still using MT for some other projects, Webquills.net is now running a custom code base that I have built using <a href="http://masonhq.com/">HTML::Mason</a>. Switching to Mason made my redesign of the site much easier to deal with. Incremental changes could be done quickly in a standard text editor rather than through the web with MT's interface. Also, I can now easily use source control for both the code that runs my website, and the content I publish. On the other hand, MT's <a href="http://microformats.org/">microformats</a> and fine metadata are missing (I will rebuild them eventually), and there is no web interface for editing or publishing content at all. It works for me, but not for anyone else!</p>
+<p>Over the next few weeks I'll write in the <a href="http://www.webquills.net/web-development/">tech section</a> about some of the details of that implementation. I'll also write about the reasoning behind some of my decisions in the <a href="http://www.webquills.net/web-strategy/">strategy section</a>. I will also be bringing up a lot shortcomings of the current implementation (and hopefully how I fix them). Of course, some the back end is just way too ugly to talk about, but I'll be trying to clean that up too.</p>
+<p>If you're interested in seeing how a new Perl-powered web site gets built from the beginning, then follow along via the <a href="http://feeds.feedburner.com/Webquills">Webquills RSS Feed</a>, or get <a href="http://www.feedburner.com/fb/a/emailverifySubmit?feedId=929839&amp;loc=en_US">updates via email</a>.</p>
+</div>
+    </content>
+</entry>
+<entry>
+    <title>10 Things I Love/Hate About Movable Type </title>
+    <link rel="alternate" type="text/html" href="http://www.webquills.net/web-development/perl/10-things-i-lovehate-about-mov.html" />
+    <id>tag:www.webquills.net,2009-05-03:10-things-i-lovehate-about-mov</id>
+    <published>2009-05-03T18:30:45Z</published>
+    <updated>2009-05-03T18:33:14Z</updated>
+    <summary>In which our hero counts off the list of inspirations and irritations encountered while blogging with Movable Type.  </summary>
+    <author>
+        <name>Vince Veselosky</name>
+    </author>
+    <category term="perl" label="Perl" />
+    <content type="xhtml" xml:lang="en" xml:base="http://www.webquills.net/web-development/perl/">
+    <div xmlns="http://www.w3.org/1999/xhtml"><h1 id="thingsilovehateaboutmovabletype">10 Things I Love/Hate About Movable Type</h1>
+<p>I have a love/hate relationship with my blogging tool. Here are ten aspects of Movable Type about which I am emotionally conflicted.</p>
+<ol>
+	<li>
+		<p><strong>Love:</strong> Movable Type is implemented in Perl. Yay, Perl! <br /><strong>Hate:</strong> Movable Type is implemented in "old school" Perl, not <a href="http://www.modernperlbooks.com/mt/2009/01/why-modern-perl.html">Modern Perl</a>. (But they are working on that, thanks MT team!)</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Movable Type's publishing engine supports many publishing modes, including scheduled posts, and publishes static HTML files by default for efficient hosting. <br /><strong>Hate:</strong> The only option for dynamic publishing is - PHP? Seriously? Sorry MT, I fully understand the business reasons behind this, but as a Perl developer, it still offends me.</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Movable Type is themeable. <br /><strong>Hate:</strong> The default theme is ugly. Replacement themes are not much better, so I'm still using the default.</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Movable Type fully supports post metadata, without overwhelming you with interface inputs (not a unique feature of MT, but a nice one). <br /><strong>Hate:</strong> MT has three distinct metadata items called Categories, Tags, and Keywords. Each behaves differently, despite the fact that they all <em>mean</em> approximately the same thing to a user. (Tip: Categories generate pages. Tags do not, but are searchable. Keywords are basically useless.)</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Input filters allow you to compose your posts using <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, <a href="http://textile.thresholdstate.com/">Textile</a>, or plain HTML. <br /><strong>Hate:</strong> The built-in editor is just as clunky as all web-based editors (a problem not unique to MT). But worse, it feels "bolted on" rather than integrated into the blogging system. For example, there is no tool to easily create links to other posts. If you want to link to a previous post, you have to go look up the URL yourself (which is not easy due to the information architecture of the site, see below).</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Plugins and The Registry - Everything revolves around this central "registry" data structure. Once you understand that structure and how to tweak it, you can do some pretty cool things without a lot of code. As a matter of fact, you don't even need to write Perl anymore, you can just drop a yaml file in a directory and it gets slurped into the data structure. <br /><strong>Hate:</strong> Managing plugins is a huge pain. In order for them to work you have to mix the plugin files with the original MT code in the same directory. You're never really sure if you're overwriting something, and if you do, you're SOL. Upgrading MT or one of the plugins also becomes painful, because it's hard to tell which files are core and which plugin. I took to managing mine with <a href="http://www.gnu.org/software/stow/">stow</a>, which made it livable, but still horrible. Plus, half the plugins available only work with the ancient MT3, not the more modern MT4.</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> The flexible template system. Once you get the hang of it, it's easy to make template tags produce all kinds of nifty things. And it is possible (though not trivial) to create new tags via plugins if you need additional functionality. <br /><strong>Hate:</strong> Templates are stored in the database by default, not the file system. This means you have to use the clunky MT template editor to edit them any time you change, or use the clunky MT template editor to edit every single template individually to force them to live in the filesystem. (Or write a script to fix it.) And you have to remember to do this every time you create a new blog too.</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Every template is customizable, and you can make as many as you want. <br /><strong>Hate:</strong> As soon as you customize a template, you have to start worrying about your changes getting clobbered if you "refresh" to get new MT templates, which you really have to do if you want to take advantage of new MT features. (At least MT makes backups for you by default. But since they are stored in the database and not the filesystem, they are a pain to deal with.)</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Movable Type supports multiple blogs/sites in the same installation, and as a result it is possible to craft queries in your templates that aggregate multiple blogs. <br /><strong>Hate:</strong> Each blog always gets its own separate set of templates based on an original core set. Sharing individual templates across blogs is hard. Sharing a whole set of templates requires bending over backwards and nibbling your heels. Making an identical set of changes to identical non-shared templates requires a custom Perl script, or the patience of Job.</p>
+	</li>
+	<li>
+		<p><strong>Love:</strong> Movable Type's default template set is built with web standards: XHTML, CSS, and even <a href="http://microformats.org/about/">microformats</a>, with <a href="http://en.wikipedia.org/wiki/Progressive_enhancement">progressive enhancement</a> in Javascript. <br /><strong>Hate:</strong> The information architecture of the default template set is terrible. Navigation is stuck into a sidebar down the page instead of up front. Pages that list posts always include the full text of a post rather than just a pointer, making exploration and discovery difficult. The whole site architecture seems to have been inherited unchanged from whatever protozoic blog first emerged from the muck back in the Paleo-web of the "Dot Com Bubble" era.</p>
+	</li>
+</ol>
+<p>Glad I got that off my chest. What's <em>your</em> boggle?</p>
+</div>
+    </content>
+</entry>
+<entry>
+    <title>The Moose is on fire! </title>
+    <link rel="alternate" type="text/html" href="http://www.webquills.net/web-development/perl/the-moose-is-on-fire.html" />
+    <id>tag:www.webquills.net,2009-04-26:the-moose-is-on-fire</id>
+    <published>2009-04-26T21:38:26Z</published>
+    <updated>2009-04-26T22:14:54Z</updated>
+    <summary>In which I am inspired by my fellow Perl hackers to write blog posts and code using the Moose object system for Perl.  </summary>
+    <author>
+        <name>Vince Veselosky</name>
+    </author>
+    <category term="perl" label="Perl" />
+    <content type="xhtml" xml:lang="en" xml:base="http://www.webquills.net/web-development/perl/">
+    <div xmlns="http://www.w3.org/1999/xhtml"><h1 id="themooseisonfire">The Moose is on fire!</h1>
+<p><a href="http://www.shadowcat.co.uk/blog/matt-s-trout/iron-man/">Matt S. Trout suggested</a> that we Perl people should be posting to our blogs weekly, rather than weakly. It's hard to argue against that, so here's my first in an attempted string of weekly posts. Cross your fingers!</p>
+<p>This week I was strongly inspired by all the yummy goodness happening around the <a href="http://search.cpan.org/perldoc?Moose">Moose</a> project. The <a href="http://www.catalystframework.org/">Catalyst framework</a> is now <a href="http://jjnapiorkowski.vox.com/library/post/catalyst-58001-has-shipped.html">officially based on Moose</a>, and <a href="http://jjnapiorkowski.vox.com/">John Napiorkowski</a> is <a href="http://jjnapiorkowski.vox.com/library/post/bluechild-end-to-end-development-of-a-perl-catalyst-website.html">writing a Catalyst app in public</a> to show it off. Meanwhile <a href="http://blog.jrock.us">Jonathan Rockway</a> did some showing off too (okay, before this week, but I just caught up on my feeds), using a URL un-shortening service as an excuse to put some <a href="http://blog.jrock.us/articles/Unshortening%20URLs%20with%20Modern%20Perl.pod">swank Moose extensions</a> out front. And chromatic also had some great stuff to say about <a href="http://www.modernperlbooks.com/mt/2009/04/attributes-of-elegant-perl-concision.html">concision in Perl</a>, a subject on which <a href="http://www.webquills.net/scroll/2008/07/perl-readability-expressivenes.html">I have spoken</a> as well.</p>
+<p>With both jrock and chromatic writing about how cool <a href="http://search.cpan.org/perldoc?MooseX::Declare">MooseX::Declare</a> is, it got me itching to try it out for myself. I've been way too busy for hobby coding in the last couple of months, and that's just bad for a Perl geek's mood. So this week I'm going to make some time for my passion and carve out a script I've been wanting, and I'm going to do it with MooseX::Declare for that warm and fuzzy feeling. So I'm going to take a spin through the new Moose documentation that <a href="http://blog.urth.org/2009/04/moose-docs-grant-wrap-up.html">Dave Rolsky just finished</a>, and then get cracking. If it all works out, you'll hear about it next week!</p>
+</div>
+    </content>
+</entry>
+<entry>
+    <title>What do you get if you cross Perl CGI with Mod-PHP? </title>
+    <link rel="alternate" type="text/html" href="http://www.webquills.net/web-development/perl/cross-perl-cgi-with-mod-phphtml.html" />
+    <id>tag:www.webquills.net,2008-12-16:cross-perl-cgi-with-mod-phphtml</id>
+    <published>2008-12-16T23:14:11Z</published>
+    <updated>2008-12-16T23:39:00Z</updated>
+    <summary>One possibility is mod_perlite, an Apache module that aims to make Perl as easy as PHP for users to deploy and for service providers to host.</summary>
+    <author>
+        <name>Vince Veselosky</name>
+    </author>
+    <category term="perl" label="Perl" />
+    <content type="xhtml" xml:lang="en" xml:base="http://www.webquills.net/web-development/perl/">
+    <div xmlns="http://www.w3.org/1999/xhtml"><h1 id="whatdoyougetifyoucrossperlcgiwithmod-php">What do you get if you cross Perl CGI with Mod-PHP?</h1>
+<p>One possibility is <a href="http://www.modperlite.org/">mod_perlite</a>, an Apache module that aims to make Perl as easy as PHP for users to deploy and for service providers to host.</p>
+<p>I love <code>mod_perl</code> and use it every day, but the fact is that most web hosts don't give their customers access to it, precisely because it is so powerful (and complex). But old-school CGI scripts with their fork-and-exec model are slow and resource intensive. This has left an opening into which PHP has stepped as the "upload your files and you're done" language for web development.</p>
+<p>The <abbr title="Just Another Perl Hacker">JAPH</abbr>s over at <a href="http://www.modperlite.org/">modperlite.org</a> are looking for some help. If you know your way around Perl and/or Apache internals, or are looking for an excuse to learn, they would love to hear from you. Go "git" <a href="http://github.com/SodaBrew/mod_perlite/tree/master">the code</a>, <a href="http://groups.google.com/group/modperlite">join the group</a>, and lend a hand!</p>
+</div>
+    </content>
+</entry>
+
+</feed>

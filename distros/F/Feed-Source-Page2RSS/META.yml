@@ -1,0 +1,20 @@
+---
+name: Feed-Source-Page2RSS
+version: 0.01
+author:
+  - 'Emmanuel Di Pretoro <<manu@bjornoya.net>>'
+abstract: Creation of a Atom/RSS feed with the Page2RSS service
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  URI: 0
+provides:
+  Feed::Source::Page2RSS:
+    file: lib/Feed/Source/Page2RSS.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

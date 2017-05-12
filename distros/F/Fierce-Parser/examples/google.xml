@@ -1,0 +1,295 @@
+<fiercescan args=" -dns google.com -format xml -output google.xml" startscan="1258146660" startscanstr="Fri Nov 13 16:11:00 2009" fversion="2.0beta-r273" xmlversion="1.0"> 
+<domainscan domain="google.com" startscan="1258146660" startscanstr="Fri Nov 13 16:11:00 2009">
+
+    <!--  Name Servers -->
+    <nameservers starttime="1258146660" starttimestr="Fri Nov 13 16:11:00 2009" endtime="1258146661" endtimestr="Fri Nov 13 16:11:01 2009" elapsedtime="1">
+            <node ip="216.239.36.10" hostname="ns3.google.com"/>
+            <node ip="216.239.38.10" hostname="ns4.google.com"/>
+            <node ip="216.239.32.10" hostname="ns1.google.com"/>
+            <node ip="216.239.34.10" hostname="ns2.google.com"/>
+    </nameservers>
+    <!--  ARIN -->
+    <arin query="google" starttime="1258146661" starttimestr="Fri Nov 13 16:11:01 2009" endtime="1258146661" endtimestr="Fri Nov 13 16:11:01 2009" elapsedtime="0">
+               <range iprange="206.130.86.0 - 206.130.86.255" nethandle="NET-206-130-86-0-1"/>
+               <range iprange="208.5.125.160 - 208.5.125.175" nethandle="NET-208-5-125-160-1"/>
+               <range iprange="65.68.85.208 - 65.68.85.215" nethandle="NET-65-68-85-208-1"/>
+               <range iprange="66.139.252.144 - 66.139.252.151" nethandle="NET-66-139-252-144-1"/>
+               <range iprange="69.51.202.32 - 69.51.202.63" nethandle="NET-69-51-202-32-1"/>
+               <range iprange="69.149.145.120 - 69.149.145.127" nethandle="NET-69-149-145-120-1"/>
+    </arin>
+    <zonetransfers starttime="1258146661" starttimestr="Fri Nov 13 16:11:01 2009" endtime="1258146664" endtimestr="Fri Nov 13 16:11:04 2009" elapsedtime="3">
+        <zonetransfer nameserver="ns3.google.com" bool="0"> 
+            </zonetransfer>
+        <zonetransfer nameserver="ns4.google.com" bool="0"> 
+            </zonetransfer>
+        <zonetransfer nameserver="ns1.google.com" bool="0"> 
+            </zonetransfer>
+        <zonetransfer nameserver="ns2.google.com" bool="0"> 
+            </zonetransfer>
+    </zonetransfers>
+    <!--  Check for Wildcard -->
+    <wildcard starttime="1258146664" starttimestr="Fri Nov 13 16:11:04 2009" endtime="1258146664" endtimestr="Fri Nov 13 16:11:04 2009" elapsedtime="0">
+    </wildcard>
+    <!--  Prefix Brute Force DNS -->
+    <bruteforce starttime="1258146664" starttimestr="Fri Nov 13 16:11:04 2009" endtime="1258147086" endtimestr="Fri Nov 13 16:18:06 2009" elapsedtime="422">
+               <node ip="74.125.115.105" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.147" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.104" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.103" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.99" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.106" hostname="scholar.l.google.com"/>
+               <node ip="74.125.91.106" hostname="scholar.l.google.com"/>
+               <node ip="74.125.91.99" hostname="scholar.l.google.com"/>
+               <node ip="74.125.91.103" hostname="scholar.l.google.com"/>
+               <node ip="74.125.91.105" hostname="scholar.l.google.com"/>
+               <node ip="74.125.91.147" hostname="scholar.l.google.com"/>
+               <node ip="74.125.91.104" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.104" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.103" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.99" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.105" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.106" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.147" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.112" hostname="adwords.l.google.com"/>
+               <node ip="74.125.93.112" hostname="adwords.l.google.com"/>
+               <node ip="74.125.93.101" hostname="www3.l.google.com"/>
+               <node ip="74.125.93.100" hostname="www3.l.google.com"/>
+               <node ip="74.125.93.138" hostname="www3.l.google.com"/>
+               <node ip="74.125.93.139" hostname="www3.l.google.com"/>
+               <node ip="74.125.93.102" hostname="www3.l.google.com"/>
+               <node ip="74.125.93.113" hostname="www3.l.google.com"/>
+               <node ip="74.125.91.113" hostname="www3.l.google.com"/>
+               <node ip="74.125.91.138" hostname="www3.l.google.com"/>
+               <node ip="74.125.91.102" hostname="www3.l.google.com"/>
+               <node ip="74.125.91.100" hostname="www3.l.google.com"/>
+               <node ip="74.125.91.139" hostname="www3.l.google.com"/>
+               <node ip="74.125.91.101" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.102" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.100" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.101" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.138" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.139" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.113" hostname="www3.l.google.com"/>
+               <node ip="66.249.89.99" hostname="asia.l.google.com"/>
+               <node ip="66.249.89.104" hostname="asia.l.google.com"/>
+               <node ip="66.249.89.147" hostname="asia.l.google.com"/>
+               <node ip="66.249.89.103" hostname="asia.l.google.com"/>
+               <node ip="74.125.115.191" hostname="blogger.l.google.com"/>
+               <node ip="74.125.93.191" hostname="blogger.l.google.com"/>
+               <node ip="74.125.54.213" hostname="feedsftp.l.google.com"/>
+               <node ip="74.125.19.101" hostname="csi.l.google.com"/>
+               <node ip="74.125.19.138" hostname="csi.l.google.com"/>
+               <node ip="74.125.19.113" hostname="csi.l.google.com"/>
+               <node ip="74.125.19.139" hostname="csi.l.google.com"/>
+               <node ip="74.125.19.102" hostname="csi.l.google.com"/>
+               <node ip="74.125.19.100" hostname="csi.l.google.com"/>
+               <node ip="74.125.127.138" hostname="csi.l.google.com"/>
+               <node ip="74.125.127.102" hostname="csi.l.google.com"/>
+               <node ip="74.125.127.100" hostname="csi.l.google.com"/>
+               <node ip="74.125.127.139" hostname="csi.l.google.com"/>
+               <node ip="74.125.127.113" hostname="csi.l.google.com"/>
+               <node ip="74.125.127.101" hostname="csi.l.google.com"/>
+               <node ip="74.125.155.138" hostname="csi.l.google.com"/>
+               <node ip="74.125.155.100" hostname="csi.l.google.com"/>
+               <node ip="74.125.155.102" hostname="csi.l.google.com"/>
+               <node ip="74.125.155.139" hostname="csi.l.google.com"/>
+               <node ip="74.125.155.101" hostname="csi.l.google.com"/>
+               <node ip="74.125.155.113" hostname="csi.l.google.com"/>
+               <node ip="74.125.93.190" hostname="kh.l.google.com"/>
+               <node ip="74.125.93.91" hostname="kh.l.google.com"/>
+               <node ip="74.125.93.136" hostname="kh.l.google.com"/>
+               <node ip="74.125.93.93" hostname="kh.l.google.com"/>
+               <node ip="74.125.115.91" hostname="kh.l.google.com"/>
+               <node ip="74.125.115.136" hostname="kh.l.google.com"/>
+               <node ip="74.125.115.190" hostname="kh.l.google.com"/>
+               <node ip="74.125.115.93" hostname="kh.l.google.com"/>
+               <node ip="74.125.91.91" hostname="kh.l.google.com"/>
+               <node ip="74.125.91.136" hostname="kh.l.google.com"/>
+               <node ip="74.125.91.93" hostname="kh.l.google.com"/>
+               <node ip="74.125.91.190" hostname="kh.l.google.com"/>
+               <node ip="74.125.93.193" hostname="mobile.l.google.com"/>
+               <node ip="74.125.115.193" hostname="mobile.l.google.com"/>
+               <node ip="74.125.91.193" hostname="mobile.l.google.com"/>
+               <node ip="74.125.93.83" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.93.18" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.93.17" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.93.19" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.91.83" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.91.18" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.91.17" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.91.19" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.115.19" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.115.83" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.115.17" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.115.18" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.93.133" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.93.118" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.91.133" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.91.118" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.115.118" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.47.140" hostname="newsfeed1.google.com"/>
+               <node ip="216.239.32.10" hostname="ns.google.com"/>
+               <node ip="216.239.34.10" hostname="ns2.google.com"/>
+               <node ip="216.239.36.10" hostname="ns3.google.com"/>
+               <node ip="216.239.38.10" hostname="ns4.google.com"/>
+               <node ip="74.125.159.118" hostname="pages.l.google.com"/>
+               <node ip="74.125.159.133" hostname="pages.l.google.com"/>
+               <node ip="64.233.184.4" hostname="proxy.google.com"/>
+               <node ip="66.102.14.225" hostname="proxy.google.com"/>
+               <node ip="64.233.187.4" hostname="proxy.google.com"/>
+               <node ip="216.239.42.4" hostname="proxy.google.com"/>
+               <node ip="216.239.53.4" hostname="proxy.google.com"/>
+               <node ip="66.102.9.4" hostname="proxy.google.com"/>
+               <node ip="216.239.59.4" hostname="proxy.google.com"/>
+               <node ip="216.239.55.5" hostname="proxy.google.com"/>
+               <node ip="64.233.165.4" hostname="proxy.google.com"/>
+               <node ip="216.239.57.4" hostname="proxy.google.com"/>
+               <node ip="64.233.171.4" hostname="proxy.google.com"/>
+               <node ip="64.233.167.4" hostname="proxy.google.com"/>
+               <node ip="66.102.14.241" hostname="proxy.google.com"/>
+               <node ip="64.233.161.4" hostname="proxy.google.com"/>
+               <node ip="66.102.0.4" hostname="proxy.google.com"/>
+               <node ip="64.233.179.4" hostname="proxy.google.com"/>
+               <node ip="64.233.169.4" hostname="proxy.google.com"/>
+               <node ip="74.125.53.91" hostname="sb.l.google.com"/>
+               <node ip="74.125.53.190" hostname="sb.l.google.com"/>
+               <node ip="74.125.53.93" hostname="sb.l.google.com"/>
+               <node ip="74.125.53.136" hostname="sb.l.google.com"/>
+               <node ip="74.125.45.25" hostname="smtp1.google.com"/>
+               <node ip="74.125.65.125" hostname="talk.l.google.com"/>
+               <node ip="209.85.163.125" hostname="talk.l.google.com"/>
+               <node ip="74.125.47.125" hostname="talk.l.google.com"/>
+               <node ip="64.9.224.69" hostname="vpn.google.com"/>
+               <node ip="64.9.224.70" hostname="vpn.google.com"/>
+               <node ip="64.9.224.68" hostname="vpn.google.com"/>
+               <node ip="66.102.9.100" hostname="w1.google.com"/>
+               <node ip="72.14.224.25" hostname="wam.google.com"/>
+               <node ip="72.14.224.24" hostname="wam.google.com"/>
+               <node ip="64.233.169.99" hostname="www.l.google.com"/>
+               <node ip="64.233.169.103" hostname="www.l.google.com"/>
+               <node ip="64.233.169.105" hostname="www.l.google.com"/>
+               <node ip="64.233.169.147" hostname="www.l.google.com"/>
+               <node ip="64.233.169.104" hostname="www.l.google.com"/>
+               <node ip="64.233.169.106" hostname="www.l.google.com"/>
+               <node ip="64.233.179.104" hostname="www2.google.com"/>
+    </bruteforce>
+    <!--  Find MX Record-->
+    <findmx starttime="1258147086" starttimestr="Fri Nov 13 16:18:06 2009" endtime="1258147086" endtimestr="Fri Nov 13 16:18:06 2009" elapsedtime="0">
+            <mx preference="10" exchange="google.com.s9b1.psmtp.com"/>
+            <mx preference="10" exchange="google.com.s9a2.psmtp.com"/>
+            <mx preference="10" exchange="google.com.s9b2.psmtp.com"/>
+            <mx preference="10" exchange="google.com.s9a1.psmtp.com"/>
+    </findmx>
+
+    <!--  Whois -->
+    <whois starttime="1258147086" starttimestr="Fri Nov 13 16:18:06 2009" endtime="1258147088" endtimestr="Fri Nov 13 16:18:08 2009" elapsedtime="2">
+               <range iprange="74.125.0.0 - 74.125.255.255" nethandle="NET-74-125-0-0-1"/>
+    </whois>
+     <!--  Reverse Lookup -->
+    <reverselookup starttime="1258147088" starttimestr="Fri Nov 13 16:18:08 2009" endtime="1258147145" endtimestr="Fri Nov 13 16:19:05 2009" elapsedtime="57">
+               <node ip="74.125.93.103" hostname="scholar.google.com"/>
+               <node ip="74.125.115.105" hostname="scholar.google.com"/>
+               <node ip="74.125.93.106" hostname="scholar.google.com"/>
+               <node ip="255.2.0.0" hostname="scholar.google.com"/>
+               <node ip="74.125.93.112" hostname="adwords.l.google.com"/>
+               <node ip="74.125.91.112" hostname="adwords.l.google.com"/>
+               <node ip="74.125.115.112" hostname="adwords.l.google.com"/>
+               <node ip="74.125.93.113" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.102" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.139" hostname="www3.l.google.com"/>
+               <node ip="74.125.115.103" hostname="www2.l.google.com"/>
+               <node ip="74.125.93.99" hostname="scholar.google.com"/>
+               <node ip="74.125.91.105" hostname="scholar.google.com"/>
+               <node ip="74.125.91.99" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.104" hostname="scholar.l.google.com"/>
+               <node ip="74.125.93.147" hostname="scholar.l.google.com"/>
+               <node ip="74.125.91.147" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.104" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.106" hostname="scholar.l.google.com"/>
+               <node ip="74.125.115.147" hostname="www2.l.google.com"/>
+               <node ip="74.125.93.105" hostname="www2.l.google.com"/>
+               <node ip="74.125.93.138" hostname="www3.l.google.com"/>
+               <node ip="74.125.91.113" hostname="www3.l.google.com"/>
+               <node ip="74.125.93.102" hostname="www3.l.google.com"/>
+               <node ip="74.125.93.100" hostname="clients.l.google.com"/>
+               <node ip="74.125.91.101" hostname="clients.l.google.com"/>
+               <node ip="74.125.93.191" hostname="www.blogger.com"/>
+               <node ip="74.125.91.191" hostname="www.blogger.com"/>
+               <node ip="74.125.115.191" hostname="www.blogger.com"/>
+               <node ip="66.249.89.99" hostname="asia.l.google.com"/>
+               <node ip="66.249.89.103" hostname="asia.l.google.com"/>
+               <node ip="74.125.115.100" hostname="clients.l.google.com"/>
+               <node ip="74.125.93.139" hostname="clients.l.google.com"/>
+               <node ip="74.125.91.102" hostname="code.l.google.com"/>
+               <node ip="74.125.115.138" hostname="code.l.google.com"/>
+               <node ip="74.125.115.113" hostname="books.google.com"/>
+               <node ip="74.125.115.101" hostname="books.google.com"/>
+               <node ip="74.125.91.139" hostname="books.google.com"/>
+               <node ip="74.125.91.100" hostname="books.google.com"/>
+               <node ip="66.249.89.104" hostname="asia.l.google.com"/>
+               <node ip="66.249.89.147" hostname="asia.l.google.com"/>
+               <node ip="74.125.93.101" hostname="gmail.google.com"/>
+               <node ip="74.125.54.213" hostname="uploads.google.com"/>
+               <node ip="74.125.91.138" hostname="groups.l.google.com"/>
+               <node ip="74.125.19.139" hostname="id.l.google.com"/>
+               <node ip="74.125.93.136" hostname="kh.l.google.com"/>
+               <node ip="74.125.115.99" hostname="gw.l.google.com"/>
+               <node ip="74.125.91.106" hostname="images.l.google.com"/>
+               <node ip="74.125.91.104" hostname="images.l.google.com"/>
+               <node ip="74.125.93.190" hostname="kh.l.google.com"/>
+               <node ip="74.125.19.113" hostname="id.l.google.com"/>
+               <node ip="74.125.115.91" hostname="kh.l.google.com"/>
+               <node ip="74.125.115.93" hostname="kh.l.google.com"/>
+               <node ip="74.125.93.93" hostname="kh.l.google.com"/>
+               <node ip="74.125.91.103" hostname="images.l.google.com"/>
+               <node ip="74.125.91.193" hostname="mobile.l.google.com"/>
+               <node ip="74.125.93.193" hostname="mobile.l.google.com"/>
+               <node ip="74.125.93.19" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.93.83" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.91.136" hostname="mt.l.google.com"/>
+               <node ip="74.125.115.118" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.93.118" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.93.133" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.91.118" hostname="mw-small.l.google.com"/>
+               <node ip="74.125.93.91" hostname="mt.l.google.com"/>
+               <node ip="74.125.115.19" hostname="googlemail.l.google.com"/>
+               <node ip="74.125.115.193" hostname="mobile.l.google.com"/>
+               <node ip="74.125.47.140" hostname="newsfeed1.google.com"/>
+               <node ip="74.125.159.118" hostname="pages.google.com"/>
+               <node ip="74.125.159.133" hostname="pages.google.com"/>
+               <node ip="74.125.91.190" hostname="picasaweb.l.google.com"/>
+               <node ip="74.125.45.25" hostname="smtp1.google.com"/>
+               <node ip="74.125.53.93" hostname="sb.l.google.com"/>
+               <node ip="74.125.53.190" hostname="sb.l.google.com"/>
+               <node ip="74.125.53.91" hostname="sb.l.google.com"/>
+               <node ip="74.125.65.125" hostname="talk.l.google.com"/>
+               <node ip="74.125.47.125" hostname="talk.l.google.com"/>
+               <node ip="209.85.163.125" hostname="talk.l.google.com"/>
+               <node ip="64.233.169.125" hostname="talk.l.google.com"/>
+               <node ip="74.125.53.136" hostname="sb.l.google.com"/>
+               <node ip="74.125.115.190" hostname="sb.l.google.com"/>
+               <node ip="74.125.91.133" hostname="voice.l.google.com"/>
+               <node ip="74.125.45.100" hostname="google.com"/>
+               <node ip="74.125.67.100" hostname="google.com"/>
+               <node ip="64.233.169.104" hostname="www.l.google.com"/>
+               <node ip="64.233.169.106" hostname="www.l.google.com"/>
+               <node ip="64.233.169.99" hostname="www.l.google.com"/>
+               <node ip="64.233.169.105" hostname="www.l.google.com"/>
+               <node ip="64.233.169.103" hostname="www.l.google.com"/>
+               <node ip="74.125.53.100" hostname="google.com"/>
+    </reverselookup>
+
+    <!--  Find Nearby -->
+    <findnearby starttime="1258147146" starttimestr="Fri Nov 13 16:19:06 2009" endtime="1258147929" endtimestr="Fri Nov 13 16:32:09 2009" elapsedtime="783">
+               <ptr ip="66.102.14.225" hostname="225.14.102.66.in-addr.arpa" ptrdname="proxy.google.com"/>
+               <ptr ip="66.102.9.4" hostname="4.9.102.66.in-addr.arpa" ptrdname="proxy.google.com"/>
+               <ptr ip="66.102.9.25" hostname="25.9.102.66.in-addr.arpa" ptrdname="smtp5.google.com"/>
+               <ptr ip="64.233.179.4" hostname="4.179.233.64.in-addr.arpa" ptrdname="proxy.google.com"/>
+               <ptr ip="64.233.169.4" hostname="4.169.233.64.in-addr.arpa" ptrdname="proxy.google.com"/>
+    </findnearby>
+
+<endtimedetails endtime="1258147929" endtimestr="Fri Nov 13 16:11:00 2009" elapsedtime="1269"/>
+</domainscan>
+
+<endscan endtime="1258147929" endtimestr="Fri Nov 13 16:32:09 2009" elapsedtime="1269"/>
+</fiercescan>

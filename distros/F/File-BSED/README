@@ -1,0 +1,201 @@
+NAME
+    File::BSED - Search/Replace in Binary Files.
+
+VERSION
+    This document describes File::BSED version 0.66
+
+SYNOPSIS
+        use File::BSED qw(binary_search_replace binary_file_matches);
+
+        # search/replace
+        my $matches = binary_search_replace({
+            search  => 'ff3cea3f0013',
+            replace => 'b801000000c3',
+            infile  => '/bin/ls',
+            outfile => '/tmp/ls.patched'
+        });
+        if ($matches == -1) {
+            my $error_string = File::BSED->errtostr();
+            die "Error: $error_string\n";
+        }
+        print "Replaced $matches time(s)\n";
+
+        # search
+        my $matches = binary_file_matches('ff3cea3f0013', '/bin/ls');
+        print "Matched $matches time(s)\n";
+
+        # replace 'gnu' to 'bsd'
+        my $hex_gnu = File::BSED::string_to_hexstring('gnu');
+        my $hex_bsd = File::BSED::string_to_hexstring('bsd');
+        my $matches = binary_search_replace({
+            search  => $hex_gnu,
+            replace => $hex_bsd,
+            infile  => '/bin/ls',
+            outfile => 'ls.bsd',
+        });
+        # [...]
+
+DESCRIPTION
+    This is a perl-binding to "libgbsed", a binary stream editor.
+
+    "gbsed" lets you search and replace binary data in binary files by using
+    hex values in text strings as search patterns. You can also use wildcard
+    matches with "??", which will match any wide byte.
+
+    These are all valid search strings:
+
+        search => "0xffc300193ab2f63a";
+        search => "0xff??00??3ab2f??a";
+        search => "FF??00??3AB2F??A";
+
+    while these are not:
+
+        search => "the quick brown fox"; # only hex, no text. you would have to
+                                         # convert the text to hex first.
+        search => "0xff?c33ab3?accc";    # no nybbles only wide bytes. (?? not ?).
+
+SUBROUTINES/METHODS
+  CLASS METHODS
+   "binary_search_replace(\%arguments)"
+    Search and replace in a binary file. Valid arguments are:
+
+    search
+        The pattern to search for. Must be a string with hex digits.
+
+    replace
+        What to replace with. Must be a string with hex digits. (Probably a
+        very good idea that it is the same length as the search pattern).
+
+    infile
+        The filename of the file to search in.
+
+    outfile
+        The filename of the file to save changes to.
+
+    minmatch
+        Need at least $minmatch matches before any work.
+
+    maxmatch
+        Stop after $maxmatch matches.
+
+    "bsed" returns the number of times the search string was found in the
+    file, or -1 if an error occurred. When an error occurs the error number
+    can be found with "errno" and you can get a description of the error
+    with "errtostr".
+
+    Example:
+
+        my $number_of_matches = binary_search_replace({
+            search  => '0xff',
+            replace => '0x00',
+            
+        infile  => '/bin/ls',
+            outfile => '/bin/ls.patched',
+        });
+
+        if ($number_of_matches = -1) {
+            die sprintf("ERROR: %s\n", File::BSED->errtostr());
+        }
+        print "Replaced $number_of_matches time(s).\n";
+
+   "gbsed(\%arguments)"
+    Alias to "binary_search_replace" for backward compatibility.
+
+   "binary_file_matches($search_pattern, $input_file)"
+    Return the number of times $search_pattern is found in binary file.
+    Search pattern must be a string of hex digits.
+
+    Example:
+
+        my $number_of_matches = binary_file_matches('0xfeedface', '/bin/ls');
+        print "Matched $number_of_matches time(s)\n";
+
+   "string_to_hexstring($text)"
+    Convert text to a string of ASCII hex values.
+
+  ERROR HANDLING
+   "errtostr"
+    This function returns a string describing what happened. if an error has
+    occurred with either "binary_search_matches" or "binary_file_matches"
+    (they return -1 on error).
+
+   "errno"
+    This function returns the error number if an error has occurred with
+    either "binary_search_replace" or "binary_file_matches" (they return -1
+    on error).
+
+    Use "errtostr" instead.
+
+  WARNINGS
+   "warnings()"
+    Returns an array ref to any warnings raised.
+
+    Example:
+
+        my @warnings = @{ File::BSED::warnings() };
+        for my $warning (@warnings) {
+            warn "Warning: $warning\n";
+        }
+
+DIAGNOSTICS
+CONFIGURATION AND ENVIRONMENT
+    This module requires no configuration file or environment variables.
+
+DEPENDENCIES
+    *   A working C compiler.
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-file-bsed@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+SEE ALSO
+    *   plbsed
+
+AUTHOR
+    by Ask Solem, "ask@0x61736b.net".
+
+ACKNOWLEDGEMENTS
+    Dave Dykstra "dwdbsed@drdykstra.us". for "bsed" the original program,
+
+    *0xfeedface* for the wildcards patch.
+
+LICENSE AND COPYRIGHT
+    Copyright (c), 2007 Ask Solem "ask@0x61736b.net".
+
+  SEE
+    perlartistic perlgpl
+
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

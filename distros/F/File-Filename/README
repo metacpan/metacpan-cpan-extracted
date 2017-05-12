@@ -1,0 +1,34 @@
+File::Filename - expect a filename to be named by a person to be metadata
+=========================================================================
+
+A lot of people use the filename as a place to insert metadata for the file.
+This module has some routines to help with treating those filenames.
+This code takes into consideration what human beings would name files as.
+
+People often expect a space to be *part of* something.
+To us, used to the prompt, a space is a delimiter, not a delimeter.
+
+People see an underscore and it is a delimiter to them, but to us it is a "word character".
+This is one of a colleciton of modules to help consolidate the real world of file archiving
+in offices (multiple human users naming files by hand) with the
+needs of people maintaining such filesystem hierarchy structures.
+
+INSTALLATION
+
+perl Makefile.PL
+make install
+make realclean
+
+DEPENDENCIES
+
+   Exporter
+   Test::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+   

@@ -1,0 +1,40 @@
+---
+abstract: 'Simple and dumb file system watcher'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+  Test::SharedFork: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Filesys-Notify-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/miyagawa/Filesys-Notify-Simple/issues
+  homepage: https://github.com/miyagawa/Filesys-Notify-Simple
+  repository: https://github.com/miyagawa/Filesys-Notify-Simple.git
+version: 0.12
+x_contributors:
+  - 'Chia-liang Kao <clkao@clkao.org>'
+  - 'Christiaan Kras <c.kras@pcc-online.net>'
+  - 'Kent Fredric <kentfredric@gmail.com>'
+  - 'Kenta Sato <karupa@cpan.org>'
+  - 'Masahiro Chiba <chiba@everqueue.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'

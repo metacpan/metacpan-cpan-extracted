@@ -1,0 +1,92 @@
+NAME
+    Function::Register - Create Function Registries and Register Functions
+
+SYNOPSIS
+      package Company::Employee;
+      use Function::Register;
+      set_register 'Type';
+  
+      sub employee_type {
+          my $self = shift;
+          for ( @Type ) {
+              my $retval = $_->($self);
+              return $retval if $retval;
+          }
+          return;
+      }
+
+      # meanwhile, in some other package
+      package Company::Employee::Executive;
+      use Function::Register 'Company::Employee';
+
+      register Type => \&is_cto;
+      register Type => \&is_ceo;
+  
+      sub is_cto { ... }
+      sub is_ceo { ... }
+
+      # meanwhile, in your program
+      use Company::Employee;
+      use Company::Employee::Executive;
+
+DESCRIPTION
+    This module allows you to declare registers in your namespace, and
+    update registers in other modules.
+
+  Exports
+    There are two ways to use this modules.
+
+    As the Registry
+          use Function::Register;
+
+        As the registry you simply use the module without any arguments.
+        This will export the "set_register" function. It will also create a
+        default register in your namespace called @REGISTER.
+
+    As the Registrant
+          use Function::Register qw[Some::NameSpace];
+
+        As the registrant you use the module with a single argument. This
+        will export the "register" function. It will remember what namespace
+        you want to add to each time you call "register".
+
+  Functions
+    set_registry
+          set_registry 'Name';
+
+        This function creates a new register in your namespace. A register
+        is a package array of the same name. The call above creates an
+        array, @Name, in your namespace.
+
+    register
+          register sub { ... };
+          register Name => \&function_ref;
+
+        This function registeres functions in the namespace you've declared
+        as your registrant. If a single argument is given the function is
+        added to the default registry. If two arguments are given, the first
+        is the name of of the register and the second is a function.
+
+        This function returns a false value if it was unable to add the
+        function to the register. This may be because the register name does
+        not exist, or the function argument isn't a code reference.
+
+        If "register" is successful it returns true.
+
+          die "Couldn't add to register"
+            unless register \&some_func;
+
+SEE ALSO
+    For a more OO and "do it all for me behind my back" approach, see
+    Module::Pluggable.
+
+    perl.
+
+AUTHOR
+    Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+      Copyright (c) 2004 Casey West.  All rights reserved.
+      This module is free software; you can redistribute it and/or modify it
+      under the same terms as Perl itself.
+

@@ -1,0 +1,15 @@
+Build.PL
+CHANGES
+lib/Formatter/HTML/Textile.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01compile.t
+t/02paragraph.t
+t/03url.t
+t/04list.t
+t/05combined.t
+t/06utf8.t
+xt/00-signature.t

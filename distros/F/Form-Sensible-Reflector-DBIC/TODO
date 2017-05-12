@@ -1,0 +1,11 @@
+TODO:
+Add Reflecting from row objects in addition to ResultSet (default values?)
+provide for field omitting - via should_process_field_delegate
+add relationship following - on simple relationships
+docs
+tests?
+save method? $form = Form::Sensible::Form::Reflector::DBIC->new(...);
+#...
+$form->save; # ?
+normalize case, fields shouldn't have to be case sensitive
+reflectors should be roles.

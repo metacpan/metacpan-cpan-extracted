@@ -1,0 +1,81 @@
+NAME
+    FBP - Parser and Object Model for wxFormBuilder Project Files (.fpb
+    files)
+
+SYNOPSIS
+      my $object = FBP->new;
+      
+  $object->parse_file( 'MyProject.fbp' );
+
+DESCRIPTION
+    NOTE: Documentation is limited as this module is in active development
+
+    wxFormBuilder is currently the best and most sophisticated program for
+    designing wxWidgets dialogs, and generating the code for these designs.
+
+    However, wxFormBuilder does not currently support the generation of Perl
+    code. If we are to produce Perl code for the designs it creates, the
+    code generation must be done independantly, outside of wxFormBuilder
+    itself.
+
+    FBP is a SAX-based parser and object model for the XML project files
+    that are created by wxFormBuilder. While it does NOT do the creation of
+    Perl code itself, it should serve as a solid base for anyone who wishes
+    to produce a code generator for these saved files.
+
+METHODS
+  new
+      my $fbp = PBP->new;
+
+    The "new" constructor takes no arguments and creates a new parser/model
+    object.
+
+  project
+      my $project = $FBP->project;
+
+    Finds and returns the FBP::Project object for the FBP file, of which
+    there should only be one. Throws an exception if the file does not
+    contains a project.
+
+  form
+      my $form = $FBP->form('MyDialog1');
+
+    Convenience method which finds and returns the root FBP::Form object for
+    a specific named dialog, frame, panel, menu or toolbar in the object
+    model.
+
+  dialog
+      my $dialog = $fbp->dialog('MyDialog1');
+
+    Convenience method which finds and returns the root FBP::Dialog object
+    for a specific named dialog box in the object model.
+
+  parse_file
+      my $ok = $fbp->parse_file('foo/bar.fbp');
+
+    The "parse_file" method takes a named fbp project file, and parses it to
+    produce an object model.
+
+    Returns true if the parsing run succeeds, or throws an exception on
+    error.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FBP>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2009 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

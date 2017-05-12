@@ -1,0 +1,36 @@
+---
+abstract: 'fetch a remote image into a L<File::Temp>'
+author:
+  - 'Mark Ellis <markellis@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.10'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Fetch::Image
+name: Fetch-Image
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Validate::Image: 0
+  Data::Validate::URI: 0
+  Exception::Simple: 0
+  File::Temp: 0
+  LWP::UserAgent::Paranoid: 0
+  URI: 0
+  perl: 5.8.0
+resources:
+  bugtracker: https://github.com/markwellis/fetch-image/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markwellis/fetch-image.git
+version: '1.000000'

@@ -1,0 +1,6 @@
+Revision history for Perl extension FigAnim.
+
+0.1  Wed Jun 16 14:44:34 2004
+	- original version; created by h2xs 1.22 with options
+		-AXcfn FigAnim
+

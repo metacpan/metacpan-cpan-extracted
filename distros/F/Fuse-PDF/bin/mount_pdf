@@ -1,0 +1,93 @@
+#!perl
+
+#######################################################################
+#      $URL: svn+ssh://equilibrious@equilibrious.net/home/equilibrious/svnrepos/chrisdolan/Fuse-PDF/bin/mount_pdf $
+#     $Date: 2008-06-06 22:47:54 -0500 (Fri, 06 Jun 2008) $
+#   $Author: equilibrious $
+# $Revision: 767 $
+########################################################################
+
+use warnings;
+use strict;
+use Fuse::PDF::MountPDF;
+
+our $VERSION = '0.09';
+
+my $exitval = Fuse::PDF::MountPDF->run(@ARGV);
+exit $exitval;
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mount_pdf - Enable access to a filesystem embedded in a PDF document
+
+=head1 LICENSE
+
+Copyright 2007-2008 Chris Dolan, I<cdolan@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SYNOPSIS
+
+ mount_pdf file.pdf /path/to/mount/point
+ mount_pdf --deletefs file.pdf
+ mount_pdf -i file.pdf
+ mount_pdf -h
+ mount_pdf -V
+
+ Options:
+   -A --all            mount the whole PDF (same as '-f pdf')
+   -d --debug          turn on FUSE debug messages
+   -p --password       prompt for a PDF user password, if needed
+   -r --revision=num   roll back to particular revision before mounting (see below)
+   -k --keep           keep old versions of the filesystem in the PDF
+   -b --backup         move the original PDF to ".bak" just before the first write
+   -f --fs=name        which embedded filesystem to use
+      --fuseopts=opts  comma-separated list of options to pass directly to Fuse
+                       Only used when actually mounting.  See 'mountopts' in Fuse.pm.
+
+ Other flags:
+      --deletefs       remove the filesystem from the PDF (implies compact)
+   -i --info           print filesystem details and quit
+   -h --help           print verbose help message and quit
+   -V --version        print the Fuse::PDF version and quit
+
+If you want to read the PDF from STDIN and write it out to STDOUT, you
+can supply C<-> as the PDF filename.
+
+To see the choices for the C<-r> flag, try C<-i> first.  Note that if
+you roll back, there's no way to undo that choice, so make a backup
+copy of your PDF before starting!  Unless you specified the C<-K>
+option earlier, there will be no revisions to go back to.
+
+=head1 DESCRIPTION
+
+This is a simple front-end to L<Fuse::PDF> which allows you to mount a
+PDF as a filesystem.  All content in the filesystem is represented as
+a tree in the PDF data structure.
+
+If you employ PDF encryption, all content will be encrypted (including
+file and directory names and extended attributes) but filesystem
+metadata (sizes, timestamps, permissions, tree structure) will not be.
+See the F<rewritepdf.pl> utility in the L<CAM::PDF> distribution.
+
+=head1 AUTHOR
+
+Chris Dolan, I<cdolan@cpan.org>
+
+=cut
+
+# Local Variables:
+#   mode: perl
+#   perl-indent-level: 3
+#   cperl-indent-level: 3
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

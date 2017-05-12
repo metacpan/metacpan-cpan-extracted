@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>HowRSS</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<h1> NAME </h1><p>Foorum::Manual::HowRSS - How we build RSS system</p><h1> How we build RSS system </h1><ul><li>we don't use L&lt;XML::RSS&gt; or &lt;XML::Feed&gt; or anything else to build RSS, instead we just use TT2 to produce RSS XML. </li><li>RSS URL is always add /rss at behind. like:<ol><li>/forum/FoorumLongLive has RSS: /forum/FoorumLongLive/rss </li><li>/site/popular has RSS: /site/popular/RSS </li><li>/forum/FoorumLongLive/72 has RSS: /forum/FoorumLongLive/72/rss </li></ol> </li><li>since URL is so special, we have a stash: $c-&gt;stash-&gt;{is_rss_template} = ( $path =~ /\/rss(\/|$)/ ) ? 1 : 0;<ol><li>Root.pm sub end {}. if res-&gt;redirect(), we raise RSS error. </li><li>Root.pm sub end {}. if template is not RSS, raise RSS error. </li></ol> </li><li>we have RSS and it's based URL in one sub. so it's pretty neat and easy to read. </li></ul><h2> SEE ALSO </h2><p><a href="RULES.html">RULES</a></p>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/HowRSS">http://code.google.com/p/foorum/wiki/HowRSS</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+$Header: /cvsroot/WWW::Fido/Changes,v 1.4 2002/11/11 20:09:39 mina Exp $
+
+Revision history for Perl extension WWW::Fido.
+
+0.02
+	- Fido redesigned their website, had to change some paths inside the script
+
+
+0.01
+	-original version; created by h2xs 1.19
+

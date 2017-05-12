@@ -1,0 +1,43 @@
+File/Log version 1.3
+====================
+
+This is version 1.3 of File::Log, a module to allow simple logging
+of data to a file.  It provides for control over the amount of data
+written by defining a debug value (where higher values represent more
+log detail.  There is also an exception method which is used to log
+errors (which are printed with leading ** characters).
+
+There are quite a few configuration flags to control how the application
+logs data.  You can configure timestamps on the data and/or the log file.
+
+You can configure File::Log to store any exceptions internally.  The
+combined errors can then be extracted with a call to $log->getExpText()
+which could be used at the end of your application to email to the
+administrator
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the two standard modules:
+
+  Carp,
+  Symbol
+
+and
+
+  POSIX if 'dateformat' flag to new is used
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999- Greg George. All rights reserved. This
+library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

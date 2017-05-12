@@ -1,0 +1,4 @@
+#fsdb -F C= last_name first_name 
+# Should show that we work with char column separators.
+Helmy=Ahmed Abdel-Ghaffar
+Red=Anoop K.

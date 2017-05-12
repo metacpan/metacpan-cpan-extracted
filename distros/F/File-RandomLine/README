@@ -1,0 +1,103 @@
+NAME
+    File::RandomLine - Retrieve random lines from a file
+
+VERSION
+    version 0.20
+
+SYNOPSIS
+      # Fast but biased randomness
+      use File::RandomLine;
+      my $rl = File::RandomLine->new('/var/log/messages');
+      print $rl->next;
+      print join("\n",$rl->next(3));
+  
+      # Slow but uniform randomness
+      $rl = File::RandomLine->new('/var/log/messages', {algorithm=>"uniform"});
+
+DESCRIPTION
+    This module provides a very fast random-access algorithm to retrieve
+    random lines from a file. Lines are not retrieved with uniform
+    probability, but instead are weighted by the number of characters in the
+    previous line, due to the nature of the algorithm. Lines are most random
+    when all lines are about the same length. For log file sampling or
+    quote/fortune generation, this should be "random enough". Note -- when
+    getting multiple lines, this module resamples with replacement, so
+    duplicate lines are possible. Users will need to check for duplication
+    on their own if this is not desired.
+
+    The algorithm is as follows:
+
+    *   Seek to a random location in the file
+
+    *   Read and discard the line fragment found
+
+    *   Read and return the next line, or the first line if we've reached
+        the end of the file
+
+    *   Repeat until the requested number of random lines have been found
+
+    This module provides some similar behavior to File::Random, but the
+    random access algorithm is much faster on large files. (E.g., it runs
+    nearly instantaneously even on 100+ MB log files.)
+
+    This module also provides an optional, slower algorithm that returns
+    random lines with uniform probability.
+
+METHODS
+  new
+     $rl = File::RandomLine->new( "filename" );
+     $rl = File::RandomLine->new( "filename", { algorithm => "uniform" } );
+
+    Returns a new File::RandomLine object for the given filename. The
+    filename must refer to a readable file. A hash reference may be provided
+    as an optional second argument to specify an algorithm to use. Currently
+    supported algorithms are "fast" (the default) and "uniform". Under
+    "uniform", the module indexes the entire file before selecting random
+    lines with true uniform probability for each line. This can be
+    significantly slower on large files.
+
+  next
+     $line = $rl->next();
+     @lines = $rl->next(5);
+     ($line1, $line2, $line3) = $rl->next();
+
+    Returns one or more lines from the file. Without parameters, returns a
+    single line if called in scalar context. With a positive integer
+    parameter, returns a list with the specified number of lines. "next"
+    also has some magic if called in list context with a finite length list
+    of l-values and will return the proper number of lines.
+
+ACKNOWLEDGMENTS
+    Concept and code for "magic" behavior in array context taken from
+    File::Random by Janek Schleicher.
+
+SEE ALSO
+    *   File::Random
+
+    *   Re^2: selecting N random lines from a file in one pass
+        <http://perlmonks.thepen.com/417065.html>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/file-randomline/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/file-randomline>
+
+      git clone git://github.com/dagolden/file-randomline.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

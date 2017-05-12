@@ -1,0 +1,15 @@
+Revision history for Perl extension FreeMind::Convert.
+
+0.01  Sun Oct 29 20:47:52 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n FreeMind::Convert
+
+0.02  Sun Nov  5 19:47:19 2006
+    - original version; recreated by pmsetup.pl
+    - comment out; use 5.008005 ;
+    - add method; toMediaWiki()
+    - add method; setOutputJcode()	for Japanese
+    - rewrite Makefile.PL; use inc::Module::Install;
+    - make sample script; mm2mediawiki.pl
+    
+    

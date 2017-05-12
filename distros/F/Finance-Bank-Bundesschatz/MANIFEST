@@ -1,0 +1,11 @@
+Changes
+lib/Finance/Bank/Bundesschatz.pm
+lib/Finance/Bank/Bundesschatz.pod
+examples/balance.pl
+examples/balance-gpg.pl
+Build.PL
+Makefile.PL
+MANIFEST
+README
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+#!perl
+
+use strict;
+use warnings;
+use File::Copy::Link qw(copylink);
+my $VERSION = $File::Copy::Link::VERSION;
+
+for my $file (@ARGV) {
+    copylink $file;
+}
+
+# $Id: copylink 218 2008-06-12 11:09:11Z rmb1 $

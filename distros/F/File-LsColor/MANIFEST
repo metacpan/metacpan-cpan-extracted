@@ -1,0 +1,10 @@
+bin/ls_color
+lib/File/LsColor.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+t/021-synopsis.t
+t/03-ls_color.t
+META.yml                                 Module meta-data (added by MakeMaker)

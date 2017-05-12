@@ -1,0 +1,27 @@
+Revision history for File-Find-Rule-Age
+
+0.302	2014-06-11
+    - fix some test-issues seen during smoking
+
+0.301	2014-05-25
+    - introduce a new API to allow one easier to choose operator
+      (<, <=, >=, >) and operands (mtime, atime, ctime) on the
+      one hand and duration objects, seconds since epoch, reference
+      file on the other hand
+    - distinguish between modern API and legacy API, added tests
+      for legacy API and implement legacy API as documented
+
+0.300	2013-11-02
+    - Move code repository to GitHub
+    - use common (sno) Makefile.PL (bye bye, Module::Install)
+    - use mandatory author tests
+    - taking maintainership (Jens Rehsack)
+
+0.2	2008-11-06
+    - Version bump because apparently 0.1.1 < 0.1
+        
+0.1.1   2008-11-06
+    - Removed Leopard metadata files from the distribution
+        
+0.1     2008-11-04
+    - First version.

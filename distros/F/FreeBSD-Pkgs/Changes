@@ -1,0 +1,14 @@
+Revision history for FreeBSD-Pkgs
+
+0.2.0	 2012-06-02/08:00
+		 -Now uses Error::Helper.
+
+0.1.2	2011-07-01/04:30
+		-Don't warn about portupgrade's DB file.
+		-Update name post marriage.
+
+0.1.1	2009-03-25/13:00
+		-Now handles display lines.
+
+0.1.0	2009-03-01/13:00
+		-Make processing file related things for the pakages optional.

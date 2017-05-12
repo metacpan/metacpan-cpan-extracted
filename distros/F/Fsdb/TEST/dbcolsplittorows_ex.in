@@ -1,0 +1,7 @@
+#h name uid
+John_Heidemann  2274
+Greg_Johnson    2275
+Root    0
+# this is a simple database
+#  | dbcol fullname uid
+#  | dbcolrename fullname name

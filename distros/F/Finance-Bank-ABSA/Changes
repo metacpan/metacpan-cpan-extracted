@@ -1,0 +1,8 @@
+0.03: Removed counter from password char field loop and
+      replaced with regexp () result.
+0.02: Fixed so that only requested password chars are sent
+      and not the entire password (although both work fine).
+0.01: First release.
+
+--
+Leon Cowle <leon@leolizma.com>

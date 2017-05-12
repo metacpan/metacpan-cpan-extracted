@@ -1,0 +1,7 @@
+Artistic
+Changes
+MANIFEST
+Makefile.PL
+README
+TinyLock.pm
+t/main.t

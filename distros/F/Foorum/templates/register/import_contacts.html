@@ -1,0 +1,15 @@
+[% USE FillInForm %]
+[% FILTER fillinform fdat => c.req.params %]
+<div id='register' class='one'>
+<table align='center'>
+	<tbody>
+	<form method='post'>
+	<tr class='title'><td colspan='2'>Import Contacts</td></tr>
+	<tr class='misc1'><td width='20%' align='right'>[% c.loc("Email") %]</td><td><input type='text' name='email' size='24' value='[% email %]' /></td></tr>
+	<tr class='misc2'><td align='right'>[% c.loc("Password") %]</td><td><input type='password' name='password' size='24' /></td></tr>
+	<tr class='misc1'><td> </td><td><input type='submit' /></td></tr>
+	</form>
+	</tbody>
+</table>
+</div>
+[% END %]

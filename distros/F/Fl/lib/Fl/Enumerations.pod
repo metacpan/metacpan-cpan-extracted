@@ -1,0 +1,1097 @@
+class 'Fl';
+include 'FL/Enumerations.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Enumerations - Easily Imported Static Variables
+
+=head1 Synopsis
+
+    use Fl qw[:enum]; # Import everything!
+    use Fl qw[:font]; # Import fonts
+
+=head1 Description
+
+This file contains type definitions and general enumerations.
+
+=head1 Exports
+
+Values are exported directly or with tags.
+
+=head2 C<:version>
+
+This tag imports values related to the library and its version number:
+
+=over
+
+=item FL_MAJOR_VERSION
+
+The major release version of this FLTK library.
+
+=item FL_MINOR_VERSION
+
+The minor release version for this library.
+
+FLTK remains mostly source-code compatible between minor version changes.
+
+=item FL_PATCH_VERSION
+
+The patch version for this library.
+
+FLTK remains binary compatible between patches.
+
+=item FL_VERSION
+
+The FLTK version number.
+
+    FL_MAJOR_VERSION + (FL_MINOR_VERSION * 0.01) + (FL_PATCH_VERSION * 0.0001)
+
+=back
+
+=cut
+
+export_constant("FL_MAJOR_VERSION", "version");
+export_constant("FL_MINOR_VERSION", "version");
+export_constant("FL_PATCH_VERSION", "version");
+export_constant("FL_VERSION",       "version");
+
+=pod
+
+=head2 C<:box>
+
+Events are identified by an enumeration value. If you subclass a widget, these
+are passed to your C<handle(...)> method. The following events are currently
+defined:
+
+=over
+
+=item FL_NO_EVENT - No event (or an event fltk does not understand) occurred (0).
+
+=item FL_PUSH - A mouse button was pushed.
+
+=item FL_RELEASE - A mouse button was released.
+
+=item FL_ENTER - The mouse pointer entered a widget.
+
+=item FL_LEAVE - The mouse pointer left a widget.
+
+=item FL_DRAG - The mouse pointer was moved with a button pressed.
+
+=item FL_FOCUS - A widget should receive keyboard focus.
+
+=item FL_UNFOCUS - A widget loses keyboard focus.
+
+=item FL_KEYBOARD - A key was pressed.
+
+=item FL_CLOSE - A window was closed.
+
+=item FL_MOVE - The mouse pointer was moved with no buttons pressed.
+
+=item FL_SHORTCUT - The user pressed a shortcut key.
+
+=item FL_DEACTIVATE - The widget has been deactivated.
+
+=item FL_ACTIVATE - The widget has been activated.
+
+=item FL_HIDE - The widget has been hidden.
+
+=item FL_SHOW - The widget has been shown.
+
+=item FL_PASTE - The widget should paste the contents of the clipboard.
+
+=item FL_SELECTIONCLEAR - The widget should clear any selections made for the clipboard.
+
+=item FL_MOUSEWHEEL - The horizontal or vertical mousewheel was turned.
+
+=item FL_DND_ENTER - The mouse pointer entered a widget dragging data.
+
+=item FL_DND_DRAG - The mouse pointer was moved dragging data.
+
+=item FL_DND_LEAVE - The mouse pointer left a widget still dragging data.
+
+=item FL_DND_RELEASE - Dragged data is about to be dropped.
+
+=item FL_SCREEN_CONFIGURATION_CHANGED - The screen configuration (number, positions) was changed.
+
+=item FL_FULLSCREEN - The fullscreen state of the window has changed
+
+=back
+
+=cut
+
+export_constant("FL_LEFT_MOUSE",   "mouse");
+export_constant("FL_NO_EVENT", "event");
+export_constant("FL_PUSH", "event");
+export_constant("FL_RELEASE", "event");
+export_constant("FL_ENTER", "event");
+export_constant("FL_LEAVE", "event");
+export_constant("FL_DRAG", "event");
+export_constant("FL_FOCUS", "event");
+export_constant("FL_UNFOCUS", "event");
+export_constant("FL_KEYBOARD", "event");
+export_constant("FL_CLOSE", "event");
+export_constant("FL_MOVE", "event");
+export_constant("FL_SHORTCUT", "event");
+export_constant("FL_DEACTIVATE", "event");
+export_constant("FL_ACTIVATE", "event");
+export_constant("FL_HIDE", "event");
+export_constant("FL_SHOW", "event");
+export_constant("FL_PASTE", "event");
+export_constant("FL_SELECTIONCLEAR", "event");
+export_constant("FL_MOUSEWHEEL", "event");
+export_constant("FL_DND_ENTER", "event");
+export_constant("FL_DND_DRAG", "event");
+export_constant("FL_DND_LEAVE", "event");
+export_constant("FL_DND_RELEASE", "event");
+export_constant("FL_SCREEN_CONFIGURATION_CHANGED", "event");
+export_constant("FL_FULLSCREEN", "event");
+
+=pod
+
+=head2 C<:box>
+
+Values related to Fl::Box box types including:
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/boxtypes.png" /></center>
+
+=over
+
+=item FL_NO_BOX
+
+Nothing is drawn at all. This box is invisible and the default for
+Fl::Box->new(...).
+
+=item FL_FLAT_BOX
+
+A flat box.
+
+=item FL_UP_BOX
+
+=item FL_DOWN_BOX
+
+=item FL_UP_FRAME
+
+=item FL_DOWN_FRAME
+
+=item FL_THIN_UP_BOX
+
+=item FL_THIN_DOWN_BOX
+
+=item FL_THIN_UP_FRAME
+
+=item FL_THIN_DOWN_FRAME
+
+=item FL_ENGRAVED_BOX
+
+=item FL_EMBOSSED_BOX
+
+=item FL_ENGRAVED_FRAME
+
+=item FL_EMBOSSED_FRAME
+
+=item FL_BORDER_BOX
+
+=item FL_BORDER_FRAME
+
+=item FL_FREE_BOXTYPE
+
+The first free box type for creation of new box types.
+
+=back
+
+=cut
+
+export_constant("FL_ROUND_UP_BOX",           "box");
+export_constant("FL_NO_BOX",                 "box");
+export_constant("FL_FLAT_BOX",               "box");
+export_constant("FL_UP_BOX",                 "box");
+export_constant("FL_DOWN_BOX",               "box");
+export_constant("FL_UP_FRAME",               "box");
+export_constant("FL_DOWN_FRAME",             "box");
+export_constant("FL_THIN_UP_BOX",            "box");
+export_constant("FL_THIN_DOWN_BOX",          "box");
+export_constant("FL_THIN_UP_FRAME",          "box");
+export_constant("FL_THIN_DOWN_FRAME",        "box");
+export_constant("FL_ENGRAVED_BOX",           "box");
+export_constant("FL_EMBOSSED_BOX",           "box");
+export_constant("FL_ENGRAVED_FRAME",         "box");
+export_constant("FL_EMBOSSED_FRAME",         "box");
+export_constant("FL_BORDER_BOX",             "box");
+export_constant("FL_SHADOW_BOX",             "box");
+export_constant("FL_BORDER_FRAME",           "box");
+export_constant("FL_SHADOW_FRAME",           "box");
+export_constant("FL_ROUNDED_BOX",            "box");
+export_constant("FL_RSHADOW_BOX",            "box");
+export_constant("FL_ROUNDED_FRAME",          "box");
+export_constant("FL_RFLAT_BOX",              "box");
+export_constant("FL_ROUND_DOWN_BOX",         "box");
+export_constant("FL_DIAMOND_UP_BOX",         "box");
+export_constant("FL_DIAMOND_DOWN_BOX",       "box");
+export_constant("FL_OVAL_BOX",               "box");
+export_constant("FL_OSHADOW_BOX",            "box");
+export_constant("FL_OVAL_FRAME",             "box");
+export_constant("FL_OFLAT_BOX",              "box");
+export_constant("FL_PLASTIC_UP_BOX",         "box");
+export_constant("FL_PLASTIC_DOWN_BOX",       "box");
+export_constant("FL_PLASTIC_UP_FRAME",       "box");
+export_constant("FL_PLASTIC_DOWN_FRAME",     "box");
+export_constant("FL_PLASTIC_THIN_UP_BOX",    "box");
+export_constant("FL_PLASTIC_THIN_DOWN_BOX",  "box");
+export_constant("FL_PLASTIC_ROUND_UP_BOX",   "box");
+export_constant("FL_PLASTIC_ROUND_DOWN_BOX", "box");
+export_constant("FL_GTK_UP_BOX",             "box");
+export_constant("FL_GTK_DOWN_BOX",           "box");
+export_constant("FL_GTK_UP_FRAME",           "box");
+export_constant("FL_GTK_DOWN_FRAME",         "box");
+export_constant("FL_GTK_THIN_UP_BOX",        "box");
+export_constant("FL_GTK_THIN_DOWN_BOX",      "box");
+export_constant("FL_GTK_THIN_UP_FRAME",      "box");
+export_constant("FL_GTK_THIN_DOWN_FRAME",    "box");
+export_constant("FL_GTK_ROUND_UP_BOX",       "box");
+export_constant("FL_GTK_ROUND_DOWN_BOX",     "box");
+export_constant("FL_GLEAM_UP_BOX",           "box");
+export_constant("FL_GLEAM_DOWN_BOX",         "box");
+export_constant("FL_GLEAM_UP_FRAME",         "box");
+export_constant("FL_GLEAM_DOWN_FRAME",       "box");
+export_constant("FL_GLEAM_THIN_UP_BOX",      "box");
+export_constant("FL_GLEAM_THIN_DOWN_BOX",    "box");
+export_constant("FL_GLEAM_ROUND_UP_BOX",     "box");
+export_constant("FL_GLEAM_ROUND_DOWN_BOX",   "box");
+export_constant("FL_FREE_BOXTYPE",           "box");
+
+=pod
+
+=head2 C<:label>
+
+The C<labeltype()> method of Fl::Widget sets the type of the label. The
+following standard label types are included:
+
+=over
+
+=item FL_NORMAL_LABEL
+
+Draws the text.
+
+=item FL_NO_LABEL
+
+Does nothing.
+
+=item FL_SHADOW_LABEL
+
+Draws a drop shadow under the text.
+
+=item FL_ENGRAVED_LABEL
+
+Draws edges as though the text is engraved.
+
+=item FL_EMBOSSED_LABEL
+
+Draws edges as though the text is raised.
+
+=back
+
+=cut
+
+# Fl_Labeltype
+export_constant("FL_NORMAL_LABEL",   "label");
+export_constant("FL_NO_LABEL",       "label");
+export_constant("FL_SHADOW_LABEL",   "label");
+export_constant("FL_ENGRAVED_LABEL", "label");
+export_constant("FL_EMBOSSED_LABEL", "label");
+export_constant("FL_FREE_LABELTYPE", "label");
+
+=pod
+
+=head2 C<:font>
+
+The following may be imported with this tag:
+
+=over
+
+=item FL_NORMAL_SIZE
+
+This is the approximate height of a font in pixels.
+
+=item FL_HELVETICA
+
+Helvetica (or Arial) normal.
+
+=item FL_HELVETICA_BOLD
+
+Helvetica (or Arial) bold.
+
+=item FL_HELVETICA_ITALIC
+
+Helvetica (or Arial) oblique.
+
+=item FL_HELVETICA_BOLD_ITALIC
+
+Helvetica (or Arial) bold-oblique.
+
+=item FL_COURIER
+
+Courier normal.
+
+=item FL_COURIER_BOLD
+
+Courier bold.
+
+=item FL_COURIER_ITALIC
+
+Courier italic.
+
+=item FL_COURIER_BOLD_ITALIC
+
+Courier bold-italic.
+
+=item FL_TIMES
+
+Times roman.
+
+=item FL_TIMES_BOLD
+
+Times roman bold.
+
+=item FL_TIMES_ITALIC
+
+Times roman italic.
+
+=item FL_TIMES_BOLD_ITALIC
+
+Times roman bold-italic.
+
+=item FL_SYMBOL
+
+Standard symbol font.
+
+=item FL_SCREEN
+
+Default monospaced screen font.
+
+=item FL_SCREEN_BOLD
+
+Default monospaced bold screen font.
+
+=item FL_ZAPF_DINGBATS
+
+Zapf-dingbats font.
+
+See https://en.wikipedia.org/wiki/Zapf_Dingbats
+
+=item FL_FREE_FONT
+
+First one free to allocate for custom fonts.
+
+=item FL_BOLD
+
+Add this to C<FL_HELVETICA>, C<FL_COURIER>, or C<FL_TIMES>.
+
+=item FL_ITALIC
+
+Add this to C<FL_HELVETICA>, C<FL_COURIER>, or C<FL_TIMES>.
+
+=item FL_BOLD_ITALIC
+
+Add this to C<FL_HELVETICA>, C<FL_COURIER>, or C<FL_TIMES>.
+
+=back
+
+=cut
+
+# Fl_Font
+export_constant("FL_HELVETICA",             "font");
+export_constant("FL_HELVETICA_BOLD",        "font");
+export_constant("FL_HELVETICA_ITALIC",      "font");
+export_constant("FL_HELVETICA_BOLD_ITALIC", "font");
+export_constant("FL_COURIER",               "font");
+export_constant("FL_COURIER_BOLD",          "font");
+export_constant("FL_COURIER_ITALIC",        "font");
+export_constant("FL_COURIER_BOLD_ITALIC",   "font");
+export_constant("FL_TIMES",                 "font");
+export_constant("FL_TIMES_BOLD",            "font");
+export_constant("FL_TIMES_ITALIC",          "font");
+export_constant("FL_TIMES_BOLD_ITALIC",     "font");
+export_constant("FL_SYMBOL",                "font");
+export_constant("FL_SCREEN",                "font");
+export_constant("FL_SCREEN_BOLD",           "font");
+export_constant("FL_ZAPF_DINGBATS",         "font");
+export_constant("FL_FREE_FONT",             "font");
+export_constant("FL_BOLD",                  "font");
+export_constant("FL_ITALIC",                "font");
+export_constant("FL_BOLD_ITALIC",           "font");
+
+# Fl_Fontsize
+export_constant("FL_NORMAL_SIZE", "font");
+
+=pod
+
+=head2 C<:chart>
+
+This tag imports values related to Fl::Chart:
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/charts.png" /></center>
+
+=over
+
+=item FL_BAR_CHART
+
+Each sample value is drawn as a vertical bar.
+
+=item FL_FILLED_CHART
+
+The chart is filled from the bottom of the graph to the sample values.
+
+=item FL_HORBAR_CHART
+
+Each sample value is drawn as a horizontal bar.
+
+=item FL_LINE_CHART
+
+The chart is drawn as a polyline with vertices at each sample value.
+
+=item FL_PIE_CHART
+
+A pie chart is drawn with each sample value being drawn as a proportionate
+slice in the circle.
+
+=item FL_LINE_CHART
+
+Like C<FL_PIE_CHART> but the first slice is separated from the pie.
+
+=item FL_SPIKE_CHART
+
+Each sample value is drawn as a vertical line.
+
+=back
+
+=cut
+
+export_constant("FL_BAR_CHART",        "chart");
+export_constant("FL_FILLED_CHART",     "chart");
+export_constant("FL_HORBAR_CHART",     "chart");
+export_constant("FL_LINE_CHART",       "chart");
+export_constant("FL_PIE_CHART",        "chart");
+export_constant("FL_SPECIALPIE_CHART", "chart");
+export_constant("FL_SPIKE_CHART",      "chart");
+
+=pod
+
+=head2 C<:when>
+
+This tag imports values related to when callbacks are triggered for widgets:
+
+=over
+
+=item FL_WHEN_NEVER
+
+Never call the callback.
+
+=item FL_WHEN_CHANGED
+
+Do the callback only when the widget value changes.
+
+=item FL_WHEN_NOT_CHANGED
+
+Do the callback whenever the user interacts with the widget.
+
+=item FL_WHEN_RELEASE
+
+Do the callback when the button or key is released and the value changes.
+
+=item FL_WHEN_RELEASE_ALWAYS
+
+Do the callback when the button or key is released, even if the value doesn't
+change.
+
+=item FL_WHEN_ENTER_KEY
+
+Do the callback when the user presses the ENTER key and the value changes.
+
+=item FL_WHEN_ENTER_KEY_ALWAYS
+
+Do the callback when the user presses the ENTER key, even if the value doesn't
+change.
+
+=item FL_WHEN_ENTER_KEY_CHANGED
+
+=back
+
+=cut
+
+export_constant("FL_WHEN_NEVER",             "when");
+export_constant("FL_WHEN_CHANGED",           "when");
+export_constant("FL_WHEN_NOT_CHANGED",       "when");
+export_constant("FL_WHEN_RELEASE",           "when");
+export_constant("FL_WHEN_RELEASE_ALWAYS",    "when");
+export_constant("FL_WHEN_ENTER_KEY",         "when");
+export_constant("FL_WHEN_ENTER_KEY_ALWAYS",  "when");
+export_constant("FL_WHEN_ENTER_KEY_CHANGED", "when");
+
+=pod
+
+=head2 C<:keyboard>
+
+This tag imports values related to keyboard keys. These are often used for
+callback triggering and L<when(...)|Fl::Widget/"when(...)">.
+
+=over
+
+=item FL_Button
+
+A mouse button; use Fl_Button + n for mouse button n.
+
+=item FL_BackSpace
+
+The backspace key.
+
+=item FL_Tab
+
+The tab key.
+
+=item FL_Iso_Key
+
+The additional key of ISO keyboards.
+
+=item FL_Enter
+
+The enter key.
+
+=item FL_Pause
+
+The pause key.
+
+=item FL_Scroll_Lock
+
+The scroll lock key.
+
+=item FL_Escape
+
+The escape key.
+
+=item FL_Kana
+
+The Kana key of JIS keyboards.
+
+=item FL_Eisu
+
+The Eisu key of JIS keyboards.
+
+=item FL_Yen
+
+The Yen key of JIS keyboards.
+
+FL_JIS_Underscore
+
+The underscore key of JIS keyboards.
+
+=item FL_Home
+
+The home key.
+
+=item FL_Left
+
+The left arrow key.
+
+=item FL_Up
+
+The up arrow key.
+
+=item FL_Right
+
+The right arrow key.
+
+=item FL_Down
+
+The down arrow key.
+
+=item FL_Page_Up
+
+The page-up key.
+
+=item FL_Page_Down
+
+The page-down key.
+
+=item FL_End
+
+The end key.
+
+=item FL_Print
+
+The print (or print-screen) key.
+
+=item FL_Insert
+
+The insert key.
+
+=item FL_Menu
+
+The menu key.
+
+=item FL_Help
+
+The 'help' key on Mac keyboards
+
+=item FL_Num_Lock
+
+The num lock key.
+
+=item FL_KP
+
+One of the keypad numbers; use FL_KP + 'n' for digit n.
+
+=item FL_KP_Enter
+
+The enter key on the keypad, same as Fl_KP+'\\r'.
+
+=item FL_KP_Last
+
+The last keypad key; use to range-check keypad.
+
+=item FL_F
+
+One of the function keys; use FL_F + n for function key n.
+
+=item FL_F_Last
+
+The last function key; use to range-check function keys.
+
+=item FL_Shift_L
+
+The lefthand shift key.
+
+=item FL_Shift_R
+
+The righthand shift key.
+
+=item FL_Control_L
+
+The lefthand control key.
+
+=item FL_Control_R
+
+The righthand control key.
+
+=item FL_Caps_Lock
+
+The caps lock key.
+
+=item FL_Meta_L
+
+The left meta/Windows key.
+
+=item FL_Meta_R
+
+The right meta/Windows key.
+
+=item FL_Alt_L
+
+The left alt key.
+
+=item FL_Alt_R
+
+The right alt key.
+
+=item FL_Delete
+
+The delete key.
+
+=item FL_Volume_Down
+
+Volume control down
+
+=item FL_Volume_Mute
+
+Mute sound from the system
+
+=item FL_Volume_Up
+
+Volume control up
+
+=item FL_Media_Play
+
+Start playing of audio
+
+=item FL_Media_Stop
+
+Stop playing audio
+
+=item FL_Media_Prev
+
+Previous track
+
+=item FL_Media_Next
+
+Next track
+
+=item FL_Home_Page
+
+Display user's home page
+
+=item FL_Mail
+
+Invoke user's mail program
+
+=item FL_Search
+
+Search
+
+=item FL_Back
+
+Like back on a browser
+
+=item FL_Forward
+
+Like forward on a browser
+
+=item FL_Stop
+
+Stop current operation
+
+=item FL_Refresh
+
+Refresh the page
+
+=item FL_Sleep
+
+Put system to sleep
+
+=item FL_Favorites
+
+Show favorite locations
+
+=back
+
+The following constants define bits in the Fl::event_state() value. You get
+these with C<:keyboard> as well.
+
+=over
+
+=item FL_SHIFT
+
+One of the shift keys is down
+
+=item FL_CAPS_LOCK
+
+The caps lock is on
+
+=item FL_CTRL
+
+One of the ctrl keys is down
+
+=item FL_ALT
+
+One of the alt keys is down
+
+=item FL_NUM_LOCK
+
+The num lock is on
+
+=item FL_META
+
+One of the meta/Windows keys is down
+
+=item FL_SCROLL_LOCK
+
+The scroll lock is on
+
+=item FL_KEY_MASK
+
+All keys are 16 bit for now
+
+=item FL_COMMAND
+
+An alias for FL_CTRL on WIN32 and X11, or FL_META on MacOS X
+
+=item FL_CONTROL
+
+An alias for FL_META on WIN32 and X11, or FL_CTRL on MacOS X
+
+=back
+
+=cut
+
+export_constant("FL_Button",         "keyboard");
+export_constant("FL_BackSpace",      "keyboard");
+export_constant("FL_Tab",            "keyboard");
+export_constant("FL_Iso_Key",        "keyboard");
+export_constant("FL_Enter",          "keyboard");
+export_constant("FL_Pause",          "keyboard");
+export_constant("FL_Scroll_Lock",    "keyboard");
+export_constant("FL_Escape",         "keyboard");
+export_constant("FL_Kana",           "keyboard");
+export_constant("FL_Eisu",           "keyboard");
+export_constant("FL_Yen",            "keyboard");
+export_constant("FL_JIS_Underscore", "keyboard");
+export_constant("FL_Home",           "keyboard");
+export_constant("FL_Left",           "keyboard");
+export_constant("FL_Up",             "keyboard");
+export_constant("FL_Right",          "keyboard");
+export_constant("FL_Down",           "keyboard");
+export_constant("FL_Page_Up",        "keyboard");
+export_constant("FL_Page_Down",      "keyboard");
+export_constant("FL_End",            "keyboard");
+export_constant("FL_Print",          "keyboard");
+export_constant("FL_Insert",         "keyboard");
+export_constant("FL_Menu",           "keyboard");
+export_constant("FL_Help",           "keyboard");
+export_constant("FL_Num_Lock",       "keyboard");
+export_constant("FL_KP",             "keyboard");
+export_constant("FL_KP_Enter",       "keyboard");
+export_constant("FL_KP_Last",        "keyboard");
+export_constant("FL_F",              "keyboard");
+export_constant("FL_F_Last",         "keyboard");
+export_constant("FL_Shift_L",        "keyboard");
+export_constant("FL_Shift_R",        "keyboard");
+export_constant("FL_Control_L",      "keyboard");
+export_constant("FL_Control_R",      "keyboard");
+export_constant("FL_Caps_Lock",      "keyboard");
+export_constant("FL_Meta_L",         "keyboard");
+export_constant("FL_Meta_R",         "keyboard");
+export_constant("FL_Alt_L",          "keyboard");
+export_constant("FL_Alt_R",          "keyboard");
+export_constant("FL_Delete",         "keyboard");
+export_constant("FL_Volume_Down",    "keyboard");
+export_constant("FL_Volume_Mute",    "keyboard");
+export_constant("FL_Volume_Up",      "keyboard");
+export_constant("FL_Media_Play",     "keyboard");
+export_constant("FL_Media_Stop",     "keyboard");
+export_constant("FL_Media_Prev",     "keyboard");
+export_constant("FL_Media_Next",     "keyboard");
+export_constant("FL_Home_Page",      "keyboard");
+export_constant("FL_Mail",           "keyboard");
+export_constant("FL_Search",         "keyboard");
+export_constant("FL_Back",           "keyboard");
+export_constant("FL_Forward",        "keyboard");
+export_constant("FL_Stop",           "keyboard");
+export_constant("FL_Refresh",        "keyboard");
+export_constant("FL_Sleep",          "keyboard");
+export_constant("FL_Favorites",      "keyboard");
+export_constant("FL_SHIFT",          "keyboard");
+export_constant("FL_CAPS_LOCK",      "keyboard");
+export_constant("FL_CTRL",           "keyboard");
+export_constant("FL_ALT",            "keyboard");
+export_constant("FL_NUM_LOCK",       "keyboard");
+export_constant("FL_META",           "keyboard");
+export_constant("FL_SCROLL_LOCK",    "keyboard");
+export_constant("FL_KEY_MASK",       "keyboard");
+export_constant("FL_COMMAND",        "keyboard");
+export_constant("FL_CONTROL",        "keyboard");
+
+=pod
+
+=head2 C<:mouse>
+
+These constants define the button numbers for FL_PUSH and FL_RELEASE events.
+
+See also Fl::event_button().
+
+=over
+
+=item FL_LEFT_MOUSE
+
+The left mouse button
+
+=item FL_MIDDLE_MOUSE
+
+The middle mouse button
+
+=item FL_RIGHT_MOUSE
+
+The right mouse button
+
+=back
+
+The following constants define bits in the Fl::event_state() value. You get
+these with C<:mouse> as well.
+
+=over
+
+=item FL_BUTTON1
+
+Mouse button 1 is pushed
+
+=item FL_BUTTON2
+
+Mouse button 2 is pushed
+
+=item FL_BUTTON3
+
+Mouse button 3 is pushed
+
+=item FL_BUTTONS
+
+Any mouse button is pushed
+
+=back
+
+=cut
+
+export_constant("FL_LEFT_MOUSE",   "mouse");
+export_constant("FL_MIDDLE_MOUSE", "mouse");
+export_constant("FL_RIGHT_MOUSE",  "mouse");
+export_constant("FL_BUTTON1",      "mouse");
+export_constant("FL_BUTTON2",      "mouse");
+export_constant("FL_BUTTON3",      "mouse");
+export_constant("FL_BUTTONS",      "mouse");
+
+=pod
+
+=head1 C<:align>
+
+Flags to control the label alignment.
+
+This controls how labels are displayed next to or inside the widget. The
+default value is FL_ALIGN_CENTER for most widgets which centers the label
+inside the widget.
+
+Flags can be or'd to achieve a combination of alignments.
+
+Outside alignments:
+
+               TOP_LEFT        TOP       TOP_RIGHT
+       LEFT_TOP+---------------------------------+RIGHT_TOP
+               |                                 |
+           LEFT|                                 |RIGHT
+               |                                 |
+    LEFT_BOTTOM+---------------------------------+RIGHT_BOTTOM
+               BOTTOM_RIGHT   BOTTOM   BOTTOM_LEFT
+
+Inside alignments:
+
+               +---------------------------------+
+               |TOP_LEFT       TOP      TOP_RIGHT|
+               |                                 |
+               |LEFT                        RIGHT|
+               |                                 |
+               |BOTTOM_RIGHT  BOTTOM  BOTTOM_LEFT|
+               +---------------------------------+
+
+The following values are exported with the C<:align> tag:
+
+=over
+
+=item FL_ALIGN_CENTER
+
+Align the label horizontally in the middle.
+
+=item FL_ALIGN_TOP
+
+Align the label at the top of the widget.
+
+=item FL_ALIGN_BOTTOM
+
+Align the label at the bottom of the widget.
+
+=item FL_ALIGN_LEFT
+
+Align the label at the left of the widget.
+
+=item FL_ALIGN_RIGHT
+
+Align the label to the right of the widget.
+
+=item FL_ALIGN_INSIDE
+
+Draw the label inside of the widget.
+
+=item FL_ALIGN_TEXT_OVER_IMAGE
+
+If the label contains an image, draw the text on top of the image.
+
+=item FL_ALIGN_IMAGE_OVER_TEXT
+
+If the label contains an image, draw the text below the image.
+
+=item FL_ALIGN_CLIP
+
+All parts of the label that are lager than the widget will not be drawn.
+
+=item FL_ALIGN_WRAP
+
+Wrap text that does not fit the width of the widget.
+
+=item FL_ALIGN_IMAGE_NEXT_TO_TEXT
+
+If the label contains an image, draw the text to the right of the image.
+
+=item FL_ALIGN_TEXT_NEXT_TO_IMAGE
+
+If the label contains an image, draw the text to the left of the image.
+
+=item FL_ALIGN_IMAGE_BACKDROP
+
+If the label contains an image, draw the image or deimage in the background.
+
+=item FL_ALIGN_TOP_LEFT
+
+=item FL_ALIGN_TOP_RIGHT
+
+=item FL_ALIGN_BOTTOM_LEFT
+
+=item FL_ALIGN_BOTTOM_RIGHT
+
+=item FL_ALIGN_LEFT_TOP
+
+=item FL_ALIGN_RIGHT_TOP
+
+=item FL_ALIGN_LEFT_BOTTOM
+
+=item FL_ALIGN_RIGHT_BOTTOM
+
+=item FL_ALIGN_NOWRAP
+
+=item FL_ALIGN_POSITION_MASK
+
+=item FL_ALIGN_IMAGE_MASK
+
+=back
+
+=cut
+
+export_constant("FL_ALIGN_CENTER",             "align");
+export_constant("FL_ALIGN_TOP",                "align");
+export_constant("FL_ALIGN_BOTTOM",             "align");
+export_constant("FL_ALIGN_LEFT",               "align");
+export_constant("FL_ALIGN_RIGHT",              "align");
+export_constant("FL_ALIGN_INSIDE",             "align");
+export_constant("FL_ALIGN_TEXT_OVER_IMAGE",    "align");
+export_constant("FL_ALIGN_IMAGE_OVER_TEXT",    "align");
+export_constant("FL_ALIGN_CLIP",               "align");
+export_constant("FL_ALIGN_WRAP",               "align");
+export_constant("FL_ALIGN_IMAGE_NEXT_TO_TEXT", "align");
+export_constant("FL_ALIGN_TEXT_NEXT_TO_IMAGE", "align");
+export_constant("FL_ALIGN_IMAGE_BACKDROP",     "align");
+export_constant("FL_ALIGN_TOP_LEFT",           "align");
+export_constant("FL_ALIGN_TOP_RIGHT",          "align");
+export_constant("FL_ALIGN_BOTTOM_LEFT",        "align");
+export_constant("FL_ALIGN_BOTTOM_RIGHT",       "align");
+export_constant("FL_ALIGN_LEFT_TOP",           "align");
+export_constant("FL_ALIGN_RIGHT_TOP",          "align");
+export_constant("FL_ALIGN_LEFT_BOTTOM",        "align");
+export_constant("FL_ALIGN_RIGHT_BOTTOM",       "align");
+export_constant("FL_ALIGN_NOWRAP",             "align");
+export_constant("FL_ALIGN_POSITION_MASK",      "align");
+export_constant("FL_ALIGN_IMAGE_MASK",         "align");
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut
+
+# Don't forget to export them with the :enum tag in Fl.pm
+# Fl_Cursor
+# Fl_Damage
+# Fl_Event

@@ -1,0 +1,17 @@
+Collapse
+========
+
+'Collapses a path as much as possible'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

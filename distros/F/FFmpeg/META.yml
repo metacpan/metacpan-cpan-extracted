@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         FFmpeg
+version:      6036
+version_from: FFmpeg.pm
+installdirs:  site
+requires:
+    File::Temp:                    0
+    HTTP::Request:                 0
+    Image::Magick::Iterator:       0.01
+    Image::PBMlib:                 1.05
+    LWP::UserAgent:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,33 @@
+Revision history for Perl extension FormValidator-Simple-Struct
+
+0.18 2016-02-23T09:08:40Z
+    - add BOOLEAN to export methods
+
+0.17 2016-02-23T08:49:38Z
+    - add BOOLEAN check method
+
+0.16 2015-11-19T08:39:46Z
+    - change DATETIME check regex
+
+0.15 2014-10-16T02:31:17Z
+    - change BETWEEN implement
+
+0.14 2014-07-25T05:36:11Z
+    - add decimal length check method
+
+0.13 2013-10-25T04:54:39Z
+    - fix can't pass tests on 5.18 ,the reason why hash randomization
+
+0.12 2013-10-22T02:15:31Z
+    - add Hash::MultiValue
+
+0.11 2013-10-21T17:16:50Z
+    - add requires
+
+0.10 2013-10-21T06:41:39Z
+    - add requires
+
+0.09 2013-10-19T06:44:11Z
+
+    - original version
+

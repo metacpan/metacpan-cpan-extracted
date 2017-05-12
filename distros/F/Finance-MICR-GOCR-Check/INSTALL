@@ -1,0 +1,54 @@
+INSTALL
+=======
+
+Normal installation via cpan is not the best way to go unless you install the non perl dependencies first.
+
+One of the most crucial things you will have to do is make up your mind where you want to store your
+gocr micr databse in.. this is a collection of files to aid gocr in recognizing a MICR line.
+
+
+inside ./micrdb is an optimized database for use with gocr.
+
+This needs to be present somewhere on the host machine.
+
+Suggested is a place such as /usr/share/micrdb
+
+---
+
+HOW TO INSTALL GOCR
+===================
+
+ rpm -Uvh ./gocr-0.40-1.i386.rpm
+
+CHECK YOUR KERNEL FIRST
+uname -a
+
+dont install i386 on a 64bit etc machine!!!! 
+
+---
+
+REQUIREMENTS
+============
+
+gocr-0.40 or higher, included in this dist
+ImageMagick
+perl 5 or higher
+Finance::MICR::LineParser 
+
+
+---
+
+After you have gocr installed..
+
+Inside the directory of the package:
+
+perl t/0_imager_formats_test_for_png.t
+perl t/1_gocr.t
+perl t/2_check.t
+
+You can also test out the checkscan script
+
+perl bin/checkscan -q ./t/checks_hard/hard1.png
+
+perl bin/checkscan -q -i 2 -x 10 ./t/checks_hard/hard1.png
+

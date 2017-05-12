@@ -1,0 +1,6 @@
+blib
+^Makefile$
+^Makefile.old$
+MANIFEST.bak
+MANIFEST.old
+.git

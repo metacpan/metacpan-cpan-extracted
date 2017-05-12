@@ -1,0 +1,22 @@
+Revision history for Perl extension File::Mirror.
+
+0.10  26 Feb 2007
+        - pass $_[0], $_[1] as the source and destination file name
+
+0.05  21 Feb 2007
+        - ouput the $from in native format
+
+0.04  21 Feb 2007
+        - ignore the trailing '/' in source path
+
+0.03  21 Feb 2007
+        - fixed the wrong name used in docs.
+        - change $a, $b to $from and $to.
+
+0.02  19 Feb 2007
+        - fixed the package name
+
+0.01  6 Feb 2007
+	- original version; created by h2xs 1.22 with options
+		-XA File::Mirror
+

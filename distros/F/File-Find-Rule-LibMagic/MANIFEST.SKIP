@@ -1,0 +1,16 @@
+\B\.svn\b
+\.[Bb][Aa][Kk]$
+\.orig$
+\.rej$
+\.old$
+\..*sw[po]
+.*~
+Makefile$
+\.project
+\bblib\b
+pm_to_blib
+.*\.csv
+^MYMETA.yml$
+^_build/.*
+^Build$
+^File-Find-Rule-LibMagic-.*

@@ -1,0 +1,26 @@
+
+= 2012/03/03 - 0.43
+
+Fix packaging error: CanonicalHostnames wasn't in the MANIFEST.
+
+= 2011/06/15 - 0.42
+
+Add File::Slurp::Remote::CanonicalHostnames.  It is tested by
+the regression suite in Proc::JobQueue.
+
+= 2009/09/25 - 0.41
+
+= 2009/08/03 - 0.4 
+
+Allow ssh/scp commands to be overridden.
+
+Add t/remote_slurp.t
+
+Change File::Slurp::Remote::BrokenDNS so that it uses DNS when it can.
+Setting $ENV{BROKEN_DNS_WORKAROUND} restores the old behavior.
+
+Bugfixes for reading/writing local compressed files.
+
+= 2009/07/23 - 0.3
+
+Initial revision

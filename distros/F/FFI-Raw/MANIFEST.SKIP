@@ -1,0 +1,17 @@
+Raw.bs
+Raw.c
+Raw.o
+.*\.o
+.*\.a
+.*\.so
+.*\.la
+.*\.lo
+.*\.Plo
+.*\.pc$
+.*\.info
+stamp-h1
+libtool$
+.*\.status
+.*\.dirstamp
+ffi(config)?.h$
+local.exp

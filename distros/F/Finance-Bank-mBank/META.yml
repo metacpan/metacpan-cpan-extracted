@@ -1,0 +1,28 @@
+---
+abstract: 'Check mBank account balance'
+author:
+  - 'Bartek Jakubski <b.jakubski@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.82'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Bank-mBank
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Crypt::SSLeay: 0
+  Exception::Base: 0
+  WWW::Mechanize: 0
+  Web::Scraper: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,36 @@
+NAME
+  Finance::Bank::HSBC - Check your HSBC bank accounts from Perl
+
+SYNOPSIS
+  use Finance::Bank::HSBC;
+  my @accounts = Finance::Bank::HSBC->check_balance(
+      bankingid => "IBxxxxxxxxxx",
+      seccode   => "xxxxxx"
+  );
+
+  foreach (@accounts) {
+      printf "%25s : %13s / %18s : GBP %8.2f\n",
+        $_->{name}, $_->{type}, $_->{account}, $_->{balance};
+  }
+
+DESCRIPTION
+  This module provides a rudimentary interface to the HSBC online
+  banking system at https://www.ebank.hsbc.co.uk/. 
+
+DEPENDENCIES
+  You will need either Crypt::SSLeay or IO::Socket::SSL installed 
+  for HTTPS support to work with LWP.  This module also depends on 
+  WWW::Mechanize and HTML::TokeParser for screen-scraping.
+
+WARNING
+  This warning is from Simon Cozens' Finance::Bank::LloydsTSB, and seems
+  just as apt here.
+
+  This is code for <online banking>, and that means <your money>, and
+  that means <BE CAREFUL>. You are encouraged, nay, expected, to audit
+  the source of this module yourself to reassure yourself that I am not
+  doing anything untoward with your banking data. This software is useful
+  to me, but is provided under <NO GUARANTEE>, explicit or implied.
+
+AUTHOR
+  Chris Ball <chris@cpan.org>

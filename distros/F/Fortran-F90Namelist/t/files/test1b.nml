@@ -1,0 +1,15 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test1b.nml -- Sample namelist representing all supported datatypes.
+!                Added whitespace and comments
+!  $Id: test1b.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $
+!
+&nlist                                 ! Name of namelist 
+  string_var    = 'A simple string',   ! string
+  int_var       =14,                   ! integer
+  real_var      = -0.5,                ! real
+  double_var    = 1.D4,                ! double precision
+  complex_var   = (1.234,5.678),       ! complex
+  dcompl_var= (3.14D0, 2.718D0)
+! 
+/

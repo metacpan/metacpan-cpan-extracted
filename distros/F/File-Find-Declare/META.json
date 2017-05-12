@@ -1,0 +1,28 @@
+{
+   "generated_by" : "Dist::Zilla version 1.093400",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "0.62",
+   "name" : "File-Find-Declare",
+   "author" : [
+      "Ryan P. Kelly <rpkelly@cpan.org>"
+   ],
+   "license" : "mit",
+   "requires" : {
+      "Test::Exception" : "0",
+      "File::Util" : "0",
+      "ExtUtils::MakeMaker" : 0,
+      "Moose::Meta::TypeConstraint" : "0",
+      "Number::Compare::Date" : "0",
+      "Moose::Util::TypeConstraints" : "0",
+      "Test::More" : "0",
+      "MooseX::StrictConstructor" : "0",
+      "Text::Glob" : "0",
+      "Number::Compare" : "0",
+      "Moose" : "0"
+   },
+   "abstract" : "File::Find, declaratively"
+}
+

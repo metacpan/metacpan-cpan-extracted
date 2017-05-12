@@ -1,0 +1,95 @@
+NAME
+    FTN::Pkt - a module to make FTN-style mail packets
+
+SYNOPSIS
+        my $pkt = new FTN::Pkt (
+            fromaddr => '2:9999/999.128',
+            toaddr   => '2:9999/999',
+            password => 'password',
+            inbound  => '/var/spool/fido/inbound'
+        );    
+        my $msg = new FTN::Msg(
+            fromname => 'Vassily Poupkine',
+            toname   => 'Poupa Vassilyev',
+            subj     => 'Hello',
+            text     => "Hi, Poupa!\n\nHow do you do?\n\n--\nVassily",
+            fromaddr => '2:9999/999.128',
+            origin   => 'My cool origin',
+            tearline => '/usr/bin/perl',
+            area     => 'poupa.local',
+            reply    => '2:9999/999.1 fedcba987',
+            date     => 1210918822,                    # unixtime format
+            pid      => 'Super-Duper Editor v0.01',
+            tid      => 1
+        );
+        $pkt->add_msg($msg);    
+        $pkt->write_pkt();
+
+DESCRIPTION
+    This module can be used to make FTN-style mail packets. Either echomail
+    or netmail are supported. You can specify @REPLY cludge. @MSGID may be
+    auto-generated or specified manually.
+
+    If "area" present then message treated as echomail. Othervise it becomes
+    netmail ("toaddr" required).
+
+FTN::Msg methods
+    "new(%hash)"
+            A constructor. Some initialization parameters can be passed via
+            %hash. Possible ones are: "fromaddr toaddr fromname toname
+            tearline origin subj text area msgid reply pid tid date".
+
+            All parameters are text but "tid" is boolean. If *true* then
+            @TID cludge will be added to message.
+
+    "update(%hash)"
+            Changes the message. See "FTN::Msg::new" for parameters allowed.
+
+    "make_msgid([$msgid])"
+            Generates @MSGID, sets it inside the message and and returns it.
+            Possible parameter is only second part of @MSGID, without source
+            address. If parameter omitted then all @MSGID parts will be
+            auto-generated. Auto-generation method use *unixtime* as basis,
+            so don't allow more than one process to generate @MSGIDs in the
+            same time.
+
+    "as_string()"
+            Returns string representation of message. For debugging.
+
+FTN::Pkt methods
+    "new(%hash)"
+            A constructor. Some initialization parameters can be passed via
+            %hash. Possible ones are: "fromaddr toaddr password inbound"
+
+    "update(%hash)"
+            Changes the packet. See "FTN::Pkt::new" for parameters allowed.
+
+    "add_msg($msg)"
+            Adds a message to the packet. $msg must be a reference to
+            "FTN::Msg" object.
+
+    "write_pkt()"
+            Writes the packet to a disk into "inbound" directory. Filename
+            is auto-generated. Don't allow more than one process to write at
+            the same time. Returns resulting filename.
+
+LIMITATIONS
+    CP866 codepage is hardcoded.
+
+REQUIREMENTS
+    FTN::OS_features module required (included in this package).
+
+    Supported platforms: UNIX and Win32 have been tested. All others may
+    work or not.
+
+COPYRIGHT
+    Copyright 2008 Dmitry V. Kolvakh
+
+    This library is free software. You may copy or redistribute it under the
+    same terms as Perl itself.
+
+AUTHOR
+    Dmitry V. Kolvakh aka Keu
+
+    2:5054/89@FIDOnet
+

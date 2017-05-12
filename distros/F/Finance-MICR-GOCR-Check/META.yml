@@ -1,0 +1,22 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Finance-MICR-GOCR-Check
+version:      1.03
+version_from: lib/Finance/MICR/GOCR/Check.pm
+installdirs:  site
+requires:
+    Cwd:                           0
+    File::Copy:                    0
+    File::Path:                    0
+    File::PathInfo:                0
+    File::Type:                    0
+    File::Which:                   0
+    Finance::MICR::LineParser:     1.06
+    Image::Magick:                 0
+    Imager:                        0.54
+    Smart::Comments:               0
+    Test::Simple:                  0
+    YAML:                          0.58
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

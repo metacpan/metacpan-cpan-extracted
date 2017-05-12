@@ -1,0 +1,23 @@
+---
+name: Filesys-Virtual-DAAP
+version: 0.04
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: present a DAAP share as a VFS
+license: perl
+requires:
+  Class::Accessor: 0
+  Filesys::Virtual: 0
+  Filesys::Virtual::Plain: 0
+  Net::DAAP::Client: 0.4
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Filesys::Virtual::DAAP:
+    file: lib/Filesys/Virtual/DAAP.pm
+    version: 0.04
+  Filesys::Virtual::DAAP::Song:
+    file: lib/Filesys/Virtual/DAAP.pm
+    version: 0.04
+generated_by: Module::Build version 0.2608

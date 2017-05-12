@@ -1,0 +1,356 @@
+NAME
+
+    File::Misc -- handy file tools
+
+Description
+
+    File::Misc provides a variety of utilities for working with files.
+    These utilities provides tools for reading in, writing out to, and
+    getting information about files.
+
+SYNOPSIS
+
+     # slurp in the contents of a file
+     $var = slurp('myfile.txt');
+    
+     # spit content into a file
+     spit 'myfile.txt', $var;
+    
+     # get the lines in a file as an array
+     @arr = file_lines('myfile.txt');
+    
+     # get a list of all the files in a directory
+     @arr = files('/my/dir');
+    
+     # ensure a file is deleted - if it is already deleted return success
+     ensure_unlink('myfile.txt');
+    
+     # ensure a file exists, update its date to now
+     touch('myfile.txt');
+    
+     # many others
+
+INSTALLATION
+
+    File::Misc can be installed with the usual routine:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+FUNCTIONS
+
+ slurp
+
+    Returns the contents of the given file
+
+     $var = slurp('myfile.txt');
+
+    option: max
+
+    Sets the maximum amount in bytes to slurp in. By default the maximums
+    is 100k.
+
+     # set maximum to 1k
+     $var = slurp('myfile.txt', max=>1024);
+
+    Set max to 0 to set no maximum.
+
+    option: firstline
+
+    If true, only slurp in the first line.
+
+     $line = slurp('myfile.txt', firstline=>1);
+
+    options: stdout, stderr
+
+    If the stdout option is true, then the contents of the file are sent to
+    STDOUT and are not saved as a scalar at all. slurp returns true.
+
+     slurp('myfile.txt', stdout=>1);
+
+    The stderr option works the same way except that contents are sent to
+    STDERR. Both options can be set to true, and contents will be sent to
+    both STDOUT and STDERR.
+
+ spit
+
+    The opposite of slurp(), spit() outputs the given string(s) to the
+    given file in a single command. In its simplest form, spit takes a file
+    path, then one or more strings. Those strings are concatenated together
+    and output the given path. So, the following code outputs "hello world"
+    to /tmp/myfile.txt.
+
+     spit('/tmp/myfile.txt', 'hello world');
+
+    If you want to append to the file (if it exists) then the first param
+    should be a hashref, with 'path' set to the path to the file and
+    'append' set to true, like as follows.
+
+     spit(
+       {path=>'/tmp/myfile.txt', append=>1},
+       'hello world'
+     );
+
+ file_lines
+
+    Cfile_lines> returns the contents of one or more files as an array.
+    Newlines are stripped off the end of each line. So, for example, the
+    following code would the lines from buffer.txt:
+
+     @lines = file_lines('buffer.txt');
+
+    If the first param is an arrayref, then every file in the array is
+    read. So, the following code returns lines from buffer.txt and
+    data.txt.
+
+     @lines = file_lines(['buffer.txt', 'data.txt']);
+
+    option: max
+
+    max sets the maximum number of lines to return. So, the following code
+    indicates to send no more than 100 lines.
+
+     @lines = file_lines('buffer.txt', max=>100);
+
+    option: quiet
+
+    If the quiet option is true, then file_lines does not croak on error.
+    For example:
+
+     @lines = file_lines('buffer.txt', quiet=>1);
+
+    option: skip_empty
+
+    If skip_empty is true, then empty lines are not returned. Note that a
+    line with just spaces or tabs is considered empty.
+
+     @lines = file_lines('buffer.txt', skip_empty=>1);
+
+ size
+
+    Returns the size of the given file. If the file doesn't exist, returns
+    undef.
+
+ mod_time
+
+    Returns the modification time (in epoch seconds) of the given file. If
+    the file doesn't exist, returns undef.
+
+     print 'modification time: ', mod_time('myfile.txt'), "\n";
+
+    If you are familiar with the stat() function, then it may clarify to
+    know that mod_time simply returns the ninth element of stat().
+
+ mod_date
+
+    mod_date does exactly the same thing as mod_time.
+
+ age
+
+    age() returns the number of seconds since the given file has been
+    modifed.
+
+     print 'file age: ', age('myfile.txt'), "\n";
+
+    age() simply returns the current time minus the value of mod_time.
+
+ files
+
+    files returns an array of file paths starting at the given directory.
+    In its simplest use, files is called with just a directory path.
+
+     @myfiles = files('./tmp');
+
+    That command will return all files within ./tmp, including recursing
+    into nested directories. By default, all paths will be relative to the
+    current directory, so the file list mught look something like this:
+
+     ./tmp/buffer.txt
+     ./tmp/build
+     ./tmp/build/myfile.txt
+
+    You can get just the file names with the full_path option, described
+    below.
+
+    Note that the
+
+    files has several options, explained below.
+
+    option: recurse
+
+    By default, files recurses directory structures.
+
+    option: dirs
+
+    option: files
+
+    option: full_path
+
+    option: extensions
+
+    option: follow_links
+
+ search_inc
+
+    search_inc() searches the @INC directories for a given file and returns
+    the full path to that file. For example, this command:
+
+     search_inc('JSON/Tiny.pm')
+
+    might return somethng like this:
+
+     /usr/local/share/perl/5.18.2/JSON/Tiny.pm
+
+    The given path must be the full path within the @INC directory. So, for
+    example, this command would not return the path to JSON/Tiny.pm:
+
+     search_inc('Tiny.pm')
+
+    That feature might be added later.
+
+    If you prefer, you can give the path in Perl module format:
+
+     search_inc('JSON::Tiny')
+
+ script_dir
+
+    Returns the directory of the script. The directory is relative the
+    current directory when the script was called. Call this command before
+    altering $0.
+
+ mode
+
+    mode() returns the file mode (i.e. type and permissions) of the given
+    path.
+
+ tmp_path
+
+    tmp_path() is for the situation where you want to create a temporary
+    file, then have that file automatically deleted at the end of your code
+    or code block.
+
+    tmp_path() returns a File::Misc::Tmp::Path object. That object
+    stringifies to a random path. When the object goes out of scope, the
+    file, if it exists, is deleted. tmp_path() does not create the file, it
+    just deletes the file if the file exists.
+
+    tmp_path() takes one required param: the directory in which the file
+    will go. Here's a simple example:
+
+     # variables
+     my ($tmp, $fh);
+    
+     # get temporary path: file is NOT created
+     $tmp = tmp_path('./');
+    
+     # open a file handle, write stuff to the file, close the handle
+     $fh = FileHandle->new("> $tmp") or die $!;
+     print $fh "stuff\n";
+     undef $fh;
+    
+     # do something that might cause a crash
+     # if there is a crash, $tmp goes out of scope and deletes the file
+     if ( it_could_happen() ) {
+       die 'crash!';
+     }
+    
+     # move the file somewhere else
+     rename($tmp, './permanent') or die $!;
+    
+     # the file doesn't exist anymore, so when $tmp object
+     # goes out of scope, nothing happens
+
+    By default, the path consists of the given directory followed by a
+    random string of four characters. So in the example above, the path
+    would look something like this:
+
+     ./fZ96
+
+    No effort is made to ensure that there isn't already a file with that
+    name. It is simply assumed that four characters is enough to assure a
+    microscopic (but non-zero) chance of a name conflict.
+
+    Note that File::Temp provides a similar functionality, but there is an
+    important difference. File::Temp creates the temporay file and returns
+    a file handle for that file. This is useful for situations where you
+    want to cache data for use in the current scope. It gets a little
+    trickier, however, if you want to close the file handle and move the
+    temporary file to a permanent location. tmp_path simply gives you a
+    path that will be deleted if the file exists, allowing you manipulate
+    and move the file as you like. File::Temp also goes to some effort to
+    ensure that there are no name conflicts. What you use is a matter of
+    needs and taste.
+
+    option: rand_length
+
+    By default the random string is 4 characters long. rand_length gives a
+    different length to the string. So, for example, the following code
+    indicates a random string length of 8:
+
+     $tmp = tmp_path('./', rand_length=>8);
+
+    That produces a string like this:
+
+     ./JQd4P6W7
+
+    option: auto_delete
+
+    If the auto_delete option is sent and is false, then the file is not
+    actually deleted when the tmp object goes out of scope. For example:
+
+     $tmp = tmp_path('./', auto_delete=>0);
+
+    This option might seem to defeat the purpose of tmp_path, but it's
+    useful for debugging your code. By setting the object so that it
+    doesn't automatically delete the file you can look at the contents of
+    the file later to see if it actually contains what you thought it
+    should.
+
+    option: extension
+
+    extension allows you to give the path a file extension. For example,
+    the following code creates a path that ends with '.txt'.
+
+     $tmp = tmp_path('./', extension=>'txt');
+
+    option: prefix
+
+    prefix indicates a string that should be put after the directory name
+    but before the random string. So, for example, the following code puts
+    the prefix "build-" in the file name:
+
+     $tmp = tmp_path('./', prefix=>'build-');
+
+    giving us something like
+
+     ./build-J3v1
+
+ tmp_dir
+
+    tmp_dir() creates a temporary directory and returns a
+    File::Misc::Tmp::Dir object. When the object goes out of scope, the
+    directory is deleted.
+
+TERMS AND CONDITIONS
+
+    Copyright (c) 2012-2016 by Miko O'Sullivan. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This software comes with NO
+    WARRANTY of any kind.
+
+AUTHOR
+
+    Miko O'Sullivan miko@idocs.com
+
+VERSION
+
+    Version 0.10.
+
+HISTORY
+
+    Version 0.10, Sep 7, 2016
+
+      Initial release
+

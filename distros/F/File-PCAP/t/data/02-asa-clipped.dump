@@ -1,0 +1,15 @@
+# dump taken from
+# http://www.techrepublic.com/blog/data-center/easy-packet-captures-straight-from-the-cisco-asa-firewall/
+#
+myasa# show capture testcap detail packet-number 5 dump
+
+4532 packets captured
+
+   5: 13:46:39.803120 0022.5597.25b9 0014.3815.89fb 0x0800 1514: 192.168.81.52.443 > 192.168.80.51.3968: P [tcp sum ok] 787673978:787675438(1460) ack 30                   43311886 win 8192 (ttl 255, id 54032)
+
+0x0000   4500 05dc d310 0000 ff06 c052 c0a8 5134        E..........R..Q4
+0x0010   c0a8 5033 01bb 0f80 2ef2 f37a b565 410e        ..P3.......z.eA.
+0x0020   5018 2000 5488 0000 1703 0106 4654 db31        P. .T.......FT.1
+0x0030   b3d4 0a5b 3295 f719 d82a 8767 6b8b dae1        ...[2....*.gk...
+0x0040   0a54 0ea8 c8c4 1c61 c45c e321 452e 6ab6        .T.....a.\.!E.j.
+0x0050   ba80 4e94 3801 d973 b4fe 97d4 8b2f 9e77        ..N.8..s...../.w

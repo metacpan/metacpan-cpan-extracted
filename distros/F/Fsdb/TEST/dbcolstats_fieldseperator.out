@@ -1,0 +1,7 @@
+#fsdb -F S mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+0.064188  0.036194  56.387  0.037989  0.026199  0.10218  0.95  0.38513  0.031271  0  0.096602  6
+#  | /home/johnh/BIN/DB/dbrow 
+#  | /home/johnh/BIN/DB/dbcol event clock
+#  | dbrowdiff clock
+#  | /home/johnh/BIN/DB/dbcol absdiff
+#   | dbcolstats -F S absdiff

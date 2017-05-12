@@ -1,0 +1,30 @@
+Finance-Bank-ES-Cajamadrid
+==================================
+
+This module checks your balance in all your Cajamadrid's accounts
+Este modulo chequea el saldo de todas tus cuentas de Cajamadrid.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+WWW::Mechanize
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Bruno Diaz Briere
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

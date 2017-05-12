@@ -1,0 +1,203 @@
+0.31    2017-02-03 (PERLANCAR)
+
+	- [ux] Use rsync option -v (--verbose) when under debug/trace
+	  logging.
+
+
+0.30    2015-10-29 (PERLANCAR)
+
+	- [dist][Bugfix] Include a YAML implementation (YAML-Old) because
+	  YAML-Any does not depend on one.
+
+
+0.29    2015-10-22 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Bugfix] Fix dependencies (File::RsyBak didn't work, only rsybak CLI).
+
+        - Replace File::Flock with the more lightweight File::Flock::Retry.
+
+
+0.28    2015-10-21 (PERLANCAR)
+
+	[Experimental changes]
+
+        - Make rsybak a packed script, so the number of prereqs for this dist is
+          significantly reduced. This eases installation.
+
+
+0.27    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.26    2015-08-17 (PERLANCAR)
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.25    2015-04-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Documentation] Give example of how to use
+	  --extra-rsync-opts-json and the configuration file.
+
+
+0.24    2015-03-18 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Rebuild with newer DZP:Rinci::ScriptFromFunc so it now has
+          prereq to Perinci::CmdLine::Classic instead of the old name
+          Perinci::CmdLine, so I can purge Perinci::CmdLine from CPAN.
+
+
+0.23    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.22     2014-09-05 (PERLANCAR)
+
+         - No functional changes.
+
+         - Workaround to avoid JSON decoding failure warning when run by
+           Perinci::CmdLine.
+
+
+0.21     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.20    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.19    2013-11-07 (SHARYANTO)
+
+        - No functional changes. Show sample backup directory structure in
+          Synopsis.
+
+
+0.18    2012-03-16 (SHARYANTO)
+
+        - No functional changes. Rebuild with Pod::Weaver::Plugin::Perinci
+          enabled.
+
+
+0.17    2012-03-03 (SHARYANTO)
+
+        - No functional changes. Reduce startup overhead by delaying loading of
+          modules (measured on my Atom N570 netbook: from 0.15s to 0.06s). This
+          is not important actually, I'm just testing Perinci::CmdLine and
+          Perinci::BashComplete on this module.
+
+
+0.16    2012-03-02 (SHARYANTO)
+
+        - No functional changes. Replace Sub::Spec::CmdLine with
+          Perinci::CmdLine.
+
+
+0.15    2011-05-27 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - The code touched .current.timestamp before we use its mtime for
+          history backup dir name, it should be after.
+
+
+0.14    2011-02-28 (SHARYANTO)
+
+        - Spec: add 'deps' clause to nice/rsync/rm execs.
+
+        - Require newer version of Sub::Spec::CmdLine.
+
+
+0.13    2011-02-22 (SHARYANTO)
+
+        - Update to latest Sub::Spec (%SUBS -> %SPEC).
+
+
+0.12    2011-02-16 (SHARYANTO)
+
+        - Reduce startup overhead (avoid loading Log::Any::App) when invoked for
+          bash completion.
+
+
+0.11    2011-02-15 (SHARYANTO)
+
+        - Fix tests.
+
+
+0.10    2011-02-15 (SHARYANTO)
+
+        - Do not die in backup(), return error response instead.
+
+
+0.09    2011-02-15 (SHARYANTO)
+
+        - Fix sub spec (--histories is optional).
+
+
+0.08    2011-02-15 (SHARYANTO)
+
+        - Rename from File-CRBackup -> File-RsyBak.
+
+        - Remove the use of "cp -la" and use "rsync --link-dest" instead.
+
+        - Allow remote sources.
+
+
+0.07    2011-02-11 (SHARYANTO)
+
+        - Fix POD.
+
+
+0.06    2011-02-10 (SHARYANTO)
+
+        - Add POD documentation for functions (using
+          Pod::Weaver::Plugin::SubSpec).
+
+
+0.05    2011-02-09 (SHARYANTO)
+
+        - Add missing dependencies for script 'crbackup'.
+
+
+0.04    2011-02-09 (SHARYANTO)
+
+        - Some small fixes and update to newer version of Sub::Spec::CmdLine.
+
+
+0.03    2011-02-09 (SHARYANTO)
+
+        - Add script: crbackup.
+
+        - Add more documentation.
+
+        - Fix missing dependencies/use statements.
+
+
+0.02    2011-02-05 (SHARYANTO)
+
+        - Add arguments: extra_cp_opts, extra_rsync_opts
+
+
+0.01    2011-02-04 (SHARYANTO)
+
+        - First release.

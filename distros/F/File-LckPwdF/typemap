@@ -1,0 +1,4 @@
+const void *					T_PTROBJ
+const char *					T_PTROBJ
+char **						T_PTROBJ
+char * const *					T_PTROBJ

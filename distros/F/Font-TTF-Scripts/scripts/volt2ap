@@ -1,0 +1,114 @@
+#! /usr/bin/perl
+use Font::TTF::Scripts::Volt;
+use Getopt::Std;
+use Pod::Usage;
+
+getopts('ht:');
+
+unless (defined $ARGV[0] || defined $opt_h)
+{
+    pod2usage(1);
+    exit;
+}
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2, -noperldoc => 1);
+    exit;
+}
+
+$font = Font::TTF::Scripts::Volt->read_font($ARGV[0]) || die "Can't open font file $ARGV[0]";
+if ($opt_t)
+{
+    my ($inf) = IO::File->new("< $opt_t") || die "Can't open file $opt_t";
+    while (<$inf>)
+    { $volt_text .= $_; }
+    $inf->close;
+}
+elsif (defined $font->{'font'}{'TSIV'})
+{ $volt_text = $font->{'font'}{'TSIV'}->read->{' dat'}; }
+else
+{ die "No VOLT table in the font, nothing to do"; }
+$name = $font->{'font'}{'name'}->read->find_name(4);
+$upem = $font->{'font'}{'head'}{'unitsPerEm'};
+$font->{'font'}{'post'}->read;
+$res = $font->parse_volt($volt_text);
+
+print "<?xml version='1.0'?>\n<font name='$name' upem='$upem'>\n\n";
+for ($i = 0; $i < scalar @{$res->{'glyphs'}}; $i++)
+{
+    $glyph = $res->{'glyphs'}[$i];
+    print "<glyph GID='$i'";
+    @unis = sort {$a <=> $b} @{$glyph->{'uni'}};
+    printf(" UID='%04X'", $unis[0]) if ($unis[0]);
+    $psname = $font->{'font'}{'post'}{'VAL'}[$i];
+    print " PSName='$psname'" if ($psname);
+    print " VoltId='$glyph->{name}'" if ($glyph->{'name'} && $glyph->{'name'} ne $psname);
+    if ($glyph->{'points'} || $glyph->{'type'})
+    {
+        print ">\n";
+        foreach $p (sort keys %{$glyph->{'anchors'}})
+        {
+            $n = $p;
+            $n =~ s/^MARK_/_/o;
+            $numcomp = $#{$glyph->{'anchors'}{$p}};
+            for $c (0 .. $numcomp)
+            {    
+                next unless defined $glyph->{'anchors'}{$p}[$c];
+                $n =~ s/(_\d+)?$/'_' . ($c+1)/e if $numcomp > 0;
+                print "    <point type='$n'>\n";
+                printf "        <location x='%d' y='%d'/>\n", $glyph->{'anchors'}{$p}[$c]{'pos'}{'x'}[0], $glyph->{'anchors'}{$p}[$c]{'pos'}{'y'}[0];
+                print "    </point>\n";
+            }
+        }
+        print "    <property name='VOLT_type' value='$glyph->{'type'}'/>\n" if ($glyph->{'type'});
+        print "</glyph>\n";
+    }
+    else
+    {
+        print "/>\n";
+    }
+}
+
+print "\n</font>\n";
+
+__END__
+
+=head1 NAME
+
+volt2ap - create attachment point database from VOLT source in a TrueType Font
+
+=head1 SYNOPSIS
+
+  volt2ap [-t voltdat.txt] infile.ttf > outfile.xml
+
+=head1 OPTIONS
+
+  -t file  Volt source as text file to use instead of what is in the font
+  -h       Help
+
+=head1 DESCRIPTION
+
+volt2ap parses the volt source in a font to extract attachment point information
+which it prints to stdout in the form of an XML attachment point database. For more
+information on the file format see L<ttfbuilder>
+
+=head1 SEE ALSO
+
+ttfbuilder, make_volt
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut 
+
+1;

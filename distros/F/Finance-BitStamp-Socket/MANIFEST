@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+BitStamp-Socket.readme
+TODO
+t/BitStamp-Socket.t
+lib/Finance/BitStamp/Socket.pm
+ex/simple_example.pl

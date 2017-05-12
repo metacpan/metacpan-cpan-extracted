@@ -1,0 +1,44 @@
+<fiercescan args=" -dns thisisjustfortestingfierce.com -format xml -output result.xml" startscan="1220494203" startscanstr="Wed Sep  3 22:10:03 2008" fversion="2.0" xmlversion="1.0">
+<domainscan domain="thisisjustfortestingfierce.com" startscan="1220494203" startscanstr="Wed Sep  3 22:10:03 2008">
+    <!--  Name Servers -->
+    <nameservers starttime="1220494203" starttimestr="Wed Sep  3 22:10:03 2008" endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0">
+    </nameservers>
+
+    <zonetransfers starttime="1220494203" starttimestr="Wed Sep  3 22:10:03 2008" endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0">
+    </zonetransfers>
+
+    <!--  Prefix Brute Force DNS -->
+    <bruteforce starttime="1220494203" starttimestr="Wed Sep  3 22:10:03 2008" endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0">
+               <node ip="127.0.4.1" hostname="www.thisisjustfortestingfierce.com"/>
+               <node ip="127.0.5.1" hostname="smtp.thisisjustfortestingfierce.com"/>
+    </bruteforce>
+
+    <!--  Extension Brute Force DNS -->
+    <extbruteforce starttime="1220494203" starttimestr="Wed Sep  3 22:10:03 2008" endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0">
+               <node ip="127.0.3.1" hostname="thisisjustfortestingfierce.com"/>
+    </extbruteforce>
+
+    <!--  Find MX Record-->
+    <findmx starttime="1220494203" starttimestr="Wed Sep  3 22:10:03 2008" endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0">
+    </findmx>
+
+
+    <!--  Check for Wildcard -->
+    <wildcard starttime="1220494203" starttimestr="Wed Sep  3 22:10:03 2008" endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0">
+    </wildcard>
+
+    <!--  Whois -->
+    <whois starttime="" starttimestr="" endtime="" endtimestr="" elapsedtime="">
+    </whois>
+
+     <!--  Reverse Lookup -->
+    <reverselookup starttime="1220494203" starttimestr="Wed Sep  3 22:10:03 2008" endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0">
+               <node ip="127.0.3.1" hostname="thisisjustfortestingfierce.com"/>
+    </reverselookup>
+
+
+<endtimedetails endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0"/>
+</domainscan>
+
+<endscan endtime="1220494203" endtimestr="Wed Sep  3 22:10:03 2008" elapsedtime="0" />
+</fiercescan>

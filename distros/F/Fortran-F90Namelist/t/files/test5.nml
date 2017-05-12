@@ -1,0 +1,257 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test5.nml -- Sample namelist file copied from
+!               param.nml for a Pencil dust run of Anders
+!  $Id: test5.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $
+!
+
+!
+!  Initialisation parameters
+!
+ &RUN_PARS
+ CVSID   = '@Id: test5.nml,v 1.1 2004/09/24 23:57:56 dobler Exp @                                                                     ', ! Replaced dollar signs by ampersands so CVS doesn't modify value
+ IP      =          20,
+ NT      =     1000000,
+ IT1     =         100,
+ DT      =   100.0000    ,
+ CDT     =  0.4000000    ,
+ CDTV    =  0.8000000    ,
+ CDTS    =   1.000000    ,
+ CDTR    =   1.000000    ,
+ ISAVE   =         100,
+ ITORDER =           3,
+ DSNAP   =   1000000.    ,
+ D2DAVG  =   100.0000    ,
+ DVID    =  0.2000000    ,
+ DTMIN   =  9.9999997E-10,
+ DSPEC   =  3.9084999E+37,
+ TMAX    =  3.0000000E+08,
+ IWIG    =           0,
+ AWIG    =   1.000000    ,
+ IALIVE  =           0,
+ BORDER_FRAC     = 3*0.0000000E+00  ,
+ VEL_SPEC        = F,
+ MAG_SPEC        = F,
+ UXJ_SPEC        = F,
+ VEC_SPEC        = F,
+ OU_SPEC = F,
+ AB_SPEC = F,
+ FFT_SWITCH      = 'fftpack                  ',
+ RO_SPEC = F,
+ SS_SPEC = F,
+ CC_SPEC = F,
+ CR_SPEC = F,
+ RHOCC_PDF       = F,
+ CC_PDF  = F,
+ LNCC_PDF        = F,
+ GCC_PDF = F,
+ LNGCC_PDF       = F,
+ RANDOM_GEN      = 'min_std                  ',
+ LRMWIG_RHO      = F,
+ LRMWIG_FULL     = F,
+ LRMWIG_XYAVERAGE        = F,
+ LWRITE_ZAVERAGES        = F,
+ LWRITE_PHIAVERAGES      = F,
+ TEST_NONBLOCKING        = F,
+ IX      =           4,
+ IY      =           4,
+ IZ      =           4,
+ IZ2     =         131,
+ SLICE_POSITION  = 'p',
+ BCX     = 306*'she    ',
+ BCY     = 306*'p      ',
+ BCZ     = 3*'a      ', 2*'v3     ', 's      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      '
+ , 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ',
+  2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ',
+  3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3    
+ ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ',
+  3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3    
+ ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ',
+  3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3    
+ ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ',
+  3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3    
+ ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ',
+  3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3    
+ ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ',
+  3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3    
+ ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ', 3*'a      ', 'v3     ', 2*'s      ',
+ R_INT   =  0.0000000E+00,
+ R_EXT   =  3.9084999E+37,
+ TTRANSIENT      =  0.0000000E+00,
+ TAVG    =  0.0000000E+00,
+ IDX_TAVG        =           0,
+ LSERIAL_IO      = F,
+ NR_DIRECTIONS   =           1,
+ LSFU    = F,
+ LSFB    = F,
+ LSFZ1   = F,
+ LSFZ2   = F,
+ LSFFLUX = F,
+ LPDFU   = F,
+ LPDFB   = F,
+ LPDFZ1  = F,
+ LPDFZ2  = F,
+ ONED    = F,
+ LWRITE_AUX      = T,
+ ONEDALL = F,
+ LCALC_CP        = F,
+ PRETEND_LNTT    = F,
+ OLD_CDTV        = T,
+ LMAXADVEC_SUM   = F,
+ FORCE_LOWER_BOUND       = '                         '
+ /
+ &HYDRO_RUN_PARS
+ NU      =  9.9999997E-05,
+ IVISC   = '0                        ',
+ OMEGA   =  1.6700000E-08,
+ THETA   =  0.0000000E+00,
+ TDAMP   =  0.0000000E+00,
+ DAMPU   =  0.0000000E+00,
+ DAMPUEXT        =  0.0000000E+00,
+ DAMPUINT        =  0.0000000E+00,
+ RDAMPEXT        =  3.9084999E+37,
+ RDAMPINT        =  0.0000000E+00,
+ WDAMP   =  0.2000000    ,
+ TAU_DAMP_RUXM   =  0.0000000E+00,
+ TAU_DAMP_RUYM   =  0.0000000E+00,
+ TAU_DIFFROT1    =  0.0000000E+00,
+ AMPL_DIFFROT    =  0.0000000E+00,
+ GRADH0  = 3*0.0000000E+00  ,
+ LOMEGA_INT      = F,
+ OMEGA_INT       =  0.0000000E+00,
+ LDAMP_FADE      = F,
+ LUPW_UU = F,
+ OTHRESH =  0.0000000E+00,
+ OTHRESH_PER_ORMS        =  0.0000000E+00
+ /
+ &DENSITY_RUN_PARS
+ CS0     =  3.9084999E+37,
+ RHO0    =  3.9084999E+37,
+ GAMMA   =   1.400000    ,
+ CDIFFRHO        =  0.0000000E+00,
+ DIFFRHO =  0.0000000E+00,
+ DIFFRHO_SHOCK   =  0.0000000E+00,
+ GRADLNRHO0      = 3*0.0000000E+00  ,
+ CS2BOT  =  3.9084999E+37,
+ CS2TOP  =  3.9084999E+37,
+ LUPW_LNRHO      = F,
+ CP      =  3.9084999E+37
+ /
+ &GRAV_RUN_PARS
+ ZREF    =  0.0000000E+00,
+ GRAVZ   =  0.0000000E+00,
+ NU_EPICYCLE     =  1.6700000E-08,
+ GRAV_PROFILE    = 'linear                   ',
+ ZGRAV   =  3.9084999E+37,
+ LNRHO_BOT       =  0.0000000E+00,
+ LNRHO_TOP       =  0.0000000E+00,
+ SS_BOT  =  0.0000000E+00,
+ SS_TOP  =  0.0000000E+00,
+ LGRAVZD = T
+ /
+ &ENTROPY_RUN_PARS
+ HCOND0  =  0.0000000E+00,
+ HCOND1  =   1.000000    ,
+ HCOND2  =   1.000000    ,
+ WIDTHSS =  1.1920929E-06,
+ LUMINOSITY      =  0.0000000E+00,
+ WHEAT   =  0.1000000    ,
+ COOLTYPE        = 'Temp                     ',
+ COOL    =  0.0000000E+00,
+ CS2COOL =  0.0000000E+00,
+ RCOOL   =   1.000000    ,
+ WCOOL   =  0.1000000    ,
+ FBOT    =  0.0000000E+00,
+ CHI_T   =  0.0000000E+00,
+ CHI_SHOCK       =  0.0000000E+00,
+ CHI     =  0.0000000E+00,
+ KAPPA0  =  0.0000000E+00,
+ KISOTR  =  0.0000000E+00,
+ IHEATCOND       = 'K-const                  ',
+ KGPERP  =  0.0000000E+00,
+ KGPARA  =  0.0000000E+00,
+ LCALC_HEATCOND_SIMPLE   = F,
+ LCALC_HEATCOND  = F,
+ LCALC_HEATCOND_CONSTCHI = F,
+ TAU_SS_EXTERIOR =  0.0000000E+00,
+ LMULTILAYER     = T,
+ KBOT    =  0.0000000E+00,
+ TAU_COR =  0.0000000E+00,
+ TT_COR  =  0.0000000E+00,
+ Z_COR   =  0.0000000E+00,
+ TAUHEAT_BUFFER  =  0.0000000E+00,
+ TTHEAT_BUFFER   =  0.0000000E+00,
+ ZHEAT_BUFFER    =  0.0000000E+00,
+ DHEAT_BUFFER1   =  0.0000000E+00,
+ HEAT_UNIFORM    =  0.0000000E+00,
+ LUPW_SS = F,
+ LCALC_CP        = F,
+ COOL_INT        =  0.0000000E+00,
+ COOL_EXT        =  0.0000000E+00,
+ LSHEAR_HEAT     = T,
+ NU_TURB0        =  1.2370001E+18,
+ TAU_NUTURB      =  1.0000000E+07,
+ LGASPRESSUREGRADIENT    = T
+ /
+ &RADIATION_RUN_PARS
+ RADX    =           0,
+ RADY    =           0,
+ RADZ    =           1,
+ RAD2MAX =           1,
+ BC_RAD  = 3*'0:0    ',
+ LRAD_DEBUG      = F,
+ KAPPA_CST       =   4.000000    ,
+ SOURCE_FUNCTION_TYPE    = 'LTE                      ',
+ OPACITY_TYPE    = 'kappa_cst                ',
+ SRAD_CONST      =   1.000000    ,
+ AMPLSRAD        =   1.000000    ,
+ RADIUS_SRAD     =   1.000000    ,
+ LNCHI_CONST     =   1.000000    ,
+ AMPLLNCHI       =   1.000000    ,
+ RADIUS_LNCHI    =   1.000000    ,
+ LINTRINSIC      = T,
+ LCOMMUNICATE    = T,
+ LREVISION       = T,
+ LCOOLING        = T
+ /
+ &IONIZATION_RUN_PARS
+ YH0     =  0.0000000E+00,
+ XHE     =  0.1000000    ,
+ XH2     =  0.5000000    
+ /
+ &PSCALAR_RUN_PARS
+ PSCALAR_DIFF    =  0.0000000E+00,
+ NOPSCALAR       = F,
+ TENSOR_PSCALAR_DIFF     =  0.0000000E+00,
+ GRADC0  = 3*0.0000000E+00  ,
+ REINITALIZE_LNCC        = F
+ /
+ &DUSTVELOCITY_RUN_PARS
+ NUD     = 50*0.0000000E+00  ,
+ NUD_ALL =  0.0000000E+00,
+ BETAD   = 50*0.0000000E+00  ,
+ BETAD_ALL       =  0.0000000E+00,
+ TAUSD   = 50*0.0000000E+00  ,
+ TAUSD_ALL       =  0.0000000E+00,
+ LDUSTDRAG       = T,
+ LFEEDBACK_GAS   = 50*F,
+ LFEEDBACK_GAS_ALL       = F
+ /
+ &DUSTDENSITY_RUN_PARS
+ RHOD0   =   1.000000    ,
+ CDIFFND = 50*0.0000000E+00  ,
+ CDIFFND_ALL     =  0.0000000E+00,
+ LDUSTGROWTH     = T,
+ LDUSTCOAGULATION        = T,
+ LCALCDKERN      = T,
+ SUPSATFAC       =   1.000000    
+ /
+ &SHEAR_RUN_PARS
+ QSHEAR  =   1.500000    ,
+ SSHEAR  = -2.5049999E-08
+ /
+ &VISCOSITY_RUN_PARS
+ NU      =  9.9999997E-05,
+ IVISC   = '0                        ',
+ NU_MOL  =   1.100000    
+ /

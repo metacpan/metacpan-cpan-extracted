@@ -1,0 +1,104 @@
+Finance-BankVal-International-IBANValidate version 0.05
+=======================================================
+
+This module handles all of the restful web service calls to Unified Software's
+BankValInternational IBAN validate service. It also handles fail over to the back up services
+transparently to the calling script.It can be called in a procedural or OO fashion
+(see synopsis)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or just copy the .pm file to your PERL lib and ensure all of the dependencies listed below are installed.
+
+The exportable method &ibanValidate(); takes a number of parameters including;
+
+1: Format 	- the response format (either xml, json or csv)
+
+2: IBAN		- the IBAN to be validated
+
+3: UserID	- available from www.unifiedsoftware.co.uk
+
+4: PIN		- available from www.unifiedsoftware.co.uk
+
+(UserID and PIN are available from http://www.unifiedsoftware.co.uk/freetrial/free-trial-home.html)
+
+The order of the parameters MUST be as above. The UserID and PIN can be stored in the InternationalLoginConfig.txt
+file bundled with this module, the use of this file saves passing the PIN and user ID data with each call to ibanValidate.
+For example, a call to validate an IBAN passing the user ID and PIN as parameters
+and printing the reply to console should follow this form:
+
+=====================================================================
+
+ #!/usr/bin/perl
+
+ use Finance::BankVal::International::IBANValidate qw(&ibanValidate);
+
+ my $ans = ibanValidate('XML','ANIBANNUMBERGOESHERE','xmpl123','12345');
+
+ print $ans;
+
+=============================OR for OO===============================
+
+ use Finance::BankVal::International::IBANValidate;
+
+ $ibanObj = Finance::BankVal::International::IBANValidate->new();
+ my $ans = $ibanObj->ibanValidate('XML','ANIBANNUMBERGOESHERE','xmpl123','12345');
+
+ print $ans;
+
+=====================================================================
+
+valid parameter lists are:-
+
+ibanValidate('$format','$iban','$userID','$PIN');
+
+ibanValidate('$format','$iban');
+
+n.b. the last parameter list requires that the user ID and PIN are stored
+in the InternationalLoginConfig.txt file bundled with this module.
+
+EXPORT
+
+None by default.
+&ibanValidate is exported on request i.e. "use Finance::BankVal::International::IBANValidate qw(&ibanValidate);"
+
+
+SEE ALSO
+
+Please see http://www.unifiedsoftware.co.uk for full details on Unified Software's web services.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+use LWP::UserAgent;
+use XML::Simple;
+use JSON;
+
+Crypt::SSLeay is also required as it is a dependency of LWP::UserAgent.
+
+Crypt::SSLeay is typically bundled with windows Perl ports, however on *nix you may need to install it by:
+
+sudo aptitude install libssl-dev (might not be neccessary and can be removed after install)
+sudo cpan -i Crypt::SSLeay
+
+
+AUTHOR
+
+A. Evans - Unified Software, support@unifiedsoftware.co.uk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Unified Software
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Football::League::Match.
+
+0.01  Sun Apr 13 20:54:08 2003
+	- original version; created by h2xs 1.22 with options
+		-X Football::League::Match
+

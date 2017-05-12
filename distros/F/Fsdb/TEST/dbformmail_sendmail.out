@@ -1,0 +1,30 @@
+#!/bin/sh
+sendmail 'johnh' <<'END'
+To: johnh
+From: the sysadmin <root>
+Subject: time to change your password
+
+Please change your password regularly.
+
+END
+
+sendmail 'greg' <<'END'
+To: greg
+From: the sysadmin <root>
+Subject: time to change your password
+
+Please change your password regularly.
+
+END
+
+sendmail 'root' <<'END'
+To: root
+From: the sysadmin <root>
+Subject: time to change your password
+
+Please change your password regularly.
+
+END
+
+# this is a simple database
+#   | dbformmail -m sendmail TEST/dbformmail_sendmail.in-2

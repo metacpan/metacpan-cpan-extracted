@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               FedoraCommons-APIA
+version:            0.5
+abstract:           Implements Fedora Commons Repository APIA interface.
+author:
+    - David L. Fielding (dlf2@cornell.edu)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:          1.03
+    SOAP::Lite:    0.67
+    Test::Simple:  0.44
+    Time::HiRes:   1.59
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

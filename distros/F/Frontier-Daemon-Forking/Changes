@@ -1,0 +1,10 @@
+Revision history for Perl extension Frontier::Daemon::Forking.
+
+0.02  Tue Mar  8 21:47:40 2005
+	- optionally pass encoding attribute to Frontier::RCP->new ( Patch from Erik Wasser )
+        - updated SYNOPSIS to show encoding attribute
+
+0.01  Mon Jan  5 09:44:45 2004
+	- original version; created by h2xs 1.20 with options
+		-AX -n Frontier::Daemon::Forking
+

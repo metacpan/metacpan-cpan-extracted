@@ -1,0 +1,96 @@
+0.16     2011-06-14
+
+- The test fix in 0.15 didn't quite do the trick.
+
+
+0.15     2011-06-11
+
+- Tests assumed that $$ can be modified, which doesn't work on every platform.
+
+
+0.14    2010-09-10
+
+- Added missing dep on Fey::Test. Reported by Phillip Moore. RT #61246.
+
+
+0.13    2010-09-04
+
+- Add a clone() method to Fey::DBIManager::Source objects. This is handy if
+  you need to create multiple connections to the same dbms.
+
+
+0.12    2010-08-24
+
+- The handling of forking and threading was broken, and is now fixed.
+
+
+0.11    2010-01-27
+
+- Implemented a ping_interval attribute for sources. This defaults to 60
+  seconds. Based on a patch from Bryan Deeney. RT #46693.
+
+- Updated to use Native Traits rather than MooseX::AttributeHelpers.
+
+- Put the $VERSION in all modules.
+
+
+0.10    2009-02-06
+
+- This module tried to load (but not use) a module no longer in the
+  core Fey distro, Fey::Validate.
+
+
+0.09    2008-11-08
+
+- When an existing database handle is passed to the constructor for
+  Fey::DBIManager::Source, it now sets some attribute values for that
+  handle.
+
+
+0.08    2008-11-07
+
+- Tweaks so that when checking if a database handle supports nested
+  transactions, it also suppresses warnings from DBD::Mock, which seem
+  to be slightly different from other drivers. Also added tests to
+  check that these warnings are suppresed with DBD::SQLite and
+  DBD::MOck.
+
+
+0.07    2008-09-01
+
+- Updates to work with the latest Fey and Moose modules.
+
+
+0.06    2008-06-22
+
+- Fixed a bug where if you passed a DBI handle to the constructor, it
+  should set the pid (so it can check for forking later), but it
+  didn't. This manifested as a warning in the tests.
+
+
+0.05    2008-05-25
+
+- Update prereqs to require the latest Moose modules. With some
+  combinations of Moose and MooseX::AttributeHelpers, the tests fail.
+
+
+0.04    2008-02-20
+
+- Add $source->allows_nested_transactions() attribute (primarily for
+  the benefit off Fey::ORM).
+
+
+0.03    2008-02-09
+
+- Add missing prereq for MooseX::AttributeHelpers. Reported by Ilmari
+  Vacklin.
+
+
+0.02    2008-02-09
+
+- Add Fey.pm as a prereq.
+
+
+0.01    2008-02-05
+
+- Initial release

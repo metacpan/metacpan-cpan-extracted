@@ -1,0 +1,6 @@
+#fsdb cid cname
+11	numanal
+10	pascal
+12	os
+13	statistics
+#   | dbfilecat --input - --input TEST/dbmerge_ex_b.in

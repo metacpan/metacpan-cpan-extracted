@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Filesys-MakeISO
+version:      v0.1.0
+version_from: lib/Filesys/MakeISO.pm
+installdirs:  site
+requires:
+    Module::Pluggable:             0
+    Test::More:                    0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

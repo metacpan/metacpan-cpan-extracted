@@ -1,0 +1,36 @@
+Finance::Math::IRR
+==================
+
+Finance::Math::IRR is a module for calculating
+the internal rate of return of a cashflow. It
+is similar to the XIRR function in Excell and
+Gnumeric.
+
+See perldoc Finance::Math::IRR for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module depends on:
+
+   Math::Polynom
+   Date::Calc
+   Scalar::Util
+
+AUTHOR
+
+Erwan Lemonnier
+
+COPYRIGHT AND LICENCE
+
+See perldoc Math::Finance::IRR
+
+

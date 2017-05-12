@@ -1,0 +1,48 @@
+Revision history for Perl extension File::Iterator.
+
+0.01  6/vii/2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n File::Iterator
+
+0.02  6/vii/2002
+	- added reset()
+
+0.03  7/vii/2002
+	- added support for multiple filename filters
+	- resolved bug with directory recursion
+
+0.04  7/vii/2002
+	- amended _getFiles() so that failure on opendir is treated as non-fatal
+
+0.05  1/viii/2002
+	- updates to POD documentation
+
+0.06  20/viii/2002
+	- minor amendments to _getFiles()
+
+0.07  24/viii/2002
+	- ** MAJOR NON-BACKWARDS COMPATIBLE CHANGES INTRODUCED **
+	- removed the hasNext() method
+	- the FILTER option now takes a subroutine ref as an argument
+	- added the RETURNDIRS and FOLLOWSYMLINKS options
+
+0.08  8/xi/2002
+	- amended test on $^O (line 48) so that darwin is no longer
+	  recognised as a Windows OS. You can imagine the rumpus that
+	  might have caused. :-)
+
+0.09  4/xii/2002
+	- removed redundant Exporter stuff
+
+0.10  24/i/2003
+	- fixed bug in reset() method
+
+0.11  28/i/2003
+	- further tweaks to the $^O line to make it Cygwin safe. What
+	  *was* I thinking...?
+
+0.13  3/iii/2007
+    - moved filter check into next()
+
+0.14  13/iii/2007
+    - added LICENSE

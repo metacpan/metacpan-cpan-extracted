@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         File-Mosaic
+version:      0.03
+version_from: lib/File/Mosaic.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   
+    File::Path:                    
+    File::Spec:                    
+    IO::File:                      
+    Log::Log4perl:                 
+    Storable:                      
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

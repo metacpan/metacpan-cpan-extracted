@@ -1,0 +1,590 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Flickr::Upload;
+use Getopt::Long;
+use Pod::Usage;
+
+# get your own key and secret from https://www.flickr.com/services/api/key.gne
+my $api_key = '8dcf37880da64acfe8e30bb1091376b7';
+my $not_so_secret = '2f3695d0562cdac7';
+
+my %args;
+my @tags = ();
+my $help = 0;
+my $man = 0;
+my $auth = 0;
+my $oauth = 0;
+my $progress = 0;
+my $check = 0;
+my $report = 1;
+my $reverse = 0;
+my $photoset;
+my @photo_ids;
+my $upload_config = "$ENV{HOME}/.flickrrc";
+my $oauth_config = "$ENV{HOME}/.flickroauth.st";
+
+if( open CONFIG, "< $upload_config" ) {
+	while( <CONFIG> ) {
+		chomp;
+		s/#.*$//;	# strip comments
+
+		next unless m/^\s*([a-z_]+)=(.+)\s*$/io;
+		if( $1 eq "key" ) {
+			$api_key = $2;
+		} elsif( $1 eq "secret" ) {
+			$not_so_secret = $2;
+		} elsif( $1 eq "progress" ) {
+			$progress = $2;
+		} elsif( $1 eq "report" ) {
+			$report = $2;
+		} else {
+			$args{$1} = $2;
+		}
+	}
+	close CONFIG;
+}
+
+GetOptions(
+	'help|?' => \$help,
+	'man' => \$man,
+	'tag=s' => \@tags,
+	'uri=s' => sub { $args{$_[0]} = $_[1] },
+	'auth_token=s' => sub { $args{$_[0]} = $_[1] },
+	'public=i' => sub { $args{is_public} = $_[1] },
+	'friend=i' => sub { $args{is_friend} = $_[1] },
+	'family=i' => sub { $args{is_family} = $_[1] },
+	'title=s' => sub { $args{$_[0]} = $_[1] },
+	'description=s' => sub { $args{$_[0]} = $_[1] },
+	'key=s' => \$api_key,
+	'secret=s' => \$not_so_secret,
+	'auth' => \$auth,
+	'oauth' => \$oauth,
+	'progress!' => \$progress,
+	'check' => \$check,
+	'report!' => \$report,
+	'option=s' => \%args,
+	'reverse' => \$reverse,
+	'set=s' => \$photoset,
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+my $version = $Flickr::Upload::VERSION;
+
+my $ua = Flickr::Upload->new( {'key' => $api_key, 'secret' => $not_so_secret} );
+$ua->agent( "flickr_upload/$version" );
+$ua->env_proxy();
+
+if( $progress ) {
+	eval {
+		require Term::ProgressBar;
+		Term::ProgressBar->import(2.00);
+	};
+	if( $@ ) {
+		# Remove duplicate newline from error, and no need for two 'at line' messages
+		chomp(my $err = $@);
+		$err =~ s/\) at .*? line.*/)/;
+		die "Term::ProgressBar needs to be installed for `--progress' to work: (error from perl: $err)";
+	}
+}
+
+if( $auth ) {
+	# The user wants to authenticate. There's really no nice way to handle this.
+	# So we have to spit out a URL, then hang around or something until
+	# the user hits enter, then exchange the frob for a token, then tell the user what
+	# the token is and hope they care enough to stick it into .flickrrc so they
+	# only have to go through this crap once.
+
+	# 1. get a frob
+	my $frob = getFrob( $ua );
+
+	# 2. get a url for the frob
+	my $url = $ua->request_auth_url('write', $frob);
+
+	# 3. tell the user what to do with it
+	print "1. Enter the following URL into your browser\n\n",
+	      "$url\n\n",
+	      "2. Follow the instructions on the web page\n",
+			"3. Hit <Enter> when finished.\n\n";
+	
+	# 4. wait for enter.
+	<STDIN>;
+
+	# 5. Get the token from the frob
+	my $auth_token = getToken( $ua, $frob );
+	die "Failed to get authentication token!" unless defined $auth_token;
+	
+	# 6. Tell the user what they won.
+	print "Your authentication token for this application is\n\t\t",
+		$auth_token, "\n";
+	
+	exit 0;
+}
+
+if($oauth) {
+    # See Flickr::API SYNOPSIS on OAuth authentication, upon which this is heavily based
+    $ua = Flickr::Upload->new({
+        consumer_key => $api_key,
+        consumer_secret => $not_so_secret
+    });
+    my $response = $ua->oauth_request_token({ 'callback' => 'https://127.0.0.1/' });
+    my %request_token;
+    if($response eq 'ok') {
+        my $uri = $ua->oauth_authorize_uri({ 'perms' => 'write' });
+
+        print "Please open this URL in your browser and follow the instructions:\n\n";
+        print "$uri\n\n";
+        print "When you authorize this app, you'll be directed to a dummy URL\n";
+        print "that contains a confirmation code. Paste that URL here.\n\n";
+        print "URL: ";
+        my $input = <STDIN>;
+        chomp $input;
+
+        my ($callback_returned, $token_received) = split /\?/, $input;
+        my @params = split /\&/, $token_received;
+        foreach my $pair (@params) {
+            my ($key,$val) = split(/=/,$pair);
+            $key =~ s/oauth_//;
+            $request_token{$key}=$val;
+
+        }
+        die "Bad OAuth token received! verifier => '$request_token{verifier}', token => '$request_token{token}'\n"
+            unless $request_token{verifier} =~ /^[0-9a-f]+$/ && $request_token{verifier} =~ /^[0-9a-f-]+$/;
+    }
+    else {
+        die "Unable to initiate OAuth authorization. Response from Flickr was: '$response'\n";
+    }
+    my $ac_rc = $ua->oauth_access_token(\%request_token);
+    if($ac_rc eq 'ok') {
+        print "Saving OAuth credentials to $oauth_config\n";
+        $ua->export_storable_config($oauth_config);
+    }
+}
+
+if(!exists $args{'auth_token'} && -r $oauth_config) {
+    $ua = Flickr::Upload->import_storable_config($oauth_config);
+    bless $ua, 'Flickr::Upload';
+}
+
+die "No auth token or OAuth credentials found.\nUse --auth or --oauth to generate credentials or --auth_token to specify a token.\n"
+    unless exists $args{'auth_token'} || $ua->is_oauth;
+
+if( $check ) {
+	exit( checkToken( $ua, $args{api_key}, $args{auth_token} ) );
+}
+
+die "No image specified to upload.\n" unless @ARGV;
+
+$args{'tags'} = join( " ", @tags ) if @tags;
+
+# pipeline things by uploading first, waiting for photo ids second.
+$args{'async'} = 1;
+my %tickets;
+
+$| = 1;
+
+my @argv = $reverse ? reverse @ARGV : @ARGV;
+
+while( my $photo = shift @argv ) {
+	my $rc;
+
+	if ($progress) {
+		$HTTP::Request::Common::DYNAMIC_FILE_UPLOAD = 1;
+		my $photo_size = (stat($photo))[7];
+		my $req = $ua->make_upload_request( 'photo' => $photo, %args );
+		my $gen = $req->content();
+		die unless ref($gen) eq "CODE";
+
+		my $progress = Term::ProgressBar->new({
+			name => $photo,
+			count => $photo_size,
+			ETA => 'linear',
+		});
+		$progress->minor(0);
+
+		my $state;
+		my $size;
+
+		$req->content(
+			sub {
+				my $chunk = &$gen();
+
+				$size += Flickr::Upload::file_length_in_encoded_chunk(\$chunk, \$state, $photo_size);
+				$progress->update($size);
+
+				return $chunk;
+			}
+		);
+
+		$rc = $ua->upload_request( $req );
+	} else {
+		print 'Uploading ', $photo, '...';
+		$rc = $ua->upload( 'photo' => $photo, %args );
+	}
+
+	# let the caller know how many images weren't uploaded
+	exit (1+@ARGV) unless defined $rc;
+
+	# check those later
+	$tickets{$rc} = $photo;
+
+	print "\n";
+}
+
+# check
+if( $report ) {
+	print "Waiting for upload results (ctrl-C if you don't care)...\n";
+	do {
+		sleep 1;
+		my @checked = $ua->check_upload( keys %tickets );
+		for( @checked ) {
+			if( $_->{complete} == 0 ) {
+				# not done yet, don't do anythig
+			} elsif( $_->{complete} == 1 ) {
+				# uploaded, got photoid
+				print "$tickets{$_->{id}} is at " .
+				"https://www.flickr.com/tools/uploader_edit.gne?ids=$_->{photoid}\n";
+				push @photo_ids, $_->{photoid};
+				delete $tickets{$_->{id}};
+			} else {
+				print "$tickets{$_->{id}} failed to get photoid\n";
+				delete $tickets{$_->{id}};
+			}
+		}
+	} while( %tickets );
+}
+
+if ( $photoset ) {
+	if ( scalar(@photo_ids)==0 ) {
+		warn "Cannot create photoset '$photoset', no photos were successfully uploaded (or, you didn't wait for the upload verification)\n";
+	}
+	else {
+		my $primary_photo_id = shift @photo_ids;
+		warn "Creating photoset '$photoset', primary_photo_id = $primary_photo_id\n";
+		my $photoset_id = $ua->photosets_create (
+			title => $photoset,
+			primary_photo_id => $primary_photo_id,
+			'auth_token' => $args{'auth_token'} );
+		warn "Created photoset, id = $photoset_id\n";
+
+		while ( my $photo_id = shift @photo_ids ) {
+			warn "Adding photoID $photo_id to photoset $photoset...\n";
+			my $rc = $ua->photosets_addphoto (
+				photoset_id => $photoset_id,
+				photo_id => $photo_id,
+				'auth_token' => $args{'auth_token'} );
+			warn "Adding photoID $photo_id failed...\n" unless $rc;
+		}
+	}
+}
+
+exit 0;
+
+sub response_tag {
+	my $t = shift;
+	my $name = shift;
+	my $tag = shift;
+
+	return undef unless defined $t and exists $t->{'children'};
+
+	for my $n ( @{$t->{'children'}} ) {
+		next unless $n->{'name'} eq $name;
+		next unless exists $n->{'children'};
+
+		for my $m (@{$n->{'children'}} ) {
+			next unless exists $m->{'name'}
+				and $m->{'name'} eq $tag
+				and exists $m->{'children'};
+
+			return $m->{'children'}->[0]->{'content'};
+		}
+	}
+	return undef;
+}
+
+sub getFrob {
+	my $ua = shift;
+
+	my $res = $ua->execute_method("flickr.auth.getFrob");
+	return undef unless defined $res and $res->{success};
+
+	# FIXME: error checking, please. At least look for the node named 'frob'.
+	return $res->{tree}->{children}->[1]->{children}->[0]->{content};
+}
+
+sub getToken {
+	my $ua = shift;
+	my $frob = shift;
+
+	my $res = $ua->execute_method("flickr.auth.getToken",
+		{ 'frob' => $frob } );
+	return undef unless defined $res and $res->{success};
+
+	# FIXME: error checking, please.
+	return $res->{tree}->{children}->[1]->{children}->[1]->{children}->[0]->{content};
+}
+
+sub checkToken {
+	my $ua = shift;
+	my $key = shift;
+	my $token = shift;
+
+	my $res = $ua->execute_method("flickr.auth.checkToken",
+		{
+			'auth_token' => $token,
+			'api_key' => $key,
+		} );
+
+	# FIXME: this could be parsed, but I'm not going to get too fancy
+	print $res->decoded_content();
+
+	return 0;
+}
+
+__END__
+
+=head1 NAME
+
+flickr_upload - Upload photos to C<flickr.com>
+
+=head1 SYNOPSIS
+
+flickr_upload [--auth] --auth_token <auth_token> [--title <title>]
+	[--description description] [--public <0|1>] [--friend <0|1>]
+	[--family <0|1>] [--tag <tag>] [--option key=value] [--progress]
+    <photos...>
+
+=head1 DESCRIPTION
+
+Batch image uploader for the L<Flickr.com> service.
+
+L<flickr_upload> may also be useful for generating authentication tokens
+against other API keys/secrets (i.e. for embedding in scripts).
+
+=head1 OPTIONS
+
+=over 4
+
+=item --auth
+
+The C<--auth> flag will cause L<flickr_upload> to generate an
+authentication token against it's API key and secret (or, if you want,
+your own specific key and secret).  This process requires the caller
+to have a browser handy so they can cut and paste a url. The resulting
+token should be kept somewhere like C<~/.flickrrc> since it's necessary
+for actually uploading images.
+
+=item --auth_token <auth_token>
+
+Authentication token. You B<must> get an authentication token using
+C<--auth> before you can upload images. See the L<EXAMPLES> section.
+
+=item --oauth
+
+Interactively perform OAuth authorization with Flickr. The user will get a URL to visit at Flickr at which Flickr::Upload must be granted write permissions. After granting permission, the user will be redirected to a dummy URL that contains an OAuth token and verifier. This user will paste this URL at the prompt, and L<flickr_upload> will save the resulting credentials in C<~/.flickroauth.st>.
+
+=item --title <title>
+
+Title to use on all the images. Optional.
+
+=item --description <description>
+
+Description to use on all the images. Optional.
+
+=item --public <0|1>
+
+Override the default C<is_public> access control. Optional.
+
+=item --friend <0|1>
+
+Override the default C<is_friend> access control. Optional.
+
+=item --family <0|1>
+
+Override the default C<is_family> access control. Optional.
+
+=item --tag <tag>
+
+Images are tagged with C<tag>. Multiple C<--tag> options can be given, or
+you can just put them all into a single space-separated list. If you want
+to define a tag with spaces, the quotes have to be part of the tag itself.
+The following works in L<bash>:
+
+  flickr_upload --tag='"tag one"' --tag='"tag two"' image.jpg
+
+=item --reverse
+
+Reverse the list of supplied images. Useful when uploading contents of 
+directory with sorted filenames. Following example will upload the last 
+glob expanded file as first and vice versa. The last file will appear 
+first in target photo stream.
+
+  flickr_upload --reverse *.jpg
+
+=item --set <NAME>
+
+After successfully uploading all photos, create a new set named "NAME", and
+add the photos into the set. One (random) photo will be the set's thumbnail.
+
+=item --option key=value
+
+Flickr periodically adds new features to the uploading API, and these are
+almost always implemented as new key/value pairs. Rather than waiting for
+a new L<Flickr::Upload> release, you can specify any of the upload
+API's optional arguments using C<--option>.
+
+  flick_upload --option content_type=1 --tag='cats' two_cats.jpg
+
+You may also use C<--option> rather than L<flickr_upload>'s command-line
+options:
+
+  flickr_upload --option is_public=1 --option title='cats' two_cats.jpg
+
+While Flickr may add new options at any time (see
+L<https://www.flickr.com/services/api/upload.api.html> for the most up-to-date
+list), currently known options include:
+
+=over 4
+
+=item --option safety_level=<1|2|3>
+
+Override the default C<safety_level> notation.
+Set to 1 for Safe, 2 for Moderate, or 3 for Restricted.
+Refer to L<https://www.flickr.com/help/filters/>.
+
+=item --option content_type=<1|2|3>
+
+Override the default C<content_type> notation.
+Set to 1 for Photo, 2 for Screenshot, or 3 for Art/Illustration.
+Refer to L<https://www.flickr.com/help/filters/>.
+
+=item --option hidden=<1|2>
+
+Override the default C<hidden> notation.
+Set to 1 to keep the photo in global search results, 2 to hide from public
+earches.
+
+=back
+
+Note that options unknown to Flickr will result in undefined behaviour.
+
+=item --check
+
+Checks the authentication token via the flickr.auth.checkToken API call.
+This can be used to verify API keys and credentials without trying to
+upload an image. The output is the raw results of the API call.
+
+=item --progress, --no-progress
+
+Display a progress bar for each upload with L<Term::ProgressBar>. That
+optional module will have to be installed on the system.
+
+The default is not to display a progress bar. That can be changed in
+the configuration file:
+
+    echo progress=1 >~/.flickrrc
+
+=item --report, --no-report
+
+Report the status of each upload ticket after uploading the batch via
+L<Flickr::Upload's check_upload
+method|Flickr::Upload/check_upload>. On by default. Checking the status can
+be canceled by pressing ctrl-C.
+
+The default is to display a report after each upload. That can be
+changed in the configuration file:
+
+    echo report=0 >~/.flickrrc
+
+=item --key <api_key>
+
+=item --secret <secret>
+
+Your own API key and secret. This is useful if you want to use
+L<flickr_upload> in auth mode as a token generator. You need both C<key>
+and C<secret>. Both C<key> and C<secret> can be placed in C<~/.flickrrc>,
+allowing to mix L<flickr_upload> with your own scripts using the same
+API key and authentication token. Getting your own API key and secret is
+encouraged if you're tying L<flickr_upload> to some automated process.
+
+Note that if you do get an authentication token against your own API key
+and secret, you'll need to specify the key and secret along with the token
+when uploading images. The default L<flickr_upload> API key and token won't
+work in that case.
+
+=item <photos...>
+
+List of photos to upload. Uploading stops as soon as a failure is detected
+during the upload. The script exit code will indicate the number of images
+on the command line that were not uploaded. For each uploaded image, a
+Flickr URL will be generated. L<flickr_upload> uses asynchronous uploading
+so while the image is usually transferred fairly quickly, it might take
+a while before it's actually available to users. L<flickr_upload> will
+wait around for that to complete, but be aware that delays of upwards
+of thirty minutes have (rarely) been know to occur.
+
+=back
+
+=head1 EXAMPLES
+
+First, you need to get an authentication token. This is a requirement
+driven by how Flickr manages third-party applications:
+
+   cpb@earth:~$ flickr_upload --auth
+	1. Enter the following URL into your browser
+
+	https://www.flickr.com/services/auth?api_sig=<...>&frob=<...>&perms=write&api_key=<...>
+
+	2. Follow the instructions on the web page
+	3. Hit <Enter> when finished.
+	Your authentication token for this application is
+	<token>
+
+Unless you like typing long numbers on the command-line, you should 
+keep the C<<token>> somewhere handy, like a configuration file:
+
+   echo auth_token=<token> >~/.flickrrc
+
+Uploading a bunch of images is then as easy as:
+
+   flickr_upload --tag 'dog' 'kernel in a window.jpg' 'sad in sunbeam.jpg'
+
+=head1 CONFIGURATION
+
+To avoid having to remember authentication tokens and such (or have them
+show up in the process table listings), default values will be read from
+C<$HOME/.flickrrc> if it exists. Any field defined there can, of course,
+be overridden on the command line. For example:
+
+	# my config at $HOME/.flickrrc
+	auth_token=334455
+	is_public=0
+	is_friend=1
+	is_family=1
+
+Note, however, that these defaults override the defaults you've assigned in
+your Flickr profile. You may want to do all that stuff in one place.
+
+=head1 BUGS
+
+Error handling could be better.
+
+=head1 AUTHORS
+
+Christophe Beauregard, L<cpb@cpan.org>.
+
+E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason, <avar@cpan.org>.
+
+=head1 SEE ALSO
+
+L<flickr.com>
+
+L<Flickr::Upload>
+
+L<https://www.flickr.com/services/api/>
+
+L<https://www.flickr.com/help/filters/>
+
+=cut

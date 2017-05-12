@@ -1,0 +1,36 @@
+File-Append-TempFile version 0.07
+=================================
+
+
+The File::Append::TempFile module provides an OOP interface to appending
+data to files using a temporary file, in order to ensure the atomicity of
+the updates.  Care should be taken to ensure that no other applications
+try to modify the original file concurrently, since any changes made while
+appending the data may be lost.
+
+The most recent version of the module should always be available via CPAN,
+and also, along with an unofficial Debian package, at the Ringlet
+development webserver -
+http://devel.ringlet.net/sysutils/file-append-tempfile/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require any modules or libraries besides the ones
+provided with the standard Perl runtime.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, 2015  Peter Pentchev.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

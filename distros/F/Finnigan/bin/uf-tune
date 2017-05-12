@@ -1,0 +1,258 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Declare;
+use Finnigan;
+
+my $args = new Getopt::Declare q{
+  [strict]
+  [mutex: -h -w]
+  [mutex: -a -r]
+  [mutex: -header -n]
+  -header			extract the tune header (record structure)
+  -d[ump]			dump the requested feature with file seek addresses
+  -a[ll]			detailed dump of all field descriptors [requires: -d]
+  -s[ize]			print object size [requires: -d]
+  -h[tml]			format as html
+  -w[iki]			format as a wiki table
+  -r[elative]			show relative addersess in the dump [requires: -d]
+  <file>			input file [required]
+}
+  or exit(-1);
+
+my $file = $args->{"<file>"};
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $file_header = Finnigan::FileHeader->decode(\*INPUT);
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $file_header->version);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+my $rfi = Finnigan::RawFileInfo->decode(\*INPUT, $file_header->version);
+
+my $run_header_addr = $rfi->preamble->run_header_addr;
+
+# fast-forward to RunHeader
+seek INPUT, $run_header_addr, 0;
+my $run_header = Finnigan::RunHeader->decode(\*INPUT, $file_header->version);
+
+# The following three structures must be skipped in order to reach the
+# tune file header: ErroLog, scan event hierarchy, and ScanParameters header.
+
+# Skip to the error log and read through
+seek INPUT, $run_header->error_log_addr, 0;
+my $error_log_length = Finnigan::Decoder->read(\*INPUT, ['length' => ['V', 'UInt32']])->{data}->{length}->{value};
+foreach my $i ( 0 .. $error_log_length - 1) {
+  Finnigan::Error->decode(\*INPUT);
+}
+# Read through the scan event hierarchy
+my $nsegs = Finnigan::Decoder->read(\*INPUT, ['nsegs' => ['V', 'UInt32']])->{data}->{nsegs}->{value};
+foreach my $i ( 0 .. $nsegs - 1) {
+  my $n = Finnigan::Decoder->read(\*INPUT, ['n' => ['V', 'UInt32']])->{data}->{n}->{value};
+  foreach my $j ( 0 .. $n - 1) {
+    Finnigan::ScanEventTemplate->decode(\*INPUT, $file_header->version);
+  }
+}
+# Skip the ScanParameters header
+Finnigan::GenericDataHeader->decode(\*INPUT);
+
+# Now at the start of the Tune File header
+my $header = Finnigan::GenericDataHeader->decode(\*INPUT);
+
+if ($header->n == 0) {
+  say STDERR "tune file not present";
+  exit;
+}
+
+if ( $args->{'-header'} ) {  if ( exists $args->{-d} ) {
+    if ( exists $args->{-s} ) {
+      my $size = $header->size;
+      say "size: $size";
+    }
+    if ( exists $args->{-a}) {
+      if ( exists $args->{-h} ) {
+        $header->dump(style => 'html', filter => ['n']);
+        foreach my $i (0 .. $header->n - 1) {
+          $header->field($i)->dump(style => 'html', header => undef);
+        }
+      }
+      elsif ( exists $args->{-w} ) {
+        $header->dump(style => 'wiki', filter => ['n']);
+        foreach my $i (0 .. $header->n - 1) {
+          $header->field($i)->dump(style => 'wiki', header => undef);
+        }
+      }
+      else {
+        $header->dump(relative => exists $args->{-r}, filter => ['n']);
+        foreach my $i (0 .. $header->n - 1) {
+          $header->field($i)->dump(relative => exists $args->{-r});
+        }
+      }
+    }
+    else {
+      if ( exists $args->{-h} ) {
+        $header->dump(style => 'html', relative => exists $args->{-r});
+      }
+      elsif ( exists $args->{-w} ) {
+        $header->dump(style => 'wiki', relative => exists $args->{-r});
+      }
+      else {
+        $header->dump(relative => exists $args->{-r});
+      }
+    }
+  }
+  else {
+    foreach my $i (0 .. $header->n - 1) {
+      say $header->field($i)->type
+        . "\t" . $header->field($i)->length
+          . "\t" . $header->field($i)->label;
+    }
+  }
+}
+else {
+  # do the Tune File itself
+  my $record = Finnigan::GenericRecord->decode(\*INPUT, $header->ordered_field_templates);
+  if ( exists $args->{-d} ) {
+    if ( exists $args->{-s} ) {
+      my $size = $record->size;
+      say "size: $size";
+    }
+    if ( exists $args->{-h} ) {
+      $record->dump(style => 'html', relative => exists $args->{-r});
+    }
+    elsif ( exists $args->{-w} ) {
+      $record->dump(style => 'wiki', relative => exists $args->{-r});
+    }
+    else {
+      $record->dump(relative => exists $args->{-r});
+    }
+  }
+  else {
+    if ( exists $args->{-w} ) {
+      say "|| label || value ||";
+      foreach my $key ( sort {(split /\|/, $a)[0] <=> (split /\|/, $b)[0]} keys %{$record->{data}}) {
+        my ($stripped_key) = ($key =~ /^\d+\|(.*)$/);
+        $stripped_key ||= '';
+        say "|| " . $stripped_key
+          . " || " . $record->{data}->{$key}->{value}
+            . " ||";
+      }
+    }
+    else {
+      foreach my $key ( sort {(split /\|/, $a)[0] <=> (split /\|/, $b)[0]} keys %{$record->{data}}) {
+        my ($stripped_key) = ($key =~ /^\d+\|(.*)$/);
+        $stripped_key ||= '';
+        say "$stripped_key\t$record->{data}->{$key}->{value}";
+      }
+    }
+  } # if / if not -d
+}
+
+__END__
+=head1 NAME
+
+uf-tune - list or dump the instrument settings and calibration data from a Finnigan raw file
+
+=head1 SYNOPSIS
+
+uf-tune [options] file
+
+ Options:
+
+  -header              extract the tune header (record structure)
+  -d[ump]              dump the requested feature showing file seek addresses
+  -a[ll]               detailed dump of all field descriptors [requires: -d]
+  -s[ize]              print object size [requires: -d]
+  -h[tml]              format as html
+  -w[iki]              format as a wiki table
+  -r[elative]          show relative addersess in the dump [requires: -d]
+  <file>               input file [required]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print a brief help message and exit.
+
+=item B<-d[ump]>
+
+Prints a table listing all fields in the requested object (a tune file
+or its header), with their seek addresses, sizes, names and
+values. Individual entries can be selected with the B<-n[umber]>
+option.
+
+=item B<-h[tml]>
+
+Format the dump output as an html table. When multiple entries are
+specified, each will be rendered in its own table
+
+=item B<-w[iki]>
+
+Format the dump output as a wiki table.
+
+=item B<-s[ize]>
+
+Show structure size in bytes (works with the -d[ump] option).
+
+=item B<-r[elative]>
+
+Show relative addresses of all elements in the dump. The default is to
+show the absolute seek address. (works with the -d[ump] option)
+
+=item B<-a[ll]>
+
+Dump all GenericDataDescriptor entries in the file header (requires B<-header>)
+
+=back
+
+=head1 DESCRIPTION
+
+B<uf-tune> can be used to examine the embedded tune file, either by
+listing its entries (which were intended for human consumption), or by
+dumping the details of its encoding.
+
+=head1 SEE ALSO
+
+Finnigan::ScanParameters
+
+L<uf-params>
+
+=head1 EXAMPLES
+
+=over 4
+
+=item List all tune file entries in the tabular form: <label, value>
+
+  uf-tune sample.raw 
+
+=item Dump the tune file contents in wiki format with total size and relative addresses:
+
+  uf-tune -dswr sample.raw
+
+=item Print the contents of the tune file header in the tabular form: <type, length, label>
+
+  uf-tune -header sample.raw
+
+=item Dump the header in the compact wiki format, with a stringified
+  GenericDataDescriptor list:
+
+  uf-tune -header -dw sample.raw
+
+=item Dump the header in the extended wiki format, showing the
+  location of echa GenericDataDescriptor's element:
+
+  uf-tune -header -daw sample.raw
+
+=back
+
+=cut

@@ -1,0 +1,13 @@
+abstract: Make macro modules that are expanded inline
+author: Audrey Tang <cpan@audreyt.org>
+distribution_type: module
+generated_by: Module::Install version 0.62
+license: MIT
+name: Filter-Macro
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Filter::Simple::Compile: 0
+version: 0.11

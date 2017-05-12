@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                File-Pid-Quick
+version:             1.02
+abstract:            Quick PID file implementation
+license:             ~
+author:              
+    - Matthew Sheahan <chaos@lostsouls.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

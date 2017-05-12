@@ -1,0 +1,73 @@
+=head1 FTN-Database To Do
+
+
+=head2 General
+
+Add a note to documentaion regarding the special database name for SQLite of
+":memory:" which enables usage of an in memory database.
+
+
+=head2 Testing
+
+Add extended testing of the databases by writing and reading data. Use the 
+module Test::Database in the test scripts in order to do the extended testing
+in whatever database services are available. Limit those to just SQLite, MySQL,
+and PostgreSQL? Start the numbering for them at "11". If there ends up being a
+need to do some specific preliminary testing prior to doing the extended testing
+scripts, number that script as "10-".
+
+
+=head2 FTN::Database
+
+The option used to define which type of database to use does not currently do
+any error checking on that type; the script will fail if an correct DBD name
+is used. Get & use a list of the currently installed or available DBI DBD
+modules? If do not explicitly do such error or other checking, document the
+standard names for DBI DBD modules like SQlite (default), mysql, and postgresql.
+
+The use of special characters like periods in table names is a more general
+issue where it is not a good idea to use them at all. Redo the comments in
+scripts and modules regarding that, to generalize it. (Derive function to
+validate it and add that to the FTN::Database module?)
+
+
+=head2 FTN::Database::Nodelist
+
+Need to update the definition of the timestamp field, and/or what the default
+for it is. Currently "now" is the default, but that results in the word 'now'
+being inserted into the field instead of a date/time timestamp (at least, in
+a PostgreSQL database). Check how the various databases handle timestamp type
+fields and add code to set the definition of the field dpending on that.
+
+
+=head2 FTN:Database::Forum
+
+The FTN attributes information intended to be held in the I<attrib> field comes
+from a two byte, 16 bit integer. In a MySQL database it could be defined using
+a SET datatype but other database servers do not support that by default, so
+defaulting to defining it as an integer.
+
+
+=head2 FTN:Database::Echolist
+
+Create an FTN Database module for echolists which: Defines an Echolist table,
+default name "Echolist"? Basic table would consist of (at least) the following
+fields: name, description, source. Also include fields like: moderator?
+
+=head1 SEE ALSO
+
+ L<FTN::Database>, L<FTN::Database::Forum>, L<FTN::Database::Nodelist>
+
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2013 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

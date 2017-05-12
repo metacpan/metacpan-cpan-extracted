@@ -1,0 +1,2 @@
+TYPEMAP
+magic_t       T_PTR

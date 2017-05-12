@@ -1,0 +1,6 @@
+AVAIL     /var/local/pub/misc/rocasa.zip
+FILES     /var/local/pub/misc/rocasa.zip
+NEWFILES  /var/local/pub/misc/rocasa.new
+INFO	  /var/local/pub/misc/freqinfo.txt
+NODELIST  /var/local/pub/ftn/fidonet/nodelist.zip
+STNLIST   /var/local/pub/ftn/stn/stnlist.zip

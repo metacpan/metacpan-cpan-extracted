@@ -1,0 +1,34 @@
+Changes
+lib/Finance/Nadex.pm
+lib/Finance/Nadex/Contract.pm
+lib/Finance/Nadex/Order.pm
+lib/Finance/Nadex/Position.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-new.t
+t/02-login.t
+t/03-create_order.t
+t/04-get_epic.t
+t/05-get_markets.t
+t/06-market_instruments.t
+t/07-time_series.t
+t/08-contracts.t
+t/09-quote.t
+t/10-order.t
+t/11-orders.t
+t/12-position.t
+t/13-positions.t
+examples/balance
+examples/cancelallorders
+examples/contracts
+examples/getmarket
+examples/getmarkets
+examples/getorders
+examples/getquote
+examples/positions
+examples/timeseries
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

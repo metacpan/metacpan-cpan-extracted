@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/postillion.pl
+dist.ini
+lib/Fortune/WWW/Postillion.pm
+t/00-load.t
+t/manifest.t
+t/pod.t

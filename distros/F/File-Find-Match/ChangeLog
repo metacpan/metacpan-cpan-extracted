@@ -1,0 +1,42 @@
+2004-12-23  Dylan Hardison <dhardison@cpan.org>
+
+	* t: Added versions tests, Devel::Cover reports are looking nicer.
+	* SIGNATURE: I'm using Module::Signature now.
+	* lib/File/Find/Match.pm: We're passing the filename as the first argument to
+	predicates and actions now, rather than setting $_. This is cleaner, and apparently
+	faster. But speed isn't as important as the cleanness.
+
+
+2004-12-22  Dylan Hardison <dhardison@cpan.org>
+
+	* lib/File/Find/Match.pm: _API_CHANGE_ We're going back to as it was in days of old, 
+	with file => instead of file { ... }. It really is a better design. In additon:
+	default is magical -- it is always executed last. A string predicate not matching
+	/^file|dir|default$/ will be evaluated as perl code. So you can write predicates like
+	this: -r = sub { print "Readable by effective UID!\n" }.
+	* lib/File/Find/Match/Sugar.pm: This file is deprecated. use'ing it will result in a
+	fatal error, explaining the incompatibilty between 0.06 .. 0.07 and 0.08.
+	I appologize for the API change, but this is still not 1.0. :)
+	* lib/File/Find/Match/Util.pm: Some utility functions for writing clean rulesets.
+	Includes only filename().
+	
+
+2004-11-13  Dylan Hardison <dhardison@cpan.org>
+
+	* lib/File/Find/Match.pm: Fixed up documentation, changed the meaning of
+	string predicates. Removed PASS constant and made it the default behavior.
+	Released version to CPAN. Decided to remove syntax-sugar functions and put
+	them in File::Find::Match::Sugar.
+	* lib/File/Find/Match/Sugar.pm: Created this file to hold file(), dir(),
+	and default(), plus associated documentation.
+
+2004-11-01  Dylan Hardison <dhardison@cpan.org>
+
+	* lib/File/Find/Match.pm: Added documentation, made object-oriented,
+	removed functional interface.
+
+2004-10-28  Dylan Hardison <dhardison@cpan.org>
+
+	* ChangeLog: added change log. :)
+
+# vim: set tw=90:

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Finance-Math-IRR
+version:             0.10
+abstract:            Calculate the internal rate of return of a cash flow
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Date::Calc:                    5.4
+    Math::Polynom:                 0.06
+    Scalar::Util:                  1.18
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Erwan Lemonnier <erwan@cpan.org>

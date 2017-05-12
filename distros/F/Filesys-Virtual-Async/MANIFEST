@@ -1,0 +1,7 @@
+Async.pm
+Changes
+Makefile.PL
+README
+t/00_require.t
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

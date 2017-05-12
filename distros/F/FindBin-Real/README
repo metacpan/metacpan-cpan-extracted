@@ -1,0 +1,89 @@
+NAME
+    FindBin::Real - Locate directory of original perl script
+
+SYNOPSIS
+     use FindBin::Real;
+     use lib FindBin::Real::Bin() . '/../lib';
+
+     or
+
+     use FindBin::Real qw(Bin);
+     use lib Bin() . '/../lib';
+
+     or
+
+     # Run from /usr/bin/www/some/path/ or /usr/bin/www/some/other/path or any
+     use FindBin::Real qw(BinDepth);
+     use lib BinDepth(3) . '/lib';
+     # And always got /usr/bin/www/lib !
+
+DESCRIPTION
+    Locates the full path to the script bin directory to allow the use of
+    paths relative to the bin directory.
+
+    This allows a user to setup a directory tree for some software with
+    directories <root>/bin and <root>/lib and then the above example will
+    allow the use of modules in the lib directory without knowing where the
+    software tree is installed.
+
+    If perl is invoked using the -e option or the perl script is read from
+    "STDIN" then FindBin sets both "Bin()" and "RealBin()" return values to
+    the current directory.
+
+EXPORTABLE FUNCTIONS
+  Bin
+    - path to bin directory from where script was invoked
+
+  Script
+    - basename of script from which perl was invoked
+
+  RealBin
+    - Bin() with all links resolved
+
+  RealScript
+    - Script() with all links resolved
+
+  BinDepth(n)
+    - path to n-level parent directory
+
+  Dir()
+    - the same as Bin()
+
+  RealDir()
+    - the same as RealBin()
+
+KNOWN ISSUES
+    If there are two modules using "FindBin::Real" from different
+    directories under the same interpreter, this WOULD work. Since
+    "FindBin::Real" uses functions instead of "BEGIN" block in "FindBin",
+    it'll be executed on every script, and all callers will get it right.
+    This module can be used under mod_perl and other persistent Perl
+    environments, where you shouldn't use "FindBin".
+
+KNOWN BUGS
+    If perl is invoked as
+
+       perl filename
+
+    and *filename* does not have executable rights and a program called
+    *filename* exists in the users $ENV{PATH} which satisfies both -x and -T
+    then FindBin assumes that it was invoked via the $ENV{PATH}.
+
+    Workaround is to invoke perl as
+
+     perl ./filename
+
+AUTHORS
+    Serguei Trouchelle <stro@railways.dp.ua>
+
+    FindBin::Real uses code from FindBin module, which was written by
+
+    Graham Barr <gbarr@pobox.com> Nick Ing-Simmons <nik@tiuk.ti.com>
+
+COPYRIGHT
+    Copyright (c) 1995 Graham Barr & Nick Ing-Simmons. All rights reserved.
+    Copyright (c) 2003-2005 Serguei Trouchelle. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

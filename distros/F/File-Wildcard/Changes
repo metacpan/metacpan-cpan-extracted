@@ -1,0 +1,45 @@
+Revision history for Perl module File::Wildcard
+
+0.11 Fri Mar 13 2009
+      Stop warnings and errors for readdir looking under files.
+
+0.10 Fri Feb 16 2007
+      Fix append absolute bug & add new test for it
+
+0.09 Sat Sep 18 2006
+      Fix false positive in t/04_append on solaris 
+      (sort order not predictable)
+
+0.08 Mon Apr 17 2006
+      New simple interface File::Wildcard::Find
+
+0.07 Sat Dec 31 2005
+      Fixed bug: appending absolute paths didn't work
+      New option: exclude for tree pruning
+
+0.06 Sun Sep 25 2005
+      Reviewed kwalitee and coverage. Added pod and pod_coverage tests.
+      Case sensitivity: use Filesys::Type as an optional module.
+      Debug logging to a file handle.
+
+0.05 Fri Sep  9 2005
+      Changed to use Module::Optional to remove the dependency on 
+      Params::Validate.
+      Fixed symlink support, and added 'follow' parameter.
+
+0.04 Thu Jul 29 2004
+      Added functionality to sort directories, and to process the ellipsis
+      in different orders.
+      Fix VMS: dirhandles return .dir on the end of each directory.
+      Make tests able to deal with case insensitive O/S.
+
+0.03 Sun Jul 11 2004
+      A major revision of the API. Instead of the user supplying a regex
+      as 'path', the user supplies a globbing string. 
+      Added append and prepend methods.
+
+0.02 Thu Jun 25 2004
+      Fixed errors in the POD
+
+0.01 Wed Jun 24 2004
+      Initial version. Works on Unix.

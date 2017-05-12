@@ -1,0 +1,47 @@
+This is version 0.07 of the Perl 5 File::Sync module.
+
+It provides Perl interfaces to the Unix sync(2) and POSIX.1b fsync(2)
+system calls. The fsync() call is needed for putting messages into
+qmail maildirs, and sync() is included for completeness.
+
+You will need at least Perl 5.003 to use this module.  5.002 might
+work but has not been tested.  You will also need a C compiler for the
+XS part of the module.
+
+>>> For verson 0.09, the fsync() code has been fixed to work properly
+>>> with glob names as file handles in Perl 5.005.
+
+----------
+
+To install the module, enter these commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+----------
+
+Please send any bugs and/or ideas to Carey Evans at
+<c.evans@clear.net.nz>.  Is there anything that can be done to make
+this module work like the POSIX fsync() call on non-POSIX machines,
+for example?  Is there any way to test whether the fsync() call has
+actually happened in the tests?
+
+Thanks to everyone who reported the bug in t/02_error.t.
+
+Thanks to Eric Veldhuyzen for letting me know about sync() not
+existing in OS/2.
+
+Thanks to David Muir Sharnoff for getting me to actually work out what
+was going on and fix my code.
+
+All files contained in this installation are copyright © 1996,1997,1999
+Carey Evans except for parts from the Perl distribution.  All rights
+reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+-- 
+Carey Evans, <c.evans@clear.net.nz>, 28 November 1999.

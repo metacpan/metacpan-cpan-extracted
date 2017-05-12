@@ -1,0 +1,74 @@
+Filesys/CygwinPaths version 0.03
+================================
+
+A perl extension for doing various path translations on Cygwin. Is
+expected to be built and run on CygwinPerl only. Requires the gcc
+C compiler that comes with Cygwin; calls the Cygwin C API.
+
+ABOUT "exoMakefile.PL" >>READ THIS<<
+
+One non-standard, puzzling file will be found in this distribution. The
+<exoMakefile.PL> is included because the author uses it to build and install
+this module on his own systems. The author is developing a separate perl
+project named "ExoBuild" that allows building of Perl extension modules from
+source ("manual installation") located remotely from the build directory.
+Thus, an "exobuild." Those familiar with GNU software packages will
+recognize the paradigm. Heretofore, Perl 5 did not support this approach to
+build configuration through its built-in ExtUtils::MakeMaker facilities. The
+ExoBuild package will, when released, allow users who prefer to, to build
+from a read-only medium containing expanded module source trees, for
+instance. The user will simply cd into a build directory created for the
+purpose of module installation, tell ExoBuild where the source is located and
+off it goes.
+
+ExoBuild is not yet available as of this writing, for testing or download.
+Those interested in it are certainly encouraged to encourage the author by
+writing me at <somian -AT- pobox -DOT- com>.
+
+
+INSTALLATION
+
+To install this module the standard Perl way, type the following:
+
+  perl Makefile.PL [ (INSTALLDIRS=[site(is the default)|perl|vendor]) | PREFIX=xxx ]
+  make
+ #make test  TODO
+  make install_dry_run  # to preview that install will do What You Expect (TM).
+  make install
+
+Report bugs in the build configuration to the package author. Please be
+aware that this module hasn't been tested for use on perls < 5.006 (5.6.1)
+and that it requires the use of the ExtUtils::MakeMaker package to build and
+install. Please upgrade to the latest release of ExtUtils::MakeMaker (6.05
+as of this writing) if you have not already done so. It comprises a major
+overhaul of this venerable code and important bug-fixes. Available at a CPAN
+proxy near you :-).
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Cygwin's system headers and libs.
+
+
+
+COPYRIGHT AND LICENCE
+
+This program is Copyright 2002 by Soren Andersen.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the Perl Artistic License or the
+GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+If you do not have a copy of the GNU General Public License write to
+the Free Software Foundation, Inc., 675 Mass Ave, Cambridge,
+MA 02139, USA.
+
+

@@ -1,0 +1,336 @@
+#!/usr/bin/perl -w
+#
+#   <LANG>.po to faqomatic's Language_<LANG>.pm converter.
+#
+#   Usage:
+#       po2pm [-h] [{inputfile|-} [outfile]]
+#
+#   Copyright (c) Andrew W. Nosenko <awn@bcs.zp.ua>, 2001
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of either:
+#
+#       a) the GNU General Public License as published by the Free
+#       Software Foundation; either version 2, or (at your option) any
+#       later version, or
+#       b) the "Artistic License" which comes with Perl Kit.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+#   the GNU General Public License or the Artistic License for more details.
+#
+
+use strict;
+use IO;
+use File::Basename;
+use Getopt::Long;
+
+my $NAME = 'po2pm';
+my $PROG;
+
+sub Help()
+{
+    printf("<LANG>.po to faqomatic's Language_<LANG>.pm converter.\n");
+    printf("Copyright (c) Andrew W. Nosenko <awn\@bcs.zp.ua>, 2001\n");
+    printf("Usage:\n");
+    printf("    %s [-h] [{inputfile|-} [outfile]]\n", $PROG);
+    printf("Where:\n");
+    printf("    inputfile      .po file for building Language_<LANG>.pm from which.\n");
+    printf("                   If omited or have magic name \`-' (minus sign)\n");
+    printf("                   then STDIN will be used\n");
+    printf("    outfile        Name of taget .pm file.  If omited then STDOUT\n");
+    printf("                   will be used.\n");
+    printf("Options:\n");
+    printf("    --help | -h    this Help\n");
+}
+
+sub UseHelp()
+{
+    printf(STDERR "%s: try \`%s --help' for help\n", $PROG, $PROG);
+}
+
+sub perlify( $ )
+{
+    my $s = $_[0];
+    if (defined($s))
+    {
+        $s =~ s/\\\\/\\/g;
+    }
+    return $s;
+}
+
+sub po_to_pm( $$$$ )
+{
+    my ($inhandle, $infilename, $outhandle, $outfilename) = @_;
+    my $state = 'initial';  # 'initial', 'msgid', 'msgstr'
+
+    my $line;
+    my $lineno = 0;
+    my $fuzzy = 0;
+    my ($msgid, $msgstr);
+
+    while(defined($line = $inhandle->getline()))
+    {
+        chomp($line);
+        ++$lineno;
+
+        if ($line =~ m/^\s*$/ || $line =~ m/^#/)
+        {
+            if ($state ne 'initial' && $state ne 'msgstr')
+            {
+                die("$infilename:$lineno: syntax error: current state \`$state', expected state \`initial' or \`msgstr'");
+            }
+
+            if (defined($msgid) && defined($msgstr))
+            {
+                $outhandle->printf(" \"%s\"\n", $msgid)
+                    or die("error output into \`$outfilename': $!");
+                if ($fuzzy)
+                {
+                    $outhandle->printf("# fuzzy # => \"%s\",\n",
+                                   $msgstr)
+                        or die("error output into \`$outfilename': $!");
+                    $outhandle->printf(" => \"\",\n")
+                        or die("error output into \`$outfilename': $!");
+                }
+                else
+                {
+                    $outhandle->printf(" => \"%s\",\n", $msgstr)
+                        or die("error output into \`$outfilename': $!");
+                }
+                undef($msgid);
+                undef($msgstr);
+            }
+            $state = 'initial';
+
+            if ($line =~ m/^#,/ && $line =~ m/, fuzzy\b/)
+            {
+                $fuzzy = 1;
+            }
+            else
+            {
+                $fuzzy = 0;
+            }
+            $outhandle->printf("%s\n", $line)
+                    or die("error output into \`$outfilename': $!");
+            next;
+        }
+
+        if ($line =~ m/^msgid "/)
+        {
+            if ($state ne 'initial')
+            {
+                die("$infilename:$lineno: unexpected msgid");
+            }
+            $line =~ m/^msgid "(.*)"$/
+                or die("$infilename:$lineno: syntax error");
+            $msgid = perlify($1);
+            $state = 'msgid';
+            next;
+        }
+
+        if ($line =~ m/^msgstr "/)
+        {
+            if ($state ne 'msgid')
+            {
+                die("$infilename:$lineno: unexpected msgstr");
+            }
+            $line =~ m/^msgstr "(.*)"$/
+                or die("$infilename:$lineno: syntax error");
+            $msgstr = perlify($1);
+            $state = 'msgstr';
+            next;
+        }
+
+        if ($line =~ m/^"/)
+        {
+            if ($state ne 'msgid' && $state ne 'msgstr')
+            {
+                die("$infilename:$lineno: unexpected string");
+            }
+            $line =~ m/^"(.*)"$/
+                or die("$infilename:$lineno: syntax error");
+            if ($state eq 'msgid')
+            {
+                $msgid .= perlify($1);
+            }
+            elsif ($state eq 'msgstr')
+            {
+                $msgstr .= perlify($1);
+            }
+            next;
+        }
+
+        die("assert! state=$state, infilename=$infilename, lineno=$lineno, line=\`$line'");
+    }
+
+    if ($inhandle->error())
+    {
+        die("error reading from \`$infilename': $!");
+    }
+
+    if ($state ne 'initial' && $state ne 'msgstr')
+    {
+        die("$infilename:$lineno: syntax error at EOF: current state \`$state', expected state \`initial' or \`msgstr'");
+    }
+
+    if (defined($msgid) && defined($msgstr))
+    {
+        $outhandle->printf(" \"%s\"\n", $msgid)
+            or die("error output into \`$outfilename': $!");
+        if ($fuzzy)
+        {
+            $outhandle->printf("# fuzzy # => \"%s\",\n",
+                               $msgstr)
+                or die("error output into \`$outfilename': $!");
+            $outhandle->printf(" => \"\",\n")
+                or die("error output into \`$outfilename': $!");
+        }
+        else
+        {
+            $outhandle->printf(" => \"%s\",\n", $msgstr)
+                or die("error output into \`$outfilename': $!");
+        }
+        undef($msgid);
+        undef($msgstr);
+    }
+
+    return 1;
+}
+
+sub output_pm_header( $$$ )
+{
+    my ($infilename, $outhandle, $outfilename) = @_;
+    my ($inbasename, $outbasename);
+
+    $inbasename = basename($infilename);
+    $outbasename = basename($outfilename);
+
+    $outhandle->printf('#--------------------------------------------------------------------
+#   %s
+#   Generated automatically from %s by %s
+#--------------------------------------------------------------------
+
+sub translations {
+    my $tx = shift;
+
+    my %%data = (
+
+', $outbasename, $inbasename, $NAME)
+        or die("error output into \`$outfilename' : $!");
+    return 1;
+}
+
+sub output_pm_footer( $$ )
+{
+    my ($outhandle, $outfilename) = @_;
+
+    $outhandle->print('
+
+);  # end of %data hash
+
+    my $msgid;
+
+    foreach $msgid (keys(%data))
+    {
+        $tx->{$msgid} = $data{$msgid};
+    }
+    return 1;
+}
+')
+        or die("error output into \`$outfilename' : $!");
+    return 1;
+}
+
+sub main()
+{
+    my $success;
+    my $opt_help;
+    my ($infilename, $inhandle, $in_close_on_exit);
+    my ($outfilename, $outhandle, $out_close_on_exit);
+
+    $PROG = basename($0);
+    Getopt::Long::Configure('bundling', 'no_ignore_case', 'no_auto_abbrev');
+    $success = GetOptions('help|h' => \$opt_help);
+
+    if (!$success)
+    {
+        UseHelp();
+        exit(1);
+    }
+    if ($opt_help)
+    {
+        Help();
+        exit(0);
+    }
+
+    if (@ARGV > 2)
+    {
+        printf(STDERR
+               "%s: too many command line arguments\n",
+               $PROG);
+        UseHelp();
+        exit(1);
+    }
+
+    #
+    #   Open input/output handles
+    #
+    $infilename = $ARGV[0];
+    if ($infilename && $infilename ne '-')
+    {
+        $inhandle = IO::File->new($infilename, 'r')
+            or die("error opening \`$infilename' for reading: $!\n");
+        $in_close_on_exit = 1;
+    }
+    else
+    {
+        $infilename = '(stdin)';
+        $inhandle = IO::Handle->new_from_fd(fileno(STDIN), 'r')
+            or die("error reopening STDIN for reading: $!\n");
+        $in_close_on_exit = 0;
+    }
+
+    $outfilename = $ARGV[1];
+    if ($outfilename)
+    {
+        $outhandle = IO::File->new($outfilename, 'w')
+            or die("error opening \`$outfilename' for writing: $!\n");
+        $out_close_on_exit = 1;
+    }
+    else
+    {
+        $outfilename = '(stdout)';
+        $outhandle = IO::Handle->new_from_fd(fileno(STDOUT), 'w')
+            or die("error reopening STDOUT for writing: $!\n");
+        $out_close_on_exit = 0;
+    }
+
+    #
+    #   Main work
+    #
+
+    $success = output_pm_header($infilename, $outhandle, $outfilename)
+        && po_to_pm($inhandle, $infilename, $outhandle, $outfilename)
+        && output_pm_footer($outhandle, $outfilename);
+
+    #
+    #   Finish
+    #
+    if ($in_close_on_exit)
+    {
+        $inhandle->close()
+            or die("error closing input file \`$infilename': $!\n");
+    }
+    if ($out_close_on_exit)
+    {
+        $outhandle->close()
+            or die("error closing output file \`$outfilename': $!\n");
+    }
+
+    return $success ? 0 : 1;
+}
+
+my $rc = main();
+exit($rc);

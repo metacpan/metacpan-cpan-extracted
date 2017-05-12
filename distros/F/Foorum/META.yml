@@ -1,0 +1,75 @@
+---
+abstract: 'Foorum - forum system based on Catalyst'
+author:
+  - 'Fayland Lam<fayland@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Foorum
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Cache::FileCache: 0
+  Catalyst: 5.80005
+  Catalyst::Authentication::Store::FromSub: 0.01
+  Catalyst::Model::DBIC::Schema: 0.24
+  Catalyst::Plugin::Authentication: 0.10011
+  Catalyst::Plugin::Authentication::Credential::Password: 0
+  Catalyst::Plugin::Cache: 0
+  Catalyst::Plugin::Captcha: 0
+  Catalyst::Plugin::ConfigLoader: 0.23
+  Catalyst::Plugin::FormValidator::Simple: 0
+  Catalyst::Plugin::I18N: 0.08
+  Catalyst::Plugin::PageCache: 0.21
+  Catalyst::Plugin::Session: 0.190
+  Catalyst::Plugin::Session::DynamicExpiry: 0
+  Catalyst::Plugin::Session::State::Cookie: 0.11
+  Catalyst::Plugin::Session::Store::DBIC: 0
+  Catalyst::Plugin::Session::Store::Delegate: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::View::JSON: 0.25
+  Catalyst::View::TT: 0.29
+  DBIx::Class: 0.08107
+  Date::Calc: 0
+  DateTime: 0
+  Digest: 0
+  Email::Send: 0
+  Encode::Guess: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Remove: 0
+  HTML::Email::Obfuscate: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Locale::Country::Multilingual: 0.03
+  MIME::Entity: 0
+  Moose: 0.75
+  Net::CIDR::Lite: 0
+  Net::IP::Match::Regexp: 0
+  Pod::Xhtml: 0
+  Schedule::Cron: 0
+  Set::Object: 0
+  Sphinx::Search: 0
+  Template: 2.20
+  Template::Plugin::Date: 0
+  Template::Plugin::FillInForm: 0
+  Text::GooglewikiFormat: 0.05
+  Text::Textile: 0
+  TheSchwartz::Moosified: 0.03
+  URI::Find::UTF8: 0
+  WWW::Contact: 0.22
+  YAML::XS: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/fayland/foorum/tree/master
+version: 1.001000

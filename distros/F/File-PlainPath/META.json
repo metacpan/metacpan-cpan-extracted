@@ -1,0 +1,92 @@
+{
+   "abstract" : "Construct portable filesystem paths in a simple way",
+   "author" : [
+      "Michal Wojciechowski <odyniec@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-PlainPath",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "0"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::PlainPath" : {
+         "file" : "lib/File/PlainPath.pm",
+         "version" : "0.030"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/odyniec/File-PlainPath/issues"
+      },
+      "homepage" : "https://github.com/odyniec/File-PlainPath",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/odyniec/File-PlainPath.git",
+         "web" : "https://github.com/odyniec/File-PlainPath"
+      }
+   },
+   "version" : "0.030",
+   "x_contributors" : [
+      "Michal Wojciechowski <odyniec@odyniec.net>",
+      "Micha\u0142 Wojciechowski <odyniec@odyniec.eu.org>",
+      "Toby Inkster <tobyink@cpan.org>"
+   ]
+}
+

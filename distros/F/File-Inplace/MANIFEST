@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/File-Inplace.t
+lib/File/Inplace.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+t/abc.txt
+t/adc.txt
+t/cba.txt
+t/csv-squared.txt
+t/csv.txt

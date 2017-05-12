@@ -1,0 +1,58 @@
+Revision history for Fedora-App-ReviewTool
+
+0.10 Sun May  3 2009
+- add auto_provides to Makefile.PL
+- unmark methods in Fedora::App::ReviewTool as private
+- (import) it's now possible to override the SRPM to import
+- (import) we now use MooseX::Workers, to try to parallelize koji tasks
+- (review) we try harder to use the koji-built scratch for review purposes...
+  we still have a ton of cleanup to do, but WFN :)
+
+0.09 Mon Apr 27 2009
+- remove an oversight
+
+0.08 Sun Apr 26 2009
+- use IPC::System::Simple; autodie will autoload this but we need to make sure
+  it's pulled in by rpm
+
+0.07 Sat Apr 25 2009
+- Major changes: add initial review bits; better upload/etc; more status
+  information given.
+- no_smart_comments.t is now a release test
+- Archive::RPM is now its own separate package
+- Additional methods in the Bugzilla role
+- new import, review, etc command classes
+- our default "branch to" is now: F-9 F-10 F-11 devel
+
+0.06     8 Mar 2009
+- add check.pm
+- move bug table generation into Bugzilla role
+
+0.05    27 Feb 2009
+- implement some basic startup checks for submit, etc
+- add requires on koji, scp, rpm2cpio, cpio
+- start centralizing the "push to reviewspace" bits
+- allow additional comment to be posted with submission
+- tag submitted reviews with a (hopefully discreet) "*rt-$VERSION" at the
+  bottom left of a submitted review
+- start using Archive::RPM to get at info in the rpms (will be broken out into
+  its own dist shortly)
+
+0.04    06 Feb 2009
+- remove the reviewer bits from MANIFEST for the moment
+- update docs, etc
+- make submit failure on koji a little more helpful
+- make setup a little healthier, checking one's fedorapeople.org setup
+- only try to fetch Bugzilla id/pw when we're asked for it, for
+  Fedora::Bugzilla >= 0.05
+- fixup _cert's builder, such that we check to make sure the cert actually
+  exists first, and catch other errors
+- make _cert et al less fragile
+
+0.03    19 Jan 2009
+- prompt for bugzilla id/pw when we don't have one
+- look at fedora cert for cn/email defaults
+
+0.01    18 Jan 2009 
+- First version, released on an unsuspecting world.
+

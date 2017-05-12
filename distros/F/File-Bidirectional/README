@@ -1,0 +1,271 @@
+NAME
+    File::Bidirectional - Read a file line-by-line either forwards or
+    backwards
+
+SYNOPSIS
+        use File::Bidirectional;
+        my $file = "/var/log/large_file";
+
+        # Object interface
+
+        # start from the last line
+        my $fh = File::Bidirectional->new($file, {origin => -1})
+            or die $!;
+
+        # read backwards until point of interest
+        while (my $line = $fh->readline()) {
+            last if $line =~ /RECORD_START/;
+        }
+
+        # switch directions
+        $fh->switch();
+
+        # read forwards until point of interest
+        while (my $line = $fh->readline()) {
+            last if $line =~ /RECORD_END/;
+        }
+
+        # Tied Handle Interface
+
+        local *F;
+        tie *F, "File::Bidirectional", $file, {origin => 1}
+            or die $!;
+
+        while (my $line = <F>) { ... }
+
+        (tied *F)->switch();
+
+DESCRIPTION
+    File::Bidirectional reads a file line-by-line in either the forwards or
+    backwards direction. It supports an object interface as well as a tied
+    filehandle interface, and should be straight-forward to use. It is also
+    memory efficient, since it is intended to be used on files too large to
+    be efficiently slurped into an array and traversed backwards.
+
+    The direction in which to traverse the file can be changed at anytime,
+    but it is important to note that the last-read line will be repeated
+    when this happens. See "line_num" to see why this is so.
+
+    On non-Unix platforms, this module attempts to immitate native Perl in
+    converting the line endings. Currently, this is limited and untested, so
+    please see "LINE ENDINGS" for more information.
+
+MOTIVATION
+    I had a "diff" file describing the changes in a large (> 200MB) file.
+    Based on the line numbers in the "diff", I have to repeatedly read
+    backwards and forwards in the large file to obtain the context lines
+    before and after the "diff" changes. The number of context lines vary,
+    thus it was a little more involved than regenerating the "diff" with an
+    appropriate "--context" option.
+
+    I decided to publish this module as I thought others might have similar
+    needs. Reading large log files backwards is probably the most common of
+    these, but if you have any other interesting uses, do let me know.
+
+CONSTRUCTOR (CLASS METHODS)
+    new $file, \%option
+            $fh = File::Bidirectional->new($file);
+            $fh = File::Bidirectional->new($file, {mode => 'forward'});
+            $fh = File::Bidirectional->new($file, {mode => 'backward'});
+            $fh = File::Bidirectional->new($file, {origin => -1});
+            $fh = File::Bidirectional->new($file, \%option);
+
+        Has the file name as the first parameter, and a hashref of options
+        as an optional second parameter. Upon success, it will return the
+        object. For invalid parameters, it will "Carp/croak". For "sysopen"
+        in perlfunc errors, it returns undef and sets the error code in "$!"
+        in perlvar.
+
+        The list of valid options are:
+
+        mode
+            Can be either "bi" (bi-directional), "forward" or "backward".
+            The "forward" and "backward" modes are restrictive: the file is
+            read from the first and last line respectively, and switching
+            directions is prohibited. The "bi" mode allows direction
+            switching, and will start from the first line by default (use
+            the "origin" option to change that.) The default is "bi".
+
+        origin
+            Can be either 1 or -1. These denote whether the first or last
+            line of the file is considered as line 1 by "line_num".
+            ("readline" will always start from line 1.) "origin" can only be
+            set if the "mode" option is "bi". The default is 1.
+
+        binmode
+            Can be any true or false expression. It is analogous to the
+            "binmode" in perlfunc built-in function. On systems that
+            distinguish between binary and text files, notably DOS and
+            Windows-based systems, this is important. A true value will
+            preserve "\r\n" as is; a false value will convert "\r\n" to
+            "\n". The default is false.
+
+        separator
+            Can be any scalar string. It is analogous to the "$/" in perlvar
+            variable. "separator" determines "File::Bidirectional"'s notion
+            of what a line is. The default is "$/" in perlvar, which in turn
+            defaults to "\n".
+
+            Caveat: The Perl-ish magic that occurs when "$/" in perlvar is
+            "" does not happen yet.
+
+        regex
+            Can be any true or false expression. It determines whether the
+            "separator" option is a regex or a string. The default is false.
+
+        block_size
+            Can be any positive integer. This is the size of a single block
+            read by the underlying "sysread" in perlfunc. The default is
+            8192.
+
+INSTANCE METHODS
+    readline
+            while (my $line = $fh->readline()) { ... }
+
+        Returns the subsequent line. This refers either to the next line
+        when the direction is forwards, or to the previous line when the
+        direction is backwards. The direction can be changed with "switch".
+        "undef" is returned when there are no more lines to be read.
+
+    getline
+        An alias for "readline". It exists for compatability with the IO::*
+        classes.
+
+    eof Returns true when "readline" will return an "undef", false
+        otherwise.
+
+    switch
+            $fh->switch();
+
+        Switches the current direction in which we are reading the file. It
+        will "croak" in Carp if the "mode" option in the constructor is set
+        to "forward" or "backward".
+
+        Note that switching directions will cause the last-read line to be
+        repeated by "readline".
+
+    close
+            $fh->close();
+
+        Closes the underlying filehandle and releases the memory allocated
+        for its buffer. On success it returns true, otherwise it returns
+        false with the error code found in "$!" in perlvar. All subsequent
+        "readline" calls will return undef, and "line_num", its last value.
+
+    direction $direction
+        Takes an optional parameter: 1 for reading forwards, -1 for reading
+        backwards, "croak" in Carp otherwise. If an argument for the
+        parameter is provided, the direction will be switched if necessary.
+        Either way, it returns the (new) direction.
+
+    line_num
+            my $fh=File::Bidirectional->new($file); n=$fh->line_num(); # n = 0
+            $fh->readline();                        n=$fh->line_num(); # n = 1
+            $fh->readline();                        n=$fh->line_num(); # n = 2
+            $fh->switch();                          n=$fh->line_num(); # n = 2
+            $fh->readline();                        n=$fh->line_num(); # n = 1
+            $fh->readline();                        n=$fh->line_num(); # n = 0
+
+        Returns the current line number. It is analogous to "$." in perlvar.
+
+        For a file with *n* logical lines, the line number ranges from 0 to
+        *n*. When reading away from the origin (forwards if the first line
+        is the origin), its behavior is always identical to that of "$." in
+        perlvar - it refers to the number of lines that has been read. When
+        reading towards the origin, it refers to the number of lines that
+        can still be read.
+
+        When "switch" is called, the direction is changed, but the line
+        number remains the same. Therefore, the last-read line before
+        changing directions will be repeated by "readline".
+
+    tell
+        Returns the current position of the filehandle.
+
+    fh  Returns the underlying filehandle. This is mainly useful for
+        file-locking.
+
+        Notice that this actually breaks the encapsulation of
+        File::Bidirectional, therefore it becomes the user's responsibility
+        to ensure that nothing bad happens to the underlying filehandle. For
+        example, it should definitely not be closed.
+
+        The underlying filehandle will be returned with its seek position
+        set to what is returned by "tell". It should generally be okay for
+        this seek position to be modified (the object remembers its own seek
+        position and will always restore it). Any other operations on the
+        filehandle, however, is very likely to void your warranty. =)
+
+TIED HANDLE INTERFACE
+        local *F;
+        tie *F, "File::Bidirectional", $file, {origin => 1}
+            or die $!;
+
+        while (my $line = <F>) { ... }
+
+        (tied *F)->switch();
+
+    The "TIEHANDLE", "READLINE", "EOF", "CLOSE" and "TELL" are aliased to
+    the constructor and the lower-case method names, respectively. All other
+    tied operations, such as seeking and writing, are unsupported and will
+    generate an unknown method area.
+
+    To use the other methods, it is necessary to get at the reference to the
+    object underlying the tied variable via "tied" in perlfunc.
+
+LINE ENDINGS
+    Currently, File::Bidirectional attempts to imitate Perl by converting
+    the platform-specific line separator into "\n". Currently, this only
+    means converting "\r" on MacOS, and "\r\n" on DOS and Windows-type
+    systems (when the "binmode" option is not set).
+
+    So far, this module has only been tested on Unix where line endings do
+    not need to be converted, thus it will be greatly appreciated if users
+    can feedback whether the line endings conversion work on their
+    respective platforms.
+
+BENCHMARKS
+    As would be expected, File::Bidirectional is hardly as fast as native
+    Perl I/O. To break the news gently, it can be up to an order of
+    magnitude slower...
+
+    Reading through a 250MB file with various methods yield the following
+    numbers:
+
+        Method                      | Time (s)
+        --------------------------------------
+        Native Perl                 |   5
+        IO::File                    |  16
+        File::Bidirectional (OO)    |  42
+        File::Bidirectional (tied)  |  51
+
+    To be optimistic about it, in the best case File::Bidirectional takes
+    2.6 times the time taken for IO::File. For smaller files, the absolute
+    time difference may be less noticeable, so you will have to decide if
+    the tradeoff is worth it for your application. It is about as fast as I
+    can make it without dropping down into C, but if anybody has a
+    compelling need for speed or ideas on how to optimize things, please do
+    drop me a line.
+
+    The benchmarks were performed circa 2005, on a Pentium-4 machine with
+    clockspeed 2.8GHz, a 7200rpm IDE harddisk, running Debian sarge and
+    ext3. The programs tested were the respective variants of
+
+        while (my $line = <$fh>) { chomp $line; }
+
+    The record separator was simply "\n" and no newline translation took
+    place.
+
+AUTHOR
+    Kian Win Ong, cpan@bulk.squeakyblue.com
+
+COPYRIGHT
+    Copyright (C) 2005 by Kian Win Ong. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself. This can be either the GNU General Public License
+    or the Artistic License, as specified in the Perl README file.
+
+ACKNOWLEDGEMENTS
+    Thanks goes out to Uri Guttman, the author of File::ReadBackwards, from
+    which I stole a bunch of code and tests. =)
+

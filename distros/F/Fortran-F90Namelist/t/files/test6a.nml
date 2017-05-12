@@ -1,0 +1,22 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test6a.nml -- Namelist from Sven's corona test, produced by ifc 7.x
+!                This namelist is almost certainly syntactically incorrect
+!                (a comma is missing after the ' in line 12)
+!  $Id: test6a.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $
+!
+ &ENTROPY_RUN_PARS
+ HCOND0= 0.0,HCOND1= 1.000000,HCOND2= 1.000000,WIDTHSS= 1.192093E-06,MPOLY0=
+  1.500000,MPOLY1= 1.500000,MPOLY2= 1.500000,LUMINOSITY= 0.0,WHEAT= 0.1000000
+ COOLING_PROFILE='gaussian                 ',COOLTYPE='Temp                     
+'COOL= 0.0,CS2COOL= 0.0,RCOOL= 1.000000,WCOOL= 0.1000000,FBOT= 0.0,CHI_T=
+  10.00000,CHI_SHOCK= 0.0,CHI= 0.0
+ IHEATCOND='corona                   ','nothing                  '
+           'nothing                  ','nothing                  '
+ KGPERP= 3.606260E-08,KGPARA= 3743.450,COOL_RTV= 0.6000000,TAU_SS_EXTERIOR= 0.0
+ LMULTILAYER= T,KBOT= 0.0,TAU_COR= 0.0,TT_COR= 0.0,Z_COR= 0.0,TAUHEAT_BUFFER=
+  0.0,TTHEAT_BUFFER= 0.0,ZHEAT_BUFFER= 0.0,DHEAT_BUFFER1= 0.0,HEAT_UNIFORM= 0.0
+ LUPW_SS= F,COOL_INT= 0.0,COOL_EXT= 0.0,CHI_HYPER3= 0.0,LTURBULENT_HEAT= F
+ DELTAT_POLEQ= 0.0,LPRESSUREGRADIENT_GAS= T,TDOWN= 1.000000,ALLP= 1.000000
+ BETA_GLNRHO_GLOBAL=        0.0    ,        0.0    ,        0.0    
+ / 

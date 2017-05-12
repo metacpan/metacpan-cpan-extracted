@@ -1,0 +1,203 @@
+Revision history for Perl extension File-Remove
+
+1.57    2016-04-24 - Shlomi Fish
+    - Correct the copyright holder and year.
+    - Add a test for Kwalitee and 'use warnings'.
+
+1.56    2016-03-23 - Shlomi Fish
+    - Remove the Build.PL so there won't be two build files.
+        - https://github.com/shlomif/File-Remove/pull/1
+        - I think it doesn't matter too much with Dist-Zilla, but to avoid
+        future complaints, I decided to comply with the request.
+        - Thanks to Karen Etheridge (ETHER) for the report.
+
+1.55    2016-01-11 - Shlomi Fish
+    - Add the "{ glob => 0 }" option to remove().
+        - See https://rt.cpan.org/Ticket/Display.html?id=78405
+        - Thanks to SHARYANTO for the request.
+
+1.54    2016-01-10 - Shlomi Fish
+    - Fix a typo in the documentation:
+        - https://rt.cpan.org/Ticket/Display.html?id=72010
+        - Thanks to DFH, and dsteinbrunner for the report.
+    - Hopefully fix the GitHub remote to make it more MetaCPAN-friendly.
+
+1.53    2016-01-10 - Shlomi Fish
+    - Convert the distribution from Module-Install to Dist-Zilla.
+        - Module-Install is undermaintained and unloved.
+    - Fix a problem running the tests in parallel.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=90183
+        - Thanks to ETHER, RJBS, and KENTNL for the report and the analysis.
+        - Earlier report by EDENC - thanks as well.
+            - https://rt.cpan.org/Ticket/Display.html?id=71779
+    - Removed trailing whitespace and \r-s.
+        - The \r-s confused Dist-Zilla abstract extraction.
+
+1.52    2012-03-19 - Adam Kennedy
+	- No functional changes
+	- Updating Module::Install to 1.06
+	- Moved File::Spec dependency to 3.29 to fix problems with
+	  four-digit decimal dependencies in some downstream packaging
+	  systems.
+
+1.51    2011-10-27 - Adam Kennedy
+	- END-time deletion by clear() is now fork-safe, it will only remove
+	  paths created in the same process.
+
+1.50    2011-07-11 - Adam Kennedy
+	- Adding a second skip for the known-bad cygwin file permissions problem
+
+1.49    2011-03-14 - Adam Kennedy
+	- Restoring 02_directories to no_plan as it runs different test counts
+	  on different systems.
+
+1.48    2011-03-11 - Adam Kennedy
+	- Promoting dev code to production version
+	- Fixed a major bug in the 1.46 logic that works out what to change the
+	  cwd to when deleting while inside a directory.
+
+1.47_01     2011-02-18 - Adam Kennedy
+	- Add test counts to all test scripts
+	- Added a test for space-safe globs
+
+1.46    2011-02-18 - Adam Kennedy
+	- No changes from 1.45_01
+	- CPAN Testers likes the dev release, moving to production release
+
+1.45_01  2011-02-17 - Adam Kennedy
+	- Updated to Module::Install::DSL 1.00
+	- Skip test on cygwin due to non-root users not being able to deny
+	  themselves write permissions to files.
+	- Added a test to delete directories when the current working
+	  directory is inside the location to delete (ADAMK)
+	- Fixes for trash() with callbacks and on Mac (MIYAGAWA)
+
+1.42    2008-07-03 - Adam Kennedy
+	- Updated to Module::Install 0.76
+	- Updated bundled author tests
+	- Added the test_remove function
+	- Localising $@ during eval calls
+
+1.41    2008-06-02 - Adam Kennedy
+	- No functional changes
+	- Updating location of author tests
+	- Switching to Module::Install again, to generate a better META.yml
+
+1.40    2008-02-23 - Adam Kennedy
+	- Dev release looks good, changing to production release
+
+1.39_01 2008-02-20 - Adam Kennedy
+	- Fixed rt.cpan.org #30251 "removing dirs enclosed by curly braces"
+	- remove now ignores globbing if -e is true BEFORE globbing
+	  (This should fix numerous possible failures where people are trying
+	   delete strangely named files, but globbing is kicking in and
+	   expanding the names incorrectly)
+	- Moving to a production-grade version to indicate module stability
+	- Adding explicit 5.005 dependency
+	  (Primarily for the benefit of automated quality/anaylsis tools)
+
+0.39    2007-11-12 - Adam Kennedy
+	- No functional changes
+	- Updating to Module::Install 0.68
+
+0.38    2007-10-15 - Adam Kennedy
+	- Removed an extremely dangerous and reckless test case that tried
+	  to delete a soft link to root and (when it failed) deleted the
+	  actual root directory.
+
+0.37    2007-07-08 - Adam Kennedy
+	- Restoring support for broken symlinks (Marek Rouchal)
+	- Adding tests for the broken symlink case (Marek Rouchal)
+	- Tidying up the Changes file a bit
+
+0.36    2007-06-30 - Adam Kennedy
+	- Avoid the installation of Mac::Glue.
+	  (It should not be necesary to test voice synthesis to delete a file)
+	- Anyone truly needing "trash" support will need to add a dependency
+	  on Mac::Glue themself. The function may be split out of File::Remove
+	  later down the track.
+	- Constanting the debugger flag for a minor speed and memory improvement
+	- Copy in a known-readonly flag for more accurate testing on Win32
+	- Remove assumption that -w implied deletion rights on Win32
+	- Validate that the file was actually deleted.
+	- Add better mode-handling for files.
+	- Add smarter implementation of "candelete" logic.
+
+0.35    2007-02-09
+	- Update makefile to require Mac::Glue version compatible with Intel macs
+	- Change pod heading from "methods" to "subroutines" [RT#13687]
+	- No functional changes from 0.34
+
+0.34    2006-11-06
+	- Update t/03 to skip the "is this file not writable" test when
+	  it would fail because the tests are being run by root (as sometimes
+	  happens when installing Perl modules).
+
+0.33    2006-10-24
+	- Previous release tested ok.
+	- Incrementing for production release.
+	- No functional changes
+
+0.32_01     2006-10-23
+	- Use File::Spec to clean/canon paths instead of hand-stripping trailing slash
+	- Apply the File::Path "safe" check manually for the root only, and
+	  use File::Path itself with safe OFF, so that we can handle deleting
+	  deep readonly files (and do it properly on VMS)
+	- Added a test for the deletion of deep readonly files
+	- Removing the use of "our" variables to try and get the Perl version
+	  dependency back to at least 5.005.
+	- Report "deleted" for non-existant files they want to delete
+	- Report the path they pass, but for dir USE a File::Spec->canonpath
+
+0.31    2005-12-28
+	- Applied Eric Hanchrow's patch to support filenames with spaces.
+	- Skip recycle tests unless recycle/trash support is available.
+
+0.30    2005-07-14
+	- Applied CNANDOR's patch to fix trash() support on OS X 10.4.
+
+0.29    2004-12-04
+	- Stabilize undelete support for OS X and Windows.
+
+0.26    2004-11-16
+	- Fix the synopsis.
+
+0.25    2004-11-15
+	- Renamed undelete() to trash(), to be more clear.
+	- Allow users to provide their own rmdir/unlink to trash().
+	- Re-disabled debugging by default.
+
+0.24    2004-11-15
+	- Add undelete support for OS X (via Mac::Glue).
+	- Fix undelete overloading of unlink/rmdir and update tests.
+	- Fix the documentation to be readable with perldoc.
+
+0.23    2004-11-15
+	- Add undelete supportand tests (currently only for Win32, via
+	  Win32::FileOp).
+
+0.22    2004-11-15
+	- Add the first set of tests.
+
+0.21    2004-07-20
+	- Converted the internals to File::Spec.
+	- Maintenance transferred by modules@perl.org to Richard Soderberg.
+	  Please e-mail bug reports to <bug-File-Remove@rt.cpan.org>.
+
+0.20    1998-04-15
+	- Now you can pass a scalar reference as the first argument and it
+	  will used as the recursive flag when removing directories.  With
+	  recursive flag set to 0 only the files in the directory are
+	  removed and no attempt is made to recurse into subdirectories.
+	  Nevertheless, if the directory becomes empty it is removed.
+
+0.12    1998-04-14
+	- change the umask and set the permission on directories so we can
+	  remove the files
+
+0.11    1998-04-13
+	- changed the return values to successes rather than failures since
+	  it makes more sense.
+
+0.10    1998-04-10
+	- original version

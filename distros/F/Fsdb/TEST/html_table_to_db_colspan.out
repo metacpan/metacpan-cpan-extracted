@@ -1,0 +1,20 @@
+#fsdb -F S column0 column1
+-  -
+Money into selected accounts comes from  -
+Expenses:Bank Service Charge  $86
+Expenses:Credit  $87
+Expenses:Miscellaneous  $88
+Expenses:Mortgage  $89
+Income:Gifts Received  $99
+Money In  $109
+-  -
+Money out of selected accounts goes to  -
+Expenses:Auto:Repair and Maintenance  $110
+Expenses:Bank Service Charge  $111
+Expenses:Books  $112
+Expenses:Charity  $113
+Unspecified  $165
+Money Out  $166
+-  -
+Difference  $167
+#   | html_table_to_db

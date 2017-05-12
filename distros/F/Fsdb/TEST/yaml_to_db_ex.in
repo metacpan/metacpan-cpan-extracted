@@ -1,0 +1,20 @@
+- name: ACM
+  role: sponsor
+  alttext: ACM, the Association for Computing Machinery
+  image: logos/acm-small.jpg
+  link:  https://www.acm.org/
+  date: 2016-01-01
+
+- name: SIGCOMM
+  role: sponsor
+  alttext: SIGCOMM, ACM'S Special Interest Group on Communication
+  image: logos/sigcommlogo.png
+  link:  http://sigcomm.org
+  date: 2016-01-02
+
+- name: SIGMETRICS
+  role: sponsor
+  alttext: SIGMETRICS, ACM'S Special Interest Group on Performance Evaluation
+  image: logos/sigmetrics-small.png
+  link:  http://www.sigmetrics.org
+  date: 2016-01-03

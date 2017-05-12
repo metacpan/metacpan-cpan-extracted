@@ -1,0 +1,61 @@
+With RPM-based systems
+----------------------
+
+	rpm[build] -ts PACKAGE.tar.gz
+
+builds perl-PACKAGE.src.rpm
+
+	rpm[build] -tb PACKAGE.tar.gz
+
+builds perl-PACKAGE.ARCH.rpm
+
+	rpm[build] -ta PACKAGE.tar.gz
+
+builds both of them.
+
+
+
+Standard installation
+---------------------
+
+On most systems, just do this from the command line:
+
+	perl Makefile.PL
+	make test
+	make install
+
+and watch errors after each step.
+
+To be sure on most Unix systems you can:
+
+	perl Makefile.PL && make test && make install
+
+
+
+Non-standard installation
+-------------------------
+
+To install to a non-standard place (e.g., under your own home directory),
+or try this:
+
+	perl Makefile.PL PREFIX=$HOME LIB=$HOME/lib/site_perl
+	make test
+	make install
+
+See how to install perl modules by running 'perldoc perlmodinstall'.
+
+If you have problem with this above, try my own fix:
+
+	perl Makefile.PL prefix=$HOME
+	make test
+	make install
+
+Don't mix PREFIX and LIB parameters with prefix, use only one or another!
+
+
+To use the installed module from non-standard place, set environment
+variables:
+
+ export PERL5LIB=$HOME/lib/site_perl
+ export MANPATH=$HOME/man:$MANPATH
+

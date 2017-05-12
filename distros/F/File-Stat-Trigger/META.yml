@@ -1,0 +1,29 @@
+---
+abstract: 'The module to monitor the status of file.'
+author:
+  - 'Akihito Takeda <takeda.akihito@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Stat-Trigger
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Trigger: 0
+  DateTime: 0
+  DateTime::Format::DateParse: 0
+  DateTime::TimeZone: 0
+  File::Stat::OO: 0
+  Module::Install::AuthorTests: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

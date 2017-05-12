@@ -1,0 +1,128 @@
+Revision history for Perl extension FTN::Packet
+
+0.23  Thu Oct  9 2014
+    - Minor edit of the README file.
+    - Correct spelling of Test::Pod & Test::Pod::Coverage in .travis yml
+    - Add missing 'use' lines and variable defines to the /Examples.pod file.
+    - Do the following to better match the documentation in fts-0001.16:
+      replace 'OrgZone' with 'origZone', replace 'OrgNet' with 'origNet',
+      replace 'OrgNode' with 'origNode', replace 'OrgPoint' with 'origPoint',
+      replace 'DestZone' with 'destZone', replace 'DestNet' with 'destNet'
+      replace 'DestNode' with 'destNode', replace 'DestPoint' with 'destPoint'.
+
+0.22  Wed Oct  8 2014
+    - Add initial version of the MANIFEST.SKIP file.
+    . Add code repository information to POD in lib/FTN/Database.pm.
+    - Add code repository information to META section in Makefile.PL.
+    - Add initial version of '.travis.yml' for use at GitHub mirror.
+
+0.21  Thu Dec 26 2013
+    - Add FTSC Product codes file reference to the lib/FTN/Packet.pm file.
+    - Add FTN Packet FTSC documentation reference to lib/FTN/Packet.pm file.
+    - FTN::Packet FTSC Product Code is 0x1CFF; set that in lib/FTN/Packet.pm.
+
+0.20  Wed Sep  5 2012 15:50
+    - Already using @EXPORT_OK so do not need @EXPORT in Packet.pm.
+    - Update the MANIFEST file with the names of the new test scripts.
+    - Add FTN::Packet::Examples as the file lib/FTN/Packet/Examples.pod
+    - Correct the tr// replacement range for masking control characters from
+      040-100 to 040-077.
+
+0.19  Wed Sep  5 2012 12:05
+    - Add the file t/46926700.pkt for Netmail message related test scripts and
+      the file t/46984d00.pkt for Echomail message related test scripts.
+    - Add the initial versions of the t/01-read_netmail.t, t/02-read_echomail.t,
+      and t/03-write_packet.t test scripts.
+
+0.18  Tue Sep  4 2012
+    - Add a 'use Carp' line to the Packet.pm file.
+    - Update the documentation for the read_ftn_packet function.
+    - Change how the read_ftn_packet function in Packet.pm is called.
+    - Correct the variable $s to $c in line 187 of the Packet.pm file.
+
+0.17  Mon Sep  3 2012 16:19
+    - Rewrite the doc/TODO file using POD file named lib/FTN/Packet/ToDo.pod.
+    - Add the -or9 ZIPFLAGS parameter and clean up whitespace in Makefile.PL.
+    - Rewrite the file open line in the write_ftn_packet function of Packet.pm.
+
+0.16  Mon Sep  3 2012 07:45
+    - Use 'croak' instead of 'die' in the file open line of write_ftn_packet.
+    - Correct issue tracker URL in the BUGS pod section of Packet.pm.
+
+0.15  Sun Jan 29 2012
+    - Change documented Issue Tracker to SourceForge Project.
+    - Update Copyright years for Robert James Clay to include 2012.
+
+0.14  Sun Jul 17 2011
+    - Correct GitHub repository name in Packet.pm.
+
+0.13  Fri Jul 15 2011
+    - Correct numbers in test scripts.
+    - Updated the FTN::Packet TODO file.
+    - Reorganize documentation in lib/FTN/Packet.pm: moved the ACKNOWLEDGEMENT
+      section, added a BUGS section, and added to the SUPPORT section.
+
+0.12  Mon Jul 11 2011 17:11
+    - Correct line for TODO file in MANIFEST.
+    - Correct grep line number 355 in Packet.pm.
+    - Set scope for ISA, EXPORT, and EXPORT_OK in Packet.pm.
+    - Some cleanup of white space and comments in Packet.pm.
+
+0.11  Mon Jul 11 2011 15:26
+    - Correct POD email links in Packet.pm.
+    - Rewrite grep at line 356 in Packet.pm.
+    - Corrections for EXPORT_OK in Packet.pm.
+    - Update RJC copyright years to include 2011.
+    - Localize usage of separator value in Packet.pm.
+    - Explicitly set scope for $VERSION, $PKT, and $nmesgs in Packet.pm.
+    - Correct where code ends in Packet.pm by moving the "1;" to line 398.
+
+0.10  Mon Jul 11 2011 12:30
+    - Explicitly use warnings in Packet.pm.
+    - Make loop iterators in Packet.pm lexical.
+    - Correct binmode call at line 332 of Packet.pm
+    - Use three argument version of open() in Packet.pm.
+    - Some general cleanup of white space in Packet.pm.
+    - Correct misspelling of ftnscdate to ftscdate in Packet.pm.
+    - Correct year number adjustment from 2000 to 1900 in Packet.pm.
+
+0.09  Sun Sep 05 2010
+    - Change to using the TEST modules for testing.
+    - Change how Author copyright years is listed.
+    - Moved updated TODO file to doc source directory.
+    - Change the Author email being used to jame@rocasa.us.
+    - Updated Makefile.pl;  adding items for AUTHOR, ABSTRACT_FROM, LICENSE,
+      dist, & clean.
+
+0.08  Sun Dec 21 2008
+    - Do some clean up of usage and naming of variables, as well as to the
+      documentation.
+
+0.07  Sat May 13 2006
+    - Renamed the readpkt function as read_ftn_packet, and renamed the writepkt
+      function as write_ftn_packet.
+    - Corrected the pod documentation for the read_ftn_packet function. 
+
+0.06  Sat Mar 27 2004
+    - Created the lib/FTN source directory and moved Packet.pm to it.
+    - Imported and created initial versions of readpkt & writepkt functions.
+    - Corrected version numbers in Changes file and Packet.pm to reflect
+      the actual changes.
+
+0.05  Mon Nov 10 2003
+    - Updated Copyright date
+
+0.04  Wed Jan 01 2003
+    - Corrected year numbers to 2003.
+
+0.03  Wed Dec 26 2001
+    - in README;  added installation info & included '2002' in copyright
+      statement.
+
+0.02  Sun Dec 16 2001
+    - Corrected NAME reference in MakeFile.PL.
+    - Added EXPORT_OK reference in Packet.pm
+    - removed unnecessary reference to t directory
+
+0.01  Sat Jun  9 2001
+    - original version; created by R.J. Clay

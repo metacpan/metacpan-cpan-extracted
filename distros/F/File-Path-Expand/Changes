@@ -1,0 +1,8 @@
+1.02 Thursday 11th May, 2006
+	Apply the patch from http://rt.cpan.org/Ticket/Display.html?id=13081
+
+1.01 Sunday 11th May, 2003
+	Bugfix to the test suite - had miscounted the number of skipped tests
+
+1.0 Sunday 11th May, 2003
+	Initial release

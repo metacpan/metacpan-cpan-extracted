@@ -1,0 +1,254 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+rrr-fsck - 
+
+=head1 SYNOPSIS
+
+  rrr-fsck [options] principalfile
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--dry-run|n>
+
+Does nothing, only prints what it would do.
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--remoteroot=s>
+
+If provided fsck will try to mirror missing files from this location.
+For remote locations requiring authentication you may need to set the
+environment variables USER and RSYNC_PASSWORD as well.
+
+=item B<--verbose|v+>
+
+More feedback.
+
+=item B<--yes|y>
+
+Consider all answers to asked questions to be I<yes>.
+
+=back
+
+=head1 DESCRIPTION
+
+Compares disk contents with index contents and gathers files missing
+on local disk and files missing in local index.
+
+If remoteroot is given missing files are fetched from remote.
+
+Files on the local disk that have no counterpart in the index are
+considered obsolete and the user is asked for each file if the file
+should be deleted. And if the user confirms it will be deleted.
+
+=head1 BUGS
+
+There is a race condition when the tree or the index is manipulated
+while we are running. This implies that the result is only then 100%
+correct when disk and index are not changed while we are running.
+
+There should be an option to declare the files on disk authoritative
+so that they are added to the index.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use File::Basename qw(dirname);
+use File::Find qw(find);
+use ExtUtils::MakeMaker qw(prompt);
+use File::Rsync::Mirror::Recent;
+use File::Spec;
+use Getopt::Long;
+use List::Util qw(max);
+use Pod::Usage qw(pod2usage);
+use Time::HiRes qw(time sleep);
+
+our %Opt;
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(1);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (@ARGV == 1) {
+} else {
+    pod2usage(1);
+}
+
+my($principal) = @ARGV;
+my $recc = File::Rsync::Mirror::Recent->new
+    (
+     local => $principal,
+     localroot => dirname $principal,
+    );
+for my $passthrough (qw(remoteroot verbose)) {
+    if (my $opt = $Opt{$passthrough}) {
+        $recc->$passthrough($opt);
+    }
+}
+my $root = $recc->localroot;
+die "Alert: Root not defined, giving up" unless defined $root;
+my $prf = $recc->principal_recentfile;
+my $filenameroot = $prf->filenameroot;
+my $serializer_suffix = $prf->serializer_suffix;
+my $ignore_rx = qr((?x:
+ ^ \Q$filenameroot\E (?:  - [0-9]*[smhdWMQYZ] \Q$serializer_suffix\E (?: \.lock (?: /.* )? )?  | \.recent ) \z
+));
+
+my %diskfiles;
+my $i;
+my $last_verbosity = 0;
+$|=1;
+if ($Opt{verbose}) {
+    print "\n";
+}
+find({
+      wanted => sub {
+          my @lstat = lstat $_;
+          return unless -l _ or -f _;
+          my($reportname) = $File::Find::name =~ m{^\Q$root\E/*(.*)};
+          return if $reportname =~ $ignore_rx;
+          $i++;
+          if ($Opt{verbose} && time - $last_verbosity > 0.166666) {
+              printf "\r%8d files and symlinks checked on disk ", $i;
+              $last_verbosity = time;
+          }
+          $diskfiles{$File::Find::name} = $lstat[9];
+      },
+      no_chdir => 1,
+     },
+     $root
+    );
+if ($Opt{verbose}) {
+    printf "\r%8d files and symlinks checked on disk\n", $i;
+}
+$i = 0;
+
+if ($Opt{verbose}) {
+    print "\rChecking index";
+}
+my @newsargs = ();
+if ($Opt{verbose}) {
+    @newsargs =
+        (callback => sub {
+             $i = scalar @{shift;};
+             if (time - $last_verbosity > 0.166666) {
+                 printf "\r%8d entries read from index ", $i;
+                 $last_verbosity = time;
+             }
+         });
+}
+my $indexfiles = $recc->news(@newsargs);
+if ($Opt{verbose}) {
+    printf "\r%8d entries read from index\n", scalar @$indexfiles;
+}
+my %seen;
+my %indexfiles = map {
+    ("$root/$_->{path}"=>$_->{epoch})
+} grep {
+    defined $_->{path} &&
+        !$seen{$_->{path}}++
+            && $_->{type} eq "new"
+} @$indexfiles;
+
+my @missing_rfrfiles;
+for my $rf (@{$recc->recentfiles}) {
+    my $rfrfile = $rf->rfile;
+    unless (-e $rfrfile) {
+        push @missing_rfrfiles, $rfrfile;
+    }
+}
+if (@missing_rfrfiles) {
+    warn "Warning: missing index files @missing_rfrfiles\n";
+}
+if ($Opt{verbose}) {
+    printf "\r%8d file objects found in index\n", scalar keys %indexfiles;
+}
+my $sprintfd = length(max scalar @$indexfiles, scalar keys %diskfiles);
+warn sprintf(
+             "diskfiles:        %*d\n".
+             "indexfiles:       %*d\n",
+             $sprintfd, scalar keys %diskfiles,
+             $sprintfd, scalar keys %indexfiles,
+            );
+my @diskmisses  = sort { $indexfiles{$b} <=> $indexfiles{$a} } grep { ! exists $diskfiles{$_}  } keys %indexfiles;
+my @indexmisses = sort { $diskfiles{$a}  <=> $diskfiles{$b}  } grep { ! exists $indexfiles{$_} } keys %diskfiles;
+warn sprintf(
+             "missing on disk:  %*d\n".
+             "missing in index: %*d\n",
+             $sprintfd, scalar @diskmisses,
+             $sprintfd, scalar @indexmisses,
+            );
+$DB::single++;
+my $rf = $recc->principal_recentfile;
+my $last_aggregate_call = time;
+my @batch;
+for my $dm (@diskmisses) {
+    if (0) {
+    } elsif ($Opt{"dry-run"}) {
+        if ($Opt{remoteroot}) {
+            warn "Would fetch $dm\n";
+        } else {
+            warn "Would remove from indexfile $dm\n";
+        }
+    } elsif ($Opt{remoteroot}) {
+        my $relative = substr $dm, 1 + length $root;
+        $rf->get_remotefile($relative);
+    } else {
+        warn "Removing from indexfile: $dm\n";
+        push @batch, {path => $dm, type => "delete"};
+    }
+}
+for my $im (@indexmisses) {
+    if ($Opt{"dry-run"}) {
+        if ($Opt{remoteroot}) {
+            warn "Would remove $im\n";
+        } else {
+            warn "Would add to indexfile $im\n";
+        }
+    } elsif ($Opt{remoteroot}) {
+        my $ans;
+        if ($Opt{yes}) {
+            warn "Going to unlink '$im'\n";
+            $ans = "y";
+        } else {
+            $ans = prompt "Unlink '$im'?", "y";
+        }
+        if ($ans =~ /^y/i) {
+            unlink $im or die "Could not unlink '$im': $!";
+        }
+    } else {
+        warn "Adding to indexfile: $im\n";
+        my @stat = lstat $im or next;
+        push @batch, {epoch => $stat[9], path => $im, type => "new"};
+    }
+}
+unless ($Opt{"dry-run"}) {
+    if (@batch) {
+        $rf->batch_update(\@batch);
+    }
+}
+
+__END__
+
+
+# Local Variables:
+# mode: cperl
+# coding: utf-8
+# cperl-indent-level: 4
+# End:

@@ -1,0 +1,7 @@
+RdistByRsync.pm
+RdistByRsync.pod
+Makefile.PL
+MANIFEST
+README
+CHANGELOG
+rdist2rsync

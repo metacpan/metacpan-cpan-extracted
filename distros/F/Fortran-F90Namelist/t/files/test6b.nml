@@ -1,0 +1,11 @@
+!
+!  test6b.nml -- Namelist sniplet from Pathscale compiler
+!                (around November 2006)
+!
+
+ &INIT_PARS  CVSID = '@Id: test6b.nml,v 1.1 2006/12/18 23:14:12 dobler Exp @                                                           
+         ' IP = 14 XYZ0 = -1.65441024 -1.65441024 -2.61195993 XYZ1 = 1.65441048 1.65441048 0.593460083 LXYZ = 3.30882072 3.30882072
+ 3.20542002 LPERI = T T F LSHIFT_ORIGIN = F F F COORD_SYSTEM = 'cartesian' LEQUIDIST = T T T ZETA_GRID0 = 0.E+0
+  GRID_FUNC = 'linear                   ' 'linear                   ' 'linear                   '
+  INIT_LOOPS = 1 LWRITE_2D = F /
+ &EOS_INIT_PARS  XHE = 0.100000001 LCONST_YH = F /

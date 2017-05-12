@@ -1,0 +1,43 @@
+[1;47r[?25h[?8c[?25h[?0c[27m[24m[0m[H[J[?25l[?1c[47;1H"MANIFEST" "MANIFEST" 18L, 402C[1;1H.shipit
+Changes
+examples/scsb-check-balance
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Finance/Bank/SCSB/TW.pm
+Makefile.PL
+MANIFEST[14;32H This list of files
+META.yml
+t/0.use.t
+t/check-balance.t
+t/currency-exchange-rate.t
+[1m[34m~                                                                                             [20;1H~                                                                                             [21;1H~                                                                                             [22;1H~                                                                                             [23;1H~                                                                                             [24;1H~                                                                                             [25;1H~                                                                                             [26;1H~                                                                                             [27;1H~                                                                                             [28;1H~                                                                                             [29;1H~                                                                                             [30;1H~                                                                                             [31;1H~                                                                                             [32;1H~                                                                                             [33;1H~                                                                                             [34;1H~                                                                                             [35;1H~                                                                                             [36;1H~                                                                                             [37;1H~                                                                                             [38;1H~                                                                                             [39;1H~                                                                                             [40;1H~                                                                                             [41;1H~                                                                                             [42;1H~                                                                                             [43;1H~                                                                                             [44;1H~                                                                                             [45;1H~                                                                                             [0m[46;1H[1m[7mMANIFEST                                                                    1,1            All[1;1H[?25h[?0c[?25l[?1c[0m[47;1HType  :quit<Enter>  to exit Vim[?5h[?5l[1;1H[?25h[?0c[?25l[?1c[47;1HType  :quit<Enter>  to exit Vim[?5h[?5l[1;1H[?25h[?0c[?25l[?1c[47;1HType  :quit<Enter>  to exit Vim[?5h[?5l[1;1H[?25h[?0c[?25l[?1c[46;77H[1m[7m2,1            All[2;1H[?25h[?0c[?25l[?1c[46;77H3,1            All[3;1H[?25h[?0c[?25l[?1c[46;77H4,1            All[4;1H[?25h[?0c[47;1H
+[0m[?25h[?8c[?25h[?0c[27m[24m[0m[H[J[?25l[?1c[1;1H.shipit
+Changes
+examples/scsb-check-balance
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Finance/Bank/SCSB/TW.pm
+Makefile.PL
+MANIFEST[14;32H This list of files
+META.yml
+t/0.use.t
+t/check-balance.t
+t/currency-exchange-rate.t
+[1m[34m~                                                                                             [20;1H~                                                                                             [21;1H~                                                                                             [22;1H~                                                                                             [23;1H~                                                                                             [24;1H~                                                                                             [25;1H~                                                                                             [26;1H~                                                                                             [27;1H~                                                                                             [28;1H~                                                                                             [29;1H~                                                                                             [30;1H~                                                                                             [31;1H~                                                                                             [32;1H~                                                                                             [33;1H~                                                                                             [34;1H~                                                                                             [35;1H~                                                                                             [36;1H~                                                                                             [37;1H~                                                                                             [38;1H~                                                                                             [39;1H~                                                                                             [40;1H~                                                                                             [41;1H~                                                                                             [42;1H~                                                                                             [43;1H~                                                                                             [44;1H~                                                                                             [45;1H~                                                                                             [0m[46;1H[1m[7mMANIFEST                                                                    4,1            All[4;1H[?25h[?0c[?25l[?1c[0m[47;1H"MANIFEST" "MANIFEST" 20L, 421C[1;1H.MANIFEST.swp
+.shipit
+Changes[3;8H[K[4;1Hexamples/scsb-check-balance[5;18Hl.pm[5;22H[K[6;19H/Base.pm[7;19H/Can.pm[7;26H[K[8;19H/Fetch.pm[8;28H[K[9;20HMakefile[10;19H/Metadata.pm[11;20HWin32.pm[11;28H[K[12;1Hinc/Module/Install/WriteAll.pm
+lib/Finance/Bank/SCSB/TW.pm
+Makefile.PL[14;33H[K[15;1HMANIFEST[15;32H This list of files
+META.yml[16;9H[K[17;1HSKIP[17;5H[K[18;2H/0.use.t[18;10H[K[19;1Ht/check-balance.t[19;18H[K[20;1Ht/currency-exchange-rate.t[20;27H[K[46;1H[1m[7mMANIFEST[46;77H4,1            All[4;1H[?25h[?0c[?25l[?1c[46;77H5,1            All[5;1H[?25h[?0c[?25l[?1c[46;77H6,1            All[6;1H[?25h[?0c[?25l[?1c[0m[47;1HType  :quit<Enter>  to exit Vim[?5h[?5l[6;1H[?25h[?0c[?25l[?1c[47;1HType  :quit<Enter>  to exit Vim[?5h[?5l[6;1H[?25h[?0c[?25l[?1c[47;1HType  :quit<Enter>  to exit Vim[?5h[?5l[6;1H[?25h[?0c[?25l[?1c[47;1HType  :quit<Enter>  to exit Vim[?5h[?5l[6;1H[?25h[?0c[?25l[?1c[46;77H[1m[7m7,1            All[7;1H[?25h[?0c[?25l[?1c[46;77H8,1            All[8;1H[?25h[?0c[?25l[?1c[46;77H9,1            All[9;1H[?25h[?0c[?25l[?1c[46;77H10,1           All[10;1H[?25h[?0c[?25l[?1c[46;77H11,1           All[11;1H[?25h[?0c[?5h[?5l[?25l[?1c[0m[47;1H[K[47;1H:[?25h[?0cq![?25l[?1c[?25h[?0c[47;1H[K[47;1H

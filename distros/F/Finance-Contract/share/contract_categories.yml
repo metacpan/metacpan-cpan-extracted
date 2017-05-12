@@ -1,0 +1,85 @@
+---
+callput:
+    display_order: 1
+    display_name: "Up/Down"
+    allow_forward_starting: 1
+    supported_expiries:
+      - intraday
+      - daily
+      - tick
+    explanation: "Predict the ending market level relative to a chosen barrier."
+    available_types:
+      - CALL
+      - PUT
+      - CALLE
+      - PUTE
+touchnotouch:
+    display_order: 2
+    display_name: "Touch/No Touch"
+    is_path_dependent: 1
+    supported_expiries:
+      - intraday
+      - daily
+    explanation: "Predict whether or not the market will touch a chosen level before expiration."
+    available_types:
+      - ONETOUCH
+      - NOTOUCH
+endsinout:
+    display_order : 3
+    two_barriers: 1
+    display_name: "Ends In/Out"
+    supported_expiries:
+      - intraday
+      - daily
+    explanation: "Predict the ending market level relative to 2 chosen barriers."
+    available_types:
+      - EXPIRYMISS
+      - EXPIRYRANGE
+      - EXPIRYMISSE
+      - EXPIRYRANGEE
+staysinout:
+    display_order : 4
+    two_barriers: 1
+    display_name: "Stays In/Goes Out"
+    is_path_dependent: 1
+    supported_expiries:
+      - intraday
+      - daily
+    explanation: "Predict whether or not the market will touch either of 2 chosen levels before expiration."
+    available_types:
+      - RANGE
+      - UPORDOWN
+digits:
+    display_order : 5
+    display_name: "Digits"
+    supported_expiries:
+      - tick
+    explanation: "Predict the last digit of the market price at expiration."
+    available_types:
+      - DIGITMATCH
+      - DIGITDIFF
+      - DIGITODD
+      - DIGITEVEN
+      - DIGITOVER
+      - DIGITUNDER
+asian:
+    display_order: 6
+    display_name: "Asians"
+    supported_expiries:
+      - tick
+    explanation: "Predict the ending market level relative to the average market prices throughout the course of the contract"
+    barrier_at_start: 0
+    available_types:
+      - ASIANU
+      - ASIAND
+vanilla:
+    offer: 0
+    display_order: 0
+    display_name: "Vanilla Options"
+    supported_expiries:
+      - intraday
+      - daily
+    available_types:
+      - VANILLA_CALL
+      - VANILLA_PUT
+    explanation: "Plain vanilla options"

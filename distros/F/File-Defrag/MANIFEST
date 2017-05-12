@@ -1,0 +1,9 @@
+README
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+Defrag.pm
+Defrag.xs
+bin/defrag
+META.yml                                 Module meta-data (added by MakeMaker)

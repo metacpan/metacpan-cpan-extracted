@@ -1,0 +1,276 @@
+Revision history for FFI-Platypus
+
+0.47      2017-03-23 18:26:01 -0400
+  - Fix installer bug where My::ShareConfig was accidentally declared as a
+    prereq
+
+0.46      2017-03-23 15:47:29 -0400
+  - Remove some internal use of Module::Build with the intent of one day
+    migrating to EUMM or some other installer
+  - Remove Module::Build::FFI.  It now has its own distribution.
+  - Prefix the lang attribute with an equal '=' sign to indicate a fully qualified
+    class name instead of one under FFI::Platypus::Lang
+
+0.45      2016-10-24 07:59:57 -0400
+  - Remove check for Threaded Perl / OpenBSD, as the issue there has been reported fixed
+
+0.44      2016-10-20 14:31:23 -0400
+  - You can now control which implementation of strdup FFI::Platypus::Memory uses
+    via the FFI_PLATYPUS_MEMORY_STRDUP_IMPL environment variable.
+
+0.43      2016-07-08 03:28:57 -0400
+  - Numerous fixes for systems with 64bit big-endian arch
+    (previously only 32bit big-endian had been tested)
+  - Officially discourage the use of FFI::Platypus::Declare
+
+0.42      2016-05-06 16:31:01 -0400
+  - Support for MSYS2
+
+0.41      2016-04-09 16:03:07 -0400
+  - For the return value undef can be passed in to mean 'void'.
+  - Fixed installer bug where ABI probe would silently fail if /tmp
+    was mounted noexec
+  - Avoid unnecessary downgrade on when Perl is compiled to use longdouble
+
+0.40      2015-08-29 08:45:19 -0400
+  - Closure declerations ignore white space between () and ->
+
+0.39      2015-08-24 03:23:10 -0400
+  - Fixed spurious warning: auto loading of record class (via FFI::Platypus::Record)
+    was ALWAYS warning, when it should have only been warning on load failure.
+
+0.38      2015-08-13 17:13:07 -0400
+  - closure method now comes with a more useful diagnostic thinks to
+    Carp::croak
+  - Added a check for standard C headers.  This seems to help the configure
+    stage find ptrdiff_t, which was frequently not detected correctly
+    (at least on Linux).
+  - Improved thread safety by using MY_CXT for some very infrequently used
+    global variables.
+  - Added IRC meta data information for metacpan.org.  Please join us at
+    #native on irc.perl.org!
+  - Many minor documentation corrections and tweaks.  Most significant is
+    that Convert::Binary::C can now be recommended as it is once again
+    properly maintained.
+  - Added tests for threads and forks.  If these tests fail in your environment
+    please let me know!
+
+0.37      2015-05-29 14:28:21 -0400
+  - Added compatability back in for older version of constant
+    (newer one is not available on CPAN yet)
+
+0.36      2015-05-29 13:40:32 -0400
+  - Explicitly require constant pragma version 1.32
+
+0.35      2015-05-29 12:06:39 -0400
+  - FFI::Platypus::Record uses constant to create size of alignment constants
+    instead of creating them with a sub reference (this usage was deprecated
+    in Perl 5.22)
+
+0.34      2015-05-07 09:27:04 -0400
+  - Require Alien::FFI which is more reliable at configure time on some platforms
+
+0.33      2015-03-23 21:55:02 -0400
+  - Additional fix for Microsoft Visual C++ that didn't get folded into
+    the previous release.
+  - Fixed segfault during global destruction (gh#53)
+
+0.32      2015-03-18 13:02:53 -0400
+  - Make sure -L flags from Alien::FFI come before those in perl Config
+    For more reliable builds
+  - Support for Microsoft Visual C++ (you will probably also need
+    Alien::FFI 0.09 or beter)
+
+0.31      2015-02-26 13:41:23 -0500
+  - Fix bug involving wide custom arguments 
+    "wide" meaning where a single Perl argument is translated
+    into multiple machine code arguments.  (pipcet++ gh#43)
+
+0.30      2015-02-25 17:50:54 -0500
+  - You can now pass an opaque in place of a closure type (pipcet++ gh#40,gh#41)
+  - FFI closures are now cached and can be reused if the same closure is passed
+    repeatedly (pipcet++ gh#40,gh#42)
+  - Passing non-reference to scalar as a pointer argument will now issue a warning
+    (gh#5)
+
+0.29      2015-02-24 08:50:34 -0500
+  - Delayed loading of Win32::ErrorMode to avoid build prereq failure on Windows
+
+0.28      2015-02-23 14:01:54 -0500
+  - Fix Win32 probe prereq on non-Strawberry 5.20.x+
+  - Fix for Solaris cc
+
+0.27      2015-02-22 11:17:05 -0500
+  - Interface to alternate ABIs / calling conventions
+  - Added abi method
+  - Added abis class method
+  - Simplify Win32 probe
+  - Added FFI::Platypus::Lang::Win32 which provides data types used by
+    the Windows API.  Takes care of subtle differences between
+    Win32 and Win64.
+  - Fixed bugs specific to 5.8.x
+  - Language plugins can now specify an ABI with abi class method
+  - Default ABI for FFI::Platypus::Lang::Win32 is stdcall on 32bit windows
+
+0.26      2015-02-18 17:47:43 -0500
+  - Added support for pointers to longdouble (in C "long double *") type
+  - Added support for array of longdouble (in C "long double []") type
+  - Added tied array interface for record array members (see FFI::Platypus::Record::TieArray)
+    Marked as EXPERIMENTAL
+  - Array members of records can now be accessed (set/get) by element
+  - Array members of records types are now documented (see FFI::Platypus::Record)
+  - Bugfix: array wasn't being updated on return for variable length
+    array types
+  - Should now build with an Alien::FFI that was built with ALIEN_FORCE=1
+
+0.25      2015-02-16 20:18:41 -0500
+  - Probe for proper long double support instead of trusting ffi.h
+  - This disables long double support on cygwin, which does not seem to
+    work, at least in so far as it seems to work on other platforms
+    patches to prove otherwise are welcome.
+
+0.24      2015-02-16 15:38:58 -0500
+  - Fixed Windows / Strawberry configuration issues
+
+0.23      2015-02-16 05:44:39 -0500
+  - Support for longdouble (in C "long double") type.
+  - Support for complex_float (in C "float complex") type
+  - Support for complex_double (in C "double complex") type
+  - Fixes for Big Endian architectures (tested on Linux PowerPC)
+
+0.22      2015-02-12 07:47:32 -0500
+  - Variable length arrays
+  - More recent version of Config::AutoConf required in the configure step
+    (gh#33 zmughal)
+  - Documentation improvements and additional examples, including a 
+    crazy Java one
+
+0.21      2015-02-09 06:23:03 -0500
+  - Added FFI::Platypus#alignof method
+  - Added FFI::Platypus::Record module
+  - Added fixed length strings example: string(10)
+  - Added ro and rw trait for strings
+
+0.20      2015-02-05 14:06:11 -0500
+  - Added optional wrapper argument to FFI::Platypus#attach
+    and FFI::Platypus::Declare#attach
+  - Added FFI::Platypus#find_lib method
+  - FFI::CheckLib is now a runtime requirement for Platypus
+  - Bumped Alien::FFI requirement to 0.06
+
+0.19      2015-02-03 13:34:53 -0500
+  - Accept additional extensions, in addition to dlext
+    Example: on OS X both .bundle and .dylib can be used
+    Example: although arguably wrong, on cygwin sometimes .so is used
+  - Added Module::Build::FFI->ffi_dlext class method
+
+0.18      2015-01-30 15:22:07 -0500
+  - Improved support for C++ in Module::Build::FFI
+  - Module::Build::FFI can now be subclassed to support foreign 
+    languages other than C and C++.  See Module::Build::FFI::Rust as an 
+    example.
+  - Added a hook to allow different names for native types.  See 
+    FFI::Platypus::Lang::Rust for an example.
+  - Added a hook to allow mangling of symbol (function) names.  See 
+    FFI::Platypus::Lang::CPP for an example with C++
+  - Module::Build::FFI#ffi_include_dir can now be an array reference
+  - Module::Build::FFI#ffi_source_dir can now be an array reference
+  - Module::Build::FFI#ffi_libtest_dir can now be an array reference
+  - Module::Build::FFI will build assembly source files (with .s
+    extensions) in the libtest and ffi directories
+
+0.17      2015-01-28 11:11:02 -0500
+  - Allow integer and floating point type default to 0 when not provided
+    without warning
+  - You can now take the sizeof a custom type (it will be the size of
+    the native type that is actually passed on the C argument stack).
+  - Sizeof should be faster now as it doesn't look up the other meta
+    information or create a hash to contain it
+  - Added record type see FFI::Platypus::Type#Records
+  - Added bool as a primitive type.
+
+0.16      2015-01-23 17:31:00 -0500
+  - Bumping Alien::FFI version requirement up to 0.04
+    Thus indirectly Alien::Base to 0.07
+    Believe this may fix a cpan testers failure that I am seeing 
+
+0.15      2015-01-23 16:46:27 -0500
+  - add FFI::Platypus#ignore_not_found attribute
+  - add FFI::Platypus#package method
+  - Module::Build::FFI was moved into this distribution
+    (formerly distributed as part of FFI-Util)
+  - added aliases: uchar, ushort, uint and ulong
+
+0.14      2015-01-22 08:19:42 -0500
+  - Fixed some broken links in the documentation
+
+0.12      2015-01-21 23:22:16 -0500
+  - First CPAN release
+  - Improved documentation
+  - Functionally identically to 0.11
+
+0.11      2015-01-21 16:33:58 -0500
+  - Release candidate 2
+  - arguments are available during custom return type even when
+    platform does not support alloca
+  - More documentation and examples
+  - FFI::Platypus::API now use prototypes so you can skip the ()
+
+0.10      2015-01-20 04:06:17 -0500
+  - Release candidate 1
+  - Added custom Types API (see FFI::Platypus::API)
+  - Added String Pointer custom type (FFI::Platypus::Type::StringPointer)
+  - Added Pointer / Size Buffer custom type (FFI::Platypus::Type::PointerSizeBuffer)
+
+0.09      2015-01-19 03:01:48 -0500
+  - Third beta
+  - moved cast and sizeof from FFI::Platypus::Memory
+    into FFI::Platypus methods.
+  - cast and size of functions for FFI::Platypus::Declare
+  - attach_cast for faster casting
+  - renamed FFI::Platypus::Declare#function to
+    FFI::Platypus::Declare#attach to more closely match
+    the OO interface
+  - adjusted custom type interface
+    - renamed ffi_to_perl native_to_perl
+    - renamed perl_to_ffi perl_to_native
+    - type argument is now part of the hash and is called
+      native_type
+
+0.08      2015-01-16 10:55:14 -0500
+  - Second beta
+  - add FFI::Platypus::Buffer
+    stole the buffer functions from FFI::Util
+    can do this with cast, but cast is slow
+  - Fixed bug where cast didn't work with closures.
+  - closure data now free'd when it the closure
+    goes out of scope (GH#4)
+
+0.07      2015-01-15 18:53:45 -0500
+  - First (mostly complete) beta
+  - workaround some issues with closures
+  - much more comprehensive documentation
+
+0.06      2015-01-14 17:13:57 -0500
+  - fix typo in last version that broke 32 bit Perls.  oops.
+
+0.05      2015-01-14 17:04:25 -0500
+  - Forth (and mostly complete) alpha
+  - custom types written in Perl are supported.
+  - bug fixes for 32 bit Perls (with compilers that support int64_t)
+
+0.04      2015-01-13 11:14:54 -0500
+  - Third (and incomplete) alpha
+  - all basic types supported everywhere
+  - closures do not support non basic types or returning strings from a closure
+
+0.03      2015-01-09 15:40:14 -0500
+  - Second (and incomplete) alpha
+  - closure support added (only integer arguments implmented).
+  - memory leak related to closures will be fixed in the next alpha.
+
+0.02      2015-01-07 17:40:35 -0500
+  - Early (and incomplete) alpha
+
+0.01      2015-01-07 17:21:27 -0500
+  - Original (and incompatible) prototype

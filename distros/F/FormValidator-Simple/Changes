@@ -1,0 +1,115 @@
+Revision history for Perl extension FormValidator::Simple.
+
+0.29  Thu Dec 08 15:45:00 2011
+    - better BETWEEN check: allow float decimal
+      https://github.com/lyokato/p5-formvalidator-simple/pull/1
+
+0.28  Mon Jun 22 14:30:00 2009
+    - bugfix: on single apache process, 'each' command in Profile.pm breaks
+      hash reference.
+      Thanks to asannou.
+
+0.23  Thr Apr 17 21:17:00 2008
+    - Applied a patch which lets FVS loads plugin easily with +, like Catalyst.
+      Thanks to Jiro Nishiguchi.
+
+0.22  Tue Mar 6 20:07:00 2007
+    - Applied a patch that lets it work as expected in case *set_messages* is invoked after *check*.
+      Thanks to Yappo.
+
+0.21  Wed Feb 2 17:52:00 2007
+    - Applied a patch and set_messages_decode_from method was implemented.
+      Thanks to Yasuhiro Horiuchi.
+
+0.20  Wed Jan 24 20:05:00 2007
+    - Added field_messages method on Results class.
+      required by Jim Spath, Thanks.
+
+0.19  Thu Oct 26 18:52:00 2006
+    - Added set_invalid method to Results class.
+      This function is described in POD, but didn't work.
+      Applied a patche from IKEBE Tomohiro. Thanks!
+
+0.18  Tue Sep 12 18:20:00 2006
+    - bugfix:
+        numeric comperison, GREATER_THAN, LESS_THAN, and EQUAL_TO doesn't work
+        as expected when 0 is passed as arguments. Thanks to Ryo Okamoto.
+
+0.17  Tue Sep 05 15:22:00 2006
+    - took CLACO's patch that resolves RT issues: 21224, 20658, 19667.
+        RT20658: fixed POD error, thanks to ISHIGAKI.
+        RT20658: fixed Profile _init from eating profile via slice
+                 set_messages on object now overrides messages set on class
+        RT21224: added 'clear' method to FVS::Results. Thanks to CLACO.
+
+0.16  Tue May 16 10:19:00 2006
+    - added DATETIME_FORMAT and DATETIME_STRPTIME validation
+      Thanks to Masahiro Nagano and fbis.
+
+      new sample for IN_ARRAY on POD
+      bugfix: IN_ARRAY didn't work well with numeric arguments.
+      Thanks to ISLUE
+
+0.15  Mon Apr 24 11:51:00 2006
+    - added IN_ARRAY validation
+      Thanks to Masahiro Nagano.
+
+    - bugfix:
+        fixed to use Scalar::Util::blessed instead of UNIVERSAL::isa
+        because of its unexpected work on perl 5.8.0.
+        Thanks to Toru Yamaguchi
+        
+        allow to handle 0 on 'BETWEEN' validation
+        Thanks to Masahiro Nagano.
+        
+0.14  Mon Mar 13 03:19:00 2006
+    - added UINT validation
+      Thanks to Tokuhirom.
+
+0.13  Thu Nov 24 00:45:00 2005
+    - added set_message_format
+      Thanks to Daisuke Murase.
+
+0.12  Thu Nov 24 00:45:00 2005
+    - added validation ALL
+
+0.11  Thu Nov 24 00:45:00 2005
+    - added set_option method
+
+0.10  Thu Nov 17 12:00:00 2005
+    - added error-message handler
+
+0.09  Wed Nov 16 23:00:00 2005
+    - added documentation for FormValidation::Simple::Results
+
+0.08  Tue Nov 15 21:00:00 2005
+    - added some methods to FormValidator::Simple::Results.
+      changed behavior of validation DATE and DATETIME,
+      now it returns string or DateTime object or Time::Piece one,
+      you can choose it in option-setting.
+
+0.07  Mon Oct 31 21:00:00 2005
+    - added validation DECIMAL
+
+0.06  Thu Oct 27 21:00:00 2005
+    - added validations: numeric comparisons
+      GREATER_THAN LESS_THAN EQUAL_TO BETWEEN
+      ( suggested by Jody Alkema )
+
+0.05  Thu Oct 20 01:00:00 2005
+    - added validation HTTP_URL
+
+0.04  Wed Oct 19 20:00:00 2005
+    - added validation SELECTED_AT_LEAST
+      fixed some code didn't work as expected.
+
+0.03  Sun Oct  1 22:00:00 2005
+    - little bit fixed documentation and Makefile.PL
+
+0.02  Sun Sep  25 22:00:00 2005
+    - cpan release version
+
+0.01  Thu Sep  1 10:38:22 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A FormValidator::Simple
+

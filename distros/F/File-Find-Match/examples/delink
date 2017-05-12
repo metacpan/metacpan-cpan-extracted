@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Find::Match;
+use File::Spec;
+use File::Basename 'dirname';
+
+my $finder = new File::Find::Match(
+	is_broken => sub {
+		my $path = smart_readlink($_[0]);
+		print "Remvoing broken symlink: $_[0]\n";
+		unlink($_[0]);
+		return IGNORE;
+	},
+	-d => sub { MATCH },
+);
+$finder->find(shift @ARGV || '.');
+
+sub is_broken {
+	my ($file) = $_;
+	if (-l $file) {
+		my $path = smart_readlink($file);
+		return not -e $path;
+	} else {
+		return undef;
+	}
+}
+
+sub smart_readlink {
+	my $file = shift;
+	my $path = readlink $file;
+	my $absfile = File::Spec->rel2abs($file);
+	my $abspath = File::Spec->rel2abs($path, dirname($absfile));
+	return $abspath;
+}

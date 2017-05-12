@@ -1,0 +1,192 @@
+class 'Fl::Slider';
+isa 'Fl::Valuator';
+include 'FL/Fl_Slider.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Slider - Widget with a Sliding Knob Inside a Box
+
+=head1 Description
+
+The Fl::Slider widget contains a sliding knob inside a box.
+
+It is often used as a scrollbar. Moving the box all the way to the top/left
+sets it to the minimum(), and to the bottom/right to the maximum(). The
+minimum() may be greater than the maximum() to reverse the slider direction.
+
+Use Fl::Widget->type($type) to set how the slider is drawn, which can be one
+of the following:
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/slider.png" /></center>
+
+=over
+
+=item FL_VERTICAL - Draws a vertical slider (this is the default).
+
+=item FL_HORIZONTAL - Draws a horizontal slider.
+
+=item FL_VERT_FILL_SLIDER - Draws a filled vertical slider, useful as a progress or value meter.
+
+=item FL_HOR_FILL_SLIDER - Draws a filled horizontal slider, useful as a progress or value meter.
+
+=item FL_VERT_NICE_SLIDER - Draws a vertical slider with a nice looking control knob.
+
+=item FL_HOR_NICE_SLIDER - Draws a horizontal slider with a nice looking control knob.
+
+=back
+
+All of these values can be imported with the C<:type> tag.
+
+=cut
+
+export_constant("FL_VERTICAL",          "type");
+export_constant("FL_HORIZONTAL",        "type");
+export_constant("FL_VERT_FILL_SLIDER",  "type");
+export_constant("FL_HOR_FILL_SLIDER",   "type");
+export_constant("FL_VERT_NICE_SLIDER",  "type");
+export_constant("FL_HOR_NICE_SLIDER",   "type");
+
+=pod
+
+=head1 Methods
+
+Fl::Slider inherits from Fl::Valuator and Fl::Widget. On top of that, it
+exposes the following methods...
+
+=head2 new(...)
+
+    my $val_a = Fl::Slider->new(0, 0, 250, 500, 'Important Stuff');
+    my $val_b = Fl::Slider->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default boxtype is FL_DOWN_BOX.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Slider *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 bounds(...)
+
+    $val_b->bounds($a, $b);
+
+Sets the minimum (C<$a>) and maximum (C<$b>) values for the valuator widget.
+If either values is changed, a partial redraw is asked.
+
+=cut
+
+xs {name        => 'bounds',
+    definitions => [
+            {required => [[qw[double a]], [qw[double b]]],
+             returns  => 'void'
+            }
+    ]
+};
+
+=pod
+
+=head2 scrollvalue(...)
+
+    my $value = $val_a->scrollvalue($pos, $size, $first, $total);
+
+Sets the size and position of the sliding knob in the box.
+
+C<$pos> would be the position of the first line displayed, C<$size> is the
+size of the window in lines, C<$first> is the number of the first line, and
+C<$total> is the total number of lines.
+
+The return value is the same as C<<FL::Valuator->value();>>
+
+=cut
+
+xs {name        => 'scrollvalue',
+    definitions => [
+            {required => [[qw[int pos]], [qw[int size]], [qw[int first]], [qw[int total]]],
+             returns  => 'int'
+            }
+    ]
+};
+
+=pod
+
+=head2 slider(...)
+
+    my $boxtype = $val_a->slider();
+    $val_b->slider( FL_UP_BOX );
+
+Gets or sets the slider box type.
+
+=cut
+
+xs {name        => 'slider',
+    definitions => [
+            {required => [[qw[Fl_Boxtype box]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Boxtype'}
+    ]
+};
+
+=pod
+
+=head2 slider_size(...)
+
+Set the dimensions of the moving piece of slider.
+
+    $val_b->slider_size( .13 );
+
+This is the fraction of the size of the entire widget. If you set this to C<1>
+then the slider cannot move. The default value is C<.08>.
+
+For the "fill" sliders this is the size of the area around the end that causes
+a drag effect rather than causing the slider to jump to the mouse.
+
+=cut
+
+xs {name        => 'slider_size',
+    definitions => [
+            {required => [[qw[double v]]],
+             returns  => 'void'
+            }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

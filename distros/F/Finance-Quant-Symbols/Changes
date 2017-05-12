@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::Quant::Symbols.
+
+0.01  Mon Feb 13 17:45:55 2012
+	- original version; created by h2xs 1.23 with options
+		-XA Finance::Quant::Symbols
+

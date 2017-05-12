@@ -1,0 +1,10 @@
+Revision history for Perl extension Finance::IIF.
+
+0.02.01  Tue Feb  7 23:02:23 EST 2006
+	- initial release of module on sourceforge
+0.03.01  Tue May 23 00:54:00 EDT 2006
+	- initial release of module on CPAN
+0.20.01  Wed Aug 23 00:26:49 EDT 2006
+	- Added autodetect option and related test cases
+	- Fixed bug that could caused wrong separator to be used
+	- Changed separator support to use a single record_separator

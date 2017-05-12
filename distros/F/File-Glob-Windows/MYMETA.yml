@@ -1,0 +1,26 @@
+---
+abstract: 'glob routine for Windows environment.'
+author:
+  - 'tateisu <tateisu@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.26, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Glob-Windows
+provides:
+  File::Glob::Windows:
+    file: lib/File/Glob/Windows.pm
+    version: v0.1.5
+recommends:
+  Module::Install: 0
+  Module::Install::AuthorTests: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+requires:
+  perl: 5.008003
+version: 0.1.5

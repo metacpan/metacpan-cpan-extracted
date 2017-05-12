@@ -1,0 +1,55 @@
+Changelog for File::Type
+
+0.22 Thu May 06 11:00:00 BST 2004
+
+     - Added MIME type for PDFs
+     - Added some MP3 detection
+
+0.21 Mon Apr 26 14:10:00 BST 2004
+
+     - Differentiated .wav and .avi
+
+0.20 Wed Mar 03 16:10:00 GMT 2004
+
+     - Added .asf movie support, and accompanying tests
+     - Added NINJA file
+
+0.12 Fri Dec 05 16:40:00 GMT 2003
+
+     - Fixed more minor documentation glitches
+     - Removed File::Slurp dependency
+
+0.11 Wed Sep 24 10:40:00 BST 2003
+
+     - Fixed minor documentation glitches
+
+0.10 Mon Sep 01 11:45:00 BST 2003
+
+     - added mime_type method to take either file or data
+     - removed superflous Build file from manifest, distribution
+     - tidied test suite
+     
+0.05 Tue Aug 26 17:18:00 BST 2003
+
+     - fixed documentation bugs
+     - added belong to generation and rules 
+     
+0.04 Tue Aug 26 13:02:00 BST 2003
+
+     - first public release
+     - fixed substr/undef warnings on small files
+     
+0.03 Tue Aug 26 11:14:00 BST 2003
+
+     - added and documented clearcode.org mime-magic
+     - smaller test images
+     
+0.02 Fri Aug 22 15:00:00 BST 2003
+
+     - corrected Builder.pm to handle tar and gzip types
+     - many additional tests
+     
+0.01 Thu Aug 21 17:30:00 BST 2003
+
+     - initial version
+     - works for image/jpeg

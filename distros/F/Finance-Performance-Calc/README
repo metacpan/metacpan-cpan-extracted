@@ -1,0 +1,37 @@
+Finance-Performance-Calc version 1.01
+=====================================
+
+LATEST CHANGES (from Changes file)
+
+1.01 Wed Apr 21 23:00:00 2004
+	Substantive:
+	- Makefile.PL: Changed perl version pragma from 5.008001 to
+	5.006001 to match Calc.pm.
+
+	Cosmetic:
+	- README: Removed boilerplate text, added LASTEST CHANGES
+	section.
+	- Calc.pm  - Upped $VERSION.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other non-core modules or libraries at this time.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Matthew O. Persico, persicom@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

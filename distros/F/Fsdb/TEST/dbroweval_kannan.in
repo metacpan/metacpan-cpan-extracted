@@ -1,0 +1,8 @@
+#h name id test1 test2 sum
+a       1       80      81      0
+b       2       70      71      0
+c       3       65      66      0
+d       4       90      91      0
+e       5       70      71      0
+f       6       90      91      0
+#  | dbcolcreate -d sum 0

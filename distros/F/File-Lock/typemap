@@ -1,0 +1,32 @@
+Off_t		T_IV
+off_t		T_IV
+mode_int	T_MODE
+#########################################
+INPUT
+T_MODE
+	{
+		char * work = (char*)SvPV($arg,na);
+		if((!work) || (work[0]==0)) {
+			$var = Lock_exclusive | Lock_nonblock;
+		} else {
+		
+		if(strchr(\"wx\",work[0])) 
+			$var = Lock_exclusive;
+		else if(strchr(\"srl\",work[0])) 
+			$var = Lock_shared;
+		else if(strchr(\"ti\",work[0])) 			
+			$var = Lock_test;
+		else if(strchr(\"u\",work[0])) 
+			$var = Lock_unlock;
+			
+		if(work[1]==0)
+			$var |= Lock_wait;
+		else if(strchr(\"n\",work[1]))
+			$var |= Lock_nowait;
+		else if(strchr(\"bw\",work[1]))
+			$var |= Lock_wait;
+		else
+			$var |= Lock_nowait;
+		}
+	}
+

@@ -1,0 +1,16 @@
+Changes
+lib/File/ELAN.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+MANIFEST.SKIP
+t/01-read.t
+t/02-roundtrip.t
+t/test.eaf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

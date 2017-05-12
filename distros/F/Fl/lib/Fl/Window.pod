@@ -1,0 +1,197 @@
+class 'Fl::Window';
+isa 'Fl::Group';
+include 'FL/Fl_Window.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Window - Window Container for Widgets
+
+=head1 Synopsis
+
+    use Fl;
+    my $window = Fl::Window->new(350, 500, 'Hello, World!');
+    $window->show();
+    Fl::run();
+
+=head1 Description
+
+This widget produces an actual window.
+
+This can either be a main window, with a border and title and all the window
+management controls, or a "subwindow" inside a window. This is controlled by
+whether or not the window has a C<parent()>.
+
+Once you create a window, you usually add children L<Fl::Widget>s to it by
+using C<<$window->add($child)>> for each new widget. See Fl::Group for more
+information on how to add and remove children.
+
+There are several subclasses of Fl::Window that provide double-buffering,
+overlay, menu, and OpenGL support.
+
+The window's callback is done if the user tries to close a window using the
+window manager and Fl::modal() is zero or equal to the window. Fl::Window has
+a default callback that calls C<<Fl::Window->hide()>>.
+
+=head1 Methods
+
+In addition to inheriting from Fl::Group, this widget also supports the
+following methods.
+
+=head2 new(...)
+
+The constructor creates a window of a given size and (optionally) position on
+screen. The upstream API has a few poorly designed options:
+
+    my $window_a = Fl::Window->new(300, 500);
+
+This creates a window from the given size. You may also set the window's title
+like this:
+
+    my $window_b = Fl::Window->new(300, 500, 'Basic math');
+
+If not provided, the window's title defaults to the filename of the current
+running script.
+
+You'll notice that the above examples don't define an on screen position. The
+window manager is allowed to place the new window as it sees fit. To define a
+position yourself, use either:
+
+    my $window_c = Fl::Window->new(100, 150, 300, 500);
+
+...or...
+
+    my $window_d = Fl::Window->new(100, 150, 300, 500, 'Math is singular');
+
+In these examples, the new window is placed 100 pixels from the left and 150
+pixels down from the top of the display area.
+
+=begin TODO
+
+Ideally, we could also create windows with something like:
+
+    my $window = Fl::Window->new(
+        -position => [100, 100],
+        -size     => [380, 400],
+        -title    => 'NA'
+    );
+
+=end TODO
+
+Again, the ($w, $h) form of the constructor creates a top-level window and
+asks the window manager to position the window. The ($x, $y, $w, $h) form of
+the constructor either creates a subwindow or a top-level window at the
+specified location ($x, $y), subject to window manager configuration. If you
+do not specify the position of the window, the window manager will pick a
+place to show the window or allow the user to pick a location. Use
+C<position($x, $y)> or C<hotspot()> before calling C<show()> to request a
+position on the screen. See L<Fl::Window->resize()/resize(...)> for more
+details on positioning windows.
+
+Top-level windows initially have C<visible()> set to 0 and <parent()> set to
+C<undef>. Subwindows initially have C<visible()> set to 1 and C<parent()> set
+to the parent window pointer.
+
+Fl::Widget->box() defaults to C<FL_FLAT_BOX>. If you plan to completely fill
+the window with children widgets you should change this to C<FL_NO_BOX>. If
+you turn the window border off you may want to change this to C<FL_UP_BOX>.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [{required => [[qw[int w]], [qw[int h]]],
+                     optional =>
+                         [['const char *', 'label', 'PL_origfilename']],
+                     returns => 'Fl_Window *'
+                    },
+                    {required =>
+                         [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+                     optional =>
+                         [['const char *', 'label', 'PL_origfilename']],
+                     returns => 'Fl_Window *'
+                    }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+The destructor I<also deletes all children.> This allows a whole tree to be
+deleted at once, without having to keep a pointer to all children in the user
+code.
+
+=cut
+
+=pod
+
+=head2 show()
+
+Puts the window on the screen.
+
+On X, this usually has the side effect of opening the display.
+
+If the window is already shown, it is restored and raised to the top. This is
+really convenient because your program can call C<show()> at any time, even if
+the window is already up. It also means that C<show()> serves the purpose of
+C<raise()> in other toolkits.
+
+=cut
+
+xs {name        => 'show',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head2 shown()
+
+Returns non-zero if C<show()> has been called but not C<hide()>.
+
+You can tell if a window is iconified with C<( $w->shown() && !$w->visible() )>.
+
+=cut
+
+xs {name        => 'shown',
+    definitions => [{returns => 'int'}]
+};
+
+=pod
+
+=head2 hide()
+
+Removes the window from the screen.
+
+If the window is already hidden or has not been hsown then this does nothing
+and is harmless.
+
+=cut
+
+xs {name        => 'hide',
+    definitions => [{returns => 'void'}]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

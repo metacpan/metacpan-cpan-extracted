@@ -1,0 +1,384 @@
+#!/usr/bin/perl
+#
+#   FUSE driver: read-only union of read-only branches
+#
+# Driver is calling from mount.fuse wrapper
+# See --help and "man Fuse" for details.
+#
+# Copyright (C) Vladimir V. Kolpakov 2006-2011
+# All rights reserved.
+#
+#--w 02/2006,03/2010,08/2011############################################
+package Fuse::Funifs;
+use strict;
+
+use threads;
+use threads::shared;
+use Fuse;
+use POSIX qw(setsid O_RDONLY ENOENT EROFS EACCES EINVAL ENOSYS);
+use Filesys::Statvfs qw(statvfs);
+use Unix::Syslog qw(:subs LOG_INFO LOG_NDELAY LOG_PID LOG_DAEMON);
+use Getopt::Long;
+
+#-----------------------------------------------------------------------
+#-- FUSE filesystem name:
+#- package basename is default for $FSname
+#- script basename (symlink, for instance) alters $FSname
+my $FSname = ($0 =~ m!([^/]+)$!)[0];
+$FSname = (__PACKAGE__ =~ m/::(.*?)$/)[0] unless $FSname;
+############ printLog($msg) ############################################
+sub printLog {
+  openlog($FSname, LOG_NDELAY | LOG_PID, LOG_DAEMON);
+  syslog(LOG_INFO,$_[0],'');
+  closelog();
+}
+############ Main ######################################################
+my $OpenMode = O_RDONLY | (defined(&O_LARGEFILE) ? &O_LARGEFILE() : 0);
+my $Fh = {};                    #-- open files handles cache
+my @Fh = ();                    #-- open files paths list
+my $MaxFiles = 100;             #-- max length of @Fh
+my @Branch = ();                #-- ordered branches list
+#-----------------------------------------------------------------------
+my $LogMsg = join(' ',$0,@ARGV);
+my $opt = {
+  'help'    => undef,
+  'verbose' => 0,
+  'opts'    => '',
+  'debug'   => undef,
+};
+#--- Consume --option words before any mount.fuse arguments
+#- Ignore any /bin/mount arguments
+GetOptions(
+  'help'    => \$opt->{'help'},
+  'o=s'     => \$opt->{'opts'},
+  'd'       => \$opt->{'debug'},    #-- to enable FUSE debug, enable debug in Fuse::main call below
+  'v|verbose+'  => \$opt->{'verbose'},
+);
+sub Say { $opt->{'verbose'} and print STDERR @_; }
+&Say("---2---$FSname: $LogMsg\n");
+my ($fspath     #-- fstab FS's "specification" with "$FSname#" stripped out in mount.fuse
+   ,$Union      #-- mount point
+   ,$Opts       #-- mount options as of fstab(8)
+  ) = @ARGV;    #---mount.fuse: ${FSTYPE} ${MOUNTPATH} ${MOUNTPOINT} ${OPTIONS}
+$Opts   ||= $opt->{'opts'} if $opt->{'opts'};
+$fspath ||= '/union';           #-- fake default, for --help only
+$Union  ||= '/mnt/union';       #-- fake default, for --help only
+my $fsSpec = ".$fspath";        #-- re-assemble fstab's spec value back
+#---
+@Branch = split(/:/, $1) if ($Opts =~ s/\bdirs=([^,]+)//);
+my $dirs = join(':',@Branch);
+my $opts = {};
+$Opts = join(',',
+  map {exists($opts->{$_}) ? () : ($opts->{$_} = $_)}
+  map {$_ ? $_ : ()}
+  split(',',$Opts.',ro,noexec,nosuid,nodev')
+).',dirs='.$dirs;
+############ Usage() ###################################################
+sub Usage {
+  $dirs ||= '/delta/www:/srv/www';
+  print <<"EoD" ;
+------------------------------------------------------
+  FUSE funifs (read-only union) filesystem driver
+Normally invoking by mount.fuse helper at "mount -a -t fuse" boot call
+
+Usage:  (mount.fuse order):
+    $FSname {FS_spec} {Union_mount_point} {[-o] Fstab_options]} [OPTIONS]
+
+Options:
+    --help              #-- print this info and exit
+    -v, --verbose       #-- verbose (incremental option)
+    -d                  #-- don't fork to daemon mode, stay in foreground
+
+Example:
+    $FSname $fsSpec $Union -o ro,noexec,nosuid,nodev,dirs=$dirs -v
+
+/etc/fstab line example:
+    $fsSpec $Union fuse.funifs user,ro,_netdev,dirs=$dirs 0 91
+
+/etc/fstab options:
+    user,ro,_netdev                 #-- [recommended] mount options
+    dirs=$dirs        #-- colon-separated list of branches, top layer first
+    ro,noexec,nosuid,nodev          #-- [hardcoded] mount options. "ro" again, despite fstab has it
+    allow_other,default_permissions #-- [hardcoded] fuse options; allow_other need flag in /etc/fuse.conf
+
+/etc/fuse.conf line:
+    user_allow_other                #-- flag: regular user is enabled to do mount / fusermount -u
+
+------------------------------------------------------
+EoD
+}
+############ Main ######################################################
+if ($opt->{'help'}) { &Usage(); exit 0; }
+
+#--- Sanity checks
+unless ($dirs) {
+  print STDERR "$FSname: try: $0 --help\n";
+  exit 1;
+}
+for ($Union, @Branch) {
+  next if (-d $_);
+  print STDERR "$0: *** Error: fake directory: '$_', bye.\n";
+  exit 1;
+}
+unless ($FSname =~ m![^.]!) {
+  &Usage();
+  print STDERR "$0: *** Error: invalid FS type name, bye.\n";
+  exit 1;
+}
+unless ($Union =~ m![^.]!) {
+  &Usage();
+  print STDERR "$0: *** Error: invalid mount point, bye.\n";
+  exit 1;
+}
+unless (scalar(@Branch)) {
+  &Usage();
+  print STDERR "$0: *** Error: source branch is missing, -- nothing to mount, bye.\n";
+  exit 1;
+}
+#-----------------------------------------------------------------------
+$LogMsg = "$fsSpec $Union $Opts";
+&Say("---3---$FSname: $LogMsg\n");
+&printLog('mount.fuse: '.$LogMsg);
+#Aug 29 01:02:32 kent funifs[23161]: mount.fuse: ./example.com/u/w /web/example.com/u/w ro,dev,suid,noexec,nosuid,nodev,dirs=/web/sites/example.com/u/w:/web/sites/example.com/www
+############ Internal functions ########################################
+#----------- upath() ---------------------------------------
+#--- Find top exiting file in union, return real path
+sub upath {
+  my $file = shift;
+  $file =~ s!^/!!;
+  for (@Branch) {
+    next unless lstat("$_/$file");
+    return "$_/$file";
+  }
+  return undef;
+}
+############ Fuse.*  callbacks #########################################
+#----------- getattr() -------------------------------------
+#--- Return stat of top existing file in the union
+sub u_getattr {
+  my $file = shift();
+  &Say("---35---u_getattr($file)\n");
+  my $path = upath($file) or return ();
+  #return lstat($path);
+  #&Say("---35.1---u_getattr($file)\n");
+  return lstat(_);
+}
+#----------- getdir() --------------------------------------
+#--- Merge content of all branches directories
+sub u_getdir {
+  my $dir = shift();
+  &Say("---36---u_getdir($dir)\n");
+  $dir =~ s!^/!!;
+  my $files = {};
+  for my $b(@Branch) {
+    next unless opendir(DIR,"$b/$dir");
+    for (readdir(DIR)) { $files->{$_} = 1; }
+    closedir(DIR);
+  }
+  return -ENOENT() unless exists($files->{'.'});
+  return (keys %$files, 0);
+}
+#----------- open() ----------------------------------------
+#-- modes are from /usr/include/linux/fs.h
+#-- ~(1+4+8+32) = ~(FMODE_READ | FMODE_LSEEK | FMODE_PREAD | FMODE_EXEC)
+sub u_open {
+  &Say("---37---u_open(@_)\n");
+  my ($file,$mode) = @_;
+ #my $write = ($mode & 0x7fff); # ~FMODE_READ
+  my $write = ($mode & 0x7fdf); # ~(FMODE_READ | FMODE_EXEC)
+  #&Say("---37.1---u_open: \$write=<$write>\n");
+  return -EACCES() if $write;   #-- reject anything, except read-only access
+  &upath($file) or return -ENOENT();
+  return 0;
+}
+#----------- release() -------------------------------------
+#--- Release open file handle.
+#- Arguments: Pathname, numeric flags passed to open
+#- Returns: an errno or 0 on success.
+#
+#- Called to indicate that there are no more references to the file.
+#- Called once for every file with the same pathname and flags as were passed to open.
+sub u_release {
+  &Say("---39---u_release(@_)\n");
+  #my ($file,$mode) = @_;
+  return 0;
+}
+#----------- read() ----------------------------------------
+#--- Return an error numeric, or binary/text string.
+#--NOTE: 0 means EOF, "0" will
+#- give a byte (ascii "0") to the reading program.
+sub u_read {
+  &Say("---40.1---u_read(@_)\n");
+  my ($file,$size,$off) = @_;
+  my ($fh,$rc,$buf,$path);
+  $path = upath($file) or return -ENOENT();
+  sysopen($fh,$path,$OpenMode);
+  $fh or return -ENOENT();
+  if ($off) {
+    $rc = sysseek($fh,$off,0) or return -EINVAL();
+  }
+  $rc = sysread($fh,$buf,$size);    #-- sysread(FILEHANDLE,SCALAR,LENGTH,OFFSET)
+  &Say("---40.2---u_read: length=<".length($buf).">\n");
+  return defined($rc) ? $buf : -ENOSYS();
+}
+#----------- flush() ---------------------------------------
+#--- Useless on read-only branches, however called from fuse
+#- before every close file, opened even for read().
+sub u_flush {
+  #&Say("---41---u_flush(@_)\n");
+  return 0;
+}
+#----------- readlink() ------------------------------------
+#--- Return the symlink string value
+sub u_readlink {
+  #&Say("---42---u_readlink(@_)\n");
+  my $file = shift();
+  my $path = upath($file) or return -ENOENT();
+  return readlink($path);
+#EINVAL
+}
+#----------- listxattr() -----------------------------------
+#--- Return the list of extended attribute names
+#--NOTE: do not include this in Fuse::main() args, --
+# to supress 2+ extra calls on each file.
+sub u_listxattr {
+  #&Say("---43---u_listxattr(@_)\n");
+  my $file = shift();
+  my $path = upath($file) or return ();
+  #return listxattr($path);      #-- no native support in perl
+  return (0);
+}
+
+#----------- getxattr() ------------------------------------
+#--- Return an extended attribute value
+#--NOTE: avoid to include this in Fuse::main() args, --
+# to supress 2+ extra calls on each file.
+sub u_getxattr {
+  &Say("---44---u_getxattr(@_)\n");
+  #    my ($file,$name) = @_;
+  #    my $path = upath($file) or return ();
+  #      #return lgetxattr($path,$name,$value,$size);
+  return (0);
+}
+
+#----------- statfs() --------------------------------------
+#--- Return an error numeric, or binary/text string.
+sub u_statfs {
+  #-- No args.
+  my @st = statvfs($Branch[0]) or return -$!;
+  my $statvfs = { map {$_ => shift(@st)} qw(
+    bsize frsize blocks bfree bavail files
+    ffree favail fsid basetype flag namemax fstr
+  ) };
+  return ( 0, map {$statvfs->{$_}} qw(
+    namemax files ffree blocks bfree bsize
+  ) );
+}
+#----------- rofs() ----------------------------------------
+#--- Return "read-only filesystem" error
+sub rofs {
+  &Say("---45---rofs(@_)\n");
+  return -EROFS();
+}
+sub u_chmod         { &rofs('chmod'         ,@_); }
+sub u_chown         { &rofs('chown'         ,@_); }
+sub u_fsync         { &rofs('fsync'         ,@_); }
+sub u_link          { &rofs('link'          ,@_); }
+sub u_mkdir         { &rofs('mkdir'         ,@_); }
+sub u_mknod         { &rofs('mknod'         ,@_); }
+sub u_removexattr   { &rofs('removexattr'   ,@_); }
+sub u_rename        { &rofs('rename'        ,@_); }
+sub u_rmdir         { &rofs('rmdir'         ,@_); }
+sub u_setxattr      { &rofs('setxattr'      ,@_); }
+sub u_symlink       { &rofs('symlink'       ,@_); }
+sub u_truncate      { &rofs('truncate'      ,@_); }
+sub u_unlink        { &rofs('unlink'        ,@_); }
+sub u_utime         { &rofs('utime'         ,@_); }
+sub u_write         { &rofs('write'         ,@_); }
+
+#------------------------------------------------------------------#
+#--- daemon(3) emulation
+#--- Shrinked down variant of Net::Server::Daemonize
+sub daemon {    #-- dissociate process from terminal
+  my $pid = fork();
+  exit(0) if $pid;  #-- parent process
+  croak("Couldn't fork: [$!]\n") unless defined $pid;
+  #-- child process will continue on
+  #-- close all input/output and separate
+  #-- from the parent process group
+  open STDIN,  '</dev/null' or croak("Can't open STDIN from /dev/null: [$!]\n");
+  open STDOUT, '>/dev/null' or croak("Can't open STDOUT to /dev/null: [$!]\n");
+  open STDERR, '>&STDOUT'   or croak("Can't open STDERR to STDOUT: [$!]\n");
+  #-- Change to root dir to avoid locking a mounted file system
+  #chdir '/'                 or croak("Can't chdir to \"/\": [$!]");
+  #-- Turn process into session leader, and ensure no controlling terminal
+  POSIX::setsid();
+  return 1;
+}
+############ Fuse::main call ###########################################
+# If you run the script directly, it will run fusermount, which will in turn
+# re-run this script.  Hence the funky semantics.
+#print STDERR "---19--- ok.\n";
+my $args = {
+  'mountpoint'  => $Union,
+  'mountopts'   => join(','
+    ,'ro'
+    , 'allow_other'
+    ,'default_permissions'
+   #,'use_ino'
+    ,"fsname=$fsSpec"
+  ),
+  'debug'       => 0,
+ #'debug'       => 1,
+ #'threaded'    => 0,
+  'threaded'    => 1,
+  #-- Implemented callbacks
+  'getattr'     => 'Fuse::Funifs::u_getattr'    ,
+  'getdir'      => 'Fuse::Funifs::u_getdir'     ,
+  'open'        => 'Fuse::Funifs::u_open'       ,
+  'read'        => 'Fuse::Funifs::u_read'       ,
+  'flush'       => 'Fuse::Funifs::u_flush'      ,
+  'statfs'      => 'Fuse::Funifs::u_statfs'     ,
+  'listxattr'   => 'Fuse::Funifs::u_listxattr'  ,
+  'readlink'    => 'Fuse::Funifs::u_readlink'   ,
+  'release'     => 'Fuse::Funifs::u_release'    ,
+  #-- Not implemented callbacks
+  'getxattr'    => 'Fuse::Funifs::u_getxattr',    #--NOTE: avoid (keep this undef) to supress 2+ extra calls on each file
+  #-- Disabled access
+  'chmod'       => 'Fuse::Funifs::u_chmod'      ,
+  'chown'       => 'Fuse::Funifs::u_chown'      ,
+  'fsync'       => 'Fuse::Funifs::u_fsync'      ,
+  'link'        => 'Fuse::Funifs::u_link'       ,
+  'mkdir'       => 'Fuse::Funifs::u_mkdir'      ,
+  'mknod'       => 'Fuse::Funifs::u_mknod'      ,
+  'removexattr' => 'Fuse::Funifs::u_removexattr',
+  'rename'      => 'Fuse::Funifs::u_rename'     ,
+  'rmdir'       => 'Fuse::Funifs::u_rmdir'      ,
+  'setxattr'    => 'Fuse::Funifs::u_setxattr'   ,
+  'symlink'     => 'Fuse::Funifs::u_symlink'    ,
+  'truncate'    => 'Fuse::Funifs::u_truncate'   ,
+  'unlink'      => 'Fuse::Funifs::u_unlink'     ,
+  'utime'       => 'Fuse::Funifs::u_utime'      ,
+  'write'       => 'Fuse::Funifs::u_write'      ,
+
+};
+#use Data::Dumper;
+#BEGIN { $Data::Dumper::Indent = 1; $Data::Dumper::Terse = 1; }
+#print STDERR "---21---\$args: ".Dumper($args);
+#exit 0;
+
+#-- Change to root dir to avoid locking a mounted file system
+chdir('/') or croak("Can't chdir to \"/\": [$!]");
+
+#-- Ensure consistent behaviour across debug and normal modes
+daemon() unless $opt->{'debug'};
+&Fuse::main(%$args);
+
+############ Exit after umount #########################################
+#Feb  8 20:37:39 knob funifs[10318]: unmount: funifs#/dev /web/me.nu/dev ro,noexec,nosuid,nodev,dirs=/web/sites/me.nu/Delta/dev:/web/sites/me.nu/www
+&printLog('unmount: '.$LogMsg);
+
+0;
+__END__
+########################################################################
+#

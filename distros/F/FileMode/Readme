@@ -1,0 +1,111 @@
+Readme file for Perl module File::Mode.
+This module is copyrighted under the same terms as Perl itself.
+
+#--------------------------  File::Mode Ver 0.05 ---------------------#
+#---------------------  ©2000 Idan Robbins aka Aqutiv ----------------#
+
+File::Mode is a simple perl library meant to handle file modes and convert 
+them to the wanted format, as well as read the files in a directory with their modes
+in a human readable format (eg. -rwxrwxrwx). 
+
+Installation
+-------------
+type:
+perl Makefile.pl
+make
+make test
+make install
+
+on win32 I doubt you'll find any use for this module, but if you persist, you can either
+use nmake (shipped with VC++ and the like) or simply copy Mode.pm to the perl\lib\file directory.
+
+Synopsis
+---------
+use File::Mode;
+  my $Fmode   =  File::Mode->new();
+  my $unixmod =  $Fmode->OctToUnix( NUMBER );
+  my ($mod, $type) =  $Fmode->UnixToOct( STRING, [notype] ); 
+  $Fmode->FileList( \%hash, DIR PATH, ["NODIR"] ); 	
+
+METHODS
+-------
+
+For more accurate information, be sure to type: 'perldoc File::Mode' after installation.
+
+OctToUnix( NUMBER )
+
+This method converts a numeric file mode to its unix standart equilivant,
+(i.e The file modes you get when you do 'ls -l'.) Since it's not possible to determine 
+if it's a file or a directory, it returns a string that is only 6 chars, for example: 
+
+        print $Fmode->OctToUnix(0777) or die("Illegal Number.\n");
+
+Will print out the string: rwxrwxrwx. which means Read, Write, and eXecute for all usrs.
+(refer to your unix/linux manual for more info.) Will return 0 if the format is wrong. 
+(eg, one of the digits is greater then 7, or the number has more then 3 digits. optionally 4, 
+if starts with 0).
+
+
+UnixToOct( STRING, [notype] )
+
+This complex method converts a standart unix file mode string into its numeric equilivant,
+(i.e the file mode that you use when you do CHMOD.) It returns either a scalar of the octal 
+number, if the string is in a format of 6 chars (e.g rwxrwxrwx), which means that it'l not 
+be able to determine if it's a file or a directory. Or a list of two items, the first is 
+the number, and the second is the type (DIR or FILE), if the string is in a format of 7 chars. 
+(e.g drwxr-xr-x which is a directory). If the second argument is true, 
+will never return the type. Will return an empty list if the format is wrong.
+Full Example:
+
+	use File::Mode;
+	$Fmode = File::Mode->new();
+
+	print "Type a unix standart file mode\
+        to convert into a its numeric value:\n";
+	chomp($mod = <STDIN>);
+        
+	@mod = $Fmode->UnixToOct($mod) or die "Wrong Format.\n";
+	print "@mod\n";
+
+If the user has entered "rwxr-xr-x", will print "0755". 
+if he has entered "-rwxrwxr-x" will print "0755 FILE".
+if he has entered "hello" will quit (die) and print "Wrong format."
+
+FileList( \%hash, DIR STRING, [nodir] )
+
+This method takes 2 arguments and an optional third. The first must be an hash referense
+that will store a list of files in a specified directory as the keys, and their 
+file modes / permissions in a unix standart format, as the values. The second argument is 
+the directory to look in, if none specified, the current directory will be used as a default. 
+(altough, It's always a better practice to specify it.) The third argument is rethar useless, 
+but well, you never know. If you set it to "NODIR" (or any other true value, for that matter), 
+The file modes will be in a format of 6 characters and will not mention wheter each file is 
+actually a directory or not. 
+Here's an example, you may use it freely:
+
+	use File::Mode;
+
+	$Fmode = File::Mode->new();
+
+	$Fmode->FileList(\%modes, "./") or die "Can't open dir, $!.\n";
+
+	foreach $file (sort keys %modes) {
+	print "$modes{$file}\t$file\n";
+	}
+	
+This might remind you the 'ls -l' unix command a bit.
+
+TO DO
+------
+
+Add a few more simple methods such as StatToOct, OctToStat, SpecFileMode, etc..
+
+AUTHOR
+-------
+Idan Robbins (aqutiv@softhome.net)
+
+SEE ALSO
+---------
+
+chmod(), stat(), perl(1).
+

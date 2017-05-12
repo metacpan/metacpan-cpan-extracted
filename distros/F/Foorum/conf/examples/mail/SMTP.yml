@@ -1,0 +1,13 @@
+---
+mailer: 'SMTP'
+mailer_args:
+  - Host
+  - 'mail.foorumbbs.com'
+  - Port
+  - 587
+  - User
+  - 'fayland@foorumbbs.com'
+  - Password
+  - 'password'
+  - Hello
+  - 'foorumbbs.com'

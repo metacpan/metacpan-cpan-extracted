@@ -1,0 +1,29 @@
+---
+abstract: 'Memoization of File::Spec to make it faster'
+author:
+  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: File::Spec::Memoized
+name: File-Spec-Memoized
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Spec: 3.2701
+  perl: 5.6.2
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gfx/Perl-File-Spec-Memoized.git
+version: 1.00

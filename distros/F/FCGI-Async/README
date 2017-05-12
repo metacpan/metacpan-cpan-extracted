@@ -1,0 +1,49 @@
+NAME
+    "FCGI::Async" - use FastCGI with IO::Async
+
+SYNOPSIS
+     use FCGI::Async;
+     use IO::Async::Loop;
+
+     my $loop = IO::Async::Loop->new();
+
+     my $fcgi = FCGI::Async->new(
+        loop => $loop
+        service => 1234,
+
+        on_request => sub {
+           my ( $fcgi, $req ) = @_;
+
+           # Handle the request here
+        }
+     );
+
+     $loop->loop_forever;
+
+DESCRIPTION
+    This subclass of Net::Async::FastCGI provides a slightly different API;
+    where it can take an argument containing the IO::Async::Loop object,
+    rather than be added as "Notifier" object within one. It is provided
+    mostly as a backward-compatibility wrapper for older code using this
+    interface; newer code ought to use the "Net::Async::FastCGI" interface
+    directly.
+
+CONSTRUCTOR
+  $fcgi = FCGI::Async->new( %args )
+    Returns a new instance of a "FCGI::Async" object.
+
+    If either a "handle" or "service" argument are passed to the
+    constructor, then the newly-created object is added to the given
+    "IO::Async::Loop", then the "listen" method is invoked, passing the
+    entire %args hash to it.
+
+    If either of the above arguments are given, then a "IO::Async::Loop"
+    must also be provided:
+
+    loop => IO::Async::Loop
+        A reference to the "IO::Async::Loop" which will contain the
+        listening sockets.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

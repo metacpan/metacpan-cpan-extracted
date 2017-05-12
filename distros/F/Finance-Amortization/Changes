@@ -1,0 +1,28 @@
+0.5
+
+Changes to improve "kwalitee" rating on cpants.
+
+0.4
+
+Fixed doc bug in BUGS section.  BUGS now notes that there is a test script,
+which should be better.
+
+Fixed documentation of new() constructor.  It now matches the behavior.
+
+Added TODO about locale dependent rounding.
+
+0.3
+
+Added t directory and a test program.
+
+Added precision field to round results.
+
+Fixed some bugs.
+
+0.2
+
+Version number bump to get around PAUSE naming issue.
+
+0.1
+
+Initial release.

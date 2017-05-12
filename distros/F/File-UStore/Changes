@@ -1,0 +1,26 @@
+Changelog for File-UStore
+
+0.16 2016-04-07T07:28:11
+ - ADding deps for uuid-dev to travis (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.15 2016-04-07T07:23:35
+ - v0.15 (Shantanu Bhadoria)
+ - fixing spelling issues (Shantanu Bhadoria)
+ - Added travis and badges (Shantanu Bhadoria)
+
+0.14 2013-09-15T05:17:41
+ - v0.14 (Shantanu)
+ - Switched the module to dzil for release management and to improve its
+   kwalitee rating (Shantanu)
+
+0.13 2013-03-05T02:26:05
+ - Added repo to makefile (Shantanu Bhadoria)
+ - Adding INSTALL (Shantanu Bhadoria)
+ - Added Changes File (Shantanu Bhadoria)
+ - Renamed a test (Shantanu Bhadoria)
+ - Adding the Tests (Shantanu Bhadoria)
+ - File::UStore Committing Version 0.04 Changes Added a few Documentation
+   tweaks. (Shantanu Bhadoria)
+ - First Commit File::UStore Version 0.03 of File UStore (Shantanu
+   Bhadoria)

@@ -1,0 +1,18 @@
+Changes
+lib/File/Lock/Multi.pm
+lib/File/Lock/Multi/Base.pm
+lib/File/Lock/Multi/Base/Iterative.pm
+lib/File/Lock/Multi/FlockFiles.pm
+lib/File/Lock/Multi/Fuser.pm
+lib/File/Lock/Multi/MySQL.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/100-fuser-simple.t
+t/200-fuser-forks.t
+t/300-flockfiles-simple.t
+t/400-flockfiles-forks.t
+t/500-mysql-simple.t
+t/550-mysql-forks.t
+META.json                                Module JSON meta-data (added by MakeMaker)

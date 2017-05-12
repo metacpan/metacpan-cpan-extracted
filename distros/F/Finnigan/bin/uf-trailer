@@ -1,0 +1,313 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Declare;
+use Finnigan;
+
+my $args = new Getopt::Declare q{
+  [strict]
+  [mutex: -h -w]
+  [mutex: -a -n]
+  [mutex: -a -range]
+  [mutex: -n -range]
+  [mutex: -c -d]
+  -a[ll]		        process all ScanEvent objects
+  -c[oefficients]		print the table of conversion coefficients
+  -n[unmber] <n:0+n>		extract ScanEvent number <n>
+  -range <from:0+n> .. <to:0+n>	extract ScanEvent objects with numbers between <from> and <to>
+  -d[ump]			dump all data in each ScanEvent
+  -h[tml]			dump as html [requires: -d]
+  -w[iki]			dump in wiki table format [requires: -d]
+  -r[elative]			show relative addersess in dump [requires: -d]
+  -p[reamble]			include the full listing of ScanEventPreamble
+  <file>			input file [required]
+}
+  or exit(-1);
+
+my $file = $args->{"<file>"};
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $VERSION = $header->version;
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $VERSION);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+my $rfi = Finnigan::RawFileInfo->decode(\*INPUT, $VERSION);
+
+my $data_addr = $rfi->preamble->data_addr;
+my $run_header_addr = $rfi->preamble->run_header_addr;
+
+# fast-forward to RunHeader
+seek INPUT, $run_header_addr, 0;
+my $run_header = Finnigan::RunHeader->decode(\*INPUT, $VERSION);
+my $scan_index_addr = $run_header->scan_index_addr;
+my $trailer_addr = $run_header->trailer_addr;
+
+# fast-forward to ScanIndex
+seek INPUT, $scan_index_addr, 0;
+
+my %index;
+if ( $args->{-a} ) {
+  # An alternative way to read all entries (assuming there ever are
+  # more of them than the number between the first and the last
+  # scans specified in SampleInfo) is to read everything between the
+  # start address of ScanIndex and the address of the stream
+  # following it. Since ScanIndexEntry is a static structure, the
+  # number of entries is obtained by dividing the address offset by
+  # the entry size
+
+  my $stream_size = $trailer_addr - $scan_index_addr;
+  die "nothing to read" unless $stream_size > 0;
+
+  # Read one record and measure its size. We know it's 72, but
+  # better be indirect, and there is no time to add a recursive size
+  # method to Decoder, to calculate the expected size.
+  my $entry = Finnigan::ScanIndexEntry->decode(\*INPUT, $VERSION);
+  my $record_size = $entry->size;
+  $index{0} = $entry->values;
+
+  my $nrecords = $stream_size / $record_size;
+  die "can't fit the whole number of $record_size\-byte records between $scan_index_addr and $trailer_addr" if $stream_size % $record_size;
+  foreach my $n ( 2 .. $nrecords ) {
+    $index{$n - 1} = Finnigan::ScanIndexEntry->decode(\*INPUT, $VERSION)->values;
+  }
+}
+else {
+  # unless option --all is given, assume the index range specfied in SampleInfo is wanted
+
+  # this code is not fool-proof and is not finished! It assumes that
+  # there are exactly as many entries in ScanIndex as would fit
+  # between $first_scan and $last_scan. In other words, the internal
+  # indices and links are not checked.
+  my $first_scan = $run_header->sample_info->first_scan;
+  my $last_scan = $run_header->sample_info->last_scan;
+  if ( exists $args->{-n} ) {
+    my $n = $args->{-n}{"<n>"};
+    die "index $n is not in the range of available scan numbers ($first_scan .. $last_scan)"
+      unless $n >= $first_scan and $n <= $last_scan;
+
+    # get the first entry
+    my $entry = Finnigan::ScanIndexEntry->decode(\*INPUT, $VERSION);
+    my $size = $entry->size;
+    if ($n > 1) {
+      seek INPUT, $scan_index_addr + ($n - 1)*$size, 0;
+      $entry = Finnigan::ScanIndexEntry->decode(\*INPUT, $VERSION);
+    }
+
+    $index{$n-1} = $entry->values;
+  }
+  else {
+    my $from = exists $args->{-range} ? $args->{-range}{"<from>"} : $first_scan;
+    my $to = exists $args->{-range} ? $args->{-range}{"<to>"} : $last_scan;
+    die "inverted range: [$from .. $to]" if $from > $to;
+
+    if ( $from > $first_scan) {
+      my $size = 72; # this may be wrong!
+      seek INPUT, $scan_index_addr + ($from - $first_scan)*$size, 0;
+    }
+    foreach my $i ($from - 1 .. $to - 1) {
+      $index{$i} = Finnigan::ScanIndexEntry->decode(\*INPUT, $VERSION)->values;
+    }
+  }
+}
+
+# use Data::Dumper;
+# print Dumper(\%index);
+
+# Now go read the trailer. Because the trailer records are of variable
+# size, they are not directly addressable and all of them must be
+# read, up to the highest number in range.
+seek INPUT, $trailer_addr, 0;
+
+# read the number of ScanEvent records in the file
+my $rec;
+my $bytes_to_read = 4;
+my $nbytes = read INPUT, $rec, $bytes_to_read;
+$nbytes == $bytes_to_read
+  or die "could not read all $bytes_to_read bytes of the trailer scan events count at $trailer_addr";
+my $trailer_length = unpack 'V', $rec;
+
+# determine the range to read
+
+my @ix = sort {$a <=> $b} keys %index;
+my $from = $ix[0];
+my $to = $ix[-1];
+
+foreach my $i ( 0 .. $trailer_length - 1) {
+  my $n = $i + 1;
+  my $e = Finnigan::ScanEvent->decode(\*INPUT, $VERSION);
+  next if $i < $from;
+  if (exists $args->{-p}) {
+    say "$i\tpreamble: " . join " ", $e->preamble->list('decode');
+  }
+  if ( exists $args->{-d} ) {
+    say "\n$n:" if ( $to > $from ); # not a single record
+    if ( exists $args->{-h} ) {
+      $e->dump(style => 'html', relative => exists $args->{-r});
+    }
+    elsif ( exists $args->{-w} ) {
+      $e->dump(style => 'wiki', relative => exists $args->{-r});
+    }
+    else {
+      $e->dump(relative => exists $args->{-r});
+    }
+
+    if ($e->precursors) {
+      foreach my $p ( @{ $e->precursors } ) {
+        say "---------------------- precursors --------------------";
+        if ( exists $args->{-h} ) {
+          $p->dump(style => 'html', relative => exists $args->{-r});
+        }
+        elsif ( exists $args->{-w} ) {
+          $p->dump(style => 'wiki', relative => exists $args->{-r});
+        }
+        else {
+          $p->dump(relative => exists $args->{-r});
+        }
+      }
+    }
+
+  }
+  elsif ( exists $args->{-c} ) {
+    if ( $e->nparam ) {
+      if ($e->nparam == 4) {
+        say join("\t", $n, $e->unknown_double, $e->A, $e->B, $e->C);
+      }
+      elsif ($e->nparam == 7) {
+        say join("\t", $n, $e->unknown_double, $e->I, $e->A, $e->B, $e->C, $e->D, $e->E);
+      }
+    }
+    else {
+      say STDERR "no raw profile in this scan";
+    }
+  }
+  elsif ( exists $args->{-p} ) {
+  }
+  else { # no arguments given
+    say "$n\t$e"; # it stringifies itself
+  }
+  last if $i == $to;
+}
+
+__END__
+=head1 NAME
+
+uf-trailer - examine the ScanEvent structures in a Finnigan raw file "trailer"
+
+=head1 SYNOPSIS
+
+uf-trailer [options] file
+
+ Options:
+
+  -a[ll]                         process all ScanEvent objects
+  -c[oefficients]                print the table of conversion coefficients
+  -n[unmber] <n:0+n>             extract ScanEvent number <n>
+  -range <from:0+n> .. <to:0+n>  extract ScanEvent objects with numbers between <from> and <to>
+  -d[ump]                        dump all data in each ScanEvent
+  -h[tml]                        dump as html
+  -w[iki]                        dump in wiki table format
+  -r[elative]                    show relative addersess in dump
+  -p[reamble]                    include the full listing of ScanEventPreamble
+  <file>                         input file
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-d[ump]>
+
+Prints a table listing all fields in ScanEvent entries, with their seek
+addresses, sizes, names and values. Individual entries can be selected
+with the B<-n[umber]> option or with the B<-range> option.
+
+=item B<-n[umber]>
+
+Gives the number of a single ScanEvent to process
+
+=item B<-r[ange]>
+
+Selects a range of the ScanEvent records to process
+
+=item B<-h[tml]>
+
+Format the dump output as an html table. When multiple entries are
+specified, each will be rendered in its own table
+
+=item B<-w[iki]>
+
+Format the dump output as a wiki table.
+
+=item B<-r[elative]>
+
+Show relative addresses of all itmes in the dump. The default is to
+show the absolute seek address. (works with the -d[ump] option)
+
+=item B<-a[ll]>
+
+Process all entries, including those that may lie outside the declared
+range. It appears as though it can be possible to find more index
+entries in the file than would fit between the first and the last scan
+numbers specified in RunHeader/SampleInfo. In that case, in the
+absence of the -all option, the entries will be enumerated according
+to ScanIndex, which will be treated as a linked list -- starting with
+the entry whose index matches the first scan number.
+
+=item B<-p[reamble]>
+
+Show the translated scan event preamble for each scan on one line (useful for comparison and for spotting changes).
+
+=back
+
+=head1 DESCRIPTION
+
+B<uf-trailer> can be used to list or dump the ScanEvent records in a
+Finnigan raw file. These records are stored in a stream Thermo calls a
+"trailer", which occurs near the end of the file. Now, the "trailer"
+containing scan event descriptions is not the only stream trailing the
+data; apparently, new ones were added as the format evolved, but the
+name stuck. The code in Thermo libraries refers to this stream as
+"TrailerScanEvent".
+
+=head1 SEE ALSO
+
+Finnigan::ScanEvent
+
+Finnigan::ScanEventPreamble
+
+Finnigan::FractionCollector
+
+Finnigan::Reaction
+
+=head1 EXAMPLES
+
+=over 4
+
+=item List all scan events in the file using Thermo's short-hand notation known as "filter line":
+
+  uf-trailer sample.raw
+
+=item List the first five records:
+
+  uf-trailer -range 1 .. 5 sample.raw
+
+=item Dump the fifth ScanEvent with relative addresses:
+
+  uf-trailer -drn 5 sample.raw
+
+=back
+
+=cut

@@ -1,0 +1,20 @@
+Revision history for Fuse::TagLayer
+
+0.12	2013-12-09
+	- backends are modular now
+	- new option: --backend
+	- pure Perl backend
+
+0.11	unreleased
+	- enforce current min. tag-length of 2 for all tag-sources
+	- new option: --ignore-numbers-only
+	- Changes file
+	- typos fixed, rephrasing in pod, elaborated
+	- assume xattribs to be in utf8, and decode
+	- repository metadata in Makefile.PL
+
+0.10	2013-02-17
+	- CPAN compatible README and tiny POD tweak
+
+0.09	2013-02-13
+	First public version, released on an unsuspecting world.

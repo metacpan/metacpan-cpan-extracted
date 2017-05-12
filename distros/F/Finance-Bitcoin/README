@@ -1,0 +1,32 @@
+NAME
+    Finance::Bitcoin - manage a bitcoin instance
+
+DESCRIPTION
+    Bitcoin is a peer-to-peer network based digital currency.
+
+    This module provides high and low level APIs for managing a running
+    bitcoin instance over JSON-RPC.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    Finance::Bitcoin::API, Finance::Bitcoin::Wallet,
+    Finance::Bitcoin::Address.
+
+    <http://www.bitcoin.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2010, 2011, 2013, 2014 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,9 @@
+# Dzil build directories
+/File-Utils*
+[._][Bb]uild/
+release*
+# Temp files
+*.bak$
+*.swp$
+.gitnxtver_cache
+

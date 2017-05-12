@@ -1,0 +1,13 @@
+Revision history for Perl extension Finance::ChartHist.
+
+0.01  Mon Dec 30 15:29:53 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Finance::ChartHist
+
+0.02  Fri Jan 03 09:12:00 2003
+	- Added missing prerequisites to Makefile.PL
+
+0.03 Fri Mar 09 19:12:00 2007
+        - Fixed prerequisites in Makefile.PL, again
+        - Updated usage of Finance::QuoteHist
+        - Added format argument to save_chart()

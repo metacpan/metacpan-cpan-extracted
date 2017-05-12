@@ -1,0 +1,344 @@
+Changes for Perl extension File-HomeDir
+
+1.002	2017-04-06
+    - regenerate README.md with correct encoding settings
+
+1.001_001	2017-03-29
+    - switch to ExtUtils::MakeMaker
+    - compatibility with blead
+
+1.00 2012-10-19
+	- No functional changes
+	- Updating to Module::Install 1.06
+	- Don't require documents directory on Mac under AUTOMATED_TESTING
+
+0.99 2012-01-26
+	- Updating to Module::Install 1.04
+	- Removed deprecated interfaces from the documentation
+	- Don't require music and video directories in FreeDesktop tests
+	- The use of deprecated %~ now emits a warning
+
+0.98 2011-07-07
+	- Updating to Module::Install 1.01
+	- If Win32::GetFolderPath returns a \\UNC type path do not do the
+	  normal -d sanity check, as strange and unusual bugs may occur.
+
+0.97 2011-02-20
+	- Looks good, moving to production release
+	- This should finally pass on ActivePerl Mac
+
+0.96_04 2011-02-01
+	- Typo in 11_darwin.t
+
+0.96_03 2011-01-31
+	- Return undef in list context on Mac as per the documentation
+
+0.96_02 2011-01-31
+	- No longer assume we have Application Support, sigh
+
+0.96_01 2011-01-31
+	- Removed a dubious "different users have different data" test on Macs
+	- Removed tests for legacy %~ interface
+
+0.95 2011-01-31
+	- Switch to prod version
+
+0.94_01 2010-12-14
+	- More special casing in tests to deal with stripped down non-root
+	  Mac environments (mostly to make BINGOS' automated testing pass)
+
+0.93 2010-09-15
+	- Production release, no changes from 0.92_05
+
+0.92_05 2010-09-13
+	- use Mac::SystemDirectory for each Darwin based MacOS. (REHSACK)
+
+0.92_04 2010-09-10
+	- Be less strict about desktop and others on FreeDesktop (ADAMK)
+
+0.92_03 2010-09-06
+	- Adding experimental support for my_dist_config() (JQUELIN)
+	- Adding diag comment on which drivers gets used (ADAMK)
+
+0.92_02 2010-06-28
+	- Updating to Module::Install 1.00 (ADAMK)
+	- Add a bit more docs, and tweak the existing stuff a bit (ADAMK)
+	- Deprecated the %~ interface. It will continue to exist as an
+	  undocumented legacy interface until 2015, warnings will be
+	  issued from 2013 (ADAMK)
+	- On FreeDesktop.org systems, root often does not have the relevant
+	  directories. Skip tests for them in the same way as we do for the
+	  Mac root users on darwin (GARU)
+
+0.92_01 2010-06-11
+	- Updating to Module::Install 0.99 (ADAMK)
+	- Adding experimental support for my_dist_data() (JQUELIN)
+
+0.91 2010-05-23
+	- Moving the FreeDesktop driver to prod
+	- Adding File::HomeDir::Test driver
+
+0.90_04 2010-02-12
+	- Adding missing prereq
+
+0.90_03 2010-02-09
+	- Using FreeDesktop implementation only if xdg-user-script is
+	  present, since it's now what's been used internally. This should
+	  prevent test failures seen in _02. (JQUELIN)
+	
+0.90_02 2010-01-14
+	- Adding support for the alternate FreeBSD xdg directory (JQUELIN)
+	- Improved specification compliance (DAXIM)
+
+0.90_01 2010-01-07
+	- WARNING: This release introduces a major backwards incompatibility
+	  for Unix users. The results returned by most methods may change.
+	- Added complete implementation of the FreeDesktop specification and
+	  auto-detection of the Unix hosts to which it applies (JQUELIN)
+	- 01_compile.t now loads all backends (since on most platforms,
+	  most backends will never normally be loaded).
+
+0.89 2010-01-03
+	- Loosen the testing intensity on Darwin Carbon backends to prevent
+	  issues with consumer directories prevent installation entirely.
+
+0.88 2009-11-24
+	- Switching to a production release
+
+0.87_01 2009-10-03
+	- First developer implementation of improved Mac support
+
+0.86 2009-03-27
+	- Bug fix for the 64-bit implementation
+
+0.85_01 2009-03-27
+	- For 64-bit perl on Darwin, fall back to File::HomeDir::Unix
+	  as Mac::Carbon is not available
+
+0.84 2009-03-11
+	- Adds support for $ENV{HOME} on Darwin
+	- Other bug fixes on Darwin (MIYAGAWA)
+
+0.83_01 2008-11-01
+	- Patch from Darin McBride to fix user_home on Darwin.
+
+0.82 2008-10-14
+	- When we get more than one warning, diag the warnings 
+	  so that we have actually have a chance to get rid of
+	  the extra warnings.
+
+0.81 2008-07-03
+	- Updating to Module::Install 0.77
+	- Localising $@ during evals
+	- Updating Perl version dependency to 5.00503
+
+0.80 2008-06-27
+	- All clear on the CPAN Testers front, flipping to production
+
+0.71_03 2008-06-25
+	- Removing the Server 2003 and 2008 skips that should work
+	  now that we create directories on demand.
+	- File::HomeDir should now support "Perl on a Stick"
+
+0.71_02 2008-04-28
+	- Added `my_dot_config`.
+	- Adding a base driver class.
+
+0.71_01 2008-04-04
+	- Converted from Registry checks to Win32 calls.
+	  This includes giving it the "create directory" call.
+	- Removing the dependency on the registry modules.
+
+0.70    2008-02-28
+	- Windows Server 2003 does not have Music/Pictures/etc directories
+	  (correct the test to not expect them to exist)
+	- Make the same assumption about Windows Server 2008
+
+0.69    2008-02-03
+	- No changes, incrementing for production release
+
+0.68_01 2008-01-22
+	- Fixed folder detection on Darwin so that symlinks that resolve to
+	  directories are considered valid folders. Patch from David Wheeler.
+
+0.67    2007-12-06
+	- No functional changes, no need to upgrade.
+	- Upgrading to Module::Install 0.68
+	- Updating bundled author tests
+
+0.66    2007-08-25
+	- No functional changes, no need to upgrade.
+	  (This release attempts to regain 100% CPAN Testers results)
+	- Spurious failures on some path-levels of 5.9.0 due to a warnings
+	  bug regression. Skip the relevant test on Perl 5.9.0.
+	- Remove a -w flag in 02_main.t so test run under tainting
+
+0.65    2007-03-21
+	- Add a special case to pass users_home(current user) on to my_home
+	  (This prevents tests failing when you manually set HOME to lie
+	   about your home directory. This was mostly preventing installation
+	   with "sudo cpan -i File::HomeDir".
+	- Upgraded to Module::Install 0.65
+
+0.64    2017-02-08 (Stephen Steneker)
+	- Add Makefile prequisite for a version of Mac::Carbon that properly supports Intel macs .. default Tiger install includes a buggy version [RT#24222]
+	- No other changes from 0.63
+
+0.63    2017-01-09
+	- The ability to overload HOME on any platform, even Win32, is
+	  apparently desirable. So now we support the use of HOME on Win32
+	  for that specific case.
+
+0.62    2017-01-02
+	- On WinXP, the My Videos directory (and registry entry) does not
+	  exist by default. It is created the first time Windows Movie Maker
+	  is run.
+	- Skip the My Videos test on WinXP as a result
+
+0.61    2017-01-02
+	- Verified the previous version on Win2K, WinXP, Linux and Mac OS X.
+	- Verified as a normal user, root and nobody on most of these.
+	- No change other than converting the version to a release version.
+
+0.60_13 2017-01-01
+	- Lets try that again
+
+0.60_12 2017-01-01
+	- Skip an unreliable test on older Perls
+
+0.60_11 2017-01-01
+	- Reduced the basic version dependencies on Mac OS because they
+	  were unnecesary on that platform, and now Mac users don't need
+	  to upgrade PathTools.
+
+0.60_10 2017-01-01
+	- More testing problems on Win2K
+	- Adding a dependency on Win32 to access Win32::GetOSName
+	  (Dependency issues could make this backfire, so maybe will
+	   need another test cycle or two to make sure it works)
+
+0.60_09 2017-01-01
+	- Sigh... cases are now known to exist where users
+	  do not have home directories. Tests refactored
+	  AGAIN do allow the "nobody" user to pass the test
+	  suite. Don't ask me WHY people might need to install
+	  a module as nobody. I don't know.
+
+	  But now the test suite accomodates that.
+
+	- On Unix, if the home directory does not exist, for
+	  example /nonexistant, it means the user does NOT have
+	  a home directory. So in those cases, return undef
+	  instead of the /nonexistant directory.
+
+0.60_08 2017-01-01
+	- Problems with Win2k hopefully finally resolved
+
+0.60_07 2006-12-19
+	- Problems with testing continue to plague the module...
+
+0.60_06 2006-12-15
+	- Another attempt to fix the getpwuid problem
+
+0.60_05 2006-12-12
+	- Removed a build-time dependency on getpwuid
+
+0.60_04 2006-11-02
+	- win32: add support for my_pictures, my_videos
+	- darwin: add support for my_music, my_pictures, my_videos
+	- Skip "root" tests on darwin, not supported
+	- add POD docs with examples for o/s specific implementations
+
+0.60_03 2006-09-20
+	- Cleaned up the way unimplemented method exceptions are thrown.
+	- Fleshed out the docs a bit more.
+	- Added an initial implementation of my_music
+
+0.60_02 2006-07-14
+        - Altered testing to allow cases where there are no "toys" directories
+        - More cleanups for Darwin in the root case
+        - Updating dependencies to something more modern
+          (mostly to ensure certain fixes to certain problems exist)
+
+0.60_01 2006
+	# Introduces back-compatibility issues
+	- No longer treat lack of a home directory as an error
+	- More test written on the Israel.pm monthly meeting
+	- Major upgrade to Darwin driver (CNANDOR)
+
+0.58 2006-05-10
+	# No functional changes, upgrading has no benefit.
+	- Upgrade Module::Install to 0.62 final
+	- AutoInstall is only needed for options, so remove auto_install
+
+0.57 2006-03-10 Adam Kennedy  adamk@cpan.org
+	# No functional changes, upgrading has no benefit.
+	- Upgraded Module::Install to 0.62
+	  (M:I is relatively sane from 0.61)
+	- Removing all use of UNIVERSAL::isa (the function)
+	- Adding missing use Carp() in a couple of cases
+	- Minor POD changes
+
+0.56 2006-03-10 Adam Kennedy  adamk@cpan.org
+	# No functional changes, upgrading has no benefit.
+	- I screwed up Module::Install 0.58
+	- Fixed that, then incremented version to fix this
+
+0.55 2006-03-05 Adam Kennedy  adamk@cpan.org
+	# No functional changes, upgrading has no benefit.
+	- Documentation bug fix
+	- Documented the todo list
+	- Updated Module::Install to 0.58
+
+0.54 2006-02-27 Adam Kennedy  adamk@cpan.org
+	- Adding a dependency of Win32::TieRegistry's, so this installs.
+	- Will remove it later when that bug is fixed in Win32::TieRegistry
+
+0.53 2006-02-27 Adam Kennedy  adamk@cpan.org
+	- Typo caused Makefile.PL not to require Win32::TieRegistry on Win32
+	- Upgraded to Module::Install 0.57
+
+0.52 2005-01-04 Adam Kennedy  adamk@cpan.org
+	- Added initial Darwin support.
+
+0.51 2005-12-30 Adam Kennedy  adamk@cpan.org
+	- Fixed a typo where I left the require of the Windows module
+	  as Win32. (Randy Kobes)
+
+0.50 2005-12-26 Adam Kennedy  adamk@cpan.org
+	- Rewrote the guts entirely to split functionality out into
+	  platform-specific submodules, and to add more specialised
+	  code for Win32.
+
+0.07 2005-11-09 Adam Kennedy  adamk@cpan.org
+	- Near-complete rewrite to modernise and prepare to
+	  start merging in File::HomeDir::Win32.
+
+	- "Traded" module in exchange for Data::JavaScript::Anon :)
+	- Replaced Makefile.PL with Module::Install-based version that lists
+	  its dependencies in a platform-sensitive way.
+	  This also removes the need for evals.
+	- Replaced tests with Test::More-based ones and improved
+	  coverage.
+	- Put the platform-specific code into if ( CONSTANT ) blocks
+	  so they will compile out.
+	- Otherwise cleaned up and improved the layout of the code
+	- Added support for $ENV{HOMEDIR} and $ENV{HOMEPATH} on Win32
+	- More-explicit testing before we return a path
+	- Keep caching user home, but NOT "my" home in case the
+	  process changes user.
+
+0.06 2004-12-29  Sean M. Burke  sburke@cpan.org
+	# No functional changes, upgrading has no benefit.
+	- just rebundling.  No code changes.
+
+0.05 2000-12-09  Sean M. Burke  sburke@cpan.org
+	- adding MSWin code to consult the registry,
+	  as helpfully suggested by Richard Soderberg <rs@crystalflame.net>.
+	- Tweaked MacPerl code a bit.
+
+0.04 2000-12-09  Sean M. Burke  sburke@cpan.org
+	- just fixing incidental typos in the POD.
+
+0.03 2000-12-08  Sean M. Burke  sburke@cpan.org
+	-  first public release.

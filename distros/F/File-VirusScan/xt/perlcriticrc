@@ -1,0 +1,17 @@
+[-CodeLayout::ProhibitHardTabs]
+
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+[-Subroutines::ProhibitExplicitReturnUndef]
+
+[-Modules::RequireVersionVar]
+
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-CodeLayout::RequireTidyCode]
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-Documentation::RequirePodSections]

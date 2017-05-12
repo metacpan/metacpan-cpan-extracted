@@ -1,0 +1,22 @@
+TODO list for File::BOM
+
+Iron out bugs in the PerlIO::via interface.
+
+  o Investigate bugs in PerlIO::via - patch?
+    - patched XS code and tested locally.
+    o get patch submitted
+      - done! perl 5.8.7 doesn't have this bug
+
+  o There are still problems with PerlIO::via. seek and tell don't work terribly
+    well. This really needs to get raised via perlbug, I think. Other
+    PerlIO::via modules don't support seek and tell at all.
+
+Test coverage
+  o Currently can't get Devel::Cover working on Perlio::via tests.
+
+    Bizarre copy of HASH in aassign at /usr/local/lib/perl5/5.8.5/i686-linux/B.pm line 225.
+
+    with newest Devel::Cover:
+
+    Bizarre copy of ARRAY in aassign at /usr/local/lib/perl5/5.8.5/i686-linux/B.pm line 225.
+

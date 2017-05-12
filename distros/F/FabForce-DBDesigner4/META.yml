@@ -1,0 +1,25 @@
+---
+abstract: 'Parse/Analyse XML-Files created by DBDesigner 4 (FabForce)'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FabForce-DBDesigner4
+requires:
+  Carp: '1.04'
+  Exporter: '5.58'
+  IO::File: '1.1'
+  XML::Twig: '3.32'
+  XML::Writer: '0.6'
+resources:
+  bugtracker: http://github.com/reneeb/FabForce-DBDesigner4/issues
+  homepage: http://github.com/reneeb/FabForce-DBDesigner4
+  repository: http://github.com/reneeb/FabForce-DBDesigner4.git
+version: '0.34'

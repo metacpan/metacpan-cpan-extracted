@@ -1,0 +1,11 @@
+CHANGELOG
+lib/File/Slurp/Remote/BrokenDNS.pm
+lib/File/Slurp/Remote.pm
+lib/File/Slurp/Remote/SmartOpen.pm
+lib/File/Slurp/Remote/CanonicalHostnames.pm
+lib/Tie/Function/Examples.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/remote_slurp.t
+t/tiefunc.t

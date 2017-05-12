@@ -1,0 +1,23 @@
+---
+abstract: 'Handy collection of file-related tools.'
+author:
+  - 'Kurt Kincaid <kurt.kincaid@gmail.com>'
+build_requires:
+  Moose: 0
+  Test::More: 0
+  feature: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Butler
+provides:
+  File::Butler:
+    file: lib/File/Butler.pm
+    version: v4.0.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v4.0.0

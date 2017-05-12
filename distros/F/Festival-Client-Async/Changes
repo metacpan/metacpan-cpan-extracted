@@ -1,0 +1,21 @@
+Revision history for Perl extension Festival::Client::Async
+
+0.0303 Tue Jan 15 15:44:06 EST 2002
+	- Fix problems that happen when the stuff key gets split
+	  between two chunks of data.
+
+0.0302 Wed Aug 22 13:46:48 EDT 2001
+	- Long time no see, eh?
+	- Add parse_lisp() function
+	- Fix testsuite
+	- Make server_eval_sync() use the server_eval() core
+
+0.0301 Thu Apr  5 14:38:47 EDT 2001
+	- Argh!  Precedence lossage made server_eval_sync error returns break.
+	- This version submitted to CPAN.
+
+0.03 Tue Mar 27 11:55:07 EST 2001
+	- First external release.
+	- Revised the protocol handling significantly from previous
+	  versions.  This makes it a lot faster, though it
+	  unfortunately broke some (wrong) assumptions in PoCo::Festival.

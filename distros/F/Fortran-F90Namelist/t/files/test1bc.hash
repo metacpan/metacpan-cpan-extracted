@@ -1,0 +1,33 @@
+# test1bc.hash                             -*-cperl-*-
+#
+# Name and hashref for the namelist in test1{b,c}.nml
+#
+$name = 'nlist';
+
+$slotsref = [
+             'string_var',
+             'int_var',
+             'real_var',
+             'double_var',
+             'complex_var',
+             'dcompl_var',
+            ];
+
+$hashref =
+  {
+   'string_var'   => { value => [ 'A simple string' ],
+		       stype => 'single-quote string',    type => 1 },
+   'int_var'      => { value => [ 14 ],
+		       stype => 'integer',                type => 4 },
+   'real_var'     => { value => [ -0.5 ],
+		       stype => 'unspecified float',      type => 5 },
+   'double_var'   => { value => [ '1.D4' ],
+		       stype => 'double precision float', type => 7 },
+   'complex_var'  => { value => [ '(1.234,5.678)' ],
+		       stype => 'complex number',         type => 8 },
+   'dcompl_var'   => { value => [ '(3.14D0, 2.718D0)' ],
+		       stype => 'double precision complex number',
+		       type => 9 }
+  };
+
+$nslots = (keys %$hashref)+0.;

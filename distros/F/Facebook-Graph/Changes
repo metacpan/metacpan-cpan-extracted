@@ -1,0 +1,182 @@
+1.1202 2017-04-03
+ - Found and fixed the conflicting version number that CPAN was complaining about.
+
+1.1201 2017-04-03
+ - Attempting to overcome some sort of CPAN glitch.
+
+1.1200 2017-04-03
+ - Updated to 2.8 Graph API.
+ - Removed add_like() as it was removed in the 2.4 API and above.
+ - Removed add_link() as it was removed in the 2.4 API and above.
+
+1.1101 2016-03-09
+ - Fixes typo in user agent class exception message. (Olaf)
+
+1.1100 2015-10-22
+ - Exposed API so you can pass in extra parameters such as api_version to override some of the defaults.
+ - Allow v2.3 styled /oauth/access_token response thanks to oklahomer.
+ - Switched back to LWP thanks to jussikinnula.
+
+1.1000 2015-03-20
+ - More POD thanks to Nathan Handy.
+ - Upgraded to Facebook Graph v2.2 API, and all the changes that come with it.
+ - Allow for Facebook's versioned URLs.
+ - Removed the following APIs as they are no longer supported in Facebook's Graph v2 API: FQL, publishing notes, publishing events
+ - You can no longer do public queries (queries without an access token).
+ - You can no longer do queries using usernames or object names, you must use object ids.
+ - Removed "display" from Facebook::Graph::Authorize as Facebook no longer supports it.
+
+1.0900 2014-12-25
+ - Replace Any::Moose in favor of Moo.
+
+1.0801 2014-09-07
+ - Fix for hash randomization thanks to syohex.
+
+1.0800 2014-09-07
+ - Added Facebook::Graph::Feed thanks to hurricup.
+ - Fix failed test 'exception gives good detail' thanks to guillaumeaubert.
+ - More tests.
+
+1.0700 2014-05-30
+ - POD fixes thanks to dsteinbrunner
+ - fix typos thanks to dsteinbrunner
+ - Added request_extended_access_token thanks to srchulo
+ - Improved error message on access token expiration.
+
+1.0600 2013-05-13
+ - Added the $fb->request() method.
+
+1.0502 2013-05-07
+ - Added AnyEvent::TLS as a prereq. Should get rid of the CPAN complaints about not having TLS.
+
+1.0501 2013-05-06
+ - Fixed a version number issue with AnyEvent::HTTP::LWP::UserAgent thanks to Rsrchboy.
+ - Now pulling contributors list from git thanks to Rsrchboy.
+ - Fixed some problems with add_photo() thanks to Sebastian Wernerus.
+
+1.0500 2012-11-15
+ - Added batch requests. Thanks to fayland.
+ - Fix: Facebook no longer allows public queries. Thanks to spazm.
+ - Added authentication test.
+ - Fixed some other failing tests due to Facebook changes.
+ - Started making Facebook::Graph async. Still working deciding on callback API, so left out true async in this release.
+ - WARNING: "ua" method no longer available from Facebook::Graph.
+
+1.0401 2012-05-07
+ - Added impersonation recipe.
+
+1.0400 2012-04-11
+ - Added a date format option to find. Thanks to jwieland.
+ - Added better FQL handling. Thanks to vielmath.
+ - Added photo publishing. Thanks to c0decafe.
+ - Documented the "ua" parameter on Facebook::Graph->new().
+ - Replaced URI::Encode with URI::Escape.
+ - Fixed a failing test due to changes in the Facebook API.
+
+1.0301 2011-10-18
+ - Merged custom user agent. Thanks to typester.
+
+1.0300 2011-04-30
+ - Merged 'properties' in Post graph from Fayland Lam.
+ - Now require LWP 6 to eliminate SSL problems with CPAN Testers, and just because that's the way everybody should be moving anyway.
+ - Now using Ouch instead of Exception::Class.
+
+1.0200 2011-03-15
+ - Made Digest::SHA an optional component. Thanks to Mark Carey.
+ - Added the ability to publish checkins to Facebook.
+ - Documented an easy way to take a relationship URL passed back from Facebook and turn it into a Facebook::Graph::Response object.
+
+1.0100 2011-01-04
+ - Added Facebook::Graph::Query::from. Inspired by a pull request from Dan
+  Magnuszewski.
+
+1.0000 2010-12-09
+ - Updated recipe2 example to use more modern Dancer features.
+ - Merged POD patch from fayland.
+ - Can now post posts and events directly to other pages you control without
+  switching access tokens.
+ - Added set_source(), set_privacy(), set_actions(), add_actions(),
+  set_target_countries(), set_target_cities(), set_target_regions(), and
+  set_target_locales to Facebook::Graph::Publish::Post.
+ - Changed get_post_params() in Facebook::Graph::Publish to return an array ref
+  instead of a hash ref.
+ - Now requires Exception::Class.
+
+ NOTE: This version is not backward compatible with previous versions because
+ the get_post_params() method in Facebook::Graph::Publish now returns an array
+ ref rather than a hash ref. However, if you didn't extend this module, then you
+ likely aren't calling this method anywhere, so for you the module will remain
+ backward compatible. This is the reason for the major version number increase.
+
+ NOTE2: This version is not backward compatible with previous versions because
+ we are no longer throwing array based exceptions. Instead the exceptions are
+ Exception::Class based. If you don't care about exception formatting then this
+ module will still be backward compatible for you.
+
+0.0705 2010-09-26
+ - Missed a spot in 0.0704.
+
+0.0704 2010-09-26
+ - Fixed a problem with access token encoding.
+
+0.0703 2010-09-26
+ - Documented Response's as_string method.
+ - Facebook changed their damn API yet again, so that is now fixed, AGAIN!
+
+0.0702 September 1, 2010
+ - Facebook changed their API slightly and it broke stuff, so that is now fixed.
+ - Added link to the cookbook from the main page.
+
+0.0701 August 17, 2010
+ - Added a link to the talk I gave at MadMongers about Facebook::Graph. It could be useful to people getting started with Facebook::Graph.
+
+0.0700 August 13, 2010
+ - Added recipe #2 to the cookbook.
+ - Added signed request support for canvas applications. Thanks to Rainer Größlinger.
+ - New prereqs: Digest::SHA and MIME::Base64::URLSafe.
+
+0.0600 August 11, 2010
+ - Fixed a runtime error created in 0.0500.
+ - Added likes publishing.
+ - Added comment publishing.
+ - Added note publishing.
+ - Added link publishing.
+ - Added event publishing.
+ - Added RSVPs for events.
+
+0.0500 August 10, 2010
+ - Added feed/wall publishing.
+
+0.0402 July 15, 2010
+ - Fixed a pod error.
+
+0.0401 July 14, 2010
+ - Added a cookbook and the first recipe.
+ - Made the third element of the exception, the original exception type from Facebook.
+ - Fixed a bug with the Any::Moose transition.
+
+0.0400 July 13, 2010
+ - Added Facebook::Graph::Picture for accessing the pictures of any object.
+ - Fixed POD docs thanks to Tim Heaney for the patch.
+ - Migrated to Any::Moose for those people that want to use Mouse instead of Moose. Thanks to tehmoth for the patch.
+ - Added a note about using IO::Socket::SSL instead of Crypt::SSLeay. Thanks to Søren Lund for the idea.
+
+0.0300 July 11, 2010
+ - Added convert_sessions method to make it easier for existing apps to use Facebook::Graph. Thanks to Rainer Größlinger for the idea.
+ - Converted Facebook::Graph::Query::Response into Facebook::Graph::Response, so it could be generically used and/or subclassed by other modules.
+
+0.0201 July 10, 2010
+ - Better error messages on failed queries.
+ - Fixed the AccessToken parsing problem.
+ - Fixed another POD formatting problem.
+ - More cleanup.
+ - Modified the fetch() method to use the Query module behind the scenes.
+
+0.0200 July 9, 2010
+ - Added the Facebook::Graph::Query API, which allows for powerful searching of Facebook data.
+ - Fixed a bunch of AccessToken and Authorize bugs.
+ - Fixed a bunch of POD formatting problems.
+ - Replaced URL with URI everywhere for consistency.
+
+0.0100 July 8, 2010
+ - Initial public release.

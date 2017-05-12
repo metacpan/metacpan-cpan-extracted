@@ -1,0 +1,8 @@
+1.2    2010-01-22    Bug fixes suggested by Daniel Muey (RT 50067)
+
+1.1    2009-04-10    Bug fix in tests for Win32 - can't delete open
+                       files
+                     Note that in docs
+                     Add full text of licences
+
+1.0    2006-01-29    first release

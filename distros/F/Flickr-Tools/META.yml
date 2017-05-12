@@ -1,0 +1,41 @@
+---
+abstract: 'Tools to assist using the Flickr API'
+author:
+  - 'Louis B. Moore <lbmoore@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::TypeTiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Flickr-Tools
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CHI: '0'
+  Cache: '0'
+  Carp: '0'
+  Flickr::API: '1.26'
+  Flickr::API::Cameras: '1.26'
+  Flickr::API::Reflection: '1.26'
+  Moo: '0'
+  Moo::Role: '0'
+  Test::More: '0'
+  Test::TypeTiny: '0'
+  Type::Library: '0'
+  Type::Params: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  namespace::clean: '0'
+  perl: '5.010'
+  strictures: '0'
+resources:
+  repository: https://github.com/lbmoore/perl-Flickr-Tools
+version: '1.22'

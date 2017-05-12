@@ -1,0 +1,101 @@
+--- Fl_Text_Editor.cxx.orig	Wed Aug 23 07:30:37 2000
++++ Fl_Text_Editor.cxx	Mon Sep 25 13:44:25 2000
+@@ -56,7 +56,7 @@
+   int state;
+   Fl_Text_Editor::Key_Func func;
+ } default_key_bindings[] = {
+-  { FL_Escape,    FL_TEXT_EDITOR_ANY_STATE, Fl_Text_Editor::kf_ignore     },
++  { FL_Escape,    FL_TEXT_EDITOR_ANY_STATE, Fl_Text_Editor::kf_ignore    },
+   { FL_Enter,     FL_TEXT_EDITOR_ANY_STATE, Fl_Text_Editor::kf_enter      },
+   { FL_KP_Enter,  FL_TEXT_EDITOR_ANY_STATE, Fl_Text_Editor::kf_enter      },
+   { FL_BackSpace, FL_TEXT_EDITOR_ANY_STATE, Fl_Text_Editor::kf_backspace  },
+@@ -94,9 +94,9 @@
+   { FL_Down,      FL_CTRL|FL_SHIFT,         Fl_Text_Editor::kf_c_s_move   },
+   { FL_Page_Up,   FL_CTRL|FL_SHIFT,         Fl_Text_Editor::kf_c_s_move   },
+   { FL_Page_Down, FL_CTRL|FL_SHIFT,         Fl_Text_Editor::kf_c_s_move   },
+-//{ FL_Clear,	  0,                        Fl_Text_Editor::delete_to_eol },
+-//{ 'z',          FL_CTRL,                  Fl_Text_Editor::undo	  },
+-//{ '/',          FL_CTRL,                  Fl_Text_Editor::undo	  },
++//{ FL_Clear,    0,                        Fl_Text_Editor::delete_to_eol },
++//{ 'z',          FL_CTRL,                  Fl_Text_Editor::undo    },
++//{ '/',          FL_CTRL,                  Fl_Text_Editor::undo    },
+   { 'x',          FL_CTRL,                  Fl_Text_Editor::kf_cut        },
+   { 'c',          FL_CTRL,                  Fl_Text_Editor::kf_copy       },
+   { 'v',          FL_CTRL,                  Fl_Text_Editor::kf_paste      },
+@@ -120,7 +120,28 @@
+       if (current->state == FL_TEXT_EDITOR_ANY_STATE || current->state == state)
+         break;
+   if (!current) return 0;
+-  return current->function;
++  return ((current->function)? current->function : 0);
++}
++
++Fl_Text_Editor::Key_Func0
++Fl_Text_Editor::bound_key_function(int key, int state, void* data, 
++                                   Key_Binding* list) {
++  Key_Binding* current;
++  for (current = list; current; current = current->next)
++    if (current->key == key)
++      if (current->state == FL_TEXT_EDITOR_ANY_STATE || current->state == state)
++        break;
++  if (!current) return 0;
++  return ((current->dfunction)? current->dfunction : 0);
++}
++
++void*
++Fl_Text_Editor::lookup_binding_data(int key, int state, Key_Binding* list) {
++  Key_Binding* current;
++  for (current = list; current; current = current->next)
++    if (current->key == key)
++      if (current->state == FL_TEXT_EDITOR_ANY_STATE || current->state == state)        break;
++  return ((current)? current->data : 0);
+ }
+ 
+ void
+@@ -151,10 +172,24 @@
+   kb->key = key;
+   kb->state = state;
+   kb->function = function;
++  kb->dfunction = NULL;
++  kb->data = NULL;
+   kb->next = *list;
+   *list = kb;
+ }
+ 
++void
++Fl_Text_Editor::add_key_binding(int key, int state, Key_Func0 f, void* data,
++                                Key_Binding** list) {
++  Key_Binding* kb = new Key_Binding;
++  kb->key = key;
++  kb->state = state;
++  kb->function = NULL;
++  kb->dfunction = f;
++  kb->data = data;
++  kb->next = *list;
++  *list = kb;
++}
+ ////////////////////////////////////////////////////////////////
+ 
+ #define NORMAL_INPUT_MOVE 0
+@@ -208,7 +243,7 @@
+       // make two ^A's in a row do select-all:
+       int i = e->buffer()->line_start(e->insert_position());
+       if (i != e->insert_position())
+-	e->insert_position(i);
++  e->insert_position(i);
+       else kf_select_all(0, e);
+       break;}
+     case FL_End:
+@@ -383,6 +418,12 @@
+   if (!f) f = bound_key_function(key, state, key_bindings);
+ 
+   if (f) return f(key, this);
++
++  Key_Func0 df = 0;
++  void *data;
++  data = lookup_binding_data(key, state, key_bindings);
++  if (data) df = bound_key_function(key, state, data, key_bindings);
++  if (df) return df(key, this, data);
+   if (default_key_function_ && !state) return default_key_function_(c, this);
+   return 0;
+ }

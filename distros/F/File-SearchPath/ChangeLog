@@ -1,0 +1,12 @@
+2010-12-03  Tim Jenness  <tjenness@cpan.org>
+
+	* SearchPath.pm: Fix RT #55495 (from Peter Edwards)
+
+	* Build.PL: Switch to Module::Build
+
+2008-03-16  Tim Jenness  <tjenness@cpan.org>
+
+	* SearchPath.pm (_env_to_dirs): Use $Config{path_sep} rather than hard-coded ":"
+	if Env::Path is not present. (thanks to David Golden)
+
+	* t/search.t: Do not throw away volume information

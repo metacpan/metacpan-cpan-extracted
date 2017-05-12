@@ -1,0 +1,66 @@
+HTML::FormValidator
+===================
+
+Version: 0.11
+
+Description
+-----------
+
+HTML::FormValidator validates user input (usually from an HTML form)
+based on an input profile. It's main aim is to make the tedious coding
+of input validation expressible in a simple format and to let the
+programmer focus on more interesting task.
+
+When you are coding web application one of the most tedious though
+crucial task is to validate user's input (usually submitted by way of
+an HTML form). You have to check that each required fields is present
+and that some feed have valid data. (Does the phone input looks like a
+phone number ? Is that a plausible email address ? Is the YY state
+valid ? etc.) For simple form, this is not really a problem but as
+forms get more complex and you code more of them this task became
+really boring and tedious.
+
+HTML::FormValidator lets you defines profiles which defines the
+required fields and their format. When you are ready to validate the
+user's input, you tell HTML::FormValidator the profile to apply to the
+user data and you get the valid fields, the name of the fields which
+are missing, the name of the fields that contains invalid input and
+the name of the fields that are unknown to this profile.
+
+You are then free to use this information to build a nice display to
+the user telling which fields that he forgot to fill.
+
+Installing
+----------
+
+The usual:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Documentation
+-------------
+
+Documentation is included in POD format.
+
+Bugs
+----
+
+Send bug reports and suggestions to <bugs@Contre.COM>
+
+Authors
+-------
+
+Francis J. Lacoste <francis.lacoste@Contre.COM>
+
+Copyright
+---------
+
+Copyright (c) 1999, 2000 iNsu Innovations Inc. 
+Copyright (c) 2001, 2002 Francis J. Lacoste
+All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/File/System.pm
+lib/File/System/Globber.PL
+lib/File/System/Layered.pm
+lib/File/System/Object.pm
+lib/File/System/Passthrough.pm
+lib/File/System/Real.pm
+lib/File/System/Table.pm
+lib/File/System/Test.pm
+MANIFEST			This list of files
+README
+t/01_normalize_path.t
+t/02_glob.t
+t/03_real.t
+t/04_table_basic.t
+t/05_table_multimount.t
+t/06_table_mount.t
+t/07_layered.t
+t/08_passthrough.t
+META.yml
+Makefile.PL

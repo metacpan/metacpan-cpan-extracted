@@ -1,0 +1,31 @@
+NAME
+    File::Find::Rule::DIZ - Rule to match the contents of a FILE_ID.DIZ
+
+SYNOPSIS
+        use File::Find::Rule::DIZ;
+
+        my @files = find( diz => { text => qr/stuff and things/ }, in => '/archives' );
+
+DESCRIPTION
+    This module will search through a ZIP archive, specifically the contents
+    of the FILE_ID.DIZ file in the archive.
+
+METHODS
+  diz( %options )
+        my @files = find( diz => { text => qr/stuff and things/ }, in => '/archives' );
+
+    For now, all you can do is search the text using a regex. Yehaw.
+
+AUTHOR
+    * Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * File::Find::Rule
+    * File::Find::Rule::MP3Info
+

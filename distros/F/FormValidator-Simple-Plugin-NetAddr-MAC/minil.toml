@@ -1,0 +1,4 @@
+name = "FormValidator-Simple-Plugin-NetAddr-MAC"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+repository_branch = "github"

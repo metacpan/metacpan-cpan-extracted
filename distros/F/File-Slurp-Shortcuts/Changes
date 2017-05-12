@@ -1,0 +1,27 @@
+Revision history for File-Slurp-Shortcuts
+
+0.05     2014-02-26 (SHARYANTO)
+
+         - No functional changes. Add 'use experimental smartmatch' for perl
+           5.18+.
+
+
+0.04     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.03    2011-02-08 (SHARYANTO)
+
+        - Rename module from File::Slurp::Chomp -> File::Slurp::Shortcuts.
+
+
+0.02    2011-02-04 (SHARYANTO)
+
+        - Add read_file_c/slurp_c and read_file_q/slurp_q.
+
+
+0.01    2011-02-04 (SHARYANTO)
+
+        - First release.

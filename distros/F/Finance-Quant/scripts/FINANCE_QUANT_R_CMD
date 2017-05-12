@@ -1,0 +1,96 @@
+#!/usr/bin/perl -w
+use strict;
+use threads;
+use Thread::Queue;
+use Cache::Memcached;
+$|++;
+
+
+my $memd = new Cache::Memcached {
+'servers' => [ "127.0.0.1:11211"],
+'debug' => 0,
+'compress_threshold' => 10_000,
+} or warn($@);
+
+my @symbols = ();
+my $data = $memd->get("master-run-SYMBOLS");
+
+   @symbols = @{$memd->get("master-run-SYMBOLS")} unless(!$data);
+
+
+sub worker {
+    my( $Q ) = @_;
+    
+    my $dir = File::Spec->tmpdir();
+    my $date = gmtime;
+    my @e = split " ",$date;# =~ s/ /_/g;
+  
+    if(defined($e[2]) && (length $e[2]) == 1) {
+     $e[2] = "0".$e[2];
+    }
+  
+    my $downfolder = "$e[4]-$e[1]-$e[2]";
+
+      
+      
+      while( my $workitem = $Q->dequeue ) {
+          print "Processing $workitem";
+          
+  my $cmd = sprintf("sh -c 'cat %s | replace \"AAPL\" \"%s\"  | R --vanilla'","/usr/local/bin/longtrend-002.r",$workitem);
+  `$cmd`;
+
+ $cmd = sprintf("sh -c 'cat %s | replace \"AAPL\" \"%s\"  | R --vanilla > %s/Finance-Quant/%s/backtest/longtrend_backtest_%s.data'","/usr/local/bin/longtrend-003.r",$workitem,$dir,$downfolder,$workitem);
+#  print "\n".$cmdx,"\n";
+`$cmd`;
+
+          
+      }
+  }
+
+  our $THREADS = 50; 
+
+my $Q = new Thread::Queue;
+
+$SIG{'INT'} = sub{
+    print "Sigint seen";
+    $Q->dequeue while $Q->pending;
+    $Q->enqueue( (undef) x $THREADS );
+};
+
+$Q->enqueue(reverse @symbols );
+
+my @threads = map threads->new( \&worker, $Q ), 1 .. $THREADS;
+$Q->enqueue( (undef) x $THREADS );
+sleep 1 while $Q->pending;
+$_->join for @threads;
+
+
+1;
+
+__DATA__
+=head1 NAME
+  
+  FINANCE_QUANT_R_CMD
+  
+=head1 DESCRIPTION
+
+  Thread::Queue for executing strategy and chart
+
+=head1 SYNOPSIS
+
+  FINANCE_QUANT_R_CMD
+
+=head1 SEE ALSO
+
+  part of Finance::Quant  
+  
+=head1 AUTHOR
+
+  Hagen Geissler, E<lt>santex@cpan.org<gt>
+  
+=head1 COPYRIGHT AND LICENSE
+  Copyright (C) 2012 by Hagen Geissler
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself, either Perl version 5.12.4 or,
+  at your option, any later version of Perl 5 you may have available.
+=cut

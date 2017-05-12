@@ -1,0 +1,16 @@
+Revision history for File-Parser-Role
+
+0.2.4 2015-01-06 09:18:19
+      fixed test failures on odd platforms
+
+0.2.3 2014-12-18 10:43:34
+      took out use feature from test class. wasn't using it.
+
+0.2.2 2014-12-18 10:38:19
+      put author tests in xt
+
+0.2.1 2014-12-17 21:55:25
+      Fixed ugly pod
+
+0.2.0 2014-12-17 17:06:04
+      Initial release.

@@ -1,0 +1,53 @@
+File-Copy-Link version 0.14
+===========================
+
+The distribution File-Copy-Link includes the modules
+File::Spec::Link and File::Copy::Link and the script
+copylink.  They include routines to read and copy links.
+
+Version 0.14  fixed a precendence issue in File::Copy::Link.
+Version 0.113 fixed a typo in tests and changes to build files.
+Version 0.112 includes compliance with kwalitee metrics.
+Version 0.111 removes some debugging code.
+Version 0.110 includes changes for old Cwd.
+Version 0.100 includes changes to meet (some) Perl Best Practices.
+
+INSTALLATION
+
+To install this module you need some variety of make
+command or the Module::Build perl module.
+
+With make, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+With Module::Build, type the following:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install 
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  File::Spec
+  File::Copy
+
+Both of which are part of the core perl distribution, since
+at least perl5.005_03 in 1999.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, 2005, 2006, 2007, 2008, 2011, 2014 Robin Barker
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+$Id: README 354 2014-07-03 19:42:34Z robin $

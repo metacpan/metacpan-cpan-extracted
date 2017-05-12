@@ -1,0 +1,309 @@
+=head1 NAME
+
+Form::Sensible::FAQ - Answers to questions about how to use Form::Sensible
+
+=head1 Fields
+
+=over 4
+
+=item I have a hash that contains the field values, what's the best way to get those into a Form::Sensible form?
+
+There are two ways to do this. The preferred way is usually to delegate
+your form's field values to your hash. You often want to do this to link a
+form's fields to a single source of data, for example,
+L<Catalyst|Catalyst::Request>'s C<< $c->req->params >> hashref. This can be done
+easily using the L<Form::Sensible::Form's delegate_all_field_values_to_hashref|Form::Sensible::Form/"METHODS">
+routine:
+
+ $form->delegate_all_field_values_to_hashref($c->req->params);
+
+After that, all fields will get and set their values via the C<< $c->req->params >> hashref.
+
+B<NOTE that this is actually a very bad idea if your forms are persistent from one request to the next, as the C<< $c->req->params >>
+from the initial request will be captured within a closure.  If you are using persistent forms, you must re-set the delegate
+during each request or use an intermediate object instead that can obtain the current request's parameters.>
+
+If you have not delegated your field's values to something else (as indicated above), the form itself
+will store the values.  In this case, you must push the values into the form object instead.  You can
+accomplish this by calling C<< $form->set_values($your_hashref); >>
+
+=item How do I disable a field?
+
+Simply set the field's 'C<editable>' attribute to false.  C<Form::Sensible> will ensure that the field is
+not editable by the end user.  Note that when a field is disabled in HTML, the browser does NOT send the
+value when the form is submitted.  C<Form::Sensible>'s HTML renderer takes this into account and if a value
+exists on a field that is marked as not editable, a hidden field will be added to transport the value back
+to the form processor.
+
+=item Can I set the options for my Select field directly from a DBIx::Class resultset?
+
+Yes.  This is actually quite easy.  You define an C<options_delegate> on the Select field and use a
+subroutine similar to the following:
+
+ ## defined as a named subroutine so that it can be reused as often as needed.
+ sub get_options_from_rs {
+     my $caller = shift;
+     my $option_details = shift;
+
+     $option_details->{rs}->reset;
+     return [
+               map {
+                    name => $_->get_column($option_details->{name_column}),
+                    value => $_->get_column($option_details->{value_column})
+                  } $option_details->{rs}->all()
+            ];
+ }
+
+Then set the C<options_delegate> to use that function and pass the appropriate
+information:
+
+ $field->options_delegate( FSConnector( \&get_options_from_rs,
+     {
+        rs => $your_resultset->search({ ... }),
+        name_column => 'name',
+        value_column => 'id',
+     }
+     ));
+
+The L<FSConnector|Form::Sensible::DelegateConnection/"FUNCTIONS"> will pass your C<option_details> hash to the C<get_options_from_rs> function,
+and your options will be pulled from the database when they are needed (whether for validation
+or for display).
+
+=back
+
+=head1 Validation
+
+=over 4
+
+=item How do I create validation that involves multiple fields (like password and confirmation fields)?
+
+Individual field based validation is handled via the individual field's C<validation> hash.  If you want
+to check multiple fields together you need to do whole-form level validation.  This can be accomplished
+easily via the form's C<validation> hash as follows:
+
+    $form->validation({
+                        code => sub {
+                                my ($form, $result) = @_;
+                                
+                                if ($form->field('password')->value() ne $form->field('password2')->value()) {
+                                    $result->add_error('password2', 'Passwords do not match');
+                                }
+                        }
+    });
+
+=back
+
+=head1 HTML Rendering
+
+=head2 CSS tagging
+
+=over 4
+
+=item How do I style forms created by C<Form::Sensible>'s HTML renderer?
+
+Each element created by C<Form::Sensible>'s HTML renderer is thoroughly marked up for CSS
+styling.  Each element has a CSS ID and one or more classes.  While the best way to
+decipher these is to simply generate a form and look at the IDs and classes on each element,
+we will endeavor to give you somewhat of a road map here.
+
+First, all CSS ids and classes are prefixed.  This prefix is 'C<fs_>' by default.  It can
+be overridden by passing a css_prefix attribute in the C<default_options> passed to the
+HTML renderer's C<new()> method.  For the remainder of this explanation, we will assume that
+the default prefix of 'C<fs_>' is in use.  The name of the form is also used in most IDs and
+classes.  For the remainder of this explanation, we will use 'login' as our form name.
+
+First, each form is contained within a div. The div has an id of 'C<fs_>' + the
+name of the form + 'C<form_div>'. So, for our 'login' form, the ID of the div
+would be 'C<fs_login_form_div>'. The containing div will also have two classes
+applied to it: 'C<fs_form_container>' and 'C<fs_login_form_container>'
+
+The form element itself has an ID of 'C<fs_>' + form name + 'C<_form>' and again has
+two classes applied to it: 'C<fs_form>' and 'C<fs_login_form>'
+
+A complete example of the form start from above would be:
+
+    <div id="fs_login_form_div" class="fs_form_container fs_login_form_container">
+        <form action="/formtest/submit" method="post" id="fs_login_form" class="fs_form fs_login_form" accept-charset="utf-8" enctype="multipart/form-data">
+
+Each field in the form has a CSS id and several classes. For fields, the form
+name, the field's name, and type are taken into account. Because there are so
+many classes and elements involved, we will simply provide an example based on
+the rendering of a text field called 'username' in the 'login' form.
+
+    <div id="fs_username_div" class="fs_formfieldline fs_text fs_username">
+        <label class="fs_label fs_text_label " for="fs_test_username_input">Username</label>
+        <input type="text" id="fs_login_username_input" class="fs_input fs_text_input fs_username_input " name="username" />
+    </div>
+
+Note that for the default template scheme the div that includes the field and
+its label always has a class of 'C<fs_formfieldline>' in addition to classes
+based on the field's type and field name.
+
+Certain field types have more complex rendering and therefore have more
+complex CSS id and class mappings (e.g., Select fields). The best way to
+understand these is to simply look at the results of rendering them.
+
+One last thing to note is that when a field is disabled by setting the
+'editable' flag on the field to false, an additional class of 'C<noteditable>'
+will be added to the input element.
+
+=back
+
+=head2 HTML changes
+
+=over 4
+
+=item How do I tell C<Form::Sensible> about my own custom templates?
+
+C<Form::Sensible> is built to allow you to easily switch themes or override
+individual fields or field types. In order to override the builtin templates,
+you must tell the renderer where your templates are. You do this by passing an
+'additional_include_paths' parameter to the HTML renderer constructor:
+
+   my $html_renderer = Form::Sensible::Renderer::HTML->new({ additional_include_paths => [ '/path/to/your/templates' ] });
+   
+   #### OR #####
+   
+   my $html_renderer = Form::Sensible->get_renderer('HTML', { additional_include_paths => [ '/path/to/your/templates' ] });
+
+Once you have done this, C<Form::Sensible> will look in the directory or
+directories provided first for its templates, falling back to the
+pre-installed templates when a particular template is not found.
+
+=item How do I override a field's template or change the field wrapper?
+
+When rendering in HTML, for a given field the form name, field name and field
+type are all taken into account when searching for overrides. Let's assume you
+have a Form called 'login_form' and a 'username' text field. C<Form::Sensible>'s
+HTML renderer looks for templates (in its include_paths) in the following
+order and the first one found will be used:
+
+   login_form/username_field.tt
+   login_form/text.tt
+   username_field.tt
+   text.tt
+
+This allows you to customize any field on any form by name or by type.  Further, you only need to define the
+template for the items you wish to override.  Anything not found here will fall through to the default templates
+that ships with C<Form::Sensible>.
+
+=item I don't like the way labels for my fields are rendered, Can I change that?
+
+Yes.  Use the methods described above to tell the HTML renderer where to look for your additional templates.
+Then simply create a 'field_wrapper.tt' template file.  This is a standard L<Template::Toolkit|Template> wrapper
+file.  You will have access to all the field information about the field as C<field> and the rendered input
+element will be placed wherever you put the string C<< [% content %] >>.
+
+=item I would like to change or add information to the start or end of my form, how do I do that?
+
+Use the methods described above and provide one of the following templates (assuming your form is called 'login_form'):
+
+    ## for form start
+    login_form/form_start.tt
+    form_start.tt
+    
+    ## for form messages (errors and status)
+    login_form/form_messages.tt
+    form_messages.tt
+    
+    ## for form_end:
+    login_form/form_end.tt
+    form_end.tt
+
+Note again that this allows you to change form start, messaging or ending on a per-form basis or globally for all forms.
+
+=back
+
+=head1 Delegates
+
+=over 4
+
+See L<Form::Sensible::Delegation>.
+
+=back
+
+=head1 Miscelleneous Questions
+
+=over 4
+
+=item How do I localize field names and error messages?
+
+Localization of forms can be accomplished through the use of delegates.  Both the L<Form::Sensible::Validator> class and
+L<Form::Sensible::Renderer::HTML::RenderedForm> support localizing through delegates.
+
+By providing a C<DelegateConnection|Form::Sensible::DelegateConnection> to L<Form::Sensible::Validator's message_delegate|Form::Sensible::Validator/"DELEGATE CONNECTIONS"> you can
+translate the error or status messages as necessary.
+
+You can translate field names in the form in the same way by providing a C<DelegateConnection|Form::Sensible::DelegateConnection> to L<Form::Sensible::Renderer::HTML::RenderedForm's display_name_delegate|Form::Sensible::Renderer::HTML::RenderedForm/"DELEGATE CONNECTIONS">
+
+=item I'm using Catalyst and I would like my form objects to be persistent from one request to the next, how do I do that?
+
+B<BEWARE: Here lie Monsters and really freaky problems>
+
+Generally speaking, it is a bad idea to persist forms from one request to the
+next within Catalyst. The main reason is that you can not reliably delegate in
+many cases because many of Catalyst's objects (such as Models and
+Controllers) can be created and destroyed within the request lifecycle in
+certain scenarios. This can be very difficult to predict and is prone to
+accidental breakage and bleed over.
+
+If you feel you must try to do this, you have two options:
+
+=over 4
+
+=item 1.
+
+Ensure that none of your delegation is tied to Controllers or Models (or
+any other Component) that might use the context C<< $c >> to do its job.
+
+=item 2.
+
+Create and persist 'skeleton forms' that contain no delegation information,
+clone them per request and initialize the delegate connections on the newly
+created clone form.
+
+=back
+
+If you do not take care to use one of these approaches, you are going to
+experience problems ranging from weird data consistency problems to full scale
+bleed over of form data between users. Considering the problems inherent to
+doing this, how to accomplish it is left as an exercise to the reader.
+
+B<NOTE:> Persisting the basic form definition hash (as passed to
+C<Form::Sensible>'s create_form routine) is not similarly problematic, though
+care should be taken to ensure that you don't accidentally capture C<< $c >>
+when creating your delegates. If, after reading the above you still want to
+know how to do this properly, drop by the C<#form-sensible> irc channel on C<irc.perl.org> and we
+may be able to help.
+
+=item Where can I go for help using C<Form::Sensible>
+
+You can join the google discussion group:
+
+L<http://groups.google.com/group/formsensible>
+
+OR look at the wiki:
+
+L<http://wiki.catalyzed.org/cpan-modules/form-sensible>
+
+OR drop by the irc channel:
+
+irc.perl.org#form-sensible L<Join #form-sensible via your web browser|http://mibbit.com/#form-sensible@irc.perl.org>
+
+=back
+
+=head1 AUTHORS
+
+Jay Kuri, C<jayk@cpan.org>
+
+=head1 SPONSORED BY
+
+Ionzero LLC. L<http://ionzero.com/>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2010 the aforementioned authors. All rights
+reserved. This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut

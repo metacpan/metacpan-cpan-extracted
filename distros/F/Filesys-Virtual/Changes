@@ -1,0 +1,27 @@
+Revision history for Perl extension Filesys::Virtual.
+
+0.06 Sun Jul 30 2006
+    - updated the license, same as perl
+    - renamed a test
+
+0.05 Fri Jan 21 2005
+	- seperated Filesys::Virtual::Plain from Filesys::Virtual
+	- added utime
+
+0.04 Sun Apr 18 2004
+	- fixed problem with some dirs not shown as dirs in list
+	- added file_path key in obj hashref so it has the last file opened
+	- added size sub, returns file size of file
+
+0.03 Mon Feb 16 2004
+	- added size command
+
+0.02  Thu Feb 5 2004
+	- cleaned it up
+	- full path changedir fixed
+	- gid and uid caching fixed
+
+0.01  Sun Dec 2 2001
+	- original version; created by h2xs 1.1.1.4 with options
+		-XA -n Filesys::Virtual
+

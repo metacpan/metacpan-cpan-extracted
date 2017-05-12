@@ -1,0 +1,14 @@
+---
+- name:            "foo.server"
+  server_class:    "FCGI::Engine::Manager::Server"
+  scriptname:      "t/scripts/foo.pl"
+  nproc:            1
+  pidfile:         "/tmp/foo.pid"
+  socket:          "/tmp/foo.socket" 
+  additional_args: [ "-I", "lib/" ]
+- name:       "bar.server"
+  scriptname: "t/scripts/bar.pl"
+  nproc:       1
+  pidfile:    "/tmp/bar.pid"
+  socket:     "/tmp/bar.socket"
+

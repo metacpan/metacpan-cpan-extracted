@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+fkp-agent - File::KeePass::Agent program
+
+=cut
+
+use File::KeePass::Agent;
+
+if (@ARGV && $ARGV[0] =~ /^--?h(?:elp)?$/) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage();
+}
+
+File::KeePass::Agent::run();
+
+=head1 USAGE
+
+   fkp-agent
+
+   fkp-agent keepass-filename.kbd
+
+   fkp-agent [keepass-filename.kbd --pass=password
+
+   fkp-agent [keepass-filename.kbd --pass=password
+
+   fkp-agent [keepass-filename.kbd --pass=password --keyfile=path/to/some.key
+
+If no file is specified, you will be prompted for the file.  If no
+password is supplied you will be prompted for the password.  Multiple
+files can be passed.  Each can likewise have a corresponding --pass
+and or a --keyfile entry depending upon how the keepass file has been
+locked..
+
+See L<File::KeePass::Agent> for more information about what typical
+KeePass features are currently implemented.
+
+KeePass version 1 and version 2 databases are supported.
+
+=head1 STATUS
+
+This module and program are proof of concept.  They work, but are
+limited in their feature set.  There currently are no managment
+capabilities.
+
+=head1 AUTHOR
+
+Paul Seamons <paul at seamons dot com>
+
+=head1 LICENSE
+
+This module may be distributed under the same terms as Perl itself.
+
+=cut

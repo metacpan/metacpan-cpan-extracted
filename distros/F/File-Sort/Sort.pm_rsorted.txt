@@ -1,0 +1,1081 @@
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+written is unspecified.
+with MAX_SORT_FILES environment variable.  No temp files will be used
+will not be supported.  Sorry for any inconvenience this may cause.
+where field_start and field_end define a key field restricted to a
+wanted, and I didn't even know I had made them.
+values may be passed via an anonymous array:
+v1.01, Monday, January 14, 2002
+utility for PPT project, then brought changes back over.  As a result
+user ID.
+use vars qw(@ISA @EXPORT_OK);
+use vars qw($VERSION *sortsub *sort1 *sort2 *map1 *map2 %fh);
+use strict;
+use locale;
+use Symbol qw(gensym);
+use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+use Carp;
+up, you must call setlocale() for the new settings to take effect.  For
+to be part of a field (although it can be included in a sort key).  Each
+to a temp file.  Overriden by B<y> option.
+to a specific key (see B<k>), the specified ordering options override all
+they have this effect if specified with field_start, field_end, or both.
+themselves, unless demanded by perl's regex and split semantics (e.g.,
+the interface has changed slightly, mostly in regard to what letters
+the fifth field first, and only return records with unique keys.
+the collating sequence of the current locale.  No output is produced;
+the B<+pos1> B<pos2> options being ordered AFTER the B<k> options.
+text data as characters (for example, single- versus multi-byte
+terms as Perl itself.
+suite; fixed warning for redefined subs (sort1 and sort2).
+sub usage {
+sub sort_file {
+sub _write_temp {
+sub _sort_file {
+sub _parse_keydef {
+sub _merge_files {
+sub _make_sort_sub {
+sub _get_temp { # nice and simple
+sub _debug {
+sub _check_last {
+sub _are_uniq {
+standard Windows port of perl5.004_02 (50).  Adjusted the default
+specified, blank characters are used as default field separators; each
+specified) and with all bytes in the lines significant to the
+sorts, and arbitrary sorts.
+sort.  If you don't like that, feel free to change it.
+sort(1), locale, PPT project, <URL:http://sf.net/projects/ppt/>.
+sort utility.
+sort regards each input line as a single field.  The sort is a merge
+require Exporter;
+regexes in parentheses will add that matched expression as an extra
+reference passed to the function in the format:
+positions of a restricted sort key.  If the B<b> option is specified
+portion of the line, and type is a modifier from the list of characters
+platforms.  (Hubert Toullec)
+package File::Sort;
+output.
+output to STDOUT.
+output in outfile and using second character of second field
+or B<k> were present (but with B<r> still in effect, if it was
+options.
+options, but apply only to the key field to which they are attached;
+options appear independent of any key field specifications, the requested
+only the exit code is affected.
+only after all earlier keys compare equal.
+of 1 or 0.
+occurrence of char is significant (for example,
+no longer supported.  Hopefully made the whole thing more robust and
+much RAM, it might need to be lowered.
+maximal non-empty sequence of blank characters that follows a non-blank
+many parts out into separate functions.
+low-memory systems, or where (e.g.) the MacPerl binary is not allocated
+locale setting.
+listed in TODO below, they are not in the plan for implementation.
+lines.  Lines was easier to implement.  Can also specify with
+like them and want to use them.  Usage is:
+it specifes the last position to NOT be included.  Also, numbers
+it is attached. The other modifiers behave like the corresponding
+is used.  When there are multiple keys fields, later keys are compared
+is free software; you can redistribute it and/or modify it under the same
+is basically a mapping of the command-line options to the Unix
+interface may be offered in the future, as well.  This interface
+instead.  Do not escape any characters (C</> characters need to be
+input file is sorted.
+global ordering options for that key.
+format of this definition is:
+for total number of temp files from 50 to 40 (leave room for other open
+for the purposes of comparison.
+files.  Overriden by B<F> option.
+files), changed docs.  (Mike Blazer, Gurusamy Sarathy)
+filename, or an array reference containing multiple filename strings.
+field_start or field_end option argument (see below).
+field).  See L<perlre> and L<perlfunc/split>.
+field ordering rules are applied globally to all sort keys. When attached
+faster, while supporting more options for sorting, including delimited
+example:
+escaped internally, and will be escaped for you).
+equal are ordered as if none of the options B<d>, B<f>, B<i>, B<n>
+corresponding B<+pos1>.  The rest should be the same as the B<k> option.
+consecutive lines with duplicate keys, in addition to checking that the
+comparison.  The order in which lines that still compare equal are
+code to use the new interface.
+characters in arguments and input files) and the behaviour of
+character is a field separator.
+character classification for the B<b>, B<d>, B<f>, B<i> and B<n>
+before the first B<k> option, it is applied to all B<k> options. 
+be a number in numeric comparisons.
+at all if MAX_SORT_RECORDS is never reached.
+as the sort key.
+as older Windows ports had quite a small limit.  Can also specify
+are used for options, but there are also some key behavioral differences.
+are counted from 0 instead of 1.  B<pos2> must immediately follow
+are based on one or more sort keys extracted from each line of input,
+applies to either.
+and are performed lexicographically. By default, if keys are not given,
+according to the current locale setting, to be the upper-case equivalent
+according to the current locale setting, are significant in comparisons.
+__END__
+Where the OPTION is a switch, it should be passed a boolean VALUE
+Where field_end in B<k> specified the last position to be included,
+Where an option can take multiple values (like C<I>, C<k>, and C<pos>),
+Vicki Brown E<lt>vlb@cfcl.comE<gt>,
+Use I<STRING> as the field separator character; char is not considered
+Unique: Suppresses all but one in each set of lines having equal keys.
+Tom Phoneix E<lt>rootbeer@teleport.comE<gt>,
+Tom Christiansen E<lt>tchrist@perl.comE<gt>,
+This module sorts text files by lines (or records).  Comparisons
+This interface will always be supported, though a more perlish
+This includes B<T> and B<z>.
+The string matched by I<STRING> is not included in the fields
+The keydef argument is a restricted sort key field definition. The
+The good news is that it should not be too difficult to update your
+The following options override the default ordering rules. When ordering
+The following options are available, and are passed in the hash
+Tests 3 and 4 failed because we hit the open file limit in the
+Switched to sysopen for better portability.
+Specify the name of an I<OUTPUT> file to be used instead of the standard
+Specify that only blank characters and alphanumeric characters,
+Sort, in reverse order, contents of file1 and file2, placing
+Sort file by straight string compare of each line, sending
+Sort contents of file by second key in file.
+Some cleanup; made it not subject to system file limitations; separated 
+Some cleanup.
+Similar to B<k>, these are mostly obsolete switches, but some people
+Send debugging information to STDERR.  Behavior subject to change.
+Same sort but sorting numerically on characters 3 through 5 of
+Same as B<t>, but I<STRING> is interpreted as a Perl regular expression
+Rich Morin E<lt>rdm@cfcl.comE<gt>,
+Reverse the sense of the comparisons.
+Removed O_EXCL flag from C<sort_file>.
+Record separator, defaults to newline.
+Print to STDOUT if no output file supplied.
+Print passwd(4) file sorted by numeric user ID.
+Played with somem of the -k options (Marco A. Romero).
+Paul Eckert E<lt>peckert@epicrealm.comE<gt>,
+Pass in the input file(s).  This can be either a single string with the
+Otherwise, the B<b> option can be attached indepently to each
+One year between releases was too long.  I made changes Miko O'Sullivan
+Occurrences of the B<k> option are significant in command line order. 
+Note that if you change the locale settings after the program has started
+More cleanup; fixed special case of no linebreak on last line; wrote test 
+Mixing B<+pos1> B<pos2> with B<k> is allowed, but will result in all of
+Miko O'Sullivan E<lt>miko@idocs.comE<gt>,
+Mike Blazer E<lt>blazer@mail.nevalink.ruE<gt>,
+Merge only; the input files are assumed to already be sorted.
+Maximum number of temp files to be held open at once.  Default to 40,
+Maximum number of open temp files to use before merging open temp
+Maximum number of lines (records) read before writing to temp file.
+Matthias Neeracher E<lt>neeri@iis.ee.ethz.chE<gt>,
+Marco A. Romero E<lt>mromero@iglou.comE<gt>,
+Made CHUNK default a lot larger, which improves performance.  On
+MAX_SORT_RECORDS environment variable.
+Long overdue release.
+It is best if you Don't Do That.  Pick one and stick with it.
+Ignores all characters that are non-printable, according to the current
+Ignore leading blank characters when determining the starting and ending
+If you need the old interface, the old module will remain on CPAN, but
+If used with the B<c> option check that there are no lines with
+If the options are not listed as implemented above, or are not
+If no B<k> option is specified, a default sort key of the entire line
+If any modifier is attached to a field_start or a field_end, no option
+Hubert Toullec E<lt>Hubert.Toullec@wanadoo.frE<gt>.
+Here are some equivalencies:
+Gurusamy Sarathy E<lt>gsar@activestate.comE<gt>,
+Gene Hsu E<lt>gene@moreinfo.comE<gt>,
+Gael Marziou E<lt>gael_marziou@hp.comE<gt>,
+For the anal sysadmin, check that passwd(4) file is sorted by numeric
+Fixed up docs and did some more tests and benchmarks.
+Fixed bug with unique option (didn't work :).
+Fixed bug in sorting multiple files.  (Paul Eckert)
+Fixed bug in C<_merge_files> that tried to C<open> a passed
+Fix filehandle close test of STDOUT (Gael Marziou).
+First release.
+File::Sort - Sort a file or merge sort multiple files
+Exports C<sort_file> on request.
+Except when the B<u> option is specified, lines that otherwise compare
+E<lt>charE<gt>E<lt>charE<gt> delimits an empty field).  If B<t> is not
+Does numeric instead of string compare, using whatever perl considers to
+Documented C<I> option.  (Hubert Toullec)
+Determine the locale for the interpretation of sequences of bytes of
+Determine the locale for ordering rules.
+Default is 200,000. This may eventually change to be kbytes instead of
+Default is 200,000.  Maximum number of records to use before writing
+Copyright (c) 1997-2002 Chris Nandor.  All rights reserved.  This program
+Consider all lower-case characters that have upper-case equivalents,
+Complete rewrite.  Took the code from this module to write sort
+Closed all files in test.pl so they could be unlinked on some
+Chris Nandor E<lt>pudge@pobox.comE<gt>, http://pudge.net/
+Check that single input fle is ordered as specified by the arguments and
+Change license to be that of Perl.
+C<IO::File> object.
+Brian L. Matthews E<lt>blm@halcyon.comE<gt>,
+B<d> overrides B<i>.
+B<b>, B<d>, B<f>, B<i>, B<n>, B<r>.  The b modifier behaves like the
+B<b> option, but applies only to the field_start or field_end to which
+Andrew M. Langmead E<lt>aml@world.std.comE<gt>,
+Also now use C<IO::File> to create temp files, so the TMPDIR option is
+Albert Dvornik E<lt>bert@mit.eduE<gt>,
+Added unique and merge-only options.
+Added reverse and numeric sorting options.
+Added c option to check sorting.
+Add O_TRUNC to output open (D'oh!).
+@ISA = 'Exporter';
+@EXPORT_OK = 'sort_file';
+=over 4
+=over 4
+=over 4
+=over 4
+=over 4
+=item v1.01, Monday, January 14, 2002
+=item v1.00, Tuesday, November 13, 2001
+=item v0.91, Saturday, February 12, 2000
+=item v0.90, Friday, April 30, 1999
+=item v0.20
+=item v0.18 (31 January 1998)
+=item v0.17 (30 December 1998)
+=item v0.16 (24 December 1998)
+=item v0.11 (04 January 1998)
+=item v0.10 (03 January 1998)
+=item v0.03 (23 December 1997)
+=item v0.02 (19 December 1997)
+=item v0.01 (18 December 1997)
+=item Switch for turning off locale ... ?
+=item Performance hit with -u
+=item MAX_SORT_RECORDS
+=item MAX_SORT_FILES
+=item LC_CTYPE
+=item LC_COLLATE
+=item Do bytes instead of lines
+=item C<y> I<MAX_SORT_RECORDS>
+=item C<u>
+=item C<t> I<STRING>
+=item C<r>
+=item C<pos> I<+pos1 [-pos2]>
+=item C<o> I<OUTPUT>
+=item C<n>
+=item C<m>
+=item C<k> I<pos1[,pos2]>
+=item C<i>
+=item C<f>
+=item C<d>
+=item C<c>
+=item C<b>
+=item C<X> I<STRING>
+=item C<R> I<STRING>
+=item C<I> I<INPUT>
+=item C<F> I<MAX_SORT_FILES>
+=item C<D>
+=item Better test suite
+=item Better debugging and error reporting
+=head2 Options
+=head2 Not Implemented
+=head1 VERSION
+=head1 TODO
+=head1 THANKS
+=head1 SYNOPSIS
+=head1 SEE ALSO
+=head1 NAME
+=head1 HISTORY
+=head1 EXPORT
+=head1 EXAMPLES
+=head1 ENVIRONMENT
+=head1 DESCRIPTION
+=head1 AUTHOR
+=cut
+=back
+=back
+=back
+=back
+=back
+$VERSION = '1.01';
+# take optional arrayref of handles of sorted files,
+# plus optional arrayref of sorted scalars
+  });
+  use File::Sort qw(sort_file);
+  sort_file({
+  sort_file('file1', 'file1.sorted');
+  OPTION => [VALUE1, VALUE2]
+  OPTION => VALUE
+    });
+    });
+    } keys %oth;
+    } elsif ($opts->{'m'}) {
+    } elsif (!ref $file) {
+    } else {
+    } else {
+    } else {
+    } else {
+    } else {
+    } else {
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    while (keys %fh) {
+    while (<DATA>) {
+    while (<DATA>) {
+    use POSIX 'locale_h';
+    use File::Sort qw(sort_file);
+    usage() unless @{$opts->{I}};
+    sort_file({t => ':', k => '3n', I => '/etc/passwd'});
+    sort_file({k => 2, I => 'file'});
+    sort_file({c => 1, t => ':', k => '3n', I => '/etc/passwd'});
+    sort_file({
+    sort_file({
+    sort_file('file');
+    setlocale(LC_CTYPE, '');
+    setlocale(LC_COLLATE, '');
+    select $oldfh;
+    seek DATA, 0, 0;
+    seek $temp, 0, 0;  # might need to read back from it
+    seek $file, 0, 0;  # might need to read back from it
+    return \%opts;
+    return 1;   # yay
+    return $temp;
+    return $file;
+    require IO::File;
+    print STDERR @_;
+    pos => ['+2', '+0b -1']     ->  k => ['3', '1b,1']
+    pos => ['+1 -2', '+3 -5']   ->  k => ['2,2', '4,5']
+    pos => '+2.1 -2.4'          ->  k => '3.2,3.4'
+    pos => '+2.0 -3.0'          ->  k => '3.1,4.0'
+    pos => '+1.1 -1.2'          ->  k => '2.2,2.2'
+    pos => '+1 -2'              ->  k => '2,2'
+    o => 'file_new', k => '5.3,5.5rn', -t => '|'
+    my($uniq, $first, $o, %oth);
+    my($topts, @sortsub, @mapsub, @sort1, @sort2) = shift;
+    my($recs, $opts) = @_;
+    my($opts, @fh, @recs) = shift;
+    my($opts, $fh, $recs, $file) = @_;
+    my($k, $topts) = @_;
+    my @args = @_;
+    my %opts = (
+    my $u;
+    my $temp = _get_temp() or die "Can't get temp file: $!";
+    my $oldfh = select $file;
+    my $nok = shift;
+    my $close = _merge_files($opts, \@fh, \@recs, $opts->{o});
+    local $^W;
+    local $\;   # don't mess up our prints
+    local $/ = $opts->{R} ? $opts->{R} : "\n";
+    local $/ = "\n";    # in case changed
+    if (ref $args[0]) {
+    if ($topts->{K}) {
+    if ($topts->{K}) {
+    if ($opts->{c}) {
+    if ($opts->{K}) {
+    if ($nok) {
+    if ($file eq '') {
+    if (!$opts{kst} && !$opts{kft}) {
+    for (qw(ksf ksc kff)) { #  kfc stays same
+    field_start[.first_char][type][,field_end[.last_char][type]]
+    die "Usage:$u";
+    close $close unless fileno($close) == fileno('STDOUT'); # don't close STDOUT
+    _make_sort_sub($opts);
+    _debug("\nDone!\n\n") if $opts->{D};
+    _debug("\nCreating sorted $file ...\n") if $opts->{D};
+    _debug("New tempfile: $temp\n") if $opts->{D};
+    _check_last($recs);
+    IO::File->new_tmpfile;
+    I => [qw(file_1 file_2)],
+    +field_start[.first_char][type] [-field_end[.last_char][type]]
+    );
+    %oth = map {($o++ => $_)} @$fh;
+    %fh  = map {
+    $| = 0; # just in case, use the buffer, you knob
+    ${$_[0]}[-1] .= $/ if (${$_[0]}[-1] !~ m|$/$|);
+    $u =~ s/\n//;
+    $opts->{o}   = !$opts->{o} ? '' : $opts->{o};
+    $opts->{k} = $opts->{k} ? [$opts->{k}] : [] if !ref $opts->{k};
+    $opts->{K} = $opts->{k} ? 0 : 1;
+    $opts->{I} = [$opts->{I}] unless ref $opts->{I};
+    $opts->{F}   ||= $ENV{MAX_SORT_FILES}   || 40;      # default max files
+    $opts->{'y'} ||= $ENV{MAX_SORT_RECORDS} || 200000;  # default max records
+    $k =~ /^(\d+)(?:\.(\d+))?([bdfinr]+)?
+    $fh{X} = shift @$recs if @$recs;
+    $ENV{LC_ALL} = $ENV{LANG} = '';
+    # we need the options, filehandles, and output file
+    # use new ENV settings
+    # their idea of 1 is not ours
+    # set output and other defaults
+    # set defaults at zero or undef
+    # see big ol' mess below
+    # record separator, default to \n
+    # output to STDOUT if no output file provided
+    # ooo, get ready, get ready
+    # only check to see if file is sorted
+    # match handle key in %oth to next record of the handle    
+    # if output file is a path, not a reference to a file, open
+    # if nothing in kst or kft, use other flags possibly passed
+    # if no keydefs set
+    # if no keydefs set
+    # if merging sorted files
+    # gurgle
+    # get input files into anon array if not already
+    # get constants
+    # file and get a reference to it
+    # extra records, special X "handle"
+    # except for b, flags on one apply to the other
+    # e.g., blank out locale
+    # do the merge thang, uh huh, do the merge thang
+    # arbitrarily named keys, store handles as values
+    # add new record separator if not one there
+    # "K" == "no k", for later
+        } else {                # we don't need you anymore
+        } else {
+        } else {
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        {
+        {
+        {
+        while (defined(my $rec = <F>)) {
+        u => 1, r => 1, k => ['5.3,5.5rn', '2.2,2.2'],
+        sysopen($tfh, $file, O_WRONLY|O_CREAT|O_TRUNC)
+        return 1;
+        return &sortsub;
+        return &sort1;
+        r => 1, k => '2.2,2.2', o => 'outfile',
+        print $temp sort sort1 @{$recs};
+        print $temp map {$_->[0]} sort sortsub map &map1, @{$recs};
+        o => 'outfile', I => ['file1', 'file2']
+        my(%maps, $sortsub, $mapsub) = (map1 => '$_', map2 => '$fh{$_}');
+        my($cmp, $aa, $bb, $fa, $fb) = qw(cmp $a $b $fh{$a} $fh{$b});
+        my $tfh = gensym();
+        my $sort2 = "sub { $fa $cmp $fb }\n";
+        my $sort1 = "sub { $aa $cmp $bb }\n";
+        my $rec = $first eq 'X' ? shift @$recs : scalar <$curr>;
+        my $last;
+        my $fh = $oth{$_};
+        my $curr = $oth{$first};
+        local *F;
+        local $^W;
+        local $^W;
+        last if m/^=head1 SYNOPSIS$/;
+        last if m/^=/;
+        kst => $3 || '',                    # start field type
+        ksf => $1 || 0,                     # start field
+        ksc => $2 || 0,                     # start field char start
+        kft => $6 || '',                    # end field type
+        kff => (defined $4 ? $4 : undef),  # end field
+        kfc => $5 || 0,                     # end field char end
+        if (exists $args[0]{'pos'}) {
+        if (defined $rec) {     # bring up next record for this filehandle
+        if (@recs) {
+        if ($topts->{kst} =~ /[bdfi]/) {
+        if ($opts->{u}) {
+        if ($opts->{I}[0] eq '-') {
+        if (!$opts->{u} && keys %fh == 1) {
+        if (! $topts->{u} ) {
+        foreach my $k (@{$topts->{k}}) {
+        foreach my $filein (@{$opts->{I}}) {
+        foreach my $filein (@{$opts->{I}}) {
+        foreach (qw(d f i n r)) {
+        foreach (qw(b d f i n r)) {
+        foreach (qw(b d f i n r)) {
+        for my $m (keys %maps) {
+        _sort_file({I => $args[0], o => $args[1]});
+        _sort_file(@args);
+        _debug("No keydef set\n") if $topts->{D};
+        _debug("$sortsub\n$maps{map1}\n$maps{map2}\n") if $topts->{D};
+        _debug("$sort1\n$sort2\n") if $topts->{D};
+        I => ['file1', 'file2']
+        (?:,(\d+)(?:\.(\d+))?([bdfinr]+)?)?$/x;
+        ($bb, $aa, $fb, $fa) = ($aa, $bb, $fa, $fb) if $topts->{r};
+        ($a, $b) = map &map1, @_;
+        ($a, $b) = @_;
+        ($_ => scalar <$fh>);
+        %$topts,                            # get other options
+        $u .= $_;
+        $topts->{t} =~ s|/|\\/|g if defined $topts->{X};
+        $topts->{t} =
+        $topts->{kst} = '';
+        $sortsub = "sub {\n  " . join(" || \n  ", @sortsub) . "\n}\n";
+        $opts{$_}-- if $opts{$_};
+        $file = \*STDOUT;
+        $file = $tfh;
+        $cmp = '<=>' if $topts->{n};
+        # use @$recs, not filehandles, if key is X
+        # success, yay
+        # reverse sense
+        # records leftover, didn't reach record limit
+        # once for each input file
+        # more complex stuff, act like we had -k defined
+        # if not -u
+        # get text separator or use whitespace
+        # get current filehandle
+        # fix pos to look like k
+        # don't print if -u and not unique
+        # don't bother sorting keys if only one key remains!
+        # do numeric sort
+        # defaults for main sort sub components
+        # add finished expression to array
+            } elsif ($opts->{kst} =~ /i/) {
+            } elsif (!ref $args[0]{'k'}) {
+            } else {
+            } else {
+            } else {
+            } else {
+            } else {
+            }
+            }
+            }
+            }
+            }
+            }
+            }
+            }
+            }
+            }
+            }
+            }
+            }
+            while (defined(my $rec = <F>)) {
+            sysopen(F, $opts->{I}[0], O_RDONLY)
+            sysopen($sym, $filein, O_RDONLY)
+            push @sortsub, sprintf "%s->[1] %s %s->[1]",
+            push @sortsub, sprintf "%s->[$n] %s %s->[$n]",
+            push @fh, $sym;
+            print $fh{$first};
+            print $fh{$first}, @left;
+            print $fh{$first} if
+            or die "Can't open `$file' for writing: $!";
+            open(F, $opts->{I}[0])
+            my($opts, @fil) = ($topts);
+            my($cmp, $ab_, $fab_, $aa, $bb) = qw(cmp $_ $fh{$_} $a $b);
+            my @left = $first eq 'X' ? @$recs : <$curr>;
+            my @argv;
+            my $sym = gensym();
+            my $pos = $args[0]{'pos'};
+            my $n = @sortsub + 2;
+            my $k = $maps{$m};
+            my $curr = $oth{$first};
+            my $count = 0;
+            local *F;
+            local $^W;
+            local $^W;
+            last;
+            if (@fil > 1) {
+            if ($opts->{u} && $last) {
+            if ($opts->{kst} =~ /f/) {
+            if ($opts->{kst} =~ /d/) {
+            if ($opts->{K}) {
+            if ($opts->{K}) {
+            if ($last) {
+            if ($k ne 'K') {
+            if ($filein eq '-') {
+            if (!ref $pos) {
+            if (!exists $args[0]{'k'}) {
+            for (@$pos) {
+            die "Can't create sort sub: $@" if $@;
+            die "Can't create sort sub: $@" if $@;
+            die "Can't create sort sub: $@" if $@;
+            die "Can't create sort sub: $@" if $@;
+            die "Can't create sort sub: $@" if $@;
+            delete $fh{$first};
+            delete $fh{$first};
+            defined $topts->{t} ? quotemeta($topts->{t}) :
+            defined $topts->{X} ? $topts->{X} :
+            close F;
+            _debug("\nSorting leftover records ...\n") if $opts->{D};
+            _debug("Sorting file $filein ...\n") if $opts->{D};
+            _check_last(\@recs);
+            *sortsub = eval $sortsub;
+            *sort2  = eval $sort2;
+            *sort1  = eval $sort1;
+            *map2  = eval $maps{map2};
+            *map1  = eval $maps{map1};
+            ($first) = keys %fh;
+            ($bb, $aa) = ($aa, $bb) if ($opts->{kst} =~ /r/);
+            '\s+';
+            $uniq = $fh{$first};
+            $topts->{k} = ['K'];    # special K ;-)
+            $topts->{kst} .= $_ if $topts->{$_};
+            $topts->{K} = 0;
+            $opts{kst} .= $_ if ($opts{kst} =~ /$_/ || $opts{kft} =~ /$_/);
+            $opts{kst} .= $_ if $topts->{$_};
+            $opts{kft} .= $_ if ($opts{kst} =~ /$_/ || $opts{kft} =~ /$_/);
+            $opts{kft} .= $_ if $topts->{$_};
+            $opts = $k eq 'K' ? $topts : _parse_keydef($k, $topts);
+            $maps{$m} = sprintf "sub {\n  my \@tmp = %s;\n",
+            $maps{$m} .= "]\n}\n";
+            $maps{$m} .= "\n  [\$_, $k";
+            $maps{$m} .= ",\n  " . join('', @mapsub) if @mapsub;
+            $maps{$m} .= "  my \$tmp;\n" if $topts->{DD};
+            $last = $rec;
+            $fil[0] = "\$tmp = $fil[0]" if $opts->{kst} =~ /d/;
+            $fh{$first} = $rec;
+            $cmp = '<=>' if ($opts->{kst} =~ /n/);
+            # skip stuff if special K
+            # save value of last record
+            # reverse sense
+            # only printable characters
+            # only alphanumerics and whitespace, override -i
+            # just open files and get array of handles
+            # fold to upper case
+            # fail if records not in proper sort order
+            # fail if -u and keys are not unique (assume sorted)
+            # do straight compare if all else is equal
+            # do numeric sort
+            # defaults for main sort sub components
+            # add finished expressions to arrays
+            # $first is arbitrary number assigned to first fh in sort
+                } else {
+                } else {
+                }
+                }
+                }
+                }
+                }
+                }
+                sysopen(F, $filein, O_RDONLY)
+                return 0 unless _are_uniq($opts->{K}, $last, $rec);
+                return 0 if $foo[0] ne $last || $foo[1] ne $rec;
+                require POSIX;
+                push @recs, $rec;
+                push @mapsub, "  (\n" .
+                push @mapsub, "  " . $fil[0] . ",\n  ";
+                push @fil, "\$tmp =~ s/[^\\w\\s]+//g", '"$tmp"';
+                or die "Can't open `$opts->{I}[0]' for reading: $!";
+                or die "Can't open `$opts->{I}[0]' for reading: $!";
+                or die "Can't open `$filein' for reading: $!";
+                open(F, $filein)
+                my($tmp1, $tmp2) = ("\$tmp[$opts->{ksf}]",
+                my @foo;
+                my $n;
+                local $^W;
+                local $^W;
+                local $^W;
+                local $^W;
+                if ($opts->{kst} =~ /b/) {
+                if ($opts->{kft} =~ /b/) {
+                if ($opts->{K}) {
+                if ($count >= $opts->{'y'}) {    # don't go over record limit
+                if (! defined $opts->{kff} || $opts->{ksf} == $opts->{kff}) {
+                if (   /^\+(\d+)(?:\.(\d+))?([bdfinr]+)?
+                @recs = sort sort1 @recs;
+                @recs = map {$_->[0]} sort sortsub map &map1, @recs;
+                @fil = $opts->{kst} =~ /b/ ?
+                ($first) = (sort sort2 keys %fh);
+                ($first) = (map {$_->[0]} sort sortsub
+                (!$uniq || _are_uniq($opts->{K}, $uniq, $fh{$first}));
+                $topts->{r} ? qw($b cmp $a) : qw($a cmp $b);
+                $topts->{k}[0] eq 'K' ? $k : "split(/$topts->{t}/, $k)";
+                $topts->{DD}++;
+                $pos = [$pos];
+                $fil[0] = "uc($fil[0])";
+                $fil[0] = "join '', grep {POSIX::isprint \$_} " .
+                $count++;  # keep track of number of records
+                $args[0]{'k'} = [];
+                $args[0]{'k'} = [$args[0]{'k'}];
+                $aa, $cmp, $bb;
+                # try again, shall we?
+                # skip leading spaces
+                # simpler if one field, goody for us
+                   (?:\s+\-(\d+)(?:\.(\d+))?([bdfinr]+)?)?$/x) {
+                    } elsif (($opts->{kff} - $opts->{ksf}) == 1) {
+                    } elsif (!$opts->{kfc}) {
+                    } else {
+                    } else {
+                    }
+                    }
+                    }
+                    }
+                    push @{$args[0]{'k'}}, $n;
+                    push @fh, _write_temp(\@recs, $opts);
+                    or die "Can't open `$filein' for reading: $!";
+                    or die "Can't open `$filein' for reading: $!";
+                    map &map2, keys %fh);
+                    local $^W;
+                    local $^W;
+                    join(",\n", map {s/^/      /mg; $_} @fil),
+                    if (defined $4) {
+                    if (@fh >= $opts->{F}) {
+                    if ($opts->{ksc} == 0 &&
+                    if ($opts->{kfc} == 0 && $opts->{ksc} == 0 &&
+                    _debug("$count records reached in `$filein'\n")
+                    @foo = sort sort1 ($rec, $last);
+                    @foo = map {$_->[0]} sort sortsub
+                    ($opts->{kff} ? "\$tmp[$opts->{kff}]" : ''));
+                    ($count, @recs) = (0);
+                    $tmp2 = "($tmp2 =~ /(\\S.*)/)[0]";
+                    $tmp1 = "($tmp1 =~ /(\\S.*)/)[0]";
+                    $n = $1 + 1;
+                    $n .= '.' . ($2 + 1) if defined $2;
+                    $n .= $3 if $3;
+                    # simpler if chars are both 0, wicked pissah
+                    # save to temp file, add new fh to array
+                    # reset record count and record array
+                    # if spans two fields, but chars are both 0
+                    # if only one field away
+                    # hmmmmm
+                    # getting out of hand now
+                    # fine, have it your way!  hurt me!  love me!
+                    # do a merge now if at file limit
+                    # and neither has -b, alrighty
+                    "split //,\n$fil[0]";
+                    "\n    )[-1],\n  ";
+                    "(\$tmp[0] =~ /(\\S.*)/)[0]" : "\$tmp[0]";
+                        map &map1, ($rec, $last);
+                        if $opts->{D};
+                        _debug("\nCreating temp files ...\n") if $opts->{D};
+                        @fil = "substr($tmp1, $opts->{ksc}, ". 
+                        @fil = "substr($tmp1, $opts->{ksc})";
+                        @fil = "join(''," .
+                        @fil = "join('', substr($tmp1, $opts->{ksc}), " .
+                        @fil = "join('', substr($tmp1, $opts->{ksc}), " .
+                        @fil = "\$tmp[$opts->{ksf}]";
+                        @fh = (_merge_files($opts, \@fh, [], _get_temp()));
+                        (!$opts->{kfc} || $opts->{kfc} == 0)) {
+                        $opts->{kst} !~ /b/ && $opts->{kft} !~ /b/) {
+                        $n .= $6 if $6;
+                        $n .= "," . (defined $5 ? ($4 + 1) . ".$5" : $4);
+                        # get filehandle and restart array with it
+                            ($opts->{kfc} - $opts->{ksc}) . ')';
+                            "substr($tmp2, 0, $opts->{kfc}))";
+                            "substr($tmp2, 0, $opts->{kfc}))";
+                            "\@tmp[$opts->{ksf} .. $opts->{kff}])";
+                            "\@tmp[" . ($opts->{ksf} + 1) . " .. " .
+                                ($opts->{kff} - 1) . "], " .
+            
+        
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,34 @@
+File::ReplaceBytes - read or replace arbitrary data in files (with dangerous system calls)
+
+To install this module, use CPAN, for example:
+
+  cpan File::ReplaceBytes
+
+For the current release, or to report bugs or whatnot, see:
+
+http://github.com/thrig/File-ReplaceBytes
+
+This can be built and installed by running:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Then the documentation may be read via:
+
+  perldoc File::ReplaceBytes
+
+DEPENDENCIES
+
+A C compiler for the XS code, plus the availability of the pread(2) and
+pwrite(2) system calls, which are unavailable in the perl POSIX module--
+doubtless due to the unpredictable behavrior of these system calls with in-
+memory filehandles; see this module's perldocs for warnings.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2016 by Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

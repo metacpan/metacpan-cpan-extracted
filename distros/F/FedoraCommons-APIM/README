@@ -1,0 +1,521 @@
+NAME
+    FedoraCommons::APIM - Interface for interaction with Fedoras Management
+    API
+
+VERSION
+    This documentation describes version 0.1.
+
+SYNOPSIS
+      use Fedora::APIM;
+
+      my $apim=new Fedora::APIM(
+             host    => "my.fedora.host",
+             port    => "8080",
+             usr     => "fedoraAdmin",
+             pwd     => "foobarbaz",
+             timeout => 100); 
+
+      if ($apim->ingest(XML_ref=>\$foxml, logMessage=>"Ingesting", \$pid)) {
+        print "Ingested FOXML Record:\n".$foxml."\n\nFedora PID: $pid";
+      } else {
+        print "Error ingesting: ".$apim->error();
+      }
+
+DESCRIPTION
+    Fedora::APIM provides an interface to the SOAP::Lite based management
+    API (API-M) of the Fedora repository architecture
+    (<http://www.fedora.info/>).
+
+    It exposes a subset of the API-M operations and handles errors and
+    elapsed-time profiling.
+
+OPTIONS
+    Fedora::APIM may be invoked with an option
+
+    version
+         Fedora::APIM supports multiple versions of the Fedora API-M.
+         Specifying the version of the Fedora API-M is done at invocation
+         time by
+
+           use FedoraCommons::APIM version=>3.2;
+
+         Supported versions of the Fedora API-M: 3.2.
+
+METHODS
+    Parameters for each method is passed as an anonymous hash. Below is a
+    description of required and optional hash keys for each method. Methods
+    will croak if mandatory keys are missing. Most keys corresponds to
+    paramter names to the equivalent API-M operation described at
+    <http://www.fedora.info/definitions/1/0/api/Fedora-API-M.html>.
+
+  Constructor
+    new()
+       Constructor. Called as
+
+           my $apim = new Fedora::APIM(
+             host    => "hostname",      # Required. Host name of 
+                                         #   fedora installation
+             port    => "8080",          # Required. Port number of 
+                                         #   fedora installation
+             usr     => "fedoraAdmin",   # Required. Fedora admin user
+             pwd     => "fedoraAdmin",   # Required. Fedora admin password
+             timeout => 100              # Optional. Timeout for
+                                         #   SOAP connection
+           );
+
+  Methods representing API-M operations
+    Each method returns 0 upon success and 1 upon failure. Method error()
+    may be used to get back a textual description of the error of the most
+    recent method call.
+
+    ingest()
+       Ingest a FOXML record into Fedora and return the PID. Called as
+
+           my $pid;
+           $apim->ingest(
+             XML_ref => \$foxml_record,  # Required. Reference to scalar 
+                                         #   holding FOXML record
+             logMessage => $msg,         # Optional.  Log message
+             pid_ref => \$pid            # Required. Reference to scalar
+                                         #   to hold pid returned from
+                                         #   fedora 
+           );
+
+       The createObject() method encapsulates the ingest and addDatastream
+       methods into a single call. See createObject().
+
+    purgeObject()
+       Purge a Fedora object and return the timestamp of that operation.
+       Called as
+
+           my $ts;
+           $apim->purgeObject(
+             pid => $pid,                # Required. Scalar holding
+                                         #   PID of object to be purged
+             logMessage => $msg,         # Optional.  Log message
+             timestamp_ref => \$ts       # Required. Reference to scalar
+                                         #   to hold timestamp returned
+                                         #   from fedora 
+           );
+
+    uploadFile()
+       Uploading a file via multipart HTTP POST to
+       /fedora/management/upload. This allows adding a datastream from a
+       local file (url not required).
+
+       This is a method from the API-M Lite api. Allows you to upload a
+       local file and avoid having to specify a URL when adding a
+       datastream. This method is used by uploadNewDatastream() which
+       combines uploadFile() and addDatastream() into one method.
+
+           $apim->uploadFile(filename => $filename,
+                             file_ref => \$file_ref)
+
+         then supply $file_ref to addDatastream() call:
+
+           my $url = $file_ref;
+           # Remove trailing spaces
+           $url =~ s/\s+$//;
+
+           $apim->addDatastream( 
+             pid => $pid,
+             dsID => $dsID,
+             altIDs => $altids,
+             dsLabel => $label,
+             versionable => $v,
+             MIMEType => $mime,
+             formatURI => $uri,
+             dsLocation => $url, # file_ref
+             controlGroup => $cg,
+             dsState => $state,
+             logMessage => $msg,
+             dsid_ref => \$dsid )
+
+    addDatastream()
+       Add a datastream to a Fedora object and return the datastream id.
+       Called as
+
+           my $dsid;
+           $apim->addDatastream(
+             pid => $pid,                # Required. PID of object 
+             dsID => $dsID,              # Required. ID of the datastream 
+             altIDs => $altids,          # Optional.  Alternative id's
+             dsLabel => $label,          # Required. Datastream label 
+             versionable => $v,          # Required. "false" or "true"
+             MIMEType =>, $mime,         # Required. Mime type of datastream
+             formatURI => $uri,          # Required. 
+             dsLocation => $url,         # Required. URL from where 
+                                         #   fedora can fetch datastream 
+             controlGroup => $cg,        # Required. Must have value 
+                                         #   "X", "M", "R" or "E"
+             dsState => $state,          # Required. Must have value
+                                         #   "A", "I" or "D"
+             checksumType => $checksumType, # Optional. Checksum algorithm 
+             checksum => $checksum       # Optional. Checksum value
+             logMessage => $msg,         # Optional.  Log message
+             dsid_ref => \$dsid          # Required. Reference to scalar
+                                         #   to hold datastream ID returned
+                                         #   from fedora 
+           );
+
+    compareDatastreamChecksum()
+       Verifies that the Datastream content has not changed since the
+       checksum was initially computed.
+
+           $apim->compareDatastreamChecksum (
+             pid => $pid,                        # Required.  PID of object
+             dsID => $dsID,                      # Required. datastream ID
+             versionDate => $versionDate,        # Optional. 0 or 1
+             checksum_result =>\$checksum_result,# Required. Returns checksum
+                                                 # or error message.
+           );
+
+    getDatastream()
+       Get a datastream from a Fedora object and returns the datastream.
+       Called as
+
+           my $ds_ref;
+           $apim->getDatastream(
+             pid => $pid,                # Required. Scalar holding
+                                         #   PID of object to be purged
+             dsID => $dsID,              # Required. 
+             ds_ref => \$ds_ref          # Required. Reference to scalar
+                                         #   to hold datastream returned
+                                         #   from fedora 
+           );
+
+    modifyDatastreamByReference()
+       Modifies an existing datastream in an object, by reference and
+       returns the timestamp. Called as
+
+           my $ts;
+           $apim->modifyDatastreamByReference(
+             pid => $pid,                # Required. PID of object 
+             dsID => $dsID,              # Required. ID of the datastream 
+             altIDs => $altids,             # Optional.  Alternative id's
+             dsLabel => $label,          # Required. Datastream label 
+             MIMEType =>, $mime,         # Required. Mime type of datastream
+             formatURI => $uri,          # Required. 
+             dsLocation => $url,         # Required. URL from where 
+                                         #   fedora can fetch datastream 
+             checksumType => $checksumType, # Optional.Checksum algorithm 
+             checksum => $checksum       # Optional. Checksum value 
+             logMessage => $msg,         # Optional.  Log message
+             force => $force,            # Required. "false" or "true"
+             timestamp_ref => \$ts       # Required. Reference to scalar
+                                         #   to hold timestamp returned
+                                         #   from fedora 
+           );
+
+    setDatastreamVersionable()
+       Selectively turn versioning on or off for selected datastream. When
+       versioning is disabled, subsequent modifications to the datastream
+       replace the current datastream contents and no versioning history is
+       preserved. To put it another way: No new datastream versions will be
+       made, but all the existing versions will be retained. All changes to
+       the datastream will be to the current version.
+
+           $apim->setDatastreamVersionable (
+             pid => $pid,                # Required.  PID of object
+             dsID => $dsID,              # Required. ID of the datastream 
+             versionable => $versionable,# Required. versionable setting 0 or 1
+             timestamp_ref => \$ts,      # Required. Reference to scalar
+                                         #   to hold timestamp returned
+                                         #   from fedora 
+           );
+
+    purgeDatastream()
+       Purge a datastream from a Fedora object and return the timestamp of
+       that operation. Called as
+
+           my $ts;
+           $apim->purgeDatastream(
+             pid => $pid,                # Required.  PID of object to be purged
+             dsID => $dsID,              # Required. ID of the datastream 
+             startDT => $startDT,        # Optional. 
+             endDT => $endDT,            # Optional. 
+             logMessage => $msg,         # Optional.  Log message
+             force => $force,            # Required. "false" or "true"
+             timestamp_ref => \$ts       # Required. Reference to scalar
+                                         #   to hold timestamp returned
+                                         #   from fedora 
+           );
+
+    addRelationship()
+       Creates a new relationship in the object.
+
+         $apim->addRelationship( 
+           pid => $pid,                  # Required. PID of object
+           relationship => $relation,    # Required. Relation to add.
+           object => $object,            # Required. Target object.
+           isLiteral => 'false',         # Optional. Is object a literal? 
+                                         # Default: 'false'
+           datatype => "",               # Optional. Datatype of literal.
+                                         # Default: ''
+           );
+
+    purgeRelationship()
+       Delete the specified relationship.
+
+           $apim->purgeRelationship( 
+             pid => $pid,                # Required. PID of object
+             relationship => $relation,  # Required. Relation to delete.
+                                         # Note: null matches any relationship
+             object => "$object",        # Required. Target object.
+                                         # Note: null matches any object.
+             isLiteral => 'false',       # Optional. Is object a literal?
+             datatype => "",             # Optional. Datatype of literal.
+             result => \$result,         # Required. Result of purge.
+             );
+
+    getNextPID()
+       Get next PID(s) from Fedora in a given PID namespace. Called as
+
+           my @pids;
+           $apim->getNextPID (
+             numPids => $n,              # Required.  Number of pids.
+             pidNamespace => $ns,        # Required. Namespace for pids.
+             pidlist_ref  => \@pids      # Required. Reference to list
+                                         #   into which resulting pids
+                                         #   are put
+           );
+
+  Methods Currently Not Implemented
+    getDatastreamHistory()
+       Gets all versions of a datastream, sorted from most to least recent.
+
+    getDatastreams()
+       Gets all datastreams in the object.
+
+    modifyDatastreamByValue()
+       Modifies an existing Datastream in an object, by value.
+
+    setDatastreamState()
+       Sets the state of a Datastream to the specified state value.
+
+    getRelationships()
+       Get the relationships asserted in the object's RELS-EXT Datastream
+       that match the given criteria.
+
+    modifyObject()
+       Modify an object.
+
+    export()
+       Exports the entire digital object in the specified XML format, and
+       encoded appropriately for the specified export context.
+
+    getObjectXML()
+       Gets the serialization of the digital object to XML appropriate for
+       persistent storage in the repository, ensuring that any URLs that are
+       relative to the local repository are stored with the Fedora local URL
+       syntax.
+
+  Additional NON-APIM Methods
+    These methods often consolidate several APIM methods into a single
+    method. The idea is to encapsulate functionality where several APIM
+    methods are normally used together in client code into a single method.
+
+    createObject()
+       This method takes care of creating the FOXML and the new object
+       [normally two APIA steps].
+
+       Creating an object requires FOXML for the object you are creating.
+       You must install the default ingest template (available) in the
+       default file path location [/ingesttemplate.xml] or you must provide
+       a path to the method as an argument.
+
+       The params are values in the FOXML template that will be substitutes
+       before being ingested. You may create your own FOXML template and
+       supply the appropriate values to be substituted. The current default
+       template accepts the values: pid_in, title_in, and collection_in.
+
+       Typical createObject() method call:
+
+           $apim->createObject (
+             XML_file=> "./ingesttemplate.xml", 
+             params => { pid_in => $idno,
+                         title_in => "$title",
+                         collection_in => "DXLS:Math"},
+             pid_ref =>\$pid 
+           );
+
+       To use default ingest template:
+
+           $apim->createObject (
+             params => { pid_in => $idno,
+                         title_in => "$title",
+                         collection_in => "DXLS:Math"},
+             pid_ref =>\$pid 
+
+       To specify FOXML template that's already stored in memory:
+
+           $apim->createObject (
+             XML_ref => "$foxml",
+             params => { pid_in => $idno,
+                         title_in => "$title",
+                         collection_in => "DXLS:Math"},
+             pid_ref =>\$pid 
+
+    uploadNewDatastream() This method combines the upload operation and the
+    add datastream operation into a single call and sets reasonable defaults
+    (which the caller may override) for several parameters.
+       Full method call looks like:
+
+         $apim->uploadNewDatastream( 
+           pid => $pid,                  # Required. PID of object
+           dsID => $dsID,                # Required. ID of the datastream 
+           altIDs => $altids,            # Optional. Alternative id's
+           dsLabel => $dsLabel,          # Optional. Datastream label.
+                                         # Default: null string
+           versionable => $versionable,  # Optional. Is datastream versionable?
+                                         # Default: true
+           filename => $filename,        # Required. Datastream file to upload.
+           MIMEType => $mime,            # Required. Mime type of datastream
+           controlGroup => $cgroup,      # Optional. Control group.
+                                         # Default: 'M', for managed content.
+           dsState => $dsState,          # Optional. Datastream state.
+                                         # Default: 'A', for active.
+
+           checksumType => $checksumType,# Optional. Checksum type.
+                                         # Default: SHA-1
+           checksum => $checksum,        # Optional. Actual checksum.
+                                         # Default: null, calculated 
+                                         # automatically by repository
+           logMessage => $logMessage,    # Optional. Log message.
+                                         # Default: "Add datastream."
+           dsid_ref => \$dsid,           # Required. Reference to scalar
+                                         #   to hold datastream ID returned
+                                         #   from fedora 
+           timestamp_ref => \$ts,        # Required. Reference to scalar
+                                         #   to hold timestamp returned
+                                         #   from fedora 
+           );
+
+       Typical call looks like:
+
+           $apim->uploadNewDatastream( pid => $pid,
+                                       dsID => $dsID,
+                                       filename => $filename,
+                                       MIMEType => $mime,
+                                       dsid_ref => \$dsid,
+                                       timestamp_ref => \$ts,
+                                       );
+
+  Other methods
+    error()
+       Return error of most recent API-M method.
+
+    get_time()
+       Return the elapsed time of the most recent SOAP::Lite call to the
+       fedora API-M.
+
+    get_stat()
+       Return reference to hash describing total elapsed time and number of
+       calls - since instantiation or since most recent call to start_stat()
+       - of all SOAP::Lite calls to the fedora API-M.
+
+    start_stat()
+       Start over the collection of elapsed times and number of calls
+       statistics.
+
+    get_default_foxml()
+       The APIM module stores a default FOXML internally. This is used when
+       the client does not provide the createObject with raw FOXML or a file
+       path to custom FOXML.
+
+       The get_default_foxml() method will return the internal FOXML
+       template so that you may customize it for your purposes.
+
+       If you save the FOXML template in the location './ingesttemplate.xml'
+       it will be detected automatically when you call createObject()
+       without specifying a FOXML argument.
+
+DEPENDENCIES
+    MIME::Base64, SOAP::Lite, Time::HiRes, Carp
+
+KNOWN BUGS, LIMITATIONS AND ISSUES
+    In its current implementation, Fedora::APIM represents a wrapping of the
+    SOAP based interface in which most of the parameters for the SOAP
+    operations are required parameters to the corresponding wrapping method,
+    even though parameters may be optional in the SOAP interface.
+
+    In future versions, parameters should become optional in the methods if
+    they are optional in the corresponding SOAP operation; or suitable
+    defaults may be used with SOAP for some of the parameters, should they
+    be missing as parameters to the wrapping method.
+
+SEE ALSO
+    Fedora documentation:
+    <http://fedora-commons.org/confluence/display/FCR30/Fedora+Repository+3.
+    2.1+Documentation>.
+
+    Fedora API-M documentation:
+    <http://www.fedora.info/definitions/1/0/api/Fedora-API-M.html>.
+
+AUTHOR
+    The Fedora::APIM module is based on a module written by Christian
+    Tønsberg, <ct@dtv.dk>, in 2006. Christian no longer supports or
+    distributes the module he developed.
+
+    Maryam Kutchemeshgi (Penn State University) put together the initial
+    version of Fedora::APIM. This module was originally developed (circa
+    2007) in a collaboration between Cornell University and Penn State
+    University as part of a project to develop an interface to support the
+    use of the Fedora Repository as the underlying repository for DPubS
+    [Digital Publishing System] <http://dpubs.org>. Maryam Kutchemeshgi
+    <mxk128@psu.edu> is no longer involved with maintaining this module.
+
+    David L. Fielding (<dlf2@cornell.edu<gt>) is responsible for recent
+    enhancements along with packaging up the module and placing it on CPAN.
+    To avoid confusion between Fedora (the Linux operating system) and
+    Fedora (the repository) I changed the name of the module package from
+    Fedora to FedoraCommons (the qualified name of the Fedora repository). I
+    have modified the modules to work with the Fedora Commons 3.2 APIs.
+
+    This module implements a subset of the requests supported by the API-M
+    specification. Additional requests may be implemented upon request.
+    Please direct comments, suggestions, and bug reports (with fixes) to me.
+    The amount of additional development will depend directly on how many
+    individuals are using the module.
+
+    Please refer to module comments for information on who implemented
+    various methods.
+
+INSTALLATION
+    This module uses the standard method for installing Perl modules. This
+    module functions as an API for a Fedora server and therefore requires a
+    functioning Fedora server to run the tests ('make test'). Settings for
+    the Fedora server are read from the following environment variables:
+    FEDORA_HOST, FEDORA_PORT, FEDORA_USER, FEDORA_PWD. The tests will not
+    run if these environment variable are not set properly.
+
+    Note: The APIM module supports methods that modify the repository. The
+    'make test' operation below will create objects in the repository in
+    order to test methods. The last step will be to remove the test objects.
+    Be ware that this test will attempt to modify the target repository.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008, 2009 by Cornell University,
+    <http://www.cornell.edu/> Copyright (C) 2006 by PSU,
+    <http://www.psu.edu/> Copyright (C) 2006 by DTV, <http://www.dtv.dk/>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this library; if not, visit http://www.gnu.org/licenses/gpl.txt or
+    write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+    Floor, Boston, MA 02110-1301 USA
+

@@ -1,0 +1,7 @@
+Revision history for Perl module File-Symlink-Atomic
+
+0.002     2012-06-12
+  - Bail unless it is a Unix-ey platform [GH #2]
+
+0.001     2012-06-10
+  - Initial revision

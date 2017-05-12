@@ -1,0 +1,115 @@
+Changes for File-chdir
+
+0.1010    2015-02-05 10:04:27-05:00 America/New_York
+
+    [Changed]
+
+    - Updated distribution metadata and repo layout
+
+    - Changed bugtracker to github
+
+0.1009    2014-09-23 12:24:11-04:00 America/New_York
+
+    [Changed]
+
+    - Updated distribution metadata
+
+0.1008    2012-12-02 22:32:37 America/New_York
+
+    - Fixed broken use of abs_path on Cygwin [Joel Berger]
+
+0.1007    2012-09-17 20:29:43 America/New_York
+
+    - Fixed broken Pod link; reordered CAVEATS section
+
+0.1006    2011-11-02 18:11:13 America/New_York
+
+    - Handle directories with newlines [rt.cpan.org #72114]
+
+0.1005    2011-11-02 14:21:27 America/New_York
+
+    - Fixed rt.cpan.org #53064 [Michael Schwern]
+
+    - Removes bundled Test::More
+
+    - Converted distribution builder to Dist::Zilla
+
+0.1004 Wed Jun  9 14:14:54 EDT 2010
+
+    - Build.Pl and Makefile.PL will bail out on Perl 5.13.1, which
+      accidentally broke File::chdir
+
+0.1003 Tue Apr 27 21:21:32 EDT 2010
+
+    - testfix: remove -T flag in tests
+
+0.1002 Mon Feb 11 19:47:46 EST 2008
+
+    - testfix: 0.1001 accidentally left many array tests commented out
+
+0.1001 Sat Feb  9 13:07:05 EST 2008
+
+    - testfix: work around odd Test::Builder errors on perl 5.6.2 dying in
+      the middle of a "push"
+
+0.10 Fri Feb  8 08:42:53 EST 2008
+    - File::Spec 3.2501 broke File::chdir on Win32; updated prerequisite to
+      latest File::Spec (3.27) and rewrote internals of File::chdir
+    - Split array deletion tests to separate file to skip on Perl < 5.006
+    - Added Build.PL and other files (e.g. INSTALL, LICENSE) to the tarball
+    - Minor documentation changes/additions
+
+0.0901
+    - removed unnecessary prototypes on internal functions (perl critic)
+    - cosmetic changes to distribution package (README, extra tests in xt)
+
+0.09 Mon Jul 30 09:50:28 EDT 2007
+    - Updated Makefile.PL to warn about API change in 0.08
+    - Added $! diagnostic to error messages
+
+0.08 Thu Jun 21 20:56:50 EDT 2007
+    * Croaks if the chdir fails when changing $CWD or @CWD
+    * Deleting from end of @CWD acts like a pop
+    - Revised and expanded @CWD tests
+    - Revised delete error message for deleting from middle of @CWD
+    - Added DIAGNOSTICS section to documentation
+
+0.07 Mon Jun 18 18:38:00 EDT 2007
+    - Fixed testfile bug that prepended "/" in tests on Cygwin
+
+0.06_01 Mon Apr  9 05:17:02 EDT 2007
+    - Development release by David Golden
+    * Fixed bug that prepended "/" to $CWD for Win32
+    * $CWD changed to use native path separators
+    * Tests fixed on Win32 by always using native separators as well
+    * Upped File::Spec and Cwd dependencies to require many recent bug-fixes
+    - Added note about comparing $CWD to File::Spec generated names
+    - Other minor documentation patches from Schwern
+
+0.06  Thu Aug 14 17:02:32 PDT 2003
+    * Now working under taint mode (thanks Mark Guckeyson)
+    - Small nit in the SYNOPSIS
+    * Removed dependency on File::Spec 0.8 and File::Spec::Functions
+    - Added a LICENSE
+    - Added NOTES about %CWD.
+
+0.05  Mon Nov 26 15:44:20 EST 2001
+    * Added @CWD
+    - $CWD's value now guaranteed to be correct even if some other code
+      calls chdir().
+
+0.04  Mon Nov 26 13:36:24 EST 2001  *UNRELEASED*
+    * The magic chdir() is *gone*
+    * Now works back to 5.004
+
+0.03  Mon Sep  3 20:10:15 EDT 2001
+    * chdir() is being deprecated and will be removed next version!
+    - Gave credit to Abigail and Bryan
+
+0.02  Mon Sep  3 19:51:02 EDT 2001
+    * Added $CWD
+    - chdir() with no args works
+
+0.01  Fri Aug 31 21:15:25 EDT 2001
+    * HA!  It works!
+

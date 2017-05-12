@@ -1,0 +1,348 @@
+class 'Fl';
+include 'FL/Enumerations.H';
+include 'FL/fl_show_colormap.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Color - Easily Imported Color-related Functions and Static Values
+
+=head1 Synopsis
+
+    use Fl qw[:enum]; # Import with all enums!
+    use Fl qw[:color]; # Import just the stuff in here
+
+=head1 Description
+
+This file contains type definitions, general enumerations, and several
+functions which can be inported with the C<:color> tag.
+
+Colors are either 8-bit indexes into a virtual colormap or 24-bit RGB color
+values. (See Fl::Draw for the default colormap)
+
+Color indices occupy the lower 8 bits of the value, while RGB colors occupy
+the upper 24 bits, for a byte organization of RGBI.
+
+    Fl_Color => 0xrrggbbii
+                   | | | |
+                   | | | +--- index between 0 and 255
+                   | | +----- blue color component (8 bit)
+                   | +------- green component (8 bit)
+                   +--------- red component (8 bit)
+
+Here's a list of built-in colors:
+
+=over
+
+=item FL_FOREGROUND_COLOR
+
+The default foreground color used for labels and text.
+
+=item FL_BACKGROUND2_COLOR
+
+The default background color for text, list, and valuator widgets.
+
+=item FL_INACTIVE_COLOR
+
+The inactive foreground color.
+
+=item FL_SELECTION_COLOR
+
+The default selection/highlight color.
+
+=item FL_GRAY0
+
+=item FL_DARK3
+
+=item FL_DARK2
+
+=item FL_DARK1
+
+=item FL_BACKGROUND_COLOR
+
+=item FL_LIGHT1
+
+=item FL_LIGHT2
+
+=item FL_LIGHT3
+
+=item FL_BLACK
+
+=item FL_RED
+
+=item FL_GREEN
+
+=item FL_YELLOW
+
+=item FL_BLUE
+
+=item FL_MAGENTA
+
+=item FL_CYAN
+
+=item FL_DARK_RED
+
+=item FL_DARK_GREEN
+
+=item FL_DARK_YELLOW
+
+=item FL_DARK_BLUE
+
+=item FL_DARK_MAGENTA
+
+=item FL_DARK_CYAN
+
+=item FL_WHITE
+
+=back
+
+=cut
+
+export_constant("FL_FOREGROUND_COLOR",  "color");
+export_constant("FL_BACKGROUND2_COLOR", "color");
+export_constant("FL_INACTIVE_COLOR",    "color");
+export_constant("FL_SELECTION_COLOR",   "color");
+export_constant("FL_GRAY0",             "color");
+export_constant("FL_DARK3",             "color");
+export_constant("FL_DARK2",             "color");
+export_constant("FL_DARK1",             "color");
+export_constant("FL_BACKGROUND_COLOR",  "color");
+export_constant("FL_LIGHT1",            "color");
+export_constant("FL_LIGHT2",            "color");
+export_constant("FL_LIGHT3",            "color");
+export_constant("FL_BLACK",             "color");
+export_constant("FL_RED",               "color");
+export_constant("FL_GREEN",             "color");
+export_constant("FL_YELLOW",            "color");
+export_constant("FL_BLUE",              "color");
+export_constant("FL_MAGENTA",           "color");
+export_constant("FL_CYAN",              "color");
+export_constant("FL_DARK_RED",          "color");
+export_constant("FL_DARK_GREEN",        "color");
+export_constant("FL_DARK_YELLOW",       "color");
+export_constant("FL_DARK_BLUE",         "color");
+export_constant("FL_DARK_MAGENTA",      "color");
+export_constant("FL_DARK_CYAN",         "color");
+export_constant("FL_WHITE",             "color");
+
+=pod
+
+The following functions are also imported with the C<:color> tag.
+
+=over
+
+=item fl_inactive(...)
+
+    my $inactive_red = fl_inactive(FL_RED);
+
+Returns the inactive, dimmed version of the given color.
+
+=cut
+
+xs {name        => 'fl_inactive',
+    definitions => [{required => [['Fl_Color', 'color']],
+                     returns  => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_contrast(...)
+
+    my $fg = FL_RED;
+    my $bg = FL_BLACK;
+    my $color = fl_contrast($fg, $bg);
+
+Returns a color that contrasts with the background color.
+
+This will be the foreground color if it contrasts sufficiently with the
+background color. Otherwise, returns C<FL_WHITE> or C<FL_BLACK> depending on
+which color provides the best contrast.
+
+=cut
+
+xs {name        => 'fl_contrast',
+    definitions => [{required => [['Fl_Color', 'fg'], ['Fl_Color', 'bg']],
+                     returns => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_color_average(...)
+
+    my $average = fl_color_average(FL_RED, FL_BLUE, .14);
+
+Returns the weighted average color between the two given colors.
+
+The red, green and blue values are averages using the following formula:
+
+    color = color1 * weight  + color2 * (1 - weight)
+
+Thus, a weight value of 1.0 will return the first color, while a value of 0.0
+will return the second color.
+
+=cut
+
+xs {name        => 'fl_color_average',
+    definitions => [{required => [['Fl_Color', 'color1'],
+                                  ['Fl_Color', 'color2'],
+                                  ['double',   'weight']
+                     ],
+                     returns => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_lighter(...)
+
+    my $light_red = fl_lighter(FL_RED);
+
+Returns a lighter version of the specified color.
+
+=cut
+
+xs {name        => 'fl_lighter',
+    definitions => [{required => [['Fl_Color', 'color']],
+                     returns  => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_darker(...)
+
+    my $dark_red = fl_darker(FL_RED);
+
+Returns a darker version of the specified color.
+
+=cut
+
+xs {name        => 'fl_darker',
+    definitions => [{required => [['Fl_Color', 'color']],
+                     returns  => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_rgb_color(...)
+
+    my $color = fl_rgb_color(100, 200, 180);
+
+Returns the 24-bit color value closest to r, b, g.
+
+    my $gray = fl_rgb_color(13);
+
+Returns the 24-bit color value closest to g (grayscale).
+
+=cut
+
+xs {name        => 'fl_rgb_color',
+    definitions => [{required =>
+                         [['uchar', 'r'], ['uchar', 'g'], ['uchar', 'b']],
+                     returns => 'Fl_Color',
+                    },
+                    {required => [['uchar', 'color']],
+                     returns  => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_gray_ramp(...)
+
+    my $gray = fl_gray_ramp(20 / 255);
+
+Returns a gray color value scaled from black to white.
+
+=cut
+
+xs {name        => 'fl_gray_ramp',
+    definitions => [{required => [['int', 'index']],
+                     returns  => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_color_cube(...)
+
+    my ($r, $g, $b) = (200, 180, 0);
+    my $color = fl_color_cube($r, $b, $g);
+
+Returns a color out of the color cube.
+
+C<$r> must be in the range 0 to FL_NUM_RED - 1,
+C<$g> must be in the range 0 to FL_NUM_GREEN - 1,
+C<$b> must be in the range 0 to FL_NUM_BLUE - 1.
+
+To get the closest color to a 8-bit set of R,G,B values use:
+
+fl_color_cube(R * (FL_NUM_RED - 1) / 255,
+   G * (FL_NUM_GREEN - 1) / 255,
+   B * (FL_NUM_BLUE - 1) / 255);
+
+=cut
+
+xs {name        => 'fl_color_cube',
+    definitions => [{required => [['int', 'r'], ['int', 'g'], ['int', 'b']],
+                     returns => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=item fl_show_colormap(...)
+
+    my $new_color = fl_show_colormap(FL_RED);
+
+Pops up a window to let the user pick a colormap entry. The provided color is
+highlighted when the grid is shown.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/fl_show_colormap.png" /></center>
+
+=cut
+
+xs {name        => 'fl_show_colormap',
+    definitions => [{required => [['Fl_Color', 'old_color']],
+                     returns  => 'Fl_Color'
+                    }
+    ],
+    export => [qw[color]]
+};
+
+=pod
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

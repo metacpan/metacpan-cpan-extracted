@@ -1,0 +1,29 @@
+Revision history for FrameNet-QueryData
+
+0.07	09-09-11
+	- Added documentation for methods cache() and dumpout()
+
+0.06	09-09-09
+	- Included testing resources in the package
+
+0.05	09-09-09
+	- Updated dependencies
+
+0.04	09-09-07
+	- More robust testing
+	- Can now test against a small demo-FrameNet
+
+0.03	07-01-23
+	- Updated documentation
+	- More tests
+	- Caching
+
+0.02 	07-01-22
+	- Removed Class::MethodMaker dependency
+	- Completed documentation
+	- New method: path_related
+	- New method: transitive_related
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

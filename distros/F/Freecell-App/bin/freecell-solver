@@ -1,0 +1,96 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+freecell-solver - solve a FreeCell game by number
+
+=cut
+
+use warnings;
+use strict;
+
+use Freecell::App;
+
+Freecell::App::run;
+
+=head1 SYNOPSIS
+
+freecell-solver [options]
+
+Options:
+
+    --gameno <int>   Solve FreeCell for game <int> (required, 1-1000000)
+
+    --maxnodes <int> Maximum number of nodes to search per level
+                     (default is --maxnodes 2000)
+
+    --winxp          A switch to make sure the solution is valid for XP. If
+                     you get the message "Game solution not valid for XP!"
+                     you can use this flag to solve specifically for XP.
+                     Over half the solutions are already valid for Windows 
+                     XP, Vista and 7 (default is --nowinxp) 
+
+    --showall        A switch to log all the Tableaus and moves for the 
+                     solution. (default is --noshowall)
+
+Example:
+
+    freecell-solver --gameno 1070
+
+=head2 NOTE. The result HTML page image tag src location.>
+
+The generated HTML page needs suit images to display correctly. You should copy these to where your html pages are at.
+
+  site\lib\auto\share\dist\Freecell-App\Freecell\c.png
+  site\lib\auto\share\dist\Freecell-App\Freecell\d.png
+  site\lib\auto\share\dist\Freecell-App\Freecell\h.png
+  site\lib\auto\share\dist\Freecell-App\Freecell\s.png
+
+=head1 DESCRIPTION
+
+C<freecell-solver> is a perl application to solve Freecell using a breadth-first
+search with a simple heuristic to trim the 'seen' position hash to prevent an
+out-of-memory condition.
+
+=head2 --maxnodes considerations
+
+The default of 2000 seems to work quiet well and on a 32 bit distribution of Perl,
+setting it to 8000 to solve gameno 1070 will crash the interpreter.
+
+I use Activeperl 5.16.1 x64 and an Intel quad core i5-2500K and 8GB of memory 
+and have no trouble running 3 solutions at a time in their own console with
+--maxnodes 25000. Each solution takes about 30 minutes. I have successfully 
+solved games at --maxnodes 100000 but they each take over 2 hours and usually 
+don't improve the solution. With a 64 bit version of Perl I haven't seen the
+interpreter crash but I have seen the CPU consumption go from 25% to 2% telling
+me that I'm out of physical memory and swapping. Better lower maxnodes!
+
+=head2 The Heuristic
+
+The algorithm is simple.
+
+=over 4
+
+=item * Start with 64.
+
+=item * Subtract the rank of all the top home cards.
+
+=item * Subtract 1 for each empty freecell and empty column.
+
+=item * Add 1 for each sequence break in the cascade
+        e.g. 6C 5H 4S 2C KD QS TH has 3 sequence breaks,
+        one major at 2C because the KD is greater than
+        the 2C.
+
+=back
+
+Before the search of the next level, the nodes to be search are sorted by 
+their score and only the top maxnodes qualify for the next search and all 
+the remaining nodes are deleted from the position hash.
+
+ author: Shirl Hart
+ email:  shirha@cpan.org
+
+=cut
+
+

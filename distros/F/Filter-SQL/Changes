@@ -1,0 +1,34 @@
+Revision history for Perl extension Filter::SQL.
+
+0.10  Tue Nov 04 11:00:00 2008
+	- implement ``SELECT AS HASH'' directive
+
+0.09  Fri Oct 17 15:55:00 2008
+	- autoconnect to database when FILTER_SQL_DBI env. var. exists
+	- add interface to mysql_insert_id
+
+0.08  Wed Aug 27 13:47:00 2008
+	- fix errors that occur after passing a coderef to dbh()
+
+0.07  Tue Aug 26 14:20:00 2008
+	- dbh() now accepts coderef that return a database handle
+
+0.06  Thu Jun 26 16:15:00 2008
+	- (SELECT ROW) do not croak when table is empty
+
+0.05  Thu Apr 17 13:49:00 2008
+	- use SQL placeholders (?) instead of $dbi->quote
+	- fix error handling of SQL statement errors introduced in 0.04
+
+0.04  Thu Apr 17 12:25:00 2008
+	- handle quote-like operators within SQL statement as SQL literal
+	- report SQL errors from perspective all caller
+
+0.03  Wed Apr 16 18:14:00 2008
+	- fix handling of brackets, accept as part of perl expr. () as well
+
+0.02  Wed Apr 16 10:40:00 2008
+	- merge "SQL" statement to "EXEC"
+
+0.01  Wed Apr 16 10:00:00 2008
+	- initial release

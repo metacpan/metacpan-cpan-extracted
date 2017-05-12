@@ -1,0 +1,5 @@
+2.00   Move to Module::Install, add kwalitee tests
+
+       Make the mkpath and rmpath functions return the correct values
+
+1.00   Initial release to the CPAN

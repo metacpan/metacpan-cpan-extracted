@@ -1,0 +1,23 @@
+bin/acap2pcap
+Build.PL
+Changes
+lib/File/PCAP.pm
+lib/File/PCAP/ACAP2PCAP.pm
+lib/File/PCAP/Reader.pm
+lib/File/PCAP/Writer.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-fpw.t
+t/02-fpa.t
+t/03-fpr.t
+t/data/02-asa-clipped.dump
+t/data/02-pix.dump
+t/data/03-raw-ip.pcap
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t

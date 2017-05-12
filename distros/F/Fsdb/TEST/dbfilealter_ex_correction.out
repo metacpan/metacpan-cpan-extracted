@@ -1,0 +1,5 @@
+#fsdb name id test1
+a_student	1	80
+b_nice	2	70
+c_all	3	65
+#   | dbfilealter -c -F D

@@ -1,0 +1,5 @@
+#fsdb -F s a    b
+# Should show that the b column is at column 15, even though the a contents do not by themselves force that.
+short           1
+short           2
+#   | dbcolneaten a>=15

@@ -1,0 +1,12 @@
+Revision history for File-DigestStore
+
+1.008     2011-10-26 20:05:32 Europe/London
+
+Fixed a showstopper bug where it was only reading the first line of the
+input file to digest, instead of the whole thing.
+
+1.007	  2011-08-20 21:49:09 Europe/London
+
+1.006	  2011-05-13 19:54:34 Europe/London
+
+updated distribution to use Dist::Zilla

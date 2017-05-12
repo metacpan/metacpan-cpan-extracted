@@ -1,0 +1,39 @@
+Chain acct-in :
+Chain acct-fwd :
+Chain acct-out :
+Chain tcp-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-in     tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-in     tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+Chain tcp-fwd :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-fwd    tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-fwd    tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+Chain tcp-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-out    tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-out    tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+Chain udp-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     udp  ------ 0xFF 0x00  eth1                           192.168.1.10         10.10.10.10           1024:65535 ->   514
+Chain udp-fwd :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+MASQ       udp  ------ 0xFF 0x00  ppp0                           192.168.1.10         10.10.10.10           1024:65535 ->   514
+Chain udp-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     udp  ------ 0xFF 0x00  ppp0                           172.16.1.1           10.10.10.10           61000:65096 ->   514
+Chain icmp-in :
+Chain icmp-fwd :
+Chain icmp-out :
+Chain all-in :
+Chain all-fwd :
+Chain all-out :
+Chain syn-in :
+Chain syn-fwd :
+Chain syn-out :
+Chain ack-in :
+Chain ack-fwd :
+Chain ack-out :
+Chain oth-in :
+Chain oth-fwd :
+Chain oth-out :

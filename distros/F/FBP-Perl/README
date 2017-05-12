@@ -1,0 +1,63 @@
+NAME
+    FBP::Perl - Generate Perl GUI code from wxFormBuilder .fbp files
+
+SYNOPSIS
+      my $fbp = FBP->new;
+      $fbp->parse_file( 'MyProject.fbp' );
+      
+  my $generator = FBP::Perl->new(
+          project => $fbp->project
+      );
+      
+  open( FILE, '>', 'MyDialog.pm');
+      print $generator->flatten(
+          $generator->dialog_class(
+              $fbp->dialog('MyDialog')
+          )
+      );
+      close FILE;
+
+DESCRIPTION
+    FBP::Perl is a cross-platform Perl code generator for the cross-platform
+    <wxFormBuilder> GUI designer application.
+
+    Used with the FBP module for parsing native wxFormBuilder save files, it
+    allows the production of complete standalone classes representing a
+    complete Wx dialog, frame or panel as it appears in wxFormBuilder.
+
+    As code generators go, the Wx code produced by FBP::Perl is remarkebly
+    readable. The produced code can be used either as a starter template
+    which you modify, or as a pristine class which you subclass in order to
+    customise.
+
+    Born from the Padre Perl IDE project, the code generation API provided
+    by FBP::Perl is also extremely amenable to being itself subclassed.
+
+    This allows you to relatively easily write customised code generators
+    that produce output more closely tailored to your large Wx-based
+    application, or to automatically integrate Perl Tidy or other
+    beautifiers into your workflow.
+
+METHODS
+    TO BE COMPLETED
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FBP-Perl>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2010 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

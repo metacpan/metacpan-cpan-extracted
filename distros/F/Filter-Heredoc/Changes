@@ -1,0 +1,8 @@
+Revision history for Filter-Heredoc
+
+0.02  Dec 19 19:39 2012
+       Bugfix - Don't exclude Max OS X in Build.PL.
+
+0.01  Dec 14 12:43 2011
+       Initial release.
+

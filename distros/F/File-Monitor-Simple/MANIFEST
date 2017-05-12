@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Changes
+t/pod.t
+t/file-monitor-simple.t
+Build.PL
+Makefile.PL
+lib/File/Monitor/Simple.pm
+META.yml

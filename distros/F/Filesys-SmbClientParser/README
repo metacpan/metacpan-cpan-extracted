@@ -1,0 +1,8 @@
+See POD Documentation in Filesys::SmbClientParser
+Too see it, use something like 
+$ perldoc Filesys::SmbClientParser 
+or 
+$ pod2txt SmbClientParser.pm |more
+
+INSTALL:
+perl Makefile.PL && make && make install

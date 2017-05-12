@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - 'Gabor Szabo'
+build_requires:
+  File::Temp: 0
+  Test::More: 0.80
+  Test::NoWarnings: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Tools
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Path: 0
+  File::Temp: 0
+  POSIX: 0
+resources:
+  repository: https://github.com/szabgab/File-Tools.git
+version: 0.09

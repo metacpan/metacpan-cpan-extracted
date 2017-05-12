@@ -1,0 +1,13 @@
+~$
+.svn/
+.hg/
+.hgignore$
+.bak$
+.swp$
+.txt$
+blib/
+pm_to_blib/
+Makefile$
+^test/
+t/freeradius_database.conf-dist$
+^freeradius_database.conf-dist$

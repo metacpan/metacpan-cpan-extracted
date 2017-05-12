@@ -1,0 +1,8 @@
+Revision history for Perl extension File::History
+
+0.00002 2009/04/07
+        - update Makefile.PL
+        - update SYNOPSIS
+
+0.00001 2009/03/30
+        - original version

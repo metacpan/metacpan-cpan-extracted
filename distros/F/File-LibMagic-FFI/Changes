@@ -1,0 +1,15 @@
+Revision history for File-LibMagic-FFI
+
+0.04      2015-01-22 06:39:38 -0500
+  - CPAN release identical to 0.03
+
+0.03      2015-01-16 10:58:55 -0500
+  - Converted to FFI::Platypus
+  - Add support for Perl 5.8
+  - Non CPAN release
+
+0.02      2014-11-04 17:03:35 -0500
+  - first CPAN version
+
+0.01      2014-10-26 11:45:27 -0400
+  - initial version

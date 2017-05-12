@@ -1,0 +1,5 @@
+#fsdb case mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n copylast_mean copylast_stddev copylast_n
+b	1.98	0.083666	4.2256	0.10387	1.8761	2.0839	0.95	9.9	19.63	1.9	2.1	5	1.02	0.083666	5
+#  | dbmultistats -k case value
+#   | dbcolcopylast mean stddev n
+#   | dbrow _case eq "b"

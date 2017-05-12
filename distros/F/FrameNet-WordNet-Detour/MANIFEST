@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/FrameNet/WordNet/Detour.pm
+lib/FrameNet/WordNet/Detour/Data.pm
+lib/FrameNet/WordNet/Detour/Frame.pm
+script/detour
+t/00-load.t
+t/01-module.t
+t/02-detour.t
+t/03-cmd.t
+t/pod-coverage.t
+t/pod.t

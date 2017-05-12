@@ -1,0 +1,129 @@
+
+
+NAME
+
+
+File::chmod::Recursive - Run chmod recursively against directories
+
+
+
+DESCRIPTION
+
+
+Like [File::chmod][], but recursive with selective permissions
+
+
+
+SYNOPSIS
+
+
+    use File::chmod::Recursive;  # Exports 'chmod_recursive' by default
+
+    # Apply identical permissions to everything
+    #   Similar to chmod -R
+    chmod_recursive( 0755, '/path/to/directory' );
+
+    # Apply permissions selectively
+    chmod_recursive(
+        {
+            dirs  => 0755,       # Mode for directories
+            files => 0644,       # Mode for files
+
+            # Match both directories and files
+            match => {
+                qr/\.sh|\.pl/ => 0755,
+                qr/\.gnupg/   => 0600,
+            },
+
+            # You can also match files or directories selectively
+            match_dirs  => { qr/\/logs\//    => 0775, },
+            match_files => { qr/\/bin\/\S+$/ => 0755, },
+        },
+        '/path/to/directory'
+    );
+
+
+
+FUNCTIONS
+
+
+-   chmod_recursive(MODE, $path)
+-   chmod_recursive(\%options, $path)
+
+    This function accepts two parameters. The first is either a _MODE_
+    or an _options hashref_. The second is the directory to work on. It
+    returns the number of files successfully changed, similar to
+    [chmod][].
+
+    When using a _hashref_ for selective permissions, the following
+    options are valid -
+
+        {
+            dirs  => MODE,  # Default Mode for directories
+            files => MODE,  # Default Mode for files
+
+            # Match both directories and files
+            match => { qr/<some condition>/ => MODE, },
+
+            # Match files only
+            match_files => { qr/<some condition>/ => MODE, },
+
+            # Match directories only
+            match_dirs => { qr/<some condition>/ => MODE, },
+
+            # Follow symlinks. OFF by default
+            follow_symlinks => 0,
+
+            # Depth first tree walking. ON by default (default _find_ behavior)
+            depth_first => 1,
+        }
+
+    In all cases the _MODE_ is whatever [File::chmod][] accepts.
+
+-   rchmod
+-   chmodr
+
+    This is an alias for chmod_recursive and is exported only on
+    request.
+
+
+
+BUGS AND LIMITATIONS
+
+
+Please report any bugs or feature requests at
+https://github.com/mithun/perl-file-chmod-recursive/issues.
+
+
+
+SEE ALSO
+
+
+- [File::chmod][]
+
+- [chmod][]
+
+- [Perl Monks thread on recursive perl chmod][]
+
+
+
+AUTHOR
+
+
+Mithun Ayachit <mithun@cpan.org>
+
+
+
+LICENCE AND COPYRIGHT
+
+
+Copyright (c) 2015, Mithun Ayachit <mithun@cpan.org>. All rights
+reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See [perlartistic][].
+
+  [File::chmod]: https://metacpan.org/pod/File::chmod
+  [chmod]: http://perldoc.perl.org/functions/chmod.html
+  [Perl Monks thread on recursive perl chmod]: http://www.perlmonks.org/?node_id=61745
+  [perlartistic]: https://metacpan.org/pod/perlartistic

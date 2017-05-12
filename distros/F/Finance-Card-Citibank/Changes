@@ -1,0 +1,14 @@
+Changes for Finance::Card::Citibank:
+
+2.02 - Fri Oct 15 13:30:47 EDT 2010
+	Fixed missing prereq in Build.PL
+	While the API didn't change with the move to v2.0, the name,
+	sort_code, and account_no will most likey be different in this
+	verson than in previous.
+
+2.01 - Thu Oct 14 13:57:22 EDT 2010
+    Re-write to use OFX interface rather than screen scraping
+    - Citi move to aspnet style forms which require javascript support
+      (or lost of kludges to fake javascript)
+    - Should be much more stable
+

@@ -1,0 +1,21 @@
+Revision history for File-Spec-Native
+
+1.004     2015-05-25T00:55:14Z
+
+  - Update metadata
+
+1.003     2011-07-14T23:56:49Z
+
+  - Update metadata
+
+1.002     2011-06-30T02:33:05Z
+
+  - Fix test for non-unix
+
+1.001     2011-06-28T16:50:39Z
+
+  - Fix typo in Pod
+
+1.000     2011-06-28T16:28:36Z
+
+  - Initial release

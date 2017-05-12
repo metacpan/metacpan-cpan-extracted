@@ -1,0 +1,35 @@
+Finance::Bank::easybank version 1.05
+====================================
+
+This module provides you with a basic interface to the Easybank AG
+online banking system at http://www.easybank.at.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   - WWW::Mechainze (at least 0.57)
+   - HTML::TokeParser (at least 2.24)
+   - Class::MethodMaker (at least 1.06)
+
+Additonally, you need either Crypt::SSLeay or IO::Socket::SSL to enable
+HTTPS support of LWP.
+
+
+COPYRIGHT AND LICENCE
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+Copyright (C) 2003, 2004 Florian Helmberger

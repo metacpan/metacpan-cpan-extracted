@@ -1,0 +1,10 @@
+Revision history for Finance-Bookkeeping-Account
+
+0.02  2013-06-19 15:06:24 CDT
+
+0.02	2013-06-05 15:04:30 CDT
+				- Check that the input looks like a number
+				- Check that input is not a negative number
+
+0.01  2013-04-10 22:49:44 CDT
+        - Initial release

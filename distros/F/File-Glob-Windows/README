@@ -1,0 +1,88 @@
+NAME
+    File::Glob::Windows - glob routine for Windows environment.
+
+SYNOPSIS
+      use File::Glob::Windows;
+  
+      @list = glob($path);
+  
+      {
+          local $File::Glob::Windows::encoding = getCodePage();
+          local $File::Glob::Windows::sorttype = 0;
+          local $File::Glob::Windows::nocase   = 1;
+          @list = glob($path);
+      }
+
+DESCRIPTION
+    This glob routines works correctly on Windows environment.
+
+    *   Recognize system's current codepage such as 'cp932', It's multibyte
+        character contains '\\' and '/' and '*' and '?' in second byte.
+
+    *   Correctly handles current drive and currend cirectory. MS-DOS
+        derived environments has current directory for each drive. current
+        working directory means current directory on current drive. 'G:'
+        means 'G:.' , not 'G:\'.
+
+    *   It differs from perlglob.exe, this glob can include the wild-card
+        specification also in the middle part of path.
+
+INSTALL
+     perl Makefile.PL
+     nmake
+     nmake test
+     nmake install
+
+    Notice: If you have no make, automatically old nmake.exe is downloaded
+    from site of Microsoft,
+    http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15
+    .exe or ftp://ftp.microsoft.com/Softlib/MSLFILES/Nmake15.exe to same
+    path of perl. You can check nmake install path by:
+
+     perl -e "print $^X"
+
+FUNCTIONS
+  glob( $path [,$enc [,\%options]);
+    This function returns array of path that matches to specified *$path*.
+
+    Third argument is reference of hash that indicate glob option.
+
+   meta characters in path spec
+     *   Match any string of characters
+     ?   Match any single character
+
+  getCodePage()
+    This function detect current ANSI Codepage and returrns string such as
+    "cpNNNNNN";
+
+  getCodePage_A(), getCodePage_B()
+    These functions are different implement to get current codepage.
+
+OPTIONS
+   $File::Glob::Windows::encoding
+    Encoding of current codepage of OS.
+
+   $File::Glob::Windows::sorttype
+    *   1: sort by name.
+
+    *   2: sort by directory,name
+
+    *   3: sort by file,name
+
+    *   4: sort by name descent.
+
+    *   other: no sort
+
+   $File::Glob::Windows::nocase
+    *   0: case sensitive
+
+    *   1: ignore case
+
+    default is 1.
+
+SEE ALSO
+    perlglob, File::DosGlob, File::Glob
+
+AUTHOR
+    tateisu <tateisu@gmail.com>
+

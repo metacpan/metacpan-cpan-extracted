@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+use strict;
+use lib qw(lib);
+use POE qw(Component::Server::FTP);
+use Filesys::Virtual::DAAP;
+
+my $host = shift || 'localhost';
+my $port = shift || 2112;
+my $daap_port = shift || 3689;
+print "Republishing $host on ftp://localhost:$port/\n";
+POE::Component::Server::FTP->spawn(
+    ListenPort      => $port,
+    FilesystemClass => 'Filesys::Virtual::DAAP',
+    FilesystemArgs  => {
+        host      => $host,
+        port      => $daap_port,
+        root_path => '/',
+        cwd       => '/',
+        home_path => '/',
+    },
+    # use 0 to disable these Limits
+    DownloadLimit   => 0,
+    UploadLimit     => 0,
+    LimitSceme      => 'ip',  # ip or per (connection)
+    LogLevel        => 4,     # 4=debug, 3=less info, 2=quiet, 1=really quiet
+    TimeOut         => 120,   # Connection Timeout
+   );
+
+$poe_kernel->run();

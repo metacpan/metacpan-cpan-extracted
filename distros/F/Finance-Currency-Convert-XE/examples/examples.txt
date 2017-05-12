@@ -1,0 +1,15 @@
+To see examples for this distribution, it is recommended you read the test 
+scripts included under ./t, which cover the basic usage of the modules.
+
+I may add further examples should the need ever arise. If you have any example
+scripts that use the distribution in an unusual way or make good use of all the
+features available, please feel free to submit one. If submitting an example
+script, please sure to include the following in your POD:
+
+* Author
+* License
+* Copyright
+
+
+Thanks,
+Barbie.

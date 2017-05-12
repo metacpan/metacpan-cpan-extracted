@@ -1,0 +1,467 @@
+2000-08-04  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Tag: FWCTL_0_28
+	
+	* fwctllog: Only warn (don't die) when encoutering an
+	invalid syslog line.
+
+2000-08-01  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* test.pl: Added test for ICA module.
+
+	* Fwctl/Services/ica.pm: New ICA module.
+
+	* README: Added requirements for Net::IPv4Addr 0.10.
+
+	* NEWS: News for 0.28.
+
+	* Fwctl.spec: Updated for version 0.28.
+	Updated spec file to use new macros.
+
+	* Fwctl.pm (VERSION): Changed version number to 0.28.
+	Required Net::IPv4Addr 0.10.
+
+	* Changed copyright to GPL only.
+	
+	* test-data/in/deny-snmp-INT_NET-nolog: Removed unessary 
+	rules because of Net::IPv4Addr 0.10
+
+	* test-data/in/deny-netbios-INT_NET-nolog: Removed unessary 
+	rules because of Net::IPv4Addr 0.10
+
+2000-06-20  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Copyright: put under GPL only for ipchains.
+
+	* Fwctl/Services/ipsec.pm (accept_rules): Load module
+	when portfw is turned on.
+
+	* Fwctl/Services/pptp.pm (accept_rules): Load module
+	when portfw is turned on.
+
+2000-06-11  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: FWCTL_0_27
+
+	* Fwctl/RuleSet.pm: 
+	(all_masq_forward_ruleset) removed.
+	(all_umasq_forward_ruleset) removed.
+	(ip_forward_ruleset) Changed implementation for all service.
+	(doc) Changed copyright.
+
+	* Fwctl/Services/all.pm: Add rules to all chains:
+	tcp, udp and icmp, to fix problem related to rules
+	optimization.
+
+2000-06-07  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl.pm: 
+	(routes) Return a destination based routing table.
+	(find_interface) Handle case of two routes with one more
+	specific than the other.
+	(interfaces) Fixed a bug when setting the interfaces. 
+	(doc) Copyright is all to iNsu.
+	
+	* test-data/etc/interfaces: Better interface definition
+	  for an IP alias.
+
+	* IPChains/PortFW.pm: Changed Copyright. Removed 
+	  assignment to undef which requires perl 5.005.
+
+2000-05-12  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* fwctlreport: Removed page header and put report's date
+	  under the title.
+
+	* Fwctl/Report.pm 
+	(report_iterator): Assumes that records are
+	  already sorted by time stamp to reduce memory consumption.
+	(remove_duplicates): Was transformed on is_duplicate which is
+	called before adding each records, again to reduce memory usage.
+
+2000-05-08  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl.spec (Requires): Requires Net-IPv4Addr >= 0.09
+
+	* Makefile.PL (PREREQ): Requires Net::IPv4Addr >= 0.09
+
+	* TAG: FWCTL_0_26
+
+	* Fwctl.spec (Version): Updated version number to 0.26.
+
+	* Fwctl.pm (VERSION): Updated version number to 0.26
+
+	* fwctllog (read_records): Throw exception when it is not
+	  possible to parse a Packet log: line.
+
+	* NEWS : Added user changes for 0.26.
+
+	* TODO: Added list of requested enhancements.
+
+2000-05-05  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* fwctllog : Fixe parsing of chains with - in it. 
+	(Thanks Bernd Eckenfels).
+
+2000-02-17  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: FWCTL_0_25_1
+	
+	* fwctl.logrotate: Moved back weekly report to log rotation script.
+
+	* fwctl.cron: Moved back weekly report to log rotation script.
+
+2000-02-16  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: FWCTL_0_25
+	
+	* fwctl.logrotate: Moved weekly reports to fwctl.cron.
+
+	* fwctl.cron: Added weekly reports from logrotate.d sample 
+	configuration.
+
+2000-02-11  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* fwctl: Fixed problem with the way the new switches were 
+	  interpreted.
+
+	* fwctlreport.pm: Changed way to select subset of records with
+	an expression rather than many switches.
+
+	* Fwctl/Report.pm: Changed way to select subset of records with
+	an expression rather than many switches.
+
+	* Fwctl.spec: Updated for version 0.25.
+
+	* Fwctl/Report.pm: When removing duplicates, we should compare
+	src and dst ip using eq not ==.
+
+2000-02-07  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* fwctl.logrotate: Added service_host_sum to weekly report and
+	drop src_host.
+
+	* Fwctl/Services/name_service.pm: When using the server option,
+	accepts UDP queries from any source port.
+
+	* fwctl.logrotate: endpostrotate -> endscript.
+
+2000-01-30  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* fwctl: Added --nocopy, --nolog, --default and --mark options
+	to override default policy.
+	
+	* Fwctl.pm: Possibility to override defaults policy for logging, 
+	copy, deny policy and marking.
+
+2000-01-26  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: FWCTL_0_24
+
+	* fwctl.logrotate: Make sure that only one week of report is
+	generated in the postrotate script.
+
+	* Fwctl/Report.pm: (BEGIN) Conditional loading of Date::Manip
+	wasn't working.
+
+	* IPChains/PortFW.pm: (new) Added /sbin:/bin:/usr/sbin:/usr/bin to 
+	PATH.
+
+	* fwctlreport: Fix problem when there are no records, and 
+	output NO RECORDS. Default details report wasn't working properly.
+
+	* fwctlacctreport: Fix problem when there are no records, and 
+	output NO RECORDS.
+
+	* Fwctl.pm: Check for ipchains in PATH at startup. Use die and
+	warn instead than croak and carp for user errors. Incremented
+	version number.
+
+2000-01-23  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: FWCTL_0_23
+
+	* fwctl.cron: Transform to crontab format. Dumps accounting
+	  counters every 15mins. Preprocess kernel logs every hour and
+	  generates daily reports.
+
+	* fwctl.logrotate: Added fwctl_log to rotation. Generates
+	  weekly reports in the postrotate script.
+
+	* Fwctl/AcctReport.pm: (read_records) Fix problem with opening STDIN.
+
+	* Fwctl/Report.pm: (read_records) Fix problem with opening STDIN.
+	
+	* Fwctl.pm: (version) Updated version number to 0.23.
+
+	* fwctlacctreport:  (pod) Added program documentation.
+	
+	* Fwctl/AcctReport.pm: (pod) Added module documentation.
+
+2000-01-21  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl/AcctReport.pm: New module to generates report from
+	accounting data.
+	
+	* fwctlacctreport: Added program to generates text report
+	from accounting data.
+
+2000-01-18  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* test.pl(test): Add tests for interfaces with same IPs and 
+	aliases with interface specification.
+
+	* Fwctl.pm (expand): Each elements of the expansions is now
+	an array ref which contains ( host_or_network, interface ). 
+	(find_host_alias): Normalize IP addresses (.001 -> .1). Removes
+	interface specification. 
+	(configure): Rewrite for new semantics of expand.
+	(read_aliases): Permit interface specification in expansion by 
+	giving the interface name in parentheses after the host or subnet.
+	Tagged all default aliases with their proper interface.
+	(read_rules): Rewrote for new expand semantics. This makes the
+	function simpler, the only special cases being portfw.
+
+2000-01-17  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* test.pl (test): Added test for masquerading of ftp service.
+
+	* Fwctl/Services/ftp.pm (accept_rules): Problem with masquerading
+	of the ftp port data connection fixed.
+	(account_rules): Wasn't switching between src and dst ports in
+	port forwarding condition. Problem with masquerading of the ftp
+	port data connection fixed.
+
+2000-01-14  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl.pm (read_interfaces): Allow wildcard interface
+	specification (ppp+).
+
+2000-01-10  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl/Report.pm: Module to generate reports. This module
+	is the report backend. fwctlreport is a frontend which displays
+	the generated report in text.
+
+	* fwctlreport: Packet filter report generation utility added.
+
+	* fwctllog: Added possibility to generates record log for only
+	a specific period of time.
+
+	* TODO: Removed items about log report tool.
+
+1999-12-22  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* fwctllog (main): Fix for broken turn of year logic.
+	
+1999-12-21  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl.pm (find_interface_by_dev): New method to find an interface
+	by its associated device.
+	(find_host_alias): New method to find the alias related to an
+	host.
+	(find_host_alias): When looking for subnets alias, we were
+	skipping aliases with a /.
+	
+	* fwctllog: New program to preprocess kernel firewall logs for
+	later analysis.
+
+1999-12-20  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* test.pl: Added test for pptp with portfw option.
+	
+	* Fwctl/Services/ipsec.pm: Added support for portfw option.
+
+	* Fwctl/Services/pptp.pm: Added support for portfw option.
+
+	* Fwctl.pm(BEGIN): Even if ipmasqadm was not present, loading
+	 IPChains::PortFW was considered sucessfully loaded and triggered
+	 an error at configuration time.
+
+	* Fwctl/RuleSet.pm(BEGIN): Use eval {} rather than eval "".
+	(ip_forward_ruleset): Removed restrictions on tcp and udp for the
+	portfw option.
+	(ip_portfw_forward_ruleset): Generates rules suitable for generic
+	IP forwarding.
+	
+f1999-12-17  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Tag: FWCTL_0_22
+
+	* fwctl(flush): Flush with warning if there is a configuration
+	file problem.
+	
+	* Fwctl.pm(flush_chains,really_flush_chains) Added a 
+	really_flush_chains method that can be called without
+	an object.
+
+	* Several:	    Added port forwarding support.
+
+1999-12-16  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* IPChains/PortFW.pm:	    New.
+
+	* Fwctl/Services/ipsec.pm:	New service module.
+
+	* Fwctl/Services/pptp.pm:	New service module.
+
+	* Fwctl.pm(reset_fw):	Added oth-in, oth-out and oth-fwd
+	chains. Protocol optimisation on the output chains wasn't
+	working. (Packets passed through all the chain)
+
+	* Fwctl/Services/icmp_pkt.pm:	New service module.
+
+	* Fwctl/Services/udp_pkt.pm:	New service module.
+
+	* Fwctl/Services/ip_pkt.pm:	New service module.
+
+	* Fwctl/RuleSet.pm (constants and others): MASQ constants are 
+	not a bit fields and added FWDMASQ and MASQNOHIGH values.
+	(determine_base,accept_ip_ruleset): Masquerading isn't
+	limited to icmp,udp and tcp protocol anymore.
+
+
+1999-12-15  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl.pm(read_aliases,pod): Added IF_REM_NETS alias
+	that expands to all remote network attach to an interface.
+
+	* test.pl: Print current test being run and strip
+	whitespace before comparing regression tests results.
+
+	* Fwctl/RuleSet.pm(accept_ip_ruleset): Handle case of 
+	forwarding on the same interface when src and dst are on
+	different network.
+
+1999-11-22  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* fwctl.init(check):	Check was flushing the rules instead
+	of doing a check.
+
+1999-10-20  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* Fwctl.pm (read_aliases): <IF>_NETS aliases was defined
+	as an array references which caused a bug in expand().
+
+1999-10-19  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: FWCTL_0_21
+	
+	* Fwctl/Services/rsh.pm: Documentation fixes.
+	
+	* Fwctl/Services/redirect.pm: New service definition.
+	
+	* Fwctl/Services/lpd.pm: New service definition.
+
+	* Fwctl/Services/pcanywhere.pm: New service definition.
+	
+	* Fwctl/Services/hylafax.pm: Properly inherits from ftp now.
+
+	* Fwctl/Services/ping.pm (account_rules): Was calling
+	accept_ip_ruleset instead of acct_ip_ruleset.
+
+	* test.pl: Removed bytes and packets counters from regression test.
+	Added new tests.
+	
+	* Several files:  Network::IPv4Addr got renamed to Net::IPv4Addr.
+
+	* fwctl.logrotate: New file for logrotate.
+
+	* fwctl (main): Added flush command which resets the firewall.
+
+	* Fwctl.pm (flush_chains): Added flush_chains method which
+	reset the packet filters to ACCEPT everything. 
+	(Thanks to Bernd Eckenfels <ecki@lina.inka.de>)
+	(global): Moved configuration under /etc rather than
+	/etc/sysconfig.
+	(read_rules): Services expect IPChains options in
+	$options->{options}.
+	
+	* debian/: Debian packaging b Bernd Eckenfels <ecki@lina.inka.de>.
+	
+
+1999-09-15  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	* TAG: FWCTL_0_20
+
+	* Fwctl.pm:		Fixes documentation.
+
+	* README:		Add instructions for non RedHat users.
+
+	
+1999-09-03  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	* TAG: FWCTL_0_18
+
+	* Fwctl/Services/dhcp.pm    Added missing rules from client ip
+				    to all broadcast address.
+
+	* etc/rules		Fixed some small errors in the 
+				example rules file.
+
+1999-08-23  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	* TAG: FWCTL_0_17
+
+	* Fwctl.pm		    Forgot to increment version number.
+	
+1999-08-23  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	* TAG: FWCTL_0_16
+
+	* Fwctl.pm		    Fixed quote inserted before commit.
+	
+1999-08-23  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	* TAG: FWCTL_0_15
+
+	* Fwctl.pm(find_interface)  Check first for local IP. This caused
+				    a problem when there multiple
+				    interface aliases on the same subnet.
+				    
+
+1999-08-19  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	* TAG: FWCTL_0_14
+	
+	* etc/aliases		    Updated to give a more
+	* etc/rules		    complete example setup.
+	* etc/interfaces
+
+	* Fwctl/Services/ftp.pm	    ctrl_port wasn't listed
+				    as a valid option.
+
+				    Added a data_port option.
+
+	* Fwctl/Services/hylafax.pm Added HylaFAX module.
+
+	* Fwctl/Services/syslog.pm  Added syslog module.
+	
+
+1999-07-13  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	* TAG: FWCTL_0_13
+
+	* Fwctl/Services/ping.pm: Corrected masquerading error.
+
+	* test.pl:		Added test for masqueraded
+				ping to the Internet.
+
+1999-07-09  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	* TAG: FWCTL_0_12.
+	
+	* Fwctl/Services/rsh.pm: Stderr is from dst to src.
+	
+	* fwctl.init:		Added restart and reload action.
+				Fixed a typo.
+
+	* Fwctl.pm (dump_acct): Add -n switch when dumping 
+			        chains to preven DNS lockup.
+
+1999-07-05  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	- Completed test suite.
+	- TAG: FWCTL_0_11.
+	
+1999-05-29  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+	- Internal release. Completed all features and documentation.
+	- Begin testing.
+	- Version 0.10
+	
+1999-05-15  Francis J. Lacoste  <francis.lacoste@iNsu.COM>
+
+	- original version; created by h2xs 1.19
+

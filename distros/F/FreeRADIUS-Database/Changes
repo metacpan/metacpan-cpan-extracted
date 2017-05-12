@@ -1,0 +1,24 @@
+Revision history for Perl extension FreeRADIUS::Database.
+
+0.05 20120310
+    - multiple POD fixes
+
+0.04 20120310
+    - renamed project to FreeRADIUS::Database from ISP::RADIUS
+    - retab to 4 spcace tabs
+
+0.03 
+    - new 'classify' option implemented into aggregate_daily script.
+      It is not recommended to use this, but it does allow the operator
+      to override the 'ras_classification' config file variable
+
+0.02  Wed Jan  6 15:47 2010
+    - everything except archive_radacct() now uses DBIx::Class
+    - SQL replication implemented
+    - several minor bug fixes
+    - utility scripts now have man pages and usage printouts
+
+0.01  Fri Oct  9 10:50:26 2009
+    - original version; created by h2xs 1.23 with options
+        -X -n FreeRADIUS::Database
+

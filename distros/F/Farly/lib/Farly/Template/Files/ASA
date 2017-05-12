@@ -1,0 +1,272 @@
+[% FILTER remove('\t') %]
+[% FILTER remove('\r') %]
+
+[% IF ENTRY == "INTERFACE" %]
+	[% PROCESS interface %]
+[% END %]
+
+[% IF ENTRY == "NAME" %]
+	[% PROCESS name %]
+[% END %]
+
+[% IF ENTRY == "OBJECT" %]
+	[% IF REMOVE.defined %]
+		[% IF REMOVE == "OBJECT" %]
+			no [% PROCESS object_header %]
+			[% RETURN %]
+		[% END %]
+	[% ELSE %]
+		[% PROCESS object_header %]
+		 [% PROCESS object_member %]
+	[% END %]
+[% END %]
+
+[% IF ENTRY == "GROUP" %]
+	[% IF REMOVE.defined %]
+		[% IF REMOVE == "GROUP" %]
+			no [% PROCESS group_header %]
+		[% ELSIF REMOVE == "OBJECT" %]
+			[% FILTER remove('\r') %]
+			[% FILTER remove('\t') %]
+				[% PROCESS group_header %]
+				no [% PROCESS group_member %]
+			[% END %]
+			[% END %]
+		[% END %]
+		[% RETURN %]
+	[% ELSE %]
+		[% PROCESS group_header %]
+		 [% PROCESS group_member %]
+	[% END %]
+[% END %]
+
+[% IF ENTRY == "RULE" %]
+	[% IF REMOVE.defined %]
+		no [% PROCESS rule %]
+	[% ELSE %]
+		[% PROCESS rule %]
+	[% END %]
+[% END %]
+
+[% IF ENTRY == "ACCESS_GROUP" %]
+	[% PROCESS access_group %]
+[% END %]
+
+[% IF ENTRY == "ROUTE" %]
+	[% PROCESS route %]
+[% END %]
+
+[% END %]
+[% END %]
+
+[% BLOCK name %]
+	[% FILTER collapse %]
+		name [% OBJECT %] [% ID %]
+		[% IF COMMENT.defined %]
+			description [% COMMENT %]
+		[% END %]
+	[% END %]
+[% END %]
+
+[% BLOCK interface %]
+
+	interface [% NAME %]
+ 	nameif [% ID %]
+ 	security-level [% SECURITY_LEVEL %]
+ 	[% FILTER collapse %]
+		ip address [% OBJECT %] [% MASK %]
+		[% IF STANDBY_IP.defined %]
+			standby [% STANDBY_IP %]
+		[% END %]
+	[% END %]
+
+[% END %]
+
+[% BLOCK object_header %]
+
+	[% IF OBJECT_TYPE == "HOST" %]
+		object network [% ID %]
+	[% END %]
+
+	[% IF OBJECT_TYPE == "RANGE" %]
+		object network [% ID %]
+	[% END %]
+
+	[% IF OBJECT_TYPE == "NETWORK" %]
+		object network [% ID %]
+	[% END %]
+
+	[% IF OBJECT_TYPE == "SERVICE" %]
+		object service [% ID %]
+	[% END %]
+
+[% END %]
+
+[% BLOCK object_member %]
+
+	[% IF OBJECT_TYPE == "HOST" %]
+	 [% OBJECT %]
+	[% END %]
+
+	[% IF OBJECT_TYPE == "RANGE" %]
+	 range [% OBJECT %]
+	[% END %]
+
+	[% IF OBJECT_TYPE == "NETWORK" %]
+	 subnet [% OBJECT %]
+	[% END %]
+
+	[% IF OBJECT_TYPE == "SERVICE" %]
+
+		[% FILTER collapse %]
+		
+			service [% PROTOCOL %]
+			
+			[% IF SRC_PORT.defined %]
+			source [% SRC_PORT %]
+			[% END %]
+			
+			[% IF DST_PORT.defined %]
+			destination [% DST_PORT %]
+			[% END %]
+		
+		[% END %]
+		
+	[% END %]
+		
+[% END %]
+
+[% BLOCK group_header %]
+	
+	[% FILTER collapse %]
+
+		object-group [% GROUP_TYPE %] [% ID %]
+
+		[% IF GROUP_PROTOCOL.defined %]
+			 [% GROUP_PROTOCOL %]
+		[% END %]
+
+	[% END %]
+
+[% END %]
+
+[% BLOCK group_member %]
+
+	[% FILTER collapse %]
+
+		[% IF OBJECT_TYPE == "COMMENT" %]
+		 description [% OBJECT %]
+		[% END %]
+
+		[% IF OBJECT_TYPE == "GROUP" %]
+		 group-object [% OBJECT %]
+		[% END %]
+
+		[% IF OBJECT_TYPE == "NETWORK" %]
+		 network-object [% OBJECT %]
+		[% END %]
+
+		[% IF OBJECT_TYPE == "PORT" %]
+		 port-object [% OBJECT %]
+		[% END %]
+
+		[% IF OBJECT_TYPE == "PROTOCOL" %]
+		 protocol-object [% OBJECT %]
+		[% END %]
+
+		[% IF OBJECT_TYPE == "ICMP_TYPE" %]
+		 icmp-object [% OBJECT %]
+		[% END %]
+
+		[% IF OBJECT_TYPE == "SERVICE" %]
+
+			 service-object [% PROTOCOL %]
+
+			[% IF SRC_PORT.defined %]
+				source [% SRC_PORT %]
+			[% END %]
+
+			[% IF DST_PORT.defined %]
+				destination	[% DST_PORT %]
+			[% END %]
+
+			[% ICMP_TYPE IF ICMP_TYPE.defined %]
+
+		[% END %]
+
+	[% END %]
+
+[% END %]
+
+[% BLOCK rule %]
+
+	[% FILTER collapse %]
+		access-list [% ID %]
+
+		[% IF LINE.defined %]
+			line [% LINE %]
+		[% END %]
+
+		[% IF COMMENT.defined %]
+			remark [% COMMENT %]
+		[% END %]
+
+		[% TYPE IF TYPE.defined %]
+
+		[% ACTION %]
+
+		[% PROTOCOL %]
+
+		[% SRC_IP %] 
+
+		[% SRC_PORT IF SRC_PORT.defined %]
+
+		[% DST_IP %] 
+
+		[% IF DST_PORT.defined %]
+			[% DST_PORT %]
+		[% ELSIF ICMP_TYPE.defined %]
+			[% ICMP_TYPE%]
+		[% END %]
+
+		[% IF LOG_LEVEL.defined %]
+			[% IF LOG_LEVEL == 6 %]
+				log
+			[% ELSE %]
+			    log [% LOG_LEVEL %]
+			[% END %]
+		[% END %]
+
+		[% IF LOG_INTERVAL.defined %]
+			interval [% LOG_INTERVAL %]
+		[% END %]
+
+		[% IF TIME_RANGE.defined %]
+			time-range [% TIME_RANGE %]
+		[% END %]
+		
+		[% IF STATUS.defined %]
+			[% IF STATUS == "inactive" %]
+				inactive
+			[% END %]
+		[% END %]	
+	[% END %]
+[% END %]
+
+[% BLOCK access_group %]
+	access-group [% ID %] [% DIRECTION %] [% INTERFACE %]
+[% END %]
+
+[% BLOCK route %]
+	[% FILTER collapse %]
+		route [% INTERFACE %] [% DST_IP %] [% NEXTHOP %] [% COST %]
+	
+		[% IF TRACK.defined %]
+			track [% TRACK %]
+		[% END %]
+
+		[% IF TUNNELED.defined %]
+			[% TUNNELED %]
+		[% END %]
+	[% END %]
+[% END %]

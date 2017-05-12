@@ -1,0 +1,25 @@
+---
+abstract: 'analyses a image [strong-sell,sell,hold,buy,strong-buy] for given stock, released by Institutional Brokers Estimate System'
+author:
+  - 'santex <santex@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Optical-StrongBuy
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Exporter: 0
+  GD: 0
+  GD::Image: 0
+  WWW::Mechanize: 0
+  strict: 0
+  warnings: 0
+version: 0.09

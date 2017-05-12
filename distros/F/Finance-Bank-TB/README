@@ -1,0 +1,11 @@
+Perl API for TatraPay, CardPay and EliotPay e-banking.
+
+(c) 2000-2008 SOMI Systems a.s    Jan ' Kozo ' Vajda <Jan.Vajda@somi.sk>
+All rights reserved.  It may be used and modified freely, but I do request
+that this copyright notice remain attached to the file.  You may modify this
+module as you wish, but if you redistribute a modified version, please
+attach a note listing the modifications you have made.
+
+Address bug reports and comments to:
+Jan.Vajda@somi.sk
+

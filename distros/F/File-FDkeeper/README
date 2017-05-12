@@ -1,0 +1,38 @@
+File::FDkeeper - Store open filehandles in another process for later use
+========================================================================
+
+File::FDkeeper allows you to store open filehandles in a "server" process and
+retrieve them at a later time from another process.
+
+When a filehandle is stored, an id is returned. This id can then be used by 
+any other process to retrieve the filehandle (as long as they have permission 
+to open the fifo).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  File::FDpasser
+
+Note: This module only works on UNIX-type platforms. See File::FDpasser
+for more information.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

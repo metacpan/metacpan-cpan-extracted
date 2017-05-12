@@ -1,0 +1,25 @@
+Revision history for File-Find-Parallel
+
+0.0.1   2007-02-18
+        Initial release.
+        
+0.0.2   Exposed 'need N of M' interface want_iterator.
+        Added lncopies command line tool.
+
+0.0.3   2007-02-23
+        Added machine readable licence.
+        
+0.0.4   2007-02-23
+        Moved lncopies to /examples to make it explicit that it serves
+        as an example.
+
+0.50    2007-11-12
+        Added missing use File::Spec
+
+0.51    2007-11-14
+        Removed erroneous and unnecessary close $dh. Thanks to Peter
+        Dintelmann for spotting it.
+
+0.52    2010-07-03
+        Remove dependency on File::Tempdir (#59019, thanks to Alan
+        Barrett).

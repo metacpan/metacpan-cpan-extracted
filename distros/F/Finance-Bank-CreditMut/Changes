@@ -1,0 +1,49 @@
+0.13 Fri Sep  9 11:40:23 CEST 2016
+     - Yet another change on the Credit Mutuel website.
+
+0.12 Thu Jan 27 12:42:28 CET 2011
+     - Yet another change on the Credit Mutuel website.
+
+0.11 Wed Dec 30 11:26:36 CET 2009
+     - Credit Mutuel changed the way they print the account numbers; they are
+       now prefixed with the agency number, i.e., NNNNN XXXXXXXXX YY, instead
+       of just XXXXXXXXX YY. We stay consistent by trimming this out.
+
+0.10 Mon Jul 20 20:28:36 CEST 2009
+     - Credit Mutuel have yet again slightly changed their interface. The
+       summary page no longer gives the amounts translated into French francs.
+
+0.09 Thu Nov 16 23:28:05 CET 2006
+     - Credit Mutuel have yet again slightly changed their interface. Movements
+       are now retrieved from the regional subsidiary instead of the root site.
+
+0.08 Sun Jun 25 00:05:04 CEST 2006
+     - statements never have an undefined amount (empty ones are turned into
+       zeros)
+     - added Crypt::SSLeay to the list of dependencies, as the Crédit Mutuel
+       website is only accessible through HTTP/SSL.
+
+0.07 Sun May 28 21:30:47 CEST 2006
+     - Take into account the new layout of the Credit Mutuel website (again)
+
+0.06 Tue Mar  1 23:58:26 CET 2005
+     - Take into account the new layout of the Credit Mutuel website
+
+0.04 Tue Oct 14 23:38:09 CEST 2003
+     - Hit directly the /comptes/ page, instead of following a link there
+       from the home page. The accounts appear immediately instead of being
+       one click away.
+
+0.03 Sat Aug 30 23:09:07 CEST 2003
+     - Changed the parsing of CSV data to accomodate the new Value Date
+       column
+
+0.02 Fri Jun 13 12:26:09 CEST 2003
+     - Added retrieval of account balances.
+     - Retrieval of account statements is now post-poned to the actual call
+       to method statements()
+     - Added method currency() for accounts.
+     - Added comments
+
+0.01 Thu Jun 12 15:03:52 CEST 2003
+     - Initial release

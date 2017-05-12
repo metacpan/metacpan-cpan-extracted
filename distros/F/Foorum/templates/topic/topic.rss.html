@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+[% USE date %]
+[% PROCESS sub/date.html %]
+[% url_prefix = c.req.base _ forum.forum_url _ '/topic/' _ topic.topic_id %]
+<rss version="2.0">
+<channel>
+<title><![CDATA[[% topic.title %]]]></title>
+<link>[% url_prefix %]</link>
+<description><![CDATA[[% topic.title %]]]></description>
+<pubDate>[% date.format(date.now, '%Y-%m-%dT%H:%M:%S+00:00') %]</pubDate>
+<lastBuildDate>[% date.format(date.now, '%Y-%m-%dT%H:%M:%S+00:00') %]</lastBuildDate>
+<generator>Foorum RSS Generator</generator>
+
+[% FOREACH comment IN comments %]
+<item>
+<title><![CDATA[[% comment.title %]]]></title>
+<link>[% url_prefix _ '/comment_id=' _ comment.comment_id _ '/#c' _ comment.comment_id %]</link>
+<description><![CDATA[[% comment.text %]]]></description>
+<guid isPermaLink="true">[% url_prefix _ '/comment_id=' _ comment.comment_id _ '/#c' _ comment.comment_id %]</guid>
+<pubDate>[% date_format(comment.post_on, '%Y-%m-%dT%I:%M:%S') %]</pubDate>
+</item>
+[% END %]
+
+</channel>
+</rss>

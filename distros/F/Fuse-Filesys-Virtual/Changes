@@ -1,0 +1,8 @@
+Revision history for Fuse-Filesys-Virtual
+
+0.02	Jan 10, 2008
+	nlink correction. 'find' does not follow direcotry having nlink <= 2.
+	Use read() and print() instead of sysread() and syswrite().
+0.01    Dec 29, 2008
+        First version
+

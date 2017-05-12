@@ -1,0 +1,31 @@
+---
+abstract: 'Copy and move files with verification and retries'
+author:
+  - 'Anthony Kilna <anthony@kilna.com>'
+build_requires:
+  Data::Dumper: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IO::File: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Copy-Vigilant
+provides:
+  File::Copy::Vigilant:
+    file: lib/File/Copy/Vigilant.pm
+    version: '1.3'
+requires:
+  Digest::MD5::File: '0'
+  File::Compare: '0'
+  File::Copy: '0'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.3'

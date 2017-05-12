@@ -1,0 +1,120 @@
+NAME
+    File::LckPwdF - Lock and unlock the passwd and shadow files with lckpwdf
+    and ulckpwdf
+
+SYNOPSIS
+      use File::LckPwdF;
+
+      (lock_passwd(15)) || (die "Can't lock password file:\n$! stopped");
+
+      # ... do stuff with the passwd file ...
+
+      (unlock_passwd()) || (die "Can't unlock password file:\n$! stopped");
+
+DESCRIPTION
+    This is a perl module to use lckpwdf(3) and ulckpwdf(3) to lock the
+    /etc/passwd and (if present) /etc/shadow files.
+
+  Functions exported automatically
+
+    lock_passwd($timeout)
+
+    $timeout works as follows:
+
+    1. The initial time is checked.
+    2. If $timeout is 0, it tries lckpwdf() until it succeeds, waiting a
+    random time in between.
+    3. If $timeout is above 0, it tries lckpwdf() once. If that (or any
+    following lckpwdf()) succeeds, it returns 1. It will try lckpwdf() until
+    either it succeeds or the time is greater than the initial time plus
+    $timeout. In the latter case, it returns 0. It waits a random time in
+    between tries of lckpwdf().
+    The random timeout is controlled by $File::LckPwdF::Rand_Wait, which is
+    exported on request. It is used via
+
+        sleep int(rand($Rand_Wait) + 1);
+
+    inside an until loop. This sleep is only done if
+    $File::LckPwdF::Rand_Wait is above 0.
+
+    $timeout defaults to $File::LckPwdF::Default_Timeout, which is also
+    exported on request; the initial setting of
+    $File::LckPwdF::Default_Timeout (the default default) is 15 seconds. The
+    default setting for $File::LckPwdF::Rand_Wait is 10 seconds.
+
+    unlock_passwd()
+
+    This function uses ulckpwdf(). If lock_passwd() has previously been used
+    to lock the passwd file, and unlock_passwd() has not been used to lock
+    it, then it will be used to unlock the passwd file in an END: statement.
+    (Admittedly, with many implementations of lckpwdf() this is not
+    necessary, since when a process exits it loses the passwd file lock; it
+    is present as a safety measure for those systems for which this is not
+    true.)
+
+  Functions exported by request
+
+    lckpwdf() ulckpwdf()
+
+    These are the xs-loaded versions of lckpwdf(3) and ulckpwdf(3),
+    respectively.
+
+RETURN VALUE
+    The lock_passwd() and unlock_passwd() functions return 1 on success and
+    0 on failure. The return values for lckpwdf() and ulckpwdf() are the
+    same as for the system versions (lckpwdf(3) and ulckpwdf(3)).
+
+ERRORS
+    If the effective UID is not 0, then lock_passwd() and unlock_passwd()
+    set $! to EACCES if they fail (they do try once, just in case you've got
+    a *really* weird setup).
+
+    If the effective UID is 0, in the event of failure, lock_passwd() sets
+    $! to:
+
+    1. if you've already locked the file through lock_passwd(), EALREADY
+    2. EAGAIN (or EWOULDBLOCK, if EAGAIN isn't present on your system and
+    EWOULDBLOCK is; $File::LckPwdF::EAGAIN, which is exported on request, is
+    equal to the value returned).
+    unlock_passwd(), in the event of failure, sets $! to:
+
+    1. if you've already unlocked the file via unlock_passwd() or haven't
+    locked it via lock_passwd(), EALREADY.
+    2. EINVAL.
+    If you try to use a negative number for $timeout with
+    lock_passwd($timeout), it carps, returns 0, and sets $! to EINVAL.
+
+CAVEATS
+    This program only works if your system has lckpwdf(3) and ulckpwdf(3).
+    This should be true of SVR4 systems; others will vary. If you use
+    lock_passwd() and unlock_passwd(), lckpwdf(3) and ulckpwdf(3) need to
+    have return values of 0+ for success and below 0 (usually -1) for
+    failure.
+
+    The timeout period for lock_passwd() is approximate, since many versions
+    of lckpwdf() will keep trying for a total of 15 seconds to lock the
+    passwd (and possibly shadow) files before they return an appropriate
+    value.
+
+    This module only keeps track on its own of whether the passwd file is
+    locked if you always use lock_passwd() and unlock_passwd(). If you use
+    lckpwdf() or ulckpwdf() by themselves for locking and unlocking, you
+    will need to set $File::LckPwdF::Passwd_Locked to 1 for locked and 0 for
+    unlocked yourself.
+
+BUGS
+    I haven't written any good automated tests for this program yet. If
+    anyone's interested, be my guest (or for any other improvements, of
+    course).
+
+AUTHOR
+    E. Allen Smith, <easmith@beatrice.rutgers.edu>. Copyright 1998. This
+    software may be used, distributed, modified, etcetera under the same
+    conditions as perl.
+
+FILES
+    /etc/passwd, /etc/shadow
+
+SEE ALSO
+    the perl(1) manpage, the lckpwdf(3) manpage, the ulckpwdf(3) manpage
+

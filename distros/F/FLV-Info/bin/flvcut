@@ -1,0 +1,154 @@
+#!/usr/bin/perl -w
+
+package main;
+
+use warnings;
+use strict;
+use 5.008;
+use Getopt::Long;
+use Pod::Usage;
+use English qw(-no_match_vars);
+use FLV::Cut;
+
+our $VERSION = '0.24';
+
+my %opts = (
+   keyframes => 0,
+   verbose   => 0,
+   help      => 0,
+   version   => 0,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+   'k|keyframes' => \$opts{keyframes},
+   'v|verbose'   => \$opts{verbose},
+   'h|help'      => \$opts{help},
+   'V|version'   => \$opts{version},
+) or pod2usage(1);
+if ($opts{help})
+{
+   pod2usage(-exitstatus => 0, -verbose => 2);
+}
+if ($opts{version})
+{
+   print "v$VERSION\n";
+   exit 0;
+}
+
+if (3 > @ARGV)
+{
+   pod2usage(1);
+}
+if (1 != (@ARGV % 2))
+{
+   pod2usage(1);
+}
+
+my $infile = shift;
+
+my $flv = FLV::File->new;
+$flv->parse($infile);
+my @keyframe_times;
+if ($opts{keyframes})
+{
+   $flv->populate_meta;
+   @keyframe_times = @{ $flv->get_meta('keyframes')->{millis} };
+}
+
+my $converter = FLV::Cut->new;
+while (@ARGV)
+{
+   my $outfile = shift;
+   my $times   = shift;
+   if ($times =~ m/\A (\d+|) : (\d+|) \z/xms)
+   {
+      my $cutin  = $1 || undef;
+      my $cutout = $2 || undef;
+      if (@keyframe_times)
+      {
+         $cutin  = _round_to_keyframe($cutin, \@keyframe_times, $opts{verbose});
+         $cutout = _round_to_keyframe($cutout, \@keyframe_times, $opts{verbose});
+      }
+      $converter->add_output($outfile, $cutin, $cutout);
+   }
+   else
+   {
+      pod2usage(1);
+   }
+}
+$converter->parse_flv($flv);
+$converter->save_all;
+
+sub _round_to_keyframe
+{
+   my $cut     = shift; # millisecs
+   my $times   = shift; # arrayref of millisecs
+   my $verbose = shift; # bool
+
+   return $cut if !defined $cut;
+   my $best_time = -1;
+   my $best_diff = 1_000_000_000;
+   for my $time_ms (@{ $times })
+   {
+      my $diff = abs($cut - $time_ms);
+      if ($diff < $best_diff)
+      {
+         $best_diff = $diff;
+         $best_time = $time_ms;
+      }
+   }
+   $best_time = $best_time < 0 ? $cut : $best_time;
+   if ($verbose && $cut != $best_time)
+   {
+      print "Rounding time from $cut to $best_time (milliseconds)\n";
+   }
+   return $best_time < 0 ? $cut : $best_time;
+}
+
+__END__
+
+=for stopwords FLV flv2flv flvsplice in.flv out.flv inms:outms flvcut
+
+=head1 NAME
+
+flvcut - Extract one or more time segments from an FLV file
+
+=head1 SYNOPSIS
+
+flvcut [options] in.flv out.flv inms:outms [out.flv inms:outms ...]
+
+ Options:
+   -k --keyframes      Round specified times to the nearest keyframe time
+   -v --verbose        Print diagnostic messages
+   -h --help           Verbose help message
+   -V --version        Print version
+
+Either of the in or out files can be C<->, meaning STDIN or STDOUT.
+
+=head1 DESCRIPTION
+
+Sometimes you have an FLV that is too long, or has extraneous content.
+This tool lets you efficiently split the FLV into one or more
+segments.
+
+The in and out times are in milliseconds.  Either (or both!) can be
+omitted, which implies the ends of the input file.
+
+You should probably always use the C<-k> option.  Otherwise, if your
+times are wrong, the video is going to look terrible at the start of
+the clip.
+
+=head1 SEE ALSO
+
+flv2flv
+
+flvsplice
+
+L<FLV::Cut>
+
+=head1 AUTHOR
+
+Chris Dolan, I<cdolan@cpan.org>
+
+=cut

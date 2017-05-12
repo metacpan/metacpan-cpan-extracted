@@ -1,0 +1,40 @@
+Revision history for Perl extension Filter::Include.
+
+1.7 Thu May 28 18:58:09 CEST 2015
+  * Fix filenames not working in includes.
+
+1.6 Wed Aug  3 10:24:14 BST 2005
+  * Added before/after handlers.
+  * Attempted to clarify docs to address Robert Rothenburg's criticisms in his
+    review: http://cpanratings.perl.org/dist/Filter-Include.
+
+1.5 Fri Jul 15 15:46:32 GMT 2005
+  * Dropped Regexp::Common dependency, but added Scalar::Util dependency
+  * Dropped Changes from POD
+  * Fixed bug where line numbers weren't set correctly with includes within
+    includes
+  * Now uses ExtUtils::MakeMaker instead of Module::Build
+  * Added pre/post source inclusion handlers
+  * Tidied up and refactored source
+
+1.4 Mon Sep 22 17:24:20 BST 2003
+  * Moved out the functionality for locating modules to Module::Locate.
+  * Thanks to the tip off[0] from an Anonymous Monk at the line numbering is now
+    set accordingly.
+
+    [0] http://www.perlmonks.org/index.pl?node_id=302235
+
+1.3 Fri Sep  5 16:15:09 BST 2003
+  * recursively processes the 'include' directive
+  * moved over to Module::Build, hurrah!
+
+1.2 Mon Aug  4 12:19:12 BST 2003
+  * Fixed 2 bugs - forgot to "reverse" "@dirs" in "find_module_file" and
+    "_isfh" now checks if an object can "getlines" (not "can" which is silly).
+
+1.1 Wed Jul 30 16:15:55 BST 2003
+  * Upgraded to a more respectable version number and added a more robust check
+    for the existence of a filehandle.
+  * Added tests for the coderef-type magic in @INC when performing a bareword
+    include.
+  * Added Changes section in POD.

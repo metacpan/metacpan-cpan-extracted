@@ -1,0 +1,33 @@
+---
+abstract: 'a flat-text database for shell scripting'
+author:
+  - 'John Heidemann <johnh@isi.edu>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Fsdb
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Parser: '0'
+  IO::Compress::Bzip2: '0'
+  IO::Compress::Gzip: '0'
+  IO::Compress::Xz: '0'
+  IO::Uncompress::AnyUncompress: '0'
+  Test::More: '0'
+  Text::CSV_XS: '0'
+  XML::Simple: '0'
+  YAML::XS: '0'
+version: '2.63'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

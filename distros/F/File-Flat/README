@@ -1,0 +1,283 @@
+NAME
+    File::Flat - Implements a flat filesystem
+
+SYNOPSIS
+DESCRIPTION
+    File::Flat implements a flat filesystem. A flat filesystem is a
+    filesystem in which directories do not exist. It provides an abstraction
+    over any normal filesystem which makes it appear as if directories do
+    not exist. In effect, it will automatically create directories as
+    needed. This is create for things like install scripts and such, as you
+    never need to worry about the existance of directories, just write to a
+    file, no matter where it is.
+
+  Comprehensive Implementation
+    The implementation of File::Flat is extremely comprehensive in scope. It
+    has methods for all stardard file interaction taks, the -X series of
+    tests, and some other things, such as slurp.
+
+    All methods are statically called, for example, to write some stuff to a
+    file.
+
+      use File::Flat;
+      File::Flat->write( 'filename', 'file contents' );
+
+  Use of other modules
+    File::Flat tries to use more task orientated modules wherever possible.
+    This includes the use of File::Copy, File::Copy::Recursive, File::Remove
+    and others. These are mostly loaded on-demand.
+
+  Pruning and $AUTO_PRUNE
+    "Pruning" is a technique where empty directories are assumed to be
+    useless, and thus empty removed whenever one is created. Thus, when some
+    other task has the potential to leave an empty directory, it is checked
+    and deleted if it is empty.
+
+    By default File::Flat does not prune, and pruning must be done
+    explicitly, via either the "prune" in File::Flat method, or by setting
+    the second argument to the "remove" in File::Flat method to be true.
+
+    However by setting the global $AUTO_PRUNE variable to true, File::Flat
+    will automatically prune directories at all times. You should generally
+    use this locally, such as in the following example.
+
+      #!/usr/bin/perl
+  
+      use strict;
+      use File::Flat;
+  
+      delete_files(@ARGV);
+      exit();
+  
+      # Recursively delete and prune all files provided on the command line
+      sub delete_files {
+            local $File::Flat::AUTO_PRUNE = 1;
+            foreach my $file ( @_ ) {
+                    File::Flat->remove( $file ) or die "Failed to delete $file";
+            }
+      }
+
+  Non-Unix platforms
+    As of version 0.97 File::Flat should work correctly on Win32. Other
+    platforms (such as VMS) are believed to work, but require confirmation.
+
+METHODS
+  exists $filename
+    Tests for the existance of the file. This is an exact duplicate of the
+    -e function.
+
+  isaFile $filename
+    Tests whether "filename" is a file. This is an exact duplicate of the -f
+    function.
+
+  isaDirectory $filename
+    Test whether "filename" is a directory. This is an exact duplicate of
+    the -d function.
+
+  canRead $filename
+    Does the file or directory exist, and can we read from it.
+
+  canWrite $filename
+    Does the file or directory exist, and can we write to it OR can we
+    create the file or directory.
+
+  canReadWrite $filename
+    Does a file or directory exist, and can we both read and write it.
+
+  canExecute $filename
+    Does a file or directory exist, and can we execute it.
+
+  canOpen $filename
+    Is this something we can open a filehandle to. Returns true if filename
+    exists, is a file, and we can read from it.
+
+  canRemove $filename
+    Can we remove the file or directory.
+
+  isaText $filename
+    Does the file "filename" exist, and is it a text file.
+
+  isaBinary $filename
+    Does the file "filename" exist, and is it a binary file.
+
+  fileSize $filename
+    If the file exists, returns its size in bytes. Returns undef if the file
+    does not exist.
+
+  open [ $mode, ] $filename
+    Rough analogue of the open function, but creates directories on demand
+    as needed. Supports most of the normal options to the normal open
+    function.
+
+    In the single argument form, it takes modes in the form [mode]filename.
+    For example, all the following are valid.
+
+      File::Flat->open( 'filename' );
+      File::Flat->open( '<filename' );
+      File::Flat->open( '>filename' );
+      File::Flat->open( '>>filename' );
+      File::Flat->open( '+<filename' );
+
+    In the two argument form, it takes the following
+
+      File::Flat->open( '<', 'filename' );
+      File::Flat->open( '>', 'filename' );
+      File::Flat->open( '>>', 'filename' );
+      File::Flat->open( '+<', 'filename' );
+
+    It does not support the more esoteric forms of open, such us opening to
+    a pipe or other such things.
+
+    On successfully opening the file, it returns it as an IO::File object.
+    Returns undef on error.
+
+  getReadHandle $filename
+    The same as File::Flat->open( '<', 'filename' )
+
+  getWriteHandle $filename
+    The same as File::Flat->open( '>', 'filename' )
+
+  getAppendHandle $filename
+    The same as File::Flat->open( '>>', 'filename' )
+
+  getReadWriteHandle $filename
+    The same as File::Flat->open( '+<', 'filename' )
+
+  read $filename
+    Opens and reads in an entire file, chomping as needed.
+
+    In array context, it returns an array containing each line of the file.
+    In scalar context, it returns a reference to an array containing each
+    line of the file. It returns undef on error.
+
+  slurp $filename
+    The "slurp" method 'slurps' a file in. That is it attempts to read the
+    entire file into a variable in as quick and memory efficient method as
+    possible.
+
+    On success, returns a reference to a scalar, containing the entire file.
+    Returns undef on error.
+
+  write $filename, ( $content | \$content | \@content )
+    The "write" method is the main method for writing content to a file. It
+    takes two arguments, the location to write to, and the content to write,
+    in several forms.
+
+    If the file already exists, it will be clobered before writing starts.
+    If the file doesn't exists, the file and any directories will be created
+    as needed.
+
+    Content can be provided in three forms. The contents of a scalar
+    argument will be written directly to the file. You can optionally pass a
+    reference to the scalar. This is recommended when the file size is
+    bigger than a few thousand characters, is it does not duplicate the file
+    contents in memory. Alternatively, you can pass the content as a
+    reference to an array containing the contents. To ensure uniformity,
+    "write" will add a newline to each line, replacing any existing newline
+    as needed.
+
+    Returns true on success, and undef on error.
+
+  append $filename, ( $content | \$content | \@content )
+    This method is the same as "write", except that it appends to the end of
+    an existing file ( or creates the file as needed ).
+
+    This is the method you should be using to write to log files, etc.
+
+  overwrite $filename, ( $content | \$content | \@content )
+    Performs an atomic write over a file. It does this by writing to a
+    temporary file, and moving the completed file over the top of the
+    existing file ( or creating a new file as needed ). When writing to a
+    file that is on the same partition as /tmp, this should always be
+    atomic.
+
+    This method otherwise acts the same as "write".
+
+  copy $source, $target
+    The "copy" method attempts to copy a file or directory from the source
+    to the target. New directories to contain the target will be created as
+    needed.
+
+    For example "<File::Flat-"( './this', './a/b/c/d/that' );>> will create
+    the directory structure required as needed.
+
+    In the file copy case, if the target already exists, and is a writable
+    file, we replace the existing file, retaining file mode and owners. If
+    the target is a directory, we do NOT copy into that directory, unlike
+    with the 'cp' unix command. And error is instead returned.
+
+    "copy" will also do limited recursive copying or directories. If source
+    is a directory, and target does not exists, a recursive copy of source
+    will be made to target. If target already exists ( file or directory ),
+    "copy" will returns with an error.
+
+  move $source, $target
+    The "move" method follows the conventions of the 'mv' command, with the
+    exception that the directories containing target will of course be
+    created on demand.
+
+  remove $filename [, $prune ]
+    The "remove" method will remove a file, or recursively remove a
+    directory.
+
+    If a second (true) argument is provided, then once the file or directory
+    has been deleted, the method will the automatically work its way upwards
+    pruning (deleting) empty and thus assumably useless directories.
+
+    Returns true if the deletion (and pruning if requested) was a success,
+    or "undef" otherwise.
+
+  prune $filename
+    For a file that has already been delete, "prune" will work upwards,
+    removing any empty directories it finds.
+
+    For anyone familiar with CVS, it is similar to the "update -P" flag.
+
+    Returns true, or "undef" on error.
+
+  truncate $filename [, $size ]
+    The "truncate" method will truncate an existing file to partular size. A
+    size of 0 ( zero ) is used if no size is provided. If the file does not
+    exists, it will be created, and set to 0. Attempting to truncate a
+    directory will fail.
+
+    Returns true on success, or undef on error.
+
+  makeDirectory $directory [, mode ]
+    In the case where you do actually have to create a directory only, the
+    "makeDirectory" method can be used to create a directory or any depth.
+
+    An optional file mode ( default 0755 ) can be provided.
+
+    Returns true on success, returns undef on error.
+
+TO DO
+    Function interface to be written, like File::Spec::Functions, to provide
+    importable functions.
+
+    There's something bigger here too, I'm not exactly sure what it is, but
+    I think there might be the beginings of a unified filesystem interface
+    here... FSI.pm
+
+SUPPORT
+    Bugs should be filed at via the CPAN bug tracker at:
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Flat>
+
+    For other issues or comments, contact the author
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    File::Spec, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2002 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

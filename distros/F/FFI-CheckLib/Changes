@@ -1,0 +1,58 @@
+Revision history for FFI-CheckLib
+
+0.15      2016-05-05 19:53:32 -0400
+  - Add MSYS2 support
+
+0.14      2015-09-09 08:25:15 -0400
+  - Version identical to 0.12
+    (0.12 was accidentally removed from CPAN)
+
+0.12      2015-08-06 16:09:32 -0400
+  - Switch to MakeMaker since we are not using any features
+    that require Module::Build
+
+0.11      2015-02-13 08:45:23 -0500
+  - New recursive option
+  - The experimental _r option will be keept beiefly then removed
+  - The lib option allows '*' to match any library
+  - New systempath option
+
+0.10      2015-02-12 18:52:54 -0500
+  - Add experimental and undocumented _r option intended for use
+    with Alien::Base only.
+
+0.09      2015-01-28 17:10:53 -0500
+  - Skip undef found in system library path. (thanks bakkiaraj gh#3)
+    On Windows this was causing a undef'd variable warning if %PATH% has a 
+    trailing ;
+
+0.08      2015-01-25 04:54:37 -0500
+  - Prefer FFI::Platypus in documentation over FFI::Raw
+
+0.07      2015-01-16 10:22:22 -0500
+  - bugfix: forgot to export find_lib_or_die
+
+0.06      2015-01-13 12:07:19 -0500
+  - add function find_lib_or_die
+
+0.05      2015-01-10 17:31:34 -0500
+  - add function find_lib_or_exit (GH#2)
+  - [API CHANGE] find_lib returns first library
+    found if called in scalar context, instead 
+    of the number of libraries found.
+  - better diagnostics for failure (GH#1)
+
+0.04      2015-01-02 11:21:59 -0500
+  - works with .bundle files on OS X
+    (previously only with .dylib files)
+
+0.03      2014-10-26 16:35:22 -0400
+  - use DynaLoader for symbol resolution instead of FFI::Raw
+    thus remove dep on FFI::Raw
+  - add verify option
+
+0.02      2014-10-26 13:18:14 -0400
+  - first release to CPAN
+
+0.01      2014-10-26 11:34:58 -0400
+  - initial version

@@ -1,0 +1,20 @@
+Revision history for File-Glob-Windows
+
+0.1.5 2012/04/13(Fri) 14:52
+
+    fix [rt.cpan.org #76241]
+	add installation notice about 64bit nmake.exe to POD.
+
+0.1.4 09/10/06(Tue) 19:59:36
+	import patch from [rt.cpan.org #49514] sub File::Glob::Windows::getCodePage_POSIX 
+
+0.1.3 08/11/08(Sat) 15:51:20
+	change builder from Module::Build to Module::Install and check how it works on Windows.
+
+0.1.2 08/11/08(Sat) 14:05:35
+      fix permission of files.
+      Seems I cannot use windows to make package that acceptable by windows?
+
+0.1.1  08/11/08(Sat) 14:05:30
+      Initial release.
+

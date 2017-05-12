@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+use strict;
+use File::PatternMatch qw(patternmatch);
+
+my $dir = shift;;
+not defined $dir and $dir = $ENV{HOME};
+
+my @files = glob("$dir/*");
+my $data = patternmatch(256, @files);
+
+for my $i(sort(keys(%{$data}))) {
+  for my $file(keys(%{$data->{$i}})) {
+    printf("%03d: %s\n", $i,  $file);
+  }
+}

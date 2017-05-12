@@ -1,0 +1,20 @@
+---
+name: File-Read
+version: 0.0801
+author:
+  - 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>'
+abstract: Unique interface for reading one or more files
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  File::Slurp: 0
+  Test::More: 0
+provides:
+  File::Read:
+    file: lib/File/Read.pm
+    version: 0.0801
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

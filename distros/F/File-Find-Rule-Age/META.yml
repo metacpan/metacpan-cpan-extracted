@@ -1,0 +1,32 @@
+---
+abstract: 'rule to match on file age'
+author:
+  - 'Pedro Figueiredo <pedro.figueiredo@sns.bskyb.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  File::Touch: '0'
+  FindBin: '0'
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Find-Rule-Age
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '0.42'
+  File::Find::Rule: '0.30'
+  File::stat: '0'
+  Params::Util: '0.37'
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.302'

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Read and prepare parsing of file (or glob) data",
+   "author" : [
+      "Torbjørn Lindahl <torbjorn.lindahl@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Parser-Role",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::All" : "0",
+            "Mojo::Path" : "0",
+            "Path::Tiny" : "0"
+         },
+         "requires" : {
+            "IO::String" : "1.08",
+            "Moo" : "1.006001",
+            "Moo::Role" : "1.006001",
+            "MooX::Aliases" : "0.001",
+            "Pod::Coverage::Moose" : "0.02",
+            "Test::Most" : "0.34",
+            "Test::Output" : "1.02",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Pod" : "1.48",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Warnings" : "0.010"
+         }
+      }
+   },
+   "provides" : {
+      "File::Parser::Role" : {
+         "file" : "lib/File/Parser/Role.pm",
+         "version" : "v0.2.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.2.4"
+}

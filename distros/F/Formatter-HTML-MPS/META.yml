@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Formatter-HTML-MPS
+version:      0.4
+version_from: lib/Formatter/HTML/MPS.pm
+installdirs:  site
+requires:
+    HTML::LinkExtor:               1.33
+    Text::Markdown:                1.0.3
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

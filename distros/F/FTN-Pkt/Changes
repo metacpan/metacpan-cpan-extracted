@@ -1,0 +1,11 @@
+Revision history for Perl extension FTN::Pkt.
+
+1.00  Tue May 13 2008
+    - original version;
+
+1.01  Wed May 14 2008
+    - documentation fixed;
+    
+1.02  Fri May 16 2008
+    - message's date can be set manually
+    

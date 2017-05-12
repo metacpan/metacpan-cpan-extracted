@@ -1,0 +1,20 @@
+Changelog for Filter::Indent::HereDoc
+=====================================
+
+1.01 - 10 August 2003
+  Module now supports terminator strings which are compatible with
+  Perl6 RFC 111 (this is a default, but can be turned off)
+
+1.00 - 08 August 2003
+  First public release (no code changes from version 0.03)
+
+0.03 - 08 August 2003
+  Changed module name from Indent::HereDoc to Filter::Indent::HereDoc
+  Added test
+
+0.02 - 02 August 2003
+  Documentation update
+  Added prerequisite for Filter::Simple to Makefile.PL
+
+0.01 - 31 July 2003
+  First development release

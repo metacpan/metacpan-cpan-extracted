@@ -1,0 +1,80 @@
+README for File::Binary 1.6
+
+=head1 NAME
+
+File::Binary - Binary file reading module
+
+=head1 SYNOPSIS
+
+    use File::Binary qw($BIG_ENDIAN $LITTLE_ENDIAN $NATIVE_ENDIAN);
+
+    my $fb = File::Binary->new("myfile");
+    
+    $fb->get_ui8();
+    $fb->get_ui16();
+    $fb->get_ui32();
+    $fb->get_si8();
+    $fb->get_si16();
+    $fb->get_si32();
+
+    $fb->close();
+
+    $fb->open(">newfile");
+
+    $fb->put_ui8(255);
+    $fb->put_ui16(65535);
+    $fb->put_ui32(4294967295);
+    $fb->put_si8(-127);
+    $fb->put_si16(-32767);
+    $fb->put_si32(-2147483645);
+    
+    $fb->close();
+
+
+    $fb->open(IO::Scalar->new($somedata));
+    $fb->set_endian($BIG_ENDIAN); # force endianness
+
+    # do what they say on the tin
+    $fb->seek($pos);
+    $fb->tell();
+
+    # etc etc
+
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ IO::File	1.14
+ IO::Scalar	1.126
+ Test::More
+
+=head1 INSTALLATION
+
+ perl Makefile.PL
+ make test
+
+and if all goes well
+
+ make install
+
+=head1 HISTORY
+
+Revision history for Perl extension File::Binary.
+1.60  Mon 31 Mar 2008 19:06:03 BST
+    - Specify minimum version of IO::File
+    - Make binmode more automatic
+    - Change tests to exercise IO::Scalar
+
+1.50  Wed 12 Mar 2008 20:08:06 GMT
+    - fix a bug to do with binmode of file handles thanks to Peter Möller
+
+1.40  Wed 30 Aug 2006 20:09:25 BST
+    - fix bug with checking file handle on open thanks to Duane Hitz 
+
+=head1 AUTHOR
+
+Copyright 2003, Simon Wistow <simon@thegestalt.org>
+
+

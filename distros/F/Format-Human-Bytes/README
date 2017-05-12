@@ -1,0 +1,43 @@
+Format-Human-Bytes
+
+This module is used to convert bytecount values to human-readable strings.
+
+This is my first published Perl module, so please be patient. Thank :-)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Format::Human::Bytes
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Format-Human-Bytes
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Format-Human-Bytes
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Format-Human-Bytes
+
+    Search CPAN
+        http://search.cpan.org/dist/Format-Human-Bytes/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Sebastian Willing
+
+This program is released under the following license: gpl
+

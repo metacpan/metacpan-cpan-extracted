@@ -1,0 +1,9 @@
+#fsdb name id test1 test2 sum
+a	1	80	81	161
+b	2	70	71	141
+c	3	65	66	131
+d	4	90	91	181
+e	5	70	71	141
+f	6	90	91	181
+#  | dbcolcreate -d sum 0
+#  | dbroweval  '{ _sum = 0; foreach (0..1) { _sum += _test1($_); } ; }'

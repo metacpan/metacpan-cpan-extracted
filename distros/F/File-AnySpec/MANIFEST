@@ -1,0 +1,15 @@
+lib/Docs/Site_SVD/File_AnySpec.pm
+MANIFEST
+Makefile.PL
+README
+lib/File/AnySpec.pm
+t/File/AnySpec.d
+t/File/AnySpec.pm
+t/File/AnySpec.t
+t/File/Drivers/Driver.pm
+t/File/Drivers/Generate.pm
+t/File/Drivers/IO.pm
+t/File/File/SmartNL.pm
+t/File/Text/Scrub.pm
+t/File/Test/Tech.pm
+t/File/Data/Secs2.pm

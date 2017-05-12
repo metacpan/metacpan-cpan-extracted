@@ -1,0 +1,27 @@
+---
+name: File-Path-Collapse
+version: 0.03.7
+author:
+  - 'Nadim ibn hamouda el Khemir. <nkh@cpan.org>'
+abstract: Collapses a path as much as possible
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Readonly: 0
+  Sub::Exporter: 0
+build_requires:
+  Data::TreeDumper: 0.35
+  Test::Block: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Diff: 0
+provides:
+  File::Path::Collapse:
+    file: lib/File/Path/Collapse.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

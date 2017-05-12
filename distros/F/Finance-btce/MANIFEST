@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-btce.t
+lib/Finance/btce.pm

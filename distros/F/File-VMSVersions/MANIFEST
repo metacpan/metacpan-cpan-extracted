@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+VMSVersions.pm
+t/basic.t
+t/days.t

@@ -1,0 +1,472 @@
+#!/usr/bin/perl
+#
+#    fwctllog:	program parse and compile the kernel log related to the
+#		firewall
+#
+#    This file is part of Fwctl.
+#
+#    Author: Francis J. Lacoste <francis.lacoste@iNsu.COM>
+#
+#    Copyright (c) 1999,2000 iNsu Innovations Inc.
+#
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+
+use strict;
+
+use Fwctl;
+use Fwctl::Report;
+use Getopt::Long;
+use Time::Local;
+use Socket;
+
+sub usage() {
+die <<EOFU;
+usage: fwtcllog [--aliases file] [ --interfaces file ] [--rules file]
+		[--services-dir dir ]+
+		[--start date] [ --end date | --period period ]
+		[--dns | --nodns]
+EOFU
+}
+
+use vars qw( %serv_cache %proto_cache %host_cache %month_str2num
+	     %host_alias_cache %host_if_cache %if_cache %icmp_codes
+	     %icmp_types );
+
+# Some global cache
+%serv_cache	    = ();
+%proto_cache	    = ();
+%host_cache	    = ();
+%host_alias_cache   = ();
+%host_if_cache	    = ();
+%if_cache	    = ();
+
+%month_str2num  = (
+		   Jan => 0, Feb => 1, Mar => 2, Apr => 3, May => 4, Jun => 5,
+		   Jul => 6, Aug => 7, Sep => 8, Oct => 9, Nov => 10, Dec => 11
+		  );
+
+
+%icmp_types =
+  (
+   0  => "Echo Reply",
+   1  => "Unassigned",
+   2  => "Unassigned",
+   3  => "Destination Unreachable",
+   4  => "Source Quench",
+   5  => "Redirect",
+   6  => "Alternate Host Address",
+   7  => "Unassigned",
+   8  => "Echo",
+   9  => "Router Advertisement",
+   10 => "Router Selection",
+   11 => "Time Exceeded",
+   12 => "Parameter Problem",
+   13 => "Timestamp",
+   14 => "Timestamp Reply",
+   15 => "Information Request",
+   16 => "Information Reply",
+   17 => "Address Mask Request",
+   18 => "Address Mask Reply",
+   30 => "Traceroute",
+   31 => "Datagram Conversion Error",
+   32 => "Mobile Host Redirect",
+   33 => "IPv6 Where-Are-You",
+   34 => "IPv6 I-Am-Here",
+   35 => "Mobile Registration Request",
+   36 => "Mobile Registration Reply",
+   37 => "Domain Name Request",
+   38 => "Domain Name Reply",
+   39 => "SKIP",
+   40 => "Photuris",
+  );
+
+%icmp_codes =
+  (
+   3 => {
+	 0  => "Net Unreachable",
+	 1  => "Host Unreachable",
+	 2  => "Protocol Unreachable",
+	 3  => "Port Unreachable",
+	 4  => "Fragmentation Needed and Don't Fragment was Set",
+	 5  => "Source Route Failed",
+	 6  => "Destination Network Unknown",
+	 7  => "Destination Host Unknown",
+	 8  => "Source Host Isolated",
+	 9  => "Communication with Destination Network is Administratively Prohibited",
+	 10 => "Communication with Destination Host is Administratively Prohibited",
+	 11 => "Destination Network Unreachable for Type of Service",
+	 12 => "Destination Host Unreachable for Type of Service",
+	 13 => "Communication Administratively Prohibited",
+	 14 => "Host Precedence Violation",
+	 15 => "Precedence cutoff in effect",
+	},
+   5 => {
+	 0 => "Redirect Datagram for the Network (or subnet)",
+	 1 => "Redirect Datagram for the Host",
+	 2 => "Redirect Datagram for the Type of Service and Network",
+	 3 => "Redirect Datagram for the Type of Service and Host",
+	},
+   11 => {
+	  0 => "Time to Live exceeded in Transit",
+	  1 => "Fragment Reassembly Time Exceeded",
+	 },
+   12 => {
+	  0 => "Pointer indicates the error",
+	  1 => "Missing a Required Option",
+	  2 => "Bad Length",
+	 },
+  );
+
+sub cache_getprotobynumber {
+    return $proto_cache{ $_[0] } if exists $proto_cache{$_[0]};
+
+    return $proto_cache{ $_[0] } = getprotobynumber $_[0];
+}
+
+sub cache_gethostbyaddr {
+    return $host_cache{ $_[0] } if exists $host_cache{ $_[0] };
+
+    my $addr = pack "CCCC", split /\./, $_[0];
+    return $host_cache{ $_[0] } = gethostbyaddr $addr, AF_INET;
+}
+
+sub cache_getservbyport {
+    my ( $port, $proto ) = @_;
+    my $key = $port . "|" . $proto;
+
+    return $serv_cache{ $key } if exists $serv_cache{ $key };
+
+    return $serv_cache{ $key } = getservbyport $port, $proto;
+}
+
+sub cache_find_host_alias {
+    my ($fwctl,$ip) = @_;
+
+    return $host_alias_cache{$ip} if exists $host_alias_cache{$ip};
+
+    return $host_alias_cache{$ip} = $fwctl->find_host_alias( $ip );
+}
+
+sub cache_find_host_interface {
+    my ($fwctl,$ip) = @_;
+
+    return $host_if_cache{$ip} if exists $host_if_cache{$ip};
+
+    return $host_if_cache{$ip} = $fwctl->find_interface( $ip )->{name};
+}
+
+sub cache_find_interface {
+    my ($fwctl,$name) = @_;
+
+    return $if_cache{$name} if exists $if_cache{$name};
+
+    return $if_cache{$name} = $fwctl->find_interface_by_dev( $name );
+}
+
+my %opts = ( dns => 1 );
+GetOptions( \%opts, "aliases=s", "interfaces=s", "rules=s",
+	    "services=s@", "dns!", "year=s", "start=s",
+	    "end=s", "period=s"
+	  )
+  or usage;
+
+# Translate options
+my %fwopts = ();
+$fwopts{interfaces_file}    = $opts{interfaces} if $opts{interfaces};
+$fwopts{aliases_file}	    = $opts{aliases}    if $opts{aliases};
+$fwopts{rules_file}	    = $opts{rules}	if $opts{rules};
+$fwopts{services_dir}	    = $opts{"services-dir"}
+  if $opts{"services-dir"};
+$fwopts{accounting_file}   = $opts{"accounting-file"}
+  if $opts{"accounting-file"};
+
+# Determine start and end of the report;
+my ($start, $end, $period, $cutoff );
+if ( $opts{start} ) {
+    $start = Fwctl::Report::parse_date( $opts{start} ) or
+      die "fwctllog: invalid start date format: $opts{start}\n";
+}
+
+if ( $opts{period} ) {
+    $period = Fwctl::Report::parse_period( $opts{period}) or
+      die "fwctllog: invalid period delta: $opts{period}\n";
+    if ( defined $start ) {
+	$end = $start + $period;
+    }
+} elsif ( $opts{end} ) {
+    $end = Fwctl::Report::parse_date( $opts{end} ) or
+      die "fwctllog: invalid end date format: $opts{end}\n";
+} else {
+    $end = 2 ** 31;
+}
+
+my $fwctl = new Fwctl( %fwopts );
+
+my ($cur_month,$cur_year) = (localtime)[4,5];
+# Allow the user to set the year
+my $year	= $opts{year} ? $opts{year} -= 1900 : undef; # Not its not a Y2K bug
+my $last_month  = $cur_month;
+
+while (<>) {
+    # Skip line that doesn't contains a valid packet dump
+    next unless /kernel: Packet log: /;
+
+    # Parse the line
+    my ( $month_str, $mday, $hours, $min, $sec, $chain, $action,
+         $interface, $proto, $src, $srcport, $dst, $dstport ) =
+	   /^(...) +(\d+) (\d\d):(\d\d):(\d\d).*Packet log: ([-\w]+) (\w+) (\w+) PROTO=(\d+) (\d+\.\d+\.\d+\.\d+):(\d+) (\d+\.\d+\.\d+\.\d+):(\d+)/;
+    unless ( defined $month_str ) {
+        warn "fwctllog: failed to package line $.: $_";
+	next;
+    }
+
+    # Transform the timestamp into epoch time
+    my $month = $month_str2num{$month_str};
+    # WARNING this simple algorithm may infringe on the Y2K US Patent.
+    unless ( $year ) {
+	if ( $month > $cur_month ) {
+	    # That month is in the future, so it's must be last year
+	    $year = $cur_year - 1;
+	} else {
+	    $year = $cur_year;
+	}
+	$last_month = $month;
+    }
+    if ( $month < $last_month) {
+	# We change year
+	$year++;
+	$last_month = $month;
+    }
+    my $epoch	   = timelocal( $sec, $min, $hours, $mday, $month, $year );
+    # Check if we are in period
+    $start  = $epoch unless $start;
+    $end    = $start + $period if ! $end && $period;
+    next unless $epoch >= $start && $epoch <= $end;
+
+    my $proto_name = cache_getprotobynumber( $proto );
+    my $src_host   = $opts{dns} ? cache_gethostbyaddr( $src ) : "";
+    my $dst_host   = $opts{dns} ? cache_gethostbyaddr( $dst ) : "";
+    my ($src_serv, $dst_serv) = ( "", "");
+    if ( $proto_name eq "udp" || $proto_name eq "tcp" ) {
+	# Is the src one very interesting ?
+	$src_serv = cache_getservbyport( $srcport, $proto_name );
+	$dst_serv = cache_getservbyport( $dstport, $proto_name );
+    } elsif ( $proto_name eq "icmp" ) {
+	$src_serv = $icmp_types{$srcport};
+	$src_serv = "" unless defined $src_serv;
+	$dst_serv = $icmp_codes{$srcport}{$dstport};
+	$dst_serv = "" unless defined $dst_serv;
+    }
+
+    my $fwctl_if    = cache_find_interface( $fwctl, $interface );
+    my $src_if	    = cache_find_host_interface( $fwctl, $src );
+    my $dst_if	    = cache_find_host_interface( $fwctl, $dst );
+    my $src_alias   = cache_find_host_alias( $fwctl, $src );
+    my $dst_alias   = cache_find_host_alias( $fwctl, $dst );
+
+    # Output our informations for next pass
+    print join( "|", $epoch, $action, $interface, $fwctl_if,
+		$chain, $proto, $proto_name,
+		$src, $src_host, $src_if, $src_alias, $srcport, $src_serv,
+		$dst, $dst_host, $dst_if, $dst_alias, $dstport, $dst_serv ),
+		  "\n";
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fwctllog - Program to gather raw data from the packet dump generated
+	   by the firewall
+
+=head1 SYNOPSIS
+
+fwtcllog    [--aliases file] [ --interfaces file ] [--rules file]
+	    [--services-dir dir ]+ [ --dns | --nodns ] [--year year]
+	    [--start date] [ --end date | --period period ]
+	    logfile ...
+
+=head1 DESCRIPTION
+
+fwctllog reads STDIN or the file named as argument on the command and
+preprocess the packet logs for convenient later analysis.
+
+=head1 OUTPUT
+
+The program outputs in a pipe (|) delimited format the following information.
+
+=over
+
+=item epoch
+
+The timestamp of the packet in epoch time.
+
+=item policy
+
+What happened to the logged packet (REJECT,ACCEPT or DENY).
+
+=item device
+
+The device interface on which the packet was logged.
+
+=item interface
+
+The Fwctl(3) interface name to which this device is releted (ex. EXT).
+
+=item chain
+
+The name of the chain on which this packet was logged.
+
+=item proto
+
+The protocol number of the packet.
+
+=item proto_name
+
+The protocol name of the packet
+
+=item src_ip
+
+The source IP of the packet in IPv4 quad dotted format.
+
+=item src_host
+
+The hostname (if dns resolution was turned on and if it was
+successful) related to the source IP.
+
+=item src_if
+
+The Fwctl(3) interface which is related to that IP.
+
+=item src_alias
+
+The Fwctl(3) alias which is related to this IP.
+
+=item src_port
+
+The port number of the source if the protocol is TCP or UDP. If the protocol
+is ICMP, this is the icmp type.
+
+=item src_serv
+
+The service name related to the port or the name related to the ICMP type.
+
+=item dst_ip
+
+The destination IP of the packet in IPv4 quad dotted format.
+
+=item dst_host
+
+The hostname (if dns resolution was turned on and if it was
+successful) related to the destination IP.
+
+=item dst_if
+
+The Fwctl(3) interface which is related to that IP.
+
+=item dst_alias
+
+The Fwctl(3) alias which is related to this IP.
+
+=item dst_port
+
+The port number of the destination if the protocol is TCP or UDP.
+If the protocol is ICMP, this is the icmp code.
+
+=item dst_serv
+
+The service name related to the port or the name related to the ICMP code.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item aliases
+
+Specifies the path to the F<aliases> file.
+Default is F</etc/fwctl/aliases>.
+
+=item interfaces
+
+Specifies the path to the F<interfaces> file.
+Default is F</etc/fwctl/interfaces>
+
+=item rules
+
+Specifies the path to the F<rules> file.
+Default is F</etc/fwctl/rules>
+
+=item services-dir
+
+Sets the search patch for service modules. The default is to look in
+I<PERLPATH> and F</etc/fwctl/services/>.
+Using this option removes the last  directory from the search path
+and adds the directory specified as option. Note that the default perl
+module path are always searched.
+
+This option may be specified multiple times.
+
+=item [no]dns
+
+Turn on or off the DNS resolving of found IP.
+
+=item year
+
+Sets the year that the log starts. Defaults to the current year if the first
+month of the log is in the past and last year if the logs starts in the future.
+
+=item start
+
+Sets the date from which to output records. If the Date::Manip module is
+available you can use any format that this module can understand. If you
+don't have this module installed, you must specify a complete date of the
+form YYYY-MM-DD HH:MM:SS The hour, minute and seconds part is optional as well
+as the year, which can be 2 or 4 digits.
+
+=item end
+
+Sets the date after which the program stops to output records. If the
+Date::Manip module is available you can use any format that this
+module can understand. If that module is not available, you should use the
+same format that the I<start> option.
+
+=item period
+
+Sets the period length for which to ouput records. It is interpreted
+relative to the starting date or the start of the logs. If the
+Date::Manip module is available you can use any format that this
+module understands. If not use something like Year Month Day Hours Min
+Secs suffixed each with y,mo,d,h,mi,s. Each part is optional.
+
+=back
+
+=head1 AUTHOR
+
+Francis J. Lacoste <francis.lacoste@iNsu.COM>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999,2000 iNsu Innovations Inc.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+Fwctl(3) Fwctl::RuleSet(3) fwctl(8).
+
+=cut
+

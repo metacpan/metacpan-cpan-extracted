@@ -1,0 +1,38 @@
+Revision history for File-Listing-Ftpcopy
+
+0.07      2015-08-10 12:36:37 -0400
+  - Make Config::AutoConf a configure requires, as it
+    should be
+
+0.06      2015-03-18 14:44:33 -0400
+  - Migrated to Module::Build
+  - Support Perl 5.8
+  - Use Math::Int64 C API for 64 bit integers instead of
+    sometimes a UV and sometimes a string
+  - Use Config::AutoConf to detect type sizes instead of
+    our own home rolled detector
+  - As a consequence of the last point, Microsoft Visual
+    C++ is now supported
+
+0.05      2013-11-22 10:07:28 -0500
+  - added diagnostic
+  - rename constant function to _constant
+
+0.04      2013-06-12 17:32:20 America/New_York
+  - clarify copyright
+
+0.03      2013-05-31 07:05:42 America/New_York
+  - promote to production
+
+0.02_02   2013-05-30 05:06:05 America/New_York
+  - be more strict and warningful
+
+0.02_01   2013-05-29 21:02:05 America/New_York
+  - rm dist build dep on Dist::Zilla::Plugin::MakeMaker::Custom
+  - rm dep on base
+
+0.02      2013-02-04 11:28:59 America/New_York
+  - documentation fix
+
+0.01      2013-01-27 19:27:49 America/New_York
+  - initial version

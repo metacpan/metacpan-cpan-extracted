@@ -1,0 +1,35 @@
+[% PROCESS sub/date.html %]
+[% WRAPPER 'message/bar.html' %]
+
+<div class='one'> 
+<table align='center'>
+<tr class="title"><td width='30%'>[% c.loc('From') %]</td><td>[% c.loc('Subject') %]</td></tr>
+<tr class="misc1">
+<td>
+    [% c.loc('From') %]: <a href='/u/[% message.sender.username %]'>[% message.sender.nickname %]</a><br />
+    [% c.loc('To') %]:   <a href='/u/[% message.recipient.username %]'>[% message.recipient.nickname %]</a><br />
+    [% c.loc('Post on') %]&nbsp;<span class='date'>[% date_format(message.post_on) %]</span>
+</td>
+<td>
+    <strong>[% message.title %]</strong><br />
+    [% message.text %]
+</td>
+</tr>
+</table>
+</div>
+
+[% IF message.recipient.user_id == c.user.user_id %]
+<br />
+<form action='/message/compose' method='post'>
+<input type='hidden' name='to' value='[% message.sender.username %]' />
+<div class='one'>
+<table align='center'>
+    <tr><td class="title" colspan='2'>[% c.loc('Reply') %]</td></tr>
+    <tr class="misc2"><td align='right'>[% c.loc('Title') %]</td><td><input type='text' name='title' size='32' value='Re: [% message.title %]' /></td></tr>
+    <tr class="misc1"><td align='right'>[% c.loc('Content') %]</td><td><textarea cols='70' rows='8' name='text'></textarea></td></tr>
+    <tr class="misc2"><td>&nbsp;</td><td><input type='submit' /></td></tr>
+</table>
+</div>
+[% END %]
+
+[% END %]

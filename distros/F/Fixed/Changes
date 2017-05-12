@@ -1,0 +1,22 @@
+Fixed
+=====
+
+Created:      2013-01-25
+Home page:    <https://metacpan.org/release/Fixed>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Fixed>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-11
+
+ [ Packaging ]
+ - Fix repo metadata.
+   Fixes RT#90639.
+   David Steinbrunner++
+   <https://rt.cpan.org/Ticket/Display.html?id=90639>
+
+0.002	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.001	2013-01-25	Initial release

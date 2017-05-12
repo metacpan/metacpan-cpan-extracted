@@ -1,0 +1,200 @@
+Thoughts about future releases, in no particular order.
+Feel free to share your thoughts with me at  mob@cpan.org 
+or through  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Forks-Super
+
+Possible TODOs:
+
+    _x_ support sockets/pipes for cmd-style forks like IPC::Open3 does.
+	_X_ for Unixy systems
+	___ for MSWin32
+	    IPC::Open3 supports MSWin32/os2 with the <system 1, @_>
+	    construction. Don't think that is appropriate for this module.
+
+    ___ There's enough stuff in here now that performance is affected,
+	especially when there are lots of short tasks. What can be done
+	to tighten up performance? What can be done to reduce overhead
+	when there are many short tasks?
+	___ disable $FSJ::Ipc::USE_TIE_?H? need to benchmark
+	_X_ tighten some delays in file-based IPC
+        ___ shorten $Forks::Super::Deferred::QUEUE_MONITOR_FREQ
+
+    ___ fork { run => [ \@cmd, ... ] }
+	to invoke or emulate IPC::Run's rich feature set
+	___ What else can I learn by studying IPC::Run?
+
+    ___ What other key-value pairs should FSJ::read_stdxxx handle?
+	_X_ warn => 0|1
+	_X_ timeout => max number of seconds to wait for input
+        ___ log => 0|1|*handle|\@list?
+
+    ___ No complaints yet, but is there a smarter way to
+        set the IPC directory?
+        ___ detect NFS and search for alternatives? NFS affects flock sync, too
+    ___ Refactor how we create and remove the temp IPC directory.
+
+    _X_ Runtime IPC cleanup routine for long running programs. For long
+	completed jobs: close the open filehandles that have slipped
+	through the cracks; remove the IPC files; move from 
+	%ALL_JOBS,@ALL_JOBS to %ARCHIVED_JOBS,@ARCHIVED_JOBS
+
+    ___ Demos/examples/cookbook section.
+        ___ Perform 1000's of jobs, 20 at a time
+            ___ with queueing to perform other tasks
+            ___ example: web crawler
+	    _x_ example: multi-threaded du
+        _x_ timeout long running jobs
+        _x_ manipulate CPU affinities
+        ___ dependencies
+        ___ interactive client/server example of IPC
+        ___ run a server using Forks::Super
+        _x_ see t/forked_harness.pl
+        _X_ load management
+            _X_ block while system is busy
+            _X_ suspend/resume
+            _X_ suspend/resume callback
+        ___ bg_eval, bg_qx examples
+	    _X_ factorial.pl for bg_eval
+        ___ can_launch examples
+        ___ how to: use sleep with Forks::Super
+        ___ how to: use alarm with Forks::Super
+        ___ changing IPC_DIR
+        ___ tuning Forks::Super for fast jobs, slow jobs,
+	    memory intensive jobs, cpu intensive jobs,
+	    I/O bound jobs
+        ___ scheduler app that can run for days at a time
+	___ reuse
+	___ share
+	___ daemon
+
+    ___ POSIX::RT::Timer as possible replacement for get/set itimer?
+
+    ___ Does anything bad happen when you set $SIG{CHLD} = 'IGNORE' ?
+        'DEFAULT'? sub {} ? undef ?
+        _X_ Yes. ANY setting for $SIG{CHLD} will let system calls
+	    like  sleep  get interrupted by SIGCHLD events. Maybe.
+	    See t/31. 
+
+	    It's curious that we can assign to $XSIG{CHLD}[-1]
+	    (which does set a handler for SIGCHLD) but that DOESN'T
+	    trigger interruption of system calls. It's as if perl
+            is just checking  defined $SIG{CHLD}  instead of whether
+	    an actual signal handler is registered to decide whether
+	    to interrupt sleep.
+
+	    ___ Setting  $SIG{CHLD}=undef  makes FS subtly wrong, though
+                setting  $SIG{CHLD}=\&bogus  is ok. How to keep $SIG{CHLD}
+                from getting undefined?
+`		___ Override $Signals::XSIG::SIGTie::STORE, ::DELETE ?
+		___ Should we periodically set  $SIG{CHLD}=\&garbage?
+
+        ___ Yes again. When $SIG{CHLD}='IGNORE', calling wait or waitpid
+	    NEVER returns a pid; it's always either 0 or -1
+	    (actually, this is platform dependent).
+ 	    ___ Should  Forks::Super  check the value of $SIG{CHLD}
+	        and emulate this behavior?
+
+        ___ Actually, this would be part of a good XSIG framework workout.
+            Some scripts with natural forks and wait/waitpid calls
+            should produce the same results with and without Forks::Super
+            (i.e., F::S is a drop-in replacement)
+
+        _X_ Test F::S as a drop in replacement to a program that
+            has a SIGCHLD handler. -- looks good
+
+    ___ reinstate t/31? ok on Cygwin, MSWin32, Linux, FreeBSD ?
+        _X_ still doesn't work on Linux? Sure it does.
+
+    ___ a "wrapper" script that executes an arbitrary command in a
+        separate process, but as if it had come from a fork call within
+        a program using Forks::Super. The purpose is to make sure that
+        a program runs in a detached process. The wrapper will set up
+        all the (almost surely file based) IPC and then run the desired
+        program. The other purpose is to execute a <XXX>command </XXX>
+        subroutine on a remote 	host.
+
+    _O_ are %CHILD_STDxxx variables obsolete? How to deprecate?
+        Not obsolete. At least not until we remove the setting
+	$Forks::Super::OVERLOAD_ENABLED.
+
+    _o_ setuid =>  option to fork
+
+    _o_ Make forked_harness.pl an application that gets installed
+        with Forks::Super
+        _o_ or maybe not, people already use prove
+        _X_ put pod in t/forked_harness.pl
+
+    _x_ daemon support depends on file-based IPC?
+        make a socket-based alternative. Let $job->{signal_ipc}, {daemon_ipc}
+	be sockets?
+
+    ___ Anything to learn from python  multiprocessing  module? See   
+        stackoverflow.com/questions/7931455/
+	_X_ synchronization objects, acquire and release methods
+	    ___ perm fix for 48b with sync?
+	___ anything else
+
+    ___ exercise every method of FS::Tie::IPCDupSTDIN 
+        (__config_fh_child_stdin_file, $job->{fh_config}{f_in},
+	sub/natural-style)
+
+    ___ use shared memory between processes, where supported
+        ___ synchronization based on shared memory
+	___ process pools based on shared memory
+        ___ IPC by shared memory
+        ___ job queue on shared memory
+
+    ___ encryption and other layers on IO channels
+
+    ___ parent_dump enhancements:
+        _X_ get and display stack trace of natural/sub-style children
+	___ measure input and output for IPCxxxHandle classes
+
+    ___ CPAN testers find lots of timing errors in openbsd. Is pause(n)
+        on openbsd prone to returning significantly more or less than n
+	seconds later? Would a busy wait just for openbsd make things
+	better or worse?
+
+    _o_ async  method like threads, forks, Coro?
+        bg_eval is like the async method
+
+    ___ $job->{child_stdin}, {child_stdout}, {child_xxx} should be
+        restructured as $job->{child_fh}{stdin}, {stdout}, etc.
+        i.e., a dedicated member that holds a collection of iohandles
+
+    ___ what happens if you mix Forks::Super and forks?
+        I'm guessing it's not good.
+          meh, it matters less than I thought
+            t/forked_harness.pl times out after 30 seconds but tests pass
+            regular make test worked?
+            t/24e-kill.t does not terminate
+
+    ___ have a "remote_host" option to go with "cmd" option
+        _X_ remote_host => host
+        _X_ remote_host => [host, user, pwd]
+            to run on a remote server that requires some credentials
+        _X_ remote_host => [ \@hosts ]  or  [ \@hosts, user, pwd ]
+            to run on any of a cluster of available remote hosts
+        _X_ allow a separate MAX_PROC-like setting to be used for
+            remote hosts
+        ___ remote_host_proto => 'ssh'
+            default is ssh and requires Net::OpenSSH
+            ___ Net::OpenSSH doesn't work on cygwin, MSWin32. Alternatives?
+        ___ support remote && dir
+        ___ support remote && env
+
+    ___ FS::Config::enable_signal_config not being tested?
+
+    _X_ Improve global destruction like I did in Devel::DumpTrace
+
+    ___ Pool, Queue objects to share data between parent and children (workers)
+        ___ Are there existing modules for this? To add and subtract from a
+            queue or stack from separate processes?
+        _X_ rename Forks::Super::Queue so this package name is available later
+
+    ___ determine in system-limits.PL if alternate alarm is needed
+
+    ___ run Test::SSH inside forked-harness.pl, let our remote tests use a
+        common test server
+
+    _X_ Signal ipc pipes must be closed (bug report from Jari Turkia)
+

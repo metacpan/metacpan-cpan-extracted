@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Irenamer.t
+lib/File/Irenamer.pm
+META.yml                                 Module meta-data (added by MakeMaker)

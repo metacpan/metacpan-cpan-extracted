@@ -1,0 +1,8 @@
+#h sid cid
+1 10
+2 11
+1 12
+2 12
+# cid 13: the unnamed class
+3 13
+#  | dbsort -n cid

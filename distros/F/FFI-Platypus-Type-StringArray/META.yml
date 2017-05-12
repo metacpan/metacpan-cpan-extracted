@@ -1,0 +1,28 @@
+---
+abstract: 'Platypus custom type for arrays of strings'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  FFI::CheckLib: '0'
+  Module::Build: '0.28'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  Module::Build::FFI: '0.15'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI-Platypus-Type-StringArray
+requires:
+  FFI::Platypus: '0.15'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/FFI-Platypus-Type-StringArray/issues
+  homepage: http://perl.wdlabs.com/FFI-Platypus-Type-StringArray
+  repository: git://github.com/plicease/FFI-Platypus-Type-StringArray.git
+version: '0.01'

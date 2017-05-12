@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+README.html
+Similars.why.htm
+release-log.txt
+bin/findsimilars
+lib/File/FindSimilars.pm
+t/00-load.t
+t/pod.t
+test.pl
+test.tgz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

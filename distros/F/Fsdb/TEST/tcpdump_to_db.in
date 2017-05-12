@@ -1,0 +1,8 @@
+14:11:12.556781 dash.isi.edu.1023 > excalibur.usc.edu.ssh: S 2306448962:2306448962(0) win 32120 <mss 1460,sackOK,timestamp 82802652[|tcp]> (DF)
+14:11:12.561734 excalibur.usc.edu.ssh > dash.isi.edu.1023: S 1968320001:1968320001(0) ack 2306448963 win 4096
+14:11:12.561875 dash.isi.edu.1023 > excalibur.usc.edu.ssh: . ack 1 win 32120 (DF)
+14:11:18.746567 excalibur.usc.edu.ssh > dash.isi.edu.1023: P 316:328(12) ack 348 win 4096
+14:11:18.755176 dash.isi.edu.1023 > excalibur.usc.edu.ssh: P 348:488(140) ack 328 win 32696 (DF) [tos 0x10]
+14:11:18.847937 excalibur.usc.edu.ssh > dash.isi.edu.1023: P 328:468(140) ack 488 win 4096
+14:11:18.860047 dash.isi.edu.1023 > excalibur.usc.edu.ssh: . ack 468 win 32696 (DF) [tos 0x10]
+14:11:18.936255 dash.isi.edu.1023 > excalibur.usc.edu.ssh: P 488:516(28) ack 468 win 32696 (DF) [tos 0x10]

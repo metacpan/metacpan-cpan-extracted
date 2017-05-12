@@ -1,0 +1,67 @@
+NAME
+    Filesys::Virtual::DPAP - Filesys::Virtual interface to DPAP (iPhoto)
+    shares
+
+SYNOPSIS
+            use Filesys::Virtual::DPAP;
+
+            my $fs = Filesys::Virtual::DPAP->new({
+                    host => 'localhost'
+            });
+
+            my @albums = $fs->list('/');
+            my @photos = $fs->list(@albums);
+
+DESCRIPTION
+    This module is based on Richard Clamp's awesome Filesys::Virtual::DAAP
+    module - many thanks to Richard for all his rad Perl contributions!
+
+    Most of this module's functionality is provided by Leon Brocard's way
+    cool Net::DPAP::Client - thanks also to Leon, for many likewise terrific
+    Perl modules!
+
+    This module currently implements only a limited subset of
+    Filesys::Virtual methods, but like Filesys::Virtual::DAAP, it can
+    republish DPAP shares, via either Net::DAV::Server or
+    POE::Component::Server::FTP
+
+AUTHOR
+    Jack Bates <ms419@freezone.co.uk>
+
+COPYRIGHT
+    Copyright (c) 2005 Jack Bates. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    So far so good - except for some strangeness actually reading photos
+    using OS X's WebDAVFS; in my experience, doing so causes script sharing
+    Filesys::Virtual::DPAP to silently terminate.
+
+    I experience this problem publishing Filesys::Virtual::DPAP using both
+    HTTP::Daemon & POE::Component::Server::HTTP - I tracked it down to
+    'print $response->content' lines in both modules.
+
+    Strangely, reading photos using Firefox, etc. or even Cadaver works fine
+    - even adjusting the file extension so OS X thinks photos are actually
+    QuickTime files enables photos to be read.
+
+    At this point, I can only speculate that OS X does something funky to
+    the HTTP connection when reading photos - like maybe it's closed when
+    Perl tries writing the response content & Perl commits suicide.
+
+    I could sure use some help with this one!
+
+    Report bugs using the CPAN RT system -
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Filesys::Virtual::DPAP>
+
+TODO
+     * Explore exporting extra DPAP properties as WebDAV properties - in a 'DPAP'
+       namespace.
+
+     * Explore writing DPAP structures back to sufficiently capable DPAP servers.
+
+SEE ALSO
+    Net::DPAP::Client, Net::DAV::Server, POE::Component::Server::FTP
+

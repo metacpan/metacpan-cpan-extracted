@@ -1,0 +1,37 @@
+---
+abstract: 'Facebook Messenger Send API'
+author:
+  - 'Tudor Marghidanu'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Facebook-Messenger-Client
+provides:
+  Facebook::Messenger::Client:
+    file: lib/Facebook/Messenger/Client.pm
+    version: '1.0'
+  Facebook::Messenger::Client::Model:
+    file: lib/Facebook/Messenger/Client/Model.pm
+  Facebook::Messenger::Client::Text:
+    file: lib/Facebook/Messenger/Client/Text.pm
+requires:
+  Mojolicious: '0'
+  Moose: '0'
+  MooseX::AbstractFactory: '0'
+  MooseX::AbstractMethod: '0'
+  MooseX::Storage: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/marghidanu/facebook-messenger-client
+version: '1.0'
+x_contributors:
+  - 'Tudor Marghidanu <tudor@marghidanu.com>'

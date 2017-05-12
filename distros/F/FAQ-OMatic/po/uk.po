@@ -1,0 +1,1973 @@
+# Ukrainian translation for FAQ-O-Matic.
+# Translated by Andrew W. Nosenko <awn@bcs.zp.ua>, 2001
+#
+# This is partial translation indeed.  For most phrases appropriate
+# Russian phrases is used.  These phrases marked as Russian in comments.
+# Contributions of proper Ukrainian translations are welcomed (same as
+# any other contributions ;-).
+#
+# Some words:
+# bag     "м╕шок"
+# content вм╕ст
+# data    вм╕ст   FIXME: хто-небудь зна╓ кращ╕й переклад?
+# define  визначити
+# script  ???     FIXME: я використав `скрипт', але...
+#
+# ATTENTION: don't remove fuzzy mark from this startup entry!
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: faqomatic 2.711_01\n"
+"POT-Creation-Date: 2001-08-07 14:22+0300\n"
+"PO-Revision-Date: 2001-08-06 19:55+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Ukrainian <someone@somewhere.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=koi8-u\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/FAQ/OMatic.pm:95 lib/FAQ/OMatic/install.pm:1040
+msgid "Warnings:"
+msgstr "Попередження:"
+
+#: lib/FAQ/OMatic.pm:135 lib/FAQ/OMatic/authenticate.pm:151
+msgid "Log In"
+msgstr "Ув╕йти"
+
+#: lib/FAQ/OMatic.pm:136
+msgid "Change Password"
+msgstr "Зм╕нити Пароль"
+
+#: lib/FAQ/OMatic.pm:137
+msgid "Edit Title of %0 %1"
+msgstr "%0 %1: Редагування заголовка"
+
+# Intentionally left blank
+#: lib/FAQ/OMatic.pm:138
+#, c-format
+msgid "New %0"
+msgstr ""
+
+#: lib/FAQ/OMatic.pm:139
+msgid "Edit Part in %0 %1"
+msgstr "%0 %1: Редагування частки"
+
+#: lib/FAQ/OMatic.pm:140
+msgid "Insert Part in %0 %1"
+msgstr "%0 %1: Вставка частки"
+
+#: lib/FAQ/OMatic.pm:141
+msgid "Move %0 %1"
+msgstr "%0 %1: Перем╕щення"
+
+#: lib/FAQ/OMatic.pm:142 lib/FAQ/OMatic/Appearance.pm:168
+msgid "Search"
+msgstr "Пошук"
+
+#: lib/FAQ/OMatic.pm:143
+msgid "Access Statistics"
+msgstr "Статистика доступу"
+
+#: lib/FAQ/OMatic.pm:144 lib/FAQ/OMatic/submitPass.pm:145
+msgid "Validate"
+msgstr "Перев╕рити"
+
+#: lib/FAQ/OMatic.pm:145
+msgid "%0 Permissions for %1"
+msgstr "%0 %1: Настройки та права доступу"
+
+#: lib/FAQ/OMatic.pm:146
+msgid "Upload bag for %0 %1"
+msgstr ""
+
+#: lib/FAQ/OMatic/Appearance.pm:177
+msgid "Appearance"
+msgstr "Зовн╕шн╕й Вигляд"
+
+#: lib/FAQ/OMatic/Appearance.pm:191
+msgid "Show Top Category Only"
+msgstr "Показати Т╕льки Верхню Категор╕ю"
+
+#: lib/FAQ/OMatic/Appearance.pm:198
+msgid "Show This <em>Entire</em> Category"
+msgstr "Показати <em>Геть Усю</em> Категор╕ю"
+
+#: lib/FAQ/OMatic/Appearance.pm:209
+msgid "Show This Category As Text"
+msgstr "Показати Цю Категор╕ю Як Текст"
+
+#: lib/FAQ/OMatic/Appearance.pm:213
+msgid "Show This Answer As Text"
+msgstr "Показати Цю В╕дпов╕дь Як Текст"
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/Appearance.pm:218
+msgid "Show This %0 As Text"
+msgstr ""
+
+#: lib/FAQ/OMatic/Appearance.pm:232
+msgid "Show This <em>Entire</em> Category As Text"
+msgstr "Показати <em>Геть Усю</em> Категор╕ю Як Текст"
+
+#: lib/FAQ/OMatic/Appearance.pm:244
+msgid "Hide Expert Edit Commands"
+msgstr "Сховати Поширен╕ Команди Редагування"
+
+#: lib/FAQ/OMatic/Appearance.pm:253
+msgid "Show Expert Edit Commands"
+msgstr "Показати Поширен╕ Команди Редагування"
+
+#: lib/FAQ/OMatic/Appearance.pm:269 lib/FAQ/OMatic/Item.pm:1955
+#: lib/FAQ/OMatic/stats.pm:133
+msgid "Return to the FAQ"
+msgstr "Повернутися до FAQ"
+
+#: lib/FAQ/OMatic/Appearance.pm:276
+msgid "This is a"
+msgstr "Це ╓"
+
+#: lib/FAQ/OMatic/Auth.pm:475
+msgid "the administrator of this Faq-O-Matic"
+msgstr "адм╕н╕стратор цього FAQ-O-Matic'а"
+
+#: lib/FAQ/OMatic/Auth.pm:476
+msgid "someone who has proven their identification"
+msgstr "хто-небудь, хто з усп╕хом пройшов ╕дентиф╕кац╕ю"
+
+#: lib/FAQ/OMatic/Auth.pm:477
+msgid "someone who has offered identification"
+msgstr "хто-небудь, хто ╕дентиф╕кував себе (досить email-адреси)"
+
+#: lib/FAQ/OMatic/Auth.pm:478
+msgid "anybody"
+msgstr "хто завгодно"
+
+#: lib/FAQ/OMatic/Auth.pm:491
+msgid "the moderator of the item"
+msgstr "модератор"
+
+#: lib/FAQ/OMatic/Auth.pm:495
+#, c-format
+msgid "%0 group members"
+msgstr "члени групи %0"
+
+#: lib/FAQ/OMatic/Groups.pm:142
+msgid "Select a group to edit:"
+msgstr "Виберить групу для редагування:"
+
+#: lib/FAQ/OMatic/Groups.pm:150
+msgid ""
+"(Members of this group are allowed to access these group definition pages.)"
+msgstr "(Члени ц╕╓╖ групи мають доступ до ц╕╓╖ стор╕нки керування групами.)"
+
+#: lib/FAQ/OMatic/Groups.pm:168
+msgid "Add Group"
+msgstr "Додати Групу"
+
+#: lib/FAQ/OMatic/Groups.pm:175
+msgid "Up To List Of Groups"
+msgstr "Нагору до Списку Груп"
+
+#: lib/FAQ/OMatic/Groups.pm:187
+msgid "Remove Member"
+msgstr "Стерти Члена Групи"
+
+#: lib/FAQ/OMatic/Groups.pm:196
+msgid "Add Member"
+msgstr "Додати Члена Групи"
+
+#: lib/FAQ/OMatic/Groups.pm:206 lib/FAQ/OMatic/install.pm:466
+#: lib/FAQ/OMatic/install.pm:470
+msgid "Go to the Faq-O-Matic"
+msgstr "Перейти до Faq-O-Matic'а"
+
+#: lib/FAQ/OMatic/Groups.pm:209
+msgid "Go To Install/Configuration Page"
+msgstr "Перейти до стор╕нки Установок ╕ Конф╕гурац╕╖"
+
+#: lib/FAQ/OMatic/Item.pm:74
+msgid "New Item"
+msgstr "(Елемент без назви)"
+
+#: lib/FAQ/OMatic/Item.pm:630
+msgid "Parts"
+msgstr "Частки"
+
+#: lib/FAQ/OMatic/Item.pm:749
+msgid "Previous"
+msgstr "Попередн╕й документ"
+
+#: lib/FAQ/OMatic/Item.pm:767
+msgid "Next"
+msgstr "Наступний документ"
+
+#: lib/FAQ/OMatic/Item.pm:861 lib/FAQ/OMatic/Item.pm:1268
+#: lib/FAQ/OMatic/Item.pm:1452
+msgid "Moderator"
+msgstr "Модератор"
+
+#: lib/FAQ/OMatic/Item.pm:862
+msgid "(inherited from parent)"
+msgstr "(успадковуеться в╕д батьк╕вського елемента)"
+
+#: lib/FAQ/OMatic/Item.pm:876
+msgid "Category Title and Options"
+msgstr "Заголовок та Настройки Категор╕╖"
+
+#: lib/FAQ/OMatic/Item.pm:877
+msgid "Edit Category Permissions"
+msgstr "Редагувати Права Доступу до Категор╕╖"
+
+#: lib/FAQ/OMatic/Item.pm:878
+msgid "Move Category"
+msgstr "Перем╕стити Категор╕ю"
+
+#: lib/FAQ/OMatic/Item.pm:879
+msgid "Trash Category"
+msgstr "Викинути Категор╕ю"
+
+#: lib/FAQ/OMatic/Item.pm:883
+msgid "Answer Title and Options"
+msgstr "Заголовок та Настройки В╕дпов╕д╕"
+
+#: lib/FAQ/OMatic/Item.pm:884
+msgid "Edit Answer Permissions"
+msgstr "Редагувати Права Доступу до В╕дпов╕д╕"
+
+#: lib/FAQ/OMatic/Item.pm:885
+msgid "Move Answer"
+msgstr "Перем╕стити В╕дпов╕дь"
+
+#: lib/FAQ/OMatic/Item.pm:886
+msgid "Trash Answer"
+msgstr "Викинути В╕дпов╕дь"
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/Item.pm:892
+msgid "%0 Title and Options"
+msgstr ""
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/Item.pm:893 lib/FAQ/OMatic/Item.pm:894
+msgid "Edit %0 Permissions"
+msgstr ""
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/Item.pm:895
+#, c-format
+msgid "Move %0"
+msgstr ""
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/Item.pm:896
+#, c-format
+msgid "Trash %0"
+msgstr ""
+
+#: lib/FAQ/OMatic/Item.pm:934
+msgid "Duplicate Answer"
+msgstr "Скоп╕ювати В╕дпов╕дь"
+
+#: lib/FAQ/OMatic/Item.pm:935
+msgid "Duplicate Category as Answer"
+msgstr "Скоп╕ювати Категор╕ю як В╕дпов╕дь"
+
+#: lib/FAQ/OMatic/Item.pm:978
+msgid "Convert to Answer"
+msgstr "Перетворити на В╕дпов╕дь"
+
+#: lib/FAQ/OMatic/Item.pm:988
+msgid "Convert to Category"
+msgstr "Перетворити на Категор╕ю"
+
+#: lib/FAQ/OMatic/Item.pm:1004 lib/FAQ/OMatic/Item.pm:1084
+msgid "New Answer in \"%0\""
+msgstr "Додати нову пару Питання/В╕дпов╕дь до \"%0\""
+
+#: lib/FAQ/OMatic/Item.pm:1011
+msgid "New Subcategory of \"%0\""
+msgstr "Додати Нову Категор╕ю до \"%0\""
+
+#: lib/FAQ/OMatic/Item.pm:1037 lib/FAQ/OMatic/Part.pm:342
+msgid "Insert Text Here"
+msgstr "Вставити Текст Сюди"
+
+#: lib/FAQ/OMatic/Item.pm:1050 lib/FAQ/OMatic/Part.pm:353
+msgid "Insert Uploaded Text Here"
+msgstr ""
+
+#: lib/FAQ/OMatic/Item.pm:1100
+msgid "Append to This Answer"
+msgstr "Додати до ц╕╓╖ В╕дпов╕д╕"
+
+#: lib/FAQ/OMatic/Item.pm:1216
+msgid "This document is:"
+msgstr "Цей документ:"
+
+#: lib/FAQ/OMatic/Item.pm:1218
+msgid "This document is at:"
+msgstr "Цей документ доступен на:"
+
+#: lib/FAQ/OMatic/Item.pm:1262
+#, c-format
+msgid "Group %0"
+msgstr "Група %0"
+
+#: lib/FAQ/OMatic/Item.pm:1266
+msgid "Users giving their names"
+msgstr "Користувач╕, як╕ надали сво╖ ╕мена"
+
+#: lib/FAQ/OMatic/Item.pm:1267
+msgid "Authenticated users"
+msgstr "Аутентиф╕кован╕ користувач╕"
+
+#: lib/FAQ/OMatic/Item.pm:1282
+msgid "New Category"
+msgstr "Нова Категор╕я"
+
+#: lib/FAQ/OMatic/Item.pm:1284
+msgid "New Answer"
+msgstr "Нова В╕дпов╕дь"
+
+#: lib/FAQ/OMatic/Item.pm:1288
+msgid "Editing Category <b>%0</b>"
+msgstr "Редагування Категор╕╖ <b>\"%0\"</b>"
+
+#: lib/FAQ/OMatic/Item.pm:1292
+msgid "Editing Answer <b>%0</b>"
+msgstr "Редагування В╕дпов╕д╕ <b>\"%0\"</b>"
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/Item.pm:1297
+msgid "Editing %0 <b>%1</b>"
+msgstr ""
+
+#: lib/FAQ/OMatic/Item.pm:1327
+msgid "Title:"
+msgstr "Заголовок:"
+
+#: lib/FAQ/OMatic/Item.pm:1332
+msgid "<p>New Order for Text Parts:"
+msgstr "<p>Нова черга для текстових часток:"
+
+#: lib/FAQ/OMatic/Item.pm:1344
+msgid "Show attributions from all parts together at bottom"
+msgstr ""
+"Показувати п╕дписи, з╕бран╕ з ус╕х часток, разом у низу (Show "
+"attributions from all parts together at bottom)"
+
+#: lib/FAQ/OMatic/Item.pm:1357 lib/FAQ/OMatic/Item.pm:1511
+#: lib/FAQ/OMatic/Part.pm:556 lib/FAQ/OMatic/editBag.pm:118
+msgid "Submit Changes"
+msgstr "Внести Зм╕ни"
+
+#: lib/FAQ/OMatic/Item.pm:1358 lib/FAQ/OMatic/Item.pm:1512
+#: lib/FAQ/OMatic/Part.pm:557 lib/FAQ/OMatic/editBag.pm:119
+msgid "Revert"
+msgstr "В╕дкотити"
+
+#: lib/FAQ/OMatic/Item.pm:1378
+msgid "Who can add a new text part to this item:"
+msgstr "Хто ма╓ право додавати нов╕ текстов╕ частки до цього елементу:"
+
+#: lib/FAQ/OMatic/Item.pm:1380
+msgid "Who can add a new answer or category to this category:"
+msgstr "Хто ма╓ право додавати нов╕ в╕дпов╕д╕ або категор╕╖ до ц╕╓╖ категор╕╖:"
+
+#: lib/FAQ/OMatic/Item.pm:1382
+msgid "Who can edit or remove existing text parts from this item:"
+msgstr ""
+"Хто ма╓ право редагувати або стирати ╕снуюч╕ текстов╕ частки у цьому "
+"елемент╕:"
+
+#: lib/FAQ/OMatic/Item.pm:1384
+msgid ""
+"Who can move answers or subcategories from this category; or turn this "
+"category into an answer or vice versa:"
+msgstr ""
+"Хто ма╓ право перем╕щувати в╕дпов╕д╕ або п╕дкатегор╕╖ ╕з ц╕╓╖ категор╕╖; або "
+"\"перетворювати\" цю категор╕ю на в╕дпов╕дь ╕ навпаки:"
+
+#: lib/FAQ/OMatic/Item.pm:1386
+msgid "Who can edit the title and options of this answer or category:"
+msgstr ""
+"Хто ма╓ право редагувати заголовок та зм╕нювати настройки ц╕╓╖ в╕дпов╕д╕ або "
+"категор╕╖:"
+
+#: lib/FAQ/OMatic/Item.pm:1388
+msgid ""
+"Who can use untranslated HTML when editing the text of this answer or "
+"category:"
+msgstr ""
+"Хто ма╓ право використовувати \"чистий\" HTML при редагуванн╕ текста ц╕╓╖ "
+"в╕дпов╕д╕ або категор╕╖:"
+
+#: lib/FAQ/OMatic/Item.pm:1390
+msgid "Who can change these moderator options and permissions:"
+msgstr "Хто ма╓ право зм╕нювати ц╕ настройки та права доступу модератора:"
+
+#: lib/FAQ/OMatic/Item.pm:1392
+msgid "Who can create new bags:"
+msgstr "Хто ма╓ право створювати нов╕ \"м╕шки\":"
+
+#: lib/FAQ/OMatic/Item.pm:1394
+msgid "Who can replace existing bags:"
+msgstr "Хто ма╓ право зам╕нювати ╕снуюч╕ \"м╕шки\":"
+
+#: lib/FAQ/OMatic/Item.pm:1396
+msgid "Who can access the installation/configuration page (use caution!):"
+msgstr ""
+"Хто ма╓ доступ до Стор╕нки Установок та Настройок (використовуйте з "
+"обережн╕стю!):"
+
+#: lib/FAQ/OMatic/Item.pm:1398
+msgid "Who can use the group membership pages:"
+msgstr "Хто ма╓ право користуватися стор╕нками членства в групах:"
+
+#: lib/FAQ/OMatic/Item.pm:1415
+msgid "Moderator options for category"
+msgstr "Настройки модератора для категор╕╖"
+
+#: lib/FAQ/OMatic/Item.pm:1419
+msgid "Moderator options for answer"
+msgstr "Настройки модератора для в╕дпов╕д╕"
+
+# Intentionally left blank
+#: lib/FAQ/OMatic/Item.pm:1424
+msgid "Moderator options for"
+msgstr ""
+
+#: lib/FAQ/OMatic/Item.pm:1442
+msgid "Name & Description"
+msgstr "Назва та Опис"
+
+#: lib/FAQ/OMatic/Item.pm:1443
+msgid "Setting"
+msgstr "Установка"
+
+#: lib/FAQ/OMatic/Item.pm:1444
+msgid "Setting if Inherited"
+msgstr "Установка якщо \"Успадковувати\""
+
+#: lib/FAQ/OMatic/Item.pm:1453
+msgid "(will inherit if empty)"
+msgstr "(буде успадковано, якщо залишити пустим)"
+
+#: lib/FAQ/OMatic/Item.pm:1463
+msgid ""
+"Send mail to the moderator when someone other than the moderator edits this "
+"item:"
+msgstr ""
+"Посилати пошту модератору, коли хтось ╕нший (не модератор), редагу╓ цей "
+"елемент:"
+
+#: lib/FAQ/OMatic/Item.pm:1469
+msgid "No"
+msgstr "Н╕"
+
+#: lib/FAQ/OMatic/Item.pm:1469
+msgid "Yes"
+msgstr "Так"
+
+#: lib/FAQ/OMatic/Item.pm:1469 lib/FAQ/OMatic/Item.pm:1505
+msgid "undefined"
+msgstr "невизначено"
+
+#: lib/FAQ/OMatic/Item.pm:1474
+msgid "Permissions"
+msgstr "Права Доступу"
+
+#: lib/FAQ/OMatic/Item.pm:1496
+msgid "Blah blah"
+msgstr "Мама мила раму ;-)"
+
+#: lib/FAQ/OMatic/Item.pm:1500 lib/FAQ/OMatic/Item.pm:1504
+msgid "Relax"
+msgstr ""
+
+#: lib/FAQ/OMatic/Item.pm:1500 lib/FAQ/OMatic/Item.pm:1504
+msgid "Don't Relax"
+msgstr ""
+
+#: lib/FAQ/OMatic/Item.pm:1500
+msgid "Inherit"
+msgstr "Успадковувати"
+
+#: lib/FAQ/OMatic/Item.pm:1534 lib/FAQ/OMatic/Item.pm:1548
+msgid "(system default)"
+msgstr "(системний по-замовчанню)"
+
+#: lib/FAQ/OMatic/Item.pm:1540
+msgid "defined in"
+msgstr "визначен у"
+
+#: lib/FAQ/OMatic/Item.pm:1617
+#, c-format
+msgid "File %0 seems broken."
+msgstr "Файл %0 ма╓ вигляд пошкодженого."
+
+#: lib/FAQ/OMatic/Item.pm:1886
+msgid "Category"
+msgstr "Категор╕я"
+
+#: lib/FAQ/OMatic/Item.pm:1887
+msgid "Answer"
+msgstr "В╕дпов╕дь"
+
+#: lib/FAQ/OMatic/Item.pm:1957
+msgid ""
+"Either someone has changed the answer or category you were editing since you "
+"received the editing form, or you submitted the same form twice"
+msgstr ""
+"Або хтось зм╕нив в╕дпов╕дь або категор╕ю, яку ви редагували "
+"п╕сля того, як ви почали заповнювати форму; або ви над╕слали одну ╕ туж саму "
+"форму дв╕ч╕."
+
+#: lib/FAQ/OMatic/Item.pm:1959
+msgid ""
+"Please %0 and start again to make sure no changes are lost. Sorry for the "
+"inconvenience."
+msgstr ""
+"Будьте ласкав╕, %0 ╕ почнить с початку, щоб бути впевненим, що зм╕ни не "
+"загубилися.  Вибачайте за незручн╕сть."
+
+#: lib/FAQ/OMatic/Item.pm:1962
+msgid "(Sequence number in form: %0; in item: %1)"
+msgstr "(Посл╕довний номер в форм╕: %0; в елемент╕: %1)"
+
+#: lib/FAQ/OMatic/Part.pm:266
+msgid "Edit This Text"
+msgstr "Редагувати Цей Текст"
+
+#: lib/FAQ/OMatic/Part.pm:277
+msgid "Duplicate This Text"
+msgstr "Скоп╕ювати Цей Текст"
+
+#: lib/FAQ/OMatic/Part.pm:288 lib/FAQ/OMatic/Part.pm:301
+msgid "Remove This Text"
+msgstr "Стерти Цей Текст"
+
+#: lib/FAQ/OMatic/Part.pm:313
+msgid "Replace %0 with new upload"
+msgstr ""
+
+#: lib/FAQ/OMatic/Part.pm:320
+msgid "Select bag to replace with new upload"
+msgstr ""
+
+#: lib/FAQ/OMatic/Part.pm:329
+msgid "Upload New Bag Here"
+msgstr ""
+
+#: lib/FAQ/OMatic/Part.pm:494
+msgid "Upload file:"
+msgstr ""
+
+#: lib/FAQ/OMatic/Part.pm:499
+msgid "Warning: file contents will <b>replace</b> previous text"
+msgstr "Попередження: вм╕ст файлу <b>зам╕нить</b> попередн╕й текст"
+
+#: lib/FAQ/OMatic/Part.pm:506
+msgid "Hide Attributions"
+msgstr "Сховати п╕дписи"
+
+#: lib/FAQ/OMatic/Part.pm:509
+msgid "Format text as:"
+msgstr "Форматувати текст як:"
+
+#: lib/FAQ/OMatic/Part.pm:519
+msgid "Directory"
+msgstr "Каталог"
+
+#: lib/FAQ/OMatic/Part.pm:526
+msgid "Natural text"
+msgstr "Природний текст"
+
+#: lib/FAQ/OMatic/Part.pm:530
+msgid "Monospaced text (code, tables)"
+msgstr "Моношир╕нний текст (код, таблиц╕)"
+
+#: lib/FAQ/OMatic/Part.pm:545
+msgid "Untranslated HTML"
+msgstr "\"Чистий\" HTML"
+
+#: lib/FAQ/OMatic/Part.pm:695 lib/FAQ/OMatic/addItem.pm:85
+#: lib/FAQ/OMatic/install.pm:1138 lib/FAQ/OMatic/submitAnsToCat.pm:67
+msgid "Answers in this category:"
+msgstr "В╕дпов╕д╕ в ц╕й категор╕╖:"
+
+#: lib/FAQ/OMatic/Slow.pm:137
+msgid ""
+"This page will reload every %0 seconds, showing the last %1 lines of the "
+"process output."
+msgstr ""
+"Ця стор╕нка буде автоматично в╕дновлюватися кожн╕ %0 секунд, "
+"показуючи останн╕ %1 строк виводу процеса."
+
+#: lib/FAQ/OMatic/Slow.pm:141
+msgid "Show the entire process log"
+msgstr "Показати вивод процеса ц╕лком"
+
+#: lib/FAQ/OMatic/addItem.pm:48 lib/FAQ/OMatic/delPart.pm:47
+#: lib/FAQ/OMatic/editItem.pm:50 lib/FAQ/OMatic/editModOptions.pm:50
+#: lib/FAQ/OMatic/faq.pm:74 lib/FAQ/OMatic/moveItem.pm:50
+#: lib/FAQ/OMatic/selectBag.pm:60 lib/FAQ/OMatic/submitAnsToCat.pm:49
+#: lib/FAQ/OMatic/submitCatToAns.pm:48 lib/FAQ/OMatic/submitItem.pm:48
+#: lib/FAQ/OMatic/submitModOptions.pm:46 lib/FAQ/OMatic/submitPart.pm:47
+msgid "The file (%0) doesn't exist."
+msgstr "Файл (%0) не ╕сну╓."
+
+#: lib/FAQ/OMatic/addItem.pm:67
+msgid "Copy of"
+msgstr "Коп╕я"
+
+#: lib/FAQ/OMatic/addItem.pm:85 lib/FAQ/OMatic/install.pm:1138
+#: lib/FAQ/OMatic/submitAnsToCat.pm:67
+msgid "Subcategories:"
+msgstr "П╕дкатегор╕╖:"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:46
+msgid "Appearance Options"
+msgstr "Настройки Зовн╕шнього Вигляду"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60 lib/FAQ/OMatic/appearanceForm.pm:64
+#: lib/FAQ/OMatic/appearanceForm.pm:68 lib/FAQ/OMatic/appearanceForm.pm:84
+#: lib/FAQ/OMatic/appearanceForm.pm:92
+msgid "Show"
+msgstr "Показати"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60
+msgid "Compact"
+msgstr "Компактно"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60 lib/FAQ/OMatic/appearanceForm.pm:64
+#: lib/FAQ/OMatic/appearanceForm.pm:68 lib/FAQ/OMatic/appearanceForm.pm:84
+#: lib/FAQ/OMatic/appearanceForm.pm:92
+msgid "Hide"
+msgstr "Сховати"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:62 lib/FAQ/OMatic/install.pm:776
+msgid "expert editing commands"
+msgstr "поширен╕ команди редагування"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:66 lib/FAQ/OMatic/install.pm:781
+msgid "name of moderator who organizes current category"
+msgstr "╕м'я модератора, керуючого ц╕╓ю категор╕╓ю"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:70 lib/FAQ/OMatic/install.pm:786
+msgid "last modified date"
+msgstr "дату останньо╖ зм╕ни"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:84
+msgid "Default"
+msgstr "По замовчанню"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:86 lib/FAQ/OMatic/install.pm:791
+msgid "attributions"
+msgstr "п╕дписи"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:88
+msgid "Simple"
+msgstr "Простий"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:88
+msgid "Fancy"
+msgstr "Примхливий"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:94 lib/FAQ/OMatic/install.pm:796
+msgid "commands for generating text output"
+msgstr "команди для генерац╕╖ текстового виводу"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:126
+msgid "Accept"
+msgstr "Прийняти"
+
+#: lib/FAQ/OMatic/authenticate.pm:55
+msgid "Set a New Password"
+msgstr "Установити Новий Пароль"
+
+#: lib/FAQ/OMatic/authenticate.pm:60
+msgid "Create a New Login"
+msgstr "Створити Новий Вх╕д"
+
+#: lib/FAQ/OMatic/authenticate.pm:63
+msgid ""
+"That password is invalid. If you've forgotten your old password, you can"
+msgstr ""
+"Цей пароль не ╓ правильним. Якщо ви забули св╕й старий пароль, ви ма╓те можлив╕сть"
+
+#: lib/FAQ/OMatic/authenticate.pm:81
+#, c-format
+msgid "New items can only be added by %0."
+msgstr "Додавати нов╕ елементи мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:83
+#, c-format
+msgid "New text parts can only be added by %0."
+msgstr "Додавати нов╕ текстов╕ частки мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:85
+#, c-format
+msgid "Text parts can only be removed by %0."
+msgstr "Стирати текстов╕ частки мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:89
+msgid ""
+"This part contains raw HTML. To avoid pages with invalid HTML, the moderator "
+"has specified that only %0 can edit HTML parts. If you are %0 you may "
+"authenticate yourself with this form."
+msgstr ""
+"Ця частка м╕стить &quot;чистий&quot; HTML.  Щоб запоб╕гти появ╕ "
+"стор╕нок, м╕стящих неправильний HTML, модератор визначив, що "
+"редагувати HTML частки мають право лише: %0.  Якщо ви з ╖х числа, ви "
+"ма╓те п╕дтвердити свою особу за допомогою подальшо╖ форми."
+
+#: lib/FAQ/OMatic/authenticate.pm:91
+#, c-format
+msgid "Text parts can only be added by %0."
+msgstr "Додавати текстов╕ частки мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:93
+#, c-format
+msgid "Text parts can only be edited by %0."
+msgstr "Редагувати текстов╕ частки мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:96
+#, c-format
+msgid "The title and options for this item can only be edited by %0."
+msgstr ""
+"Редагувати заголовок та настройки для цього елемента мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:98
+#, c-format
+msgid "The moderator options can only be edited by %0."
+msgstr "Редагувати настройки модератора мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:101
+msgid ""
+"This item can only be moved by someone who can edit both the source and "
+"destination parent items."
+msgstr ""
+"Перем╕щувати цей елемент ма╓ право лише той, хто ма╓ право редагувати обидва "
+"батьк╕вських елемента (як пох╕дний, так ╕ ц╕льовий)."
+
+#: lib/FAQ/OMatic/authenticate.pm:103
+#, c-format
+msgid "This item can only be moved by %0."
+msgstr "Перем╕щувати ц╕й елемент мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:110
+#, c-format
+msgid "Existing bags can only be replaced by %0."
+msgstr "Зам╕нювати ╕снуюч╕ \"м╕шки\" мають право лише: %0."
+
+#: lib/FAQ/OMatic/authenticate.pm:112
+#, c-format
+msgid "Bags can only be posted by %0."
+msgstr "Надсилати &quot;м╕шки&quot; мають право лише: %0"
+
+#: lib/FAQ/OMatic/authenticate.pm:115
+#, c-format
+msgid "The FAQ-O-Matic can only be configured by %0."
+msgstr "Конф╕гугрувати FAQ-O-Matic мають право: %0."
+
+#: lib/FAQ/OMatic/authenticate.pm:117
+msgid "The operation you attempted (%0) can only be done by %1."
+msgstr ""
+"Операц╕ю, яку ви спробували виконати (%0), мають право виконувати "
+"лише: %1"
+
+#: lib/FAQ/OMatic/authenticate.pm:120
+msgid ""
+"If you have never established a password to use with FAQ-O-Matic, you can"
+msgstr "Якщо у вас нема╓ свого входу до FAQ-O-Matic'а, ви ма╓те можлив╕сть"
+
+#: lib/FAQ/OMatic/authenticate.pm:121
+msgid "If you have forgotten your password, you can"
+msgstr "Якщо ви забули св╕й пароль, ви ма╓те можлив╕сть"
+
+#: lib/FAQ/OMatic/authenticate.pm:122
+msgid ""
+"If you have already logged in earlier today, it may be that the token I use "
+"to identify you has expired. Please log in again."
+msgstr ""
+"Якщо ви ре╓струвалися (входили) сьогодн╕, то поява цього "
+"пов╕домлення означа╓, що ╕дентиф╕катор вашо╖ сес╕╖ вже застар╕в. "
+"Будьте ласкав╕, заре╓струйтеся знову."
+
+#: lib/FAQ/OMatic/authenticate.pm:136
+msgid "Please offer one of the following forms of identification:"
+msgstr "Будьте ласкав╕, надайте одну з посл╕дуючих форм ╕дентиф╕кац╕╖:"
+
+#: lib/FAQ/OMatic/authenticate.pm:139
+msgid "No authentication, but my email address is:"
+msgstr "Без аутентиф╕кац╕╖, лише email-адреса:"
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/authenticate.pm:140
+msgid "Email:"
+msgstr ""
+
+#: lib/FAQ/OMatic/authenticate.pm:147
+msgid "Authenticated login:"
+msgstr "Аутентиф╕кований вх╕д:"
+
+#: lib/FAQ/OMatic/authenticate.pm:149 lib/FAQ/OMatic/changePass.pm:64
+msgid "Password:"
+msgstr "Пароль:"
+
+#: lib/FAQ/OMatic/changePass.pm:48
+msgid "Please enter your username, and select a password."
+msgstr "Будьте ласкав╕, введить ваше ре╓страц╕йне ╕м'я та пароль."
+
+#: lib/FAQ/OMatic/changePass.pm:49
+msgid ""
+"I will send a secret number to the email address you enter to verify that it "
+"is valid."
+msgstr ""
+"На email-адресу, яку ви запровадите, буде в╕дправлено Те╓мний Код (Secret Number), "
+"який вам знадобиться для п╕дтвердження, що ця email-адреса ╕сну╓ ╕ що вона "
+"д╕йсно ваша (або, як найменьш╓, ма╓те до не╖ доступ)."
+
+#: lib/FAQ/OMatic/changePass.pm:50
+msgid ""
+"If you prefer not to give your email address to this web form, please contact"
+msgstr ""
+"Якщо вам не до вподоби запроважувати вашу email-адресу через цю форму, "
+"будьте ласкав╕, св'яжитесь з"
+
+#: lib/FAQ/OMatic/changePass.pm:52
+msgid ""
+"Please <b>do not</b> use a password you use anywhere else, as it will not be "
+"transferred or stored securely!"
+msgstr ""
+"Будьте ласкв╕, <b>НЕ ВИКОРИСТОВУЙТЕ</b> пароль, який ви вже використову╓те "
+"будь-де, оск╕льки в╕н <b>НЕ БУДЕ</b> передаватися та хранитися достатньо "
+"безпечно!"
+
+#: lib/FAQ/OMatic/changePass.pm:66
+msgid "Set Password"
+msgstr "Установити Пароль"
+
+#: lib/FAQ/OMatic/editBag.pm:75
+msgid "Replace bag"
+msgstr "Зам╕нити &quot;м╕шок&quot;"
+
+#: lib/FAQ/OMatic/editBag.pm:81
+msgid "Upload new bag to show in the %0 part in <b>%1</b>."
+msgstr ""
+
+#: lib/FAQ/OMatic/editBag.pm:97
+msgid "Bag name:"
+msgstr "Назва &quot;м╕шка&quot;:"
+
+#: lib/FAQ/OMatic/editBag.pm:99
+msgid ""
+"The bag name is used as a filename, so it is restricted to only contain "
+"letters, numbers, underscores (_), hyphens (-), and periods (.). It should "
+"also carry a meaningful extension (such as .gif) so that web browsers will "
+"know what to do with the data."
+msgstr ""
+"Назва &quot;м╕шка&quot; використову╓ться, як им'я файла, отже "
+"повинна мати лише букви, цифри, знаки п╕дкреслення (`_'), знаки "
+"переносу (`-') та крапки (`.').  Вона повинна також включати осмислене "
+"поширення (наприклад, .gif), щоб web-бровзер знав, що робити з його "
+"вм╕стом."
+
+#: lib/FAQ/OMatic/editBag.pm:102
+msgid "Bag data:"
+msgstr "Вм╕ст &quot;м╕шка&quot;:"
+
+#: lib/FAQ/OMatic/editBag.pm:105
+msgid ""
+"(Leave blank to keep original bag data and change only the associated "
+"information below.)"
+msgstr "(Залиште пустим, щоб зберегти вм╕ст \"м╕шку\" незм╕неним, а зм╕нити лише зв'язану з ним ╕нформац╕ю.)"
+
+#: lib/FAQ/OMatic/editBag.pm:110
+msgid "If this bag is an image, fill in its dimensions."
+msgstr "Якщо цей \"м╕шок\" ╓ зображення -- заповнить його розм╕рност╕."
+
+#: lib/FAQ/OMatic/editBag.pm:111
+msgid "Width:"
+msgstr "Ширина:"
+
+#: lib/FAQ/OMatic/editBag.pm:113
+msgid "Height:"
+msgstr "Висота:"
+
+#: lib/FAQ/OMatic/editPart.pm:146
+msgid "Enter the answer to <b>%0</b>"
+msgstr "Введить в╕дпов╕дь на питання <b>%0</b>"
+
+#: lib/FAQ/OMatic/editPart.pm:148
+msgid "Enter a description for <b>%0</b>"
+msgstr "Введить опис для <b>%0</b>"
+
+#: lib/FAQ/OMatic/editPart.pm:150
+msgid "Edit duplicated text for <b>%0</b>"
+msgstr "Редагування скоп╕йованого тексту для <b>%0</b>"
+
+#: lib/FAQ/OMatic/editPart.pm:152
+msgid "Enter new text for <b>%0</b>"
+msgstr "Введить новий текст для <b>%0</b>"
+
+#: lib/FAQ/OMatic/editPart.pm:157
+msgid "Editing the %0 text part in <b>%1</b>."
+msgstr "Редагування текстово╖ частки N %0 в <b>%1</b>."
+
+#: lib/FAQ/OMatic/editPart.pm:171
+msgid ""
+"If you later need to edit or delete this text, use the [Appearance] page to "
+"turn on the expert editing commands."
+msgstr "Якщо вам п╕зн╕ше знадобиться в╕дредагувати або стерти цей текст, використовуйте стор╕нку <code>[Зовн╕шн╕й Вигляд]</code> щоб вв╕мкнути поширен╕ команди редагування."
+
+#: lib/FAQ/OMatic/install.pm:93
+msgid "Faq-O-Matic Installer"
+msgstr "╤нсталятор FAQ-O-Matic'а"
+
+#: lib/FAQ/OMatic/install.pm:121
+#, c-format
+msgid "%0 failed: "
+msgstr "Помилка п╕д час %0: "
+
+#: lib/FAQ/OMatic/install.pm:127
+msgid "Unknown step: \"%0\"."
+msgstr "Нев╕домий крок: \"%0\"."
+
+#: lib/FAQ/OMatic/install.pm:138
+msgid "Updating config to reflect new meta location <b>%0</b>."
+msgstr "В╕дновлення конф╕гурац╕╖ для в╕дображення нового м╕сцезнаходження каталога meta: <b>%0</b>."
+
+#: lib/FAQ/OMatic/install.pm:156
+msgid ""
+"(Can't find <b>config</b> in '%0' -- assuming this is a new installation.)"
+msgstr "(Не в змоз╕ знайти <b>config</b> в '%0' -- припускаю, що це ╓ нова ╕нсталяц╕я.)"
+
+#: lib/FAQ/OMatic/install.pm:180
+#, c-format
+msgid "Click here</a> to create %0."
+msgstr "Клацн╕ть сюди, щоб створити %0."
+
+#: lib/FAQ/OMatic/install.pm:182
+msgid ""
+"If you want to change the CGI stub to point to another directory, edit the "
+"script and then"
+msgstr "Якщо ви бажа╓те зм╕нити CGI-скрипт, щоб в╕н вказував на ╕нший каталог, в╕дредагуйте скрипт ╕ п╕сля цього"
+
+#: lib/FAQ/OMatic/install.pm:185
+msgid "click here to use the new location"
+msgstr "клацн╕ть сюди, щоб почати використовувати нове м╕сцезнаходження"
+
+#: lib/FAQ/OMatic/install.pm:187
+msgid ""
+"FAQ-O-Matic stores files in two main directories.<p>The <b>meta/</b> "
+"directory path is encoded in your CGI stub (%0). It contains:"
+msgstr "FAQ-O-Matic збер╕га╓ файли у двох головних каталогах. <p>Шлях до каталога <b>meta/</b> прописан у вашому CGI-скрипт╕ (%0).  В╕н м╕стить:"
+
+#: lib/FAQ/OMatic/install.pm:188
+msgid ""
+"<ul><li>the <b>config</b> file that tells FAQ-O-Matic where everything else "
+"lives. That's why the CGI stub needs to know where meta/ is, so it can "
+"figure out the rest of its configuration. <li>the <b>idfile</b> file that "
+"lists user identities. Therefore, meta/ should not be accessible via the web "
+"server. <li>the <b>RCS/</b> subdirectory that tracks revisions to FAQ items. "
+"<li>various hint files that are used as FAQ-O-Matic runs. These can be "
+"regenerated automatically.</ul>"
+msgstr "<ul><li>файл <b>config</b>, який пов╕домля╓ FAQ-O-Matic, де шукати усе ╕нше.  Через це CGI-скрипт повинен знати де знаходиться каталог meta/, знаюч╕ це в╕н буде у змоз╕ визначити усю ╕ншу конф╕гурац╕ю.  <li>файл <b>idfile</b>, який м╕стить список ╕дентиф╕катор╕в користувач╕в.  Через це meta/ повинен бути НЕ доступним через web-сервер. <li>у п╕дкаталоз╕ <b>RCS/</b> трасируються верс╕╖ елементов FAQ.  <li>р╕зноман╕тн╕ файлы-п╕дказки (hint files), якими користу╓ться працюючий FAQ-O-Matic.  Вони створюються автоматично.</ul>"
+
+#: lib/FAQ/OMatic/install.pm:189
+msgid ""
+"<p>The <b>serve/</b> directory contains three subdirectories <b>item/</b>, "
+"<b>cache/</b>, and <b>bags/</b>. These directories are created and populated "
+"by the FAQ-O-Matic CGI, but should be directly accessible via the web server "
+"(without invoking the CGI)."
+msgstr "Каталог <b>serve/</b> м╕стить три п╕дкаталога: <b>item/</b>, <b>cache/</b> та <b>bags/</b>.  Ц╕ п╕дкаталоги створюються та заповнюються FAQ-O-Matic'ом, але повинн╕ бути доступн╕ web-серверов╕ напряму (без звернення до CGI)."
+
+#: lib/FAQ/OMatic/install.pm:190
+msgid ""
+"<ul><li>serve/item/ contains only FAQ-O-Matic formatted source files, which "
+"encode both user-entered text and the hierarchical structure of the answers "
+"and categories in the FAQ. These files are only accessed through the web "
+"server (rather than the CGI) when another FAQ-O-Matic is mirroring this one. "
+"<li>serve/cache/ contains a cache of automatically-generated HTML versions "
+"of FAQ answers and categories. When possible, the CGI directs users to the "
+"cache to reduce load on the server. (CGI hits are far more expensive than "
+"regular file loads.) <li>serve/bags/ contains image files and other ``bags "
+"of bits.'' Bit-bags can be linked to or inlined into FAQ items (in the case "
+"of images). </ul>"
+msgstr "<ul><li>serve/item/ м╕стить лише в╕дформатован╕ пох╕дн╕ файли для FAQ-O-Matic'а, як╕ м╕стять як наданий користувачем текст, так ╕ опис ╕╓рарх╕чно╖ структури в╕дпов╕дей та категор╕й FAQ.  Доступ до ц╕х файлов йде лише через web-сервер (на в╕дм╕ну в╕д доступу через CGI) коли який-небудь ╕нший FAQ-O-Matic робить дзеркальну коп╕ю (mirroring) с цього FAQ-O-Matic'a.  <li>serve/cache/ м╕стить кеш автоматично згенерованих HTML верс╕й в╕дпов╕дей та категор╕й FAQ.  Коли можливо, CGI перенаправля╓ користувач╕в до цього кэшу, пом╕ньшуючи, тим самим, навантаження на сервер.  (В╕дпрацьовка CGI потребу╓ набагато б╕льше ресурс╕в, н╕ж просто в╕ддати вже ╕снуючий файл.) <li>serve/bags/ м╕стить файли зображень, чи, ╕ншими словами, &quot;м╕шки с б╕тами&quot; (&quot;bags of bits&quot;).  &quot;М╕шки&quot; можуть бути прив'язан╕ до або вставлен╕ до (якщо це зображення) елемента FAQ. </ul>"
+
+#: lib/FAQ/OMatic/install.pm:202 lib/FAQ/OMatic/install.pm:217
+#: lib/FAQ/OMatic/install.pm:276 lib/FAQ/OMatic/install.pm:612
+msgid "I couldn't create <b>%0</b>: %1"
+msgstr "Не вдалося створити <b>%0</b>: %1"
+
+#: lib/FAQ/OMatic/install.pm:206 lib/FAQ/OMatic/install.pm:221
+#: lib/FAQ/OMatic/install.pm:615
+msgid "Created <b>%0</b>."
+msgstr "Створено <b>%0</b>."
+
+#: lib/FAQ/OMatic/install.pm:209 lib/FAQ/OMatic/install.pm:224
+#: lib/FAQ/OMatic/install.pm:618
+msgid "I don't have write permission to <b>%0</b>."
+msgstr "Нема╓ прав на запис до <b>%0</b>."
+
+#: lib/FAQ/OMatic/install.pm:268
+msgid "Created new config file."
+msgstr "Створено новий конф╕гурац╕йний файл."
+
+#: lib/FAQ/OMatic/install.pm:282
+msgid "The idfile exists."
+msgstr "Файл <code>idfile</code> вже ╕сну╓."
+
+#: lib/FAQ/OMatic/install.pm:331
+msgid "Configuration Main Menu (install module)"
+msgstr "Конф╕гурац╕я, Головне Меню (модуль ╕нсталяц╕╖)"
+
+#: lib/FAQ/OMatic/install.pm:332
+msgid "Perform these tasks in order to prepare your FAQ-O-Matic version %0:"
+msgstr "Виконайте ц╕ задач╕ для п╕дготовки вашого FAQ-O-Matic'а верс╕╖ %0:"
+
+#: lib/FAQ/OMatic/install.pm:337
+msgid "Define configuration parameters"
+msgstr "Визначити конф╕гурац╕йн╕ параметри"
+
+#: lib/FAQ/OMatic/install.pm:342 lib/FAQ/OMatic/install.pm:347
+msgid "Set your password and turn on installer security"
+msgstr "Установити ваш пароль ╕ вв╕мкнути безпеку ╕нсталятора"
+
+#: lib/FAQ/OMatic/install.pm:348
+msgid "(Need to configure \\$mailCommand and \\$adminAuth)"
+msgstr "(Необх╕дно сконф╕гурувати \\$mailCommand и \\$adminAuth)"
+
+#: lib/FAQ/OMatic/install.pm:354
+msgid "(Installer security is on)"
+msgstr "(Безпека ╕нсталятора вв╕мкнена)"
+
+#: lib/FAQ/OMatic/install.pm:359
+msgid "Create item, cache, and bags directories in serve dir"
+msgstr "Создати item, cache, и bags п╕дкаталоги в каталоз╕ serve"
+
+#: lib/FAQ/OMatic/install.pm:367
+msgid "Copy old items</a> from <tt>%0</tt> to <tt>%1</tt>."
+msgstr "Коп╕ювати стар╕ елементи з <tt>%0</tt> до <tt>%1</tt>."
+
+#: lib/FAQ/OMatic/install.pm:374
+msgid "Install any new items that come with the system"
+msgstr "Поставити ус╕ нов╕ елементи, що йдуть разом ╕з системою."
+
+#: lib/FAQ/OMatic/install.pm:379
+msgid "Create system default items"
+msgstr "Создати системн╕ елементи по-замовчанню"
+
+#: lib/FAQ/OMatic/install.pm:387 lib/FAQ/OMatic/install.pm:498
+msgid "Rebuild the cache and dependency files"
+msgstr "Пересоздати кеш-файли та файли залежностей"
+
+#: lib/FAQ/OMatic/install.pm:394
+msgid "Install system images and icons"
+msgstr "Установити системн╕ зображення та ╕конки"
+
+#: lib/FAQ/OMatic/install.pm:402
+msgid "Update mirror from master now. (this can be slow!)"
+msgstr ""
+
+#: lib/FAQ/OMatic/install.pm:408
+msgid "Set up the maintenance cron job"
+msgstr ""
+
+#: lib/FAQ/OMatic/install.pm:414 lib/FAQ/OMatic/install.pm:419
+msgid "Run maintenance script manually now"
+msgstr "Виконати обслуговуючий скрипт вручну, зараз"
+
+#: lib/FAQ/OMatic/install.pm:421
+msgid "(Need to set up the maintenance cron job first)"
+msgstr "(Необх╕дно спочатку установити обслуговуючу cron-задачу)"
+
+#: lib/FAQ/OMatic/install.pm:429
+msgid "Maintenance last run at:"
+msgstr "Обслуговуюча задача виконувалась в останн╓:"
+
+#: lib/FAQ/OMatic/install.pm:434
+#, c-format
+msgid "Mark the config file as upgraded to Version %0"
+msgstr "Позначити конф╕гурац╕йний файл, як оновлений до верс╕╖ %0"
+
+#: lib/FAQ/OMatic/install.pm:440
+msgid "Select custom colors for your Faq-O-Matic</a> (optional)"
+msgstr "Зм╕нити кольори вашого FAQ-O-Matic'а</a> (не обов'язковий)"
+
+#: lib/FAQ/OMatic/install.pm:444
+msgid "Define groups</a> (optional)"
+msgstr "Визначити групи</a> (не обов'язковий)"
+
+#: lib/FAQ/OMatic/install.pm:450
+msgid "Upgrade to CGI.pm version 2.49 or newer."
+msgstr "В╕дновити CGI.pm до верс╕╖ 2.49 або нов╕шо╖."
+
+#: lib/FAQ/OMatic/install.pm:453
+msgid "(optional; older versions have bugs that affect bags)"
+msgstr "(не обов'язковий; стар╕ верс╕╖ мають помилку, яка робить &quot;м╕шки&quot; не працездатними)"
+
+#: lib/FAQ/OMatic/install.pm:456
+#, c-format
+msgid "You are using version %0 now."
+msgstr "Ви зараз використову╓те верс╕ю %0."
+
+#: lib/FAQ/OMatic/install.pm:461
+msgid "Bookmark this link to be able to return to this menu."
+msgstr "Зробити закладку до ц╕╓╖ стор╕нки, щоб полегшити повернення до цього меню (працю╓ не на ус╕х бровзерах)."
+
+#: lib/FAQ/OMatic/install.pm:472
+msgid "(need to turn on installer security)"
+msgstr "(необх╕дно, щоби вв╕мкнути безпеку ╕нсталятора)"
+
+#: lib/FAQ/OMatic/install.pm:475
+msgid "Other available tasks:"
+msgstr "╤нш╕ доступн╕ завдання:"
+
+#: lib/FAQ/OMatic/install.pm:479
+msgid "See access statistics"
+msgstr "Подивитися статистику доступу"
+
+#: lib/FAQ/OMatic/install.pm:484
+msgid "Examine all bags"
+msgstr "Перев╕рити ус╕ \"м╕шки\""
+
+#: lib/FAQ/OMatic/install.pm:490
+msgid "Check for unreferenced bags (not linked by any FAQ item)"
+msgstr "Перев╕рити на \"п╕дв╕шен╕ м╕шки\" (\"м╕шки\", на як╕ нема╓ посилань н╕ з жодного елементу FAQ)"
+
+#: lib/FAQ/OMatic/install.pm:503
+#, c-format
+msgid "The Faq-O-Matic modules are version %0."
+msgstr "Модул╕ FAQ-O-Matic мають верс╕ю %0."
+
+# HERE
+# Russian
+#: lib/FAQ/OMatic/install.pm:622
+msgid ""
+"I wasn't able to change the permissions on <b>%0</b> to 755 "
+"(readable/searchable by all)."
+msgstr ""
+"[R] Не удалось изменить права доступа к <b>%0</b> на 755 (чтение/поиск для "
+"всех)."
+
+#: lib/FAQ/OMatic/install.pm:637 lib/FAQ/OMatic/install.pm:638
+msgid "updated config file:"
+msgstr "оновлений файл конф╕гурац╕╖:"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:645
+msgid "Redefine configuration parameters to ensure that <b>%0</b> is valid."
+msgstr ""
+"[R] Переопределите (определите заново?) конфигурационные параметры, дабы "
+"быть уверенным, что <b>%0</b> в порядке."
+
+# Intentionally left blank.
+#: lib/FAQ/OMatic/install.pm:657
+msgid "Jon made a mistake here; key=%0, property=%1."
+msgstr ""
+
+#: lib/FAQ/OMatic/install.pm:686
+msgid "<b>Mandatory:</b> System information"
+msgstr "<b>Обов'язковий:</b> ╤нформац╕я про систему"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:689
+msgid "Identity of local FAQ-O-Matic administrator (an email address)"
+msgstr "[R] Идентификатор локального администратора FAQ-O-Matic (email-адрес)"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:691
+msgid ""
+"A command FAQ-O-Matic can use to send mail. It must either be sendmail, or "
+"it must understand the -s (Subject) switch."
+msgstr ""
+"[R] Команда, используемая FAQ-O-Matic'ом для отправки почты.  Это должен "
+"быть sendmail или что-нибудь другое, что понимает опцию -s (Subject)."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:693
+msgid "The command FAQ-O-Matic can use to install a cron job."
+msgstr ""
+"[R] Команда, которую FAQ-O-Matic может использовать для установки cron job."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:696
+msgid "Path to the <b>ci</b> command from the RCS package."
+msgstr "[R] Путь к команде <b>ci</b> из пакета RCS."
+
+#: lib/FAQ/OMatic/install.pm:699
+msgid "<b>Mandatory:</b> Server directory configuration"
+msgstr "<b>Обов'язковий:</b> Конф╕гурац╕я каталог╕в сервера"
+
+#: lib/FAQ/OMatic/install.pm:701
+msgid ""
+"Protocol, host, and port parts of the URL to your site. This will be used to "
+"construct link URLs. Omit the trailing '/'; for example: "
+"<tt>http://www.dartmouth.edu</tt>"
+msgstr "Протокол-, хост- ╕ порт-частини URL, що вказу╓ на ваш сайт.  Вони будуть використовуватися для створення URL в посиланнях.  Не запроваджуйте к╕нцевий '/'; приклад: <tt>http://www.dartmouth.edu</tt>"
+
+#: lib/FAQ/OMatic/install.pm:704
+msgid ""
+"The path part of the URL used to access this CGI script, beginning with '/' "
+"and omitting any parameters after the '?'. For example: "
+"<tt>/cgi-bin/cgiwrap/jonh/faq.pl</tt>"
+msgstr "Частина URL, в╕дпов╕дальна за путь до цього CGI-скрипта.  Повинна починатися з '/' ╕ не м╕стити н╕яких параметр╕в п╕сля '?'.  Приклад: <tt>/cgi-bin/cgiwrap/jonh/faq.pl</tt>"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:707
+msgid ""
+"Filesystem directory where FAQ-O-Matic will keep item files, image and other "
+"bit-bag files, and a cache of generated HTML files. This directory must be "
+"accessible directly via the http server. It might be something like "
+"/home/faqomatic/public_html/fom-serve/"
+msgstr ""
+"[R] Каталог в файловой системе, где FAQ-O-Matic хранит файлы элементов, "
+"изображения и другие \"мешки с битами\", а так же кэширует сгенерированные "
+"HTML файлы.  Этот каталог должен быть доступен напрямую через web-сервер.  "
+"Это может быть что-нибудь наподобие "
+"<code>/home/faqomatic/public_html/fom-serve/</code>"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:709
+msgid ""
+"The path prefix of the URL needed to access files in <b>\\$serveDir</b>. It "
+"should be relative to the root of the server (omit http://hostname:port, but "
+"include a leading '/'). It should also end with a '/'."
+msgstr ""
+"[R] Префикс пути в URL, необходимый для доступа к файлам, расположенным в "
+"<b>\\$serveDir</b>.  Он должен быть задан корневого каталога сервера "
+"(опуская http://hostname:port, но включая лидирующий '/').  Он должен, "
+"также, завершаться на '/'."
+
+# ? настройки
+#: lib/FAQ/OMatic/install.pm:712
+msgid "<i>Optional:</i> Miscellaneous configurations"
+msgstr "<i>Не обов'язковий:</i> Разн╕тн╕ настройки"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:717
+msgid "Select the display language."
+msgstr "[R] Выберите язык для отображения. (Select the display language.)"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:722
+msgid "Show dates in 24-hour time or am/pm format."
+msgstr "[R] Отображать даты в 24-часовом формате, или в формате am/pm."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:726
+msgid ""
+"If this parameter is set, this FAQ will become a mirror of the one at the "
+"given URL. The URL should be the base name of the CGI script of the master "
+"FAQ-O-Matic."
+msgstr ""
+"[R] Если этот параметр установлен, то этот FAQ станет зеркальной копией "
+"(mirror) FAQ, находящегося по указанному URL.  URL должен быть базовым "
+"именем (base name) CGI-скрипта &quot;ведущего&quot; FAQ-O-Matic'а."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:728
+msgid ""
+"An HTML fragment inserted at the top of each page. You might use this to "
+"place a corporate logo."
+msgstr ""
+"[R] HTML фрагмент, который вставляется в начало каждой страницы.  Вы можете "
+"использовать его, например, для размещения вашего логотипа."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:730 lib/FAQ/OMatic/install.pm:743
+msgid ""
+"If this field begins with <tt>file=</tt>, the text will come from the named "
+"file in the meta directory; otherwise, this field is included verbatim."
+msgstr ""
+"[R] Если содержимое этого поля начинается с <tt>file=</tt>, то текст будет "
+"взят из указанного файла в каталоге meta; в противном случае содержимое поля "
+"будет вставлено &quot;как есть&quot;."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:738
+msgid ""
+"The <tt>width=</tt> tag in a table. If your <b>\\$pageHeader</b> has "
+"<tt>align=left</tt>, you will want to make this empty."
+msgstr ""
+"[R] Тег <tt>width=</tt> в таблице.  Если ваш <b>\\$pageHeader</b> имеет "
+"<tt>align=left</tt>, вы, возможно, пожелаете оставить его пустым."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:741
+msgid ""
+"An HTML fragment appended to the bottom of each page. You might use this to "
+"identify the webmaster for this site."
+msgstr ""
+"[R] HTML фрагмент, который добавляется в конец каждой страницы.  Вы можете "
+"использовать его, например, для сообщения, кто есть webmaster вашего сайта."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:746
+msgid ""
+"Where FAQ-O-Matic should send email when it wants to alert the administrator "
+"(usually same as \\$adminAuth)"
+msgstr ""
+"[R] Куда FAQ-O-Matic должен посылать email, когда он хочет привлечь внимание "
+"администратора (обычно, тоже самое, что и \\$adminAuth)"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:748
+msgid ""
+"If true, FAQ-O-Matic will mail the log file to the administrator whenever it "
+"is truncated."
+msgstr ""
+"[R] Если 'true', то FAQ-O-Matic будет отсылать log-файл администратору "
+"всякий раз при его усечении."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:751
+msgid "User to use for RCS ci command (default is process UID)"
+msgstr ""
+"[R] Пользователь, используемый для RCS-команды <code>ci</code> "
+"(по-умолчанию: UID процесса)"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:755
+msgid ""
+"Links from cache to CGI are relative to the server root, rather than "
+"absolute URLs including hostname:"
+msgstr ""
+"[R] Использовать в кэше относительные ссылки на CGI (относительно корневого "
+"каталога сервера), вместо абсолютных URL, включающих имя хоста:"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:759
+msgid ""
+"mailto: links can be rewritten such as jonhATdartmouthDOTedu (cheesy), jonh "
+"(nameonly), or e-mail addresses suppressed entirely (hide)."
+msgstr ""
+"[R] Для защиты от spam'а, ссылки <code>mailto:</code> могут искажаться до "
+"вида jonhATdartmouthDOTedu (cheesy), jonh (nameonly), или email-адрес может "
+"быть скрыт вообще (hide).  'off' означает не искажать ссылки "
+"<code>mailto:</code>."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:763
+msgid ""
+"Number of seconds that authentication cookies remain valid. These cookies "
+"are stored in URLs, and so can be retrieved from a browser history file. "
+"Hence they should usually time-out fairly quickly."
+msgstr ""
+"[R] Количество секунд, в течении которых аутентификационные "
+"&quot;крошки&quot; (cookies) остаются действительными.  Эти "
+"&quot;крошки&quot; сохраняются в URL, и, следовательно, могут быть извлечены "
+"из файла истории бровзера (browser history file).  Посему это значение "
+"должно быть достаточно небольшим."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:766
+msgid "<i>Optional:</i> These options set the default [Appearance] modes."
+msgstr ""
+"[R] <i>Не обов'язковий:</i> Эти настройки определяют, каким будет "
+"<code>[Зовн╕шн╕й Вигляд]</code> по умолчанию."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:771
+msgid "Page rendering scheme. Do not choose 'text' as the default."
+msgstr ""
+"[R] Схема отрисовки страниц.  Не используйте 'text', в качестве схемы "
+"по-умолчанию."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:799
+msgid ""
+"<i>Optional:</i> These options fine-tune the appearance of editing features."
+msgstr ""
+"[R] <i>Не обов'язковий:</i> &quot;Тонкая&quot; настройка вида команд "
+"редактирования."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:802
+msgid "The old [Show Edit Commands] button appears in the navigation bar."
+msgstr ""
+"[R] Старая кнопка <code>[Показать Команды Редактирования]</code> входит в "
+"навигационную линейку."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:806
+msgid "Navigation links appear at top of page as well as at the bottom."
+msgstr ""
+"[R] Отображать навигационные ссылки вверху страницы, так же, как и внизу."
+
+#: lib/FAQ/OMatic/install.pm:810
+msgid "Hide [Append to This Answer] and [Add New Answer in ...] buttons."
+msgstr ""
+"Сховати кнопки <code>[Додати до Ц╕╓╖ В╕дпов╕д╕]</code> та <code>[Нова "
+"В╕дпов╕дь у ...]</code>"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:815
+msgid "Editing commands appear with neat-o icons rather than [In Brackets]."
+msgstr ""
+"[R] Команды редактирования отображаются вместе с иконками, а не <code>[в "
+"квадратных скобках]</code>."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:818
+msgid ""
+"<i>Optional:</i> Other configurations that you should probably ignore if "
+"present."
+msgstr ""
+"[R] <i>Не обов'язковий:</i> Другие настройки, которые вы, возможно, захотите "
+"проигнорировать."
+
+#: lib/FAQ/OMatic/install.pm:822
+msgid "Draw Item titles John Nolan's way."
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:826
+msgid "Hide sibling (Previous, Next) links"
+msgstr "[R] Спрятать ссылки на предыдущий и следующий документы"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:830
+msgid "Use DBM-based search databases. Faster on machines with non-broken DBM."
+msgstr ""
+"[R] Использовать поисковый движок, основанный на DBM.  Он быстрее, но не "
+"каждая машина имеет неповрежденный (работающий) DBM."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:937
+msgid "This is a command, so only letters, hyphens, and slashes are allowed."
+msgstr ""
+"[R] Это команда, посему допускаются только буквы, знаки переноса ('-') и "
+"слэши ('/')."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:996
+msgid ""
+"If this is your first time installing a FAQ-O-Matic, I recommend only "
+"filling in the sections marked <b>Mandatory</b>."
+msgstr ""
+"[R] Если вы устанавливаете FAQ-O-Matic в первый раз, рекомендуем заполнять "
+"только секции, маркированные, как <b>Обязательные</b> (<b>Mandatory</b>)."
+
+#: lib/FAQ/OMatic/install.pm:1000
+msgid "Define"
+msgstr "Установити"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1041
+msgid "You should <a href=\"%0\">go back</a> and fix these configurations."
+msgstr "[R] Вы должны <a href=\"%0\">вернуться</a> и исправить эти установки."
+
+#: lib/FAQ/OMatic/install.pm:1044
+msgid "Rewrote configuration file."
+msgstr "Конф╕гурац╕йний файл переписано."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1058
+msgid ""
+"%0 (%1) has an internal apostrophe, which will certainly make Perl choke on "
+"the config file."
+msgstr ""
+"[R] %0 (%1) содержит апостроф, который может быть неправильно воспринят "
+"Perl'ом внутри конфигурационного файла."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1062 lib/FAQ/OMatic/install.pm:1068
+msgid "%0 (%1) doesn't look like a fully-qualified email address."
+msgstr "[R] %0 (%1) не выглядит, как полный email-адрес."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1074 lib/FAQ/OMatic/install.pm:1079
+msgid "%0 (%1) isn't executable."
+msgstr "[R] %0 (%1) не является исполнимым файлом."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1096
+msgid "%0 has funny characters."
+msgstr "[R] %0 имеет \"опасные\" символы."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1125
+msgid "Untitled Faq-O-Matic"
+msgstr "[R] Безымянный Faq-O-Matic"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1131
+msgid ""
+"To name your FAQ-O-Matic, use the [Appearance] page to show the expert "
+"editing commands, then click [Edit Category Title and Options]."
+msgstr "[R] Дабы назвать ваш FAQ-O-Matic, используйте страницу [Зовн╕шн╕й Вигляд] и разрешите на ней расширенные команды редактирования, после чего нажмите [Заголовок и Настройки Категории]"
+
+#: lib/FAQ/OMatic/install.pm:1141 lib/FAQ/OMatic/install.pm:1153
+#: lib/FAQ/OMatic/install.pm:1165
+msgid "Created category \"%0\"."
+msgstr "Создана категор╕я \"%0\"."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1143 lib/FAQ/OMatic/install.pm:1155
+#: lib/FAQ/OMatic/install.pm:1167
+msgid "<b>%0</b> already contains a file '%1'."
+msgstr "[R] <b>%0</b> уже содержит файл '%1'."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1205
+msgid "Copied %0 items from <tt>%1</tt> to <tt>%2</tt>."
+msgstr "[R] Скопировано %0 элементов из <tt>%1</tt> в <tt>%2</tt>."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1262
+msgid "Attempting to install cron job:"
+msgstr "[R] Попытка установить cron job:"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1310
+msgid ""
+"I replaced this old crontab line, which appears to be an older one for this "
+"same FAQ:"
+msgstr ""
+"[R] Была заменена старая строка в файле crontab, которая относилась к этому "
+"же FAQ (или была очень на нее похожа)"
+
+#: lib/FAQ/OMatic/install.pm:1319
+msgid "I thought I installed a new cron job, but it didn't appear to take."
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1321
+msgid ""
+"You better add %0 to some crontab yourself with <b><tt>crontab -e</tt></b>"
+msgstr ""
+"[R] Вам лучше добавить \\`%0' в какой-нибудь crontab самим с помощью команды "
+"<b><tt>crontab -e</tt></b>"
+
+#: lib/FAQ/OMatic/install.pm:1327
+msgid "Cron job installed. The maintenance script should run hourly."
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1383
+msgid "Use the <u>%0</u> links to change the color of a feature."
+msgstr "[R] используйте ссылки <u>%0</u>, чтобы изменить соответствующий цвет."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1397
+msgid "An Item Title"
+msgstr "[R] Заголовок Элемента"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1405
+msgid ""
+"A regular part is how most of your content will appear. The text colors "
+"should be most pleasantly readable on this background."
+msgstr ""
+"[R] Обычная текстовая часть.  Почти все содержимое FAQ располагается именно "
+"в них.  Цвета текста должны быть подобраны так, чтобы быть наиболее "
+"комфортными для чтения."
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1407 lib/FAQ/OMatic/install.pm:1419
+#: lib/FAQ/OMatic/install.pm:1446
+msgid "A new link"
+msgstr "[R] Новая ссылка"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1408 lib/FAQ/OMatic/install.pm:1420
+#: lib/FAQ/OMatic/install.pm:1450
+msgid "A visited link"
+msgstr "[R] Посещенная ссылка"
+
+#: lib/FAQ/OMatic/install.pm:1410 lib/FAQ/OMatic/install.pm:1422
+#: lib/FAQ/OMatic/install.pm:1455
+msgid "A search hit"
+msgstr "&quot;Попадання&quot; пошука"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1418
+msgid "A directory part should stand out"
+msgstr "[R] Часть-каталог.  Она должна выделяться."
+
+#: lib/FAQ/OMatic/install.pm:1442
+msgid "Regular text"
+msgstr "Звичайний текст"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1467
+msgid "Select a color for %0:"
+msgstr "[R] Выберите цвет для &quot;%0&quot;"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1478
+msgid "Or enter an HTML color specification manually:"
+msgstr "[R] Или введите HTML-спецификацию цвета вручную:"
+
+#: lib/FAQ/OMatic/install.pm:1481
+msgid "Select"
+msgstr "Вибрати"
+
+# Russian
+#: lib/FAQ/OMatic/install.pm:1490
+msgid "Unrecognized config parameter"
+msgstr "[R] Нераспознанный конфигурационный параметр"
+
+#: lib/FAQ/OMatic/install.pm:1538
+#, c-format
+msgid "Proceed to step '%0'"
+msgstr "Пройти до крока '%0'"
+
+#: lib/FAQ/OMatic/moveItem.pm:112
+msgid "Make <b>%0</b> belong to which other item?"
+msgstr ""
+
+#: lib/FAQ/OMatic/moveItem.pm:116
+msgid "No item that already has sub-items can become the parent of"
+msgstr ""
+
+#: lib/FAQ/OMatic/moveItem.pm:118
+msgid "No item can become the parent of"
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/moveItem.pm:122
+msgid ""
+"Some destinations are not available (not clickable) because you do not have "
+"permission to edit them as currently authorized."
+msgstr ""
+"[R] Некоторые цели недоступны (на них нельзя щелкнуть), поскольку вы не "
+"имеете достаточно прав для их редактирования (по крайней мере под тем "
+"идентификатором, под которым вы сейчас вошли)."
+
+#: lib/FAQ/OMatic/moveItem.pm:125
+msgid "Click here</a> to provide better authentication."
+msgstr ""
+
+#: lib/FAQ/OMatic/moveItem.pm:131
+msgid "Hide answers, show only categories"
+msgstr "Сховати в╕дпов╕д╕, показувати лише категор╕╖"
+
+#: lib/FAQ/OMatic/moveItem.pm:134
+msgid "Show both categories and answers"
+msgstr "Показувати як катагор╕╖, так ╕ в╕дпов╕д╕"
+
+# Russian
+#: lib/FAQ/OMatic/search.pm:72
+msgid "No items matched all of these words"
+msgstr ""
+"[R] Не найдено ни одного документа, удовлетворяющего всем заданным словам"
+
+# Russian
+#: lib/FAQ/OMatic/search.pm:76
+#, c-format
+msgid "No items matched at least %0 of these words"
+msgstr ""
+"[R] Не найдено ни одного документа, удовлетворяющего, как минимум, %0 из "
+"заданных слов"
+
+# Russian
+#: lib/FAQ/OMatic/search.pm:85
+msgid "Search results for all of these words"
+msgstr "[R] Результаты поиска документов, удовлетворяющих всем заданным словам"
+
+# Russian
+#: lib/FAQ/OMatic/search.pm:89
+#, c-format
+msgid "Search results for at least %0 of these words"
+msgstr ""
+"[R] Результаты поиска документов, удовлетворяющих, как минимум, %0 из "
+"заданных слов"
+
+# Russian
+#: lib/FAQ/OMatic/search.pm:106
+msgid ""
+"Results may be incomplete, because the search index has not been refreshed "
+"since the most recent change to the database."
+msgstr ""
+"[R] Результат может быть неполон, поскольку поисковый индекс не успел "
+"обновиться после самого свежего изменения в базе данных."
+
+# Russian
+#: lib/FAQ/OMatic/searchForm.pm:52
+msgid "search for keywords"
+msgstr "[R] поиск по ключевым словам"
+
+#: lib/FAQ/OMatic/searchForm.pm:57
+msgid "Search for"
+msgstr "Шукати"
+
+#: lib/FAQ/OMatic/searchForm.pm:58
+msgid "matching"
+msgstr "повинн╕ сп╕впадати:"
+
+#: lib/FAQ/OMatic/searchForm.pm:60
+msgid "all"
+msgstr "ус╕"
+
+#: lib/FAQ/OMatic/searchForm.pm:61
+msgid "any"
+msgstr "будь-яке"
+
+#: lib/FAQ/OMatic/searchForm.pm:62
+msgid "two"
+msgstr "два"
+
+#: lib/FAQ/OMatic/searchForm.pm:63
+msgid "three"
+msgstr "три"
+
+#: lib/FAQ/OMatic/searchForm.pm:64
+msgid "four"
+msgstr "чотири"
+
+#: lib/FAQ/OMatic/searchForm.pm:65
+msgid "five"
+msgstr "п'ять"
+
+#: lib/FAQ/OMatic/searchForm.pm:67
+msgid "words"
+msgstr "слов(а,о)/сл╕в"
+
+#: lib/FAQ/OMatic/searchForm.pm:75
+msgid "search for recent changes"
+msgstr "пошук св╕жих зм╕н"
+
+#: lib/FAQ/OMatic/searchForm.pm:81
+msgid "Show documents"
+msgstr "Показати документи"
+
+#: lib/FAQ/OMatic/searchForm.pm:82
+msgid "modified in the last"
+msgstr "яких було зм╕нено за останн╕(й)"
+
+#: lib/FAQ/OMatic/searchForm.pm:84
+msgid "day"
+msgstr "день"
+
+#: lib/FAQ/OMatic/searchForm.pm:85
+msgid "two days"
+msgstr "два дня"
+
+#: lib/FAQ/OMatic/searchForm.pm:86
+msgid "three days"
+msgstr "три дня"
+
+#: lib/FAQ/OMatic/searchForm.pm:87
+msgid "week"
+msgstr "тиждень"
+
+#: lib/FAQ/OMatic/searchForm.pm:88
+msgid "fortnight"
+msgstr "два тиждя"
+
+#: lib/FAQ/OMatic/searchForm.pm:89
+msgid "month"
+msgstr "м╕сяць"
+
+#: lib/FAQ/OMatic/selectBag.pm:69
+msgid "Replace which bag?"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:69
+msgid "Hits Per Day"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:70
+msgid "Cumulative Hits"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:74
+msgid "New Hosts Per Day"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:75
+msgid "Total Hosts"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:79
+msgid "Hits Per Host"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:80
+msgid "Cumulative Searches"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:83
+msgid "Submissions Per Day"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:84
+msgid "Cumulative Submissions"
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/stats.pm:87
+msgid ""
+"Please be patient ... the image files are generated dynamically, and can "
+"take from 20 to 50 seconds to create.\n"
+msgstr ""
+"[R] Пожалуйста, будьте терпеливы... изображения генерируются динамически, и "
+"на их создание может потребоваться от 20 до 50 секунд.\n"
+
+#: lib/FAQ/OMatic/stats.pm:137
+msgid "Change View Duration"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:140
+msgid "One Month"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:142
+msgid "Two Months"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:144
+msgid "Three Months"
+msgstr ""
+
+#: lib/FAQ/OMatic/stats.pm:146
+msgid "History"
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/submitBag.pm:50
+msgid ""
+"Bag names may only contain letters, numbers, underscores (_), hyphens (-), "
+"and periods (.), and may not end in '.desc'. Yours was"
+msgstr ""
+"[R] Названия \"мешков\" могут содержать только буквы, цифры, знаки "
+"подчеркивания (_), знаки переноса (-) и точки (.), и не могут заканчиваться "
+"на '.desc'.  Ваше было"
+
+#: lib/FAQ/OMatic/submitItem.pm:61
+msgid "Your browser or WWW cache has truncated your POST."
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/submitItem.pm:72
+msgid "Changed the item title, was \"%0\""
+msgstr "[R] Изменен заголовок элемента, было \"%0\""
+
+#: lib/FAQ/OMatic/submitItem.pm:88 lib/FAQ/OMatic/submitItem.pm:98
+msgid "Your part order list (%0) "
+msgstr ""
+
+#: lib/FAQ/OMatic/submitItem.pm:89
+msgid "doesn't have the same number of parts (%0) as the original item."
+msgstr ""
+
+#: lib/FAQ/OMatic/submitItem.pm:99
+#, c-format
+msgid "doesn't say what to do with part %0."
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/submitMove.pm:51
+msgid "The moving file (%0) is broken or missing."
+msgstr "[R] Перемещаемый файл (%0) поврежден или отсутствует."
+
+#: lib/FAQ/OMatic/submitMove.pm:57
+msgid "The newParent file (%0) is broken or missing."
+msgstr ""
+
+#: lib/FAQ/OMatic/submitMove.pm:66
+msgid "The oldParent file (%0) is broken or missing."
+msgstr ""
+
+#: lib/FAQ/OMatic/submitMove.pm:74
+msgid "The new parent (%0) is the same as the old parent."
+msgstr ""
+
+#: lib/FAQ/OMatic/submitMove.pm:79
+msgid "The new parent (%0) is the same as the item you want to move."
+msgstr ""
+
+#: lib/FAQ/OMatic/submitMove.pm:86
+msgid "The new parent (%0) is a child of the item being moved (%1)."
+msgstr ""
+
+# Russian
+#: lib/FAQ/OMatic/submitMove.pm:92
+msgid "You can't move the top item."
+msgstr "[R] Вы не можете перемещать верхний элемент."
+
+# Russian
+#: lib/FAQ/OMatic/submitMove.pm:130
+#, c-format
+msgid "moved a sub-item to %0"
+msgstr "[R] перемещен, как подэлемент в %0"
+
+# Russian
+#: lib/FAQ/OMatic/submitMove.pm:133
+#, c-format
+msgid "moved a sub-item from %0"
+msgstr "[R] перемещен, как подэлемент из %0"
+
+#: lib/FAQ/OMatic/submitPass.pm:49
+msgid "An email address must look like 'name\\@some.domain'."
+msgstr "Email-адреса повинна мати вигляд 'name\\@some.domain'."
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:51
+msgid ""
+"If yours (%0) does and I keep rejecting it, please mail %1 and tell him "
+"what's happening."
+msgstr ""
+"[R] Если вид вашего email (%0) удовлетворяет этому критерию, но все-равно "
+"отвергается, пожалуйста, напишите %1 и расскажите ему, что произошло "
+"(только, пожалуйста, пишите по-английски!)"
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:58
+msgid "Your password may not contain spaces or carriage returns."
+msgstr "[R] Ваш пароль не может содержать пробелов и возвратов каретки."
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:90
+msgid "Your Faq-O-Matic authentication secret"
+msgstr "[R] "
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:113
+msgid ""
+"I couldn't mail the authentication secret to \"%0\" and I'm not sure why."
+msgstr ""
+"[R] Не удалось отправить аутентификационный Секретный Код на \"%0\" и нет "
+"никакой уверенности почему."
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:123
+msgid "The secret you entered is not correct."
+msgstr "[R] Секретный Код, который вы ввели -- неправильный."
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:125
+msgid "Did you copy and paste the secret or the URL completely?"
+msgstr "[R] Вы уверены, что скопировали Секретный Код или URL полностью?"
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:129
+msgid "I sent email to you at \"%0\". It should arrive soon, containing a URL."
+msgstr ""
+"[R] На ваш адрес \"%0\" было послано письмо.  Оно должно скоро прийти и "
+"содержать в себе URL."
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:133
+msgid ""
+"Either open the URL directly, or paste the secret into the form below and "
+"click Validate."
+msgstr ""
+"[R] Или откройте этот URL напрямую, или скопируйте Секретный Код (Secret) в "
+"расположенную ниже форму и нажмите <code>[Проверить]</code>."
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:135
+msgid "Thank you for taking the time to sign up."
+msgstr "[R] Спасибо, что нашли время подписаться."
+
+# Russian
+#: lib/FAQ/OMatic/submitPass.pm:143
+msgid "Secret:"
+msgstr "[R] Секретный Код:"

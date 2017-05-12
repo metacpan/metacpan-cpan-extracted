@@ -1,0 +1,65 @@
+NAME
+
+    Footprintless::Plugin::Atlassian::Confluence - A Footprintless plugin
+    for working with Atlassian Confluence
+
+VERSION
+
+    version 1.02
+
+DESCRIPTION
+
+    Provides a confluence_client factory method to obtain a REST client for
+    the Atlassian Confluence REST API
+    <https://developer.atlassian.com/confdev/confluence-server-rest-api>.
+
+ENTITIES
+
+    As with all plugins, this must be registered on the footprintless
+    entity.
+
+        plugins => [
+            'Footprintless::Plugin::Atlassian::Confluence',
+        ],
+
+    You may provide custom implementation of the request builder or
+    response parser as well:
+
+        plugins => [
+            'Footprintless::Plugin::Atlassian::Confluence',
+        ],
+        'Footprintless::Plugin::Atlassian::Confluence' => {
+            request_builder => 'My::Confluence::RequestBuilder',
+            response_parser => 'My::Confluence::ResponseParser',
+        }
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Footprintless
+
+      * Footprintless::MixableBase
+
+      * Footprintless::Plugin::Atlassian::Confluence
+
+      * Footprintless::Plugin::Atlassian::Confluence::Client
+
+      * Footprintless::Plugin::Atlassian::Confluence::RequestBuilder
+
+      * Footprintless::Plugin::Atlassian::Confluence::ResponseParser
+
+      * https://docs.atlassian.com/atlassian-confluence/REST/latest-server
+

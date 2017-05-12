@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-QuoteOptions.t
+lib/Finance/QuoteOptions.pm

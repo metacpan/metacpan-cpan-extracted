@@ -1,0 +1,16 @@
+; 
+; t/nodelist.003
+; 
+Zone,2,Europe_(028),Belgium,Ward_Dossche,32-3-4480880,33600,V34,VFC,CM,XX,IEM,ITX,IBN
+,5501,fido4077.railways.dp.ua,IP_Gate_Z1,Serguei_Trouchelle,00-00-000000,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC
+,5503,fido4077.railways.dp.ua,IP_Gate_Z3,Serguei_Trouchelle,00-00-000000,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC
+,5504,fido4077.railways.dp.ua,IP_Gate_Z4,Serguei_Trouchelle,00-00-000000,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC
+,5505,fido4077.railways.dp.ua,IP_Gate_Z5,Serguei_Trouchelle,00-00-000000,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC
+,5506,fido4077.railways.dp.ua,IP_Gate_Z6,Serguei_Trouchelle,00-00-000000,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC
+;
+Region,55,fido4077.railways.dp.ua,IP-ONLY_Region,Serguei_Trouchelle,00-00-000000,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC
+;
+Host,550,fido4077.railways.dp.ua,IP-ONLY_Net,Serguei_Trouchelle,00-00-000000,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC
+Pvt,357,Vidrada//357,Kijow_Ukraina,Serguei_Trouchelle,-Unpublished-,300,MO,CM,IMI:fido357@ukr.net,IUC,PING,U,NC,NPK,RPK
+Pvt,4077,fido4077.railways.dp.ua,Dniepropetrowsk_Ukraine,Serguei_Trouchelle,-Unpublished-,300,CM,MO,IBN,IMI:fido4077@ukr.net,IUC
+Pvt,9999,fido4077.railways.dp.ua,Net550_Freezer,Serguei_Trouchelle,-Unpublished-,300,CM,MO,IBN,IMI:z2r55c@ukr.net,IUC

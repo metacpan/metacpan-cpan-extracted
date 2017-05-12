@@ -1,0 +1,215 @@
+Revision history for Perl extension FameHLI.
+
+2.101 Sun Mar 20, 2005
+    FameHLI::API
+    Cfmwstr had an artificial limit of 255 characters on any string
+    written.  This should be working correctly now.  Thanks to 
+    Tarik Adi for pointing this out.
+
+2.100 Tue Mar 15, 2005
+    FameHLI (Makefile.PL)
+	Since the Linux LessTif now uses x.org (Fedora 3 and RHEL4) there
+    is now a test to see if $FAME/fame will run.  If not, it could be
+    because libXm.so.1 can't be found.  We can still run everything
+    except Cfmfame and MCADBS so a test checks this and allows skipping
+    the tests that would fail otherwise.
+
+    FameHLI::API
+    Finally got around to making the Missing Value functions return
+    a "valid" return code to let you know that they don't really
+    work. Jeff Kaplan suggested using "Doesn't work in current context".
+    - Cfmsnm returns HBCNTX
+    - Cfmspm returns HBCNTX
+    - Cfmsbm returns HBCNTX
+    - Cfmsdm returns HBCNTX
+    - Cfmisnm returns HBCNTX
+    - Cfmispm returns HBCNTX
+    - Cfmisbm returns HBCNTX
+    - Cfmisdm returns HBCNTX
+    - Cfmissm returns HBCNTX
+
+2.001 Tue feb 8, 2005
+    FameHLI::API
+    Thanks to Ken Kingsbury for finding a buglet in Cfmwhat().  The
+    documentation string was being cut off to the length of the 
+    description string.
+    - Modified Cfmwhat to use the proper length variable.
+
+2.000 xxx Jun x, 2003
+    FameHLI::API
+    Thanks again to Daniel Martin for changes to the Makefile and
+    some of the .xs files to work on Linux (with libchli.a).  Also,
+    he caught a buglet in Cfmgtstr().
+    - Modified several functions to use New() and Safefree()
+      instead of safemalloc() and safefree().
+
+1.200 Mon Aug 5, 2002 (never made it public... oops.)
+    FameHLI::API
+    Thanks to Patrick Chamberlain for bug reports:
+    - Modified Cfmwstr to use references to missing value strings
+      in the 'proper' way.
+
+    FameHLI::API/tests
+    Thanks to Jeremy Yoder for fixes and suggestions:
+    - Modified test suite to use 'USERNAME' and 'PASSWORD' properly
+      for those of you who use authenticated MCADBS servers.
+    - Modified test suite to check for $FAME variable being defined.
+      Since some of us put the license files in $FAME_PATH, I can't
+      check for license files, but there is only so much you CAN
+      do, isn't there?
+
+1.101 Fri May 3, 2002
+
+    FameHLI::API
+    - Modified Cfmrrng to return "proper" missing values instead
+      of the Fame internal representation.  For instance, a missing
+      NUMERIC would be around 1.7E+38.  It now returns a reference
+      to a string "NA", "NC" or "ND".
+    FameHLI::API/tests
+    - Added 6 tests to 12_Writing and 13_Reading to ensure the
+      aforementioned missing values are being handled properly for
+      NUMERIC.  2 each (writing and reading) for each of the three
+      missing data types.  I did not put in tests for the other 
+      data types but may, someday...
+
+1.100 Tue Feb 12, 2002
+
+    Most of the changes in this release came from Daniel Martin of
+    Fame Information Services.  He answered the question "If anyone
+    can figure out how to get this to work in Windows..."
+
+    He did.
+
+    FameHLI::all
+    - Removed the reference to <strings.h>.
+    - Changed the Exporter variables to use "use vars qw()" instead
+      of "our" so that older versions of Perl can compile the module.
+    - Modified the Makefile.PL in a number of ways so that 'nmake'
+      will work on Windows.
+    - Modified the Makefile.PL to more intelligently check paths
+      for hli.h and library files on either Unix or Windows.
+    FameHLI::API
+    - cfmini() is now called in bootstrapping the module and Cfmini()
+      allows you to call it multiple times.  It will simply return
+      the HSUCC if it ever succeeded or the most recent status.  This
+      allows you to check (in your program) if $FAME is set and
+      recover if it isn't.
+    FameHLI::API/tests
+    - Removed the test for Cfmver() failing prior to calling
+      Cfmini() since that is called automagically occuring boot.
+
+1.000 Mon Sep 10, 2001
+
+    FameHLI::API
+    - Some of the noted fixes here may have happened in an earlier
+      release but were not mentioned below so I mention them here.
+
+    - Fixed a 'hard to get' SEGV problem in Cfmnxwc by converting
+      from using the NO_INIT option for argument variables and
+      making anything that gets returned into an SV*.
+    - May have prevented lots of other SEGV problems because I just
+      went ahead and did the same for all functions.
+    - Fixed an odd bug in Cfm xxxx (rlen) where it would behave
+      oddly if you gave it a predefined array of data. (2358/2339)
+
+    - Changed handling of FREQ such that anything that isn't one of
+      the 6 non-date frequencies is 'defaulted' to a DATE freq.
+      After all, what else is there?  (And error handling will find
+      out if it is an invalid freq anyway.)
+    - Changed the default handling of Missing Values so that
+      any occurrance of a missing value is turned into a reference
+      to a string "NA", "NC" or "ND".
+
+    - Removed Cfmglen() function.  It is unnecessary.
+    - Removed Cfmdlen() function.  It is unnecessary.
+    - Defaulted Cfmgtatt() function length arguments inlen and
+      outlen.  They are unnecessary.
+    - Removed Cfmlatt() function.  It is unnecessary.
+    - Defaulted Cfmgtali() function length arguments inlen and
+      outlen.  They are unnecessary.
+    - Removed Cfmlali() function.  It is unnecessary.
+    - Removed Cfmnlen() function.  It is unnecessary.
+    - Defaulted Cfmgtnl() function length arguments inlen and
+      outlen.  They are unnecessary.
+    - Defaulted Cfmgtsts() function length arguments inlen and
+      outlen.  They are unnecessary.
+
+    FameHLI::API/tests
+    - Commented the PWD.sample file
+    - Changed the defaults in t/subs.pm to "none".
+    - Changed all test files which access values in the PWD file
+      so that they will "Skip" functions which need those values
+      if they are set to "none".
+
+0.903 Mon Apr 23, 2001
+
+    FameHLI::API
+    - Fixed the "Date Frequency" stuff.  If a data type is not one
+      of the standard "Num, Prec, Str or Bool" datatypes then it
+      is probably one of the several hundred Date Frequencies.
+    - Made the length arguments optional (and ignored) of functions 
+      which return strings.  This brings FameHLI in line with
+      TimeIQ in relieving the programmer from that drudge.
+    - Added the new "cfmspos" function for 9.0.  Please see Fame
+      docs when 9.0 comes out.  This function has a pretty strong
+      'gotcha' if your program exits abnormally.
+    - Removed "Get Length" functions and inserted "defaults" for 
+      length arguments.
+    - Removed 'cfmopre' function.
+
+    FameHLI::API/tests
+    - Removed arguments from functions not needing "length" related
+      elements.
+    - Removed tests for depricated functions.
+    - Removed "Get Length" function tests
+    - Removed Cfmopre which is depricated.  Change calls to use
+      'cfmopcn' and 'cfmoprc' instead.
+
+0.902 Thu Apr 19, 2001
+
+    FameHLI::API
+    - Removed a quirky internal function which wasn't really needed
+    - Added in several of the "how long is that" string function for
+      completeness.  They aren't really needed because if the caller
+      of the string retrieval function doesn't specify a length (or
+      gives a length of '0'), I just figure it out for them.
+    - Found 2 possible bugs in the C-HLI: cfmfame prints out an error
+      message to STDERR or STDOUT upon an error condition and 
+      cfmlerr returns an error length of '0' for that same condition.
+    - Converted several more functions from standard 'C' data type
+      arguments to SV*'s.  It seems to confuse the compiler less.
+    - Added the ':all' EXPORT_TAG so everything could be imported.
+    - Added the comments to API.pm supporting the added tests
+      noted below.
+
+    FameHLI::API/tests
+    - Added tests for other functions which are defined but were not
+      tested in the previous release.
+    - Changed all but test 08 to import all functions and #defines
+      so I could clear out some noisey text in those files.  It
+      makes it easier for a C-HLI programmer to see what is going
+      on.  08 has been left with fully qualified names for 
+      instructional purposes.
+
+    FameHLI::API::EXT
+    - It appears that the EXT module runs in a different space from
+      the API module.  I would get Not Initialized errors from CFM
+      calls in the EXT module if I didn't call cfmini there as well
+      in the BOOT code.
+    - Added the ':all' EXPORT_TAG so everything could be imported.
+
+0.901 Wed Apr 18, 2001
+    - First post to CPAN
+
+0.9   Fri Mar 23 2001
+    - First external ALPHA tester
+
+0.3   Various times through 2000
+    - enhancing performance and adding more fucntions
+
+0.2   Thu Oct  5 13:23:52 2000
+    - original XS version; created by h2xs 1.19
+
+0.1   Various times through 1999
+    - original version written using SWIG
+

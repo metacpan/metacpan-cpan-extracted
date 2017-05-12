@@ -1,0 +1,20 @@
+[% WRAPPER 'admin/bar.html' %]
+
+
+[% IF message; message; ELSE %]
+
+<div class='one'>
+<form method='get'>
+<table align='center'>
+<tr class='title'><td>Merge FOrum</td></tr>
+<tr><td class='misc2' align='center'>
+    Merge OLD Forum ID <input type='text' name='from_id' /> To NEW forum ID <input type='text' name='to_id' /><br />
+    <input type='submit' />
+</td></tr>
+</table>
+</form>
+</div>
+
+[% END %]
+
+[% END %]

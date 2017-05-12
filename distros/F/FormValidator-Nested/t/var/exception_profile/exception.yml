@@ -1,0 +1,6 @@
+params:
+  mail:
+    validators:
+      - Email#email
+      - Exception#max_length:
+          max: 100

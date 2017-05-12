@@ -1,0 +1,108 @@
+File::Tempdir::ForPackage
+
+This is mostly an interface wrapper for "File::Temp::tempdir", stealing
+code from "File::Tempdir";
+
+*   I constantly forget how "File::Tempdir" works
+
+*   I often want a "tempdir" with the name of the package working with
+    it enshrined in the path
+
+*   I constantly forget the magic glue syntax to get a folder inside a
+    system "tempdir" with a custom prefix and a user defined length of
+    random characters.
+
+And this is designed to solve this simply.
+
+use File::TempDir::ForPackage;
+
+  my $tempdir = File::TempDir::ForPackage->new( package => __PACKAGE__ , use_version => 1 );
+  my $dir = $tempdir->dir();
+
+do shit in `$dir` $dir on Linux will be something like
+/tmp/perl-Some-Package-maybewith-a-VERSION-AFG14561/ so if it crashes
+and leaves a "tempdir" behind, you will know who left that "tempdir"
+behind and have a way of cleaning it up.
+
+When $tempdir is destroyed, $dir will be cleaned;
+
+Additionally:
+
+  $dir->run_once_in(sub{
+    ...
+  });
+
+Is there for people who don't trust scope auto-cleansing and want to
+know when the directory is reaped.
+
+Additionally, this code can be run in a tight loop creating and
+destroying lots of similarly named temporary directories without risk of
+conflict.
+
+  for my $i ( 0 .. 30  ) {
+    $dir->run_once_in(sub {
+      system 'find $PWD';
+    });
+  }
+
+This emits something like:
+
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-PzH4BD
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-5h8nkG
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-UXKt4S
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-Lqg2aW
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-DkNeq6
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-jRI_zF
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-j0_Gt1
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-iX1ddT
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-ZmvikK
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-QNGOUF
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-6wssvL
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-ZmwZxl
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-wIzRTs
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-xetCym
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-8Y0vyX
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-Zlqt6X
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-U5Z_Sa
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-sKmow1
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-rUND95
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-XjPSGF
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-ec8sZZ
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-_4NBwX
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-xM9i6l
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-p3FhJf
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-Zv0sso
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-rP8cAi
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303496-408662-iade0x
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303497-408662-fsDDPy
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303497-408662-FeCcfZ
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303497-408662-ta5yfg
+  /tmp/perl-File-Tempdir-ForPackage-versionundef-1343303497-408662-rdcQhF
+
+Except of course, with a package of your choosing, and possibly that
+packages version.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

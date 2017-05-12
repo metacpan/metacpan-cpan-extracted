@@ -1,0 +1,9 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+example_script/micrline.pl
+lib/Finance/MICR/LineParser.pm
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

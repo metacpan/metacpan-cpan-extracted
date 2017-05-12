@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+#
+# Manual tests to confirm cleanup code is being run in execptional
+# (read: random kill signals) circumstances. TODO write this in as a
+# t/*.t script, though the write_file test really does need a sleep
+# statement inserted into the module to ensure it can be properly
+# killed off...
+#
+# perl -I../lib cleanup-test oo
+#
+# perl -I../lib cleanup-test p
+
+use strict;
+use warnings;
+
+use Data::Dumper qw(Dumper);
+use File::AtomicWrite ();
+
+my $method = shift || die "Usage: $0 [oo|p]\n";
+
+my %methods = (
+  'oo' => sub {
+    my $aw = File::AtomicWrite->new( { file => 'remove_me' } );
+    # Not installing these handlers leaves behind a tmpfile should the
+    # script be killed. Setting the object to undef then results in
+    # "print on undefined..." messages, as the script will still be
+    # running. exit() allows the cleanup code to run.
+    for my $sig_name (qw/INT TERM/) {
+      $SIG{$sig_name} = sub { exit }
+    }
+    my $fh = $aw->fh;
+    print "kill $$\n";
+    print `ls -al`;
+    while ( sleep 5 ) {
+      print $fh "test\n";
+    }
+  },
+  'p' => sub {
+    $SIG{'TERM'} = 'IGNORE';
+
+    print "kill $$\n";
+
+    # TODO This requires that the write_file be altered with a sleep
+    # statement...
+    File::AtomicWrite->write_file(
+      { file => 'remove_me', input => \"test" } );
+
+    print Dumper $SIG{'TERM'};
+  },
+);
+
+die "error: no such method: $method\n" unless exists $methods{$method};
+$methods{$method}->();

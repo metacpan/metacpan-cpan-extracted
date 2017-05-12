@@ -1,0 +1,12 @@
+#fsdb low histogram
+0 0
+10 0
+20 0
+30 0
+40 0
+50 0
+60 1
+70 2
+80 1
+90 2
+#   | dbcolhisto -S 0 -E 100 -N 10 test1

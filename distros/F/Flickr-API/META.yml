@@ -1,0 +1,39 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Script: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Flickr-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::MD5: '0'
+  Getopt::Long: '1'
+  HTTP::Message: '1.56'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  LWP::UserAgent: '0'
+  Net::OAuth: '0'
+  Test::More: '0'
+  Test::Script: '0'
+  URI: '1.18'
+  XML::LibXML::Simple: '0'
+  XML::Parser::Lite::Tree: '0.06'
+  parent: '0'
+  perl: '5.008'
+resources:
+  repository: https://github.com/iamcal/perl-Flickr-API
+version: '1.28'

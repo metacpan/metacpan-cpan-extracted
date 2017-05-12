@@ -1,0 +1,53 @@
+---
+abstract: 'Validation module for nested array ,hash ,scalar  like FormValidator::Simple'
+author:
+  - 'S2 <s2otsa59@gmail.com>'
+build_requires:
+  Class::Load: '0'
+  Email::Valid: '0'
+  Hash::MultiValue: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Time::Piece: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FormValidator-Simple-Struct
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  FormValidator::Simple::Struct:
+    file: lib/FormValidator/Simple/Struct.pm
+    version: '0.18'
+  FormValidator::Simple::Struct::AllowCharacter:
+    file: lib/FormValidator/Simple/Struct/AllowCharacter.pm
+    version: '0.18'
+  FormValidator::Simple::Struct::CharTypes:
+    file: lib/FormValidator/Simple/Struct/CharTypes.pm
+    version: '0.18'
+  FormValidator::Simple::Struct::Regex:
+    file: lib/FormValidator/Simple/Struct/Regex.pm
+    version: '0.18'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/S2/FormValidator-Simple-Struct/issues
+  homepage: https://github.com/S2/FormValidator-Simple-Struct
+  repository: git://github.com/S2/FormValidator-Simple-Struct.git
+version: '0.18'
+x_contributors:
+  - 'S2 <s2otsa@hotmail.com>'
+  - 'Sato shinihiro <shinichiro@wano.co.jp>'

@@ -1,0 +1,190 @@
+=head1 NAME
+
+Form::Sensible::Delegation - Understanding Form::Sensible's Delegation model
+
+=head1 INTRODUCTION
+
+Delegation is used heavily in Form::Sensible both for easy integration of
+Form::Sensible into your applications, but also to customize the behavior of
+Form::Sensible components.  If you have not encountered delegation in object
+oriented programming, it's a good idea to read the paragraphs below to become
+familiar with the concepts.  If you have encountered delegation before, and 
+it is a familiar concept for you it is still worth reading the 
+L</"Delegation in Form::Sensible"> section to better understand how delegation
+works in Form::Sensible.
+
+=head1 DELEGATION
+
+=head2 What is Delegation?
+
+When doing object-oriented programming, we tend to use a very 'push' oriented
+model. That is to say that we create an object and we push data into it in the
+form of attributes, then we prod it to perform certain actions. This works
+well for has-a type object relationships, where one object essentially owns
+another. As our object-oriented programming tasks become more complex, we
+often want to customize behavior of an existing class. We can do this in a
+number of ways, the most common being subclassing.  Delegation is another
+mechanism for accomplishing this customization.
+
+Basically, delegation is a way for one object to let another object have
+control over specific bits of its own functionality. It is most useful when
+one object knows how to perform a certain task, but certain parameters of that
+task may best be provided from outside the object. When used this way, delegation
+provides a mechanism for a more 'pull' type interaction between components,
+allowing the object to ask something else for additional information when it needs it.
+
+=head2 Why use it?
+
+There are other mechanisms to accomplish what delegation provides, abstract
+base classes are one method, L<Moose's roles|Moose::Role>'s are another.  Delegation
+is best suited when you have a good idea of where customization of behavior 
+is likely to be needed.  It is also useful when a has-a or is-a type relationship
+does not make sense.  
+
+This may best be explained using an example. In HTML, a select field type 
+provides a way for a user to select one item out of a group of
+options. In many applications, code will exist to determine the correct items
+to display and then push them into a template that creates a dropdown select
+box. However, this requires a fair amount of glue code to be created to first
+locate and pull in the data, then format it and push it into the Select
+field's set of options. Not only that, you have to be sure to call or include
+that glue code any time the field in question is to be displayed. Depending on
+how often the form is used, this can mean a lot to remember and to maintain.
+
+It makes a lot of sense for the select box to be able to obtain the options it
+needs for itself, thus dropping the requirement of pushing the data into the
+field wherever it is used. If you are using a form module to generate your
+form, you might think about subclassing the Select field class, or perhaps
+applying a Moose role that replaces static options with a mechanism to pull
+the options directly from your database, for example. If you do this, however,
+you are now creating a new (view-type) object which is directly tied to your
+model. You also now have an additional class (or role) to maintain. A better
+option here would be to have your select box object simply ask another object
+for the options it should use when it needs them.
+
+If the select box class is designed so that it knows that it should ask another
+object for the options to choose from, the rest of its features can be
+implemented completely and it can be used as is in your application, without
+the need for subclassing.
+
+L<Form::Sensible::Field::Select> is implemented
+in exactly this way. You can provide an C<options_delegate> which is an object
+of type L<Form::Sensible::DelegateConnection>. This links the Select field to
+a source of options. Once this is done, no further information is required for
+the select box to get the options to display when it needs them.
+
+An added bonus to this is that if the form is not displayed, the field never
+requests its options from the delegate. In this scenario, If your options come
+out of your DB, you just saved yourself a database hit.
+
+=head1 Delegation in Form::Sensible
+
+In Form::Sensible, delegation is accomplished via the
+L<Form::Sensible::DelegateConnection> class. An object of
+L<Form::Sensible::DelegateConnection> type
+provides essentially a connection between one object and another. Note that a
+DelegateConnection is a single connection to a delegate, in other words a
+single function or method call. In some languages it is convention that one
+object will only have a single delegate object for all behavior. We considered
+this approach but found it to be too restrictive. Instead, in Form::Sensible,
+delegation is action-based.  This means each action to be delegated can be
+connected to a different object. Each connection can be to the same object if
+you so desire, but if it makes sense for you to delegate actions to different
+objects, that is entirely possible.
+
+When you encounter a delegate connection in Form::Sensible it will usually
+take the form of an attribute on a class. For example, the
+L<Select|Form::Sensible::Field::Select> field type contains an
+L<options_delegate|Form::Sensible::Field::Select/"ATTRIBUTES"> attribute. You should set this attribute to an object of
+the L<DelegateConnection|Form::Sensible::DelegateConnection> class. The
+easiest way to do this is to use the L<FSConnector|Form::Sensible::DelegateConnection/"FUNCTIONS"> utility function:
+
+    $selectfieldobject->options_delegate( FSConnector( $delegate_object, 'get_options_from_db') );
+
+The C<FSConnector> function will create a C<DelegateConnection> object that
+will call C<< $delegate_object->get_options_from_db($selectfieldobject) >> when the
+C<options_delegate> is used. Care should be taken here, as a reference to
+C<$selectfieldobject> will become part of a closure, and thus will not be released by
+Perl until the C<DelegateConnection> is destroyed.) Note that every delegate
+action has its own calling semantics, so it's important to look at the
+documentation for the object that is doing the delegating to ensure that you
+understand how it will be called. One thing all delegate actions have in
+common is that the object that has the delegate attribute will be passed as
+the first argument. This allows the same delegate to be used by multiple
+objects.
+
+There is another feature of C<DelegateConnection> objects in Form::Sensible that
+makes them extremely powerful. In most delegation schemes, the delegate object,
+IE the target of the C<DelegateConnection> must be written to accept the
+method calls and arguments the calling object is sending. In Form::Sensible
+the C<DelegateConnection> object actually uses a subroutine reference to
+accomplish its job. 
+
+In most cases, this subroutine reference is a simple 'straight through' link
+between the calling object and the delegate's method. However, it is entirely
+possible, and often preferable, to provide your own subroutine reference
+instead. This allows you to translate calling parameters and possibly adjust
+return values to match what the caller expects. To create a C<DelegateConnection> that
+works this way, you would do something like this:
+
+    my $datasource = $existing_data_source_object;
+    
+    ## this DelegateConnection figures out the caller's category
+    ## then uses it to get the data it wants
+    ## and translates the returned array of results into a 
+    ## hash reference by name
+
+    my $connection = FSConnector( sub { 
+                        my $caller = shift;
+                        
+                        my @data = $datasource->get_data_with_category( $caller->category_name );
+                        return [ map { $_->name => $_ } @data ];
+                     });
+    $object->data_delegate($connection);
+
+The power here lies in the fact that I<using this method you can connect your
+existing objects directly to your delegate objects without modification>. It's
+easy to see how this flexibility can dramatically reduce the amount of custom
+code and subclasses required to accomplish your task.
+
+=head2 Using A DelegateConnection
+
+When you are creating an object that will use a delegate, you will usually
+have an attribute to hold the delegate connection.  Remember this is done 
+on a per-action basis, so you may have multiple attributes.  When you are
+ready to call your delegate action, you can do so as follows:
+
+    $self->delegate_action->call($self, $other, $arguments);
+
+However, since the only thing you will likely ever do to a C<DelegateConnection>
+object is call it, a shorter (and preferred) syntax is available:
+
+    $self->delegate_action->($self, $other, $arguments);
+
+This does the same as the C<< delegate_action->call() >> syntax, though it's a
+bit more concise.  It also looks just different enough to help remind you that
+this is a call to a delegate rather than just an normal method call.
+
+=head1 SUMMARY
+
+Delegation in Form::Sensible is extremely powerful and is an integral part of
+how many of Form::Sensible's components operate.  It is vital to the effective 
+use of Form::Sensible to understand the delegation mechanism used.  I hope 
+that this document has helped to demystify delegation.  If you have ideas 
+for how to make this information more clear, please get in touch!
+
+=head1 AUTHORS
+
+Jay Kuri, C<jayk@cpan.org>
+
+=head1 SPONSORED BY
+
+Ionzero LLC. L<http://ionzero.com/>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2010 the aforementioned authors. All rights
+reserved. This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut

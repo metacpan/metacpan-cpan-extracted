@@ -1,0 +1,25 @@
+rules :
+    - Email
+    - String
+lang : ja
+setting :
+    strict :
+        email :
+            rule :
+                - Email#email
+        message :
+            rule :
+                - String#length :
+                    min : 1
+                    max : 500
+        user_key :
+            rule :
+                - String#length :
+                    min : 4
+                    max : 12
+                - String#ascii 
+labels :
+    ja :
+        email    : メールアドレス
+        message  : お問い合わせ内容
+        user_key : ユーザID

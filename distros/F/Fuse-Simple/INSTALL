@@ -1,0 +1,20 @@
+INSTALLATION OF Fuse::Simple
+============================
+
+To install this module, run the usual "simple mantra" of standard
+steps for installing most Perl modules:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Or you may use the CPAN.pm module, which will automatically execute
+these steps for you.
+
+If you are on a windoze box you should use 'nmake' rather than 'make',
+but as far as I know there is no FUSE for windoze, so good luck!
+
+I am not aware of a FUSE for MacOS either, but MacOS X is based on
+BSD, so you never know...
+

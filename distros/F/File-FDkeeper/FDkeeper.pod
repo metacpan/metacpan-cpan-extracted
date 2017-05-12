@@ -1,0 +1,134 @@
+=head1 NAME
+
+File::FDkeeper - Store open filehandles in another process for later use
+
+
+=head1 SYNOPSIS
+
+  # "server"
+  my $fdk = new File::FDkeeper(Local => "/tmp/fdkeeper.sock") ;	
+  $fdk->run() ;
+
+  # "client"
+  my $fdk = new File::FDkeeper(Peer => "/tmp/fdkeeper.sock") ;
+  my $id = $fdk->put($some_fh) ;
+  $fh = $fdk->get($id) ;
+  $fdk->del($id) ;
+
+
+=head1 DESCRIPTION
+
+C<File::FDkeeper> allows you to store open filehandles in a "server" process 
+and retrieve them at a later time from another process.
+
+When a filehandle is stored, an id is returned. This id can then be used by 
+any other process to retrieve the filehandle (as long as they have permission 
+to open the fifo).
+
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item new ( [ARGS] )
+
+Creates an C<File::FDkeeper> object. C<new> expects the following argument 
+groups, in key-value pairs:
+
+
+  Local                 Path to local fifo
+  AccessTimeout         Filehandles not accessed since this number of seconds 
+                          will be closed. Default is 0 (infinity).
+  AccessTimeoutCheck    Frequency (in seconds) to check for expired 
+                          filehandles. Default is 0 (never).
+
+  Peer                  Path to peer fifo
+
+If C<Local> is specified, a "server" object is created. 
+
+If C<Peer> is specified, a "client" object is created.
+
+=back
+
+
+=head1 METHODS
+
+=over 4
+
+=item put ( FILEHANDLE )
+
+Stores C<FILEHANDLE> and returns the associated id. An exception is thrown if 
+an error occurs.
+
+Note: when C<put> is called from a "client" object, FILEHANDLE will be closed
+once it has been sent to the "server". This seems to be necesasry in order to 
+be able to C<get> and use that handle later in that process.
+
+=item get ( ID )
+
+Retrieves filehandle C<ID> and returns it. Returns undef if filehandle C<ID> 
+is not presentily stored. An exception is thrown if an error occurs.
+
+=item del ( ID )
+
+Removes and closes filehandle C<ID>. Returns undef if filehandle C<ID> is
+not presently stored. An exception is thrown if an error occurs.
+
+=item cnt ( )
+
+Returns the number of filehandles currently in the "server".
+An exception is thrown if an error occurs.
+
+=item run ( [LIFELINE] )
+
+Note: This method is available only on the "server" objects.
+
+Starts listening for connections on the fifo in order to store filehandles.
+Normally, this method does not return. However, if C<LIFELINE> is a valid 
+filehandle, C<run> will return when any data (or EOF) is received on 
+C<LIFELINE>. If used, C<LIFELINE> is normally a pipe used as such:
+
+  use IO::Pipe ;
+
+  my $pipe = new IO::Pipe() ;
+  if (fork()){
+    $pipe->reader() ;
+    require File::FDkeeper ;
+    my $fdk = new File::FDkeeper(Local => "/tmp/fdkeeper.sock") ;	
+    $fdk->run($pipe) ;
+    exit() ;
+  }
+
+  $pipe->writer() ;
+  # do stuff...
+  
+  # When this process dies, the File::FDkeeper server process will 
+  # die as well.
+
+=back
+
+
+=head1 BUGS
+
+L<File::FDpasser> may write directly to STDERR on error. It doesn't
+seem that this can be suppressed.
+
+
+=head1 SEE ALSO
+
+L<File::FDpasser>, L<IO::Socket::UNIX>
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier, E<lt>patl@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

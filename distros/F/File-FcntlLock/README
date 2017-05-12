@@ -1,0 +1,86 @@
+File::FcntlLock
+===============
+
+File::FcntlLock is a module to do file locking in an object oriented
+fashion using the fcntl(2) system call. This allows locks on parts of
+a file as well as on the whole file and overcomes some known problems
+with flock(2), on which Perls flock() function is based per default.
+
+Since version 0.15 there three slightly different ways this can be done
+with using this package. Per default a method is used where a shared
+library build creation of the package is called from the Perl code to
+invoke the fcntl(2) system function. This method can also be used by
+employing the File::FcntlLock::XS module (which basically an alias for
+File::FcntlLock). Two further methods instead use calls of the Perl
+fcntl() function. In both cases at some time a C program must be run
+to determine the binary layout of the C flock struct used by fcntl()
+for locking. For the one package, File::FcntlLock::Pure, this is done
+while making the package. For the other, File::FcntlLock::Inline, this
+happens each time the package is loaded (e.g. wih the 'use' function).
+Of course, for this to work a C compiler must be installed on the
+system!
+
+Unfortunately, there seem to be a few 32-bit systems where the off_t
+type, used in the flock struct, is a 64-bit integer but which use a
+Perl version that hasn't 64-bit support enabled. On these systems the
+'q' format for Perl's pack() and unpack() function isn't available and
+thus a "pure Perl" approach is thus not possible. On such systems the
+File::FcntlLock::Pure and File::FcntlLock::Inline modules won't get
+installed.
+
+
+PORTABILITY
+
+To use the module the system must support the fcntl() system call
+which probably will restrict its use to POSIX compliant systems.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+The module requires the following other modules:
+
+  POSIX, Errno, Carp, Exporter, DynaLoader
+
+To install the module(s) a C compiler must be available and the
+system must support the use of shared libraries (or DLLs). For
+File::FcntlFlock::Inline the C compiler must also be available when
+the module is used. The installation of the File::FcntlLock::Pure
+and File::FcntlLock::Inline modules require that the Perl pack()
+and unpack() function support the 'q' format if the off_t type on
+the system is 64-bit wide.
+
+
+ACKNOWLEDGMENTS
+
+Thanks to Mark Jason Dominus and Benjamin Goldberg for helpful discus-
+sions, code examples and encouragement. Glenn Herteg pointed out several
+problems and also helped improve the documentation. Julian Moreno Patino
+helped correcting the documentation and pointed out problems arising on
+GNU Hurd (which seems to have only very rudimentary support for locking
+with fcntl(2), at least at that time). Niko Tyni and Guillem Jover
+encouraged and helped with implementing alternatives to a XS-only
+approach which hopefully will make the module more useful under certain
+circumstances.
+
+AUTHOR
+
+Jens Thoms Toerring <jt@toerring.de>
+
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2002-2014 Jens Thoms Toerring <jt@toerring.de>
+                                            http://toerring.de

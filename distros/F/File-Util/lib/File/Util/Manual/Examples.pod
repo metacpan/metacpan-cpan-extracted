@@ -1,0 +1,716 @@
+package File::Util::Manual::Examples;
+use strict; use warnings; # for kwalitee tests
+
+# ABSTRACT: File::Util Examples
+
+=pod
+
+=head1 NAME
+
+File::Util::Manual::Examples - File::Util Examples
+
+=head1 VERSION
+
+version 4.161950
+
+=head1 INTRODUCTION
+
+This manual subsection is fully comprised of simple examples of L<File::Util>
+in greater depth than what you see in the main documentation, however to keep
+things simple, these examples are short, quick, and to the point.
+
+For examples of full Programs using File::Util, take a look at the Cookbook at
+the L<File::Util::Cookbook>.
+
+=head1 EXAMPLES
+
+Many of these are demonstrated in the standalone scripts that come in the
+"examples" directory as part of this distribution.
+
+Unless indicated otherwise, all of these short examples assume that you have
+started out with:
+
+   use File::Util;
+   my $f = File::Util->new();
+
+The variable C<$f> is used for simplicity here in the examples.  In your actual
+programming you should refrain from using single-letter variables and use
+something more obvious instead, such as C<$ftl> or C<$futil>
+
+=head2 Get the contents of a file in a string
+
+   my $contents = $f->load_file( 'filename' );
+
+      -OR-
+
+   my $contents = $f->load_file( '/path/to/filename' );
+
+      -OR-
+
+   my $contents = $f->load_file( 'C:\path\to\filename' );
+
+=head2 Get the contents of a UTF-8 encoded file in a UTF-8 encoded string
+
+   my $encoded_data = $f->load_file( 'encoded.txt' => { binmode => 'utf8' } );
+
+=head2 Get the contents of a file in an array of lines in the file
+
+   my @contents = $f->load_file( 'filename' => { as_lines => 1 } );
+
+=head2 Get an open file handle for reading
+
+   my $fh = $f->open_handle(
+      file => '/some/existing/file',
+      mode => 'read'
+   );
+
+      -OR-
+
+   # ... you can also use the shorter syntax:
+   my $fh = $f->open_handle( '/some/existing/file' => 'read' );
+
+   # ... you can open a file handle to a UTF-8 encoded file too
+   my $fh = $f->open_handle( 'encoded.txt' => 'read' => { binmode => 'utf8' } );
+
+   # then use the filehandle like you would use any other file handle:
+   while ( my $line = <$fh> ) {
+
+      # ... do stuff with $line
+   }
+
+   close $fh or die $!;
+
+=head2 Get an open file handle for writing
+
+Opening a file for writing (write mode) will create the file if it doesn't
+already exist.  The file handle is automatically locked for you with flock()
+if your system supports it.
+
+   my $fh = $f->open_handle(
+      file => '/some/file',
+      mode => 'write'
+   );
+
+      -OR-
+
+   # ... you can also use the shorter syntax:
+   my $fh = $f->open_handle( '/some/file' => 'write' );
+
+   # ... you can open a file handle with UTF-8 encoding support
+   my $fh = $f->open_handle( '/some/file' => 'write' => { binmode => 'utf8' } );
+
+   print $fh 'Hello world!';
+
+   close $fh or die $!;
+
+=head2 Write to a new or existing file
+
+   my $content = 'Pathelogically Eclectic Rubbish Lister';
+
+   $f->write_file( file => 'a new file.txt', content => $content );
+
+      -OR-
+
+   # you can use the shorter syntax:
+   $f->write_file( 'a new file.txt' => $content );
+
+      -OR-
+
+   # write UTF-8 encoded data also.  the file will have UTF-8 encoding:
+   $f->write_file( 'encoded.txt' => $encoded_data => { binmode => 'utf8' } );
+
+You can optionally specify a bitmask for a file if it doesn't exist yet.
+The bitmask is combined with the user's current umask for the creation
+mode of the file.  (You should usually omit this.)
+
+   $f->write_file(
+      file    => 'C:\some\new\file.txt',
+      content => $content
+      bitmask => oct 777,
+   );
+
+      -OR-
+
+   $f->write_file( 'file.txt' => $content => { bitmask => oct 777 } );
+
+=head2 Warn if the file couldn't be written, instead of dying by default
+
+   $f->write_file(
+      'file.txt' => $content,
+      {
+         onfail  => 'warn',
+         bitmask => oct 777
+      }
+   );
+
+=head2 Conceal the error if the file couldn't be written (secure), but log it too
+
+   # define a custom (secure) error handler
+
+   $f->write_file(
+      'file.txt' => $content =>
+      {
+         bitmask => oct 777
+         onfail  => sub {
+            my ( $err, $stack ) = @_;
+
+            # send the error message and stack trace to a logger of some kind...
+            $logger->log( $err . $stack );
+
+            # or send an email alert?
+            send_email_alert_to_admin( $err ); #<< you'll have to write that sub
+
+            # return undef to indicate a problem (or you could die/exit too)
+            return;
+         }
+      }
+   );
+
+=head2 Why not first check if the file is writeable/can be created
+
+   if ( $f->is_writable( '/root/some/file.txt' ) ) {
+
+      # ... now create/write to the file
+   }
+
+=head2 Append to a new or existing file
+
+   my $content = 'The fastest hunk of junk in the galaxy';
+
+   $f->write_file(
+      file    => 'mfalcon.spec',
+      mode    => 'append',
+      content => $content
+   );
+
+      -OR-
+
+   $f->write_file( 'mfalcon.spec' => $content => { mode => 'append' } );
+
+=head2 Get the names of all files and subdirectories in a directory
+
+   # option no_fsdots excludes "." and ".." from the list
+   my @dirs_and_files = $f->list_dir( '/foo' => { no_fsdots => 1 } );
+
+=head2 Get the names of all files and subdirectories in a directory, recursively
+
+   my @dirs_and_files = $f->list_dir( '/foo' => { recurse => 1 } );
+
+=head2 Do the same as above, but only to a certain maximum depth
+
+   my @dirs_and_files =
+      $f->list_dir( '/foo' => { recurse => 1, max_depth => 3 } );
+
+=head2 Do the same, but ignore potential filesystem loops for a speed boost
+
+   my @dirs_and_files =
+      $f->list_dir( '/foo' => { recurse_fast => 1, max_depth => 3 } );
+
+=head2 Get the names of all files (no subdirectories) in a directory
+
+   my @dirs_and_files = $f->list_dir( '/foo' => { files_only => } );
+
+=head2 Get the names of all subdirectories (no files) in a directory
+
+   my @dirs_and_files = $f->list_dir( '/foo' => { dirs_only => 1 } );
+
+=head2 Get the number of files and subdirectories in a directory
+
+   my @dirs_and_files = $f->list_dir(
+      '/foo' => { no_fsdots => 1, count_only => 1 }
+   );
+
+=head2 Get the names of files and subdirs in a directory as separate array refs
+
+   my( $dirs, $files ) = $f->list_dir( '/foo' => { as_ref => 1 } );
+
+      -OR-
+
+   my( $dirs, $files ) = $f->list_dir(
+      '/foo' => { dirs_as_ref => 1, files_as_ref => 1 }
+   );
+
+=head2 Load all the files in a directory into a hashref
+
+   my $templates = $f->load_dir( '/var/www/mysite/templates' );
+
+   # $templates now contains something like:
+   # {
+   #    'header.html' => '...file contents...',
+   #    'body.html'   => '...file contents...',
+   #    'footer.html' => '...file contents...',
+   # }
+
+   print $templates->{'header.html'};
+
+=head2 Recursively Get the names of all files that end in '.pl'
+
+   my @perl_files = $f->list_dir(
+      '/home/scripts' => { files_match => qr/\.pl$/, recurse => 1 }
+   }
+
+=head2 Recursively get the names of all files that do NOT end in '.pl'
+
+File::Util's C<list_dir()> method doesn't have a "not_matches" counterpart
+to the "files_match" parameter.  This is because it doesn't need one.  Perl
+already provides native support for negation in regular expressions.  The
+example below shows you how to make sure a file does NOT match the pattern
+you provide as a subexpression in a "negative zero width assertion".
+
+It might sound complicated for a beginner, but it's really not that hard.
+
+See the L<perlre> documentation for more about negation in regular expressions.
+
+   # find all files that don't end in ".pl"
+   my @other_files = $f->list_dir(
+      '/home/scripts' => { files_match => qr/^(?!.*\.pl$)/, recurse => 1 }
+   }
+
+=head2 Combine several options for list_dir() and be awesome
+
+Find all files (not directories) that matches *any* number of given patterns
+(OR), whose parent directory matches *every* pattern in a list of given
+patterns (AND).  Also make sure that the path to the files matches a list
+of patterns (AND).
+
+   # find the droids I'm looking for...
+   my @files = $f->list_dir(
+      '/home/anakin' => {
+         files_match    => { or  => [ qr/droid/, qr/3p(o|O)$/i, qr/^R2/ },
+         parent_matches => { and => [ qr/vader/i, qr/darth/i ] },
+         path_matches   => { and => [ qr/obi-wan/i, qr/^(?!.*Qui-Gon)/ ] },
+         recursive      => 1,
+         files_only     => 1,
+         max_depth      => 8,
+      }
+   );
+
+The above example would find and return files like:
+
+   /home/anakin/mentors/obi-wan/villains/darth-vader/R2.png
+   /home/anakin/mentors/obi-wan/villains/darth-vader/C3P0.dict
+   /home/anakin/mentors/obi-wan/villains/darth-vader/my_droids.list
+
+But would not return files like:
+
+   /home/anakin/mentors/Qui-Gon Jinn/villains/darth-vader/my_droids.list
+
+=head2 Use a callback to descend through (walk) a directory tree
+
+This is a really powerful feature. Because File::Util::list_dir() is a higher
+order function, it can take other functions as arguments.  We often refer to
+these as "callbacks".
+
+Any time you specify a callback, File::Util will make sure it's first argument
+is the name if the directory it's in (recursion), and then the second and third
+arguments are listrefs.  The first is a list reference containing the names of
+all subdirectories, and the second list ref contains the names of all the files.
+
+Below is a very simple example that doesn't really do much other than
+demonstrate the syntax.  You can see more full-blown examples of callbacks in
+the L<File::Util::Cookbook>
+
+   # print all subdirectories under /home/larry/
+   $f->list_dir(
+      '/home/larry' => {
+         callback => sub { print shift @_, "\n" },
+         recurse  => 1,
+      }
+   }
+
+=head2 Get a directory tree in a hierarchical hashref
+
+   my $tree = $f->list_dir( '/tmp' => { as_tree => 1, recurse => 1 } );
+
+   Gives you a datastructure like:
+   {
+     '/' => {
+              '_DIR_PARENT_' => undef,
+              '_DIR_SELF_' => '/',
+              'tmp' => {
+                         '_DIR_PARENT_' => '/',
+                         '_DIR_SELF_' => '/tmp',
+                         'hJMOsoGuEb' => {
+                                           '_DIR_PARENT_' => '/tmp',
+                                           '_DIR_SELF_' => '/tmp/hJMOsoGuEb',
+                                           'a.txt' => '/tmp/hJMOsoGuEb/a.txt',
+                                           'b.log' => '/tmp/hJMOsoGuEb/b.log',
+                                           'c.ini' => '/tmp/hJMOsoGuEb/c.ini',
+                                           'd.bat' => '/tmp/hJMOsoGuEb/d.bat',
+                                           'e.sh' => '/tmp/hJMOsoGuEb/e.sh',
+                                           'f.conf' => '/tmp/hJMOsoGuEb/f.conf',
+                                           'g.bin' => '/tmp/hJMOsoGuEb/g.bin',
+                                           'h.rc' => '/tmp/hJMOsoGuEb/h.rc',
+                                         }
+                       }
+            }
+   }
+
+*You can add the C<dirmeta> option, set to 0 (false), to remove the special
+entries C<_DIR_PARENT_> and C<_DIR_SELF_> from each subdirectory branch.
+
+Example:
+
+   my $tree = $f->list_dir(
+      '/tmp' => { as_tree => 1, dirmeta => 0, recurse => 1 }
+   );
+
+*You can still combine the C<as_tree> option with other options, such as the
+regex pattern matching options covered above, or options like C<recurse>, or
+C<files_only>.
+
+*You should be careful using this feature with very large directory trees, due
+to the memory it might consume.  Memory usage is generally low, but will grow
+when you use this feature for larger and larger directory trees.  Bear in mind
+that the C<$ABORT_DEPTH> limit applies here too (see L<File::Util>
+documentation), which you can override manually by setting the C<abort_depth>
+option:
+
+   # set max recursion limit to an integer value as shown below
+   $f->list_dir( '/tmp' => { as_tree => 1, recurse => 1, abort_depth => 123 } );
+
+=head2 Determine if something is a valid file name
+
+NOTE: This method is for determining if a B<file name>  is valid.  It does
+not determine if a full path is valid.
+
+   print $f->valid_filename( 'foo?+/bar~@/#baz.txt' ) ? 'ok' : 'bad';
+
+      -OR-
+
+   print File::Util->valid_filename( 'foo?+/bar~@/#baz.txt' ) ? 'ok' : 'bad';
+
+Like many other methods in File::Util, you can import this into your
+own namespace so you can call it like any other function, avoid the
+object-oriented syntax when you don't want or need it:  (This manual doesn't
+duplicate the main documentation by telling you every method you can import --
+see the C<@EXPORT_OK> section of the L<File::Util> documentation)
+
+   use File::Util qw( valid_filename );
+
+   if ( valid_filename( 'foo?+/bar~@/#baz.txt' ) )
+   {
+      print 'file name is valid';
+   }
+   else
+   {
+      print 'That file name contains illegal characters';
+   }
+
+=head2 Get the number of lines in a file
+
+   my $linecount = $f->line_count( 'foo.txt' );
+
+=head2 Split a file path into its parts
+
+This method works differently than atomize_path().  With this method, you
+get not just the components of the path, but each element in the form of
+a list.  The path will be split into the following pieces: (path root, if it
+exists, each subdirectory in the path, and the final file/directory )
+
+   use File::Util qw( split_path );
+
+   print "$_\n" for split_path( q{C:\foo\bar\baz\flarp.pl} )
+
+      -OR-
+
+   print "$_\n" for $f->split_path( q{C:\foo\bar\baz\flarp.pl} )
+
+      -OR-
+
+   print "$_\n" for File::Util->split_path( q{C:\foo\bar\baz\flarp.pl} )
+
+   The output of all of the above commands is:
+      C:\
+      foo
+      bar
+      baz
+      flarp.pl
+
+Above you see examples working on Windows-type paths.  Below are some
+examples using *nix-style paths:
+
+   print "$_\n" for split_path( '/I/am/your/father/NOOOO' )
+
+   The output of all of the above commands is:
+      /
+      I
+      am
+      your
+      father
+      NOOOO
+
+=head2 Strip the path from a file name
+
+   # On Windows
+   #  (prints "hosts")
+   my $path = $f->strip_path( 'C:\WINDOWS\system32\drivers\etc\hosts' );
+
+   # On Linux/Unix
+   #  (prints "perl")
+   print $f->strip_path( '/usr/bin/perl' );
+
+   # On a Mac
+   #  (prints "baz")
+   print $f->strip_path( 'foo:bar:baz' );
+
+      -OR-
+
+   use File::Util qw( strip_path );
+
+   print strip_path( '/some/file/name' ); # prints "name"
+
+=head2 Get the path preceding a file name
+
+   # On Windows
+   #  (prints "C:\WINDOWS\system32\drivers\etc")
+   my $path = $f->return_path( 'C:\WINDOWS\system32\drivers\etc\hosts' );
+
+   # On Linux/Unix
+   #  (prints "/usr/bin")
+   print $f->return_path( '/usr/bin/perl' );
+
+   # On a (very, very old) Mac
+   #  (prints "foo:bar")
+   print $f->return_path( 'foo:bar:baz' );
+
+=head2 Find out if the host system can use flock
+
+   use File::Util qw( can_flock );
+   print can_flock;
+
+      -OR-
+
+   print File::Util->can_flock;
+
+      -OR-
+
+   print $f->can_flock;
+
+=head2 Find out if the host system needs to call binmode on binary files
+
+   use File::Util qw( needs_binmode );
+   print needs_binmode;
+
+      -OR-
+
+   print File::Util->needs_binmode;
+
+      -OR-
+
+   print $f->needs_binmode;
+
+=head2 Find out if a file can be opened for read (based on file permissions)
+
+   my $is_readable = $f->is_readable( 'foo.txt' );
+
+=head2 Find out if a file can be opened for write (based on file permissions)
+
+   my $is_writable = $f->is_writable( 'foo.txt' );
+
+=head2 Escape illegal characters in a potential file name (and its path)
+
+   # prints "C__WINDOWS_system32_drivers_etc_hosts"
+   print $f->escape_filename( 'C:\WINDOWS\system32\drivers\etc\hosts' );
+
+   # prints "baz)__@^"
+   # (strips the file path from the file name, then escapes it
+   print $f->escape_filename( '/foo/bar/baz)?*@^' => { strip_path => 1 } );
+
+   # prints "_foo_!_@so~me#illegal$_file&(name"
+   # (yes, technically that is a legal filename)
+   print $f->escape_filename( q{\foo*!_@so~me#illegal$*file&(name} );
+
+=head2 Find out if the host system uses EBCDIC
+
+   use File::Util qw( ebcdic );
+   print ebcdic;
+
+      -OR-
+
+   print File::Util->ebcdic;
+
+      -OR-
+
+   print $f->ebcdic;
+
+=head2 Get the type(s) of an existent file
+
+   use File::Util qw( file_type );
+   print file_type( 'foo.exe' );
+
+      -OR-
+
+   print File::Util->file_type( 'bar.txt' );
+
+      -OR-
+
+   print $f->file_type( '/dev/null' );
+
+=head2 Get the bitmask of an existent file
+
+   use File::Util qw( bitmask );
+   print bitmask( '/usr/sbin/sendmail' );
+
+      -OR-
+
+   print File::Util->bitmask( 'C:\COMMAND.COM' );
+
+      -OR-
+
+   print $f->bitmask( '/dev/null' );
+
+=head2 Get time of creation for a file
+
+   use File::Util qw( created );
+   print scalar localtime created( '/usr/bin/exim' );
+
+      -OR-
+
+   print scalar localtime File::Util->created( 'C:\COMMAND.COM' );
+
+      -OR-
+
+   print scalar localtime $f->created( '/bin/less' );
+
+=head2 Get the last access time for a file
+
+   use File::Util qw( last_access );
+   print scalar localtime last_access( '/usr/bin/exim' );
+
+      -OR-
+
+   print scalar localtime File::Util->last_access( 'C:\COMMAND.COM' );
+
+      -OR-
+
+   print scalar localtime $f->last_access( '/bin/less' );
+
+=head2 Get the inode change time for a file
+
+   use File::Util qw( last_changed );
+   print scalar localtime last_changed( '/usr/bin/vim' );
+
+      -OR-
+
+   print scalar localtime File::Util->last_changed( 'C:\COMMAND.COM' );
+
+      -OR-
+
+   print scalar localtime $f->last_changed( '/bin/cpio' );
+
+=head2 Get the last modified time for a file
+
+   use File::Util qw( last_modified );
+   print scalar localtime last_modified( '/usr/bin/exim' );
+
+      -OR-
+
+   print scalar localtime File::Util->last_modified( 'C:\COMMAND.COM' );
+
+      -OR-
+
+   print scalar localtime $f->last_modified( '/bin/less' );
+
+=head2 Make a new directory, recursively if necessary
+
+   $f->make_dir( '/var/tmp/tempfiles/foo/bar/' );
+
+   # you can optionally specify a bitmask for the new directory.
+   # the bitmask is combined with the user's current umask for the creation
+   # mode of the directory.  (You should usually omit this.)
+
+   $f->make_dir( '/var/tmp/tempfiles/foo/bar/', 0755 );
+
+=head2 Touch a file
+
+   use File::Util qw( touch );
+   touch( 'somefile.txt' );
+
+      -OR-
+
+   $f->touch( '/foo/bar/baz.tmp' );
+
+=head2 Truncate a file
+
+   $f->trunc( '/wibble/wombat/noot.tmp' );
+
+=head2 Get the correct path separator for the host system
+
+   use File::Util qw( SL );
+   print SL;
+
+      -OR-
+
+   print File::Util->SL;
+
+      -OR-
+
+   print $f->SL;
+
+=head2 Get the correct newline character for the host system
+
+   use File::Util qw( NL );
+
+   print NL;
+
+      -OR-
+
+   print File::Util->NL;
+
+      -OR-
+
+   print $f->NL;
+
+=head2 Choose what to do if there's a problem (die, warn, zero, undefined, subref)
+
+   # When doing things with IO that might fail, set up good error handlers
+
+   # "Fail, these examples will..."
+
+   # If this call fails, die with an error message (*default*)
+   $f->write_file( 'bobafett.txt' => $content => { onfail => 'die' } );
+
+   # If this call fails, issue a warning to STDERR, but don't die/exit
+   $f->list_dir( '/home/greivous' => { onfail => 'warn' } );
+
+   # If this call fails, return a zero value (0), and don't die/exit
+   $f->open_handle( '/home/ventress/.emacs' => { onfail => 'zero' } );
+
+   # If this call fails, return undef, and don't die/exit
+   $f->load_file( '/home/vader/darkside.manual' => { onfail => 'undefined' } );
+
+   # If this call fails, execute the subroutine code and do whatever it says
+   # This code tries to load one directory, and failing that, loads another
+   $f->load_dir( '/home/palpatine/lofty_plans/' => {
+         onfail => sub { return $f->load_dir( '/home/sidious/evil_plots/' ) }
+      }
+   );
+
+=head1 AUTHORS
+
+Tommy Butler L<http://www.atrixnet.com/contact>
+
+=head1 COPYRIGHT
+
+Copyright(C) 2001-2013, Tommy Butler.  All rights reserved.
+
+=head1 LICENSE
+
+This library is free software, you may redistribute it and/or modify it
+under the same terms as Perl itself. For more details, see the full text of
+the LICENSE file that is included in this distribution.
+
+=head1 LIMITATION OF WARRANTY
+
+This software is distributed in the hope that it will be useful, but without
+any warranty; without even the implied warranty of merchantability or fitness
+for a particular purpose.
+
+=head1 SEE ALSO
+
+L<File::Util::Manual>, L<File::Util::Cookbook>
+
+=cut
+
+__END__

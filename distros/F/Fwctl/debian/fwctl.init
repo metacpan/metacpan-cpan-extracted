@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# fwctl		This shell script takes care of configuring the firewall
+#           	using fwctl.
+#
+# description: Configure the IP packet filtering firewall
+#
+# changes for Debian from <ecki@debian.org> Bernd Eckenfels
+
+[ -x /usr/sbin/fwctl ] || exit 0;
+
+# Source function library. Only RH
+#. /etc/rc.d/init.d/functions
+
+# Source networking configuration. Only RH
+#. /etc/sysconfig/network 
+
+# Check that networking is up. Only RH
+# [ ${NETWORKING} = "no" ] && exit 0
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting IP packet filters: "
+	/usr/sbin/fwctl start
+	echo "fwctl."
+	;;
+  stop)
+	# Stop daemons.
+	echo -n "Stopping IP packet filters: " 
+	/usr/sbin/fwctl stop
+	echo "fwctl."
+	;;
+  check)
+	fwctl check
+	;;
+  restart|force-reload)
+	echo -n  "Restarting IP packet filters: " 
+	fwctl restart
+	echo "fwctl."
+	;;
+  *)
+        echo "Usage: fwctl {start|stop|check|restart|force-reload}"
+        exit 1
+esac
+
+exit 0

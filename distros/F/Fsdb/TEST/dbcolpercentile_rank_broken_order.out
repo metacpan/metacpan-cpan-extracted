@@ -1,0 +1,6 @@
+dbcolpercentile: data out of order between 65 and 90, should be in descending order.
+ at blib/script/dbcolpercentile line 999.
+#fsdb name id test1 rank
+a	1	80	1
+b	2	70	2
+c	3	65	3

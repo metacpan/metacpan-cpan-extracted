@@ -1,0 +1,31 @@
+#fsdb -R C      experiment      mean    stddev  pct_rsd conf_range      conf_low       conf_high        conf_pct        sum     sum_squared     min     max     n
+experiment:  ufs_mab_sys
+mean:        37.25
+stddev:      0.070711
+pct_rsd:     0.18983
+conf_range:  0.6353
+conf_low:    36.615
+conf_high:   37.885
+conf_pct:    0.95
+sum:         74.5
+sum_squared: 2775.1
+min:         37.2
+max:         37.3
+n:           2
+
+experiment:  ufs_rcp_real
+mean:        271.2
+stddev:      9.4752
+pct_rsd:     3.4938
+conf_range:  85.13
+conf_low:    186.07
+conf_high:   356.33
+conf_pct:    0.95
+sum:         542.4
+sum_squared: 1.4719e+05
+min:         264.5
+max:         277.9
+n:           2
+
+#  | /home/johnh/BIN/DB/dbmultistats experiment duration
+#  | /home/johnh/BIN/DB/dblistize 

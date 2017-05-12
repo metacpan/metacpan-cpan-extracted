@@ -1,0 +1,17 @@
+0.0.4   2014-02-02
+    - Minimal version of perl in Build.PL and META.yml (CPANTS).
+        - Was 0 previously.
+    - Change "use base" to "use parent".
+
+0.0.3   2014-01-30
+    - Minimal version of perl.
+    - Add t/style-trailing-space.t , t/pod.t , t/pod-coverage.t , and
+    t/cpan-changes.t .
+    - Add the "LICENSE" file.
+
+0.0.2   2010-03-26
+    - Fixed t/File-Find-Object-Rule-MMagic.t on MSWin32 (used File::Spec).
+
+0.0.1   2009-07-06
+    - Derived from File-Find-Rule-MMagic 0.02.
+

@@ -1,0 +1,14 @@
+See the git repository, or also here, as there are by now notable changes.
+
+1.00    September 2016
+        * Fix (I hope) bugs reported in [rt.cpan.org #118117] and
+          [rt.cpan.org #118119] such that replacebytes now closes the fd
+          and pread and pwrite are less prone to misbehave
+        * Check that various length and offset values pass SvIOK, which
+          in addition to shooting down Nan also kills Inf
+        * Disallow NUL characters in filename to replacebytes
+        * Maukify Makefile.PL
+        * Test::Most for tests and related changes (e.g. t/00-load.t)
+
+0.01    July 2013
+        Initial work.

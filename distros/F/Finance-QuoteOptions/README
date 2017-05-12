@@ -1,0 +1,39 @@
+Finance-QuoteOptions version 0.23
+=================================
+
+A 'screen-scraper' utility that extracts options pricing and series
+information from the web.
+
+This uses either Yahoo Finance or the CBOE web site
+for information. The CBOE probably has better data but Yahoo is
+much faster. By default Yahoo will be used as the data source.
+
+Be sure to read the documentation regarding CBOE blacklisting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	WWW::Mechanize
+	LWP::UserAgent
+	HTML::TokeParser
+	Date::Calc
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2010 by Kirk Bocek
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

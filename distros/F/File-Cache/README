@@ -1,0 +1,69 @@
+Copyright (C) 2000, 2001 DeWitt Clinton <dewitt@unto.net>, eZiba.com, Inc.
+    
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 1, or (at your option)
+   any later version.
+		
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+	
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+NAME
+
+  File::Cache
+
+DESCRIPTION
+ 
+  File::Cache implements an object store where data is persisted
+  across processes in the filesystem.  It was written to compliment 
+  IPC::Cache.
+
+  Where IPC::Cache is faster for small numbers of simple objects,
+  File::Cache tends toward being more performant when caching large
+  numbers of complex objects.
+
+REQUIREMENTS
+
+  Storable (optional, if you have Data::Dumper)
+  Digest::MD5.
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+USAGE
+
+  see perldoc File::Cache
+
+SEE ALSO
+
+  IPC::Cache
+
+NOTES AND CAVEATS
+
+  Use of File::Cache is now discouraged in favor of the new
+  Cache::Cache project, also available on CPAN.  Cache::Cache offers
+  all of the functionality of File::Cache, as well as integrating
+  the functionality of IPC::Cache and a number of new features.  You
+  can view the Cache::Cache project page at:
+
+    http://sourceforge.net/projects/perl-cache/
+
+
+
+  Version 0.13 breaks old caches.  You will want to remove them when
+  upgrading.
+
+  
+
+ 

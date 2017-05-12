@@ -1,0 +1,13 @@
+Revision history for Perl extension FormValidator::Simple::Plugin::CreditCard.
+
+0.03  Tue Oct  4 19:21:30 2005
+	- changed the way loading Business::CreditCard
+      not to import subroutines.
+
+0.02  Mon Oct  3 23:21:30 2005
+	- little bit fixed documentation
+
+0.01  Mon Sep 26 00:21:30 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A FormValidator::Simple::Plugin::CreditCard
+

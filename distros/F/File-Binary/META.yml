@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                File-Binary
+version:             1.7
+abstract:            ~
+license:             ~
+author:              
+    - Simon Wistow <simon@thegestalt.org>
+generated_by:        ExtUtils::MakeMaker version 6.38
+distribution_type:   module
+requires:     
+    IO::File:                      1.14
+    IO::Scalar:                    1.126
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

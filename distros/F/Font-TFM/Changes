@@ -1,0 +1,71 @@
+
+Revision history for module Font::TFM.
+
+1.01 Thu Mar  3 22:03:20 CET 2011
+	Updating the upstream URL to
+	http://www.adelton.com/perl/Font-TFM/
+
+0.150 Tue Sep 21 11:12:19 MET DST 2004
+	Added support for TeX math font parameter names.
+
+0.130 Tue Oct  2 16:38:49 MET DST 2001
+	Changed the interface to method new, adding file option, as
+	well as options to override the global defaults. One- and
+	two-argument calls are still supported.
+
+0.120 Mon Oct  1 21:37:05 MET DST 2001
+	Fixed error with extended kern programs, found by Vladimir
+	Volovich.
+
+0.110 Mon Sep 24 15:50:22 MET DST 2001
+	Fixed kern handling (kern in 'va' was wrong, for example),
+	reported by Vladimir Volovich.
+
+0.100 Sat Sep 16 20:27:34 MET DST 2000
+	The module made subclassable -- fonts can be retrieved from
+	other locations that local disk. The new module (like
+	Font::TFM::UseLWP) has to override the open_tfm method to
+	return a filehandle. Patch provided by Jamie.
+
+	The source code reindented.
+
+0.074 Sun Apr  2 16:36:25 MET DST 2000
+	Removed (defined array) and added DESTROY, 5.6 seems to
+	like that.
+
+0.073 Thu Dec  3 14:48:27 MET 1998
+	Added binmode, found by Randy Kobes.
+
+0.072 Mon Sep 14 12:59:27 MET DST 1998
+	Fixed problem with .PL, inspired by Graham Barr.
+
+0.06 Sun Aug  9 14:30:30 MET DST 1998
+	Added a way to specify the TEXFONTSDIR during installation,
+	man page extended.
+
+0.05 Tue Aug 19 10:09:27 MET DST 1997
+	Minor bug fixes. Module made use strict clean. Tests added.
+
+0.04 Wed Apr  9 10:20:10 MET DST 1997
+	Font::TFM::word_dimensions added, Font::TFM::word_width and
+	new Font::TFM::word_height and Font::TFM::word_depth now call
+	it.
+
+	Font::TFM::MULTIPLY added, still defaults do 65536.
+
+	Module made faster, also uses AUTOLOAD for many things. Minor
+	bug fixes.
+
+0.03 Sun Feb 16 13:55:26 MET 1997
+	Font::TFM::expand added to provide lig/kern expansion.
+
+	Font::TFM::word_width added to measure width of word on output.
+
+	Font::TFM::em_width and TFM::name added.
+
+	Name Font::TFM set up instead of TFM.
+
+0.02 Thu Feb 13 20:43:38 MET 1997
+	First version released/announced on public.
+
+

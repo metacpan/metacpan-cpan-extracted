@@ -1,0 +1,51 @@
+{
+   "abstract" : "update file access and modification times, optionally creating files if needed",
+   "author" : [
+      "Nigel Wetters Gourlay <nwetters@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Touch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::stat" : "0",
+            "IO::File" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/File-Touch",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/File-Touch.git",
+         "web" : "https://github.com/neilb/File-Touch"
+      }
+   },
+   "version" : "0.11"
+}
+

@@ -1,0 +1,13 @@
+MANIFEST
+README
+Makefile.PL
+SafeDO.pm
+Changes
+GPL
+local/my.conf
+local/incfile.conf
+local/test.conf
+t/include.t
+t/my.t
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

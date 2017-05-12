@@ -1,0 +1,35 @@
+NAME
+
+File::Type - determine file type using magic
+
+INSTALLING
+
+Install using the standard Module::Build method:
+
+perl Build.PL
+
+./Build
+./Build test
+
+sudo ./Build install
+
+A Makefile.PL is also included if you do not have Module::Build:
+
+perl Makefile.PL
+
+make
+make test
+
+sudo make install
+
+USAGE
+
+my $ft = File::Type->new();
+
+# read in data from file to $data, then
+my $type_from_data = $ft->checktype_data($data);
+
+# alternatively, check file from disk
+my $type_from_file = $ft->checktype_filename($file);
+
+For further information, perldoc File::Type after installation.

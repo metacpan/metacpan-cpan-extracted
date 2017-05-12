@@ -1,0 +1,83 @@
+Revision history for Perl extension Finance::Bank::Wachovia.
+
+0.01  Sat Dec  4 09:50:50 2004
+
+0.02  Wed Dec  7 09:50:50 2004
+    
+    [ENHANCEMENTS]
+    * Finance::Bank::Wachovia->new() now accepts 
+      can/pin/codeword OR user_id/password.
+    * Added exception handling via Error() and ErrStr()
+    * wachovia.pl now save .wachovia file in home directory by default,
+      instead of just the current directory.
+      
+    [FIXES]
+    * Adjusted Makefile.PL to require 5.6.1, not 5.8
+    * Changed bin to scripts, added EXE_FILES line to Makefile.PL
+    
+    [DOCUMENTATION]
+    * fixed some typos
+    
+    [THANKS]
+    Jason Marcell for helping me test the user_id/password login
+    and also for helping me debug.
+    
+0.03  Tues Dec  12 09:50:50 2004
+    
+    [ENHANCEMENTS]
+    * added wachovia_summary.pl to scripts
+    * added Finance::Bank::Wachovia::Credit class
+    * module handles credit accounts properly now
+      
+    [FIXES]
+    * rewrote the argument handling routines in the included scripts to fix some
+      bugs.
+    * fixed parsing bugs for relationship summaries with multiple accounts
+      this affected F::B::W->account_numbers(), account_names(), and
+      account_balances()
+    
+    [DOCUMENTATION]
+    * fixed some typos ("--file" in perldocs for wachovia.pl was supposed to
+      be "--keyfile")
+    
+    [THANKS]
+    Eric Braxton
+
+0.04  Sat May  14  14:54:32 2005
+
+    [ENHANCEMENTS]
+    * made wachovia.pl and wachovia_summary.pl accept variations of their
+      arguments so you can use --user --userid --user-id --user_id --login, and
+      it's all the same.
+    * wachovia.pl script: usefulness of --details argument has been augmented.
+      Now you can specify how many transactions you want displayed, including:
+      --details=all
+    
+    [FIXES]
+    * made the warning about form name go away.  This started popping up when 
+      wachovia 
+      changed their website.
+    * removed VERSIONS from all the other module files, the only one that really 
+      matters is Wachovia.pm, and remembering to change the others was a PITA.
+      
+    [DOCUMENTATION]
+    * changed wachovia.pl docs to reflect change in --details argument
+    
+    [THANKS]
+    Clint and Jason for hitting me with the emails.
+    
+0.05  Sun Jan  22  08:55:09 2006
+    [FIXES]
+    * change WWW.pm to handle slight modification to Wachovia's login routine.
+      Note, this is untested with the CAN type of login.  If you have problems,
+      let me know.
+    
+    [THANKS]
+    Jason Marcell, again, for being my early alert system.
+    
+    [AND A BIG THANKS]
+    To Wachovia, who never returned my calls when I was trying to work WITH them
+    to improve the legitimacy of this module.  I really wanted to see if they
+    had a secure web services interface so the module wouldn't be dependent on 
+    the fragile screen scraping.  Oh well.  Just another bank satisfied with
+    mediocrity.

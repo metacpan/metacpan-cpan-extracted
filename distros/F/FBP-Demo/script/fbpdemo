@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use 5.008;
+use strict;
+use warnings;
+use FBP::Demo ();
+
+our $VERSION = '0.03';
+
+FBP::Demo->run;
+
+exit(0);

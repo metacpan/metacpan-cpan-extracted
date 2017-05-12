@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-Quote-Sberbank.t
+lib/Finance/Quote/Sberbank.pm
+META.yml                                 Module meta-data (added by MakeMaker)

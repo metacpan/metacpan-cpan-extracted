@@ -1,0 +1,39 @@
+---
+abstract: 'MAC Address validation'
+author:
+  - 'Ryo Okamoto <ryo@aquahill.net>'
+build_requires:
+  CGI: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FormValidator-Simple-Plugin-NetAddr-MAC
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  FormValidator::Simple::Plugin::NetAddr::MAC:
+    file: lib/FormValidator/Simple/Plugin/NetAddr/MAC.pm
+    version: '0.01'
+requires:
+  FormValidator::Simple: '0'
+  NetAddr::MAC: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://git@github.com/ryochin/p5-formvalidator-simple-plugin-netaddr-mac/issues
+  homepage: https://git@github.com/ryochin/p5-formvalidator-simple-plugin-netaddr-mac
+  repository: git://git@github.com/ryochin/p5-formvalidator-simple-plugin-netaddr-mac.git
+version: '0.01'

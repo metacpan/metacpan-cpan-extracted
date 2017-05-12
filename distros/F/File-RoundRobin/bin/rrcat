@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+=head1 DESCRIPTION
+
+This script simulates a small part of the linux C<cat> command.
+It's a small utility that helps reading / writing round-robin text files.
+
+=head1 SYNOPSIS
+
+To print the content of a file :
+
+    rrcat <filename>
+
+To write into a file :
+
+    rrcat <size> <filename>
+
+Size can be in the fallowing forms :
+
+=over 4 
+
+=item 1. number (bytes)
+
+=item 2. <number>Kb (kilobytes)
+
+=item 3. <number>Mb (megabytes)
+
+=item 4. <number>Gb (gigabytes)
+
+=back
+
+=head1 VERSION
+
+Version 0.04
+
+=cut
+our $VERSION = '0.04';
+
+
+use File::RoundRobin;
+
+
+if ( $ARGV[0] =~ /^(\d+(?:Kb?|Mb?|Gb?)?)$/ && defined $ARGV[1] ) {
+	my $rrfile = File::RoundRobin->new(path => $ARGV[1], size => $ARGV[0]);
+
+	while ( my $buffer = <STDIN> ) {
+		$rrfile->write($buffer);
+	}
+	
+	$rrfile->close();
+}
+elsif (-f $ARGV[0]) {
+	my $rrfile = File::RoundRobin->new(path => $ARGV[0], mode => 'read');
+	
+
+	while ( my $buffer = $rrfile->read(10000) ) {
+		print $buffer;
+	}
+	$rrfile->close();
+}
+else {
+	print <<EOF;
+Usage : 
+To print the content of a file :
+	$0 <filename> 
+
+To write into a file :
+	$0 <size> <filename>
+
+Size can be in the fallowing forms :
+	1. number (bytes)
+	2. <number>Kb (kilobytes)
+	3. <number>Mb (megabytes)
+	4. <number>Gb (gigabytes)
+	
+EOF
+}
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc File::RoundRobin
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-RoundRobin>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/File-RoundRobin>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/File-RoundRobin>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/File-RoundRobin/>
+
+=back
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Gligan Calin Horea.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut

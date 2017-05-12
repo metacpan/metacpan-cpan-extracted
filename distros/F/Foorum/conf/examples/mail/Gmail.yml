@@ -1,0 +1,13 @@
+---
+mailer: 'SMTP::TLS'
+mailer_args:
+  - Host
+  - 'smtp.gmail.com'
+  - Port
+  - 587
+  - User
+  - 'fayland@gmail.com'
+  - Password
+  - 'password'
+  - Hello
+  - 'fayland.org'

@@ -1,0 +1,4 @@
+- After Module::Install support CPAN::Meta 2.0, specify gpl_2 as the license.
+  Suggested by Paul Howarth <paul@city-fan.org>
+- After Module::Install support CPAN::Meta 2.0, add info for repository URL
+  and bug tracker. Suggested by Paul Howarth <paul@city-fan.org>

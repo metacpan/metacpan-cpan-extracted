@@ -1,0 +1,419 @@
+=head1 NAME 
+
+B<SmartTail.pm> Routines to smartly tail a file
+
+=head1 SYNOPSIS
+
+Special tail routines to tail a file, remember where you were, and
+pick up from there again if necessary.
+
+Called as:
+
+    use File::SmartTail;
+    $tail = new File::SmartTail(file1, file2, ...);
+    while ($line = $tail->Tail()) {
+        print $line;
+    }
+
+Or:
+
+    $tail = new File::SmartTail;
+    $tail->WatchFile(-file=>"file1",
+        -type=>"UNIX-REMOTE",
+        -host=>"lamachine",    
+        -user=>"bozo",
+        -rmtopts=>"-type UNIX -prefix appname",
+        -rmtenv=>"PERL5LIB=/lib/foo FOO=bar",
+        -date=>"parsed", -yrfmt=>4, -monthdir=>"../..",
+        -timeout=>999,
+        -request_timeout=>999,
+        -prefix=>appname,
+        -reset=>1);
+    while ($line = GetLine(-doitfn=>\&YourFn)) {
+        print $line;
+    }
+
+The format of the result is: 
+
+    hostname:filename:line-of-data 
+
+See WatchFile for detailed description of options.
+
+=head1 DESCRIPTION
+
+The File::SmartTail module provides functionality modeled on the UNIX tail
+command, but enhanced with a variety of options, and the capability to
+"remember" how far it has processed a file, between invocations. rtail.pl is
+not normally used directly, but is invoked by a File::SmartTail object when
+monitoring a file on a remote host. When monitoring files on a remote machine,
+rtail.pl must be in the path of the owner of the process, on the remote machine.
+Normally it is installed in /usr/local/bin. 
+
+=head1 AUTHOR
+
+DMJA, Inc <smarttail@dmja.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003-2015 DMJA, Inc, File::SmartTail comes with 
+ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to 
+redistribute it and/or modify it under the same terms as Perl itself.
+See the "The Artistic License" L<LICENSE> for more details.
+
+
+=cut
+
+=head2 new
+
+    $tail = new File::SmartTail($filename1, $filename2, ...)
+
+or
+
+    $tail = new File::SmartTail(-tietype=>$type, -statuskey=>$programname, -bindir=>$rtail_script_location, $filename1, $filename2, ...)
+
+B<i-tietype> can be any class that can be tied to a hash like NDBM_File DB_File
+SDBM_File.
+
+Default statuskey is name of invoking program.
+
+
+=cut
+
+=head2 Tail
+
+    $tail->Tail()
+
+or 
+
+    $tail->Tail( @files ) (doesn't seem to be supported)
+
+Format of the returned line is:
+
+    $file1: line of file here.
+
+As a degenerate case, $tail->Tail( $file ) will simply return the next
+line without a need to manage or massage.
+
+
+=cut
+
+=head2 Watchfile
+
+    WatchFile(-option1=>"value1", -option2=>"value2", ...)
+
+=over 4
+
+B<Required Options:>
+
+=over 4
+
+=item -file=>"filename"
+  
+The name of a file to watch.
+
+=back
+
+B<Other Options:>
+
+=over 4
+
+=item -type=>"UNIX" (default, i.e. if omitted) or "UNIX-REMOTE" 
+
+=item -rmtsh=>"ssh" (default)  valid values are "rsh" or "ssh"
+
+=item -host=>"host"
+
+Required for type "UNIX-REMOTE" unless file name is of the form host:filename (similar to rcp). 
+
+=item -rmtopts=>"-opt1 val1 -opt2 val2"
+
+Any flags that should be passed to the remote process. Since these become command-line args, they should have the form "-opt1 val1 -opt2 val2 ...". 
+
+=item -rmtenv=>"ENV1=val1 ENV1=val2"
+
+Any environment variables that should be set on the remote before runnign the
+remote process.
+
+=item -date=>'parsed' or 'gz'
+    
+indicates special date-related file
+processing. B<parsed> is used with files having dates in their
+name. B<gz> is used for files which are archived so that a new
+open call is needed to continue monitoring. Other archive
+file extensions can be used in theory, but the file name is
+assumed to be of the format name.date.extension
+               
+=item -yrfmt=>2 or 4
+
+For files having dates in their name, how
+many digits are used to represent the year. The default
+is 2, but a value of 4 may be set with this option.
+    
+=item -monthdir=>$relative_path 
+
+for files having dates in their
+name, to indicate, where applicable, the relative position
+in the path of the month's directory. E.g. ".."
+    
+=item -timeout=>$secs 
+
+Used for an application-specific timeout. If the file does not grow during
+the specified interval, a message of the form
+host1:file1:_timeout_999999999 is returned, where 999999999 is
+secs-in-epoch (UNIX timestamp). 
+   
+=item -request_timeout=>$secs 
+
+Used for an application-specific timeout. If no data is available within the
+specified interval from the time the request was made (GetLine() was called), a
+message of the form host1:file1:_timeout_999999999 is returned, where 999999999
+is secs-in-epoch (UNIX timestamp). 
+   
+=back
+
+B<Internal:>
+
+=over 4
+
+=item -heartbeat=>"send" 
+
+Set on the child process for a "UNIX-REMOTE" file. Similarly, flags will
+be set in the parent process to listen for the heartbeat.
+
+When processing a UNIX-REMOTE file, the child process is set to send an
+internal heartbeat message, and the local process is set to receive them.
+The heartbeat messages are of the form host1:file1:_heartbeat_999999999
+where 999999999 is secs-in-epoch (UNIX timestamp). 
+
+=item -current 
+
+Holds the current file name. This is used when
+files with date-suffixed names roll, since the hash entry is
+still keyed by the original file name.
+               
+=item -prefix 
+
+a prefix for the filestatus file, which is used to
+keep track of the seek pointer between invocations. The default
+is the path of the calling application.
+    
+=item -reset=>1 
+
+will ignore the status file that normally keeps
+track of Tail's progress through the file, including between
+invocations
+
+=item -clear=>1 
+
+like -reset, but will remove the file.
+
+=back
+
+=back
+
+
+=cut
+
+=head2 GetLine
+
+Format of the returned line is:
+
+    $hoste1:$file1: line of file here.
+
+If a remote file is being followed, heartbeat messages of the form
+$host1:$file1:_heartbeat_999999999, where 999999999 is secs-in-epoch
+are returned.
+
+If a set of file opts includes a -timeout, and there is no
+activity on the file within the timeout interval, messages of the form
+$host1:file1:_timeout_999999999 
+are returned.
+
+If a set of file opts includes a -request_timeout, and there is no data to be
+returned within the timeout interval from the time that GetLine was called,
+a message of the form $host1:file1:_timeout_999999999 is returned.
+
+
+=cut
+
+=head2 Heartbeat
+
+
+=cut
+
+=head2 ResetHeartBeats
+
+Use e.g. if monitor has been paused. Start checking for heartfailure
+again now.
+
+
+=cut
+
+=head2 CheckBeat
+
+
+=cut
+
+=head2 CheckTimeout
+
+
+=cut
+
+=head2 CheckRequestTimeout
+
+
+=cut
+
+=head2 Kill
+
+
+=cut
+
+=head2 ArchFile
+
+
+=cut
+
+=head2 RollFile
+
+
+=cut
+
+=head2 Size
+
+
+=cut
+
+=head2 Detecting Exception Notification
+
+The following functions may be used to determine if a returned line
+is a notification of exception conditions.
+
+Called as: 
+
+    $tail = new File::SmartTail;
+    $line = $tail->GetLine();
+    $tail->WatchFile(%options);
+    ($host, $file, $rec) = split (/:/, $line, 3);
+    if ($tail->IsFn($rec)) { # do what you like };
+
+where IsFn represents one of the Is-prefixed functions below.
+All of the IsFns return 1 if the named condition is present, else undef.
+
+=head2 IsTimeout
+
+An application timeout has been exceeded. 
+
+
+=cut
+
+=head2 IsRequestTimeout
+
+An application timeout has been exceeded. 
+
+
+=cut
+
+=head2 IsRollover
+
+A -date=>'parsed' file has rolled to the next day. In array context, 
+returns (newfilename, 1) if true
+
+!Note: returns 1 in scalar context, and an array with elt 0 containing
+the new filename in array context.
+
+
+=cut
+
+=head2 IsArchived
+
+A -date=>'gz' file has been gzip'd (archived). 
+
+
+=cut
+
+=head2 IsHeartFailure
+
+The internal heartbeat has not been detected for longer than the 
+prescribed interval (currently 120 seconds). 
+
+
+=cut
+
+=head2 IsZipd
+
+The file options include -date=>'gz' 
+
+
+=cut
+
+=head1 Examples
+
+=head2 Regular local file 
+
+    use File::SmartTail;
+
+    $file = "/tmp/foo"
+    $tail = new File::SmartTail($file);
+
+    while($line = $tail->Tail) {
+        print $line;
+    }
+
+or 
+
+    use File::SmartTail;
+
+    $file = "/tmp/foo"
+    $tail = new File::SmartTail();
+    $tail->WatchFile(-file=>$file);
+
+    while($line = $tail->GetLine) {
+        print $line;
+    }
+
+=head2 Regular remote file on two hosts 
+
+    use File::SmartTail;
+
+    $file = "/tmp/foo";
+
+    $tail = new File::SmartTail;
+    $tail->WatchFile(-file=>$file, -type=>"UNIX-REMOTE", -host=>"guinness", -rmtopts
+            =>"-type UNIX");
+    $tail->WatchFile(-file=>$file, -type=>"UNIX-REMOTE", -host=>"corona", -rmtopts=>
+            "-type UNIX");
+
+    while($line = $tail->GetLine()) {
+        print $line;
+    }
+
+=head2 Local file, with timeout 
+
+    use File::SmartTail;
+
+    $file = "/tmp/foo";
+
+    $tail = new File::SmartTail;
+    $tail->WatchFile(-file=>$file, -type=>"UNIX", -timeout=>70);
+
+    while($line = $tail->GetLine()) {
+        print $line;
+    }
+
+=head2 Remote file named by date, 4-digit year, having month directory 
+
+    use File::SmartTail;
+
+    $file = "guinness:/tmp/foo20011114";
+
+    $tail = new File::SmartTail;
+    $tail->WatchFile(-file=>$file, -type=>"UNIX-REMOTE", -rmtopts=>'-date parsed -yrfmt 4 -monthdir ".." -type UNIX');
+
+    while($line = $tail->GetLine()) {
+            print $line;
+
+
+
+=cut
+

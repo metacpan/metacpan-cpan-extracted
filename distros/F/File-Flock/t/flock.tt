@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+
+use Carp;
+use FileHandle;
+use File::Slurp;
+use strict;
+use warnings;
+use Time::HiRes;
+
+our $dir;  # set in wrap.tm
+die unless $dir;
+
+my $counter = "$dir/counter";
+my $lock    = "$dir/lock";
+my $lock2   = "$dir/lock2";
+my $lock3   = "$dir/lock3";
+my $lock4   = "$dir/lock4";
+my $lock5   = "$dir/lock5";
+my $lock6   = "$dir/lock6";
+my $lock7   = "$dir/lock7";
+
+STDOUT->autoflush(1);
+
+my $children = 6;
+my $count = 120;
+die unless $count % 2 == 0;
+die unless $count % 3 == 0;
+print "1..".($count*1.5+$children*2+7)."\n";
+
+my %locks;
+my $acquiring = '';
+my $releasing = '';
+
+my $parent;
+my $child = 0;
+my $i;
+for $i (1..$children) {
+	my $p = fork();
+	croak unless defined $p;
+	$parent = $p or $child = $i;
+	last unless $parent;
+}
+
+my $pdesc = "process $$, " . ($parent ? "the parent" : "child # $child");
+print "# $pdesc\n";
+
+my $lastline;
+my $lastdebug = 0;
+
+$SIG{WINCH} = sub {
+	if (time - $lastdebug > .5) {
+		$lastdebug = time;
+		debugprint();
+	}
+};
+
+sub debugprint {
+	print STDERR "# $pdesc at $lastline"
+		. (scalar(keys %locks) ? " holding locks on " . join(' ', map { "$_$locks{$_}" } sort keys %locks) : '')
+		. ($acquiring ? " trying to acquire lock on $acquiring" : "")
+		. ($releasing ? " trying to release lock on $releasing" : "")
+		. "\n";
+}
+
+STDOUT->autoflush(1);
+
+sub dolock;
+sub dounlock;
+
+dp();
+
+if ($parent) {
+	print "ok 1\n";
+	&write_file($counter, "2");
+	&write_file($lock, "");
+	&write_file($lock4, "");
+	dolock($lock4);
+} else {
+	my $e = 1;
+	while (! -e $lock) {
+		# spin
+		print "# $pdesc spinning\n" if $e %2000 == 0;
+		die if $e++ > 1000000;
+	}
+	dp();
+	dolock($lock3, 'shared');
+}
+
+dp();
+dolock($lock2, 'shared');
+dp();
+
+my $c;
+my $ee;
+while (($c = &read_file($counter)) < $count) {
+	die if $ee++ > 10000000;
+	if ($c < $count*.25 || $c > $count*.75) {
+		dolock($lock);
+	} else {
+		dolock($lock, 0, 1) || next;
+	}
+	$c = &read_file($counter);
+
+	# make sure each child increments it at least once.
+	if ($c < $children+2 && $c != $child+2) {
+		dounlock($lock);
+		next;
+	}
+
+	if ($c < $count) {
+		print "ok $c\n";
+		$c++;
+		&overwrite_file($counter, "$c");
+	}
+
+	# one of the children will exit (and thus need to clean up)
+	if ($c == $count/3) {
+		exit(0) if fork() == 0;
+	}
+
+	# deal with a missing lock file
+	if ($c == $count/2) {
+		unlink($lock)
+			or croak "unlink $lock: $!";
+	}
+
+	# make sure the lock file doesn't get deleted
+	if ($c == int($count*.9)) {
+		&overwrite_file($lock, "keepme");
+	}
+
+	dounlock($lock);
+}
+
+dp();
+dolock($lock);
+$c = &read_file($counter);
+print "ok $c\n";
+$c++;
+&overwrite_file($counter, "$c");
+dounlock($lock);
+dp();
+
+if ($c == $count+$children+1) {
+	print "ok $c\n";
+	$c++;
+	if (&read_file($lock) eq 'keepme') 
+		{print "ok $c\n";} else {print "not ok $c\n"};
+	unlink($lock);
+	$c++;
+}
+
+dounlock($lock2);
+
+if ($parent) {
+	dolock($lock2);
+	dounlock($lock2);
+
+	$c = $count+$children+3;
+
+	&write_file($counter, $c);
+	dounlock($lock4);
+}
+
+
+# okay, now that that's all done, lets try some locks using
+# the object interface...
+
+my $start = $c;
+
+for(;;) {
+	my $l = dolock2($lock4);
+
+	$c = &read_file($counter);
+
+	last if $c > $count/2+$start;
+
+	print "ok $c\n";
+	$c++;
+	&overwrite_file($counter, "$c");
+}
+
+delete $locks{$lock4}; # unlocked by going out of scope
+
+#
+# now let's make sure nonblocking works
+#
+if ($parent) {
+	my $e;
+	dolock $lock6;
+	for(;;) {
+		dp();
+		dolock($lock7, undef, 'nonblocking')
+			or last;
+		dp();
+		dounlock($lock7);
+		dp();
+		die if $e++ > 1000;
+		sleep(1);
+	}
+	dp();
+	dounlock $lock6;
+	dp();
+	dolock $counter;
+	dp();
+	$c = &read_file($counter);
+	print "ok $c\n";
+	$c++;
+	&overwrite_file($counter, "$c");
+	dp();
+	dounlock $counter;
+	dp();
+} elsif ($child == 1) {
+	dp();
+	my $e;
+	for(;;) {
+		dolock($lock6, undef, 'nonblocking')
+			or last;
+		dounlock($lock6);
+		die if $e++ > 1000;
+		sleep(1);
+	}
+	dolock $lock7;
+	dolock $lock6;
+	dolock $counter;
+	$c = &read_file($counter);
+	print "ok $c\n";
+	$c++;
+	&overwrite_file($counter, "$c");
+	dounlock $counter;
+	dounlock $lock7;
+	dounlock $lock6;
+} 
+
+dp();
+
+#
+# Shut everything down
+#
+if ($parent) {
+	dp();
+	my $l = new File::Flock $lock3;
+	$c = &read_file($counter);
+	if ($l) { print "ok $c\n" } else {print "not ok $c\n"}
+	$c++;
+	unlink($counter);
+	unlink($lock4);
+	unlink($lock);
+	dolock($lock5);
+	dounlock($lock5);
+	if (-e $lock5) { print "not ok $c\n" } else {print "ok $c\n"}
+	$c++;
+	my $x = '';
+	for (1..$children) {
+		dp();
+		wait();
+		dp();
+		my $status = $? >> 8;
+		if ($status) { $x .= "not ok $c\n";} else {$x .= "ok $c\n"}
+		$c++;
+	}
+	$releasing = $lock3;
+	$l->unlock();
+	undef $releasing;
+	delete $locks{$lock3};
+	print $x;
+	dp();
+} else {
+	dp();
+	dounlock($lock3);
+}
+dp();
+exit(0);
+
+sub dolock {
+	$lastline = (caller())[2];
+	my $s = "";
+	$s .= ":" if ($_[1] || $_[2]);
+	$s .= ":Shared" if $_[1];
+	$s .= ":Nonblocking" if $_[2];
+	my $r = lock(@_);
+	$locks{$_[0]} = $s if $r;
+	undef $acquiring;
+	return $r;
+}
+
+sub dolock2 {
+	$lastline = (caller())[2];
+	my $s = "";
+	$s .= ":" if ($_[1] || $_[2]);
+	$s .= ":Shared" if $_[1];
+	$s .= ":Nonblocking" if $_[2];
+	$acquiring = "$_[0]$s";
+	my $r = File::Flock->new(@_);
+	$locks{$_[0]} = $s if $r;
+	undef $acquiring;
+	return $r;
+}
+
+sub dounlock {
+	$lastline = (caller())[2];
+	$releasing = "$_[0]$locks{$_[0]}";
+	delete $locks{$_[0]};
+	unlock(@_);
+	undef $releasing;
+}
+
+sub dp
+{
+	$lastline = (caller())[2];
+	# debugprint();
+}
+
+1;

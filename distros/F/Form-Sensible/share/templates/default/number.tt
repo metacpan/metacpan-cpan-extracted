@@ -1,0 +1,4 @@
+<input type="text" id="[% css_prefix _ form.name %]_[% field_name %]_input" class="[% css_prefix %]input [% css_prefix _ field_type %]_input [% css_prefix _ field_name %]_input [% IF !field.editable %] noteditable" disabled="disabled[% END %]" name="[% field_name %]" value="[% field.value %]" />
+[%- IF !field.editable && field.value.defined %]
+[% INCLUDE hidden.tt %]
+[% END -%]

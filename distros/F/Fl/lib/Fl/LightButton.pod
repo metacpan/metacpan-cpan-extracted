@@ -1,0 +1,91 @@
+class 'Fl::LightButton';
+isa 'Fl::Button';
+include 'FL/Fl_Light_Button.H';
+widget_type 'Fl_Light_Button';
+
+=pod
+
+=head1 NAME
+
+Fl::LightButton - Push Button with a Light
+
+=head1 Synopsis
+
+    use Fl qw[:button];
+    my $button = Fl::LightButton->new(0, 0, 100, 200, 'Hello, World!');
+    $button->callback(sub {print q[It's dat boi]} );
+
+=head1 Description
+
+The Fl::LightButton class represents a button that displays the "ON" state by
+turning on a light rather than drawing pushed in.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/Fl_Light_Button.png" /></center>
+
+The shape of the 'light' is initially set to FL_DOWN_BOX. The color of the
+light when on is controlled by C<selection_color()>, which defaults to
+FL_YELLOW.
+
+Buttons generate callbacks when they are clicked by the user. You control
+exactly when and how by changing the values for C<type()> and C<when()>.
+
+=head1 Methods
+
+Fl::LightButton inherits Fl::Button and Fl::Widget. On top of that, it exposes
+the following methods...
+
+=head2 new(...)
+
+    my $button_a = Fl::LightButton->new(0, 0, 250, 500, 'Important Stuff');
+    my $button_b = Fl::LightButton->new(0, 0, 250, 500);
+
+The constructor creates a new light button using the given position, size, and
+label.
+
+The default box type is FL_NO_BOX, which draws the label without a box to the
+right of the light.
+
+The C<selection_color()> sets the color of the  light. The default is
+FL_YELLOW.
+
+You can use C<down_box()> to chane the box type of the checkmark. Default is
+FL_DOWN_BOX.
+
+The destructor removes the button.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Light_Button *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,19 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test1e.nml -- Sample namelist containing all sorts of fortran strings
+!                with quotes
+!  $Id: test1e.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $
+!
+&nlist                                 ! Name of namelist 
+  string1a = 'A simple string',
+  string1b = 'A "doubly-quoted" string',
+  string1c = 'A ''singly-quoted'' string',
+  string1d = 'A "very quoted" ''string''',
+  string1e = '''A "completely quoted" string''',
+
+  string2a = "A simple string",
+  string2b = "A ""doubly-quoted"" string",
+  string2c = "A 'singly-quoted' string",
+  string2d = "A 'very quoted' ""string""",
+  string2e = """A 'completely quoted' string""",
+/

@@ -1,0 +1,77 @@
+{
+   "abstract" : "Handler class to use with FCGI::EV",
+   "author" : [
+      "Alex Efros <powerman@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FCGI-EV-Std",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Distribution" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Stateless" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "FCGI::EV::Std" : {
+         "file" : "lib/FCGI/EV/Std.pm",
+         "version" : "v2.0.0"
+      },
+      "FCGI::EV::Std::Nonblock" : {
+         "file" : "lib/FCGI/EV/Std/Nonblock.pm",
+         "version" : "v2.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/powerman/perl-FCGI-EV-Std/issues"
+      },
+      "homepage" : "https://github.com/powerman/perl-FCGI-EV-Std",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/powerman/perl-FCGI-EV-Std.git",
+         "web" : "https://github.com/powerman/perl-FCGI-EV-Std"
+      }
+   },
+   "version" : "v2.0.0"
+}
+

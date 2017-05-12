@@ -1,0 +1,37 @@
+---
+abstract: 'yet another flock package'
+author:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+build_requires:
+  File::Slurp: '9999.14'
+  Path::Class: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+keywords:
+  - flock
+  - pid
+  - lock
+  - file
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Flock-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - README.pod
+requires:
+  Test::More: '0.94'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/trinitum/perl-File-Flock-Tiny/issues
+  homepage: https://github.com/trinitum/perl-File-Flock-Tiny
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trinitum/perl-File-Flock-Tiny
+version: '0.14'

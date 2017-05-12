@@ -1,0 +1,23 @@
+v0.0.4  Tue Jun  1 13:40:30 PDT 2010
+    Bugs
+    * Work around what looks like a buggy fgets() in Linux
+      that doesn't like reading nothing.
+
+
+v0.0.3  Fri May 28 15:26:48 PDT 2010
+    Bugs
+    * Make it work with scalar ref filehandles
+    * Make it work with tied filehandles that don't implement FILENO
+
+
+v0.0.2  Fri May 28 14:58:29 PDT 2010
+    Bugs
+    * Make sure the Perl version of fgets() returns an empty string,
+      not undef, if a limit of 0 is given.
+    Doc Fixes
+    * Listed the wrong RT link
+
+
+v0.0.1  Fri May 28 14:38:13 PDT 2010
+    First version thrown together after a Stack Overflow discussion
+    about doing fgets() in Perl.

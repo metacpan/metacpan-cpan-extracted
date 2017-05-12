@@ -1,0 +1,74 @@
+Revision history for Food::ECodes
+
+0.17  Thu Apr 13 18:45:00 2017
+      - Added $AUTHORITY to each packages.
+      - Enabled strict/warnings checks in the t/00-load.t script.
+      - Added load check for the package Food::ECodes::Additive.
+
+0.16  Wed Sep 07 09:15:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.15  Sat Aug 13 15:55:00 2016
+      - Updated Copyright year information.
+      - Tidied up github repository url.
+      - Tidied up Makefile.PL script.
+
+0.14  Tue Dec 15 10:40:00 2015
+      - Added key 'provides' to the Makefile.PL script.
+
+0.13  Mon Aug 03 12:00:00 2015
+      - Added section "DESCRIPTION" and "SYNOPSIS" to the pod document.
+
+0.12  Tue Jun 02 11:40:00 2015
+      - Added LICENSE file.
+
+0.11  Sat Jan 17 00:40:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.10  Sun Sep 21 02:21:34 2014
+      - Added method purpose() to the Food::ECodes::Additive package.
+
+0.09  Sun Sep 21 01:51:05 2014
+      - Re-structured the code using 'Moo'.
+      - Added placeholder for 'Additive'.
+      - Updated the interface of Food::ECodes completely.
+      - Stored the ecodes definition in XML file, added to the distribution.
+      - Removed dependency on 'Readonly' and 'Carp'.
+
+0.08  Tue Aug 09 15:44:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.07  Wed May 25 10:21:00 2011
+      - Added E441 to the list of Non-Veg ECode [https://rt.cpan.org/Ticket/Display.html?id=68455].
+
+0.06  Tue Apr 26 10:07:00 2011
+      - Added method is_vegetarian() as suggested by Sawyer.
+      - Added test case for method is_vegetarian().
+
+0.05  Thu Apr 21 18:36:23 2011
+      - Renamed title "SYNOPSIS" to "DESCRIPTION".
+      - Minor cosmetics changes.
+
+0.04  Mon Apr 11 13:49:55 2011
+      - Fixed the typo in the pod for method get_status().
+      - Fixed the typo in the pod for method get_name().
+      - Fixed the typo in the pod for method get_purpose().
+      - Fixed the syntax error in the example pod for method is_valid().
+      - Fixed the syntax error in the example pod for method is_eu_approved().
+      - Fixed the syntax error in the example pod for method is_us_approved().
+
+0.03  Mon Apr 11 12:33:18 2011
+      - Added remaining ECodes from 1000 upto 1600.
+      - Added method get_status().
+      - Updated unit test 01-unit-test.t for new method get_status().
+
+0.02  Fri Apr 08 16:42:22 2011
+      - Fixed the typo in the pod for method is_valid().
+      - Fixed the typo in the pod for method is_eu_approved().
+      - Fixed the typo in the pod for method is_us_approved().
+
+0.01  Fri Apr 08 11:00:00 2011
+      - First version released.

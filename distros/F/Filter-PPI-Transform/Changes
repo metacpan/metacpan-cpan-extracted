@@ -1,0 +1,7 @@
+Revision history for Filter-PPI-Transform
+
+v0.0.2    2012-10-20 18:55:05 Asia/Tokyo
+    * Add prereqs: Filter::Simple and perl.
+
+v0.0.1    2012-10-17 02:00:02 Asia/Tokyo
+    * Initial release.

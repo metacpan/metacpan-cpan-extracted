@@ -1,0 +1,8 @@
+Revision history for Perl extension Filesys::Df
+
+0.80  Thu May 18 23:00:11 2006
+	- Packaged Filesys::Statvfs in its own package since
+ 	  it is no longer packaged with Filesys::Df.
+
+0.82  Sat Jun 24 23:47:11 2006
+	- Updated documentation. No code changes.

@@ -1,0 +1,46 @@
+---
+abstract: 'An extension of the File::stat module, provides additional methods.'
+author:
+  - 'Hayo Baan <info@hayobaan.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.96'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-stat-Extra
+no_index:
+  directory:
+    - corpus
+provides:
+  File::stat::Extra:
+    file: lib/File/stat/Extra.pm
+    version: '0.008'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  File::stat: '0'
+  Symbol: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+  warnings::register: '0'
+resources:
+  bugtracker: https://github.com/HayoBaan/File-stat-Extra/issues
+  homepage: http://metacpan.org/release/File-stat-Extra/
+  repository: git://github.com/HayoBaan/File-stat-Extra.git
+version: '0.008'
+x_serialization_backend: 'YAML::Tiny version 1.69'

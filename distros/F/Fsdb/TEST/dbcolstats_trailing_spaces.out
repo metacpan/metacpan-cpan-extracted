@@ -1,0 +1,3 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+88.6 13.031 14.707 16.177 72.423 104.78 0.95 443 39929 70 100 5
+#   | dbcolstats grade

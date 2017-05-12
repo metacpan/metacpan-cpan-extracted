@@ -1,0 +1,52 @@
+
+Version 0.5:
+
+2007-05-11  wd  <Wolfgang.Dobler@ucalgary.ca>
+
+	* Renamed to Fortran::F90Namelist and Fortran::F90Namelist::Group
+
+	* Support for lvalues of type  `array(2,3,5)=...'
+
+	* Support for old-style (F77) markers $name ... $end
+
+	* Using Test::Pod::Snippets to test POD code snippets
+
+	* Added flatten(), first(), nth(), pop(), delete(), insert()
+	  methods for Namelist::Group objects
+
+	* Added broken => 1 option for some namelists produced by ifc v. 7
+	  code
+
+	* Supports Pathscale compiler namelists (quite compact format)
+
+Version 0.3:
+	
+2005-05-19  wd  <Wolfgang.Dobler@ucalgary.ca>
+
+	* Now supports double precision complex numbers
+
+Version 0.2:
+
+2005-02-05  wd  <Wolfgang.Dobler@ucalgary.ca>
+
+	* Object format now accomodates only one namelist (not completely
+	  documented yet); to parse several namelists, there will be a
+	  merge() method
+
+	* Implemented two output formats `f90' and `idl', which seem to
+	  work with logicals, floats, complex numbers and strings
+
+Version 0.1:
+
+2004-12-05  wd  <Wolfgang.Dobler@ucalgary.ca>
+
+	* First version (0.1)
+
+
+;; For Emacs:
+;; Local Variables:
+;; mode: change-log
+;; change-log-default-name: "Changes"
+;; add-log-full-name: "wd"
+;; add-log-mailing-address: "Wolfgang.Dobler@ucalgary.ca"
+;; End:

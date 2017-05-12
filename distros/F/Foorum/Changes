@@ -1,0 +1,41 @@
+This file documents the revision history for Foorum.
+
+1.1.0   2009.09.27
+    - use parent instead of use base
+    - Catalyst::Authentication::Store::FromSub instead of FromSub::Hash
+
+1.0.9   2009.06.20
+    - require Catmoose Model/Plugins
+
+1.0.8   2009.04.22
+    - Catmoose
+
+1.0.7   2009.03.21
+    - remove forum style setting
+    - more friendly time format: xx minutes ago
+    - server timezone diff settings
+    - For My Son's 1st birthday!
+
+1.0.6   2009.03.21
+    - use google.load instead of a local copy
+    - move code to http://github.com/fayland/foorum/tree
+    - Admin Topic, Batch Ban/Unban/Delete
+    - use jquery.ui 1.7.0
+
+1.0.5   2009.02.21
+    - fix RSS+XML first newline for Firefox
+
+1.0.4   2009.02.10
+    - use ConfigLoader instead of Config::YAML::XS
+
+1.0.3   2009.02.07
+    - remove 'catalyst;' in Makefile.PL to fix CPAN dist
+
+1.0.2   2009.02.07
+    - try to fix broken CPAN dist
+
+1.0.1	2008.11.19
+    - requires 'Pod::Xhtml';
+    - replace 'MooseX::TheSchwartz' to 'TheSchwartz::Moosified'
+
+More Changes >> 'Changes2'. Thanks.

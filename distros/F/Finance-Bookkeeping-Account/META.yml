@@ -1,0 +1,34 @@
+---
+abstract: 'debit/credit account balances correctly'
+author:
+  - 'Jesse Shy <jshy@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.018
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Bookkeeping-Account
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  MooseX::Role::Parameterized: 1.00
+  Scalar::Util: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/jshy/Finance-Bookkeeping-Account/issues
+  homepage: https://github.com/jshy/Finance-Bookkeeping-Account
+  repository: https://github.com/jshy/Finance-Bookkeeping-Account.git
+version: 0.02
+x_contributors:
+  - 'jshy <finn.cool@yahoo.com>'

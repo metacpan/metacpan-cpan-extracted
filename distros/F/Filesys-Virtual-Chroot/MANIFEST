@@ -1,0 +1,12 @@
+ChangeLog               	Change log 
+README				A readme file
+MANIFEST                	This file
+Makefile.PL             	Makefile maker
+example.pl              	A simple example of how to use Filesys::Virtual::Chroot
+lib/Filesys/Virtual/Chroot.pm	The virtual chroot module
+LICENSE				This modules LICENSE policy
+t/00basic.t             	A simple test
+t/01object.t			More simple tests
+t/02vchdir.t			More tests
+META.yml                	Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

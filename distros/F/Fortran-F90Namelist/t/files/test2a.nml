@@ -1,0 +1,17 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test2a.nml -- Arrays of different data types
+!
+&init_pars
+  strarr = 'Once', 'upon', 'a   ', 'midnight', 'dreary' ! should be
+                                                        ! fixed-width for
+                                                        ! Fortran, but
+                                                        ! F90Namelist.pm
+                                                        ! shouldn't care
+  boolarr =  T ,T ,  F,             ! two thruths + 1 lie
+  intarr = 2, 3, 5, 7, 11, 13, 17   ! guess who's next
+  realarr = -.5, -0.1, 6., 1        ! just arbitrary numbers
+  dblarr = -.5D0, -1D-1, 60D-1, 1   ! same numbers
+  complexarr = (0.,1.), (0.707,0.707), (1., 0), (-0.707, 0.7070)
+  dcomplexarr = (0.D0,1.D0), (7.07D-1,7.07D-1),(1.D0, 0D0),(-0.707D0, 0.7070D0)
+/

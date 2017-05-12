@@ -1,0 +1,10 @@
+---
+remove_db_old_data:
+  # visit: default as 2592000 = 30days
+  visit: 2592000
+  # log_path: default as 30days
+  log_path: 30
+  # log_error: default as 30days
+  log_error: 30
+  # banned_ip: default as 604800 = 7days = 7 *24 * 60 * 60
+  banned_ip: 604800

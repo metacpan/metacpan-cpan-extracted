@@ -1,0 +1,34 @@
+File/VMSVersions version 0.1
+============================
+
+The File::VMSVersions module was developed for maintaining automatic
+versioning of files in a directory. When you are using the module's routines for
+opening files, it will keep a configurable amount of old versions. The versions
+will be identified by a number that is added at the end of the filename after a
+semicolon (i. e. 'myfile.dat;7').
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these standard modules and libraries:
+
+IO::Handle
+File::Basename
+File::Spec
+Carp
+Fcntl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Thomas Kratz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,44 @@
+{
+   "abstract" : "InteractiveBrokers API C++ wrapper and connector",
+   "author" : [
+      "Jason McManus <infidel AT cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-InteractiveBrokers-SWIG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::InteractiveBrokers" : "0",
+            "Finance::InteractiveBrokers::API" : "0.02_03"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Finance::InteractiveBrokers::API" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Finance::InteractiveBrokers::API" : "0.04",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.13"
+}

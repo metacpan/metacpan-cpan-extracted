@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/File/PathInfo/Ext.pm
+lib/File/PathInfo/Ext.pod
+t/0.t
+t/1.t
+t/2_move.t
+t/3.t
+t/4_resolve_arg_to.t
+t/5_copy.t
+t/99_cleanup.t
+t/public_html/.hidden_file.txt
+'t/public_html/Test Me Please.txt'
+t/public_html/demo/civil.txt
+t/public_html/demo/hellokitty.gif
+t/public_html/house.txt
+t/public_html/oake.jpg
+t/public_html/seven.pdf
+META.yml                                 Module meta-data (added by MakeMaker)

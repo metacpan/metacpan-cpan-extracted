@@ -1,0 +1,120 @@
+NAME
+    Filesys::Virtual::Plain - A Plain virtual filesystem
+
+SYNOPSIS
+            use Filesys::Virtual::Plain;
+
+            my $fs = Filesys::Virtual::Plain->new();
+
+            $fs->login('xantus', 'supersekret');
+
+            print foreach ($fs->list('/'));
+
+DESCRIPTION
+    This module is used by other modules to provide a pluggable filesystem.
+
+CONSTRUCTOR
+  new()
+    You can pass the initial cwd, root_path, and home_path as a hash.
+
+METHODS
+  login($username, $password, $become)
+    Logs in a user. Returns 0 on failure. If $username is 'anonymous' then
+    it will try to login as 'ftp' with no password. If $become is defined
+    then it will try to change ownership of the process to the uid/gid of
+    the logged in user. BEWARE of the consequences of using $become. login()
+    also sets the uid, gid, home, gids, home_path, and chdir to the users'.
+
+  cwd
+    Gets or sets the current directory, assumes / if blank. This is used in
+    conjunction with the root_path for file operations. No actual change
+    directory takes place.
+
+  root_path($path)
+    Get or set the root path. All file paths are off this and cwd For
+    example:
+
+            $self->root_path('/home/ftp');
+            $self->cwd('/test');
+            $self->size('testfile.txt');
+
+    The size command would get the size for file /home/ftp/test/testfile.txt
+    not /test/testfile.txt
+
+  chmod($mode,$file)
+    chmod's a file.
+
+  modtime($file)
+    Gets the modification time of a file in YYYYMMDDHHMMSS format.
+
+  size($file)
+    Gets the size of a file in bytes.
+
+  delete($file)
+    Deletes a file, returns 1 or 0 on success or failure.
+
+  chdir($dir)
+    Changes the cwd to a new path from root_path. Returns undef on failure
+    or the new path on success.
+
+  mkdir($dir, $mode)
+    Creats a directory with $mode (defaults to 0755) and chown()'s the
+    directory with the uid and gid. The return value is from mkdir().
+
+  rmdir($dir)
+    Deletes a directory or file if -d test fails. Returns 1 on success or 0
+    on failure.
+
+  list($dir)
+    Returns an array of the files in a directory.
+
+  list_details($dir)
+    Returns an array of the files in ls format.
+
+  stat($file)
+    Does a normal stat() on a file or directory
+
+  test($test,$file)
+    Perform a perl type test on a file and returns the results.
+
+    For example to perform a -d on a directory.
+
+            $self->test('d','/testdir');
+
+    See filetests in perlfunc (commandline: perldoc perlfunc)
+
+  open_read($file,[params])
+    Opens a file with IO::File. Params are passed to open() of IO::File. It
+    returns the file handle on success or undef on failure. This could be
+    technically be used for any sort of open operation. See IO::File's open
+    method.
+
+  close_read($fh)
+    Performs a $fh->close()
+
+  open_write($fh, $append)
+    Performs an $fh->open(">$file") or $fh->open(">>$file") if $append is
+    defined. Returns the filehandle on success or undef on failure.
+
+  close_write($fh)
+    Performs a $fh->close()
+
+  seek($fh, $pos, $wence)
+    Performs a $fh->seek($pos, $wence). See IO::Seekable.
+
+  utime($atime, $mtime, @files)
+    Performs a utime() on the file(s). It changes the access time and mod
+    time of those files.
+
+AUTHOR
+    David Davis, <xantus@cpan.org>, http://teknikill.net/
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), Filesys::Virtual, Filesys::Virtual::SSH,
+    Filesys::Virtual::DAAP, POE::Component::Server::FTP, Net::DAV::Server,
+    HTTP::Daemon, http://perladvent.org/2004/20th/
+

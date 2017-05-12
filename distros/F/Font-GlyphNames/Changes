@@ -1,0 +1,36 @@
+Revision history for Font::GlyphNames
+
+1.00000  22 November, 2009
+         Version 1 at last!
+         (No changes apart from the version number.)
+
+0.03a    18 October, 2008
+         No changes to the module (its version is still 0.03);  fixed
+         a test to work on Windows (hopefully!).
+
+0.03     29 May, 2008
+         This is now a beta release. Changes are as follows:
+         • You can now import all functions with the :all tag.
+         • The constructor for the OO interface now  accepts  hashref
+           syntax, allowing one to
+           • customise the ‘reject’  character output by name2str and
+           • have custom glyph lists searched for in @INC.
+         • name2str  in scalar context now concatenates the  list  of
+           characters/strings,  if there is more than one (instead of
+           returning the last one, which was not particularly useful).
+         • name2ord,  str2name,  ord2name and  ord2ligname  have been
+           added.
+         • name2str now correctly validates uXXXXX glyph names.
+         • name2str  now correctly validates hex digits  (it used  to
+           allow Thai, Tamil, etc.)
+         • COPYFILE_DISABLE=1  has been added to Makefile.PL as a fix
+           for RT #35604 (resource forks). Thanks to Slaven Rezić for
+           reporting this.
+
+0.02     1 January, 2007
+         Pre-alpha version. Only the name2str function has been imple-
+         mented. It has a very minor bug.
+ 
+0.01     31 December, 2006
+         I forgot to include a MANIFEST file, and then ran 'make dist'
+         and uploaded an empty file to CPAN! Duh!

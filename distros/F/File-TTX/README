@@ -1,0 +1,49 @@
+File-TTX
+
+File::TTX is a utility module for reading and writing the TTX files used by the TRADOS tools for translation of natural
+language text.  It provides access methods for the header data and several ways of reading and building body content.
+
+You do not need TRADOS installed to use this module; it works entirely by direct access of the file content.  (Which is easier
+than you'd think; it's just XML inside.)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::TTX
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-TTX
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-TTX
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-TTX
+
+    Search CPAN
+        http://search.cpan.org/dist/File-TTX/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Michael Roberts
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+$|++;
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+use Data::Dumper;
+use Path::Class qw/ dir /;
+
+
+use lib "../lib", "lib";
+use File::Corresponding;
+use Moose::Autobox;
+use List::MoreUtils qw/ uniq /;
+
+use File::Corresponding::Config::Find;
+use File::Corresponding;
+
+
+
+=head1 NAME
+
+corresponding_file -- Command line interface to L<File::Corresponding>
+
+
+=head1 SYNOPSIS
+
+Requires a C<.corresponding_file> config file somewhere.
+
+See perldoc L<File::Corresponding>
+
+  corresponding_file [--CONFIG=file.yml] FILENAME
+
+=cut
+
+
+
+main();
+sub main {
+    my @rex_skip_source_file;
+
+    my $default_config_file = File::Corresponding::Config::Find->new(
+        preferred_dirs => [ dir(".") ],
+    )->user_config(".corresponding_file");
+    GetOptions(
+        "config:s" => \(my $config_file = $default_config_file),
+    );
+    $config_file or syntax("No .corresponding_file config file found (or specified with --config=FILE)");
+    my $file = $ARGV[0] or syntax("Please specify a file");
+
+    my $corresponding = File::Corresponding->new();
+    eval { $corresponding->load_config_file($config_file) } or syntax($@);
+
+    my @found_files = uniq(
+        $corresponding->corresponding( $file )->map(sub { $_->file })->flatten,
+    );
+    print "$_\n" for(@found_files);
+
+    return(1);
+}
+
+
+
+# syntax($message)
+#
+# Die with the syntax text and the $message.
+sub syntax {
+    my ($message) = @_;
+
+    my $error = "";
+    $message and $error = "Error: $message\n";
+
+    die q{NAME - corresponding_file
+SYNOPSIS
+
+* Find corresponding FILENAME, possible using CONFIG_FILE
+
+  corresponding_file [--config=CONFIG_FILE] FILENAME
+
+} . $error;
+}
+
+
+
+sub rex_from_qr {
+    my ($rex_string) = @_;
+    my $rex = eval "qr $rex_string";
+    $@ and die("Could not parse regexp ($rex_string):
+$@
+Correct regex syntax is e.g. '/ prove [.] bat /x'
+");
+    return $rex;
+}
+
+
+
+__END__

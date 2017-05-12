@@ -1,0 +1,124 @@
+# Rules files for fwctl
+#
+# As usual # starts a comments to the end of the line and
+# blank lines are ignored.
+# 
+# Format is
+#
+# Action service src dst options
+#
+# Action is usually ACCEPT or DENY or REJECT.
+#
+# Service is one of the firewall service defined.
+#
+# src and dst are one IP/Netmask or an ALIAS.
+# 
+# Standard options:
+#
+# masq : use masquerade for this service.
+# log  : log packet to syslog (default for  DENY and REJECT)
+# nolog: do not log packet to syslog (default for ACCEPT)
+
+## Local traffic is OK
+accept all -src LOCAL_IP -dst LOCAL_IP
+
+## Count traffic that goes on the Internet
+#account all -src INT_NET -dst INTERNET -name internet
+
+##################################################################
+## TRAFFIC CONTROL
+#accept traffic_control -src INT_NET
+#accept traffic_control -src INTERNET -account -name tf_internet
+
+##################################################################
+## NETWORK TROUBLESHOUTING
+
+## Accept pings and traceroute from the Internet
+## but logs it.
+#accept ping	     -src INTERNET  -dst EXT_IP -log -account -name monitoring
+#accept traceroute   -src INTERNET  -dst EXT_IP -log -account -name monitoring
+
+#accept ping	     -src INT_NET   -dst INT_IP
+#accept traceroute   -src INT_NET   -dst INT_IP
+
+#accept ping	    -src EXT_IP	   -dst INTERNET
+#accept traceroute  -src EXT_IP    -dst INTERNET
+
+#accept ping	    -src INT_IP	   -dst INT_NET
+#accept traceroute  -src INT_IP    -dst INT_NET
+
+## Internal users wants to test Internet connectivity
+#accept ping	    -src INT_NET    -dst INTERNET -masq
+#accept traceroute  -src INT_NET    -dst INTERNET -masq
+
+##################################################################
+## DOMAIN NAME SERVICE
+
+## A DNS server is installed on the machine.
+#accept name_service -src INT_NET    -dst INT_IP
+#accept name_service -src EXT_IP     -dst INTERNET -query-port 5353
+#accept name_service -src INTERNET   -dst EXT_IP
+
+##################################################################
+## EMAIL SERVICE
+#accept smtp	    -src INT_NET    -dst INT_IP
+#accept smtp	    -src EXT_IP	    -dst INTERNET
+#accept smtp	    -src INTERNET   -dst EXT_IP
+
+## We accept ident, since most sendmail installation will query
+## back our main server. Since we don't run ident, they will get
+## a prompt service unavailable message.
+#accept ident	    -src INTERNET   -dst EXT_IP
+
+##################################################################
+## POP AND IMAP
+#accept imap	    -src INT_NET    -dst INT_IP
+#accept pop_3	    -src INT_NET    -dst INT_IP
+
+## Remote email taking -> very insecure
+#accept imap	    -src INTERNET   -dst EXT_IP
+#accept pop_3	    -src INTERNET   -dst EXT_IP
+
+## Better
+#accept simap	    -src INT_NET    -dst INT_IP
+#accept simap	    -src INTERNET   -dst EXT_IP
+#accept spop3	    -src INT_NET    -dst INT_IP
+#accept spop3	    -src INTERNET   -dst EXT_IP
+
+##################################################################
+## PROXY SERVICES
+#accept webcache    -src INT_NET    -dst INT_IP
+#accept http	    -src EXT_IP	    -dst INTERNET -port 80,443
+#accept ftp	    -src EXT_IP	    -dst INTERNET -noport
+
+##################################################################
+## TIME SYNCHRONIZATION
+#accept ntp	    -src EXT_IP	    -dst NTP_SERVERS
+#accept ntp	    -src EXT_IP	    -dst NTP_SERVERS -client
+
+##################################################################
+## FAX SERVICES
+#accept hylafax	    -src INT_NET    -dst INT_IP
+
+##################################################################
+## INMANAGE
+#accept tcp_service -src INT_NET    -dst INT_IP -port 737
+
+##################################################################
+## REMOTE SUPPORT
+#accept telnet	    -src EXT_IP	    -dst ROUTER
+#accept telnet	    -src INT_NET    -dst INT_IP
+#accept telnet	    -src REMOTE_SUPPORT	-dst EXT_IP
+#accept ftp	    -src INT_NET    -dst INT_IP -noport -pasv_ports 40000:45000
+
+##################################################################
+## DIRECT SERVICES
+#accept telnet	    -src INT_NET    -dst REMOTE_TELNET -masq
+#accept ftp	    -src INT_NET    -dst REMOTE_FTP    -masq -noport
+
+##################################################################
+## DHCP
+#accept dhcp -src INT_NET -dst INT_IP
+
+## Prevents logs clutter
+#deny netbios -src INT_NET -nolog

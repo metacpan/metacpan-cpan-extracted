@@ -1,0 +1,388 @@
+Changes for Perl extension FBP-Perl
+
+0.78 Mon 30 Jan 2012
+	- Update FBP dependency to 0.41 for FBP::Sizer::minimum_size
+	- Generate SetMinSize for FBP::Sizer elements
+
+0.77 Mon 30 Jan 2012
+	- Update FBP dependency to 0.40 for OnCombobox fix
+
+0.76 Sun 29 Jan 2012
+	- Added support for OnToggleButton events
+
+0.75 Fri 13 Jan 2012
+	- Revert the usage of dval in the test suite
+
+0.74 Thu 12 Jan 2012
+	- Don't load Wx::STC when forms contain a Wx::RichTextCtrl
+	- Skip the panel tests on Unix, since they segfault weirdly
+
+0.73 Wed 11 Jan 2012
+	- Don't generate ->SetMinSize or ->SetMaxSize when there is an explicit
+	  -1,-1 default in addition to the implicit default
+
+0.72 Mon 9 Jan 2012
+	- Update FBP dependency to 0.39
+	- Calendar controls now include Wx::Calendar correctly
+	- Test scripts now instantiate the test dialogs
+	- Temporarily use Wx::DateTime->new until wxDefaultDateTime works
+	- Fixed some bug in the custom classes used in testing
+	- use Wx::RichText () when a form contains a RichTextCtrl
+	- RichTextCtrl constructor default not "" instead of undef
+	- Only use ->Add for gridbagsizers
+
+0.71 Fri 16 Dec 2011
+	- Adding a number of missing events
+	- Fixed missing Wx::Event::EVT_MACROS for the top level form
+	- Fixed several incorrect macro argument counts
+
+0.70 Fri 16 Dec 2011
+	- Added support for events in the top level Form objects
+	- Added support for OnIconize and OnInitDialog events
+
+0.69 Thu 15 Dec 2011
+	- Added support for two-parameter event bindings
+	- Skip some macros that fail on Linux
+	- Added missing "use File::Spec" in various tests
+
+0.68 Thu 1 Dec 2011
+	- Fixed a multiple inheritance bug in ourisa
+
+0.67 Wed 30 Nov 2011
+	- Added form_pragma defaulting to project_pragma
+	- Added shim support throughout the entire stack.
+	- Added shim_class to get the code for shim classes
+	- Changed *_super to *_supernew
+	- Split logic from *_isa into *_super and have it just
+	  wrap calls to *_super and ourisa
+	- Added shim_deep to supper generating shims under a sub
+	  namespace based on the type of form object
+
+0.66 Fri 11 Nov 2011
+	- Moving quote generation from Data::Dumper to B::perlstring
+	- First attempt at generating native UTF-8 Perl code
+	- Generated UTF-8 projects now depend on Perl 5.8.5 to guarentee
+	  the quality of the UTF implementations.
+
+0.65 Wed 9 Nov 2011
+	- The use Wx line now includes a version (ADAMK)
+	- Some newline corrections in the repository (DOLMEN)
+
+0.64 Thu 27 Sep 2011
+	- Updating FBP dependency to 0.38 to get namespace attribute
+	- If the project defines a namespace, we now use it across the
+	  generation of all classes, prepending it to the form packages.
+	- The default event handler now warns instead of dies as the latter
+	  seems to cause Wx to segfault on exit.
+
+0.63 Sat 10 Sep 2011
+	- Removing the use of Mouse so we subclass properly
+
+0.62 Fri 9 Sep 2011
+	- When an object such as a Wx::HtmlWindow is using a subclass it is not
+	  necesary to load Wx::Html as we loading the subclass will achieve the
+	  same thing.
+
+0.61 Fri 19 Aug 2011
+	- Removed redundant control_params method
+	- Moved all constant generation to using ->wx to normalise values
+	- Added prefix param to make constants load as Wx::wxFOO
+
+0.60 Tue 16 Aug 2011
+	- When trim is enabled we now also trim out trailing ...
+
+0.59 Tue 2 Aug 2011
+	- Changed the generated Layout and Fit code to be smaller, faster and
+	  hopefully much less buggy on Mac.
+
+0.58 Tue 2 Aug 2011
+	- Major API overhaul and normalisation
+	- Added support for generating Wx::App main classes
+	- Added support for generating launch script for the Wx::App class
+	- Fix to wxSplitterWindow to allow horizontal splitting
+	- Fix for explicit falsely setting negative splitter handle size
+	- Added $COMPATIBLE version for future use with Padre plugin
+	  dependency system.
+	- Added version param for setting a common project version
+	- Extended ## no critic and custom header support to the Wx::App and
+	  script generators.
+	- Removed the need to explicitly pass around the project object in 
+	  many different methods.
+
+0.57 Wed 27 Jul 2011
+	- Added i18n to override wxFormBuilder setting
+	- Added i18n_trim to provide a set of characters that we should strip
+	  out of the call to gettext.
+
+0.56 Wed 20 Jul 2011
+	- Updating FBP dependency to 0.37 to get Mouse version fix
+	- Correcting Wx::HTML to Wx::Html
+
+0.55 Mon 18 Jul 2011
+	- Separating out file path generation from bitmap generation to make
+	  it easier to customise file management in subclasses.
+
+0.54 Thu 7 Jul 2011
+	- Expanded header comment support to all generated file types
+	- Added tests for nocritic support
+
+0.53 Thu 7 Jul 2011
+	- Added a form_header method to the API that subclasses can use to
+	  add introductory comment blocks at the top of generated files.
+	- Add support for generating a ## no critic at the top of the form so
+	  that generated code won't produce endless critic complaints that the
+	  user can't do anything to fix.
+
+0.52 Tue 5 Jul 2011
+	- Bump FBP dependency to 0.36 to get complete widget support
+	- Added Wx::AnimationCtrl support
+	- Added Wx::CalendarCtrl support
+	- Added Wx::Choicebook support
+	- Added Wx::RichTextCtrl support
+	- Added Wx::ScrollBar support
+	- Added Wx::SpinButton support
+	- Added Wx::Grid support
+	- Added Wx::GenericDirCtrl support
+	- Completes the basic implementation of all core classes
+
+0.51 Mon 4 Jul 2011
+	- Bump FBP dependency to 0.34 for several additional classes
+	- Added Wx::GridBagSizer support
+	- Added Wx::Notebook support
+	- Added Wx::TreeCtrl support
+	- Added Wx::RadioButton support
+
+0.50 Fri 1 Jul 2011
+	- Corrected a number of incorrectly mapped event handlers
+	- Load Wx::HTML when Wx::HtmlWindow objects are used
+	- Added Wx::DatePickerCtrl support (disabled as Wx.pm doesn't have it)
+
+0.49 Fri 1 Jul 2011
+	- Added Wx::StdDialogButtonSizer support
+
+0.48 Fri 1 Jul 2011
+	- Bump FBP dependency to 0.33 for FBP::ScrolledWindow support
+	- Fixed generation of some labels that weren't being internationalised
+	- Added Wx::BitmapButton support
+	- Added Wx::ScrolledWindow support
+	- Added Wx::Slider support
+	- Added Wx::StaticBitmap support
+	- Added Wx::ToggleButton support
+
+0.47 Thu 30 Jun 2011
+	- Added generic bitmap "Load From File" support
+	- Added bitmap support for Wx::Tool
+
+0.46 Mon 27 Jun 2011
+	- Added Wx::Tool support
+	- Added Wx::ToolBar support
+	- Added Wx::ToolBar separator
+
+0.45 Fri 24 Jun 2011
+	- Added Wx::MenuItem.OnMenuSelection event support
+	- Added object_scope method to centralise the "my/our" code generation.
+	- Refactored some window_ methods to object_ now they are usable for
+	  more than just FBP::Window objects.
+
+0.44 Fri 24 Jun 2011
+	- Added support for Wx::MenuBar
+	- Added support for Wx::Menu
+	- Added support for Wx::MenuItem
+	- Added support for menu separators
+	- Always create Wx::StatusBar at the top of the constructor. Adding them
+	  below sizers will confuse them and result in corrupt sizing.
+
+0.43 Mon 20 Jun 2011
+	- Added support for Wx::StatusBar
+	- Improved SYNOPSIS and created an initial basic DESCRIPTION
+
+0.42 Mon 20 Jun 2011
+	- Don't use Wx::SearchCtrl::ShowSearchButton on Mac
+
+0.41 Mon 20 Jun 2011
+	- Added missing colour settings for Wx::HyperLink
+
+0.40 Sun 19 Jun 2011
+	- Added support for Wx::Gauge
+	- Added support for Wx::HyperLink
+	- Added support for Wx::SearchCtrl
+
+0.39 Thu 16 Jun 2011
+	- Bump FBP dependency to 0.30 for Frame/Panel/RadioBox support
+	- Added support for Wx::Frame class generation
+	- Added support for Wx::Panel class generation
+	- The dialog_xxxxx methods are now generalised to form_xxxxx
+
+0.38 Tue 17 May 2011
+	- Added support for Wx::RadioBox
+	- Generalised the generation of style constants a bit more
+	- Generalised the setting of ->SetSelection
+
+0.37 Thu 10 May 2011
+	- Bump FBP dependency to 0.27 to get ->hidden support
+	- Added support for setting ->Hide on hidden things
+	- Broke the generation of things like SetFont into smaller method
+	  to allow granular overriding of the code generated for them
+
+0.36 Thu 5 May 2011
+	- $self->SetSizeHints( ... ) can only be used when we also use
+	  $sizer->SetSizeHints($self) or X11 hangs nastily.
+
+0.35 Tue 3 May 2011
+	- The ->Disable logic was only being applied to buttons, now it is
+	  applied uniformly across all window types
+
+0.34 Tue 3 May 2011
+	- Added support for FBP::FilePickerCtrl OnFileChanged events
+
+0.33 Tue 3 May 2011
+	- Bump FBP dependency to 0.26 for minimum_size and maximum_size
+	- Added size method for generating size literals
+	- Added support for dialog sizer hints via ->SetSizeHints
+	- Added support for window sizer hints ->SetMinSize and ->SetMaxSize
+	- Don't call ->Fit on anything with an explicit pixel size
+	- Handle explicit -1,-1 in size-related FBP attributes
+
+0.32 Fri 8 Apr 2011
+	- Added missing OnColourChanged and OnFontChanged event bindings for
+	  the colour and font picker controls.
+
+0.31 Fri 8 Apr 2011
+	- Allow multiple controls to fire the same event handler, while still
+	  preventing clashes between accessors and event handler methods.
+
+0.30 Thu 31 Mar 2011
+	- Abstracting out the generation of accessor methods and event stubs
+
+0.29 Thu 31 Mar 2011
+	- Incorrect capitalisation of SetToolTip
+
+0.28 Thu 31 Mar 2011
+	- Adding support for tooltips
+
+0.27 Thu 31 Mar 2011
+	- Bump FBP dependency to 0.24 for FBP::Window::font
+	- Adding support for custom fonts
+
+0.26 Tue 29 Mar 2011
+	- Bump FBP dependency to 0.23 for FBP::CustomControl support
+	- Added support for pure custom controls
+
+0.25 Mon 21 Mar 2011
+	- Bump FBP dependency to 0.22 for FBP::Window::header support
+	- Added support for Wx::Treebook (via Wx::Listbook subclass)
+	- Differentiate between use of a subclass and the FBP::Window::header
+	  method for the constructor vs what to "use" when loading modules.
+
+0.24 Wed 16 Mar 2011
+	- Minor whitespace tweaks so a bit less tidying is required
+
+0.23 Wed 16 Mar 2011
+	- Use a more compact and descriptive event handler stub
+
+0.22 Wed 16 Mar 2011
+	- Wx::ColourPickerCtrl segfaults if not provided with a colour,
+	  contrary to the documentation. Default to an explicit black.
+
+0.21 Tue 15 Mar 2011
+	- Fixed crash attempting to generate packing code for empty panels
+
+0.20 Tue 29 Feb 2011
+	- Added support for Wx::SpinCtrl
+	- Added support for Wx::ColourPickerCtrl
+	- Added support for Wx::FontPickerCtrl
+	- Added support for Wx::FilePickerCtrl
+	- Added support for Wx::DirPickerCtrl
+	- Added support for SetForegroundColour to Wx::Window
+	- Added support for SetBackgroundColour to Wx::Window
+	- Added support for SetSashSize to Wx::SplitterWindow
+	- Added support for SetSashGravity to Wx::SplitterWindow
+
+0.19 Mon 28 Feb 2011
+	- wxChoice objects now ->SetSelection properly
+	- Added support for Wx::SplitterEvent events
+
+0.18 Mon 28 Feb 2011
+	- Dynamically select the Wx parent object so that objects nest
+	  properly and sizers position things properly.
+
+0.17 Mon 28 Feb 2011
+	- Improved sizer generation code to support arbitrary nesting
+	  of both sizer and non-sizer parent objects.
+	- Add support for Wx::Listbook
+	- Add support for Wx::Panel
+	- Add support for Wx::SplitterWindow
+	- Top level dialogs now support all sizers
+
+0.16 Mon 24 Jan 2011
+	- Updating copyright year
+	- Move version generation into dialog_version so it can be
+	  overloaded in the Padre wxFormBuilder plugin
+
+0.15 Thu 29 Sep 2010
+	- Added a dedicated nested indent method
+	- Added support for choice lists in Wx::Choice, Wx::ComboBox and
+	  Wx::ListBox.
+	- When using custom control classes, don't "use" the relevant
+	  custom class more than once.
+
+0.14 Wed 29 Sep 2010
+	- Add support for custom Wx subclasses for Wx::Window widgets
+
+0.13 Sun  1 Aug 2010
+	- Add $sizer->SetSizeHints($self) when wxRESIZE_BORDER is enabled.
+	- Add support for growable rows and columns to Wx::FlexGridSizer.
+	- Fix to use dialog title instead of non-existance "label"
+	- Use Data::Dumper's qquote for object_label
+	- Better testing of quote escaping
+
+0.12 Sun  1 Aug 2010
+	- Corrected the generated code for Wx::StaticBoxSizer
+
+0.11 Sat 31 Jul 2010
+	- Add support for Wx::TextCtrl
+	- Add support for Wx::FlexGridSizer
+	- Add support for Wx::StaticBoxSizer
+
+0.10 Mon 12 Jul 2010
+	- Add support for Wx::GridSizer
+
+0.09 Tue 13 Jul 2010
+	- Setting 'permission' to 'public' will now create an accessor method
+	  to allow the control to be accessed directly (ADAMK)
+
+0.08 Mon 12 Jul 2010
+	- The wxFormBuilder "permission" setting (originally intended for
+	  controlling the C++ generation) is now used to control the
+	  lexicality of the control variables (ADAMK)
+
+0.07 Thu  8 Jul 2010
+	- Reorganise event code to allow binding large quantities of them
+	- Add support for Wx::CheckBox
+	- Add support for about 50 different event bindings
+	- Event handling method stubs are now sorted
+
+0.06 Thu  8 Jul 2010
+	- Add support for Wx::Window::window_style
+	- Don't add a style param at all, rather than use zero
+
+0.05 Thu  8 Jul 2010
+	- Add support for Wx::HtmlWindow
+
+0.04 Thu  8 Jul 2010
+	- Add support for Wx::ListBox
+	- Add support for Wx::ListCtrl
+
+0.03 Wed  7 Jul 2010
+	- Avoid AddSpacer for the more-specific Add
+	- Changed the sizer to dialog binding code to the same as is
+	  generated in the C++ output from wxFormBuilder
+
+0.02 Sat  3 Jul 2010
+	- Adding support for spacers within BoxSizers
+	- Adding support for wxChoice
+	- Moving to a more example-driven testing style
+	- Adding test cases for wxChoice and wxComboBox
+
+0.01 25 Jun 2010
+	- Creating initial release

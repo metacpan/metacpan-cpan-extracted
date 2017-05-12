@@ -1,0 +1,93 @@
+
+=head1 NAME
+
+File::Versions - Emacs-like versioned file names
+
+=head1 SYNOPSIS
+
+    
+    use FindBin '$Bin';
+    use File::Versions 'make_backup';
+    my $backup = make_backup ("$Bin/file");
+    # If the environment variable 'VERSION_CONTROL' is set to
+    # 'numbered', 'file' is moved to 'file.~1~'. The value of the new
+    # file name is put into '$backup'.
+    
+
+
+=head1 VERSION
+
+This documents File::Versions version 0.08
+corresponding to git commit L<a1de1abf7bf5abc9470a40b564891bcf9a98ae0b|https://github.com/benkasminbullock/File-Versions/commit/a1de1abf7bf5abc9470a40b564891bcf9a98ae0b> released on Thu Jan 19 09:57:04 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module duplicates the behaviour of programs like the Emacs text
+editor under Unix, where the environment variables C<VERSION_CONTROL>
+and C<SIMPLE_VERSION_CONTROL> allow one to make numbered backups of a
+file.
+
+=head1 FUNCTIONS
+
+=head2 backup_name
+
+     my $backup = backup_name ('file');
+
+Make an appropriate numbered backup name for F<file>. The return value
+is this name.
+
+=head2 make_backup
+
+     make_backup ('file');
+
+Make a backup of the file specified by F<file>, by renaming F<file> to
+its backup name, as given by L</backup_name>. If such a file already
+exists, delete it using C<unlink> before renaming C<$file>.
+
+This subroutine dies using L<Carp/croak> on error. If it succeeds, the
+return value is the name of the backup file.
+
+=head1 SEE ALSO
+
+There is something similar to this module in the source code of the
+"rename" utility which comes with Perl.
+
+=head1 EXPORTS
+
+L</backup_name> and L</make_backup> are exported on demand. The export
+tag C<:all> exports everything.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use File::Versions ':all';
+    
+
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<List::Util/max>
+
+=item L<Carp>
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2010-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

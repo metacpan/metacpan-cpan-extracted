@@ -1,0 +1,201 @@
+finance-yahooquote (0.25) unstable; urgency=low
+
+  * YahooQuote.pm: Applied patch by Nicola Chiapolini restoring
+    functionality after an apparent change in behaviour at Yahoo! Finance
+    earlier today
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Wed, 29 Apr 2015 06:45:05 -0500
+
+finance-yahooquote (0.24) unstable; urgency=low
+
+  * New upstream version with a lame fix for the fix in 0.23 and
+    this time even with the missing semicolon
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Fri, 26 Mar 2010 19:41:56 -0500
+
+finance-yahooquote (0.23) unstable; urgency=medium with 
+
+  * New upstream version with a lame fix for one of the 
+    regression tests: Yahoo! now sends a different name
+    back for IBM. That'all.
+
+finance-yahooquote (0.22) unstable; urgency=medium with 
+
+  * New upstream version with a semi-urgent fix for the change in
+    the data source URL at Yahoo! Finance that occurred today and 
+    which breaks all prior versions.
+  * YahooQuote.pm: Updated base of URL of csv interface
+  * YahooQuote.pm, Makefile.PL: Updated copyright to 2007
+  
+  * debian/control: Updated Standards-Version: to 3.7.2
+  * debian/rules: Updated DH_COMPAT to 5
+  * debian/control: Now Build-Depends: debhelper (>= 5.0.0)
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Thu, 22 Feb 2007 21:03:45 -0600
+
+finance-yahooquote (0.21.1) unstable; urgency=low
+
+  * Debian-only bugfix release without any new code
+  * Oops, remove the CRAN tarball accidentally left in the build directory
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sun, 17 Jul 2005 15:24:52 -0500
+
+finance-yahooquote (0.21) unstable; urgency=low
+
+  * t/02simple.t:Updated test for returned company name for symbol 'IBM' to 
+    recognise the text currently returned by Yahoo! (Thanks, Paul Woods!)
+  * MANIFEST: Finally added files in t/ and examples/ directory, also 
+    added CHANGES (which is now a link to debian/changelog)
+  * Make CRAN release via a proper 'make dist' and upload that tarball to CRAN;
+    Debian continues to get the normal source tarball incl. all of debian/
+  * YahooQuote.pm: Note that currency support is mostly broken at Yahoo!'s end.
+  * debian/control: Updated Standards-Version: to 3.6.2.1
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sun, 17 Jul 2005 15:13:38 -0500
+
+finance-yahooquote (0.20) unstable; urgency=low
+
+  * YahooQuote.pm: Several changes based on an excellent patch by Jay Strauss
+    - makes much more extended set of query symbols available
+    - new function getcustomquote() to specify symbols per call
+    - new function setQueryString() to supply new query string
+    - new functions useExtendedQueryFormat() and useRealtimeQueryFormat()
+      as simpler wrappers to make new functionality available
+    - getquote() remains backwards-compatible
+    - internal switch to retrieve in batches of 199 if more symbols are
+      supplied in order to circumvent a restricton at Yahoo's end
+    - added new regression test cases for the new functions
+    - added some documentation for new functions
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Mon, 30 Jun 2003 21:37:31 -0500
+
+finance-yahooquote (0.19.1) unstable; urgency=low
+
+  * Debian-only bugfix release without any new code
+  * debian/rules: Precede 'make test' with 'fping finance.yahoo.com && '
+    to satisfy the somewhat silly autobuilding bug report (Closes: #197452)
+  * debian/control: Added fping to Build-Indep-Depends
+  * debian/control: Increased Standards-Version to 3.5.10
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Mon, 16 Jun 2003 21:08:50 -0500
+
+finance-yahooquote (0.19) unstable; urgency=low
+
+  * test.pl: Removed, two simple tests are actually in t/
+  * debian/control: Section changed to perl
+  * debian/control: Standards-Version upgraded to 3.5.9
+  * debian/control: Added libwww-perl to Build-Depends-Indep (Closes: #189708)
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sat, 19 Apr 2003 17:18:39 -0500
+
+finance-yahooquote (0.18) unstable; urgency=low
+
+  * First release as upstream co-maintainer
+  * This is now a Debian 'native' package, i.e. no .diff.gz is provided as
+    the sources are identical for the package and the upstream distribution.
+
+  * Code (as opposed to Debian packaging) changes:
+
+    - YahooQuote.pm: supports proxy and authentication proxy with new 
+      (and exported) variables PROXY, PROXYUSER, PROXYPASSWD.
+  
+    - yahooquote: expanded version of the old quote-test example, added
+      --verbose switch, POD documentaion and an example demonstrating 
+      the global scope of Finance::YahooQuote.
+  
+    - Makefile.PL: appropriate changes to support changes
+  
+    - examples/examine_server.sh: New script to examine different servers 
+      and URL strings to examine exactly what information is provided
+  
+    - examples/symbol_alias.sh: New script to find aliases for numeric
+      (i.e. cusip-like) stock symbols.
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Wed, 25 Dec 2002 09:18:32 -0600
+
+finance-yahooquote (0.17-3) unstable; urgency=low
+
+  * debian/rules: Correct build snafu (Closes: #143249)
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Thu, 18 Apr 2002 20:45:50 -0500
+
+finance-yahooquote (0.17-2) unstable; urgency=low
+
+  * debian/control: Added Build-Depends-Indep
+  * debian/control: Upgraded to Debian Policy 3.5.0
+  * debian/rules: Upgraded to newer Perl Policy
+  
+ -- Dirk Eddelbuettel <edd@debian.org>  Fri, 12 Apr 2002 20:57:18 -0500
+
+finance-yahooquote (0.17-1) unstable; urgency=low
+
+  * Upgraded to the new upstream release 0.17
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Wed, 10 May 2000 21:45:05 -0400
+
+finance-yahooquote (0.15-1) unstable; urgency=low
+
+  * Upgraded to the new upstream release 0.15
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sun, 16 Apr 2000 21:22:25 -0400
+
+finance-yahooquote (0.13-1) unstable; urgency=low
+
+  * Upgraded to the new upstream release 0.13
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sun, 12 Mar 2000 13:24:31 -0500
+
+finance-yahooquote (0.12-1) unstable; urgency=low
+
+  * Upgraded to new upstream package -- this consists of 0.11 plus the
+    patch by Hamish which added simple proxy support
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sat,  5 Feb 2000 21:34:53 -0500
+
+finance-yahooquote (0.11-5) frozen unstable; urgency=low
+
+  * debian/rules: Fix perl path in examples/quote-test (Lintian error)
+  * YahooQuote.pm: Applied proxy firewall patch (Closes: #56052) 
+  
+ -- Dirk Eddelbuettel <edd@debian.org>  Mon, 24 Jan 2000 19:53:50 -0500
+
+finance-yahooquote (0.11-4) unstable; urgency=low
+
+  * debian/rules: Adapted to use /usr/share/ following the recommendation
+    on FHS transition from the Technical Committee 
+  * debian/rules: Test for debhelper >= 2.0.40 for FHS compliance
+  * debian/control: Upgraded to Debian Policy 3.0.1
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Tue, 26 Oct 1999 00:28:39 -0400
+
+finance-yahooquote (0.11-3) unstable; urgency=low
+
+  * Upgraded to new Debian Perl Policy
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sun,  4 Jul 1999 12:29:49 -0400
+
+finance-yahooquote (0.11-2) unstable; urgency=low
+
+  * debian/rules: Remove .packlist (thanks, Lintian!)
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sun, 18 Apr 1999 17:05:53 -0400
+
+finance-yahooquote (0.11-1) unstable; urgency=low
+
+  * Upgrade to the new upstream release 0.11
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Tue, 23 Mar 1999 19:34:40 -0500
+
+finance-yahooquote (0.09-2) unstable; urgency=low
+
+  * debian/control: Added Depends: on libhtml-parser-perl. Thanks Colin!
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Mon, 22 Mar 1999 22:28:19 -0500
+
+finance-yahooquote (0.09-1) unstable; urgency=low
+
+  * Initial Debian release.
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Mon, 22 Mar 1999 20:25:18 -0500
+
+

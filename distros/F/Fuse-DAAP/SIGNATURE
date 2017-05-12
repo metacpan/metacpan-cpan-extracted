@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7e498fba7f1222a58e458de1a58a30ab699115ec Build.PL
+SHA1 64d0fd2bb0f52b95e3d17b1dbeed4ab7a4647559 Changes
+SHA1 58fb4d2d4440929b8ef20e1885101dcd02a90005 MANIFEST
+SHA1 3759c7358ee74a78a58ae0e0c08acc2979e810a0 META.yml
+SHA1 ec60f1a34ec3929f4cf675b65c10e92857c5306d Makefile.PL
+SHA1 afa765acb3f58d5e6309cbcae6187abca386b07e README
+SHA1 3ecfb733bec910bc525e06170eb7304a622e53d0 examples/fusedaap
+SHA1 0510b6cf7750281b7271b3dee0167bde99b20eff lib/Fuse/DAAP.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (GNU/Linux)
+
+iGUEARECACUFAkSRrn0eGGhrcDovL2NnaS5zZnUuY2E6ODAvfmpkYmF0ZXMvAAoJ
+EDQq9j8F5ZSEeRMAn1jySV2uSVUt6cvEZ1FkCYzOdZ4CAKDlZpo90Y8vDMEqJK4b
+VxMi249hSQ==
+=e6ep
+-----END PGP SIGNATURE-----

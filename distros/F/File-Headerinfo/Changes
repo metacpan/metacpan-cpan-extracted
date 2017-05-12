@@ -1,0 +1,16 @@
+Revision history for Perl extension File::Headerinfo.
+
+0.03 Tue June 15 2004
+     * small bug fixes, and added 'version' to list of recorded attributes,
+       which is initially only of use with shockwave files.
+
+0.02 Fri June 4 2004
+     * Removed stupid makefile typo that has no effect on OS X but will 
+       bork everyone else.
+
+0.01 Fri June 4 2004
+     * Extracted from the application Delivery and made standalone
+     * factory interface hidden behind a simple read() method
+     * File::Headerinfo::Image added
+     * codec, data rate and audio frequency also retrieved where relevant
+

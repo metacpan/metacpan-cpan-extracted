@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+# very simple program that mimics librsync's rdiff, using the
+# simple file utility functions. see rdiff2 for the same program,
+# written using the nonblocking API
+
+use File::Rdiff qw(:trace :file);
+
+trace_level(LOG_INFO);
+
+if ($ARGV[0] eq "signature") {
+   open $base, "<$ARGV[1]" or die "$ARGV[1]: $!";
+   open $sig,  ">$ARGV[2]" or die "$ARGV[2]: $!";
+
+   File::Rdiff::sig_file $base, $sig;
+} elsif ($ARGV[0] eq "delta") {
+   open $sig,   "<$ARGV[1]" or die "$ARGV[1]: $!";
+   open $new,   "<$ARGV[2]" or die "$ARGV[2]: $!";
+   open $delta, ">$ARGV[3]" or die "$ARGV[3]: $!";
+
+   $sig = loadsig_file $sig;
+
+   ref $sig or exit 1;
+
+   $sig->build_hash_table;
+
+   File::Rdiff::delta_file $sig, $new, $delta;
+} elsif ($ARGV[0] eq "patch") {
+   open $base,  "<$ARGV[1]" or die "$ARGV[1]: $!";
+   open $delta, "<$ARGV[2]" or die "$ARGV[2]: $!";
+   open $new,   ">$ARGV[3]" or die "$ARGV[3]: $!";
+
+   File::Rdiff::patch_file $base, $delta, $new;
+} else {
+   print <<EOF;
+$0 signature BASE SIGNATURE
+$0 delta SIGNATURE NEW DELTA
+$0 patch BASE DELTA NEW
+EOF
+   exit (1);
+}
+

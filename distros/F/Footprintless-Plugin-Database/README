@@ -1,0 +1,103 @@
+NAME
+
+    Footprintless::Plugin::Database - A Footprintless plugin for working
+    with databases
+
+VERSION
+
+    version 1.01
+
+DESCRIPTION
+
+    Provides the db factory method to the framework as well as the db
+    command to the CLI.
+
+ENTITIES
+
+    As with all plugins, this must be registered on the footprintless
+    entity. Also, it is necessary to specify the providers you want made
+    available:
+
+        plugins => [
+            'Footprintless::Plugin::Database',
+        ],
+        'Footprintless::Plugin::Database' => {
+            providers => {
+                csv => 'Footprintless::Plugin::Database::CsvProvider',
+                mysql => 'Footprintless::Plugin::Database::MySqlProvider',
+                postres => 'Footprintless::Plugin::Database::PostgreSqlProvider',
+            }
+        }
+
+    You may supply your own providers given thaty the implement they
+    interface outlined by
+    Footprintless::Plugin::Database::AbstractProvider:
+
+        'Footprintless::Plugin::Database' => {
+            providers => {
+                db2 => 'My::Database::Db2Provider',
+            }
+        }
+
+    Additional configuration is supported for specifying a default provider
+    and a custom command helper implementation class:
+
+        'Footprintless::Plugin::Database' => {
+            command_helper => 'My::Automation::CommandHelper',
+            default_provider => 'mysql'
+            providers => {
+                csv => 'Footprintless::Plugin::Database::CsvProvider',
+                mysql => 'Footprintless::Plugin::Database::MySqlProvider',
+                postres => 'Footprintless::Plugin::Database::PostgreSqlProvider',
+            }
+        }
+
+    See "ENTITIES" in Footprintless::Plugin::Database::AbstractProvider for
+    example database entity configuration.
+
+METHODS
+
+ db($footprintless, $coordinate, %options)
+
+    Returns a new database provider instance. See
+    Footprintless::Plugin::Database::AbstractProvider.
+
+ db_command_helper()
+
+    Returns a new command helper for the db command. See
+    Footprintless::Plugin::Database::DefaultCommandHelper.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * DBI
+
+      * Footprintless
+
+      * Footprintless::MixableBase
+
+      * Footprintless::Plugin::Database
+
+      * Footprintless::Plugin::Database::AbstractProvider
+
+      * Footprintless::Plugin::Database::CsvProvider
+
+      * Footprintless::Plugin::Database::DefaultCommandHelper
+
+      * Footprintless::Plugin::Database::MySqlProvider
+
+      * Footprintless::Plugin::Database::PostgreSqlProvider
+

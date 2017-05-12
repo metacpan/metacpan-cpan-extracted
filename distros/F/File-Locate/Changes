@@ -1,0 +1,23 @@
+Revision history for Perl extension File::Locate.
+
+0.62 Sat Feb 17 08:59:12 EST 2007
+    - fixed a memory-leak when using POSIX regexes
+      (reported by Andrew Page <andrew_page AT ltx DOT com>)
+    - fixed a flurry of other memory leaks discovered while fixing the above
+    - fixed parsing of the parameter list to locate() when a code-ref was passed
+
+0.61 Sat Apr  9 09:34:21 CEST 2005
+    - added POD- and POD-coverage-tests
+    - a minor warning added to the PODs
+
+0.60 Sat May 15 11:24:36 CEST 2004
+    - lots of changes:
+      + support for slocate has been added
+      + some changes in the interface
+	(just read the perldocs and forget about 0.01)
+      + now installable from CPAN.pm 
+
+0.01  Mon May 26 17:52:53 2003
+    - original version; created by h2xs 1.22 with options
+	    -b 5.5.3 -n File::Locate
+

@@ -1,0 +1,15 @@
+lib/Functional/Utility.pm
+Makefile.PL
+README.md
+t/context.t
+t/hook_run.t
+t/lib/Test/Facile.pm
+t/lib/Test/Resub.pm
+t/throttle_delay.t
+t/throttle_factor.t
+t/y_combinator.t
+MANIFEST
+LICENSE
+bin/superprove
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+^\.
+\.log$
+\.bak$
+\.old$
+\.tar.gz$
+
+^Makefile$
+^pm_to_blib
+^[^/]*\d/
+~$
+^blib/

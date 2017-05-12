@@ -1,0 +1,1572 @@
+2011-03-20  Andreas J. Koenig  <andk@cpan.org>
+
+	* More options to pass through rrr-client
+
+	* More tests
+
+	* .recent/ or .rrr/ for metadata
+
+	* memory leak in rrr-server
+
+	* lockdirectory expiration? server died and blocked fsck for so long.
+
+	* rewrite _thaw_without_pathdb as a forked child job to have it
+	format-independent
+
+	* profiling! Rewrite slow parts in C.
+
+	* rrr-server probably not robust under all possible conditions; maybe
+	add some regular fsck or something. Consider the case of IN_Q_OVERFLOW
+	again.
+
+	* signal handlers
+
+	* how would an rsync-free HTTP variant look like? See 2008-10-10 again.
+
+	* are we sure we do NOT LEAVE DOT FILES around?
+
+	* ---- no open todos below this line ----
+
+2011-02-21  Andreas J. Koenig  <andk@cpan.org>
+
+	* rrr-server has a memory leak
+
+	root     16063 94.7 10.6 358404 354600 pts/21  RN   Feb18 4117:16 /home/src/perl/repoperls/installed-perls/perl/v5.13.8-16-gf53580f/bin/perl -Ilib bin/rrr-server --verbose /home/ftp/incoming/RECENT-1h.yaml
+
+	experimenting with a fork for aggregate():
+
+	root     12196 60.2  0.2  13652  9920 pts/21   RN   08:25   1:56 /home/src/perl/repoperls/installed-perls/perl/v5.13.8-16-gf53580f/bin/perl -Ilib bin/rrr-server --verbose /home/ftp/incoming/RECENT-1h.yaml
+
+	A delete of several hundred files:
+
+	root     12196 72.8  0.3  13792 10056 pts/21   RN   08:25   3:48 /home/src/perl/repoperls/installed-perls/perl/v5.13.8-16-gf53580f/bin/perl -Ilib bin/rrr-server --verbose /home/ftp/incoming/RECENT-1h.yaml
+
+	Delete several hundred again:
+
+	root     12196 79.8  0.3  14788 10944 pts/21   RN   08:25   6:34 /home/src/perl/repoperls/installed-perls/perl/v5.13.8-16-gf53580f/bin/perl -Ilib bin/rrr-server --verbose /home/ftp/incoming/RECENT-1h.yaml
+
+	It's a lot.
+
+2011-02-20  Andreas J. Koenig  <andk@cpan.org>
+
+	* start consistently considering the RECENT files themselves not part of
+	the set.
+
+2011-02-19  Andreas J. Koenig  <andk@cpan.org>
+
+	* Found the term anonymous one way file system
+
+	* No support for empty directories
+
+2011-02-17  Andreas J. Koenig  <andk@cpan.org>
+
+	* ALERT rrr: we have a piece of code somewhere in the mirror()
+	subroutine that reads the raw YAML file with normal open() and cuts it
+	off for efficiency, then feeds it to yaml::load in order to get some
+	metadata. Reading the thing with the whole tail of the recent array
+	kills the whole idea. The whole thing will not work with JSON.
+
+	So we must invent a protocol 2 that works with one additional index
+	files, say "A", only containing meta.
+
+2011-02-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* I think interval guaranteed with the $last_aggregate_call
+	variable (both in fsck and server) need to be fixed with a $recc
+	variable to something like 60 seconds or even less.
+
+	* minor bug: fsck just added the lockfile to the index which should be
+	considered bookkeeping.
+
+	* speed: a large directory remove that is done by the kernel in 1
+	seconds triggers minutes of bookkeeping (07:56:42 - 08:01:10 for ~3000
+	files, all due to Schlemiehl again. Want to do some collecting of
+	pending ops before actually writing to the RECENT files. Lock!
+
+	Repeating the timing with 2600 files and it took 21:28:08 - 21:35:27.
+
+	Now having rewritten the loop to use batch_update(): 4383 file removed
+	21:43:37 - 21:44:12. From 7:30 to 0:35 while doing 60% more work that's
+	a joy.
+
+	* At the moment rrr-init is not needed anymore, rrr-server can be
+	started and followed by rrr-fsck. Still stupid but not the main
+	showstopper.
+
+2011-02-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* IN_Q_OVERFLOW needs to trigger an fsck, likewise the entry into the
+	server.
+
+2010-10-26  Andreas J. Koenig  <andk@cpan.org>
+
+	* forking slave is done, needs more testing.
+
+2010-07-06  Andreas J. Koenig  <andk@cpan.org>
+
+	* The two next most important goals are to get a useable rrr-server and
+	a forking slave implementation that uses virtually no memory after the
+	first pass through. Does it need the status file?
+
+	* rrr-init now being fast we can now remove the alpha alerts. Done.
+
+2010-06-16  Andreas J. Koenig  <andk@cpan.org>
+
+	* rrr-init seems to be sssslllloooowwww. At 3:49 I started it for the
+	video tree. After twelve minutes the file has reached a size of 500k. It
+	is locking and rewriting the YAML after every file. Wasn't there an
+	unlocked variant? For "init" one would not expect locked correctness and
+	a rewrite after every item. Given that this tends to become slower with
+	every file it is really unacceptable.
+
+	Reminds me of rrr-dirtyupdate (the former name of rrr-update). It seems
+	the code was not dirty enough and that was the reason why it was so
+	slow. And rrr-update does not have a --dirty switch, so it looks like we
+	have no way to force dirty and fast operation yet but we need it for
+	init.
+
+	Irritating the bootstrapping race: the order {(1) fill initial
+	array, (2) start server} leaves the need for an fsck to cover the time
+	between 1 and 2. Given that regular fsck is needed in any case the price
+	is not high but still doesn't give a warm feeling. Maybe starting the
+	server will by itself do an fsck?
+
+2010-06-15  Andreas J. Koenig  <andk@cpan.org>
+
+	* remove the wild alpha alerts and say, it is alpha but parts of it are
+	already working very well or so.
+
+2009-12-10  Andreas J. Koenig  <andk@cpan.org>
+
+	* Prominent request for statusfile to safe memory consumption. I'd like
+	to work backwards: get a verification program that verifies how well in
+	sync two nodes are without using frmr itself. Pretend that the forking
+	agent already works and can be interrupted with ^C. Then let it die at
+	random and restart at random and see the memory consumption and the
+	failure rate over time. Compare it with the curve we have now.
+
+	Of course we also invented the status file as a sharp debugging tool.
+	I'd like to see it in action. See also: F:R:M:Recent::thaw().
+
+2009-06-22  Andreas J. Koenig  <andk@cpan.org>
+
+	* Todo: rrr-init to generate some index files so that rrr-server can be
+	started.
+
+2009-05-02  Andreas J. Koenig  <andk@cpan.org>
+
+	* DONE: rename rrr-dirtyupdate to rrr-update and add an option --dirty
+	so we can use it for normal update with a single file. And add a cronjob
+	that runs rrr-fsck so we get a reminder when something is not working
+	as it should.
+
+2009-04-27  Andreas J. Koenig  <andk@cpan.org>
+
+	* Todo: I still see more link_stat errors than expected. I come back to
+	the former suspicion that we do not do necessary bookkeeping on deleted
+	files so that when we reach the "new" event on a meanwhile deleted file
+	we try to mirror it although we could know better. It's just noise, no
+	harm but noise is irritating.
+
+	* Todo: more experimenting with runstatusfile to get it official
+
+	* Todo: make sure $ENV{LANG}="C" when we call rsync because we will
+	parse the error.
+
+	rsync: link_stat "/authors/id/T/TH/THINC/DateTime-Format-Flexible-0.02.tar.gz" (in PAUSE) failed: No such file or directory
+
+	rsync: link_stat "/authors/id/A/AG/AGENT/SSH-Batch-0.001.meta" (in PAUSE) failed: No such file or directory (2)
+
+	And that ignore_link_stat_error is propagated in sparse_clone.
+
+	DONE
+
+	For the record: the bug was that ignore_link_stat_error was lost during
+	sparse_clone. And then the second bug was that it did not default to
+	true. Both are now fixed.
+
+2009-04-25  Andreas J. Koenig  <andk@cpan.org>
+
+	* Todo: fill rrr program with life
+
+2009-04-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Minor bug: I see complaints about files not existing like
+	/authors/id/G/GW/GWADEJ/SVG-Sparkline-0.2.0.meta or
+	/authors/id/R/RC/RCAPUTO/POE-1.004.readme
+
+	In the RECENT files these are delete events but of course also new
+	events in older recent files.
+
+	I think we do not properly remember deletes when we skip-deletes and so
+	do not filter them out when we later see the "new" event.
+
+	Yes, but that what ignore_link_stat_error is for, we know about this
+	race condition. We must make ignore_link_stat_error default to true.
+
+	DONE
+
+	* bug in Done.pm failing to merge two fields into one when a third is
+	present. FIXED and accompanied with new test.
+
+2009-04-24  Andreas J. Koenig  <andk@cpan.org>
+
+	* Todo: keep the index clean and run some kind of nondestructive fsck 4
+	times a day.
+
+	* who is our backbone?
+
+	http://cpan.cpantesters.org/authors/02STAMP     # barbie
+	http://cpan.solfo.com/authors/02STAMP           # abh
+	(http|ftp)://theoryx5.uwinnipeg.ca/pub/CPAN/    # rkobes
+
+2009-04-17  Andreas J. Koenig  <andk@cpan.org>
+
+	* the changelog helper I included in the Makefile release memo does not
+	show tags and is much less useful than I thought. gitk is probably much
+	more convenient.
+
+2009-04-16  Andreas J. Koenig  <andk@cpan.org>
+
+	* ABH writes:
+
+#### Sync 1239828608 (1/1/Z) temp .../authors/.FRMRecent-RECENT-Z.yaml-
+#### Ydr_.yaml ... DONE
+#### Cannot stat '/mirrors/CPAN/authors/.FRMRecent-RECENT-Z.yaml-
+#### Ydr_.yaml': No such file or directory at /usr/lib/perl5/site_perl/
+#### 5.8.8/File/Rsync/Mirror/Recentfile.pm line 1558.
+#### unlink0: /mirrors/CPAN/authors/.FRMRecent-RECENT-Z.yaml-Ydr_.yaml is
+#### gone already at cpan-pause.pl line 0
+
+	Running without skip-deletes now but cannot reproduce.
+
+2009-04-15  Andreas J. Koenig  <andk@cpan.org>
+
+	* consider state directory such we can restart after a ^C or come again
+	from a cronjob.
+
+	Reuse _runstatusfile: write atomically, see how we can use the dump to
+	start running again. Do not leak and remove globs before writing. Do not
+	only dump one rf, dump the whole complex.
+
+	* consider the effect of ^C. Is it safe?
+
+	* want to use Perl::Version to up the versions on every release. Only if
+	things have changed, of course. Does this actually work?
+
+	/usr/local/perl-5.10-g/bin/perl-reversion -dryrun
+	/usr/local/perl-5.10-g/bin/perl-reversion -dryrun -bump lib/File/Rsync/Mirror/Recentfile.pm
+
+	Must do the bookkeeping myself when this should happen, maybe based on git?
+
+	I think I prefer the same version number for all pm files. But one also
+	needs a routine for setting them. Ahh:
+
+	/usr/local/perl-5.10-g/bin/perl-reversion -current 0.0.4 -set 0.0.5 lib/**/*.pm
+
+	NEEDSMOREWORK
+
+	* why indexer wrong?
+
+cpan[2]> m /Mirror::Recent/
+Module  = File::Rsync::Mirror::Recent (ANDK/File-Rsync-Mirror-Recent-0.0.4.tar.bz2)
+Module  = File::Rsync::Mirror::Recentfile (ANDK/File-Rsync-Mirror-Recent-0.0.2.tar.bz2)
+Module  = File::Rsync::Mirror::Recentfile::Done (ANDK/File-Rsync-Mirror-Recent-0.0.2.tar.bz2)
+Module  = File::Rsync::Mirror::Recentfile::FakeBigFloat (ANDK/File-Rsync-Mirror-Recent-0.0.2.tar.bz2)
+4 items found
+
+	The META.yml was generated by ExtUtils::MakeMaker version 6.5101
+
+	The 0.0.2 release has a META.yml by ExtUtils::MakeMaker version 6.42 and without "provides".
+
+	I just tried MM 6.5102 and it again produces only a provides for Recent,
+	not for the other modules.
+
+	My own fault.	FIXED in the Makefile.PL.
+
+2009-04-13  Andreas J. Koenig  <andk@cpan.org>
+
+	* Study http://en.wikipedia.org/wiki/Magnet_URI_scheme
+
+	* is it true (as stated at
+	https://fedorahosted.org/InstantMirror/wiki/ExistingRepositoryReplicationMethods)
+	that rsync can lead to errors when upstream changes before client sync
+	has completed? Can we see the error when we run this on upstream:
+
+% perl -e '
+use Time::HiRes qw(time);
+while (){
+  open my $fh, ">", "changingfile.txt.new" or die;
+  print $fh (time."\n") x 1000000;
+  close $fh;
+  rename "changingfile.txt.new", "changingfile.txt" or die;
+}
+'
+
+	And on the receiving end:
+
+% while true; do
+rsync k75:`pwd`/changingfile.txt .; cat changingfile.txt| uniq|wc -l
+sleep 1;
+done
+
+	I cannot get it to fail. Apparently it is sufficient when upstream
+	always writes atomically (which of course is mandatory)?
+
+	SENT to mailing list Apr 28.
+
+	* from ABH:
+
+> https://fedorahosted.org/InstantMirror/
+> https://www.redhat.com/mailman/listinfo/instantmirror-list
+> irc.freenode.net channel #instantmirror
+
+	A cool name for a project. Inspires me to write a few sentences about
+	bittorrent's role in the grand picture.
+
+	http://spreadsheets.google.com/pub?key=pGlWX10blP4u2kM05SDtiMg is a
+	spreadsheet collected by Atul Aggarwal about bittorrent implementations.
+
+2009-04-12  Andreas J. Koenig  <andk@cpan.org>
+
+	* Interesting last minute bug during real download testing: the output
+	isn't as pretty anymore, it seems that more work is being done than
+	needed.
+
+	Introducing a highlevel _alluptodate method helped a lot in debugging
+	this.
+
+	FIXED now. Reason was that dirtymark on PAUSE currently is broken; it's
+	different on 1h file than on the other files. This lead to frequent
+	calls to _fullseed. Limiting the dirtymark check to $i==0 resolved the
+	issue.
+
+2009-04-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: try if we can be faster with a native float package. I'm really
+	glad to have a machine exposing perl floating point bugs, it forced me
+	to retract this item from the changes file: "several speedups in the
+	fakebigfloat code" before I get cpan testers fails.
+
+2009-04-11  Andreas J. Koenig  <andk@cpan.org>
+
+	* Bug: when the dirtymark changes upstream, then the downstream server
+	notices it immediately and mirrors the "1h" file but then leaves the
+	rmirror loop and continues with "6h" on the next round through. This
+	behaviour goes on until it reaches the Z file. Because we eat the Z file
+	piecemeal we leave the loop after a while but after that everybody seems
+	to have forgotten that there is some work left to be done. Bad, bad,
+	bad.
+
+	ETOOCONFUSING                                         better name?
+
+	Recentfile::get_remote_recentfile_as_tempfile         OK
+	Recentfile::resolve_recentfilename                    split_rfilename  DONE
+
+	Recent::_principal_recentfile_object	                _principal_recentfile_fromremote
+	Recent::principal_recentfile                          OK
+	Recent::_resolve_rfilename                            _principal_recentfile_fromremote_resosymlink
+
+	some void, some not, some not void but called in void context.
+
+2009-04-10  Andreas J. Koenig  <andk@cpan.org>
+
+	* Bug? When the dirtymark changes then the second tier hosts quickly
+	reset their DONE state and restart mirroring. But then they mirror
+	potentially outdated index files with inconsistent dirtymark because the
+	first tier box may be a bit behind on the large recentfiles.
+
+	This means we need a brake when iterating over the recentfiles that
+	refuses to use a recentfile with the wrong dirtymark.
+
+2009-04-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* install the bin/* files and talk about rrr-overview somewhere.
+
+	* Ask B. Hansen asks for tempdir accessor such that tempfiles get
+	created outside the target tree.
+
+	* Barbie asks for better logging capabilities
+
+2009-03-29  Andreas J. Koenig  <andk@cpan.org>
+
+	* known bug: cannot configure the Recentfile objects to keep delete
+	events. How to call the accessor for that? keep_delete_objects_forever?
+
+	Sounds acceptable. FIXED (but untested).
+
+	* known bug: keeps temporary index files lying around.
+
+2009-03-24  Andreas J. Koenig  <andk@cpan.org>
+
+	* Some equivalent for
+
+	for ( @{$rrr->recentfiles} ) { $_->verbose(0) }
+
+	? DONE
+
+2009-03-22  Andreas J. Koenig  <andk@cpan.org>
+
+	* k81 is again client of k75 with different parameters.
+
+	* broken now: (1) seeding and unseeding: rmirror is seeding and talking
+	about it all the time and nobody reacts accordingly; (2) lots of temp
+	files get created and not removed; culprit the new call to
+	get_remote_recentfile_as_tempfile within Recent.pm; the manpage says the
+	caller has to remove the tempfile after use.
+
+	Need the drawing board.
+
+	PARTLY FIXED: retracting the idea to call
+	get_remote_recentfile_as_tempfile from Recent.pm and moving around seed
+	and unseed such that uptodate now means "we have mirrored this
+	recentfile's bunch of files" and seeded means "somebody believes the
+	index file for this rf needs be refreshed". This seems to work now.
+
+	Still collecting temp files that nobody cares to depollute.
+
+2009-03-21  Andreas J. Koenig  <andk@cpan.org>
+
+	* Bug?: should it be harder than it is atm to set the timestamp to the
+	future? YES, FIXED
+
+	* bug with native integers:
+
+	-
+    epoch: 997872011
+    path: id/D/DE/DELTA/Crypt-Rijndael_PP-0.03.readme
+    type: new
+  -
+    epoch: 1195248431
+    path: id/L/LG/LGODDARD/Tk-Wizard-2.124.readme
+    type: new
+
+	Native integer broke when native math was turned off. FIXED
+
+	* Bug: something between id/P/PH/PHISH/CGI-XMLApplication-1.1.2.readme
+	and id/C/CH/CHOGAN/HTML-WWWTheme-1.06.readme. Mirroring the Z file loops
+	in this area.
+
+	Yes, records out of order:
+
+ 447003   -
+ 447004     epoch: 995885533
+ 447005     path: id/P/PH/PHISH/CGI-XMLApplication_0.9.3.readme
+ 447006     type: new
+ 447007   -
+ 447008     epoch: 995890358
+ 447009     path: id/H/HD/HDIAS/Mail-Cclient-1.3.readme
+ 447010     type: new
+ 447011   -
+ 447012     epoch: 995892221
+ 447013     path: id/H/HD/HDIAS/Mail-Cclient-1.3.tar.gz
+ 447014     type: new
+
+	FIXED with sanity check and later with the integer fix.
+
+	* Bug: want the index files in a .recent directory
+
+	* Bug: lots of dot files are not deleted in time
+
+	* possible test case: can a delete change the timestamp? This would
+	probably break the order of events.
+
+2009-03-20  Andreas J. Koenig  <andk@cpan.org>
+
+	* 1233701831.34486 what's so special about this number/string? It
+	belongs to
+	id/G/GR/GRODITI/MooseX-Emulate-Class-Accessor-Fast-0.00800.tar.gz and
+	atm lives in Y,Q, and Z.
+
+	It is the first entry after id/--skip-locking which has timestamp
+	1234164228.11325 which represents a file that doesn't exist anymore.
+
+	* another bug:
+
+	Sync 1237531537 (31547/33111/Z) id/J/JH/JHI/String-Approx-2.7.tar.gz ...
+	_bigfloatcmp called with l[1237505213.21133]r[UNDEF]: but both must be defined at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm line 76
+  File::Rsync::Mirror::Recentfile::FakeBigFloat::_bigfloatcmp(1237505213.21133, undef) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm line 131
+  File::Rsync::Mirror::Recentfile::FakeBigFloat::_bigfloatlt(1237505213.21133, undef) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/Done.pm line 110
+  File::Rsync::Mirror::Recentfile::Done::covered('File::Rsync::Mirror::Recentfile::Done=HASH(0x8857fb4)', 1237505213.21133, 0.123456789) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile.pm line 2041
+  File::Rsync::Mirror::Recentfile::uptodate('File::Rsync::Mirror::Recentfile=HASH(0x8533a2c)') called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recent.pm line 536
+  File::Rsync::Mirror::Recent::rmirror('File::Rsync::Mirror::Recent=HASH(0x82ef3d0)', 'skip-deletes', 1) called at /home/k/sources/CPAN/GIT/trunk/bin/testing-rmirror.pl line 27
+	at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm line 76
+  File::Rsync::Mirror::Recentfile::FakeBigFloat::_bigfloatcmp(1237505213.21133, undef) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm line 131
+  File::Rsync::Mirror::Recentfile::FakeBigFloat::_bigfloatlt(1237505213.21133, undef) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/Done.pm line 110
+  File::Rsync::Mirror::Recentfile::Done::covered('File::Rsync::Mirror::Recentfile::Done=HASH(0x8857fb4)', 1237505213.21133, 0.123456789) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile.pm line 2041
+  File::Rsync::Mirror::Recentfile::uptodate('File::Rsync::Mirror::Recentfile=HASH(0x8533a2c)') called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recent.pm line 536
+  File::Rsync::Mirror::Recent::rmirror('File::Rsync::Mirror::Recent=HASH(0x82ef3d0)', 'skip-deletes', 1) called at /home/k/sources/CPAN/GIT/trunk/bin/testing-rmirror.pl line 27
+
+	FIXED, it was the "--skip-locking" file where manual intervention was participating
+
+	* bug on the mirroring slave: when the dirtymark gets increased we
+	probably do not reset the done intervals. The mirrorer stays within
+	tight bounds where it tries to sync with upstream and never seems to
+	finish. In the debugging state file I see lots of identical intervals
+	that do not get collapsed. When I restart the mirrorer it dies with:
+
+	Sync 1237507989 (227/33111/Z) id/X/XI/XINMING/Catalyst-Plugin-Compress.tar.gz ...
+	_bigfloatcmp called with l[1237400817.94363]r[UNDEF]: but both must be defined at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm line 76
+  File::Rsync::Mirror::Recentfile::FakeBigFloat::_bigfloatcmp(1237400817.94363, undef) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/FakeBigFloat.pm line 101
+  File::Rsync::Mirror::Recentfile::FakeBigFloat::_bigfloatge(1237400817.94363, undef) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/Done.pm line 226
+  File::Rsync::Mirror::Recentfile::Done::_register_one('File::Rsync::Mirror::Recentfile::Done=HASH(0x84c6af8)', 'HASH(0xb693f2dc)') called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile/Done.pm line 200
+  File::Rsync::Mirror::Recentfile::Done::register('File::Rsync::Mirror::Recentfile::Done=HASH(0x84c6af8)', 'ARRAY(0x8c54bfc)', 'ARRAY(0xb67e618c)') called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile.pm line 1044
+  File::Rsync::Mirror::Recentfile::_mirror_item('File::Rsync::Mirror::Recentfile=HASH(0x84abcb0)', 227, 'ARRAY(0x8c54bfc)', 33110, 'File::Rsync::Mirror::Recentfile::Done=HASH(0x84c6af8)', 'HASH(0x84abd8c)', 'ARRAY(0x839cb64)', 'HASH(0x839c95c)', 'HASH(0xb6a30f0c)', ...) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recentfile.pm line 992
+  File::Rsync::Mirror::Recentfile::mirror('File::Rsync::Mirror::Recentfile=HASH(0x84abcb0)', 'piecemeal', 1, 'skip-deletes', 1) called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recent.pm line 564
+  File::Rsync::Mirror::Recent::_rmirror_mirror('File::Rsync::Mirror::Recent=HASH(0x84ab6d4)', 7, 'HASH(0x8499488)') called at /home/k/sources/rersyncrecent/lib/File/Rsync/Mirror/Recent.pm line 532
+  File::Rsync::Mirror::Recent::rmirror('File::Rsync::Mirror::Recent=HASH(0x84ab6d4)', 'skip-deletes', 1) called at /home/k/sources/CPAN/GIT/trunk/bin/testing-rmirror.pl line 27
+
+	and debugging stands at
+
+	At: before
+	Brfinterval: Z
+	Ci: 227
+	Dre+1:
+	  epoch: 1237400802.5789
+	  path: id/J/JO/JOHND/CHECKSUMS
+	  type: new
+	Dre-0:
+	  epoch: 1237400807.97514
+	  path: id/M/MI/MIYAGAWA/CHECKSUMS
+	  type: new
+	Dre-1:
+	  epoch: 1237400817.94363
+	  path: id/X/XI/XINMING/Catalyst-Plugin-Compress.tar.gz
+	  type: new
+	Eintervals:
+	  -
+	    - 900644040
+	    - 900644040
+	  - []
+
+	and it is reproducable.
+
+	Why does the mirrorer not fetch a newer Z file? It is 18 hours old while
+	pause has a fresh one.
+
+	FIXED, it was the third anded term in each of the ifs in the IV block in
+	_register_one: with that we make sure that we do not stamp on valuable
+	interval data.
+
+2009-03-17  Andreas J. Koenig  <andk@cpan.org>
+
+	* done: verified the existence of the floating point bug in bleadperl
+	and verified that switching from YAML::Syck to YAML::XS does not resolve
+	it.
+
+	BTW, the switch was doable with
+
+	perl -i~ -pe 's/Syck/XS/g' lib/**/*.pm t/*.t
+
+	and should be considered as a separate TODO
+
+	* todo: integrate a dirty update with two aggregate calls before
+	unlocking for frictionless dirtying DONE
+
+	* todo: start the second rsync daemon on pause DONE
+
+	* todo: move index files to .recent: this cannot simply be done by
+	setting filenameroot to .recent/RECENT. Other parts of the modules rely
+	on the fact that dirname(recentfile) is the root of the mirrored tree.
+
+2009-03-16  Andreas J. Koenig  <andk@cpan.org>
+
+	* What was the resolution of the mirror.pl delete hook bug? Do we call
+	the delete hook when pause removes a file from MUIR?
+
+	* Today on pause: Updating 2a13fba..29f284d and installing it for
+	/usr/local/perl-5.10.0{,-RC2}
+
+	TURUGINA/Set-Intersection-0.01.tar.gz was the last upload before this
+	action and G/GW/GWILLIAMS/RDF-Query-2.100_01.tar.gz the first after it
+
+2009-03-15  Andreas J. Koenig  <andk@cpan.org>
+
+	* currently recent_events has the side effect of setting dirtymark
+	because it forces a read on the file. That should be transparent, so
+	that the dirtymark call always forces a cache-able(?) read.
+
+	* The bug below is -- after a lot of trying -- not reproducible on a
+	small script, only in the large test script. The closest to the output
+	below was:
+
+	#!perl
+	use strict;
+	use Devel::Peek;
+	my $x = "01237123229.8814";
+	my($l,$r);
+	for ($l,$r) {
+  $_ = "x"x34;
+	}
+	($l,$r) = ($1,$2) if $x =~ /(.)(.+)/;
+	$r = int $r;
+	$l = "1237123231.22458";
+	$r = "1237123231.22458";
+	1 if $l/1.1;
+	Devel::Peek::Dump $l;
+	Devel::Peek::Dump $r;
+	Devel::Peek::Dump $x = $l <=> $r;
+	die "BROKE" if $x;
+	__END__
+
+	The checked in state at c404a85 fails the test with my
+	/usr/local/perl-5.10-uld/bin/perl on 64bit but curiously not with
+	/usr/local/perl-5.10-g/bin/perl. So it seems the behaviour is not even
+	in the test script always consistent.
+
+	* Todo: write a test that inserts a second dirty file with an already
+	existing timestamp. DONE
+
+	* Bug in perl 5.10 on my 64bit box:
+
+  DB<98> Devel::Peek::Dump $l
+	SV = PVMG(0x19e0450) at 0x142a550
+	  REFCNT = 2
+	  FLAGS = (PADMY,NOK,POK,pNOK,pPOK)
+	  IV = 0
+	  NV = 1237123231.22458
+	  PV = 0x194ce70 "1237123231.22458"\0
+	  CUR = 16
+	  LEN = 40
+	
+	  DB<99> Devel::Peek::Dump $r
+	SV = PVMG(0x19e0240) at 0x142a3e8
+	  REFCNT = 2
+	  FLAGS = (PADMY,POK,pPOK)
+	  IV = 1237123229
+	  NV = 1237123229.8814
+	  PV = 0x19ff900 "1237123231.22458"\0
+	  CUR = 16
+	  LEN = 40
+	
+	  DB<100> Devel::Peek::Dump $l <=> $r
+	SV = IV(0x19ea6e8) at 0x19ea6f0
+	  REFCNT = 1
+	  FLAGS = (PADTMP,IOK,pIOK)
+	  IV = -1
+	
+	  DB<101> Devel::Peek::Dump $l
+	SV = PVMG(0x19e0450) at 0x142a550
+	  REFCNT = 2
+	  FLAGS = (PADMY,NOK,POK,pNOK,pPOK)
+	  IV = 0
+	  NV = 1237123231.22458
+	  PV = 0x194ce70 "1237123231.22458"\0
+	  CUR = 16
+	  LEN = 40
+	
+	  DB<102> Devel::Peek::Dump $r
+	SV = PVMG(0x19e0240) at 0x142a3e8
+	  REFCNT = 2
+	  FLAGS = (PADMY,NOK,POK,pIOK,pNOK,pPOK)
+	  IV = 1237123231
+	  NV = 1237123231.22458
+	  PV = 0x19ff900 "1237123231.22458"\0
+	  CUR = 16
+	  LEN = 40
+
+	Retry with uselongdouble gives same effect. Not reproducable on 32bit box (k75).
+
+	* Todo: reset "done" or "covered" and "minmax" after a dirty operation? DONE
+
+2009-03-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* $obj->merge ($other) needs to learn about equal epoch which may happen
+	since dirty_epoch intruded.
+
+	* Wontfix anytime soon: I think we currently do not support mkdir. Only
+	files!
+
+2009-01-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: continue working on update(...,$dirty_epoch). It must be
+	followed by a fast_aggregate! DONE
+
+2008-12-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* maybe we need a closest_entry or fitting_interval or something like
+	that. We want to merge an event into the middle of some recentfile.
+	First we do not know which file, then we do not know where to lock,
+	where to enter the new item, when and where to correct the dirtymark.
+
+	So my thought is we should first find which file.
+
+	Another part of my brain answers: what would happen if we would enter
+	the new file into the smallest file just like an ordinary new event,
+	just as an old event?
+
+	(1) we would write a duplicate timestamp? No, this would be easy to
+	avoid
+
+	(2) we would make the file large quickly? Yes, but so what? We are
+	changing the dirtymark, so are willing to disturb the downstream hosts.
+
+2008-11-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 10705 root      17   0  725m 710m 1712 S  0.0 46.8 834:56.05 /home/src/perl/repoperls/installed-perls/perl/pVNtS9N/perl-5.8.0@32642/bin/perl -Ilib /home/k/sources/CPAN/GIT/trunk/bin/testing-rmirror.pl
+
+	leak!
+
+	https://rt.cpan.org/Ticket/Display.html?id=41199
+
+	* bzcat uploads.csv.bz2 | perl -F, -nale '$Seen{$F[-1]}++ and print'
+
+	Strangest output being HAKANARDO who managed to upload
+
+	Here is a better oneliner that includes also the first line of each
+	finding:
+
+	bzcat uploads.csv.bz2 | perl -MYAML::Syck -F, -nale '$F[-1]=~s/\s+\z//; push @{$Seen{$F[-1]}||=[]},$_; END {for my $k (keys %Seen){ delete $Seen{$k} if @{$Seen{$k}}==1; } print YAML::Syck::Dump(\%Seen)}'
+
+2008-10-31  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* memory leak in the syncher? It currently weighs 100M.
+
+	Update 2008-11-02:
+
+	root     10705  1.0  4.9  80192 76596 pts/32   S+   Nov02  24:05 /home/src/perl/repoperls/installed-perls/perl/pVNtS9N/perl-5.8.0@32642/bin/perl -Ilib /home/k/sources/CPAN/GIT/trunk/bin/testing-rmirror.pl
+
+
+2008-10-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* lookup by epoch and by path and use this ability on the pause to never
+	again register a file twice that doesn't need it. Let's call it
+	contains().
+
+	* after the dirtymark is done: fill up recentfiles with fake (historic)
+	entries; fill up with individual corrections; algorithm maybe to be done
+	with bigfloat so that we can always place something in the middle
+	between two entries. Before we must switch to bigfloat we could try to
+	use Data::Float::nextup to get the.
+
+	* Inotify2 on an arbitrary tree and then play with that instead of PAUSE
+	directly.
+
+	* dirtymark now lives in Recentfile, needs to be used in rmirror.
+
+	* find out why the downloader died after a couple of hours without a net
+	connection. Write a test that survives the not-existence of the other
+	end forever.
+
+2008-10-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* reconsider the HTTP epoch only. Not the whole thing over HTTP because
+	it makes less sense with tight coupling for secondary files. But asking
+	the server what the current epoch is might be cheaper on HTTP than on
+	rsync. (Needs to be evaluated)
+
+	* remove the 0.00 from the verbose overview in the Merged column in the
+	Z row. DONE
+
+	* write tests that expose the problems of the last few days: cascading
+	client/server roles, tight coupling for secondary RFs, deletes after
+	copies.
+
+	* Some day we might want to have policy options for the slave:
+	tight/loose/no coupling with upstream for secondary RFs. tight is what
+	we have now. loose would wait until a gap occurs that can be closed.
+
+2008-10-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* revisit all $rfs->[$i+1] places if they now make sense still
+
+2008-10-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* another bug is the fact that the mirror command deletes files before
+	it unhides the index file, thus confusing downstream slaves. We must not
+	delete before unhiding and must delete after unhiding. FIXED.
+
+	* new complication about the slave that is playing a server role.
+	Currently we mirror from newest to oldest with a hidden temporary file
+	as index. And when one file is finished, we unhide the index file.
+	Imagine the cascading server/slave is dead for a day. It then starts
+	mirroring again with the freshest thing and unhides the freshest index
+	file when it has worked through it. In that moment it exposes a time
+	hole. Because it now works on the second recentfile which is still
+	hidden.
+
+	We currently do nothing special to converge after such a drop out. At
+	least not intentionally and robustly and thought through.
+
+	The algorithm we use to seed the next file needs quite a lot of more
+	robustness than it currently has. Something to do with looking at the
+	merged element of the next rf and when it has dropped off, we seed
+	immediately. And if it ramains dropped off, we seed again, of course.
+
+	Nope, looking from smaller to larger RFS we look at the merged element
+	of this RF and at the minmax/max element of the next RF. If that
+	$rf[next]->{minmax}{max} >= $rf[this]->{merged}{epoch}, then we can stop
+	seeding it.
+
+	And we need a public accessor seed and unseed or seeded. But not the mix
+	of public and private stuff that then is used behind the back.
+
+	And then the secondary* stuff must go.
+
+	And we must understand what the impact is on the DONE system. Can it go
+	unnoticed that there was a hole? And could the DONE system have decided
+	the hole is covered? This should be testable with three directories where
+	the middle stops working for a while. Done->merge is suspicious, we must
+	stop it from merging non-conflatable neighbors due to broken continuity.
+
+	FIXED
+
+2008-10-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Slaven suggests to have the current epoch or the whole current
+	recentfile available from the HTTP server and take it away with
+	keepalive. This direction goes the granularity down to subseconds.
+
+	We might want to rewrite everything to factor out transport and allow
+	the whole thing to run via HTTP.
+
+2008-10-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* smoker on k81 fetching from k75 to verify cascading works. See
+	2008-07-17 in upgradexxx and rsync-over-recentfile-3.pl.
+
+	* maybe the loop should wait for CHECKSUMS file after every upload. And
+	CPAN.pm needs to deal with timestamps in the future.
+
+	* do not forget the dirtymark!
+
+	Text: have a new flag on recentfiles with the meaning: if this
+	changes, you're required to run a full rsync over all the files. The
+	reason why we set it would probably be: some foul happened. we injected
+	files in arbitrary places or didn't inject them although they changed.
+	The content of the flag? Timestamp? The relation between the
+	recentfiles would have to be inheritance from the principal, because any
+	out of band changes would soon later propagate to the next recentfile.
+
+	By upping the flag often one can easily ruin the slaves.
+
+	last out of band change? dirtymark?
+
+	Anyway, this implies that we read a potentially existing recentfile
+	before we write one.
+
+	And it implies that we have an eventloop that keeps us busy in 2-3
+	cycles, one for current stuff (tight loop) and one for the recentfiles
+	(cascade when principal has changed), one for the old stuff after a
+	dirtymark change.
+
+	And it implies that the out-of-band change in any of the recentfiles
+	must have a lock on the principal file and there is the place to set the
+	dirtymark.
+
+	* start a FAQ, especially quick start guide questions. Also to aid those
+	problematic areas where we have no good solution, like the "links"
+	option to rsync.
+
+	* wish feedback when we are slow.
+
+	* reduce mccabe
+
+	* Remove a few DEBUG statements.
+
+	* The multiple-rrr way of doing things needs a new option to rmirror,
+	like piecemeal or so. Not urgent because after the first pass through,
+	things run smoothely. It's only ugly during the first pass.
+
+	* I have the suspicion that the code is broken that decides if the
+	neighboring RF needs to be seeded. I fear when too much time has gone
+	between two calls (in our case more than one hour), it would not seed
+	the neighbor. Of course this will never be noticed, so we need a good
+	test for it.
+
+	* local/localroot confusion: I currently pass both options but one must
+	do.
+
+	* accounts for early birds on PAUSE rsync daemon.
+
+	* hardcoded 20 seconds
+
+	* who mirrors the index? DOING now.
+
+	* which CPAN mirrors offer rsync?
+
+	* visit all XXX, visit all _float places
+
+	* rename the pathdb stuff, it's too confusing. No idea how.
+
+	* rrr-inotify, backpan, rrr-register
+
+2008-10-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* current bugs: the pathdb seems to get no reset, the seeding of the
+	secondaryttl stuff seems not to have an effect. Have helped myself with
+	a rand(10), need to fix this back. So not checked in. Does the rand
+	thing even help?
+
+	The rand thing helps. The secondaryttl stuff was in the wrong line,
+	fixed now.
+
+	The pathdb stuff was because I called either _pathdb or __pathdb on the
+	wrong object. FIXED now.
+
+	* It's not so beautiful if we never fetch the recentfiles that are not
+	the principal, even if this is correct behaviour. We really do not need
+	them after we have fetched the whole content.
+
+	OK, we want a switch for that: secondaryttl DONE
+
+2008-10-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* bug: rrr-news --max does not count correctly. with "35" it shows me 35
+	lines but with 36 it shows 110. First it repeats 35, gives 70, and then
+	it lets 40 follow. FIXED
+
+	* See that the long running process really only updates the principal
+	file unless it has missed a timespan during which something happened. If
+	nothing happened, it must notice even when it misses the timespan. DONE
+
+	* we must throw away the pathdb when we have reached the end of Z. From
+	that moment we can have a very small pathdb because the only reason for
+	a pathdb is that we know to ignore old records in old files. We won't
+	need this pathdb again before the next full pass over the data is
+	necessary and then we will rebuild it as we go along. DONE
+
+2008-10-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* I think, Done::register_one is doing wrong in that it does not
+	conflate neighboring pieces. The covered() method cannot do this because
+	it has no recent_events array at hand. But register_one has it and could
+	do it and for some reason misses to do it (sometimes).
+
+	This means that the three tests I just wrote can probably not survive
+	because they test with an already broken Done structure.
+
+	The art now is to detect how it happens, then to reproduce, then write a
+	test, then fix it.
+
+	So from the logfile this is what happens: we have a good interval with
+	newest file being F1 at T1. Now remotely F1 gets a change and F2 goes on
+	top of it. Locally we now mirror F2 and open a new done interval for it.
+	Then we mirror F1 but this time with the timestamp T1b. And when we then
+	try to close the gap, we do not find T1 but instead something older. We
+	should gladly accept this older piece and this would fix this bug.
+
+	FIXED
+
+	* bug to fix: when the 1h file changes while rmirror is running, we do
+	correctly sync the new files but never switch to the 6h file but rather
+	stay in a rather quick loop that fetches the 1h file again and again.
+
+	Is it possible that we initialize a new object? Or does
+	get_remote_recentfile_as_tempfile overwrite something in myself?
+
+	Want a new option: _runstatusfile => $file which frequently dumps the
+	state of all recentfiles to a file.
+
+	FIXED
+
+2008-10-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: now teach update to verify the timestamp is about to write
+	against the previous and use _increase_a_bit if it doesn't comply with
+	strict monotony. DONE
+
+	* The problem of rounding. So far perl's default precision was
+	sufficient. One day it won't be. FakeFloat has an easy job when it is
+	only reading and other machines have written correctly. But when we want
+	to write a floating point number that is a bit larger than the other
+	one, then we need our own idea of precision.
+
+	Slaven said: just append a "1". This might be going towards the end of
+	usability too quickly. I'd like something that actually uses the decimal
+	system. Well, appending a 1 also does this but...
+
+	E.g. we have 1.0. nextup on this architecture is starting with
+	1.0000000000000004. So there is a gap to fill: 1,2,3. Now I have
+	taken the 1.0000000000000003 and the next user comes and the time tells
+	him 1.0 again. He has to beat my number without stepping over the
+	nextup. This is much less space than I had when I chose 1,2,3.
+
+	What is also irritating is that nextup is architecture dependent. The
+	128 bit guy must choose very long numbers to fit in between whereas the
+	other one with 16 bit uses larger steps. But then the algorithm is the
+	same for both, so that would be a nice thing.
+
+	I see two situation where we need this. One is when Time::HiRes returns
+	us a value that is <= the last entry in our recentfile. In this case
+	(let's call it the end-case) we must fill the region between that number
+	and the next higher native floating point number. The other is when we
+	inject an old file into an old recentfile (we would then also set a new
+	dirtymark). We find the integer value already taken and need a slightly
+	different one (let's call it the middle-case). The difference between
+	the two situations is that the next user will want to find something
+	higher than my number in the end-case and something lower than my number
+	in the middle case.
+
+	So I suggest we give the function both a value and an upper bound and it
+	calculates us a primitive middle. The upper bound in the middle-case is
+	the next integer. The upper bound on the end-case is the nextup floating
+	point number. But the latter poses another problem: if we have occupied
+	the middle m between x and nextup(x), then the nextup(m) will probably
+	not be the same as nextup(x) because some rounding will take place
+	before the nextup is calculated and when the rounding reaches the
+	nextup(x), we will end up at nextup(nextup(x)).
+
+	So we really need to consider the nextup and the nextdown from there and
+	then the middle and that's the number we may approach asymptotically.
+	Ugly. But DONE.
+
+2008-10-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* consider deprecating the use of RECENT.recent as a symlink. It turns
+	out to need extra hoops with the rsync options and just isn't worth it.
+	Or maybe these extra hoops are needed anyway for the rest of the tree?
+	Nope, can't be the case because not all filesystems support symlinks.
+
+	But before doing the large step, I'll deprecate the call of
+	get_remote_recentfile_as_tempfile with an argument. Rememberr this was
+	only introduced to resolve RECENT.recent and complicates the routine far
+	beyond what it deserves.
+
+	DONE. Won't deprecate RECENT.recent, just moved its handling to the
+	supervisor.
+
+2008-10-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* I think it's a bug that the rsync_option links must be set to true in
+	order to support RECENT.recent and that nobody cares to set it
+	automatically. Similar for ignore_link_stat_errors.
+
+2008-09-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: find all todos together and make a plan what is missing for a
+	release.
+
+	- verifytree or something like that. fsck maybe.
+
+	- rersyncrecent, the script itself? What it do?
+
+	- a way to only mirror the recentfiles without mirroring the whole
+	remote system such that people can decide to mirror only partially see
+	also 2008-08-30. .shadow-xxx directory? this also needed for a
+	filesystem that is still incomplete and might need the mirrorfiles for
+	lookup(?)
+
+	- long living objects that mirror again and again. Inject something
+	into ta, see how it goes over to tb.
+
+	- how do we continue filling up the DONE system when we use an object
+	for the second time? "fully covered" and "uptodate" or new terminology.
+
+	- overview called on the wrong file should be understandable
+
+	- the meta data field that must change when we fake something up so that
+	the downstream people know they have to re-fetch everything.
+
+	- how tolerant are we against missing files upstream? how do we keep
+	track? there are legitimate cases where we did read upstream index right
+	before a file got deleted there and then find that file as new and want
+	it. There are other cases that are not self healing and must be tracked
+	and bugreported.
+
+	- how, exactly, do we have to deal with deletes? With rsync errors?
+
+	rsync: link_stat "/id/K/KA/KARMAN/Rose-HTMLx-Form-Related-0.07.meta" (in
+	authors) failed: No such file or directory (2)
+
+	The file above is a delete in 1h and a new in file 1M and the
+	delete in the locally running rmirror did not get propagated to the 1M
+	object. Bug. And the consequence is a standstill.
+
+	It seems that a slave that works with a file below the principal needs
+	to merge things all the way up to get rid of later deletes. Or keep
+	track of all deletes and skip them later. So we need a trackdeletes.pm
+	similar to the done.pm?
+
+	see also 2008-08-20 about spurious deletes that really have no add
+	counterpart and yet they are not wrong.
+
+	- consider the effect when resyncing the recentfile takes longer than
+	the time per loop. Then we never rsync any file. We need to diagnose
+	that and force an increase of that loop time. But when we later are fast
+	enough again because the net has recovered, then we need to switch back
+	to original parameters. ERm, no, it's enough to keep syncing at least
+	one file before refetching an index file.
+
+	- remember to verify that no temp files are left lying around and the
+	signal handler
+
+	- status file for not long running jobs that want to track upstream with
+	a, say, cronjob.
+
+	- revisit all XXX _float areas and study Sub::Exporter DONE
+
+	- persistent DB even though we just said we do not need it. Just for
+	extended capabilities and time savings when, for example, upstream
+	announces a reset and we get new recentfiles and could then limit
+	ourselves to a subset of files (those that have a changed epoch) in a
+	first pass and would only then do the loop to verify the rest. Or
+	something.
+
+	* Todo: aggregate files should know their feed and finding the principal
+	should be done stepwise. (?)
+
+	* Todo: DESTROY thing that unlocks. Today when I left the debuggerr I
+	left locks around. DONE
+
+2008-09-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* maybe extend the _overview so that it always says if and where the
+	last file is in the next file and where the next event in the next rf
+	would lie. No, don't like this anymore. REJECT
+
+	* take the two new redundant tests out again, only the third must
+	survive. DONE
+
+	* Todo: add a sanity check if the merged structure is really pointing to
+	a different rf and that this different rf is larger. DONE
+
+2008-09-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* now test, if they are overlapping. And test if there is a file in the
+	next rf that would fit into this rf's interval.
+
+	1h  1222324012.8474  1222322541.7963           0.4086
+	6h  1222320411.2760  1222304207.6931           4.5010 missing overlap/gap!
+	1d  1222320411.2760  1222238750.5071          22.6835 large overlap
+	1W  1222313218.3626  1221708477.5829         167.9835
+
+	I suspect that somebody writes a merged timestamp without having merged
+	and then somebody else relies on it.
+
+	If aggregate is running, the intervals must not be extravagated, if it
+	is not running, there must not be bounds, the total number of events in
+	the system must be counted and must be controlled throughout the tests.
+	That the test required the additional update was probably nonsense,
+	because aggregate can cut pieces too. FIXED & DONE
+
+2008-09-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* rrr-aggregate seems to rewrite the RECENT file even if nothing has
+	changed. FIXED
+
+2008-09-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Most apparent bug at the moment is that the recentfiles are fetched
+	too often. Only the principal should be fetched and if it has not
+	changed, the others should not be refetched. ATM I must admit that I'm
+	happy that we refetch more often than needed because I can more easily
+	fix bugs while the thing is running.
+
+	* Let's say, 1220474966.19501 is a timestamp of a file that is already
+	done but the done system does not know about it. The reason for the
+	failure is not known and we never reach the status uptodate because of
+	this. We must get over it.
+
+	Later it turns out that the origin server had a bug somewhere.
+	1220474966.19042 came after 1220474966.19501. Or better: it was in the
+	array of the recentfile one position above. The bug was my own.
+
+2008-09-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* There is the race condition where the server does a delete and the
+	slave does not yet know and then tries to download it because he sees
+	the new. So for this time window we must be more tolerant against
+	failure. If we cannot download a file, we should just skip it and should
+	not retry immediately. The whole system should discover the lost thing
+	later. Keeping track with the DONE system should really be a no brainer.
+
+	But there is something more: the whole filesystem is a database and the
+	recentfiles are one possible representation of it. It's a pretty useful
+	representation I think that's why I have implemented something around
+	it. But for strictly local operation it has little value. For local
+	operation we would much rather have a database. So we would enter every
+	recentfile reading and every rsync operation and for every file the last
+	state change and what it leads to. Then we would always ignore older
+	records without the efforts involved with recentfiles.
+
+	The database would have: path,recentepoch,rsyncedon,deletedon
+
+	Oh well, not yet clear where this leads to.
+
+2008-09-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: the bigloop ran into a funny endless loop after EWILHELM uploaded
+	Module-Build. It *only* rsynced the "1h" recentfile from that moment on.
+
+	* statusfile, maybe only on demand, alone to have a sharp debugging
+	tool. It is locked and all recentfiles dump themselves into it and we
+	can build a viewer that lets us know where we stand and what's inside.
+
+	* remember: only the principal recentfile needs expiration, all others
+	shall be expired by principal if it discovers that something has move
+	upstream.
+
+2008-09-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Always check if we stringify to a higher value than in the entry
+	before. DONE
+
+	* And in covered make an additional check if we would be able to see a
+	numerical difference between the two numbers and if we can't then switch
+	to a different, more expensive algorithm. Do not want to be caught by
+	floating surprises. DONE
+
+2008-09-17  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* caching has several aspects here: we can cache the interval of the
+	recentfile which only will change when the mtime of the file changes. We
+	must re-mirror the recentfile when its ttl has expired. Does have_read
+	tell you anything? It counts nothing at all. Only the mtime is
+	interesting. The ntuple mtime, low-epoch, high-epoch. And as a separate
+	thing the have_mirrored because it is unrelated to the mtime.
+
+	* Robustness of floating point calculations! I always thought that the
+	string calculated by the origin server for the floating representation
+	of the epoch time is just a string. When we convert it to a number and
+	later back to a string, the other computer might come to a different
+	conclusion. This must not happen, we want to preserve it under any
+	circumstances. I will have to write tests with overlong sequences that
+	get lost in arithmetic and must see if all still works well. DONE
+
+	But one fragile point remains: if one host considers a>b and the other
+	one considers them == but no eq. To prevent this, we must probably do
+	some extra homework. DONE
+
+2008-09-16  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* the concept of tracking DONE needs an object per recentfile that has
+	something like these methods:
+
+	do_we_have(xxx), we_have(xxx), do_we_have_all(xxx,yyy), reset()
+
+	covered()        register()    covered()
+
+	The unclear thing is how we translate points in time into intervals. We
+	could pass a reference to the current recent_events array when running
+	we_have(xxx) and let the DONE object iterate over it such that it only
+	has to store a list of intervals that can melt into each other. Ah, even
+	passing the list together with a list of indexes seems feasiable.
+
+	Or maybe ask for the inverted list?
+
+	Whenever the complete array is covered by the interval we say we are
+	fully covered and if the recentfile is not expired, we are uptodate.
+
+2008-09-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+2008-09-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* need a way to "return" the next entry after the end of a list. When
+	the caller says "before" or "after" we would like to know if he could
+	cover that interval/threshold or not because this influences the effect
+	of a newer timestamp of that recentfile. DONE with $opt{info}.
+
+2008-09-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* one of the next things to tackle: the equivalent of csync2 -TIXU.
+
+	loop implies tixu (?). Nope, something like --statefile decides. Per
+	default we do ...?
+
+	T test, I init, X including removals, U nodirtymark
+
+	So we have no concept of dirtymarks, we only trust that since we are
+	running we have observed everything steadily. But people will not let
+	this program run forever so we must consider both startup penalty and
+	book keeping for later runs. We keep this for later. For now we write a
+	long running mirror that merges several intervals.
+
+2008-09-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* need to speed up the 02 test, it's not clever to sleep so much. Reduce
+	the intervals!
+
+	* rersyncrecent, the script: default to one week. The name of the switch
+	is --after. Other switches? --loop!
+
+2008-08-30  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* need a switch --skip-deletes (?)
+
+	* need a switch --enduser that tells us that the whole tempfile
+	discipline is not needed when there is no downstream user. (?)
+
+	Without this switch we cannot have a reasonable recent.pl that just
+	displays the recent additions. Either we accept to download everything.
+	Or we download temporary files without the typical rsync protocol
+	advantages.
+
+	Or maybe the switch is --tmpdir? If --tmpdir would mean: do not use
+	File::Temp::tempdir, this might be a win.
+
+2008-08-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* apropos missing: we have no push, we never know the downstream
+	servers. People who know their downstream hosts and want to ascertain
+	something will want additional methods we have never thought about, like
+	update or delete a certain file.
+
+2008-08-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* tempted to refactor rmirror into resolve_symlink, localize, etc.
+	Curious if rsync_options=links equal 0 vs. 1 will make the expected
+	difference.
+
+	* rsync options: it's a bit of a pain that we usually need several rsync
+	options, like compress, links, times, checksum and that there is no
+	reasonable default except the original rsync default. I think wee can
+	safely assume that the rsync options are shared between all recentfile
+	instances within one recent tree.
+
+2008-08-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* deletes: if a delete follows an add quickly enough it may happen that
+	a downstream mirror did not see the add at all! It seems this needs to
+	be mentioned somewhere. The point here is that even if the downstream is
+	never missing the principal timeframe it may encounter a "delete" that
+	has no complimentary "add" anywhere.
+
+2008-08-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* I suspect the treat of metadata is incorrect during read or something.
+	The bug that I am watching is that between 06:08 and 06:09 the 6h file
+	contained more than 6 hours worth of data. At 06:08 we merged into the
+	1d file. We need to take snapshots of the 6h file over the course of an
+	hour or maybe only between XX:08 and XX:09? Nope, the latter is not
+	enough.
+
+	Much worse: watching the 1h file: right at the moment (at 06:35) it
+	covers 1218867584-1219120397 which is 70 hours.
+
+	Something terribly broken. BTW, 1218867584 corresponds to Sat Aug 16
+	08:19:44 2008, that is when I checked out last time, so it seems to be
+	aggregating and never truncating?
+
+	No, correct is: it is never truncating; but wrong is: it is aggregating.
+	It does receive a lot of events from time to time from a larger file.
+	Somehow a large file gets merged into the small one and because the
+	"meta/merged" attribute is missing, nobody is paying attention. I
+	believe that I can fix this by making sure that metadata are honoured
+	during read. DONE and test adjusted.
+
+2008-08-17  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* grand renaming plan
+
+	remotebase          => remoteroot   to fit well with localroot        DONE
+	local_path()        => localroot    seems to me should already work   DONE
+	recentfile_basename => rfilename    no need to stress it has no slash DONE
+
+	filenameroot??? Doesn't seem too bad to me today. Maybe something like
+	kern? It would anyway need a deprecation cycle because it is an
+	important constructor.
+
+	* I like the portability that Data::Serializer brings us but the price
+	is that some day we might find out that it is slowing us a bit. We'll
+	see.
+
+2008-08-16  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* should we not enter the interval of the principal (or the interval of
+	the merging file?) in every aggregated/merged file?
+
+	* we should aim at a first release and give up on thinking about
+	sanitizing stuff and zloop. Let's just admit that a full traditional
+	rsync is the only available sanitizer ATM. Otherwise it's complicated
+	stuff: sanitizing on the origin server, sanitizing on the slaves,
+	sanitizing forgotten files, broken timestamps, etc. Let's delay it and
+	get the basics out before this becomes a major cause for mess.
+
+2008-08-13  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* On OSes not supporting symlinks we expect that RECENT.recent contains
+	the contents of the principal recentfile. Actually this is identical on
+	systems supporting symlinks. Simple, what follows from that is that we
+	need to keep the serializer in the metadata because we cannot read it
+	from the filename, doesn't it? Of course not. It's a chicken and egg
+	problem. This leaves us with the problem to actually parse the
+	serialized data to find out in which format it is. So who can do the 4
+	or 5 magics we wanted to support? File::LibMagic?
+
+2008-08-09  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* remotebase and recentfile_basename are ugly names. Now that we need a
+	word for the shortest/principal/driving recentfile too we should do
+	something about it.
+
+	localroot is good. rfile is good. local_path() is bad, local_path($path)
+	is medium, filenameroot() is bad, remotebase is bad, recentfile is
+	already deprecated.
+
+	Up to now remotebase was the string that described the remote root
+	directory in rsync notation, like pause.perl.org::authors. And
+	recentfile_basename was "RECENT-1h.yaml".
+
+2008-08-08  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* The test that was added in today's checkin is a good start for a test
+	of rmirror. We should have more methods in Recent.pm: verify,
+	addmissingfiles. We should verify the current tree, then rmirror it and
+	then verifytree the copy. We could then add some arbitrary file and let
+	it be discovered by addmissingfiles, then rmirror again and then
+	verifytree the copy again.
+
+	Then we could start stealing from csync2 sqlite database [no port to
+	OSX!] and fill a local DB. And methods to compare the database with the
+	recentfiles. Our strength is that in principle we could maintain state
+	with a single float. We have synced up to 1234567890.123456. If the Z
+	file does not add new files all we have to do is mirror the new ones and
+	delete the goners.
+
+	This makes it clear that we should extend current protocol and declare
+	that we cheat when we add files too late, just to help the other end
+	keeping track. Ah yes, that's what was meant when zloop was mentioned
+	earlier.
+
+	Maybe need to revisit File::Mirror to help me with this task.
+
+2008-08-07  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* There must be an allow-me-to-truncate flag in every recentfile.
+	Without it one could construct a sequence of updates winning the locking
+	battle against the aggregator. Only if an aggregator has managed to
+	merge data over to the next level, truncating can be allowed. DONE with
+	accessor merged.
+
+2008-08-06  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* We should probably guarantee that no duplicates enter the aggregator
+	array.
+
+2008-08-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* To get merge operation faster would need a good benchmark test. What
+	02 spits out isn't reliable enough and is dominated by many other
+	things. Between
+
+	commit 10176bf6b79865d4fe9f46e3857a3b8669fa7961
+	Author: Andreas J. Koenig <k@k75.(none)>
+	Date:   Sat Aug 2 07:58:04 2008 +0200
+
+	and
+
+	commit 3243120a0c120aaddcd9b1f4db6689ff12ed2523
+	Author: Andreas J. Koenig <k@k75.(none)>
+	Date:   Sat Aug 2 11:40:29 2008 +0200
+
+	there was a lot of trying but the effect is hardly measurable with
+	current tests.
+
+	* overhead of connecting seems high. When setting
+	max_files_per_connection to 1 we see that.
+
+2008-08-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 1217622571.0889 - 1217597432.86734 = 25138.2215600014
+
+	25138.2215600014/3600 = 6.98283932222261
+
+	It jumps into the eye that this is ~ 7 hours, not ~6, so there seems to
+	be a bug in the aggregator. FIXED
+
+2008-07-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* e.g. id/Y/YE/YEWENBIN/Emacs-PDE-0.2.16.tar.gz: Do we have it, should
+	we have it, can we mirror it, mirror it!
+
+	I fear this needs a new class which might be called
+	File::Rsync::Mirror::Recent. It would collect all recentfiles of a kind
+	and treat them as an entity. I realize that a single recentfile may be
+	sufficient for certain tasks and that it is handy for the low level
+	programmer but it is not nice to use. If there is a delete in the 1h
+	file then the 6h file still contains it. Seekers of the best information
+	need to combine at least some of the recentfiles most of the time.
+
+	There is the place for the Z loop!
+
+	But the combination is something to collect in a database, isn't it. Did
+	csync2 just harrumph?
+
+2008-07-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* it just occurred to me that hosts in the same mirroring pool could
+	help out each other even without rewriting the recentfile. Just fetch
+	the stuff to mirror from several places, bingo. But that's something
+	that should rather live in a separate package or in rsync directly.
+
+	* cronjobs are unsuited because with ntp they would all come at the full
+	minute and disturb each other. Besides that I'd hate to have a backbone
+	with more than a few seconds latency.
+
+2008-07-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* a second rsync server with access control for PAUSE. Port? 873 is the
+	standard port, let's take 8873.
+
+	* if there were a filesystem based on this, it would have a slow access
+	to inexistent files. It would probably provide wrong readdir (only based
+	on current content) or also a slow one (based on a recentfile written
+	after the call). But it would provide fast access to existing files. Or
+	one would deliberately allow slightly blurred answers based on some
+	sqlite reflection of the recentfiles.
+
+	* todo: write a variant of mirror() that combines two or more
+	recentfiles and treats them like one
+
+	* todo: signal handler to remove the tempfile
+
+2008-07-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* now that we have the symlink I forgot how it should be used in
+	practice.
+
+	* the z loop: add missing files to Z file. Just append them (instead of
+	prepending). So one guy prepends something from the Y file from time to
+	time and another guy appends something rather frequently. Collecting
+	pond. When Y merges into Z, things get epoch and the collecting pond
+	gets smaller. What exactly are "missing files"?
+
+	take note of current epoch of the alpha file, let's call it the
+	recent-ts
+
+	find all files on disk
+
+	remove all files registered in the recentworld up to recent-ts
+
+	remove all files that have been deleted after recent-ts according to
+	recentworld
+
+2008-07-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* rersyncrecent might be a cronjob with a (locked) state file which
+	contains things like after and maybe last z sync or such?
+
+	rrr-mirror might be an alternative name but how would we justify the
+	three Rs when there is no Re-Rsync-Recent?
+
+	With the --loop parameter it is an endless loop, without it is no loop.
+	At least this is simple.
+
+	* todo: new accssor z-interval specifies how often the Z file is updated
+	against the filesystem. We probably want no epoch stamp on these
+	entries. And we want to be able to filter the entries (e.g. no
+	by-modules and by-category tree)
+
+2008-07-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Fill the Z file. gc or fsck or both. Somehow we must get the old files
+	into Z. We do not need the other files filled up with filesystem
+	contents though.
+
+	* need interface to query for a file in order to NOT call update on
+	PAUSE a second time within a short time.
+
+2008-07-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* recommended update interval? Makes no sense, is different for
+	different users.
+
+	* Moosify
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Todo"
+	tab-width: 2
+	left-margin: 2
+	End:

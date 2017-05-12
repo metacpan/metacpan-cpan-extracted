@@ -1,0 +1,64 @@
+[% PROCESS sub/date.html %]
+
+[% title = 'Action Logs Of ' _ forum.name %]
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='[% forum.forum_url %]'><span>Topics</span></a></li>
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/polls'><span>Polls</span></a></li>
+        [% END %]
+        [% END %]
+        [% UNLESS forum.settings.can_post_threads AND forum.settings.can_post_threads == 'N' %]
+        <li><a href='[% forum.forum_url %]/topic/new'><span>[% c.loc("New Topic") %]</span></a></li>
+        [% END %]
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/poll/new'><span>[% c.loc("New Poll") %]</span></a></li>
+        [% END %]
+        [% END %]
+        <li selected="selected"><a href='[% forum.forum_url %]/action_log'><span>View Action Logs</span></a></li>
+        <li><a href='[% forum.forum_url %]/about'><span>About</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<table align='center'>
+	<tr class='title' align='center'>
+	<td width='80'>[% c.loc('Operator') %]</td>
+	<td width='50'>[% c.loc('Action') %]</td>
+	<td align='left'>[% c.loc('Object') %]</td>
+	<td width='120'>[% c.loc('Date') %]</td>
+	</tr>
+[% FOREACH log IN logs %]
+<tr align='center'>
+	<td class='forum2'><a href='/u/[% log.operator.username %]'>[% log.operator.nickname %]</a></td>
+	<td class='forum1'>[% log.action | ucfirst %]</td>
+	<td class='forum2' align='left'>
+	    [% IF log.object_type == 'topic' AND log.action != 'delete' %]
+	    <a href='[% forum.forum_url %]/topic/[% log.object_id %]'>[% log.text %]</a>
+	    [% ELSE %]
+	    [% log.text %]
+	    [% END %]
+	</td>
+	<td class='forum1'><span class='date'>[% date_format(log.time) %]</span></td>
+</tr>
+[% END %]
+<tr class='forum1'>
+	<td colspan='4' align='right'>
+	[% INCLUDE 'sub/pager.html' url_prefix = forum.forum_url _ '/action_log' %]
+	</td>
+</tr>
+</table>
+</div>
+
+    </div>
+</div>
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Frontier/Client/Easy.pm
+t/easy.t

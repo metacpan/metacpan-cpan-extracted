@@ -1,0 +1,52 @@
+{
+   "abstract" : "Search for a file in an environment variable path",
+   "author" : [
+      "Tim Jenness E<lt>tjenness@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-SearchPath",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Env::Path" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0.8"
+         }
+      }
+   },
+   "provides" : {
+      "File::SearchPath" : {
+         "file" : "lib/File/SearchPath.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-2.0.php"
+      ],
+      "repository" : {
+         "url" : "git://github.com/timj/perl-File-SearchPath.git"
+      }
+   },
+   "version" : "0.07"
+}

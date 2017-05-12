@@ -1,0 +1,40 @@
+[% USE FillInForm %]
+
+[% UNLESS c.req.method == 'POST';
+    announce_title = announce.title | decodeHTML;
+    filldata = {
+        title => announce_title,
+        text  => announce.text,
+        formatter => announce.formatter,
+    };
+END; %]
+
+[% WRAPPER 'forumadmin/bar.html' %]
+
+[% FILTER fillinform fdat => filldata || c.req.params %]
+
+<div class='one'>
+<form method='post'>
+<table align='center'>
+    <tr class='forum2'>
+        <td align='right'>[% c.loc('Title') %]</td><td><input type='text' name='title' size='40' /></td>
+        <td rowspan='3'>
+            Have fun!
+        </td>
+    </tr>
+    <tr class='forum1'><td align="right">[% c.loc("Formatter") %]</td>
+        <td><input type='radio' name='formatter' value='ubb' checked='yes' />UBB &nbsp; <input type='radio' name='formatter' value='textile' />Textile &nbsp; <input type='radio' name='formatter' value='wiki' />Wiki &nbsp; <input type='radio' name='formatter' value='pod' />Pod &nbsp; <input type='radio' name='formatter' value='plain' />Plain &nbsp;[% IF roles.site.admin %] <input type='radio' name='formatter' value='html' />HTML &nbsp;[% END %] </td>
+    </tr>
+    <tr class='forum2'>
+        <td align='right'>[% c.loc('Content') %]</td><td>
+            <textarea cols='60' rows='18' wrap="virtual" name="text"></textarea>
+        </td>
+    </tr>
+    <tr class='forum1'><td colspan='3'><input type='submit' value="I'm sure, Let's Go!" /></td></tr>
+</table>
+</form>
+</div>
+
+[% END %][%# END for FillInForm %]
+
+[% END %]

@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/File/PathInfo.pm
+lib/File/PathInfo.pod
+t/0_fpi.t
+t/1_fpi_hash.t
+t/2_errstr.t
+t/public_html/.hidden_file.txt
+t/public_html/demo/civil.txt
+t/public_html/demo/hellokitty.gif
+t/public_html/house.txt
+t/public_html/oake.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

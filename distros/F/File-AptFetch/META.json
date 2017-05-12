@@ -1,0 +1,59 @@
+{
+   "abstract" : "perl interface onto APT-Methods",
+   "author" : [
+      "ADOPTME"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-AptFetch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : 0,
+            "POSIX" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Cwd" : 0,
+            "IO::Pipe" : 0,
+            "List::Util" : 0,
+            "String::Truncate" : 0,
+            "base" : 0,
+            "perl" : "v5.8.0",
+            "version" : "v0.77.0"
+         }
+      }
+   },
+   "provides" : {
+      "File::AptFetch" : {
+         "file" : "lib/AptFetch.pm",
+         "version" : "v0.1.14"
+      },
+      "File::AptFetch::Simple" : {
+         "file" : "lib/Simple.pm",
+         "version" : "v0.1.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-3.0.txt"
+      ]
+   },
+   "version" : "v0.1.14"
+}

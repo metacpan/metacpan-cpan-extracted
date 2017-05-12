@@ -1,0 +1,55 @@
+SYNOPSIS
+
+     use Function::Fallback::CoreOrPP qw(clone unbless uniq);
+    
+     my $clone = clone({blah=>1});
+     my $unblessed = unbless($blessed_ref);
+     my @uniq  = uniq(1, 3, 2, 1, 4);  # -> (1, 3, 2, 4)
+
+DESCRIPTION
+
+    This module provides functions that use non-core XS modules (for best
+    speed, reliability, feature, etc) but falls back to those that use core
+    XS or pure-Perl modules when the non-core XS module is not available.
+
+    This module helps when you want to bootstrap your Perl application with
+    a portable, dependency-free Perl script. In a vanilla Perl installation
+    (having only core modules), you can use App::FatPacker to include
+    non-core pure-Perl dependencies to your script.
+
+FUNCTIONS
+
+ clone($data) => $cloned
+
+    Try to use Data::Clone's clone, but fall back to using Clone::PP's
+    clone.
+
+ clone_list(@data) => @data
+
+    A shortcut for:
+
+     return map {clone($_)} @data
+
+ unbless($ref) => $unblessed_ref
+
+    Try to use Acme::Damn's damn to unbless a reference but fall back to
+    shallow copying.
+
+    NOTE: damn() MODIFIES the original reference. (XXX in the future an
+    option to clone the reference first will be provided), while shallow
+    copying will return a shallow copy.
+
+    NOTE: The shallow copy method currently only handles blessed
+    {scalar,array,hash}ref as those are the most common.
+
+ uniq(@ary) => @uniq_ary
+
+    Try to use List::MoreUtils's uniq, but fall back to using slower,
+    pure-Perl implementation.
+
+SEE ALSO
+
+    Clone::Any can also uses multiple backends, but I avoid it because I
+    don't think Storable's dclone should be used (no Regexp support out of
+    the box + must use deparse to handle coderefs).
+

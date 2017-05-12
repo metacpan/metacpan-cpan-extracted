@@ -1,0 +1,25 @@
+<html>
+<head>
+<title>INSTALL</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<p>#labels Phase-Deploy,Featured</p><h1> NAME </h1><p>Foorum::Manual::INSTALL - install Foorum</p><h1> Steps </h1><h2> Database </h2><p>MySQL and SQLite are supported with tests while PostgreSQL are still marked as EXPERIMENTAL.</p><h3> MySQL </h3><ul><li>mysql -uroot -p </li><li>mysql&gt; CREATE DATABASE foorum; </li><li>mysql&gt; CREATE DATABASE theschwartz; </li><li>mysql&gt; exit; </li><li>mysql -uroot -p foorum &lt; bin/db/foorum.sql </li><li>mysql -uroot -p theschwartz &lt; bin/db/theschwartz.sql </li></ul><h3> SQLite </h3><p>Download sqlite3 from <a href="http://www.sqlite.org/download.html" rel="nofollow">http://www.sqlite.org/download.html</a></p><ul><li>sqlite3 foorum.db </li><li>sqlite&gt; .read bin/db/foorum.sqlite.sql </li><li>sqlite&gt; .read bin/db/theschwartz.sqlite.sql </li><li>sqlite&gt; .quit </li></ul><h3> PostgreSQL (EXPERIMENTAL) </h3><p>files are bin/db/foorum.pg.sql and bin/db/theschwartz.pg.sql</p><p>USE IT AT YOUR OWN RISK.</p><h2> Perl </h2><ul><li>perl bin/setup.pl </li><li>perl Makefile.PL; make; make test; make realclean; </li><li>perl bin/foorum_server.pl </li></ul><h2> Apache Configure </h2><ul><li>remember set Options -Index in $Foorum/root/upload, so that nobody can view /upload URL </li></ul><pre class="prettyprint">$ vim Foorum/root/upload/.htaccess
+Options -Indexes
+</pre><h1> SEE ALSO </h1><p><a href="Configure.html">Configure</a>, <a href="TroubleShooting.html">TroubleShooting</a></p>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/INSTALL">http://code.google.com/p/foorum/wiki/INSTALL</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

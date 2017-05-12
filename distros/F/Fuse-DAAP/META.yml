@@ -1,0 +1,16 @@
+---
+name: Fuse-DAAP
+version: 0.01
+author:
+  - 'Jack Bates <ms419@freezone.co.uk>'
+abstract: ~
+license: perl
+requires:
+  Fuse: 0
+  Net::DAAP::Client: 0
+  perl: 5
+provides:
+  Fuse::DAAP:
+    file: lib/Fuse/DAAP.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

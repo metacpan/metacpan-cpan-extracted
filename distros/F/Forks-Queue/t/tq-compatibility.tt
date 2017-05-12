@@ -1,0 +1,136 @@
+# tq-compability.tt:
+#        Thread::Queue compatibility layer to run a Thread::Queue
+#        test script against Forks::Queue. This should be used
+#        for tests whenever a call is made to a  Test::More  test
+#        method (like 'ok', 'is', 'is_deeply', etc.) from a
+#        thread that is not the main thread
+#
+# To use it, just add
+#
+#     require "t/tq-compatibility.tt";
+#
+# near the top of the script somewhere.
+#
+
+use Test::More;
+use Carp::Always;
+use Forks::Queue;
+use warnings;
+no warnings 'redefine', 'once';
+our $okq //= Forks::Queue->new(impl => 'File');
+use threads;
+$INC{'Thread/Queue.pm'} = 1;
+alarm ($^O eq 'cygwin' ? 120 : 120) if !$tq::alarm_set++;
+
+open XERR, '>&STDERR';
+our $DBG = *XERR;
+unless ($ENV{TQ_DEBUG}) {
+    open $DBG,">",$^O eq 'MSWin32' ? 'nul' : "/dev/null";
+}
+
+sub Thread::Queue::new {
+    # commandeer Thread::Queue constructor to return an equivalent
+    # Forks::Queue object
+    my ($pkg,@list) = @_;
+    print $DBG "Fake Thread::Queue::new\n";
+    Forks::Queue->new( impl => $ARGV[0] || $Forks::Queue::OPTS{impl} || 'File',
+                       on_limit => 'block', list => \@list );
+}
+
+sub done_testing {
+    print $DBG "Fake done testing\n";
+    $okq->end;
+    while (my $item = $okq->get) {
+        tq::process_okq_task($item);
+    }
+    goto &Test::More::done_testing;
+}
+
+sub tq::process_okq_task {
+    my $task = shift;
+    my $test = shift @$task;
+    my $pid = pop @$task;
+    if ($test eq 'ok') {
+        return Test::More::ok($task->[0], "[$pid] " . $task->[1]);
+    } elsif ($test eq 'is') {
+        return Test::More::is($task->[0],$task->[1],"[$pid] $task->[2]");
+    } elsif ($test eq 'is_deeply') {
+        return Test::More::is_deeply($task->[0],$task->[1],"[$pid] $task->[2]");
+    } elsif ($test eq 'like') {
+        return Test::More::like($task->[0], $task->[1], "[$pid] $task->[2]");
+    }
+    warn "unrecognized test: $test\n";
+    return 0;
+}
+
+# in child processes/threads, write components of a test to a queue.
+# the main process will read the queue and report the results.
+
+sub is ($$;$) {
+    goto &Test::More::is unless threads->tid();
+    print $DBG "Fake is\n";
+    $okq->put( [ 'is', @_, threads->tid ] );
+    return !defined($_[1]) ? !defined($_[0]) : "$_[0]" eq "$_[1]";
+}
+
+sub is_deeply {
+    goto &Test::More::is_deeply unless threads->tid();
+    print $DBG "Fake is_deeply\n";
+    $okq->put( [ 'is_deeply', @_, threads->tid ] );
+    return 1;
+}
+
+sub ok ($;$) {
+    goto &Test::More::ok unless threads->tid();
+    print $DBG "Fake ok  @_\n";
+    $okq->put( [ 'ok', @_, threads->tid ] );
+    return $_[0];
+}
+
+sub pass (;$) {
+    goto &Test::More::pass unless threads->tid();
+    print $DBG "Fake pass  @_\n";
+    $okq->put( ['ok', 1, @_, threads->tid ] );
+    return 1;
+}
+
+sub like ($$;$) {
+    goto &Test::More::like unless threads->tid();
+    print $DBG "Fake like\n";
+    $okq->put( [ 'like', @_, threads->tid ] );
+    return "$_[0]" =~ $_[1];
+}
+
+# helper to iterate through implementations, and to process
+# the 
+our (@IMPL,$impl);
+sub tq::IMPL {
+    while (my $task = $okq->get_nb) {
+        tq::process_okq_task($task);
+    }
+    if (!@IMPL) {
+        if (@_) {
+            @IMPL = @_;
+        } elsif ($ENV{FORKS_QUEUE_IMPL}) {
+            @IMPL = split /,/, $ENV{FORKS_QUEUE_IMPL};
+        } elsif (@ARGV) {
+            @IMPL = @ARGV;
+        } else {
+            push @IMPL, 'File' if eval "use Forks::Queue::File;1";
+            push @IMPL, 'Shmem' if eval "use Forks::Queue::Shmem;
+                                         -d \$Forks::Queue::Shmem::DEV_SHM";
+            push @IMPL, 'SQLite' if eval "use DBD::SQLite;
+                                          use Forks::Queue::SQLite;1";
+        }
+        push @IMPL,'__DONE__';
+    }
+    $impl = $Forks::Queue::OPTS{impl} = shift @IMPL;
+    if ($impl eq '__DONE__') {
+#        alarm 0;
+        return;
+    }
+#    alarm 60;
+    return $impl;
+}
+
+1;

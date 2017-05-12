@@ -1,0 +1,12 @@
+TODO list for Perl module FedoraCommons::APIA
+
+2009-10-23:
+
+- Consider implementing other methods. This depends on the interest
+  show in the initial module.
+
+- Build thorough test suite. This is difficult to do since the
+  module interacts with a server that must be configured and
+  running.
+
+

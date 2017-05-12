@@ -1,0 +1,146 @@
+Revision history for Perl extension Fl
+
+0.99.14 2016-07-01T13:04:26Z
+
+    - Fix crash when args are set with $widget->callback(...)
+    - Custom widgets are now reblessed into the correct package in callbacks
+
+0.99.13 2016-06-27T15:31:43Z
+
+    - Some smokers ignore prereqs>test>requires in META.json which causes
+        tests to fail. Adding Test::NeedsDisplay to ...>configure>requires.
+
+0.99.12 2016-06-27T06:07:58Z
+
+    - Clipboard support
+    - Begin work on custom widgets (undocumented alpha in this version)
+        - draw() can be overridden
+        - extends() creates inheratence trees and handles widget registration
+        - handle() handles specific events. Ugh... See the docs...
+    - Expanded export tags/values (get them all with :enum, of course):
+        - :event - handle(...) event values are now exported now
+        - :default - This tag is exported by default. I'll note these as the
+            list grows
+    - New demo scripts:
+        - eg/double_click.pl - Custom button widget that detects double clicks
+        - eg/drag_and_drop.pl - Example of clipboard access and drag and drop
+    - New widgets:
+        - Fl::Progress - Typical progress bar
+        - Fl::InputChoice - Input widget and menu button rolled into one
+        - Fl::Menu - Base class for all widgets that have a menu
+        - Fl::MenuButton - Button that pops up a menu when pushed
+        - Fl::HtmlView - Simple HTML viewer
+    - New demo scripts:
+        - eg/progress.pl - Demos using a Fl::Progress bar to keep user up to date on background progress
+        - eg/input_choice.pl - Demos using Fl::InputChoice and enabling/disabling widgets
+    - Some tests require a working DISPLAY on X11
+
+0.99.11 2016-06-04T15:18:01Z
+
+    - New widgets:
+        - Fl::Tabs - "File card tabs" interface
+        - Fl::Output - Simple display widget for single lines of text
+        - Fl::MultilineOutput - Simple display widget for multiple lines of text
+    - New demo scripts:
+        - eg/tabs.pl - Demonstrates Fl::Tabs
+        - eg/scrollbar.pl - Demonstrates Fl::Scrollbar and Fl::Output use
+
+0.99.10 2016-06-04T00:08:58Z
+
+    - New widgets:
+        - Fl::Scrollbar - Slider with arrow buttons at either end
+        - Fl::Slider - Contains a sliding knob inside a box
+        - Fl::FillSlider - Filled Vertical Slider. Useful as a progress or value meter
+        - Fl::HorFillSlider - Fl::FillSlider but horizontal
+        - Fl::NiceSlider - Fl::Slider with an easy grab handle
+        - Fl::HorNiceSlider - Fl::NiceSlider but horizontal
+        - Fl::HorSlider - Horizontal Fl::Slider
+        - Fl::ValueSlider - Slider widget that displays the current value
+        - Fl::HorValueSlider - Horizontal Fl::ValueSlider
+
+0.99.9 2016-05-19T01:11:29Z
+
+    - Fix index count when there are optional arguments in generated code
+
+0.99.8 2016-05-18T18:33:34Z
+
+    - New widgets:
+        - Fl::Counter - Controls a single floating point value with button (or keyboard) arrows
+        - Fl::SimpleCounter - Fl::Counter with only two buttons
+        - Fl::Dial - Circular dial to control a single floating point value
+        - Fl::FillDial - Fl::Dial with a filled arc
+        - Fl::LineDial - Fl::Dial with a single line to mark the current value
+        - Fl::Roller - '3D' dial to control a floating point value
+        - Fl::ValueOutput - Read-only display of floating point value
+        - Fl::ValueInput - Displays a floating point value the user can modify
+
+0.99.7 2016-05-18T00:20:32Z
+
+    - Fix refcount related crash on super sensitive *nix glibc
+
+0.99.6 2016-05-17T16:16:32Z
+
+    - New widgets:
+        - Fl::Input - single line text input widget
+        - Fl::SecretInput - input widget with hidden text (password fields, etc.)
+        - Fl::FloatInput - limits users to type only floating point numbers
+        - Fl::IntInput - limits users to type only decimal digits and hex values
+        - Fl::MultilineInput - allows editing of multiline text fields
+        - Fl::Valuator - Base class for several floating-point value widget types
+        - Fl::Adjuster - Dynamic range valuator stolen from Prisms
+
+0.99.5 2016-05-08T22:04:46Z
+
+    - Starting basic documentation in Fl.pm
+    - Callbacks no longer cause crash on destruction due to bad ref counts
+    - New widgets:
+        - Fl::CheckButton - a button with a checkbox
+        - Fl::LightButton - a button with a light to indicate 'on' vs 'off'
+        - Fl::ReturnButton - triggers callback when Enter key is pressed
+        - Fl::RepeatButton - repeatedly triggers callback as long as it's held down
+        - Fl::RadioRoundButton - looks like a radio button and acts like one too
+        - Fl::RoundButton - looks like a radio button but behaves like a traditional button
+        - Fl::RadioButton - acts like a radio button but looks like a regular one
+        - Fl::RadioLightButton - no idea...
+        - Fl::ToggleButton - toggles on when pressed and back off when pressed again
+    - New export tags/values (get them all with :enum, of course):
+        - :align - Label alignment values
+
+0.99.4 2016-05-06T02:02:22Z
+
+    - New widget: Fl::Button
+    - Incomplete callback system for widgets (strong refs cause crash)
+    - New export tags/values (get them all with :enum, of course):
+        - :when - Callback trigger conditions
+        - :button - Fl::Button types (normal, toggle, radio)
+        - :keyboard - Event and state types for keyboard keys
+        - :mouse - Event and state values for mouse buttons
+    - Forgot to update eg/synopsis.pl to new :event tag in v0.99.2
+
+0.99.3 2016-05-02T20:19:14Z
+
+    - Require Alien::FLTK during configure because some smokers ignore runtime prereqs
+
+0.99.2 2016-05-02T02:57:53Z
+
+    - New widget: Fl::Chart
+    - New demo script: eg/chart.pl
+    - New export values found in Fl::Enumerations
+        - Fl_Chart types exported with :chart tag
+    - New utility functions and values found in Fl::Color
+        - Import them with the :color tag
+    - Event loop functions are now documented in Fl::Event and imported with the :event tag
+
+0.99.1 2016-04-27T22:11:14Z
+
+    - FLTK.pm now has a $VERSION
+    - New export values found in Fl::Enumerations
+        - Fl_Label types exported with :label tag
+        - FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION, FL_VERSION exported with :version tag
+        - Fl_Boxtype types exported with :box tag
+    - We don't need to link with internal image or gl libs on most systems
+    - New Widgets: Fl::Window, Fl::Box, Fl::Group
+
+0.99.00 2016-04-26T04:55:11Z
+
+    - First release. Resume project with stable 1.3.3 branch of FLTK

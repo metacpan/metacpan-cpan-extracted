@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w
+
+#
+# dblistize
+# Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+# $Id$
+#
+# This program is distributed under terms of the GNU general
+# public license, version 2.  See the file COPYING
+# in $dblibdir for details.
+#
+
+=head1 NAME
+
+dblistize - DEPRICATED, now use dbfilealter
+
+=cut
+
+use Fsdb::Filter::dbfilealter;
+my $f = new Fsdb::Filter::dbfilealter(qw(-R C));
+$f->setup_run_finish;  # or could just --autorun
+exit 0;

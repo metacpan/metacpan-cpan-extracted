@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Finance::Nadex;
+
+if (! $ENV{NADEXUSERNAME} || ! $ENV{NADEXPASSWORD}) {
+    die "to use this program, you must set NADEXUSERNAME and NADEXPASSWORD in your environment with your Nadex username and password\n";
+}
+
+# connects to the live platform; alternatively, connect to demo with my $client = Finance::Nadex->new(platform => 'demo');
+my $client = Finance::Nadex->new();
+$client->login(username => $ENV{NADEXUSERNAME}, password => $ENV{NADEXPASSWORD});
+
+
+my $market = 'Forex (Binaries)';
+my $instrument = 'GBP/USD';
+
+
+my @series = $client->get_time_series( market => $market, instrument => $instrument );
+foreach my $series (@series) {
+   print $series, "\n"; 
+}
+

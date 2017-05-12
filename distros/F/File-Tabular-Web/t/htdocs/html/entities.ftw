@@ -1,0 +1,30 @@
+
+foo = bar
+
+
+[fixed]
+
+max = 200
+
+[default]
+
+count = 20
+
+
+[template]
+
+short  = _short.tt
+long   = _long.tt
+modif  = _modif.tt
+msg    = _msg.tt
+home   = _home.tt
+
+[permissions]
+
+modif  = *
+delete = tst_file_tabular_web
+add    = tst_file_tabular_web
+
+[fields]
+autoNum Num
+default Num = "#"

@@ -1,0 +1,14 @@
+#!perl
+use strict;
+use warnings;
+
+use Finance::TW::TAIFEX;
+
+my $rpt_dir = shift or die 'rpt dir required';
+
+my $taifex = Finance::TW::TAIFEX->new(shift);
+
+$taifex->is_trading_day
+    or exit(0);
+
+$taifex->ensure_rpt($rpt_dir, 'futures', 'Daily_');

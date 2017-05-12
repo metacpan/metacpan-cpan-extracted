@@ -1,0 +1,18 @@
+File::Find::Rule::Ext2::FileAttributes
+  Provides methods to check for the presence of the "immutable" and
+  "append only" Ext2 extended file system attributes on files via
+  File::Find::Rule
+
+For documentation please read the modules inline POD.
+  perldoc File::Find::Rule::Ext2::FileAttributes
+
+To install, do the usual:
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.
+
+For a complete list of changes, see the Changes file.

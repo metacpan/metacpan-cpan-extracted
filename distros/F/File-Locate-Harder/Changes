@@ -1,0 +1,27 @@
+Revision history for Perl extension File::Locate::Harder.
+
+0.01  Mon May 28 20:41:51 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -nFile::Locate::Harder -b5.6.0
+
+0.02  Thursday June  7, 2007   9:13 PM
+	- updated perl version dependency to 5.8.0
+
+0.03  Saturday June  9, 2007  11:52 PM
+        - improved efficiency of probe_db_via_shell_locate
+        - now allows options on locate method (as well as new)
+        - undef db arg on new suppresses file system probe for db
+        - added more tests: 01-File-Locate-Harder.t
+        - modified all tests to skip if no form of "locate" is installed
+
+0.04  Sunday June 10, 2007  12:19 AM
+        - fixed bug (potential efficiency hit) in determine_system_db
+
+
+0.05  Friday June 22, 2007  12:32 AM
+        - bug fix: create_database now creates directory if needed
+
+0.05  Sun Mar 21 23:30:13 2010
+        - The mlocate flavor of updatedb has a new style of invocation string.
+          Revised create_database to try it also.
+

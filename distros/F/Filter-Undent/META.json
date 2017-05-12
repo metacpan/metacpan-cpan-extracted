@@ -1,0 +1,47 @@
+{
+   "abstract" : "Un-indent heredoc strings automatically",
+   "author" : [
+      "Anthony Kilna <anthony@kilna.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Filter-Undent",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Simple" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Filter::Undent" : {
+         "file" : "lib/Filter/Undent.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.3"
+}

@@ -1,0 +1,89 @@
+v0.4.0  2017-04-23
+        - Add the ::DigestCache::FS feature to speed up digests' calculations
+        based on the files' mtimes.
+            - There are tests, but it is currently underdocumented except in
+            the command-line app.
+
+v0.2.3  2016-12-17
+        - Hopefully install "dir-dump" again.
+            - Caught by building the Mageia package - thanks!
+
+v0.2.2  2016-12-01
+        - Unify the versions of the .pm files
+            - https://github.com/shlomif/perl-File-Dir-Dumper/pull/11
+            - Thanks to @manwar for reporting the problem and for two pull-reqs.
+        - Hopefully Fix the tests on MS Windows.
+            - Thanks to CPAN Testers for noticing.
+
+v0.2.1  2016-11-30
+        - Add MANIFEST.SKIP and remove temporary files.
+        - Fix the previous release.
+
+v0.2.0  2016-11-30
+        - Add the digests parameter to lib/File/Dir/Dumper/Scanner.pm .
+            - With tests
+            - See https://github.com/shlomif/perl-File-Dir-Dumper/issues/3 .
+            - Thanks to @Snelius30 for a commit that implemented an incomplete
+            feature, but which still proved of some use.
+        - Convert from Class-Accessor to Class-XSAccessor
+        - Convert to Dist-Zilla
+
+v0.0.11 2016-09-05
+        - Convert the repository to git and GitHub.
+
+v0.0.10 2015-01-07
+        - Convert from JSON.pm to JSON::MaybeXS which is more recommended.
+
+v0.0.9  2014-01-29
+        - Minimum version of perl is 5.12.x (for CPANTS Kwalitee).
+        - Add a standalone LICENSE file (for CPANTS Kwalitee).
+        - Change from "use base" to "use parent".
+
+v0.0.8  2013-05-21
+
+        - Convert the Changes (this file) to t/cpan-changes.t.
+        - Get rid of Makefile.PL.
+        - Move to scripts/bump-version-number.pl
+        - Update the repository URL.
+        - Get rid of trailing space - t/style-trailing-space.t .
+
+v0.0.7   2010-06-30
+
+        - Hopefully fixed the tests (and functionality) on Windows by
+        using getpwent only on Unix systems.
+            - Thanks to Devel-CheckOS.
+
+v0.0.6   2009-06-28
+
+        - Added resources and keywords to the META.yml.
+
+v0.0.5   2008-11-13
+
+        - Fixed dumper.t to resolve this test problem:
+            - http://www.nntp.perl.org/group/perl.cpan.testers/2008/11/msg2597312.html
+            - the GID was setgid'ed or something.
+
+v0.0.4   2008-11-10
+
+        - In 'build_requires' - changed IO::Scalar (which we're not
+        using in the tests) to IO::String (which we do).
+        - added the --help flag and the man page to dir-dump.
+        - added some links to "SEE ALSO".
+
+v0.0.3   2008-11-06
+
+        - Added more dependencies to the Build.PL, including the up-to-date
+        version of Getopt::Long, with GetOptionsFromArray.
+
+v0.0.2   2008-11-03
+
+        - Fixed the ::App module - it didn't "use" JSON::Writer.
+        - Added a test script for the ::App module.
+
+v0.0.1   2008-11-03
+
+        - First version
+            - doesn't handle symbolic links.
+            - documentation:
+                - dir-dump -o to-file.txt $dir_to_dump
+

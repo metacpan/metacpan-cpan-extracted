@@ -1,0 +1,43 @@
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+
+# This file is part of Finance-Quote-Grab.
+#
+# Finance-Quote-Grab is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 3, or (at your option) any
+# later version.
+#
+# Finance-Quote-Grab is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+#
+# libhttp-message-perl split out of libwww-perl in version 6, either
+# package provides HTTP::Message.
+
+Source: libfinance-quote-grab-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.6
+Homepage: http://user42.tuxfamily.org/finance-quote-grab/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libfinance-quote-grab-perl
+Architecture: all
+Depends: perl (>= 5.005), libfinance-quote-perl (>= 1.15), libhtml-tableextract-perl, libwww-perl (>= 5.814), libhttp-message-perl | libwww-perl, liburi-perl, libscalar-list-utils-perl | perl (>= 5.8), ${perl:Depends}, ${misc:Depends}
+Description: Download stock quotes from more places
+ Finance-Quote-Grab extends Finance::Quote to download quotes from the
+ following sources
+  * MLC Funds
+  * Reserve Bank of Australia (RBA)
+  * Minneapolis Grain Exchange (MGEX)

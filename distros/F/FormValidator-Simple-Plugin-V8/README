@@ -1,0 +1,29 @@
+NAME
+    FormValidator::Simple::Plugin::V8 - Enable to write validation rules in
+    JavaScript
+
+SYNOPSIS
+      package FormValidator::Simple::Plugin::MyRules;
+      use FormValidator::Simple::Plugin::V8 'rules.js';
+
+      use FormValidator::Simple qw/MyRules/;
+
+      my $result = FormValidator::Simple->check( ... );
+
+DESCRIPTION
+    FormValidator::Simple::Plugin::V8 is for commonalizing validation
+    between client and server.
+
+API in JavaScript
+    rule(name, func);
+        name is validation rule name and func is function which returns
+        true/false.
+
+AUTHOR
+    cho45 <cho45@lowreal.net>
+
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

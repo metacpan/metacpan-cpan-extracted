@@ -1,0 +1,15 @@
+Changes
+FcntlLock.xs
+lib/File/FcntlLock.pm
+lib/File/FcntlLock.pod
+lib/File/FcntlLock/Core.pm
+lib/File/FcntlLock/XS.pm
+lib/File/FcntlLock/Errors.pm
+Pure_build/Pure.tmpl
+Pure_build/builder.c
+Inline_build/Inline.pm.in
+Makefile.PL
+MANIFEST
+README
+t/FcntlLock.t
+META.yml                                 Module meta-data (added by MakeMaker)

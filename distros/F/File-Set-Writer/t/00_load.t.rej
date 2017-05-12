@@ -1,0 +1,17 @@
+***************
+*** 1,6 ****
+  #!/usr/bin/perl
+  use warnings;
+  use strict;
+  use Test::More;
+  
+  use_ok( "File::Set::Writer" );
+--- 1,8 ----
+  #!/usr/bin/perl
+  use warnings;
+  use strict;
++ # Disable extra testing for deficient development environments
++ BEGIN { $ENV{PERL_STRICTURES_EXTRA} = 0; }
+  use Test::More;
+  
+  use_ok( "File::Set::Writer" );

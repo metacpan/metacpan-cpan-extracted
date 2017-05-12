@@ -1,0 +1,81 @@
+README for Filesys::Virtual::SSH 0.03
+
+=head1 NAME
+
+Filesys::Virtual::SSH - remote execution Virtual Filesystem
+
+=head1 SYNOPSIS
+
+ use Filesys::Virtual::SSH;
+ my $fs = Filesys::Virtual::SSH->new({
+     host      => 'localhost',
+     cwd       => '/',
+     root_path => '/',
+     home_path => '/home',
+ });
+ my @files = $fs->list("/");
+
+ # a deeply inneffecient equivalent to
+ # my @files = `ls -a /`;
+ # chomp @files;
+
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Filesys::Virtual
+ Filesys::Virtual::Plain
+ String::ShellQuote
+ perl	5.006
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.03	Wednesday 22nd June, 2005
+
+	Made the open_write method actually open files on the remote server
+	(Joel Bernstein)
+
+	Ripped out the reference to rt.cpan.org (I don't actually use it)
+
+
+=item 0.02	Friday 30th April, 2004
+
+	unstealthed the dependency on String::ShellQuote, fixed a docubug
+
+
+=item 0.01	Friday 30th April, 2004
+
+	Initial CPAN release
+
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright 2004, 2005 Richard Clamp.  All Rights Reserved.
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Filesys::Virtual, POE::Component::Server::FTP
+

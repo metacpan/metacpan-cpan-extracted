@@ -1,0 +1,6 @@
+Revision history for Perl extension File::ReadSimple.
+
+1.0  Mon Jul  3 17:04:01 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.0 File::ReadSimple -v 1.0
+

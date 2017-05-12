@@ -1,0 +1,10 @@
+<table>
+<tr><th>account</th> <th>passwd</th> <th>uid</th> <th>gid</th> <th>fullname</th> <th>homedir</th> <th>shell</th> </tr>
+<tr bgcolor="#f0f0f0"><td>johnh</td> <td>*</td> <td>2274</td> <td>134</td> <td>John &amp; Ampersand</td> <td>/home/johnh</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#f0f0f0"><td>greg</td> <td>*</td> <td>2275</td> <td>134</td> <td>Greg &lt; Lessthan</td> <td>/home/greg</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#f0f0f0"><td>root</td> <td>*</td> <td>0</td> <td>0</td> <td>Root ; Semi</td> <td>/root</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#d0d0d0"><td>four</td> <td>*</td> <td>1</td> <td>1</td> <td>Fourth Row</td> <td>/home/four</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#d0d0d0"><td>five</td> <td>*</td> <td>1</td> <td>1</td> <td>5th Row</td> <td>/home/cinq</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#d0d0d0"><td>six</td> <td>*</td> <td>1</td> <td>1</td> <td>6th Row</td> <td>/home/seis</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#f0f0f0"><td>seven</td> <td>*</td> <td>1</td> <td>1</td> <td>7th Row</td> <td>/home/sieben</td> <td>/bin/bash</td> </tr>
+</table>

@@ -1,0 +1,53 @@
+#!perl
+#===============================================================================
+#
+# t/09_pod_coverage.t
+#
+# DESCRIPTION
+#   Test script to check POD coverage.
+#
+# COPYRIGHT
+#   Copyright (C) 2014 Steve Hay.  All rights reserved.
+#
+# LICENCE
+#   You may distribute under the terms of either the GNU General Public License
+#   or the Artistic License, as specified in the LICENCE file.
+#
+#===============================================================================
+
+use 5.008001;
+
+use strict;
+use warnings;
+
+use Test::More;
+
+#===============================================================================
+# MAIN PROGRAM
+#===============================================================================
+
+MAIN: {
+    plan skip_all => 'Author testing only' unless $ENV{AUTHOR_TESTING};
+
+    my $ok = eval {
+        require Test::Pod::Coverage;
+        Test::Pod::Coverage->import();
+        1;
+    };
+
+    if (not $ok) {
+        plan skip_all => 'Test::Pod::Coverage required to test POD coverage';
+    }
+    elsif ($Test::Pod::Coverage::VERSION < 0.08) {
+        plan skip_all => 'Test::Pod::Coverage 0.08 or higher required to test POD coverage';
+    }
+    else {
+        # all_pod_coverage_ok(); - Fails require()ing Filter::Crypto::Decrypt
+        plan tests => 3;
+        pod_coverage_ok('Filter::Crypto');
+        pod_coverage_ok('Filter::Crypto::CryptFile');
+        pod_coverage_ok('PAR::Filter::Crypto');
+    }
+}
+
+#===============================================================================

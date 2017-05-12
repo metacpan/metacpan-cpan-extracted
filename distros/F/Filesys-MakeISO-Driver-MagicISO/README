@@ -1,0 +1,26 @@
+Filesys::MakeISO::Driver::MagicISO version 0.0.1
+
+Filesys::MakeISO-Driver for MagicISO.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+Filesys::MakeISO, File::Which, IPC::Run3
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006, Uwe Voelker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

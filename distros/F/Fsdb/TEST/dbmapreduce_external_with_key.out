@@ -1,0 +1,5 @@
+#fsdb experiment key
+ufs_mab_sys	ufs_mab_sys-x
+ufs_rcp_real	ufs_rcp_real-x
+# test trailing comment
+#   | dbmapreduce --nowarnings --prepend-key -K -k experiment perl TEST/dbmapreduce_external_with_key.pl

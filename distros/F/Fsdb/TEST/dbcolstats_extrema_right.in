@@ -1,0 +1,6 @@
+#h x
+# mean should be 0.5, and because of ordering here it works out.
+1e20
+-1e20
+1
+1

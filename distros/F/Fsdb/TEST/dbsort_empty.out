@@ -1,0 +1,3 @@
+#fsdb cid cname
+# empty file, should give empty output and not hang
+#   | dbsort cname

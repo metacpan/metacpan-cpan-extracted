@@ -1,0 +1,24 @@
+
+(1) Install the ffcall library, if you do not already have it installed.
+
+If it is already installed, you will have, for example, an "avcall"
+library, man page, and avcall.h header.  You can skip to step 2, and
+if ffcall is not installed, you will be given an obvious error message.
+
+ffcall is available from http://directory.fsf.org/wiki/Libffcall
+and various other places.  Several platforms have their own distributions.
+
+    debian: apt-get install libffcall1 libffcall1-dev
+    redhat: http://rpmfind.net/linux/rpm2html/search.php?query=ffcall
+
+    [please contribute more distros]
+
+(2) Now, build the FFI package in the usual manner.
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+See the pod documentation for details of usage.
+

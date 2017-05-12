@@ -1,0 +1,2 @@
+requires 'Test::Kwalitee';
+requires 'Test::More';

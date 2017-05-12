@@ -1,0 +1,16 @@
+ARTISTIC.txt
+CHANGELOG
+GPL2.txt
+lib/File/Find/Rule/Permissions.pm
+Makefile.PL
+MANIFEST
+README
+t/_createtestfiles.pl
+t/_filetests.pl
+t/_mock.pl
+t/mocked.t
+t/notmocked.t
+t/pod.t
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

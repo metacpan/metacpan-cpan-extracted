@@ -1,0 +1,50 @@
+Revision history for Perl extension File::CacheDir.
+
+1.30 Tue Jun 20 2006
+  - Trying to avoid using CORE::exit - as suggested by Rob Brown bbb@cpan.org
+1.29 Tue May 16 2006
+  - Fix cleanup_frequency reverse logic - patch by Rob Brown bbb@cpan.org
+1.28 Thu Jul 14 2005
+  - let's use rename instead of mv
+1.27 Mon Nov 16  2004
+  - let's use rename instead of mv
+1.26 Mon Nov 16  2004
+  - doing a -e check on carry forward instead of -f, so it works for directories
+1.25 Mon Jun 14  2004
+  - let's just bump up the version for cpan's sake
+1.24 Tue Apr 14  2004
+  - adding flock support on cleanup check - patch by Rob Brown bbb@cpan.org
+1.23 Tue Apr 13  2004
+  - adding EXTANT_DIR to cache -d checks
+  - adding cache_stats flag to turn off the above
+1.22 Thu Sep 11  2003
+  - Trying to stop nice .cleanup.lock recursion bug
+1.21 Wed Sep 10  2003
+  - Need more than exists check on content_typed, want to check value
+1.20 Mon Sep  9  2003
+  - Forking on cleanup and allowing for more control of when cleanup gets called
+1.03 Sat Aug 30  2003
+  - Taint clean - patch by Rob Brown bbb@cpan.org
+1.02 Fri Jun 14  2002
+  - adding carried_forward flag, stable enough for beta
+0.19 Thu Feb 19  2002
+  - making a more pure object
+0.17 Thu Nov 19  2001
+  - getting to work on old perl
+0.16 Thu Oct 18  2001
+  - using pod2text to generate README file
+0.15  Wed Oct 17 2001
+  - allowing for cookies to get set, and adding carry_forward function
+0.14  Wed Jul 18 2001
+  - moved perldoc into .pm from a .pod
+0.13  Tue Jul 17 2001
+  - got rid of GET_ARGS requirement, allowed for code refs in the new
+0.12  Mon Jun  4 2001
+  - expanded the perldoc quite a bit
+0.11  Mon Jun  4 2001
+  - fixed a little bug
+0.10  Mon Jun  4 2001
+  - original version for CPAN
+0.01  Mon Jun  4 2001
+	- original version; created by h2xs 1.20 with options
+		-X File::CacheDir

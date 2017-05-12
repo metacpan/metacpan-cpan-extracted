@@ -1,0 +1,8 @@
+Revision history for File-Permissions-Unix
+
+0.1.0	 2016-01-09/07:00
+		 -Remove the file existence check to remove a possible race condition.
+		 		 This also depreciates error 3.
+
+0.0.0	 2011-08-14/05:05
+		 -Initial release.

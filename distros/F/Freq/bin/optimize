@@ -1,0 +1,13 @@
+#!perl -w
+
+use Freq;
+
+my $indexname = shift;
+#my $index = Freq->open_read($indexname); # make sure it exists
+#die unless $index;
+#$index->close_index;
+
+Freq::optimize_index($indexname);
+
+exit;
+

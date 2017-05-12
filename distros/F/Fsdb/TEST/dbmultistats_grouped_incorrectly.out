@@ -1,0 +1,6 @@
+#fsdb experiment mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+ufs_mab_sys	37.2	0	0	-	-	-	0.95	37.2	1383.8	37.2	37.2	1
+ufs_rcp_real	264.5	0	0	-	-	-	0.95	264.5	69960	264.5	264.5	1
+ufs_mab_sys	37.3	0	0	-	-	-	0.95	37.3	1391.3	37.3	37.3	1
+ufs_rcp_real	277.9	0	0	-	-	-	0.95	277.9	77228	277.9	277.9	1
+#  | dbmultistats -S -S -k experiment duration

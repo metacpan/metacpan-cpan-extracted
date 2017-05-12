@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl wrapper for Technical Analysis Library",
+   "author" : [
+      "Wim Verhaegen <wimv@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-TA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "_swig"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Finance::TA" : {
+         "file" : "TA.pm",
+         "version" : "v0.4.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://ta-lib.org/",
+      "repository" : {
+         "url" : "https://github.com/kmx/perl-finance-ta"
+      }
+   },
+   "version" : "v0.4.3"
+}

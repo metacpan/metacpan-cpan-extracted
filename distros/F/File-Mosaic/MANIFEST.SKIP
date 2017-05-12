@@ -1,0 +1,5 @@
+blib
+^Makefile$
+^Makefile.old$
+.svn
+MANIFEST.bak

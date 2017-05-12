@@ -1,0 +1,10 @@
+Revision history for Perl extension File::Descriptions.
+
+0.01  Wed Jun 24 17:22:38 1998
+	- original version; created by h2xs 1.18
+0.02  Wed Jun 24 19:41:31 WEST 1998
+	- added code, returns a hash with file/dir=>description
+	- added simtelnet detection and read
+0.03  Thu Jun 25 16:04:37 WEST 1998
+	- added Debian Packages
+	- added FreeBSD INDEX

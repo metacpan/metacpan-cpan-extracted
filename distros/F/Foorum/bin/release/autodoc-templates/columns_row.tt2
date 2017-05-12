@@ -1,0 +1,9 @@
+[%- FILTER collapse %]
+    [% SET class = loop.count % 2 ? 'odd' : 'even' %]
+    <tr class="[% class %]">
+    <td>[% INCLUDE column_name.tt2 %]</td>
+    <td>[% INCLUDE column_type.tt2 %]</td>
+    <td>[% INCLUDE column_info.tt2 %]</td>
+    [% INCLUDE table_comment.tt2 colspan = 2 comment = col.comment %]
+[% END -%]
+[%# $Id$ #%]

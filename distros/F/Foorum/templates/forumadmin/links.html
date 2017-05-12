@@ -1,0 +1,28 @@
+[% USE FillInForm %]
+
+[% WRAPPER 'forumadmin/bar.html' %]
+
+[% FILTER fillinform fdat => filldata || c.req.params %]
+
+<div class='one'>
+<form method='post'>
+<table align='center'>
+    <tr class="title"><td>Link text</td><td>URL</td></tr>
+    [% FOREACH i IN [0 .. max_count] %]
+    <tr class="forum[% IF loop.count MOD 2 == 1 %]1[% ELSE %]2[% END %]">
+        <td><input type='text' name="text[% i %]" size="20" />
+            [% IF error.text.${i} %]<span class='highlight'>[% error.text.${i} %]</span>[% END %]
+            </td>
+        <td><input type='text' name="url[% i %]"  size="60" />
+            [% IF error.url.${i} %]<span class='highlight'>[% error.url.${i} %]</span>[% END %]
+            </td>
+    </tr>
+    [% END %]
+    <tr class='forum1'><td colspan='3'><input type='submit' /></td></tr>
+</table>
+</form>
+</div>
+
+[% END %][%# END for FillInForm %]
+
+[% END %]

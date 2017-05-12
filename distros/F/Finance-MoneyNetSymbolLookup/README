@@ -1,0 +1,22 @@
+README for Finance::MoneyNetSymbolLookup
+
+This is a perl 5 module that will look up security symbols from
+MoneyNet.
+
+Once the archive has been unpacked, the following steps are needed
+to build and install the module (to be done in the directory which
+contains the Makefile.PL)
+
+  perl Makefile.PL
+  make
+
+No tests are currently defined for the module.
+
+If the build succeeds, install it with the following command:
+
+  make install
+
+An example script appears in the man page.
+
+Send any questions, comments, accolades, flames, etc. to
+Dj Padzensky <djpadz@padz.net>.

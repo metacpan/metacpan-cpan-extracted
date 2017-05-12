@@ -1,0 +1,60 @@
+{
+   "abstract" : "extensions and convenience methods to manage background processes",
+   "author" : [
+      "Marty O'Brien <mob@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Forks-Super",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Sys::CpuAffinity",
+         "Signals::XSIG",
+         "Signals::XSIG::Default",
+         "Signals::XSIG::TieArray56",
+         "Forks::Super::SysInfo"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DateTime::Format::Natural" : "0.89",
+            "Net::OpenSSH" : "0.64",
+            "PerlIO::gzip" : "0",
+            "Sys::CpuAffinity" : "1.00",
+            "Sys::CpuLoadX" : "0.02",
+            "Test::SSH" : "0",
+            "YAML" : "0.62"
+         },
+         "requires" : {
+            "Test::More" : "0",
+            "Time::HiRes" : "1.30",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.89",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

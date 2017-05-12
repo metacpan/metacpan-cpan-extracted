@@ -1,0 +1,42 @@
+BitStamp-Socket version 0.01
+============================
+
+This module is designed to make it easy to connect and collect
+broadcasts in real time from the BitStamp trading exchange.
+
+You are advised to use this as a base class for your own module.
+
+Your module will simply fill in the trade() and order_book() routines.
+These are the callback routines that are called as soon as a new
+broadcast is received from Pusher (the provider of the BitStamp socket).
+
+There is a sample test script module which simply dumps the messages
+to your teminal.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   AnyEvent::Socket
+   AnyEvent::Handle
+   Protocol::WebSocket::Handshake::Client
+   Protocol::WebSocket::Frame
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Jeff Anderson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

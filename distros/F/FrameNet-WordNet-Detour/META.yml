@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                FrameNet-WordNet-Detour
+version:             1.1
+abstract:            a WordNet to FrameNet Detour.
+license:             ~
+author:              
+    - Nils Reiter <reiter@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    File::Spec:                    0.86
+    Getopt::Long:                  2.2
+    Pod::Usage:                    1
+    Test::More:                    0
+    WordNet::QueryData:            1.37
+    WordNet::Similarity::path:     0.1
+    XML::TreeBuilder:              3.09
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

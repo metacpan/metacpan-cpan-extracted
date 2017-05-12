@@ -1,0 +1,21 @@
+#fsdb -R C cid sid cname
+cid: 10
+sid: 1
+cname: pascal
+
+cid: 11
+sid: 2
+cname: numanal
+
+cid: 12
+sid: 1
+cname: os
+
+cid: 12
+sid: 2
+cname: os
+
+#   | dbfilealter -R C
+#  | dbsort -n cid
+#   | dbfilealter -R C
+#   | dbjoin -S --input TEST/dbjoin_ex_R.in-2 -n cid

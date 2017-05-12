@@ -1,0 +1,13 @@
+Revision history for Perl extension File::FnMatch.
+
+0.02  Tue Mar 29 23:34:03 2005
+    - Updated ppport.h for 5.004_05 compatibility. (rt.cpan 12005)
+    - Added MSWin32 warnings: Makefile.PL, README, POD. (rt.cpan 12026)
+
+0.01  Thu Mar 10 22:36:17 2005
+    - POD and packaging for general consumption.  CVSification.
+
+0.00  Tue Dec 17 00:40:59 2002
+	- original version; created by h2xs 1.22 with options
+		-O -A -b 5.4.0 -n File::FnMatch fnmatch.h
+

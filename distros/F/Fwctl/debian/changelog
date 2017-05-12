@@ -1,0 +1,10 @@
+fwctl (0.20-1) unstable; urgency=low
+
+  * Initial Release.
+  * changed config dir to /etc/fwctl/
+
+ -- Bernd Eckenfels <ecki@debian.org>  Sat, 25 Sep 1999 02:53:32 +0200
+
+Local variables:
+mode: debian-changelog
+End:

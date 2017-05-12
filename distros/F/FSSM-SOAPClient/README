@@ -1,0 +1,14 @@
+FSSM::SOAPClient.pm - Access the Fortinbras FSSM web service
+
+FSSM::SOAPClient allows the user to easily access the Fortinbras
+Research HIV-1 coreceptor predictor service via the SOAP::Lite package. 
+
+Fortinbras Research
+http://fortinbras.us
+
+To install, simply
+
+perl Build.PL
+./Build
+./Build test
+./Build install

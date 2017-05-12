@@ -1,0 +1,10 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+9.2615 0.022789 0.24606 0.0032377 9.2582 9.2647 0.95 1806 16726 9.196848 9.327973 195
+#
+# This dataset is from http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm
+# NIST/SEMATECH e-Handbook of Statistical Methods,
+# section 1.4.2.8.1. Background and Data
+# description:
+# Generation: This data set was collected by Bob Zarr of NIST in January, 1990 from a heat flow meter calibration and stability analysis. The response variable is a calibration factor. ...
+#
+#   | dbcolstats x

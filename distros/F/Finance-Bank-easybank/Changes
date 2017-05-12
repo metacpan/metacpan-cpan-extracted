@@ -1,0 +1,45 @@
+Revision history for Perl extension Finance::Bank::easybank.
+
+1.05  Sun May  2 13:30:59 CEST 2004
+        - catched another possible login error ("Es ist ein Systemfehler
+          aufgetreten...").
+
+1.04  Mon Oct  6 22:20:53 CEST 2003
+	- adapted get_entries according to the new layout of
+	  of the entry-history.
+	  Note: the date entry of the returned hashref has
+	        now the format DD.MM.YYYY.
+	- fixed the output of the example scripts in the
+	  face of the changed date format.
+	- brought POD up-to-date.
+	- changed version to 1.04, inspired by a talk about CPANTS
+	  at a vienna.pm techmeet.
+
+0.03  Thu Aug 14 23:04:24 CEST 2003
+	- the login page itself is now used as entry point and
+	  not the easybank frontpage, resulting in a noticeable
+	  (depending on your connection) performance gain.
+	- removed calls to deprecated WWW::Mechanize methods
+	  follow and form.
+	- bugfix: get_entries processed all accounts defined
+	  in the account-list, and not the ones defined in the
+	  entries-list.
+        - fixed a few typos in the man page.
+	- replaced map with hash slice in example scripts.
+	- Agent now identifies itself as 'Mac Safari' :)
+
+0.02  Sat Feb 22 22:34:24 CET 2003
+        - check_balance returns now a list of the accounts checked
+          ONLY if called in list context, otherwise it returns an
+          hashref, with the account numbers as keys.
+        - added new method get_entries.
+        - updated examples/balance.pl.
+        - added examples/balance-gpg.pl.
+        - the module croaks now, if the login failes.
+        - splited POD and code into separate files.
+        - added in code documentation.
+        - fixed a few typos in the man page.
+
+0.01  Mon Jan 27 23:21:34 2003
+        - original version; created by h2xs 1.2 with options
+                -X -n Finance::Bank::easybank

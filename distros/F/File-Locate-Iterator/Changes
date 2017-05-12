@@ -1,0 +1,94 @@
+Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+
+This file is part of File-Locate-Iterator.
+
+File-Locate-Iterator is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+File-Locate-Iterator is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with File-Locate-Iterator.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 23, August 2014
+    - debian bits Pre-Depends
+
+Version 22, March 2014
+    - workaround for Moose 2.12 incompatible change to its enum definitions
+
+Version 21, August 2011
+    - let File::Map 0.38 do tainting when applicable
+
+Version 20, June 2011
+    - new database_str_ref option
+    - taint mmap and XS cases the same as pure perl file reads
+    - MooseX fix regexp/glob/suffix options to actually restrict returns
+
+Version 19, February 2011
+    - tests fix for File::Map version required
+
+Version 18, February 2011
+    - tests fix MooseX avoid depending on system locatedb
+
+Version 17, February 2011
+    - MooseX fix add Moose::Object,
+    - MooseX add attributes describing the parameters to new()
+    - try PerlIO::Layers mappable before File::Map, to avoid spurious warnings
+
+Version 16, September 2010
+    - test manifest only as an author test
+
+Version 15, August 2010
+    - tests fix synopsis checking if no Moose
+
+Version 14, August 2010
+    - fix for mmap of database_fh when filepos!=0
+    - new rewind() method
+    - new MooseX::Iterator::Locate
+
+Version 13, August 2010
+    - tests workaround spam from Perl 5.12 UNIVERSAL.pm in Iterator::Simple
+
+Version 12, August 2010
+    - fix tests checking for File::Map 0.24
+
+Version 11, February 2010
+    - no prototypes in File::Map 0.24
+
+Version 10, January 2010
+    - layer :stdio also ok for mmap
+
+Version 9, January 2010
+    - test script fix for :raw on perl 5.6
+
+Version 8, January 2010
+    - use mmap when available
+    - fix for reading unbuffered handle
+
+Version 7, January 2010
+    - workaround incompatible changes in perl 5.11 goto
+
+Version 6, December 2009
+    - oops, Test::More::explain() is new
+
+Version 5, December 2009
+    - dual XS or pure-perl
+
+Version 4, November 2009
+    - don't depend on /var/cache/locate/locatedb in the tests
+    - avoid mmap len=0 since freebsd mmap succeeds but munmap then fails
+
+Version 3, November 2009
+    - use File::FnMatch for globs (rather than converting to a regexp)
+
+Version 2, October 2009
+    - oops, File::Map supposed to be optional (and undocumented yet)
+
+Version 1, September 2009
+    - the first version

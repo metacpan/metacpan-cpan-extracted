@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>PreRelease</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<p>#labels Phase-Implementation<br />#Rules develop Foorum</p><h1> NAME </h1><p>Foorum::Manual::<a href="PreRelease.html">PreRelease</a> - things when release</p><h2> Before Release </h2><ul><li>$ cd Misc/bin </li><li>$ perl js-min.pl </li></ul><pre class="prettyprint"># minify the javascript under root/static/js to root/static/js/min by L&lt;JavaScript::Minifier&gt;
+</pre><ul><li>$ perl css-min.pl </li></ul><pre class="prettyprint"># minify the css under root/static/css to root/static/css/min by L&lt;CSS::Minifier&gt;
+</pre><ul><li>$ perl bdfgw.pl </li></ul><pre class="prettyprint"># build docs from GoogleCode wiki by L&lt;Text::GooglewikiFormat&gt;
+</pre><ul><li>$ perl wiki2pod.pl </li></ul><pre class="prettyprint"># use L&lt;Pod::From::GoogleWiki&gt; to build Foorum::Manual::
+</pre><ul><li>$ perl g2b.pl </li></ul><pre class="prettyprint"># tranlate lib/Foorum/I18N/cn.po to lib/Foorum/I18N/tw.po and etc by L&lt;Encode::HanConvert&gt;
+</pre><ul><li>$ perl perltidy.pl </li></ul><pre class="prettyprint"># make all .pl .pm .t clean by L&lt;Perl::Tidy&gt;
+</pre><ul><li>$ perl perlcritic.pl </li></ul><pre class="prettyprint"># use L&lt;Perl::Critic&gt; to all .pl .pm .t files.
+</pre><h2> Release </h2><ul><li>$ perl Makefile.PL </li><li>$ make </li></ul><pre class="prettyprint"># or 'nmake' under Win32
+</pre><ul><li>$ rm MANIFEST </li><li>$ make manifest </li><li>$ make test </li><li>$ make dist </li><li>$ make realclean </li></ul><pre class="prettyprint"># just do those stuff as normal Perl distribution.
+</pre>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/PreRelease">http://code.google.com/p/foorum/wiki/PreRelease</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+[% WRAPPER 'admin/bar.html' %]
+
+<div class='one'>
+<table align='center'>
+<tr class='forum1'><td>
+[% IF c.req.param('m') || message %]
+<pre><span class='highlight'>[% c.req.param('m') || message %]</span></pre>
+[% ELSE %]
+Explaination for Forum Administrator's Actions.
+[% END %]
+</td></tr>
+</table>
+</div>
+
+[% END %]

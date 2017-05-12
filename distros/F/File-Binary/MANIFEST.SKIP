@@ -1,0 +1,9 @@
+t/gentests
+t/values.txt
+\.tar\.gz$
+\.tar$
+t/.*\.java$
+\.svn
+blib
+^Makefile$
+^Makefile\.old$

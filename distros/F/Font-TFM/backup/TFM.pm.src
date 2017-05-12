@@ -1,0 +1,11 @@
+#
+# Dummy Font::TFM file only to satisfy CPAN
+#
+
+package Font::TFM;
+$VERSION = undef;
+
+# Zero so that require fails.
+
+0;
+

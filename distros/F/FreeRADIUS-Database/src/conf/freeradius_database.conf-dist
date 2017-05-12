@@ -1,0 +1,34 @@
+; FreeRADIUS::Database configuration file
+
+[VERSION]
+version                 = 0.06
+
+[Global]
+timezone                = America/New_York
+ras_classification      = 0
+delete_after_archive    = 1 ; delete radacct month after archive?
+months_after_archive    = 3
+config_dir              = /usr/local/etc
+script_dir              = /usr/local/sbin
+in_test_mode            = 1
+
+[RAS]
+; used for RAS classification
+
+highspeed           = 10.0.0.1, 10.0.0.2 
+dialup              = 172.16.4, 172.16.25, 10.5.5.5
+slipstream          = 192.168
+hotspot             = 10.10.10, 10.10.9.5
+
+[Database]
+enable_replication      = 0
+master_locked           = 0
+slave_servers           = 0
+maintenance_source      = DBI:mysql:radius:maint.example.com:
+master_source           = DBI:mysql:radius:master.example.com:
+master_user             = radius
+master_pass             = password
+slave_1_source          = DBI:mysql:radius:slave1.example.com:
+slave_1_user            = isp
+slave_1_pass            = password
+test_mode_source        = DBI:SQLite:t/_test_radius.db

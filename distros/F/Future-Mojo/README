@@ -1,0 +1,102 @@
+NAME
+
+    Future::Mojo - use Future with Mojo::IOLoop
+
+SYNOPSIS
+
+     use Future::Mojo;
+     use Mojo::IOLoop;
+     
+     my $loop = Mojo::IOLoop->new;
+     
+     my $future = Future::Mojo->new($loop);
+     
+     $loop->timer(3 => sub { $future->done('Done') });
+     
+     print $future->get, "\n";
+
+DESCRIPTION
+
+    This subclass of Future stores a reference to the associated
+    Mojo::IOLoop instance, allowing the await method to block until the
+    Future is ready.
+
+    For a full description on how to use Futures, see the Future
+    documentation.
+
+CONSTRUCTORS
+
+ new
+
+     my $future = Future::Mojo->new;
+     my $future = Future::Mojo->new($loop);
+
+    Returns a new Future. Uses "singleton" in Mojo::IOLoop if no loop is
+    specified.
+
+ new_timer
+
+     my $future = Future::Mojo->new_timer($seconds);
+     my $future = Future::Mojo->new_timer($loop, $seconds);
+
+    Returns a new Future that will become ready after the specified delay.
+    Uses "singleton" in Mojo::IOLoop if no loop is specified.
+
+METHODS
+
+    Future::Mojo inherits all methods from Future and implements the
+    following new ones.
+
+ loop
+
+     $loop = $future->loop;
+
+    Returns the underlying Mojo::IOLoop object.
+
+ await
+
+     $future->await;
+
+    Runs the underlying Mojo::IOLoop until the future is ready. If the
+    event loop is already running, an exception is thrown.
+
+ done_next_tick
+
+     $future = $future->done_next_tick(@result);
+
+    A shortcut to calling the "done" in Future method on the "next_tick" in
+    Mojo::IOLoop. Ensures that a returned Future object is not ready
+    immediately, but will wait for the next I/O round.
+
+ fail_next_tick
+
+     $future = $future->fail_next_tick($exception, @details);
+
+    A shortcut to calling the "fail" in Future method on the "next_tick" in
+    Mojo::IOLoop. Ensures that a returned Future object is not ready
+    immediately, but will wait for the next I/O round.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+CONTRIBUTORS
+
+    Jose Luis Martinez (pplu)
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Future
+

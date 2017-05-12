@@ -1,0 +1,32 @@
+Revision history for Perl extension File::FilterFuncs.
+
+0.53  Thu Mar 22 06:05:10 CDT 2007
+	- Fixed end-of-line issues on Windows for t/File-FilterFuncs.t.
+
+0.521	Sat Mar  3 03:12:51 CST 2007
+	- Fixed the README file.
+
+0.52  Wed Feb  7 21:13:46 CST 2007
+	- Minor cleanups for the POD and test scripts.
+	- Major change: The anonymous subs must return 1
+	  to keep lines.
+
+0.51  Sun Jan 28 18:59:28 CST 2007
+	- Corrected POD error regarding '$/' => \3 (backslash added).
+	- Added test for using fixed line lengths.
+	- Added ignore_line() to allow functions to filter lines.
+	- We die if the source and destination files are the same;
+	  thanks to Uri Guttman <uri[[at]]stemsystems.com> for pointing out
+	  the potential problem.
+	- Thanks to suggestions from Uri Guttman <uri[[at]]stemsystems.com>,
+	  paragraph reading ($/ = '') and slurp mode ($/ = undef) are
+	  now supported.
+
+
+0.50  Thu Jan 18 20:43:29 CST 2007
+	- Included the main code and tests.
+
+0.01  Thu Jan  4 20:08:59 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n File::FilterFuncs
+

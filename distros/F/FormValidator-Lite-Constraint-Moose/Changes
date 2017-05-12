@@ -1,0 +1,35 @@
+Revision history for Perl extension FormValidator::Lite::Constraint::Moose
+
+0.13 2013-11-27T00:17:58Z
+    - Document update for compliance with spec of Moose-2.1200.
+
+0.12 2013-06-25T18:05:16Z
+    - Switch to Minilla
+
+0.11    Sun Apr 28 03:40:00 2013
+        - Change repository information
+
+0.10    Thu Feb 14 02:45:00 2013
+        - [Incompatible change] Drop support for Any::Mooose.
+
+0.07    Mon Oct 22 01:00:00 2012
+        - Change require perl ve`rsion
+
+0.06    Sun Oct 21 19:30:00 2012
+        - Switch to Module::Build
+
+0.05    Wed Mar  7 22:35:00 2012
+        - Add type coercion support
+
+0.04    Fri Dec  2 00:58:00 2011
+        - Specify version of Any::Moose
+        - Add 'Mouse' as recommends
+
+0.03    Wed Nov 30 23:32:00 2011
+        - Specify version of Test::More in Makefile.PL
+
+0.02    Mon Nov 28 23:17:00 2011
+        - Fixed broken tests
+
+0.01    Sun Nov 20 13:10:22 2011
+        - original version

@@ -1,0 +1,23 @@
+Revision history for Perl extension Freq.
+
+0.01  Mon Apr 23 03:37:59 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n Freq
+0.16  Tue Jan 25 19:04:25 PST 2005
+	- Complete rewrite. Pure perl, with arbitrarily complex sequence and alternation queries, proximity searches, sentence-boundary indexing.
+
+0.17  Thu Jan 27 16:04:25 PST 2005
+	- Documentation corrections; added ABSTRACT; isr closure update; removed dependency on latest perl; added dependency on FileHandle;
+
+0.19 Tue Feb  1 15:20:48 PST 2005
+	- Added Inline'd sum_to_pos for both speed and memory savings.
+
+0.20 Fri Feb  4 12:51:32 PST 2005 
+	- fixed bug in next_integer_length causing infinite loop; changed to older module file layout to avoid conflict with Inline::MakeMaker. Annoyingly this produces a recompile on every make, even when just Perl code has changed
+
+0.21 Mon Feb  7 19:05:32 PST 2005
+	- bug in sum_to_pos made premature end to px; bug in isr_align_match closures gave false matches with inappropriate px
+
+0.22 Thu Feb 10 13:49:41 PST 2005
+	- changed DX underlying structure to ber-string instead of Perl array, added sum_to_doc inlined C function to process it. Gives huge memory savings and 2x search speedup; fixed bug in and-matcher logic
+

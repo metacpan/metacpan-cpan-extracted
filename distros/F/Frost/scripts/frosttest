@@ -1,0 +1,68 @@
+#!/bin/sh
+
+PROVE='/usr/bin/prove'
+
+DEBUG=
+LOCK_TEST=
+MAKE_MUTABLE=
+NO_DIE_WARN=
+PATH=
+SPEED_TEST=
+TEST_PATH='../t'
+VERBOSE=
+
+while getopts 'dlmp:st:vw' OPTION
+do
+	case "$OPTION" in
+
+	d)		DEBUG=1;;
+	l)		LOCK_TEST=1;;
+	m)		MAKE_MUTABLE=1;;
+	p)		PATH="$OPTARG";;
+	s)		SPEED_TEST=1;;
+	t)		TEST_PATH="$OPTARG";;
+	v)		VERBOSE=1;;
+	w)		NO_DIE_WARN=1;;
+
+	esac
+done
+
+if [ "$VERBOSE" ]; then
+	OPTION='-rv'
+else
+	OPTION='-r'
+fi
+
+echo "#"
+echo "# frosttest..."
+echo "#"
+echo "------------ PARAM ---------------------------------------------------"
+echo "VERBOSE      = $VERBOSE"
+echo "DEBUG        = $DEBUG"
+echo "MAKE_MUTABLE = $MAKE_MUTABLE"
+echo "LOCK_TEST    = $LOCK_TEST"
+echo "SPEED_TEST   = $SPEED_TEST"
+echo "NO_DIE_WARN  = $NO_DIE_WARN"
+echo "TEST_PATH    = $TEST_PATH"
+echo "PATH         = $PATH"
+echo "OPTION       = $OPTION"
+echo "------------ TEST ----------------------------------------------------"
+
+if [ ! -d "$TEST_PATH/100_meta" ]
+then
+	echo "No test found in $TEST_PATH"
+	echo "------------ ERROR ---------------------------------------------------"
+	exit 1
+fi
+
+export Frost_NO_DIE_ON_WARNINGS=$NO_DIE_WARN
+export Frost_DEBUG=$DEBUG
+export Frost_MAKE_MUTABLE=$MAKE_MUTABLE
+export Frost_LOCK=$LOCK_TEST
+export Frost_SPEED=$SPEED_TEST
+
+cd $TEST_PATH
+
+$PROVE $OPTION -I../lib $PATH
+
+echo "------------ DONE ----------------------------------------------------"

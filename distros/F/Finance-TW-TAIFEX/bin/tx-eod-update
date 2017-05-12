@@ -1,0 +1,41 @@
+#!perl
+use strict;
+use warnings;
+use Finance::TW::TAIFEX;
+use LWP::Simple 'getstore';
+use File::Temp;
+
+my $product = shift || 'TX';
+my $dir = shift || 'taifex-interday';
+mkdir($dir);
+
+my $taifex = Finance::TW::TAIFEX->new;
+my ($year, $month);
+if ($year = shift) {
+	$month = 12;
+}
+else {
+    $year = $taifex->context_date->year;
+    $month = $taifex->context_date->month;
+    my $file = sprintf('%s/%d-%02d.csv', $dir, $year, $month);
+    unlink($file) if -e $file;
+}
+my $ua = LWP::UserAgent->new;
+$ua->cookie_jar({});
+push @{ $ua->requests_redirectable }, 'POST';
+
+
+for my $m (1..$month) {
+    my $file = sprintf('%s/%d-%02d.csv', $dir, $year, $m);
+    next if -e $file;
+
+    $taifex->context_date->set_year($year);
+    $taifex->context_date->set_month($m);
+    my $response = $ua->request($taifex->interday_futures_request($product));
+    if ($response->is_success) {
+        open my $fh, '>', $file or die $!;
+        print $fh $response->content;
+        close $fh;
+    }
+    sleep 1;
+}

@@ -1,0 +1,28 @@
+File::Modified version 0.02
+=========================
+
+This module provides an easy way for long running processes
+(like daemons) to determine whether a file was changed since
+the last time it was checked. Also, some persistence now 
+allows you to use it as a more general caching mechanism.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Digest     is optional but nice to have. If a script uses MD5 features, a fallback
+           to checksums is available.
+Test::More is needed to run the test script.
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Copyright (C) 2002 Max Maischein, corion@cpan.org

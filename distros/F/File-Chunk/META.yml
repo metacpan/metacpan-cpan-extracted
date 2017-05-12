@@ -1,0 +1,41 @@
+---
+abstract: 'Read/Write file handles that are stored as seperate, size-limited files on disk'
+author:
+  - 'Dylan William Hardison <dylan@hardison.net>'
+build_requires:
+  IO::String: 0
+  Test::More: 0
+  Test::TempDir: 0
+  Text::CSV_XS: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Chunk
+requires:
+  Bread::Board::Declare: 0
+  Carp: 0
+  English: 0
+  IO::Handle::Util: 0
+  List::MoreUtils: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Getopt::GLD: 0
+  MooseX::Params::Validate: 0
+  MooseX::SetOnce: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class::Rule: 0
+  YAML::XS: 0
+  namespace::autoclean: 0
+  namespace::clean: 0
+  overload: 0
+  strict: 0
+  warnings: 0
+version: 0.0035
+x_authority: cpan:DHARDISON

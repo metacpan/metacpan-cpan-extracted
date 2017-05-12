@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+CHANGES
+File/MkTemp.pm
+File/MkTempO.pm
+t/MkTemp.t
+t/MkTempO.t

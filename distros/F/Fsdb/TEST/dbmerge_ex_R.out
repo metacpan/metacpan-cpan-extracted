@@ -1,0 +1,16 @@
+#fsdb -R C cid cname
+cid: 11
+cname: numanal
+
+cid: 12
+cname: os
+
+cid: 10
+cname: pascal
+
+#   | dbfilealter -R C
+cid: 13
+cname: statistics
+
+#   | dbfilealter -R C
+#   | dbmerge --input - --input TEST/dbmerge_ex_R_b.in cname

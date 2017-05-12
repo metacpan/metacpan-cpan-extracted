@@ -1,0 +1,32 @@
+---
+abstract: 'a Haskell-inspired type system for Perl'
+author:
+  - 'Wim Vanderbauwhede <Wim.Vanderbauwhede@mail.be>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Functional-Types
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/wimvanderbauwhede/Perl-Functional-Types/issues
+  homepage: https://github.com/wimvanderbauwhede/Perl-Functional-Types
+  repository: https://github.com/wimvanderbauwhede/Perl-Functional-Types.git
+version: v0.0.1
+x_contributors:
+  - 'Wim Vanderbauwhede <wim.vanderbauwhede@mail.be>'

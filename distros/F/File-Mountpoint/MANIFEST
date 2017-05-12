@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/File/Mountpoint.pm
+t/00_distribution.t
+t/01_load.t
+t/02_mountpoint.t

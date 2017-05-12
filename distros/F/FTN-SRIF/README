@@ -1,0 +1,55 @@
+FTN-SRIF
+
+Perl extension which enables the parsing of an FTN SRIF (Standard Request
+Information File) received by an FTN mailer for what file(s) are being
+requested. Also provides a script, ftn-srif, which although it processes only
+a limited version of the standard SRIF keywords, does also provide an example
+of how to use the module.
+
+Required, neccessary and/or useful modules, etc.:
+
+FTN::Log	Must be a least v0.02, for the 'logging' subroutine as used
+		in the ftn-srif script. If not already installed, it can be
+		obtained from CPAN (www.cpan.org) or from the ftnpl project
+		at Sourceforge.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc FTN::SRIF
+    perldoc ftn-srif
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=FTN-SRIF
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/FTN-SRIF
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/FTN-SRIF
+
+    Search CPAN
+        http://search.cpan.org/dist/FTN-SRIF
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2003,2010-2012 Robert James Clay
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

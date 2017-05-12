@@ -1,0 +1,37 @@
+Revision history for Perl extension File::SortedSeek.
+
+0.01  Thu Nov  1 21:18:43 2001
+    - original version; created by h2xs 1.21 with options
+      -X File::SortedSeek
+
+0.011 Sun Nov 25 2001
+    - Minor typo corrections
+
+0.012 Mon Nov 26 2001
+    - Changed tar config so it expand to File-SortedSeek-0.xxx
+
+0.013 Mon May 26 2008
+    - Major refactoring to use the same proven engine as Search::Dict
+    - Thanks to Peter (Stig) Edwards for major input into this
+    - Tests refactored into t/test.t form and bug_fixes.t added
+
+0.014 Tue May 27 2008
+    - Removed need to binmode filehandle in get_between() and get_last()
+      functions by using sysseek and sysread to avoid unwanted line ending
+      conversions.
+    - Changed system dependent record separator to a heuristic that should
+      DWIM most of the time. Can always be over ridden.
+    - Added extra test cases
+    - Code clean up
+    - Documentation clean up
+    - Sample scripts added
+    - Added META.yml, t/pod.t t/pod_coverage.t to keep Kwalitee happy
+
+0.015 Mon June 2 2008
+    - Made pod.t pod_coverage.t kwalitee.t spelling.t test private so
+      they only run is RELEASE_TESTING environment var is set - the pod
+      tests have been causing spurious test failures.
+    - Hacked my Extutils::MM_Any.pm to write a "proper" META.yml
+    - Added support for all common logfile date string formats by default
+
+TODO: Sample script

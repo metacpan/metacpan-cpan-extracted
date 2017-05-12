@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               File-PathInfo-Ext
+version:            1.30
+abstract:           metadata files, renaming, some other things on top of PathInfo
+author:
+    - Leo Charre leocharre at cpan dot org
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:            1
+    Cwd:             3
+    Digest::MD5:     2
+    File::Copy:      2
+    File::Path:      1
+    File::PathInfo:  1.27
+    File::Type:      0
+    Test::Simple:    0
+    YAML:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

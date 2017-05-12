@@ -1,0 +1,62 @@
+!
+!  test6d.nml -- Namelist sniplet from qrgres.nml (qr_nml), using old-style
+!  F77 namelist delimiters and array elements as lvalues 
+!
+
+$run_type
+
+    Sim = .false.
+    ExtEOPrtls = .false.
+  TdpPolyOrd = 2
+
+$end
+$ionosphere_mdl
+
+
+$end
+$station_model
+
+! 
+! Date Namelist generated Tue Apr  3 12:25:13 2007  
+! 
+! 
+    NMLWahrK1 = .true. 
+    NMLPolTid = .true. 
+! 
+!
+  NMLname(  1) = 'ALBH'
+  NMLTropMap(  1) = 'NIELL'
+!   Epoch :       222696000.00
+!   2007  1 22  0  0  0
+!   07JAN22
+  NMLMonument(1,  1) =  
+                                 -2341.3329423
+                                 -3539.0495211
+                                  4745.7913424
+!   lat     lon      elev 
+!       48.3897813   -123.4874702   31.7591
+!  
+! Antenna Type : AOD_M_T_ 
+!  
+       NMLStaPrtl(1,  1) = 
+            'STA X',  
+            'STA Y',  
+            'STA Z',  
+            'WETZTROP',  
+            'TRPAZCOS',  
+            'TRPAZSIN',  
+            'STA BIAS',  
+            ' ',  
+   NMLTROP_DRY(  1) =    2.2911
+   NMLTROP_WET(  1) =    0.1000
+    NMLSite(1, 1,  1) =      -0.0000005      0.0000006      0.0001912
+    NMLSite(1, 2,  1) =      -0.0000006     -0.0000001      0.0002201
+    NMLSite(1, 3,  1) =      -0.0000002      0.0000017      0.0001467
+    NMLSite(1, 4,  1) =      -0.0000005      0.0000006      0.0001912
+    NMLSite(1, 5,  1) =      -0.0000006     -0.0000001      0.0002201
+    NMLSite(1, 6,  1) =      -0.0000002      0.0000017      0.0001467
+    NMLSite(1, 7,  1) =      -0.0000006     -0.0000001      0.0002201
+    NMLSite(1, 8,  1) =       0.0000000      0.0000000      0.0001000
+    NMLSite(1, 9,  1) =       0.0000000      0.0000000      0.0001000
+! 
+$end

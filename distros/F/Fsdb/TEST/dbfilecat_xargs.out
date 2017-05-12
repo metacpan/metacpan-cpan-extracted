@@ -1,0 +1,7 @@
+#fsdb cid cname
+11	numanal
+10	pascal
+12	os
+13	statistics
+# this comment from xargs input should appear in output
+#   | dbfilecat --xargs

@@ -1,0 +1,29 @@
+---
+abstract: 'parse directory listing using ftpparse from ftpcopy'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  POSIX: '0'
+  Test: '0'
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  Config::AutoConf: '0'
+  Module::Build: '0.28'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Listing-Ftpcopy
+requires:
+  Math::Int64: '0.28'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/File-Listing-Ftpcopy/issues
+  homepage: http://perl.wdlabs.com/File-Listing-Ftpcopy
+  repository: git://github.com/plicease/File-Listing-Ftpcopy.git
+version: '0.07'

@@ -1,0 +1,12 @@
+Revision history for Perl module File-Basename-Extra
+
+0.003     2016-08-10
+  * Removed Build.PL, require >= v0.009 of PluginBundle
+  * Updated author e-mail address
+
+0.002     2015-04-17
+  * Requiring File::Basename 2.74 for _strip_trailing_sep private function
+  * Documentation changes & corrections
+
+0.001     2015-04-16
+  * Initial release

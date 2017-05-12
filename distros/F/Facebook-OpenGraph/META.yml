@@ -1,0 +1,60 @@
+---
+abstract: "Simple way to handle Facebook's Graph API."
+author:
+  - 'Oklahomer <hagiwara dot go at gmail dot com>'
+build_requires:
+  Test::Exception: 0
+  Test::Mock::Furl: 0
+  Test::MockObject: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.15.2, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Facebook-OpenGraph
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Facebook::OpenGraph:
+    file: lib/Facebook/OpenGraph.pm
+    version: 1.23
+  Facebook::OpenGraph::Response:
+    file: lib/Facebook/OpenGraph/Response.pm
+    version: 0
+requires:
+  Data::Recursive::Encode: 0
+  Digest::SHA: 0
+  Furl: 0
+  HTTP::Message: 0
+  HTTP::Request::Common: 0
+  JSON: 2
+  MIME::Base64::URLSafe: 0
+  Module::Build: 0
+  Parse::CPAN::Meta: 0
+  Scalar::Util: 0
+  Sub::Uplevel: 0
+  URI: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/oklahomer/p5-Facebook-OpenGraph/issues
+  homepage: https://github.com/oklahomer/p5-Facebook-OpenGraph
+  repository: git://github.com/oklahomer/p5-Facebook-OpenGraph.git
+version: 1.23
+x_contributors:
+  - 'Oklahomer <go.hagiwara@facebook.com>'
+  - 'Oklahomer <hagiwara.go@gmail.com>'

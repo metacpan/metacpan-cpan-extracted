@@ -1,0 +1,37 @@
+File::FindByRegex version 1.00
+==============================
+
+File::FindByRegex is an object oriented module based on File::Find
+that travels a directory tree doing actions for each file whose
+name matches certain regular expression.
+
+Each regular expression may specify a distinct action, that is
+executed when filename match it.
+
+Regular expressions and actions are specified as a hash in a
+separate file.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    File::Find
+    File::Spec::Functions 1.1 or above.
+    File::Basename 2.6 or above.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Enrique Castilla Contreras. <ecastillacontreras@yahoo.es> .
+
+This library is free software; you can redistribute and/or modify
+it under the same terms as Perl itself. 
+

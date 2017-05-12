@@ -1,0 +1,105 @@
+NAME
+    Fir - a Tree::DAG_Node subclass for menu nagivation
+
+SYNOPSIS
+      # set up the following navigation structure:
+      # Home (/)
+      # \-- About (/about/)
+      #   \-- Leon (/about/leon/)
+      #   \-- Jake (/about/jake/)
+      my $fir  = Fir->new;
+      my $home = Fir::Major->new();
+      $home->name('Home');
+      $home->path('/');
+      my $about = Fir::Major->new();
+      $about->name('About');
+      $about->path('/about/');
+      my $leon = Fir::Minor->new();
+      $leon->name('Leon');
+      $leon->path('/about/leon/');
+      my $jake = Fir::Minor->new();
+      $jake->name('Jake');
+      $jake->path('/about/jake/');
+      $fir->add_major($home);
+      $fir->add_major( $about, $leon, $jake );
+
+      # and select a path
+      $fir->path('/about/');
+
+      # now traverse the tree
+      my $root = $fir->root;
+      foreach my $major ( $root->daughters ) {
+          if ( $major->is_selected ) {
+              print '*' . $major->name . '* ' . $major->path . "\n";
+          } else {
+              print $major->name . ' ' . $major->path . "\n";
+          }
+          if ( $major->is_open ) {
+              foreach my $minor ( $major->daughters ) {
+                  if ( $minor->is_selected ) {
+                      print $minor->name . '* ' . $minor->path . "\n";
+                  } else {
+                      print $minor->name . ' ' . $minor->path . "\n";
+                  }
+              }
+          }
+      }
+      # that prints:
+      # Home /
+      # *About* /about/
+      # Leon /about/leon/
+      # Jake /about/jake/
+ 
+DESCRIPTION
+    Fir is a Tree::DAG_Node subclass for menu nagivation. Menu navigation on
+    a web application is fiddly code and this module hides that away from
+    you. Note that this module only handles the logic, not the display of
+    the navigation.
+
+    There are two kinds of nodes Fir::Major nodes are allowed to have
+    subnodes, while Fir::Minor nodes are not.
+
+METHODS
+  new
+    The constructor:
+
+      my $fir  = Fir->new;
+
+  add_major
+    Adds a major navigation node, and possibly some minor navigation nodes
+    below it:
+
+      my $about = Fir::Major->new();
+      $about->name('About');
+      $about->path('/about/');
+      my $leon = Fir::Minor->new();
+      $leon->name('Leon');
+      $leon->path('/about/leon/');
+      my $jake = Fir::Minor->new();
+      $jake->name('Jake');
+      $jake->path('/about/jake/');
+      $fir->add_major($home);
+      $fir->add_major( $about, $leon, $jake );
+
+  path
+    Given a path, opens and selects nodes for the naviation::
+
+      $fir->path('/about/');
+
+  as_string
+    A debugging method to help you visualise your tree:
+
+      die $fir->as_string;
+
+SEE ALSO
+    Fir::Major, Fir::Minor
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2008, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

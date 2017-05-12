@@ -1,0 +1,18 @@
+
+=pod
+
+=head1 NAME
+
+Foorum::Manual::TroubleShooting - Foorum trouble fixes
+
+=head1 Trouble Shooting
+
+=head2 C<--Couldn't render template "plugin error - Math: plugin not found"-->
+
+upgrade L<Template>
+
+=head1 SEE ALSO
+
+L<Foorum::Manual::README>, L<Foorum::Manual::INSTALL>, L<Foorum::Manual::Configure>
+
+=cut

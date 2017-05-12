@@ -1,0 +1,25 @@
+---
+abstract: 'Get fortune cookies from http://www.der-postillion.com!'
+author:
+  - 'Maik Hentsche <caldrin@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fortune-WWW-Postillion
+requires:
+  Exporter::Tiny: 0
+  HTML::Parser: 0
+  Mojo::UserAgent: 0
+  WWW::Mechanize: 0
+  base: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+version: 0.004

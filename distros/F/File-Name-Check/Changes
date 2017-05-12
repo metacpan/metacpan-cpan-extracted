@@ -1,0 +1,26 @@
+Revision history for File-Name-Check
+		
+0.08  2014-08-16 23:35:14 CEST
+        - badges in pod
+
+0.07  2014-08-16 23:13:17 CEST
+        - more coverage, cleanup
+
+0.06  2014-08-16 16:12:55 CEST
+        - improve covergae
+
+0.05  2014-08-16 15:31:37 CEST
+        - improve tests
+
+0.04  2014-08-16 09:51:20 CEST
+        - add coverage
+
+0.03  2014-08-16 08:59:02 CEST
+        - add travis
+
+0.02  2014-05-08 15:20:33 CEST
+        - prepare release
+
+0.01  2014-04-22 15:24:19 CEST
+        - Initial release
+         

@@ -1,0 +1,24 @@
+HTML::FormValidator NEWS -- History of User-Visible Changes.  March 18 2002
+
+* Changes since iNcom 0.09
+
+- New HTML::FormValidator::ConstraintsFactory module to
+  make it easier to create simple constraints.
+
+- Results of the validation is available through a 
+  HTML::FormValidator::Results object rather than a multi element
+  array. The validate function is still available but deprecated.
+
+- Support for conflicts and "warning" constraints.
+
+- valid_province knows about the Nunavut.
+
+- Documentation for standard filters is now in the
+  HTML::FormValidator::Filters man page.
+
+- Documentation for standard constraints is now in the
+  HTML::FormValidator::Constraints man page.
+
+
+
+

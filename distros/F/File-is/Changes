@@ -1,0 +1,14 @@
+Revision history for File-is
+
+0.03    14 Sep 2010
+    * thesame() now also checks device number (thanks to Ronald Fischer)
+    * thesame() throws an exception on MSWin32 (thanks to Ronald Fischer)
+
+0.02    30 Jun 2010
+    * fixed the test for operating systems that doesn't support (sym)links
+    * removed dependency on Readonly
+    * using confess for exceptions
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

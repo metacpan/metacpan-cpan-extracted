@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+TODO
+dist.ini
+examples/dump_basic.pl
+lib/Form/Sensible/Reflector/DBIC.pm
+t/00-compile.t
+t/01test_reflector.t
+t/catalyst.t
+t/lib/TestSchema.pm
+t/lib/TestSchema/Result/Test.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

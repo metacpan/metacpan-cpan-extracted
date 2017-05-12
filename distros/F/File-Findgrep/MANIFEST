@@ -1,0 +1,14 @@
+ChangeLog
+lib/File/Findgrep.pm
+lib/File/Findgrep/I18N.pm
+lib/File/Findgrep/I18N/en.pm
+lib/File/Findgrep/I18N/en_us.pm
+lib/File/Findgrep/I18N/fr.pm
+lib/File/Findgrep/I18N/i_default.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_about_verbose.t
+t/01_old_junk.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,47 @@
+Finance-OATS version 0.10
+=========================
+
+This library is a stub which may provide a starting point
+for an OATS implementation.  Only a few Reportable Order Event (ROE)
+types are supported.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Mike Giroux and Wang Trading, LLC
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the General Public License version 2, a.k.a. GPLv2.
+
+See LICENSE file for details.
+
+CREDITS AND DISCLAIMER
+
+This library is released under the GPL with the kind permission of
+Dr. Meng-Yuan Wang, the Managing Partner of Wang Trading, LLC.
+
+This library is a STUB.  It's the beginnings of an OATS implementation,
+but it is far from complete.  Many of the ROE fields contain hard-coded
+values which may not be appropriate to your case; please check them
+carefully!
+
+Neither Wang Trading, M-Y Wang, nor Mike Giroux is responsible nor
+liable for any problems which may arise through the use of this library.
+
+YOU are RESPONSIBLE for any files you upload to NASDR.  _YOU_ are liable
+for fines if they are wrong.  Please be very careful!
+
+At a minimum, use the NASDR OATS test site and make sure everything looks
+good.
+
+See the TBD comments.
+

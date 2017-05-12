@@ -1,0 +1,87 @@
+---
+abstract: "Interact with Fedora's bugzilla instance "
+author:
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fedora-Bugzilla
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Fedora::Bugzilla:
+    file: lib/Fedora/Bugzilla.pm
+    version: 0.13
+  Fedora::Bugzilla::Bug:
+    file: lib/Fedora/Bugzilla/Bug.pm
+    version: 0.13
+  Fedora::Bugzilla::Bug::Attachment:
+    file: lib/Fedora/Bugzilla/Bug/Attachment.pm
+    version: 0.13
+  Fedora::Bugzilla::Bug::Comment:
+    file: lib/Fedora/Bugzilla/Bug/Comment.pm
+    version: 0.13
+  Fedora::Bugzilla::Bug::Flag:
+    file: lib/Fedora/Bugzilla/Bug/Flag.pm
+    version: 0.13
+  Fedora::Bugzilla::Bug::NewAttachment:
+    file: lib/Fedora/Bugzilla/Bug/NewAttachment.pm
+    version: 0.13
+  Fedora::Bugzilla::Bugs:
+    file: lib/Fedora/Bugzilla/Bugs.pm
+    version: 0.13
+  Fedora::Bugzilla::NewBug:
+    file: lib/Fedora/Bugzilla/NewBug.pm
+    version: 0.13
+  Fedora::Bugzilla::QueriedBugs:
+    file: lib/Fedora/Bugzilla/QueriedBugs.pm
+    version: 0.13
+  Fedora::Bugzilla::Role::NewHash:
+    file: lib/Fedora/Bugzilla/Role/NewHash.pm
+    version: 0.13
+  Fedora::Bugzilla::Types:
+    file: lib/Fedora/Bugzilla/Types.pm
+    version: 0.13
+  Fedora::Bugzilla::XMLRPC:
+    file: lib/Fedora/Bugzilla/XMLRPC.pm
+    version: 0.13
+requires:
+  Crypt::SSLeay: 0
+  DateTime::Format::Pg: 0
+  Email::Address: 0
+  HTTP::Cookies: 0
+  MIME::Base64: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::AttributeHelpers: 0.21
+  MooseX::CascadeClearing: 0
+  MooseX::MultiInitArg: 0
+  MooseX::StrictConstructor: 0
+  MooseX::Traits::Attribute::CascadeClear: 0
+  MooseX::Traits::Attribute::CascadeClearMaster: 0
+  MooseX::Types: 0
+  MooseX::Types::DateTime: 0
+  MooseX::Types::Path::Class: 0
+  MooseX::Types::URI: 0
+  RPC::XML::Client: 0
+  Regexp::Common: 0
+  URI::Fetch: 0
+  URI::Find: 0
+  XML::Twig: 0
+  namespace::clean: 0
+resources:
+  homepage: http://github.com/RsrchBoy/fedora-bugzilla/tree
+  license: http://opensource.org/licenses/lgpl-license.php
+  repository: git://github.com/RsrchBoy/fedora-bugzilla.git
+version: 0.13

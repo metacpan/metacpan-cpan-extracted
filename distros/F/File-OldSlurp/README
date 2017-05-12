@@ -1,0 +1,57 @@
+NAME
+            File::OldSlurp -- single call read & write file routines; read directories
+
+SYNOPSIS
+            use File::OldSlurp;
+
+            $all_of_it = read_file($filename);
+            @all_lines = read_file($filename);
+
+            write_file($filename, @contents)
+
+            overwrite_file($filename, @new_contnts);
+
+            append_file($filename, @additional_contents);
+
+            @files = read_dir($directory);
+
+DESCRIPTION
+    These are quickie routines that are meant to save a couple of lines of
+    code over and over again. They do not do anything fancy.
+
+    read_file() does what you would expect. If you are using its output in
+    array context, then it returns an array of lines. If you are calling it
+    from scalar context, then returns the entire file in a single string.
+
+    It croaks()s if it can't open the file.
+
+    write_file() creates or overwrites files.
+
+    append_file() appends to a file.
+
+    overwrite_file() does an in-place update of an existing file or creates
+    a new file if it didn't already exist. Write_file will also replace a
+    file. The difference is that the first that that write_file() does is to
+    truncate the file whereas the last thing that overwrite_file() is to
+    truncate the file (to it's new length). Overwrite_file() should be used
+    in situations where you have a file that always needs to have contents,
+    even in the middle of an update.
+
+    read_dir() returns all of the entries in a directory except for "." and
+    "..". It croaks if it cannot open the directory.
+
+HISTORY
+    This module used to be called File::Slurp. Uri Guttman <uri@sysarch.com>
+    wrote a version with more features and more speed. I gave the namespace
+    to him. However, this version still has some merit: it is much smaller
+    and thus if speed of complilation is more important that slurping speed,
+    and you don't need the new features, then this version is still useful.
+
+LICENSE
+    Copyright (C) 1996, 1998, 2001-2003 David Muir Sharnoff. License hereby
+    granted for anyone to use, modify or redistribute this module at their
+    own risk. Please feed useful changes back to muir@idiom.com.
+
+AUTHOR
+    David Muir Sharnoff <muir@idiom.com>
+

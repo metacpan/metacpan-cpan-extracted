@@ -1,0 +1,47 @@
+---
+abstract: 'Override directories returned by File::ShareDir'
+author:
+  - 'Michal Wojciechowski <odyniec@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Test::Exception: 0
+  Test::More: 0
+  perl: 5.006
+  version: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-ShareDir-Override
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  File::ShareDir::Override:
+    file: lib/File/ShareDir/Override.pm
+    version: 0.200
+requires:
+  File::ShareDir: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/odyniec/p5-File-ShareDir-Override/issues
+  homepage: https://github.com/odyniec/p5-File-ShareDir-Override
+  repository: https://github.com/odyniec/p5-File-ShareDir-Override.git
+version: 0.200

@@ -1,0 +1,27 @@
+---
+abstract: 'Fast CGI module'
+author:
+  - 'Sven Verdoolaege (skimo@kotnet.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1104, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FCGI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI
+  repository: https://github.com/perl-catalyst/FCGI.git
+version: '0.78'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,72 @@
+Revision history for Frost
+
+0.70	October 16, 2010
+	-	Frost::Burial
+		DEMOLISH back in: Calls close with a flag now,
+		so only untie etc. will be called.
+
+0.69_03	October 12, 2010
+	-	Frost::Burial
+		removed long forgotten call to close in DEMOLISH due to errors with BDB,
+		now really no longer autosave is provided!
+
+0.69_02	October 12, 2010
+	-	replaced DB_File with BerkeleyDB
+		many changes
+	-	Frost::Burial
+		new attribute _dbm_cursor
+		removed BerkeleyDB::Btree::filter_*, added -Compare
+	-	Frost::Types
+		new subtype 'Frost::DBM_Cursor' -> 'BerkeleyDB::Cursor'
+
+0.69_01	October 8, 2010
+	-	removed check_db.PL from Makefile.PL to see,
+		if DB_File::filter_* helps on *BSD with BDB 1.0
+
+0.68	October 6, 2010
+	-	Frost::Burial
+		removed sub _numeric_compare
+		added filter_*
+
+0.67	October 3, 2010
+	-	Scalar::Util back in Makefile.PL, corrected doc in Frost
+	-	show version of underlying Berkeley DB in t/100_meta/000_version.t
+	-	t/000_moose_examples and t/000_moose_recipes added and
+		moved the adopted tests from t/400_recipes here to keep the original
+		Moose's name
+
+0.66 	September 28, 2010
+	-	double checking Makefile.PL again
+	-	tests
+		-	FIXED
+			t/400_recipes/104_company.t got confused by missing modules
+		-	WORKAROUND
+			-	warnings on FreeBSD:
+				in t/lib/Frost::Test
+					cat: /proc/cpuinfo: No such file or directory
+					cat: /proc/meminfo: No such file or directory
+				NEW: t/lib/Frost::TestSystem
+					has now all subs TF_* and is only loaded by
+						t/500_speed/201_burial_profile.t
+						t/500_speed/200_burial_speed.t
+					won't run on FreeBSD,
+					but will install (fingers crossed ;-)
+		-	TODO
+			-	failed on FreeBSD:
+				unexpected bugs in
+					t/200_basic/041_illuminator_iterate.t
+					t/200_basic/042_illuminator_find.t
+					t/200_basic/070_asylum.t
+					t/200_basic/071_asylum_find.t
+
+0.65	September 26, 2010
+	-	use Moose 1.14
+	-	clean up
+	-	semi-public release to mailing-list
+
+0.64 	September 3, 2010
+	-	use Moose 1.12
+	-	apply_metaclass_roles -> apply_metaroles
+
+0.01 - 0.63 X-rated ;-)
+

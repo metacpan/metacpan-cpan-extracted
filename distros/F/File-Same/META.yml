@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - 'Matt Sergeant <MSERGEANT@cpan.org>'
+build_requires:
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Same
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  File::Same:
+    file: lib/File/Same.pm
+    version: '0.11'
+requires:
+  Digest::MD5: '0'
+  File::Spec: '0'
+  perl: '5.006'
+  strict: '0'
+resources:
+  repository: https://github.com/manwar/File-Same.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,93 @@
+File-Canonicalizer
+
+Sometimes files must be compared semantically, that is their contents,
+not their forms are to be compared.
+Sometimes files must be unified and cleaned from any cosmetic additions.
+Sometimes a kind of file changes (contents or form) must be recognized.
+This module might be useful for such tasks.
+
+The module File::Canonicalizer works with ASCII files and allows to converse
+files to a canonicalized form.
+Choice of conversion steps is flexible and can be adjusted to individual kinds
+of files.
+   file_canonicalizer ( <input_file>                                   # default is STDIN
+                      , <output_file>                                  # default is STDOUT 
+                      , remove_comments_started_with_<regular_express> # if empty, ignore comments
+                      , 'replace_adjacent_tabs_and_spaces_with_1_space'
+                      , 'replace_adjacent_slashes_with_single_slash'
+                      , 'remove_white_characters_from_line_edges'
+                      , 'remove_empty_lines'
+                      , 'convert_to_lowercased'
+                      , 'remove_leading_zeroes_in_numbers'
+                      , 'sort_lines_lexically'
+                      , <replaced_substring>
+                      , <replacing_substring> );
+
+All parameters, beginning with the 3rd, are interpreted as boolean values
+true or false. A corresponding action will be executed only if its parameter value is true.
+This means, that each of literals between apostrophes '' can be shortened to
+single arbitrary character or digit 1-9.
+
+List of parameters can be shortened, that is any amount of last parameters can be skipped.
+In this case the actions, corresponding skipped parameters, will not be executed.
+
+EXAMPLES
+
+Read from STDIN, write to STDOUT and remove all strings, beginning with '#' :
+
+   file_canonicalizer ('','','#');
+
+Create canonicalized cron table (on UNIX/Linux) in any of equivalent examples:
+
+   file_canonicalizer('path/cron_table','/tmp/cron_table.canonic','#',4,5,'e','empty_lin','',9,'sort');
+   file_canonicalizer('path/cron_table','/tmp/cron_table.canonic','#',4,5, 6,    7,       '',9, 10);
+   file_canonicalizer('path/cron_table','/tmp/cron_table.canonic','#',1,1, 1,    1,       '',1, 1);
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Canonicalizer
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Canonicalizer
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-Canonicalizer
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-Canonicalizer
+
+    Search CPAN
+        http://search.cpan.org/dist/File-Canonicalizer/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Mart E. Rivilis
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0).
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

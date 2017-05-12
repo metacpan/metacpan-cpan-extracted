@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+lib/File/Type/WebImages.pm
+t/01type.t
+t/02mime.t
+t/files/blank.gif
+t/files/blank.jpg
+t/files/blank.png
+t/files/blank.bmp

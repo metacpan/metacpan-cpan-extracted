@@ -1,0 +1,101 @@
+Finance::Bank::Wachovia version 0.01
+==================================
+
+NAME
+       Finance::Bank::Wachovia - access account info from Perl
+
+       * Account numbers
+       * Account names
+       * Account balances (posted and available)
+       * Account transaction data (in all their detailed glory)
+
+       Does not (yet) provide any means to transfer money or pay bills.
+       (Note - I don't think this will ever happen unless Wachovia creates and 
+       documents a secure web service.)
+
+SYNOPSIS
+       Since this version uses the website to get account info, it will need
+       the information to login: There are two ways to login via the wachovia
+       website, and depending on which login method you use, that decides
+       which parameters you'll provide to the new() method.  If you use the
+       Customer access number method (left form on the website) then provide
+       "customer_access_number", "pin", and "code_word".  If you use the user
+       id method (right form on the website) then provide "user_id" and "pass-
+       word".
+
+         use Finance::Bank::Wachovia;
+
+         # Two different types of login information,
+         # if you login using can/pin/codeword:
+         my $wachovia  = Finance::Bank::Wachovia->new(
+             customer_access_number => '123456789',
+             pin                    => '1234',
+             code_word              => 'blah'
+         ) or die Finance::Bank::Wachovia->ErrStr();
+
+         # OR if you login using user_id/password:
+         $wachovia = Finance::Bank::Wachovia->new(
+             user_id  => 'foo',
+             password => 'bar'
+         ) or die Finance::Bank::Wachovia->ErrStr();
+
+         my @account_numbers  = $wachovia->account_numbers();
+         my @account_names    = $wachovia->account_names();
+         my @account_balances = $wachovia->account_balances();
+
+         my $account = $wachovia->account( $account_numbers[0] )
+               or die $wachovia->ErrStr();;
+         print "Number: ",      $account->number, "\n";
+         print "Name: ",        $account->name, "\n";
+         print "Type: ",        $account->type, "\n";
+         print "Avail. Bal.: ", $account->available_balance, "\n";
+         print "Posted.Bal.: ", $account->posted_balance, "\n";
+
+         my $transactions = $account->transactions
+               or die $account->ErrStr;
+
+         foreach my $t ( @$transactions ){
+               print "Date: ",     $t->date,              "\n",
+                     "Action: ",   $t->action,            "\n",
+                     "Desc: ",     $t->description,       "\n",
+                     "Withdrawal", $t->withdrawal_amount, "\n",
+                     "Deposit",    $t->deposit_amount,    "\n",
+                     "Balance",    $t->balance,           "\n",
+                     "seq_no",     $t->seq_no,            "\n",
+                     "trans_code", $t->trans_code,        "\n",
+                     "check_num",  $t->check_num,         "\n";
+         }
+
+DESCRIPTION
+       Internally uses WWW::Mechanize to scrape the bank's website.  The idea
+       was to keep the interface as logical as possible.  The user is com-
+       pletely abstracted from how the data is obtained, and to a large degree
+       so is the module itself.  In case wachovia ever offers an XML inter-
+       face, or soap, or DBI (right) this should be an easy module to add
+       to/modify, but the application interface will not change, so YOUR code
+       won't have to either.
+ 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  WWW::Mechanize
+  HTTP::Cookies
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jim Garvin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,41 @@
+---
+abstract: 'Wrap IO::KQueue for watching file system.'
+author:
+  - 'Kenta Sato <karupa@cpan.org>'
+build_requires:
+  File::Path: '0'
+  Test::More: '0'
+  Test::SharedFork: '0'
+  parent: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Filesys-Notify-KQueue
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Filesys::Notify::KQueue:
+    file: lib/Filesys/Notify/KQueue.pm
+    version: '0.11'
+requires:
+  IO::KQueue: '0'
+resources:
+  bugtracker: https://github.com/karupanerura/p5-Filesys-Notify-KQueue/issues
+  homepage: https://github.com/karupanerura/p5-Filesys-Notify-KQueue
+  repository: git://github.com/karupanerura/p5-Filesys-Notify-KQueue.git
+version: '0.11'
+x_authority: cpan:KARUPA

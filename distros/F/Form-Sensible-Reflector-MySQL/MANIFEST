@@ -1,0 +1,26 @@
+README
+TODO
+Changes
+lib/Form/Sensible/Reflector/MySQL.pm
+Makefile.PL
+MANIFEST
+MANIFEST.skip
+t/050_manifest.t
+t/060_pod.t
+t/100_basic.t
+t/120_defaults.t
+t/200_populate.t
+t/300_comments.t
+t/150_only_columns.t
+t/lib/Local/Fixtures.pm
+t/lib/Local/Tests.pm
+t/510_floats.t
+t/520_datetimes.t
+t/530_strings.t
+t/540_doubles.t
+t/550_decmail.t
+t/560_ints.t
+t/570_bits.t
+t/580_sets.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,30 @@
+---
+abstract: 'Read either one line or X characters from a file'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.2808
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - fgets
+  - XS
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-fgets
+provides:
+  File::fgets:
+    file: lib/File/fgets.pm
+    version: v0.0.4
+requires:
+  File::Temp: 0.14
+  XSLoader: 0.02
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/schwern/File-fgets/tree/master
+version: v0.0.4

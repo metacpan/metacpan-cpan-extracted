@@ -1,0 +1,6 @@
+name = "File-Copy-Recursive-Verify"
+badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"
+

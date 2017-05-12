@@ -1,0 +1,11 @@
+fwctl for Debian
+----------------
+
+changed the config dir to /etc/fwctl and /etc/fwctl/services/.
+changed accounting file to /var/log/fwctl_acct.
+changed init script to meet Debian's needs.
+changed cron.d script to chek for /usr/sbin/fwctl. run dump-acct every 10 minutes
+added logrotate entry to save accounting files weekly
+added "flush" argument to fwctl to clear and remove all chains and rules and set policy to allow
+
+ -- Bernd Eckenfels <ecki@debian.org>, Sat, 25 Sep 1999 02:53:32 +0200

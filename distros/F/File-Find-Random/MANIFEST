@@ -1,0 +1,16 @@
+MANIFEST
+SIGNATURE
+LICENSE
+README
+META.yml
+Todo
+Changes
+lib/File/Find/Random.pm
+t/001_load.t
+t/002_create_filesystem.t
+t/003_find_file.t
+t/004_rand_test.t
+t/005_pod.t
+t/006_error_test.t
+Build.PL
+Makefile.PL

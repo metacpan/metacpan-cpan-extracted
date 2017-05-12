@@ -1,0 +1,8 @@
+n_processes  5
+                                sock_chown -1 20020
+                                      clean_inc_subnamespace  Bugzilla::Config
+#                              clean_inc_hash  2
+                                        sock_chmod  0660
+ max_requests  50
+                              stats  1
+

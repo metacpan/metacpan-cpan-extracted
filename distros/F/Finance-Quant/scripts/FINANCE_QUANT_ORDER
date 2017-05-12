@@ -1,0 +1,254 @@
+#!/usr/bin/perl
+package Mydbm;
+use Cache::Memcached;
+use Data::Dumper;
+use DBI;
+use Storable qw(lock_retrieve lock_store);
+use Text::Autoformat;
+
+  
+
+
+    # this is the same as before...
+    sub new {
+         my $class = shift;
+         my $opts = shift;
+         
+         my $self = {
+            dbh  => undef,
+            memcache => undef,
+            DATA => {},
+        };
+
+
+        $self->{memcache}  = getCache();
+        
+    
+        $self->{dbh} = DBI->connect(sprintf("DBI:mysql:%s:%s",$opts->{dbname},$opts->{dbhost}),
+                                     $opts->{dbuser},$opts->{dbpwd}) or warn(@$);
+  
+        $self->{"_CENSUS"} = \$Census;
+        bless($self, $class);
+        
+        ++ ${ $self->{"_CENSUS"} };
+        
+#        print Dumper $self;
+        
+        return $self;
+    }
+
+
+sub getCache{
+
+return  new Cache::Memcached {
+'servers' => [ "127.0.0.1:11211"],
+'debug' => 0,
+'compress_threshold' => 0,
+};
+
+
+
+
+}
+sub FETCH {
+    my $self = shift;
+    my $ref  = $self->{'memcache'};
+    $ref->get($_[0]);
+}
+sub STORE {
+    my $self = shift;
+    if (defined $_[1]){
+        my $ref = $self->{'memcache'};
+        $ref->set($_[0],$_[1]);
+    } else {
+
+#        die "Cannot SET an undefined key in Mydbm\n";
+    }
+}
+
+sub getDateDir{
+  my $self = shift;
+  my @e = split " ",gmtime;
+  
+  if(defined($e[2]) && (length $e[2]) == 1) {
+    $e[2] = "0".$e[2];
+  }
+  
+  return "$e[4]-$e[1]-$e[2]";
+
+}
+
+
+# ( sql => $sql, pholder => [..,..] )
+sub row_arrayref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchrow_arrayref;
+}
+
+sub row_hashref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchrow_hashref( $parm{name} );
+}
+
+sub all_hashref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchall_hashref( $parm{name} );
+}
+
+sub all_arrayref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchall_arrayref;
+}
+
+# ( sql => $sql, pholder => [ ..,..] )
+sub all_AoHref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+
+    my ( %row , @rows );
+    $sth->bind_columns( \( @row{ @{$sth->{NAME_lc}} } ) );
+    while ( $sth->fetch ) {
+        push @rows, { %row };
+    }
+    return \@rows;
+}
+
+
+sub print_table_data {
+    my $self = shift;
+  
+    my $meta = shift;
+    my $data = shift;
+    my @fields =  @_;
+
+    my $tname = $meta->{tablename};
+    my $output = "";
+    foreach my $row (@$data) {
+
+    $output .= 'INSERT INTO '.$NS.$tname.$NS.' ';
+
+    $output .= '( '.join (', ', @fields) .' )';
+
+    $output .= ' VALUES (';
+
+    my $tmp;
+    $output .= join (', ',
+        map {
+    	    return 'NULL' unless defined $_;
+    	    ($tmp = $_) =~ s/'/\\'/g;
+    	    $tmp =~ /^[\d\.]+$/ ? $tmp : "'$tmp'";
+        } (ref($row) eq 'ARRAY' ? @$row : values %$row)
+    );
+
+    $output .= ');'."\n";
+    }
+    
+    return $output;
+}
+
+
+
+package main;
+use strict;
+use Getopt::Long;
+use File::Spec;
+use File::Find;
+use Data::Dumper;
+use Text::Autoformat;
+
+
+my $dir = File::Spec->tmpdir();
+          chdir($dir);
+
+
+my $backtest = {};
+my @tested=();
+
+my $opts = {
+            mhost =>"localhost",
+            mport =>11211,
+            dbhost =>"localhost",
+            dbuser =>"root",
+            dbpwd =>"pass",
+            dbname =>"FinanceQuant",
+            max_cache_age => 1,
+            cache_file    => sprintf("%s/Finance-Quant/%s/getquotes_cache_%s.cache",$dir,Mydbm::getDateDir(),Mydbm::getDateDir()),
+            cache         => 1,
+           };
+
+GetOptions ($opts,
+            "timeout=i",
+            "cache!",
+            "mhost=s",
+            "mport=i",
+            "dbhost=s",
+            "dbuser=s",
+            "dbpwd=s",
+            "dbname=s",
+            "max_cache_age=i",
+            "cache_file=s");
+ 
+
+
+sub wanted { 
+  my $self = shift;
+
+  
+   /longtrend_backtest[_](.*).data$/ && push @tested,[$1,$File::Find::name];
+  
+  
+}
+
+find(\&wanted, grep { -r and -d } @INC);
+
+
+my $foo = Mydbm->new($opts);
+
+#print $foo->{dbh};
+
+my @fields =("symbol","type","avgFillPrice","changedDate","shares");
+
+my $meta = {"tablename"=>"orders"};
+my $data = [["AA","BUY",599.88,"2012-02-14",299],["AAA","BUY",599.88,"2012-02-14",299],["A","BUY",599.88,"2012-02-14",299]];
+my $sql = $foo->print_table_data($meta,$data,@fields);
+my @sql = split("\n",$sql);
+
+foreach(@sql){
+
+$foo->{dbh}->do($_);
+}
+
+
+my $in = sprintf Dumper [$foo->all_arrayref( sql => 'select * from orders where symbol = ?', pholder => [ 'AAPL' ] )];
+ 
+# print $in;
+# $in .= `FINANCE_QUANT_CACHE`;
+
+
+#print $in;
+ 
+
+#sprint  $result;#$foo->FETCH("master-run");
+
+
+
+1;

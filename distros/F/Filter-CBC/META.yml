@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Filter-CBC
+version:      0.10
+version_from: lib/Filter/CBC.pm
+installdirs:  site
+requires:
+    Crypt::CBC:                    1.25
+    Crypt::Rijndael:               0.04
+    Filter::Util::Call:            1.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

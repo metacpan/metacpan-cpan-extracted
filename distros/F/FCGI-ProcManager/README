@@ -1,0 +1,59 @@
+$Id: README,v 1.6 2001/04/23 16:07:16 muaddie Exp $
+
+General Information
+-------------------
+
+FCGI-ProcManager is a process manager for FCGI.  By implementing the
+process manager in perl, we can more finely tune FastCGI performance, and 
+we can take CPU and memory advantages of fast forks and copy-on-write UNIX
+process management characteristics.
+
+
+Installation
+------------
+
+FCGI-ProcManager is expected to compile and run on all systems which
+support normal UNIX fork/wait semantics.  FCGI-ProcManager is known to
+compile and run on the following systems:
+
+ - Linux (2.0.x, 2.1.x, 2.2.x, 2.3.x)
+ - Solaris (2.5.1, 2.6, 2.7)
+ - Digital UNIX 4.0
+ - NetBSD 1.4
+
+Full installation instructions can be found in the INSTALL file.
+To build,
+
+  perl Makefile.PL
+  make all
+  make install
+
+Usage
+-----
+In order to use this process manager, you should create a FCGI::ProcManager
+object, configure it, call its pm_manage() method.   Then, you'll want to
+call its pm_pre_dispatch() method at the top of your request loop, and then
+pm_post_dispatch() at the bottom of your request loop.  Consult
+FCGI::ProcManager documentation for more detail.  (perldoc ./ProcManager.pm)
+
+
+Copyright
+---------
+Copyright (c) 2000, FundsXpress Financial Network, Inc.
+
+
+Disclaimer
+----------
+
+This library is free software released "AS IS WITH ALL FAULTS"
+and WITHOUT ANY WARRANTIES under the terms of the GNU Lesser
+General Public License, Version 2.1, a copy of which can be
+found in the "COPYING" file of this distribution.
+
+Maintainer
+------
+Gareth Kirwan <gbjk@thermeon.com>
+
+Author
+------
+James Jurach <muaddib@erf.net>

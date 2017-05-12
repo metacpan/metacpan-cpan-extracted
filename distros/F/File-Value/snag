@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+
+my $VERSION = $File::Value::VERSION;
+
+use Getopt::Long qw(:config bundling_override);
+use Pod::Usage;
+use File::Value ':all';
+
+my %opt = (
+	force		=> 0,
+	help		=> 0,
+	lshigh		=> 0,
+	lslow		=> 0,
+	man		=> 0,
+	mknext		=> 0,
+	mknextcopy	=> 0,
+	version		=> 0,
+	verbose		=> 0,
+);
+
+# main
+{
+	GetOptions(\%opt,
+		'force|f',
+		'help|h|?',
+		'lshigh',
+		'lslow',
+		'man',
+		'mknext',
+		'mknextcopy',
+		'version',
+		'verbose|v',
+	) or pod2usage(1);
+
+	help(), exit(0)
+		if $opt{help};
+	pod2usage(-exitstatus => 0, -verbose => 2)
+		if $opt{man};
+	print "$VERSION\n" and exit(0)
+		if $opt{version};
+	pod2usage("$0: --mknext cannot be given with --lshigh or --lslow")
+		if ($opt{lshigh} || $opt{lslow}) && $opt{mknext};
+	help(), exit(1)
+	#pod2usage("$0: no file or directory names given")
+		unless @ARGV;
+
+	foreach my $node (@ARGV) {
+
+		my $as_dir = ($node =~ s,/+$,,);	# a dir if ends in '/'
+		my $prnode = $node			# print-friendly name
+			. ($as_dir ? '/' : '');		# has '/' added back
+
+		my ($n, $msg);
+		if ($opt{lshigh} or $opt{lslow}) {
+			# we're only asked to report either or both of
+			# the low version and the high version
+			my @nodes;
+			$node =~ s/\d+$//;
+			if ($opt{lslow}) {
+				($n, $msg) = list_low_version($node);
+				$n == -1 and print(STDERR
+					"$prnode: has no numbered versions\n"),
+					exit 2
+				;
+				push @nodes, $msg;	# got it, $msg is node
+			}
+			if ($opt{lshigh}) {
+				($n, $msg) = list_high_version($node);
+				$n == -1 and print(STDERR
+					"$prnode: has no numbered versions\n"),
+					exit 2
+				;
+				push @nodes, $msg;	# got it, $msg is node
+			}
+			print join(" ",
+				grep { (-d $_ and s,$,/,) or $_ } @nodes),
+				"\n";
+			next;
+			# yyy support "missing" versions ??
+		}
+		elsif ($opt{mknext} or $opt{mknextcopy}) {
+			($n, $msg) = snag_version($node, {
+				as_dir => $as_dir,
+				no_type_mismatch => ! $opt{force},
+				mknextcopy => $opt{mknextcopy}});
+			if ($n == -1) {
+				print STDERR "$prnode: $msg\n";
+				exit 2;
+			}
+			# got it:  $msg is the node name
+			print "$msg", ($as_dir ? '/' : ''), "\n";
+			next;
+		}
+		else {				# simple snag
+			if ($opt{force} && -e $node) {
+				-d $node and
+					rmdir($node) || die "$node: $!"
+				or
+					unlink($node) || die "$node: $!"
+				;
+			}
+			$msg = $as_dir ?
+				snag_dir($node) : snag_file($node);
+			if ($msg eq '') {
+				print "$prnode\n";
+				next;
+			}
+			if ($msg eq '1') {
+				print "$prnode already exists";
+				print ", but as a ", ($as_dir ?
+						"file" : "directory")
+					if ($as_dir != -d $node);
+				print "\n";
+				exit 1;
+			}
+			print STDERR "$prnode: $msg\n";
+			exit 2;
+		}
+	}
+	exit 0;
+}
+
+sub help {
+	print << 'EOI';
+
+snag - capture, without clobbering, a file or directory version 
+
+Basic usage:
+  snag <name>                if <name> doesn't exist, create as a file
+  snag <name>/               if <name> doesn't exist, create as a directory
+
+Version-aware usage:
+  snag --lshigh <name>[/]    list highest existing version of <name>
+  snag --lslow <name>[/]     list lowest existing version of <name>
+  snag --mknext <name>[/]    create next highest unused version of <name>
+  snag --mknextcopy <name>   like --mknext (files only) followed by a copy
+
+A version number is just a terminal digit string in <name> (default "1").
+That string's value becomes the next version number if no numbered versions
+exist, and its length is the minimum width of the next version number
+string.  See "snag --man" for full documentation.
+
+EOI
+	return 1;
+}
+
+__END__
+
+=pod
+
+=for roff
+.nr PS 12p
+.nr VS 14.4p
+
+=head1 NAME
+
+snag - command to reserve a previously unused file or directory version
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<snag> [B<-f>] I<name>[/] ...
+
+=item B<snag> [B<-f>] [B<--lshigh | --lslow | --mknext> | --mknextcopy] I<name>[/] ...
+
+=back
+
+=head1 DESCRIPTION
+
+The B<snag> command provides a robust way to "capture without clobbering"
+a specified filesystem node I<name> or a version of that name.  The first
+form of the command (not version-aware) creates a previously non-existing
+filesystem node, I<name>.  If I<name> ends with a '/' character, the node
+is taken to be a directory, otherwise it is taken to be a file.  It
+outputs the created node name on success and exits with status 0.  Other
+errors result in exit status 2 and a message on stderr.
+
+Unlike the L<touch(1)> command, B<snag> is guaranteed to fail if the node
+exists already (exit status 1).  Because it attempts to create the node
+first and tests for existence afterwards, it is not susceptible to the
+race condition that arises when these steps are reversed.  There is an
+exception when B<-f> (B<--force>) is given, in which case an attempt will
+be made first to remove a pre-existing node; caution should be exercised
+as a race condition makes it possible to succeed in removing a node but
+to fail in re-capturing it.
+
+Versions are only relevant for the second form of the B<snag> command,
+where "version" has no other meaning than a filesytem node name that may
+end in a string of digits.  The node I<name> is considered a base for
+numbered version names and any terminal digits in I<name> ("1" by default
+if there are no terminal digits) are interpreted specially.  The length
+of the terminal digit string determines the minimum width of the version
+number, zero-padded if necessary, and the value of the digit string is
+the first version number to use if no numbered versions exist.
+
+This second form of the command provides a safe and efficient way to
+capture an unused version.  If a race condition is detected, it will make
+several attempts to capture a higher unused version before giving up.
+
+If B<--lshigh> ("list high") is given, no node will be created, but the
+highest existing numbered version will be returned, where candidate
+versions will be any node name beginning with the base I<name> and ending
+in any string of digits.  Similarly for B<--lslow> ("list low"), but for
+the lowest existing numbered version.
+
+If B<--mknext> is given, an attempt will be made to create the next highest
+numbered version by adding one to the current highest version number.  If
+a race condition is detected, several attempts will be made.  The next
+highest version is determined by first finding the highest current
+version number and adding 1 to it.  It is an error if the type (file or
+directory) of the requested version is different from that of the current
+high version unless B<--force> is given.
+
+Where files are concerned, the B<--mknextcopy> option behaves like
+B<--mknext> but with the new file receiving a copy of the unnumbered
+file.  It is an error in this case if the specified node does not exist
+already as an unnumbered file.
+
+=head1 EXAMPLES
+
+  $ snag myfile                # create an empty file
+  myfile
+  $ snag myfile                # fails if it exists
+  myfile already exists
+  $ cp ~/protostuff myfile     # get new content into myfile
+  $ snag --mknextcopy myfile   # copy original as version 1
+  myfile1
+  $ vi myfile                  # make changes to your original
+  $ snag --mknextcopy myfile   # save changes as version 2
+  myfile2
+  $ vi myfile                  # continue making changes
+
+  $ snag v4/                   # create a numbered directory
+  v4/
+  $ snag --mknext v001/        # next is 5, but "001" pads to 005
+  v005/
+  $ snag --mknext v001/        # "001" is first version if none
+  v006/
+  $ snag --mknext v001/        # but is ignored if versions exist
+  v007/
+  $ rmdir v006                 # leaving a hole in the series
+  $ snag -mknext v005/         # doesn't effect next highest
+  v008/
+  $ snag v999/                 # leave a big gap and show that
+  v999/
+  $ snag -mknext v005/         # "005" is only a minimum width
+  v1000/
+
+=head1 OPTIONS
+
+=over
+
+=item B<-f>, B<--force>
+
+Force the overwrite of an existing node or the creation of a next
+version of a different type from that of the current highest version.
+
+=item B<-h>, B<--help>
+
+Print extended help documentation.
+
+=item B<--lshigh>, B<--lslow>
+
+Don't create a node, but print highest or lowest existing numbered
+version for the given I<name>.
+
+=item B<--man>
+
+Print full documentation.
+
+=item B<--mknext>
+
+Attempt to create the next highest numbered version.
+
+=item B<--mknextcopy>
+
+Where files are concerned, behave like B<--mknext> but with the
+unnumbered filename's contents being copied to the new file.  This can be
+useful when maintaining a file's most current state in an unnumbered or
+zero-numbered filename (e.g., "myfile" or "myfile0"), and with every
+other version numbered chronologically.
+
+=item B<-v>, B<--version>
+
+Print the current version number and exit.
+
+=back
+
+=head1 SEE ALSO
+
+touch(1)
+
+=head1 AUTHOR
+
+John Kunze I<jak at ucop dot edu>
+
+=head1 COPYRIGHT
+
+Copyright 2009-2010 UC Regents.  Open source BSD license.
+
+=begin CPAN
+
+=head1 README
+
+=head1 SCRIPT CATEGORIES
+
+=end CPAN
+
+=cut

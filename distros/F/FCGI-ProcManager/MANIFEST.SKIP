@@ -1,0 +1,8 @@
+^blib/
+^pm_to_blib
+^FCGI-ProcManager-
+MANIFEST.bak
+Makefile$
+MYMETA.
+.git/
+

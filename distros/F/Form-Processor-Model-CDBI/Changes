@@ -1,0 +1,40 @@
+Revision history for Perl extension Form::Processor::Model::CDBI.
+
+0.09 Thu Feb 28 04:23:29 UTC 2008
+    Look for a method "active_column" in the object's class
+    that returns the name of the boolean column to see if the
+    row is considered "active".  This column determines if
+    the row is included in the options list.
+
+0.08 Thu Feb 28 02:07:40 UTC 2008
+    Allow primary keys (ids) of zero.  Not sure I like this
+    change as zero primary keys are perfectly valid but tend
+    to be a bad idea.
+
+    Change from brackets to parenthesis to indicate
+    options that are not "active" in select lists.
+    This conflicted with Locale::Maketext.
+
+0.07 Wed Dec 19 05:56:19 UTC 2007
+    use_ok() was used incorrectly and Test::More
+    upgrade to .74 caused it to fail.
+
+0.06 Wed Jul 25 06:41:01 UTC 2007
+    Fixed typo when calling update_model and
+    no do_transaction exists.  Closes #28464
+    as reported by Yann Kerhervé. 
+
+0.05 Thu Jun 21 04:39:44 UTC 2007
+    Add "clear" attribute to fields which the Model uses
+    to set columns null.  Useful for the odd case of a
+    row that holds fields dependent on other fields
+    (e.g. a form that changes based on selected form elements)
+
+
+
+0.04 Sun Jun  3 15:52:15 UTC 2007
+    Allows a global active_column method in the form
+    class to set the column to check in lookup tables.
+
+0.03  Tue Apr  3 13:57:44 2007
+    Moved to separate package

@@ -1,0 +1,456 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+
+# xxx support for shadow tree of deletions? pairtree_trash?
+
+my $VERSION = $File::Pairtree::VERSION;
+
+use File::Pairtree ':all';
+use File::Value ':all';
+use File::Path;
+use File::Find;		# for lstree, lsid
+use File::OM;
+
+use Pod::Usage;
+# this :config allows -h24w80 for '‐h 24 ‐w 80', -vax for --vax or --Vax
+use Getopt::Long qw(:config bundling_override);
+
+my $dir;	# global defining our directory, ends in "pairtree_root"
+
+my $R = $File::Pairtree::root;
+
+my $om;		# output multiplexer routine shared among 'pt' routines
+my %o;		# global to communicate options to module
+
+my %opt = (
+	all		=> 0,
+	bud		=> 0,
+	directory	=> 0,
+	force		=> 0,
+	format		=> 0,
+	help		=> 0,
+	long		=> 0,
+	man		=> 0,
+	version		=> 0,
+	verbose		=> 0,
+);
+
+# main
+{
+	GetOptions(\%opt,
+		'all|a',
+		'bud|b=s',		# xxx not implemented yet
+		'directory|d=s',
+		'force|f',
+		'format|m=s',		# xxx not implemented yet
+		'help|h|?',
+		'long|l',
+		'man',
+		'version',
+		'verbose|v',
+	)
+			or  pod2usage(-exitstatus => 2, -verbose => 1);
+
+	$opt{help}	and help(), exit(0);
+	$opt{man}	and pod2usage(-exitstatus => 0, -verbose => 2);
+	$opt{version}	and print("$VERSION\n"), exit(0);
+
+	my $format = $opt{format} || 'Plain';	# given format name
+	my %om_opt = (
+		outhandle	=> *STDOUT,
+	);
+	$om = File::OM->new($format, \%om_opt) or
+		pod2usage("$0: unknown format: $format");
+
+	$opt{bud} = 0;		# xxx temporary kludge
+
+	my $cmd = shift @ARGV;
+	defined($cmd)	or help(), exit(1);
+	$cmd = "do_" . lc($cmd);
+	defined(&$cmd)	or pod2usage("$0: unknown command: $cmd");
+
+	# Which pairtree?
+	#
+	$dir = $opt{directory} || ".";
+	#$dir = fiso_dname($dir, $R);
+	#$dir = prep_file($dir, $R);
+
+	no strict 'refs';		# permits the next call
+	#exit &$cmd(@ARGV);
+	my $ret = &$cmd(@ARGV);
+	#print "ret=$ret\n";
+	exit $ret;
+}
+
+# Prepare base path with last component according to the table, normalizing
+# multiple slashes between $base and $last.  Useful to get tedious details
+# right and when path may already have the last component on it (in which
+# case we don't want it there twice).  Removes final slashes from $last.
+#
+# 	$base		$last		Returns
+#  1.	/		bar		/bar
+#  2.	.		bar		bar
+#  3.	foo		bar		foo/bar
+#  4.	foo/		bar		foo/bar
+#  5.	foo/bar		bar		foo/bar
+#  6.	bar		bar		bar
+#
+# Main use case, bar=pairtree_root  
+# xxx may not port to Windows due to use of explicit slashes (/)
+# XXXXXX probably should use File::Spec
+# xxx do some test cases for this
+# xxx find a better name
+#sub prep_file { my( $base, $last )=@_;
+#
+#	$last =~ s{/*(.*)/*$}{$1};	# remove bounding slashes
+#	return "/$last"		if $base =~ m{^/+$};	# case 1 eliminated
+#	$base =~ s{/+$}{};		# remove trailing slashes
+#	return "$last"		if $base =~ m{^\./+$};	# case 2 eliminated
+#	return "$base/$last"	if $base !~ m{$last$};	# cases 3-4 gone
+#	return "$last"		if $base =~ m{^$last$};	# case 6 eliminated
+#	$base =~ s{/*$last$}{};		# remove $last and preceding slashes
+#	return "$base/$last";				# case 5 eliminated
+#}
+
+#######################
+#
+# Command functions.
+#
+
+sub do_help { my( $topic )=@_;
+
+	$topic ||= "";
+	pod2usage(-exitstatus => 0, -verbose => 2)
+	#return print "XXX place holder for help on $topic\n";
+}
+
+sub do_lsid { my( @nodes )=@_;
+
+	# Don't allow empty node, especially for rmid, which could
+	# result in a disastrous rmtree against the entire pairtree.
+	#
+	scalar(@nodes) > 0	or pod2usage("$0: no id given");
+
+	my $exit_status = 0;		# optimistic
+
+	# set options so pt_lsid doesn't need to compute each time
+	$o{parent_dir} = fiso_uname(fiso_dname($dir, $R));
+	$o{prefix} = get_prefix( $o{parent_dir} );
+	$o{force} = $opt{force};
+
+	my ($id, $ret);
+	for $id (@nodes) {
+		$ret = pt_lsid($dir, $id, \%o);
+		$ret or		# if success
+			$om->elem($id, $o{bud}),
+			next;
+		$exit_status = $ret;	# if we get here, we had trouble
+		$om->elem('error', "$id: $o{msg}");
+	}
+	return $exit_status;
+}
+
+# XXX lsid should list (a) ppath, (b) bud, and (c) leaf
+#     id | pairpath_root/ab/c | abc | oxum  ???
+# pt_lsid to return ref to array representing a node, each of form
+#    (id | ppath | bud (enclosing dirname for leaf) | leaf oxum)
+# or (id | "" | ...    <no ppath>) # or (id | ppath | ""     <no bud>>)
+
+sub do_lstree { my( @trees )=@_;
+
+	scalar(@trees) == 0 and
+		push(@trees, $dir);	# default if no args
+
+	my $exit_status = 0;		# optimistic
+
+	my ($tree, $ret);
+	for $tree (@trees) {
+		if (! -e $tree) {
+			$exit_status = 1;
+			$om->elem('error', "$tree: no such file or directory");
+			next;
+		}
+		# set prefix based on $tree's parent (from fiso_uname)
+		$o{parent_dir} = fiso_uname(fiso_dname($tree, $R));
+		$o{prefix} = get_prefix( $o{parent_dir} );
+		$o{force} = $opt{force};
+		$o{long} = $opt{long};
+		$o{all} = $opt{all};
+		$o{om} = $om;
+
+		$o{follow_fast} = 1		# xxx set with $opt?
+			unless defined $o{follow_fast};
+		# Set follow_fast=1 to mean follow symlinks without rigorous
+		# checking (faster); it also means that (-X _) works from
+		# within &visit without doing an extra stat call, where -X
+		# is any file test operator and _ is the magic file handle.
+
+		# optional 3rd arg is &visit function to use instead
+		$ret = pt_lstree($tree, \%o);	# xxx set $o{summary} ?
+		$ret or		# if success
+			next;
+		$exit_status = $ret;	# if we get here, we had trouble
+		$om->elem('error', "$tree: $o{msg}");
+	}
+	return $exit_status;
+}
+
+sub do_mkid { my( @nodes )=@_;
+
+	# Don't allow empty node, especially for rmid, which could
+	# result in a disastrous rmtree against the entire pairtree.
+	#
+	scalar(@nodes) > 0	or pod2usage("$0: no id given");
+
+	my $exit_status = 0;	# optimistic
+
+	# set options so pt_mkid doesn't need to compute each time
+	$o{parent_dir} = fiso_uname(fiso_dname($dir, $R));
+	$o{prefix} = get_prefix( $o{parent_dir} );
+	$o{bud_style} = $opt{bud};
+	$o{force} = $opt{force};
+
+	my ($id, $ret);
+	for $id (@nodes) {
+		($ret = pt_mkid($dir, $id, \%o)) and
+			$om->elem($id, $o{bud}),
+			next;
+		$exit_status = 1;	# if we get here, we had trouble
+		$om->elem('error', "$id: $o{msg}");
+	}
+	return $exit_status;
+}
+
+sub do_mktree { my( $tree, $prefix )=@_;
+
+	$tree ||= $dir;			# use default, but only if the
+	#$tree = prep_file($tree, $R)	# tree wasn't given explicitly
+	$tree = fiso_dname($tree, $R)	# tree wasn't given explicitly
+		if ($tree ne $dir);
+	
+	my $ret = pt_mktree($tree, $prefix, \%o);
+	$ret and		# if call failed
+		$om->elem("error", "$tree: $o{msg}"),
+		return 1;
+
+	$opt{verbose} and
+		$om->elem("mktree", $tree);
+	return 0;		# success means exit status 0
+}
+
+sub do_rmid { my( @nodes )=@_;
+
+	# Don't allow empty node, especially for rmid, which could
+	# result in a disastrous rmtree against the entire pairtree.
+	#
+	scalar(@nodes) > 0	or pod2usage("$0: no id given");
+
+	my $exit_status = 0;		# optimistic
+
+	# set options so pt_rmid doesn't need to compute each time
+	$o{parent_dir} = fiso_uname(fiso_dname($dir, $R));
+	$o{prefix} = get_prefix( $o{parent_dir} );
+	$o{force} = $opt{force};
+
+	my ($id, $ret);
+	for $id (@nodes) {
+		$ret = pt_rmid($dir, $id, \%o);
+		$ret or		# if success
+			$om->elem($id, $o{bud}),
+			next;
+		$exit_status = $ret;	# if we get here, we had trouble
+		$om->elem('error', "$id: $o{msg}");
+	}
+	return $exit_status;
+}
+
+sub do_rmtree { my( $tree )=@_;
+
+	print "XXX Not implemented yet; use 'rm -r'\n";
+	# XXX force use of tree arg
+}
+
+sub do_i2p { my( @ids )=@_;
+
+	print id2ppath($_), "\n"	for (@ids);
+}
+
+sub do_p2i { my( @paths )=@_;
+
+	print ppath2id($_), "\n"	for (@paths);
+}
+
+sub help {
+	print << 'EOI';
+
+pt - make, remove, and list pairtrees and pairtree buds
+
+   pt [-d dir] mktree directory [prefix]               # make a pairtree
+   pt [-l] [-d dir] [rmtree | lstree] [directory] ...  # remove/list tree(s)
+   pt [-d dir] [mkid | rmid | lsid] id ...          # manipulate bud(s)
+   pt [i2p | p2i] name ...                             # pure id/path mapping
+
+Pairtrees map identifiers to filesystem paths.  Use sub-commands to create,
+delete, modify, and report on them.  Leaves are the user's concern, but with
+"mkid" and an id, "pt" encloses every leaf in a bud directory using the full
+id (with exceptions for short ids).  See "pt --man" for more.  Examples:
+
+   $ pt mkid foo bar zafp               # mkid with no tree first calls
+   ./pairtree_root/fo/o/foo		# mktree if there's no pairtree, then
+   ./pairtree_root/ba/r/bar		# creates each pairpath and bud (node)
+   ./pairtree_root/za/fp/zafp		# directory at the pairpath's end
+   $ pt rmid bar			# remove node identified by 'bar'
+   removed: bar | ./pairtree_root/ba/r/
+   $ touch ./pairtree_root/za/fp/zafp/{a,b,c}	# create some leaf content
+   $ pt lstree -l			# so we have something to report on
+   zafp   0.3				# after the bud name is the "oxum",
+   foo   0.0				# or num of octets and num of files
+EOI
+	return 1;
+}
+
+__END__
+
+=for roff
+.nr PS 12p
+.nr VS 14.4p
+
+=head1 NAME
+
+pt - command to manipulate pairtrees
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<pt> [B<-d dir>] B<mktree> I<directory> [I<prefix>]
+
+=item B<pt> [B<-l>] [B<-d dir>] [B<rmtree | lstree>] [I<directory>] ...
+
+=item B<pt> [B<-d dir>] [B<mkid | rmid | lsid>] I<id> ...
+
+=item B<pt> [B<i2p | p2i>] I<name> ...
+
+=back
+
+=head1 DESCRIPTION
+
+The B<pt> utility introduces commands that can be used to create,
+delete, modify, and report on a pairtree.  When not made explicit via
+an argument (see the first two forms above), the pairtree in question
+is assumed to reside in a F<pairtree_root/> directory descending from
+the current directory or from a directory specified with B<-d>.
+
+The first form creates a pairtree, recording an optional prefix that
+will be stripped from an identifier before mapping it to a pairpath
+and prepended to an identifier generated from a pairpath.  The second
+form deletes or lists an entire tree of nodes.  The format of listing
+output can be specified with the B<--format> option, currently one of
+"ANVL", "XML", "JSON", or "Plain" (default).
+
+The third form creates, deletes, or tests the existence of tree nodes
+addressed via the identifier corresponding to each node's filesystem
+I<pairpath> directory.  When B<mkid> is used with a non-existent
+pairtree, it will attempt first to create a pairtree.  After creating a
+new pairpath, B<mkid> will create a I<bud> directory to encapsulate
+the new tree I<leaf> (that will not otherwise be supplied by B<pt>).
+
+By default, the bud directory name will be taken from the full form of
+the identifier.  While a pairpath may have any length, to properly
+encapsulate a leaf, there must be one and only one bud, and its name must
+be more than two characters long.  An identifier shorter than that
+requires padding the bud name on the left with `0' (zero), except for an
+empty identifier, when the bud name simply becomes "supernode".
+
+If B<-l> is also given for B<lstree>, the total number of octets and files
+within each leaf is listed after its identifier.
+
+The fourth form permits access to the purely lexical lower level
+conversion between identifiers and pairpaths (no filesystem lookups
+take place).
+
+This beta-level software has not been extensively tested.
+
+=head1 EXAMPLES
+
+   $ pt mkid foo bar zafp
+   ./pairtree_root/fo/o/foo
+   ./pairtree_root/ba/r/bar
+   ./pairtree_root/za/fp/zafp
+   $ pt rmid bar
+   removed: bar | ./pairtree_root/ba/r/
+   $ touch ./pairtree_root/za/fp/zafp/{a,b,c}
+   $ pt lstree -l
+   zafp   0.3
+   foo   0.0
+   2 objects
+   $ pt mkid ab c ''
+   ./pairtree_root/ab/0ab
+   ./pairtree_root/c/00c
+   ./pairtree_root/supernode
+
+=head1 OPTIONS
+
+=over
+
+=item B<-d directory>
+
+Specify pairtree I<directory>.  A "pairtree_root" component will be added on
+if not already present in I<directory>.
+
+=item B<-m> I<format>, B<--format> I<format>
+
+Output in the given I<format>, currently one of "ANVL", "XML",
+"JSON", or "Plain" (default).
+
+=item B<-h>, B<--help>
+
+Print extended help documentation.
+
+=item B<-l>, B<--long>
+
+Print more detailed listings.
+
+=item B<--man>
+
+Print full documentation.
+
+=item B<--version>
+
+Print the current version number and exit.
+
+=item B<-bmfa>
+
+Options yet to come, for B<--bud>, B<--force>, B<--all>.
+
+=back
+
+=head1 CHANGES SINCE v0.301.0
+
+Bug fixed so that Namaste tag is no longer under pairtree_root, but at
+the same level.
+
+Subcommand mknode, rmnode, and lsnode renamed mkid, rmid, and lsid.
+
+=head1 SEE ALSO
+
+touch(1), nam(1)
+
+=head1 AUTHOR
+
+John Kunze I<jak at ucop dot edu>
+
+=head1 COPYRIGHT
+
+Copyright 2008-2011 UC Regents.  Open source BSD license.
+
+=begin CPAN
+
+=head1 README
+
+=head1 SCRIPT CATEGORIES
+
+=end CPAN

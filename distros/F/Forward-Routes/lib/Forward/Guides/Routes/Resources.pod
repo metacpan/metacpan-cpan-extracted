@@ -1,0 +1,160 @@
+=head1 Name
+
+Forward::Guides::Routes::Resources - Rails like resource routing for Plack web
+framework developers (Perl)
+
+=head1 Plural Resources
+
+L<Forward::Routes> provides support for Rails like resource routing.
+The C<add_resources> command generates a bunch of routes that can be used to
+dispatch to a controller's read, create, update and delete actions and to
+display CRUD related forms. Framework builders are responsible to load the
+respective controller classes and to execute the desired controller method.
+L<Forward::Routes> just generates the routes and in case
+of a match, provides a match object with the needed controller and action
+parameters.
+
+    # Routes root object
+    my $routes = Forward::Routes->new;
+
+    # Add a resource
+    $routes->add_resources('cities');
+
+    # The following routes are generated:
+
+    HTTP     Path                 Controller  Action        Route name
+    request                       parameter   parameter
+    method          
+
+    GET      /cities/new          Cities      create_form   cities_create_form
+    GET      /cities/:id          Cities      show          cities_show
+    GET      /cities/:id/edit     Cities      update_form   cities_update_form
+    GET      /cities/:id/delete   Cities      delete_form   cities_delete_form
+    GET      /cities              Cities      index         cities_index
+    POST     /cities              Cities      create        cities_create
+    PUT      /cities/:id          Cities      update        cities_update
+    DELETE   /cities/:id          Cities      delete        cities_delete
+
+
+Each generated route will usually dispatch to a specific method (see action
+parameter above) which is used to:
+
+    Action (method)       Used to
+
+    create_form           display a form to create a new item
+    show                  display an individual item
+    update_form           display a form to update an existing item
+    delete_form           display a form to confirm the deletion of an existing item
+    index                 list all items
+    create                create a new item
+    update                update an existing item
+    delete                delete an existing item
+
+
+Multiple resources can be created with a single C<add_resources> call:
+
+    # Add multiple resources
+    $routes->add_resources('cities', 'users', 'articles');
+
+    # equals
+    $routes->add_resources('cities'');
+    $routes->add_resources('users');
+    $routes->add_resources('articles');    
+
+
+=head1 Singular Resources
+
+L<Forward::Routes> also supports singular resource routing. Singular resources
+are useful if the "id" is already known and has not to be part of the URL
+pattern. For example, the id might already be part of a higher level route (in
+case of nested routes) or could be derived from a cookie.
+
+    # Routes root object
+    my $routes = Forward::Routes->new;
+
+    my $author = $routes->add_route('author/:id');
+
+    # Add a singular resource to $author
+    $author->add_singular_resources('contact');
+
+    # The following routes are generated on top of author/:id:
+
+    HTTP     Path            Controller  Action        Route name
+    request                  parameter   parameter
+    method          
+
+    GET      /contact/new    Contact     create_form   contact_create_form
+    GET      /contact/edit   Contact     update_form   contact_update_form
+    GET      /contact        Contact     show          contact_show
+    PUT      /contact        Contact     update        contact_update
+    POST     /contact        Contact     create        contact_create
+    DELETE   /contact        Contact     delete        contact_delete
+
+
+=head1 Customization
+
+Resource routing is quite flexible and offers many customization options:
+
+L<Forward::Guides::Routes::ResourceCustomization>
+
+=head1 Taking a look at the source
+
+The internal code to generate a resource makes use of nested routes:
+
+    my $resource = $routes->add_route('cities');
+
+    # get => /cities
+    $resource->add_route
+      ->via('get')
+      ->to("Cities#index")
+      ->name('cities_index');
+
+    # post => /cities
+    $resource->add_route
+      ->via('post')
+      ->to("Cities#create")
+      ->name('cities_create');
+
+    # get => /cities/new
+    $resource->add_route('/new')
+      ->via('get')
+      ->to("Cities#create_form")
+      ->name('cities_create_form');
+
+    # nested route with id placeholder, placeholder can contain everything
+    # but dots and slashed (constraint)
+    my $nested = $resource->add_route(':id')
+      ->constraints('id' => qr/[^.\/]+/);
+
+    # get => /cities/paris
+    $nested->add_route
+      ->via('get')
+      ->to("Cities#show")
+      ->name('cities_show');
+
+    # put => /cities/paris
+    $nested->add_route
+      ->via('put')
+      ->to("Cities#update")
+      ->name('cities_update');
+
+    # delete => /cities/paris
+    $nested->add_route
+      ->via('delete')
+      ->to("Cities#delete")
+      ->name('cities_delete');
+
+    # get => /cities/paris/edit
+    $nested->add_route('edit')
+      ->via('get')
+      ->to("Cities#update_form")
+      ->name('cities_update_form');
+
+    # get => /cities/paris/delete
+    $nested->add_route('delete')
+      ->via('get')
+      ->to("Cities#delete_form")
+      ->name('cities_delete_form');
+
+
+=cut

@@ -1,0 +1,1 @@
+second.bar.hostname=[${T{app.hostname}}]

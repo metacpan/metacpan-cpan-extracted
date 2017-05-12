@@ -1,0 +1,45 @@
+File-Open
+
+wrap open/sysopen/opendir and give them a nice and simple interface
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Open
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Open
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-Open
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-Open
+
+    MetaCPAN
+        https://metacpan.org/module/File::Open
+
+
+COPYRIGHT AND LICENCE
+
+Written by Lukas Mai, 2011, 2013, 2016.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

@@ -1,0 +1,92 @@
+=encoding utf-8
+
+=head1 NAME
+
+FormValidator::LazyWay::Result - 検証結果を保持するクラス
+
+=head1 SYNOPSIS
+
+ my $result = $fv->check( $cgi , $profile ) ;
+
+ if( $result->has_error ) {
+        print Dumper $result->unknown;
+        print Dumper $result->missing;
+        print Dumper $result->invalid;
+        print Dumper $result->error_message;
+        print $result->has_missing;
+        print $result->has_invalid;
+ }
+ else {
+    print Dumper $result->valid;
+    print $result->success;
+
+    # エラーを追加したい場合に使用します。
+    $result->custom_invalid( 'email_not_unique' , 'ご登録されたメールアドレスは既に登録されています。');
+
+    if( $result->has_error ) {
+        print Dumper $result->error_message;
+        print $result->has_custom_invalid;
+        print $result->custom_invalid;
+    }
+
+ }
+
+=head1 DESCRIPTION
+
+L<FormValidator::LazyWay>で検証した結果を格納するクラスです。
+
+=head1 METHOD
+
+=head2 unknown
+
+定義されてないフィールド名を取得した場合、フィールド名を格納します。
+
+=head2 missing
+
+必須項目に指定されているフィールドにもかかわらず、取得できなかった場合に、フィールド名が格納されます。
+
+=head2 valid
+
+検証済みの値を格納します。
+
+=head2 invalid
+
+検証に失敗したフィールド名、検証ルール名を取得できます。
+
+=head2 error_message
+
+エラーメッセージを取得します。
+
+=head2 custom_invalid
+
+カスタムエラーを追加、もしくは取得します。
+
+=head2 success
+
+成功/失敗を返します。
+
+=head2 has_missing
+
+必須項目に指定されているフィールドにもかかわらず、取得できなかった場合に、true を返します。
+
+=head2 has_custom_invalid
+
+カスタムエラーが会った場合、に true を返します。
+
+=head2 has_invalid
+
+検証エラーが会った場合に、true を返します。
+
+=head2 has_error
+
+なんらかのエラーが会った場合に、true を返します。
+
+=head1 SEE ALSO
+
+L<FormValidator::LazyWay>
+
+=head1 AUTHOR
+
+Tomohiro Teranishi <tomohiro.teranishi@gmail.com>
+
+=cut

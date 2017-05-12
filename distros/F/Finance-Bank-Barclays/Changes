@@ -1,0 +1,47 @@
+Revision history for Perl extension Finance::Bank::Barclays.
+
+0.11  Thu May 24 09:10:57 BST 2007
+	- we must give the last 10 digits of the membership number now
+
+0.11  Mon Apr  2 12:23:04 BST 2007
+	- changes from Simon to fix pre-welcome page problem - thanks!
+
+0.10  Thu Jun  3 14:33:03 BST 2004
+	- patch from Matt Biddulph to fix interstitial page problem
+	  (thanks!)
+	- re-ordered this Changes file to be most-recent-first
+
+0.09  Fri Dec 19 10:40:58 GMT 2003
+	- gah, Barclays changed the text of the login page again
+
+0.08  Tue Dec  2 11:38:19 GMT 2003
+	- support use of https proxy (works with Crypt::SSLeay and
+	  Net::SSL - doesn't work with Net::SSLeay and IO::Socket::SSL -
+	  patches welcome)
+
+0.07  Tue Oct 28 16:48:49 GMT 2003
+	- tick the checkbox on the "security warning" front page before
+	  following the "next" link
+
+0.06  Wed Sep 17 13:47:31 BST 2003
+	- if the account data isn't on the front page, look for a "next"
+	  link to follow and try again
+
+0.05  Mon Jan 27 10:41:52 GMT 2003
+	- oops, need to list WWW:Mechanize in the PREREQ_PM line
+
+0.04  Thu Jan 23 11:07:46 GMT 2003
+	- now uses WWW::Mechanize (which requires Clone and
+	  Test::Simple)
+	- follow Barclays' redesigned web site
+
+0.03  Mon Nov 25 12:44:42 GMT 2002
+	- included change from Matt Biddulph for handling balances
+		over £999 (thanks!)
+
+0.02  Mon Nov 18 10:57:56 GMT 2002
+	- fixed bug with negative balances
+
+0.01  Tue Nov  5 09:27:28 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Finance::Bank::Barclays

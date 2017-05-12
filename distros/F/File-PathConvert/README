@@ -1,0 +1,314 @@
+File::PathConvert 0.83 for perl version5 or later
+
+
+Copyright (c) 1998 Barrie Slaymaker. All rights reserved.
+Copyright (c) 1996, 1997, 1998 Shigio Yamaguchi. All rights reserved.
+This program is open source software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+
+** Introduction **
+
+This module provides multiplatform routines to convert paths and URLs from 
+absolute to relative and vice versa and to split paths into volume, 
+directory, and filename portions.
+
+The path splitting and joining are useful for non-fully hierarchical
+pathnames like URLs, Mac, VMS, DOS/Win32, and OS/2, for instance.
+
+These routines are still under development and need extensive testing, most
+especially for URLs, Mac, and VMS.
+
+See the POD for more information.
+
+Please send your comments and patches to rbs@telerama.com
+
+
+
+** Installation **
+
+You need perl version 5.002 or later.
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+** TODO **
+
+    This cleanup of m@name/..(/|$)@ 
+    needs to be improved by making it clean up m@name/../@
+    or m@(.)/name/..$@ or m@($isrootRE)name/..$@, preserving the
+    leading root indicator. The current approach will end up
+    leaving trailing slashes: /a/b/.. becomes /a/, not /a.
+
+    Add option to regularize() to force '\' or '/' on Win32 (or
+    just leave them be). Currently, the Win32 setting uses '/' by default
+    because there are lots of perl scripts out there that are unixian
+    in nature that need to run under Win32. But, there are some applications
+    of perl under Win32 that 
+
+    (Possibly) add an option to speed things up by using abs_path()
+    instead of cwd().
+
+    (Possibly) alter realpath() to use abs_path() for speed.
+
+    MacOS and VMS beta testing: there have to be some bugs in
+    there.
+
+
+** Revision History **
+
+All revisions up to 0.4 by Shigio Yamaguchi.  0.4 to present by Barrie
+Slaymaker.  Thanks Shigio!
+
+17-Sep-1996  first RFC on comp.lang.perl.modules.
+      Subject: RFC File::PathConvert module
+      Message-ID: <51m90o$pos@newsgate.so-net.or.jp>
+
+
+07-Oct-1996  second RFC on comp.lang.perl.modules.
+      Subject: 2nd RFC File::PathConvert module
+      Message-ID: <53a449$2qo@newsgate.so-net.or.jp>
+
+      PathConvert.pm -
+         use @EXPORT_OK instead of @EXPORT.
+         realpath added.
+         use $SL variable for path separator.
+
+
+0.1   23-Oct-1996
+         Tested with perl5.003_02.
+
+
+0.2   3-Sep-1998
+
+      PathConvert.pm
+         - SYNOPSIS fixed.
+         - Tested with perl5.004_02.
+      README   
+         - Mail address changed.
+         - History added.
+
+
+0.3   9-Jan-1998
+
+      PathConvert.pm
+         - fixed the statment of online manual.
+
+      Following useful modifications were submitted by Jesse N. Glick.
+
+      * using $VERSION, to placate CPAN, Exporter, MakeMaker, etc.
+      * exporting package variables, all of which seem to be designed
+        for possible customization (or retrieval of info in the case
+        of $resolved)
+      * prototyping public functions (those extra semicolons prevent
+        e.g. CPerl mode from thinking `$' escapes the following `)'
+        and messing up Emacs)
+      * using standard indented format for literal program examples;
+        use of .br is nonstandard and will not work on anything but
+        nroff/troff (e.g. pod2html)
+      * including suggested use of $resolved in SYNOPSIS
+      * putting more useful information in the warning messages
+
+
+0.4   8-Mar-1998
+
+      mkshadow
+         - Bug (Mkshadow converted symbolic links into real path.)
+           fixed.
+      abs2rel  - modified to produce regularize path name.
+
+
+0.5   30-Aug-1998 Barrie Slaymaker
+
+    Added support for multiplatform use, fully implemented and tested only
+    for Win32 based perl.  Published for review on comp.lang.perl
+
+    Replaced common() for two reasons.  
+       (1) having common() return the common string and then using s/// to
+       chop it off the paths may have unexpected results if the paths have 
+       RE metacharacters in them.  And '.' and '\' are meta characters.  
+       (2) this is faster, since it saves calling common(), assembling the 
+       common string, returning it, and calling s///.  Although an extra 
+       join() is required.
+
+
+0.6   05-Sep-1998
+
+    Incorporated feedback from Tye McQueen to make REs more reliable and
+    clear.
+
+    Removed bug in rel2abs() that didn't see "C:/" and "/" as both being
+    root directories.  This does mean that "C:/" and "D:/" both look 
+    like "/", which is a silent bug.
+
+    Added lots of comment inline, inspired by Tye's reminder that others
+    might look to this as a style guide.  Thinking perhaps of adding
+    a "valid path RE" that would be used to validate all path parameters
+    and returns and issue warnings if they don't match.  This would be
+    a service to the module user in case some garbage gets passed in.
+
+    Moved the excising of "name/.." patterns into regularize()
+       - simplifies abs2rel() and rel2abs()
+       - reduces likelihood of having or fixing a bug in one place and not
+         another
+       - seems like this should be part of regularizing a path, anyway
+
+    Fixed a bug in regularize() that would replace a valid root
+    path beginning with the separator no matter what.  This means that
+    'C:/' would always become '/', which is unexpected by the caller.
+    The old code worked worked fine under Unix, but acted up under Win32.
+
+    Changed behavior of regularize to change an empty path to '.'.
+
+    Removed code that silently fixed some path errors in regularize.  This
+    code fixed a path beginning with '/../' to begin with '/', and also
+    fixed '//' to be '/'.  These two changes:
+       - prevent the routine from silently patching over illegal parameter
+         values that the user of this package should probably go fix
+         anyway, IMHO.  In fact, by fixing the problem at the source, the
+         API user is likely to discover some unexpected condition that was
+         overlooked or misunderstood.
+       - allow Win32 UNC pathnames to be used.  These begin with '//'.
+       - speed up regularize()
+
+    Added UNC pathname root recognition to $rootRE for Win32
+
+
+0.7     07-Sep-1998
+
+    Added @fsconfig, fssettype(), and related code.  This should allow
+    for easy reconfiguration to all OSs with Unix or DOS like concepts
+    of root and file separators.  VMS is still an open question due to
+    it's [name] construct.
+
+
+0.71    12-Sep-1998
+
+    Fixed bug in $drive_letter creation in test.pl pointed out by Shigio.
+
+    Adopted idiom from perlmod pod for exporting variables to fix problem
+    getting to @EXPORT_OKed variables.
+
+
+0.72    12-Sep-1998
+
+    Removed spurious "$::" from the vars in @EXPORT_OK.
+
+    Documented some limitations.
+
+    Cleaned up fsconfig a bit
+       - used "undef" for values that are not used
+       - improved the MacOS settings a bit
+
+
+0.80    12-Sep-1998
+
+    Implemented splitpath(), joinpath(), splitdirectories(), 
+    joindirectories(). This required adding the 'volume' and 'directory'
+    parameters to all @fsconfig entries.
+
+    Changed test.pl to test the above, started changing it towards using
+    arrays instead of hashes for the stimulus / response data sets.  This
+    is more convenient for testing the new routines, and delivers the
+    expected test order, unliks takeing the keys() of a hash.
+
+    Added print_error() to test.pl to make it easier to complain.
+
+    Fixed bugs that assumed that '0' would never be passed
+    in.  "if ($string)" was used in several places instead of 
+    "if ( $string ne '' )".  This would have bitten on any length
+    string of 0's, and VMS volume and directory names can sometimes
+    have these.  A directory named '0' is also not impossible.
+
+    Question: does VMS cwd() return path in Unix format or VMS format?
+    
+    Problem: $sepRE can't be used to detect single separators only in a
+    situation like Win32 UNC names, and also detect separator sequences
+    for idempotent directory separators.
+
+    Improvement: flatten out fsconfig to be 2D insstead of 3D, and never
+    derive an RE from a non-RE.  This will prevent anyone from forgetting
+    to do an RE where they really shouldn't use the default RE.  And besides,
+    they're not hard to do, and not too many can be automatically derived
+    anyway.
+
+
+0.81    12-Sep-1998
+
+    Removed /o's from regexs, since the OS setting can be be changed in
+    mid stream.
+
+    Restored code that 'silently fixed some path errors' in regularize.  
+    For some OSs, Unix and DOS, at least, these errors do not make
+    invalid paths, so I put them back.  This code fixes a path beginning 
+    with '/../' to begin with '/', and also fixed '//' to be '/'.  
+
+    Changed name of $rootRE to $isrootRE, and adjusted $isrootRE values 
+    to not account for volumes.  Note that $isrootRE may only be used in 
+    testing for root, not for splitting off some
+    prefix that means 'this is root'. In VMS, at least, a lack of a
+    separator indicates root, while a leading separator indicates a
+    relative path.
+
+    Made abs2rel multiplatform.  Added multiplatform tests for abs2rel and
+    rel2abs.
+
+    Fixed bug that incorrectly turned '/name/..name2' in to 'name2'.
+
+
+0.82 08-Nov-1998
+
+    Traded @fsconfig in for an if/elsif tree.  This should be smaller,
+    faster, and easier to understand, since I could eliminate a loop, a 
+    helper routine, and 10 function calls or so.  The speed improvement 
+    is necessary because of the shift to autodetecting unix style paths
+    when in non-unix filesystem modes.
+
+    Added beginnings of URL support.
+
+
+0.83    05-Dec-1998
+
+    Cleanup.  Move history to README, edit POD.
+
+0.84
+
+    Mostly bug fixes to URLs to allow Pod::Html to use us.
+
+0.85
+
+    Cleaned up regularization of m@/name/..@ to actually clean up
+    m@name/..(/|$)@ so as to preserve root-ness. TODO: This cleanup
+    could still be improved by making it clean up m@name/../@
+    or m@(.)/name/..$@ or m@($isrootRE)name/..$@, preserving the
+    leading root indicator. The current approach will end up
+    leaving trailing slashes: /a/b/.. becomes /a/, not /a.
+
+    Fixed rel2abs()'s handling of UNC names when the base (or cwd)
+    is in the top-level shared directory.
+    
+    Noticed that treating the UNC volume specifier (\\server\sharename)
+    as a volume, which prevents security problems like 
+
+       rel2abs( '..\othersharename', '\\server\sharename' ) ;
+
+    Considered calling regularize() in rel2abs() and abs2rel even when
+    they are noops. This would make the behavior a little more complicated,
+    which could be good or bad.
+
+    Cleaned up joindirs() so that it won't introduce extra separators
+    if any of the directory names already have separators in them.
+    Made similar changes elsewhere, too.
+
+    Converted regularize() to a function (it was a subroutine that
+    modified a reference).
+
+    Modified regularize to (1) preserve the trailing separator, if any,
+    and (2) not use the default $sep when combining multiple separators
+    so that we won't introduce a '/' instead of a '\' in Win32 land.
+
+    Converted test suite to t/*.t format from test.pl.

@@ -1,0 +1,8 @@
+CVS/(Entries|Repository|Root)$
+\.bak$
+\.old$
+^Makefile$
+^blib/
+^pm_to_blib$
+^\.symlinks$
+^\.cvsignore$

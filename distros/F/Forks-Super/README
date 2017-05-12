@@ -1,0 +1,188 @@
+Forks::Super version 0.89
+=========================
+
+Forks::Super provides drop-in replacements for the Perl
+fork(), wait(), and waitpid() functions with
+additional features for spawning background processes
+and managing them, including:
+
+   *  forking to shell command or subroutine
+
+      can specify a shell command or a Perl subroutine
+      (name or code reference) to invoke in the child
+      process
+
+   *  timeouts for background processes
+
+      can specify a deadline (in relative or absolute
+      time) for a background process to complete,
+      with the background process being killed if it does
+      not complete by its deadline.
+
+   *  throttling
+
+      Limiting the number of simultaneous processes, or
+      block new processes from starting when the system's
+      CPU load is too high. Callers can install their own
+      functions to determine when the system is too busy 
+      to launch another job. More advanced features allow
+      you to suspend and resume background tasks according
+      to your own criteria.
+
+   *  dependencies
+
+      Jobs can be specified to wait until other jobs
+      have started and/or completed before they can begin.
+
+   *  deferred jobs
+
+      Jobs can be specified to start at some specific time in
+      the future, or to be launched under some specific
+      future conditions. Arbitrary priorities can be
+      assigned to jobs so that more urgent jobs will be
+      launched first.
+
+   *  simple interprocess communication
+
+      Parent process can access a child process's standard
+      input, output, and error streams to facilitate
+      interprocess communication. Parent and child processes
+      can share portable mutex objects to coordinate
+      their activities.
+
+   *  timeouts on wait,waitpid calls
+
+      extended  wait  and  waitpid  functions can take
+      an optional timeout argument
+      
+   *  operating system features
+
+      On some operating systems, the priority and CPU affinity
+      of the child processes can be set. The module also provides
+      a (more) portable set of routines for signalling,
+      suspending, or terminating processes.
+
+   *  process identifier objects
+
+      Return values from fork/wait/waitpid calls are overloaded
+      objects with methods for process monitoring, signalling,
+      and interprocess communication.
+
+
+RECOMMENDED PERL VERSION
+
+The Forks::Super module is recommended for versions of Perl
+later than 5.7.2 that implement "deferred" signals (See the 
+"Deferred Signals (Safe Signals)" section of any recent version 
+of perlipc), as the signal handlers used in the module are
+insufficiently paranoid. However the module will compile
+and run with Perl 5.6.
+
+
+INSTALLATION
+
+The typical installation recipe
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+usually works. The unit tests assume they are
+running on a moderately loaded system; intermittent
+failures are more likely on a heavily loaded
+system. If "make test" fails, it will often work
+if you run it a second time.
+
+It will take about 15 minutes to run the test suite
+of the Forks::Super module with "make test". An
+alternative is to run
+
+   make fasttest
+
+which will run the Forks::Super module tests in
+parallel, using the Forks::Super module. Running
+"make fasttest" can take about 2-3 minutes, depending
+on the number of processors available on your system.
+
+NB: Even the "perl Makefile.PL" step can take up to a
+couple of minutes. If you are trying to build this
+module with  cpanm  and you get an error message like
+
+    -> FAIL Timed out (> 60s). Use --verbose to retry.
+
+then you'll want to increase your configure timeout, e.g.
+
+    cpanm Forks::Super --configure-timeout=300
+
+
+DEPENDENCIES
+
+Windows users must install the  Win32::API  module.
+
+The  bg_eval  function for evaluating Perl code in a 
+background process requires either the YAML or
+Data::Dumper modules. It is a fatal error to use  bg_eval
+when at least one of these modules can not be found.
+
+Otherwise,  Forks::Super  recommends and will make
+use of the following modules if they are installed,
+but will still be able to perform most of its functions
+without them:
+
+    DateTime::Format::Natural
+    Proc::ProcessTable
+    Win32::Process, Win32::API [Windows and Cygwin]
+    Win32          [Windows]
+    Sys::CpuAffinity 
+    Sys::CpuLoadX
+
+The Sys::CpuAffinity and Sys::CpuLoadX are bundled with the
+Forks::Super module distribution, and may be installed at
+the same time. The Sys::CpuAffinity module is also
+available as a separate module on CPAN. See "BUNDLED
+MODULES", below.
+
+
+BUNDLED MODULES
+
+This Forks::Super distribution comes bundled with two
+additional modules, Sys::CpuAffinity and Sys::CpuLoadX. 
+You will have the opportunity to install these modules
+at the same time that you install the Forks::Super module.
+
+The Sys::CpuAffinity module is for manipulating process
+CPU affinities. The Forks::Super module can make use of
+this module to control the CPU affinities of background
+processes. This is a released module that can also be
+retrieved and installed from CPAN.
+
+The Sys::CpuLoadX module is for determining the current 
+CPU load of your system. The Forks::Super module can make
+use of this module to decide whether the system is too
+busy to launch additional background tasks. As of Forks::Super
+version 0.30, this is an unreleased module and it is only
+available bundled with Forks::Super.
+
+Installation of these additional modules is optional. If the
+modules are not available, then certain features of the
+Forks::Super module may not work.
+
+
+WINDOWS
+
+Some features of this module do not work or work a
+little differently with Windows systems. See the
+README.windows file included in this distribution
+for important information.
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2009-2017, Marty O'Brien.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+See http://dev.perl.org/licenses/ for more information.

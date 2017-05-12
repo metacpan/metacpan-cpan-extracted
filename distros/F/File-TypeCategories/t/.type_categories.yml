@@ -1,0 +1,12 @@
+---
+ignore:
+    +definite: 'test.test$'
+    +other_types:
+        - mine
+        - other
+mine:
+    definite:
+        - 'mytype.mine'
+other:
+    definite:
+        - 'mytype.other'

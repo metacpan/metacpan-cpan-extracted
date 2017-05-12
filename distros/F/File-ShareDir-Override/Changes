@@ -1,0 +1,8 @@
+Revision history for File-ShareDir-Override
+
+0.200     2014-11-30
+          The separator character was changed to semicolon.
+
+0.100     2014-09-07
+          First version, released on an unsuspecting world.
+

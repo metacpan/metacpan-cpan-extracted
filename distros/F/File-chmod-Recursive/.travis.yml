@@ -1,0 +1,11 @@
+---
+branches:
+  only:
+  - master
+  - develop
+language: perl
+perl:
+- 5.14.2
+- 5.12.4
+- 5.10.1
+- 5.8.8

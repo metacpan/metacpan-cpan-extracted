@@ -1,0 +1,8 @@
+FTN-Database
+Perl extension for Fidonet/FTN related
+processing in an SQL database supported
+by a Perl DBD module, defaulting to
+SQLite. Includes both general operations
+and specific operations like for Nodelist
+processing. See README and other
+documentation for more information.

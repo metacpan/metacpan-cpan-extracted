@@ -1,0 +1,186 @@
+#!/usr/bin/perl
+#
+#  lncopies
+#
+#  Walk directory trees making files found in more than one into hard
+#  links to the same inode.
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Fcntl ':mode';
+use File::Spec;
+use File::Find::Parallel;
+
+my $man     = 0;
+my $help    = 0;
+my $verbose = 0;
+
+GetOptions(
+    'help|?' => \$help,
+    'man'    => \$man,
+    'v'      => \$verbose,
+) or pod2usage( 2 );
+
+pod2usage( 1 ) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+pod2usage( 2 ) unless @ARGV > 1;    # Need two directories
+
+# Default link filter. Sorts files by age so that the newest is first.
+# The first element in the returned list is the file the others will
+# link to.
+my $can_link = sub {
+    return sort { $b->[9] <=> $a->[9] } @_;
+};
+
+my $say = sub {
+    print @_ if $verbose;
+};
+
+my ( $linked, $saved ) = lncopies( $can_link, $say, @ARGV );
+$say->( "Complete. Linked $linked files saving $saved bytes\n" );
+
+sub lncopies {
+    my $can_link = shift;
+    my $say      = shift;
+    my @dirs     = @ARGV;
+    my $saved    = 0;
+    my $linked   = 0;
+
+    if ( my @not_dir = grep { !-d $_ } @dirs ) {
+        die "Not directories: ", join( ', ', @not_dir ), "\n";
+    }
+
+    my $finder = File::Find::Parallel->new( @dirs );
+
+    # No matter how many directories we have we're interested in
+    # the case where a file of the same name is shared by two or
+    # more of them.
+    my $iter = $finder->want_iterator( 2 );
+
+    FILE:
+    while ( my $obj = $iter->() ) {
+
+        # Make complete pathnames and stat all the files
+        my @obj = map { [ lstat( $_ ), $_ ] }
+          map { File::Spec->catdir( $_, $obj ) } @dirs;
+
+        my @stat_failed = grep { !defined $_->[2] } @obj;
+        if ( @stat_failed ) {
+            warn "Can't stat ", join( ', ', map { $_->[-1] } @stat_failed ),
+              "\n";
+            next FILE;
+        }
+        else {
+
+            # Filter out links
+            @obj = grep { !S_ISLNK( $_->[2] ) } @obj;
+            next FILE if @obj < 2;
+
+            # Which are directories?
+            my @are_dir = grep { S_ISDIR( $_->[2] ) } @obj;
+            if ( @are_dir == 0 ) {
+
+                # All files, so consider linking them all together
+                if ( my @links = $can_link->( @obj ) ) {
+                    my $stat = shift @links;
+                    my $keep = pop @$stat;
+
+                    # Loop over all the files that are not already hard
+                    # links to the file we're linking them to.
+                    for my $link ( grep { $_->[1] != $stat->[1] } @links ) {
+                        my $file = pop @$link;
+                        my $tmp  = "$file.tmp";
+
+                        # Make the link
+                        link( $keep, $tmp )
+                          or die "Can't link $keep as $tmp ($!)\n";
+                        unlink( $file )
+                          or die "Can't remove $file"
+                          . " to replace it with a link ($!)\n";
+                        rename( $tmp, $file )
+                          or die "Can't rename $tmp as $file ($!)\n";
+
+                        $saved += $link->[11] * $link->[12];
+                        $linked++;
+
+                        $say->( "$keep --> $file\n" );
+                    }
+                }
+            }
+            elsif ( @are_dir < @dirs ) {
+
+                # Mixture so complain
+                warn "$obj is both a directory and a file\n";
+            }
+        }
+    }
+
+    return ( $linked, $saved );
+}
+
+__END__
+
+=head1 NAME
+
+lncopies - Replace duplicate files with hard links
+
+=head1 SYNOPSIS
+
+lncopies [options] [dir1 dir2 ...]
+
+ Options:
+
+    -help          see this summary
+    -man           view man page for lncopies
+    -v             verbose mode
+
+=head1 DESCRIPTION
+
+Given a number of directories that are (partial) copies of each other
+replace files that are shared between them with hard links to a
+single file.
+
+No attempt is made to verify that the files' contents match. The most
+recently modified file is chosen as the version to be linked to.
+
+=head1 EXAMPLES
+
+    # Make sure that files shared between cpan and backpan mirrors are
+    # hard links to a single file.
+    lncopies /usr/share/cpan /usr/share/backpan
+
+=head1 AUTHOR
+
+Andy Armstrong  C<< <andy@hexten.net> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

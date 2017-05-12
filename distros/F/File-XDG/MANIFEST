@@ -1,0 +1,13 @@
+Build.PL
+lib/File/XDG.pm
+MANIFEST			This list of files
+t/00use.t
+t/01env.t
+t/02noenv.t
+t/03lookup.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

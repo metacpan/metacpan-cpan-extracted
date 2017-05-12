@@ -1,0 +1,19 @@
+Changes
+inline2test.conf
+INSTALL
+lib/Fuse/Simple.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-mount.t
+t/filesystem.pl
+t/filesystem.t
+t/fuse_simple.t
+t/helper.pm
+t/pod-coverage.t
+t/pod.t
+t/zz-unmount.t
+Todo

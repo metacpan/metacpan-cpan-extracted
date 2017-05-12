@@ -1,0 +1,49 @@
+{
+   "abstract" : "To get the current gold and silver price",
+   "author" : [
+      "sdrfnord <sdrfnord@gmx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-RawMaterialPrice",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Simple" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sdrfnord/Finance-RawMaterialPrice/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/sdrfnord/Finance-RawMaterialPrice"
+      }
+   },
+   "version" : "0.02"
+}

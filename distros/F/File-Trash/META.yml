@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               File-Trash
+version:            1.10
+abstract:           move files to trash and restore as well
+author:
+    - Leo Charre leocharre at cpan dot org
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 1
+    Cwd:                  3
+    Exporter:             5
+    File::Copy:           2.09
+    File::Path:           2.07
+    Getopt::Std::Strict:  1.01
+    Test::Simple:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

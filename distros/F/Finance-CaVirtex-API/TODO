@@ -1,0 +1,13 @@
+In no particular order:
+
+- change test script to a Test::More
+- add validation to inputs
+- reword "is_ready_to_send()" to just "ready()"
+- obtain an API key and test the private calls.
+- make sure the signature is doing what is expected. This has not been tested at all.
+- remove crutch for data_key array once a single data_key can be verified to be consistently returned for each request type. search 'crutch' in Finance::CaVirtex::API.
+- try generalizing the validation of all Request child (action) classes. Probably add a REQUIRED field to the Request class and having the children define the methods. Then allow the methods to add their own method specific validation calls.
+- decide if class_action is general enough to be a DefaultPackage routine.
+- generalize responses into constants.
+- make sure all methods are being called (no leftovers).
+

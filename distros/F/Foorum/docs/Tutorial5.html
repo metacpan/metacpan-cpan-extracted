@@ -1,0 +1,195 @@
+<html>
+<head>
+<title>Tutorial5</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<h1> NAME </h1><p>Foorum::Manual::Tutorial5 - Tutorial 5: How to write test cases For Foorum</p><h2> Test </h2><p>Test, test, test!</p><h2> Reference </h2><ul><li><a href="http://search.cpan.org/perldoc?Test::Simple" rel="nofollow">Test::Simple</a> </li><li><a href="http://search.cpan.org/perldoc?Test::More" rel="nofollow">Test::More</a> </li><li><a href="http://search.cpan.org/perldoc?Test::Harness" rel="nofollow">Test::Harness</a> </li><li><a href="http://search.cpan.org/perldoc?Test::LongString" rel="nofollow">Test::LongString</a> </li></ul><h2> Controller </h2><p>We are not going to use <a href="http://search.cpan.org/perldoc?Test::WWW::Mechanize::Catalyst" rel="nofollow">Test::WWW::Mechanize::Catalyst</a> for this moment. Sure, I think we will add it later.</p><h2> Model, esp. Schema </h2><p>We are going to move all schema related code into ResultSet/ scope because it's easy to test without $c in Model/.</p><p>Some explanation in Foorum::Test under t/lib:</p><ul><li>we use DBD::SQLite to test all schema function since it's very simple. </li></ul><pre class="prettyprint">sub schema {
+    # override live cache
+    $Foorum::Schema::cache = cache();
+ 
+    # create the database
+    my $db_file = "$path/test.db";
+    my $schema
+        = Foorum::Schema-&gt;connect( "dbi:SQLite:$db_file", '', '',
+        { AutoCommit =&gt; 1, RaiseError =&gt; 1, PrintError =&gt; 1 },
+        );
+ 
+    return $schema;
+}
+</pre><ul><li>we use File::Cache as test cache backend. and with namespace: 'FoorumTest' </li></ul><pre class="prettyprint">sub cache {
+    return $cache if ($cache);
+ 
+    $cache = Cache::FileCache-&gt;new(
+        {   namespace          =&gt; 'FoorumTest',
+            default_expires_in =&gt; 300,
+        }
+    );
+ 
+    return $cache;
+}
+</pre><p>with this two things, the test case wouldn't affect the product site.</p><p>filter_word.t code explanation:</p><pre class="prettyprint">#!/usr/bin/perl
+ 
+use strict;
+use warnings;
+use Test::More;
+ 
+### Code Exp.
+### To be sane, we skip if DBD::SQLite is not installed.
+BEGIN {
+    eval { require DBI }
+        or plan skip_all =&gt; "DBI is required for this test";
+    eval { require DBD::SQLite }
+        or plan skip_all =&gt; "DBD::SQLite is required for this test";
+    plan tests           =&gt; 3;
+}
+ 
+### Code Exp.
+### load Foorum::TestUtils to get schema and cache
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Foorum::TestUtils qw/schema cache base_path/;
+my $schema = schema();
+my $cache  = cache();
+ 
+### Code Exp.
+### Test with Foorum::ResultSet::FilterWord
+my $filter_word_res = $schema-&gt;resultset('FilterWord');
+ 
+### Code Exp.
+### to make test case moving smoothly, we just create some test data
+### After test case is done, we need remove those data
+# create
+$filter_word_res-&gt;create(
+    {   word =&gt; 'system',
+        type =&gt; 'username_reserved'
+    }
+);
+$filter_word_res-&gt;create(
+    {   word =&gt; 'fuck',
+        type =&gt; 'bad_word'
+    }
+);
+$filter_word_res-&gt;create(
+    {   word =&gt; 'asshole',
+        type =&gt; 'offensive_word'
+    }
+);
+ 
+### Code Exp.
+### Make sure exist cache wouldn't affect our test cases.
+$cache-&gt;remove("filter_word|type=username_reserved");
+$cache-&gt;remove("filter_word|type=bad_word");
+$cache-&gt;remove("filter_word|type=offensive_word");
+ 
+### Code Exp.
+### Check sub get_data in Foorum::ResultSet::FilterWord
+my @data = $filter_word_res-&gt;get_data('username_reserved');
+ 
+### Code Exp.
+### ok what we get cantains the one we created.
+ok( grep { $_ eq 'system' } @data, "get 'username_reserved' OK" );
+ 
+### Code Exp.
+### check sub has_bad_word in Foorum::ResultSet::FilterWord
+my $has_bad_word = $filter_word_res-&gt;has_bad_word("oh, fuck you!");
+is( $has_bad_word, 1, 'has_bad_word OK' );
+ 
+### Code Exp.
+### check sub convert_offensive_word in Foorum::ResultSet::FilterWord
+my $return_text = $filter_word_res-&gt;convert_offensive_word("kick your asshole la, dude!");
+like( $return_text, qr/\*/, 'convert_offensive_word OK' ); #\ #/
+ 
+### Code Exp.
+### Make our DB as the same as before we run it. so that we can run it many times
+END {
+    # Keep Database the same from original
+    use File::Copy ();
+    my $base_path = base_path();
+    File::Copy::copy( "$base_path/t/lib/Foorum/backup.db",
+        "$base_path/t/lib/Foorum/test.db" );
+}
+ 
+1;
+</pre><h2> View Esp. TT </h2><p>Generally we don't write any test cases for TT. but if we want to write one, that's still possible.</p><p>check t/templates/wrapper.t</p><pre class="prettyprint">#!/usr/bin/perl
+ 
+use strict;
+use warnings;
+use Test::More;
+ 
+BEGIN {
+    my $has_test_longstring
+        = eval "use Test::LongString; 1;";    ## no critic (ProhibitStringyEval)
+    $has_test_longstring or plan skip_all =&gt; "Test::LongString is required for this test";
+    plan tests =&gt; 2;
+}
+ 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Foorum::TestUtils qw/tt2/;
+my $tt2 = tt2();
+ 
+my $var = {
+    title   =&gt; 'TestTitle',
+    RSS_URL =&gt; 'httpRSS_URL',
+};
+ 
+my $ret;
+$tt2-&gt;process( 'wrapper.html', $var, \$ret );
+ 
+contains_string( $ret, 'TestTitle', '[% title %] ok' );
+like_string(
+    $ret,
+    qr/application\/rss\+xml(.*?)href\=\"httpRSS_URL\"/,
+    '[% RSS_URL %] OK'
+);
+</pre><h2> Others </h2><p>Like Foorum::Formatter or Foorum::Utils, we just write normal test cases as told in Test::More.</p><p>Example: (t/formatter/textile.t)</p><pre class="prettyprint">#!/usr/bin/perl
+ 
+use strict;
+use warnings;
+use Test::More;
+ 
+BEGIN {
+    eval { require Text::Textile }
+        or plan skip_all =&gt; "Text::Textile is required for this test";
+ 
+    plan tests =&gt; 3;
+}
+ 
+use Foorum::Formatter qw/filter_format/;
+ 
+my $text = &lt;&lt;TEXT;
+h1. Heading
+ 
+A _simple_ demonstration of Textile markup.
+ 
+* One
+* Two
+* Three
+ 
+"More information":[http://www.textism.com/tools/textile] is available.
+TEXT
+ 
+my $html = filter_format( $text, { format =&gt; 'textile' } );
+ 
+like( $html, qr/h1/, 'h1 OK' );
+like( $html, qr/li/, '*,* OK' );
+like( $html, qr/\&lt;a href=/,
+    '"More information":[http://www.textism.com/tools/textile] OK' );
+</pre><h1> SEE ALSO </h1><p><a href="Tutorial1.html">Tutorial1</a>, <a href="Tutorial2.html">Tutorial2</a>, <a href="Tutorial3.html">Tutorial3</a>, <a href="Tutorial4.html">Tutorial4</a></p>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/Tutorial5">http://code.google.com/p/foorum/wiki/Tutorial5</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

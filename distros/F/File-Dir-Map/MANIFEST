@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/File/Dir/Map.pm
+t/00-load.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+META.yml

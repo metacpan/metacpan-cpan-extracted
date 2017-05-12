@@ -1,0 +1,32 @@
+---
+abstract: 'extension for replacing a link by a copy of the linked file'
+author:
+  - 'Robin Barker <rmbarker@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Copy-Link
+provides:
+  File::Copy::Link:
+    file: lib/File/Copy/Link.pm
+    version: '0.06'
+  File::Spec::Link:
+    file: lib/File/Spec/Link.pm
+    version: '0.073'
+recommends:
+  Cwd: '2.18'
+requires:
+  File::Copy: '0'
+  File::Spec: '0'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.140'

@@ -1,0 +1,292 @@
+Revision history for Future
+
+0.34    2016/10/02 18:40:06
+        [CHANGES]
+         * Added Future::Mutex
+         * Minor documentation wording fixes (thanks ilmari)
+
+        [BUGFIXES]
+         * Fallback to 'configure_requires' for older versions of
+           Module::Build that don't support 'test_requires' (RT110721)
+
+0.33    2015/07/29 16:15:55
+        [CHANGES]
+         * Added ->catch and ->catch_with_f
+         * Add catch-handler semantics to ->then / ->then_with_f
+         * Also pass fmap* items via $_ (RT105558)
+         * Undocument ->done_cb / ->fail_cb / ->cancel_cb
+         * Entirely delete ->and_then / ->or_else
+         * New barename documentation style including "since" versions
+         * Further document the idea of failure categories as used by catch*
+
+0.32    2015/03/10 19:54:22
+        [CHANGES]
+         * Documentation updates for new ->wrap_cb method
+
+        [BUGFIXES]
+         * Empty convergents should respect subclassing (RT97537)
+         * Adjust loss-report regexp for bleadperl (RT99002 again)
+         * Make trailing periods in warning tests optional, to account for
+           Carp version changes (RT100685)
+
+0.31    2015/03/08 17:50:06
+        [CHANGES]
+         * Added debugging warning when destroying a failed Future that has
+           not reported its failure (RT102198)
+         * Have ->and_then / ->or_else die immediately to further their
+           deprecation
+         * Announce done_cb/fail_cb/cancel_cb as deprecated in favour of curry
+         * Provide ->wrap_cb method (experimental)
+        
+        [BUGFIXES]
+         * Ensure that Test::Future does not retain Futures once they are
+           complete (RT101128)
+         * 'use Future' in Future::Utils (RT102167)
+
+0.30    2014/11/26 14:29:28
+        [CHANGES]
+         * Rename 'dependent' futures to 'convergent'
+         * Removed examples/ scripts that now exist as independent modules
+         * Added ->without_cancel
+         * Sanity-check the $code argument to ->on_{ready,done,fail,cancel} to
+           ensure it is callable or a Future
+        
+        [BUGFIXES]
+         * Ensure that 'ready_at' is always set in DEBUG mode
+         * Fix DEBUG 'lost_at' line number reporting tests for latest
+           bleadperl (RT99002)
+         * Ensure that if Future::Utils::repeat condition code dies, that is
+           passed to the result Future and not propagated to the caller
+           (RT100067)
+         * Failure by returning a non-Future from a sequencing code block
+           should report as a failed Future, not throw exception to caller
+
+0.29    2014/07/17 12:18:12
+        [CHANGES]
+         * Added Test::Future
+         * Stronger deprecations - repeat {} on failures warns every time,
+           ->and_then / ->or_else warn once
+
+        [BUGFIXES]
+         * Define the behaviour of dependent futures when components are
+           cancelled. (Partially fixes RT96685)
+         * Use Module::Build->prompt (RT96409)
+         * Ensure that repeat on an empty foreach list or empty generator
+           without 'otherwise' behaves correctly, just yield an immediate
+
+0.28    2014/06/08 22:43:40
+        [CHANGES]
+         * Added ->label
+         * Added ->btime, rtime, elapsed tracing timers
+         * Better handling of 'breaks' version detection
+
+0.27    2014/06/06 17:42:27
+        [BUGFIXES]
+         * Depend on Carp 1.25 for the new message format with trailing
+           period, so tests work
+
+0.26    2014/06/01 12:52:53
+        [CHANGES]
+         * Added ->is_failed accessor
+         * Implement ->export_to_level in Future::Utils
+         * Print a warning about lost sequence Futures
+         * Allow Future->done and Future->fail as simple class constructors
+           to return immediates
+         * Added Future->unwrap
+
+        [BUGFIXES]
+         * Ensure that sequence futures are weaken()ed in the forward
+           direction.
+           **NOTE** This will potentially break existing code that depended on
+             strong references. This old code was, however, broken.
+
+0.25    2014/02/22 03:47:08
+        [BUGFIXES]
+         * Fix warning-matching test in unit test for both older and newer
+           versions of Carp
+
+0.24    2014/02/21 17:57:49
+        [CHANGES]
+         * Have repeat print a warning if it is asked to retry over a failure
+         * Change documentation to suggest try_repeat instead of repeat for
+           retries over failure
+         * Check at call time that sequencing callbacks really are callable,
+           leading to neater error messages (RT93164)
+
+0.23    2014/01/19 15:26:55
+        [CHANGES]
+         * Link to Futures advent calendar 2013
+         * Fixes/additions to Phrasebook documentation, including section
+           about tree recursion
+
+        [BUGFIXES]
+         * Ensure that late addition of additional items to a fmap foreach
+           array works correctly even with concurrency
+
+0.22    2014/01/12 03:12:18
+        [CHANGES]
+         * Ignore ->done or ->fail on cancelled Futures
+         * Added ->then_done, ->then_fail, ->else_done, ->else_fail
+         * Neaten up naming of fmap* family - provide both long and short
+           names for each function
+         * Added Future::Utils::call and call_with_escape
+         * Ensure that dependent futures on subclasses tries to use derived
+           futures as prototype if possible
+
+0.21    2013/12/29 18:14:41
+        [CHANGES]
+         * Major performance improvement by folding out some layers of sub {}
+           wrapping in sequencing operations
+         * Added ->then_with_f and ->else_with_f
+        
+        [BUGFIXES]
+         * Don't start another trial after cancelling a repeat() (RT91147)
+
+0.20    2013/11/18 19:14:27
+        [CHANGES]
+         * Include an indication of done/failed/cancelled status of a Future
+           when ->done or ->failing an already-ready one
+
+        [BUGFIXES]
+         * Declare requires perl 5.8 because it fails on 5.6 smokers - no idea
+           why
+         * Fix a couple of typoes in docs (RT89185)
+
+0.19    2013/09/27 13:31:16
+        [BUGFIXES]
+         * Guard against odd things happening during ->cancel at global
+           destruction (RT88967)
+
+0.18    2013/09/20 19:09:57
+        [CHANGES]
+         * Added 'try_repeat' and 'try_repeat_until_success' aliases
+         * @CARP_NOT trust between Future and Future::Utils
+
+        [BUGFIXES]
+         * Fix to concurrent non-immediate + immediate fmap* return values
+
+0.17    2013/09/07 16:53:47
+        [CHANGES]
+         * Performance improvement by using direct member access instead of
+           accessor methods
+         * Documentation updates; suggestion of documentation style for
+           Future-returning code
+
+        [BUGFIXES]
+         * Respect subclassing of immediate->followed_by and dependent futures
+           with mixed subclass or immediate components
+
+0.16    CHANGES:
+         * Proper behaviour of ->wait_all and ->needs_all on an empty list -
+           just return empty immediate done
+         * Proper behaviour of ->wait_any and ->needs_any on an empty list -
+           return an immediate failure
+         * Performance improvement to ->done for immediate Future->new->done
+         * Keep a count of pending child futures to avoid quadratic behaviour
+           due to linear scan of children every time one completes
+         * Improve efficiency of Future::Utils::repeat and fmap* when trials
+           return immediates
+         * Make repeat and fmap* 'return' argument optional by cloning the
+           first non-immediate trial
+         * Rework unit tests to avoid dependency on Test::Warn
+
+0.15    CHANGES:
+         * Added Future->call constructor
+         * Fixed reference-retaining bug in Future's on_cancel callback list
+         * Ensure that ->cancel returns $self even on immediates
+         * Documentation updates to mention ->wrap and ->call, and the fmap
+           family
+
+0.14    CHANGES:
+         * Added Future->wrap constructor
+         * Added Future::Utils::fmap* family of functions
+
+        BUGFIXES:
+         * Fixed a precedence bug in 'and' vs &&
+
+0.13    CHANGES:
+         * Added ->then and ->else methods; like ->and_then but code is passed
+           result directly instead of invocant future
+         * Added repeat { ... } foreach, otherwise argument to set final
+           result and also handle empty lists
+         * Added repeat { ... } generate
+         * Turn repeat { ... } code block exceptions into failed futures
+         * Ensure that ->on_cancel returns $self (RT85134)
+         * Documentation / Phrasebook updates to demonstrate newly added
+           features
+
+0.12    CHANGES:
+         * Take a 'return' argument to Future::Utils::repeat; deprecate the
+           trial-cloning feature for subclasses
+         * Have ->followed_by/etc... print a warning in void context
+         * Throw an exception when ->followed_by/etc.. code does not yield a
+           Future (RT84188)
+         * Ensure that ->needs_all/->needs_any work correctly on a mix of
+           immediate and pending Futures (RT84187)
+         * Ensure that ->on_done/->on_fail always return invocant (RT84313)
+         * Ensure that ->on_ready($f) works on cancelled Futures (RT84312)
+
+0.11    CHANGES:
+         * Added Future::Phrasebook documentation file
+         * Ensure that exceptions thrown from ->followed_by code block are
+           caught and turned into failed Futures
+         * Fix filename regexp matches for unit-tests so they work on Windows
+
+0.10    BUGFIXES:
+         * Account for newer Carp version in unit tests, which appends
+           trailing period to messages
+
+0.09    CHANGES:
+         * Split ->fail method into new ->die call, only append caller
+           file/line to the exception in the latter
+         * Various documentation and example improvements
+
+0.08    CHANGES:
+         * Ignore attempts to cancel already-complete or already-cancelled
+           futures, or to attach ->on_cancel callbacks to them
+         * $future->get should return the first result in scalar context
+         * Added Future::Utils with repeat { ...} and
+           repeat_until_success { ... } looping constructs
+
+         * Link to LPW2012 talk slides
+
+0.07    CHANGES:
+         * Leak debugging
+
+0.06    CHANGES:
+         * Remembered to actually include the example scripts. No other actual
+           code changes.
+
+0.05    CHANGES:
+         * Respect subclassing by allowing ->new on instances
+         * Allow subclasses to provide an ->await method which will be used
+           by ->get and ->failure
+         * Added some example scripts to demonstrate how to use Futures with
+           various event systems
+
+0.04    CHANGES:
+         * Fix implementation of sequenced futures to work properly on
+           immediates
+         * Ensure that future->future chaining via callbacks works correctly
+           on immediates
+         * Link to "curry" in the docs about CODE-returning convenience
+           accessors ->done_cb, ->fail_cb and ->cancel_cb
+
+0.03    INCOMPATIBLE CHANGES:
+         * Future->needs_all and Future->needs_any now return dependents'
+           results
+
+        CHANGES:
+         * Removed $future->( ... ) callable override
+         * Pass $f1 to ->or_else code block by symmetry with ->and_then
+         * Added $f->followed_by
+         * Added Future->wait_any dependent future constructor
+         * Rearranged documentation and added more examples
+
+0.02    CHANGES:
+         * Rearranged non-leaf future logic
+         * Added {pending,ready,done,failed,cancelled}_futures accessors
+         * Added Future->needs_any constructor
+
+0.01    First version, released on an unsuspecting world.
+

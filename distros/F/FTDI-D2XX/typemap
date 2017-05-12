@@ -1,0 +1,35 @@
+TYPEMAP
+FT_HANDLE *		T_PTRREF
+FT_HANDLE		T_FT_HANDLE
+FT_STATUS		T_UV
+FT_DEVICE		T_UV
+DWORD			T_UV
+WORD			T_UV
+ULONG			T_UV
+USHORT			T_UV
+UCHAR			T_UV
+PVOID			T_PTR
+
+############################################
+INPUT
+T_PFT_HANDLE
+	if (SvROK($arg)) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"$var is not a reference\")
+
+T_FT_HANDLE
+	if (SvROK($arg)) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = *(FT_HANDLE*)INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"$var is not a reference\")
+############################################
+OUTPUT
+T_PFT_HANDLE
+	$arg = newRV_noinc((SV*)PTR2IV($var));
+#	sv_setref_pv($arg, Nullch, (void*)$var);
+

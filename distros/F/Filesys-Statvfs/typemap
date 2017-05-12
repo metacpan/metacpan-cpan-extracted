@@ -1,0 +1,2 @@
+TYPEMAP
+Statvfs	     T_PTRREF

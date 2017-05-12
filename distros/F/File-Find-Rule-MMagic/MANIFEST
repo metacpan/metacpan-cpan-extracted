@@ -1,0 +1,7 @@
+.cvsignore
+MANIFEST
+MANIFEST.SKIP
+MMagic.pm
+Makefile.PL
+t/File-Find-Rule-MMagic.t
+t/happy-baby.JPG

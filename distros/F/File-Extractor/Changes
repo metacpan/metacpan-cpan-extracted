@@ -1,0 +1,21 @@
+Revision history for File-Extractor
+
+0.04    Wed, 18 Nov 2009 00:18:34 +0100
+        - Try to be more portable across different perls.
+        - Stop using auto_install in Makefile.PL.
+        - Upgrade Module::Install to 0.91.
+        - Stop destruction of invalid instances from crashing.
+
+0.03    Thu, 24 May 2007 02:12:45 +0200
+        - Don't run tests in taint mode.
+        - Test for warnings during t/basic.t.
+        - Get rid of a warning in perl_extractor_slurp_from_handle.
+        - Specify build dependencies in Makefile.PL.
+
+0.02    Wed, 23 May 2007 15:16:02 +0200
+        - Invalidate extractor instances when needed.
+        - Add some tests (about 94% coverage).
+        - Some minor cleanups.
+
+0.01    Tue, 22 May 2007 19:35:01 +0200
+        - First version, released on an unsuspecting world.

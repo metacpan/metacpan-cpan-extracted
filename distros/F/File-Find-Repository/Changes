@@ -1,0 +1,18 @@
+commit b0296e862ae5191858873d7d609ff74343dc1083 (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:30:24 2009 +0100
+
+    FIXED: dependencies
+
+commit 03b77ce23d1dc26d448b5a28dab8809e15ebec75
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sun Dec 28 16:40:52 2008 +0100
+
+    CHANGED: removed some perl crititc erors
+    CHANGED: finished ptting module under git control
+
+commit 18df64c926ee9e519b27550d8f39a591309d95e8
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sun Dec 28 16:27:41 2008 +0100
+
+    ADDED: Initial commit

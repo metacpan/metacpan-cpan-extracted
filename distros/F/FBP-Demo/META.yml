@@ -1,0 +1,33 @@
+---
+abstract: 'FBP::Perl Demonstration Application'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Test::More: 0.47
+  Test::NoWarnings: 1.00
+  Test::Script: 1.07
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: FBP::Demo
+name: FBP-Demo
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Wx: 0.98
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/FBP-Demo
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/FBP-Demo
+version: 0.03

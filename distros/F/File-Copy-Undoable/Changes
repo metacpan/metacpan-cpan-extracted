@@ -1,0 +1,76 @@
+Revision history for File-Copy-Undoable
+
+0.11    2016-06-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump prereq version Test::Perinci::Tx::Manager -> 0.56.
+
+
+0.10    2016-06-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Replace File::Slurp::Tiny with File::Slurper.
+
+	- [dist] Replace Builtin::Logged with IPC::System::Options.
+
+
+0.09    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.08    2015-08-29 (PERLANCAR)
+
+	- Adjust test for FreeBSD [RT#95194].
+
+
+0.07    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.06    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed module SHARYANTO::File::Util ->
+	  File::MoreUtil.
+
+
+0.05    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.04    2013-09-09 (SHARYANTO)
+
+        - No functional changes. Fix wrong argument type --rsync_opts in t/cp.t
+          [CT].
+
+
+0.03    2012-09-06 (SHARYANTO)
+
+        - Don't chown (and fail miserably) if we're not running as root (this is
+          like rsync's -a behavior).
+
+
+0.02    2012-09-05 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add 'target_owner' and 'target_group' argument.
+
+
+0.01    2012-09-05 (SHARYANTO)
+
+        - First release.

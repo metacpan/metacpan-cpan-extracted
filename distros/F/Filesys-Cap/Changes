@@ -1,0 +1,10 @@
+Revision history for Filesys-Cap
+
+0.02    2015-11-12 (PERLANCAR)
+
+        - Add function: fs_can_symlink().
+
+
+0.01    2014-06-26 (SHARYANTO)
+
+        - First release.

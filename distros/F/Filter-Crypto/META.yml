@@ -1,0 +1,74 @@
+---
+abstract: 'Create runnable Perl files encrypted with OpenSSL libcrypto'
+author:
+  - 'Steve Hay <shay@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  Test::More: '0'
+  blib: '0'
+configure_requires:
+  Carp: '0'
+  Config: '0'
+  Cwd: '0'
+  ExtUtils::MakeMaker: '6.66'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '1.15'
+  Text::Wrap: '0'
+  constant: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Filter-Crypto
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Filter::Crypto::_ConfigureBuild
+optional_features:
+  critictest:
+    description: 'Perl::Critic testing'
+  parfilter:
+    description: 'PAR::Filter support'
+    requires:
+      PAR::Filter: '0'
+  podcoveragetest:
+    description: 'POD coverage testing'
+  podtest:
+    description: 'POD testing'
+requires:
+  Carp: '0'
+  Config: '0'
+  Cwd: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '6.66'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '1.15'
+  Scalar::Util: '0'
+  Text::ParseWords: '0'
+  Text::Wrap: '0'
+  XSLoader: '0'
+  constant: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/steve-m-hay/Filter-Crypto.git
+version: '2.07'

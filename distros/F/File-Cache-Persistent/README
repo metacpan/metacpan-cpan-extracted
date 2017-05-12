@@ -1,0 +1,34 @@
+File::Cache::Persistent - Caches file content and allows to use it even after file is deleted
+
+/*
+	Description
+*/
+
+File::Cache::Persistent caches file content, controls if the files are changed,
+ignores any changes withing predefined timeout and allows to use cache for
+files which were removed after entering the cache.
+
+/*
+	Installation
+*/
+
+perl Makefile.PL
+make
+make test
+make install
+
+/*
+	Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+	Copyright
+*/
+
+File::Cache::Persistent module is a free software. 
+You may redistribute and (or) modify it under the same terms as Perl itself
+whichever version it is.

@@ -1,0 +1,38 @@
+---
+abstract: 'Common rules for searching for Perl things'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Find-Rule-Perl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Find::Rule: '0.20'
+  File::Spec: '0.82'
+  Params::Util: '0.38'
+  Parse::CPAN::Meta: '1.38'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Rule-Perl
+  homepage: https://github.com/karenetheridge/File-Find-Rule-Perl
+  repository: https://github.com/karenetheridge/File-Find-Rule-Perl.git
+version: '1.15'
+x_authority: cpan:ADAMK
+x_contributors:
+  - 'Adam Kennedy <adam@ali.as>'
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'Ash Berlin <ash_github@firemirror.com>'
+  - 'Jonathan Yu <jawnsy@cpan.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'

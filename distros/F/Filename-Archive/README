@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Filename::Archive qw(check_archive_filename);
+     my $res = check_archive_filename(filename => "foo.tar.gz");
+     if ($res) {
+         printf "File is an archive (type: %s, compressed: %s)\n",
+             $res->{archive_name},
+             $res->{compressor_info} ? "yes":"no";
+     } else {
+         print "File is not an archive\n";
+     }
+
+DESCRIPTION
+
+SEE ALSO
+
+    Filename::Compressed
+

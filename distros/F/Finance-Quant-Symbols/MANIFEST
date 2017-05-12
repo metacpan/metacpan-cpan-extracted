@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-Quant-Symbols.t
+lib/Finance/Quant/Symbols.pm

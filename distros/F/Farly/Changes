@@ -1,0 +1,114 @@
+0.01 - February 2012
+  - First release
+
+0.02 - February 2012
+  - Fixed documentation mistakes
+
+0.03 - 12 February 2012
+  - Fixed Makefile.PL error
+  
+0.04 - 25 February 2012
+  - Fixed bug in Farly::IPv4::Object::gt() and Farly::Transport::Object::gt()
+  - Fixed bug in Farly::Transport::Protocol::intersects()
+  - Fixed bug in ::ASA::Parser names rule
+  - Added Line number printing in ASA.tt
+  - "DIGIT" and "ICMP_TYPE" Token to Farly::Value::Integer
+  
+0.05 - 25 February 2012
+  - Fixed asa_Parser.t names test
+  
+0.06 - June 2012
+  - documentation tweaks
+  - 'intersects' method bug fix in ::IPv4::Object, ::Transport::Object, ::Transport::Protocol
+  - ::IPv4 constructor refactoring, error checking and error testing 
+  - ::Protocol and ::Port error checking
+  - made ::IPv4::Address, ::Transport::Port, ::Transport::Protocol blessed 'SCALAR'ref
+  - added rules.t
+  - added Optimizer.pm and optimizer.t
+  - rewrite asa_Annotator.t and asa_TokenPicker.t
+  - replaced "Farly::ASA::Template" with "Farly::Template::Cisco"
+  - removed ASA specific formatters from "Farly::Template::Cisco"
+  - moved ASA/ASA.tt to 'Farly/Template/Files/ASA'
+  - added "REMOVE" property and corresponding ASA template updates
+
+0.07 - June 2012
+  - Fixed documentation mistakes
+
+0.08 - September 2012
+  - Added port 'gt' and port 'lt' support, Farly::Transport::PortGT 
+    and Farly::Transport::PortLT
+  - Added Farly::IPv4::ICMPType 
+  - Added integer to text formatter plugin's to Farly::Template::Cisco
+  - Added Farly::Opts::Search, Farly::Remove::Rule, Farly::Remove::Address
+    and corresponding unit tests
+  - First release of "Farly Script Tools" f_search.pl, f_analyze.pl, 
+    f_remove.pl
+
+0.09 - October 2012
+  - Fixed documentation mistakes
+  - Improved Makefile.PL
+  - Fixed bug in Farly::Remove::Address
+  - Added 'route' support patches from Lukas Thiemeier
+ 
+0.10 - November 2012
+  - Fixed documentation mistakes
+  - Pod tests
+  - ::ASA::Parser route bug fix
+  - Makefile.PL BUILD_REQUIRES Test::Simple and Test::More
+
+0.11 - November 2012
+   - changed route property DESTINATION to DST_IP
+   - ::ASA::Parser acl_logging token type to acl_log_level
+   - added MEMBER_TYPE imaginary token inserts in ::ASA::Parser
+   - added ::ASA::Rewriter.pm and ::ASA::Generator.pm
+   - changed ::ASA::Builder to use ::ASA::Rewriter and ::ASA::Generator
+   - updated tests for ::ASA::Parser, ::Rewriter, ::Generator
+   - retired ::ASA::TokenPicker
+   - removed bin/ directory
+   - Farly::Rules and Farly::Optimizer are deprecated, renamed to Farly::Rule::Expander
+     and Farly::Rule::Optimizer
+ 
+0.12 - January 2012
+   - translate failure logs to file
+   - added META.YML, LICENSE, repository link
+
+0.20 - June 2013
+   - added compare method to value objects
+   - moved Object::KVC into Farly
+		Object::KVC::Hash => Farly::Object
+		Object::KVC::HashRef => Farly::Object::Ref
+		Object::KVC::List => Farly::Object::List
+		Object::KVC::Set => Farly::Object::Set
+		Object::KVC::String => Farly::Value::String
+		Farly::Value::Integer => Farly::Value::Integer
+   - added Farly::Object::Aggregate
+   - optimised Farly::Rule::Optimizer
+   - fixed Farly::Remove::Rule - now using 'REMOVE' property
+   - bug fixes and all protocols test from Lukas Thiemeier
+ 
+ 0.21 - June 2013
+   - fixed wrong log file in Farly.pm
+   - change MEMBER_TYPE imaginary token to OBJECT_TYPE
+   - remove 'object' rule from Farly::ASA::Rewriter mapping
+   - fixed memory leak in Farly::ASA::Parser Parse::RecDescent grammar
+   - added asa_Parser_memorycycles.t from Lukas T.
+   - Farly::Template::Cisco::use_text bug fix from Lukas T. 
+ 
+ 0.22 - June 2013
+   - Changes file updated
+   - POD updates
+ 
+ 0.23 - June 2013
+   - META.yml version update
+   - ::Optimizer::set_l3 bug fix
+   - added 'access-list remarks' to unit tests
+   - better Farly::ASA::Parser memory leak fix
+
+ 0.24 - June 2013
+   - ::Optimizer::set_l3 bug fix
+
+ 0.25 - June 2013
+   - moved from Log::Log4perl to Log::Any 
+
+ 0.26 - October 2013
+   - META.yml update

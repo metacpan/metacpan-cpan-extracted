@@ -1,0 +1,35 @@
+% layout 'default';
+% title 'Welcome to Flower';
+
+<h2>Perl Peer mesh file list</h2>
+
+<table class="stats"></table>
+
+<table class="files"></table>
+
+<script src="js/jquery.js"></script>
+<script>
+$(document).ready(function() {
+  update_files();
+  setInterval("update_files()", 60000);
+});
+
+function update_files() {
+  $.getJSON("/REST/1.0/files/all", function(result) {
+    $(".files").empty();
+    $(".files").append("<tr><th>filename</th><th>size</th><th>age</th></tr>");
+    // should check this is ok - result.result
+    $.each(result.files, function(i, a_file) {
+      $(".files").append("<tr><td>" + a_file.filename + "</td>" +
+       "<td>" + a_file.nice_size + "</td>" +
+       "<td>" + a_file.age + "</td></tr>");
+    $(".stats").empty();
+    $(".stats").append("<tr><th>Nodes</th><th>Files</th><th>Bytes</th></tr>");
+    $(".stats").append("<tr><td>" + result.stats.total_nodes + "</td>" +
+      "<td>" + result.stats.total_files + "</td>" +
+      "<td>" + result.stats.total_bytes + "</td></tr>");
+    });
+  });
+}
+
+</script>

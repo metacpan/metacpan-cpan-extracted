@@ -1,0 +1,12 @@
+Changes
+lib/FrameNet/QueryData.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01-frames.t
+t/02-framerelations.t
+t/FrameNet-test/xml/frames.xml
+t/pod-coverage.t
+t/pod.t

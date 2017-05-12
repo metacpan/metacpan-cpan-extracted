@@ -1,0 +1,152 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use Finance::FITF;
+use Getopt::Long;
+use DateTime;
+use YAML::Syck;
+use DateTime::Format::Strptime;
+use DateTime::Format::ISO8601;
+
+my ($show_bar, $bar_seconds, $offset_seconds, $show_tick, $start, $header, $all);
+my $n = 10;
+my $format = 'OHLCVD';
+my $date_format = '%F %T';
+my %format_map = ( O => 'open',
+                   H => 'high',
+                   L => 'low',
+                   C => 'close',
+                   V => 'volume',
+                   T => 'ticks',
+                   D => 'date',
+               );
+
+GetOptions("header"  => \$header,
+           "bar"     => \$show_bar,
+           "seconds=i" => \$bar_seconds,
+           "offset=i"  => \$offset_seconds,
+           "tick"    => \$show_tick,
+           "all"     => \$all,
+           "format"  => \$format,
+           "date_format" => \$date_format,
+           "start=s" => \$start,
+           "length=s"=> \$n);
+
+@ARGV or die "usage: $0 <file>..".$/;
+
+
+process_file($_) for @ARGV;
+
+sub process_file {
+    my $data = Finance::FITF->new_from_file(shift);
+    my $h = $data->header;
+    my $strp = DateTime::Format::Strptime->new( time_zone => $h->{time_zone},
+                                                pattern => $date_format);
+
+    my $strp_iso = DateTime::Format::Strptime->new( time_zone => $h->{time_zone},
+                                                    pattern => '%FT%T');
+
+    $header = 1 if !$show_bar && !$show_tick;
+
+    if ($header) {
+        print "FITF version $h->{version}".$/;
+        print "name: $h->{name}".$/;
+        print "date: $h->{date} ($h->{time_zone})".$/;
+        for (0..2) {
+            last unless $h->{start}[$_];
+            print " Session ".($_+1).": "
+                .DateTime->from_epoch(time_zone => $h->{time_zone},
+                                      epoch => $h->{start}[$_])
+                    .' ~ '.
+                 DateTime->from_epoch(time_zone => $h->{time_zone},
+                                      epoch => $h->{end}[$_]).$/;
+        }
+        print "bar type: ".($h->{bar_seconds})." secs".$/;
+        print "bars: ".$data->nbars.$/;
+        print "ticks: ".$h->{records}.$/;
+    }
+
+    my $start_at = $h->{start}[0];
+
+    if ($start) {
+        $start_at = ($strp->parse_datetime($start) ||
+                         $strp_iso->parse_datetime($start)
+                     )->epoch;
+    }
+
+    if ($all) {
+        $n = $data->nbars - $data->bar_idx($start_at)-1;
+    }
+
+    if ($show_tick && ($h->{format} & FITF_TICK_FMT) == FITF_TICK_NONE ) {
+        print "no ticks in file found".$/;
+        undef $show_tick;
+    }
+
+    my $cb = sub {
+        my $ts = shift;
+        my $bar = shift;
+        if ($show_bar) {
+            my @res;
+            for (split //, $format) {
+                my $field = $format_map{$_};
+                my $d = $date_format eq '%F %T'
+                    ? $data->format_timestamp($ts)
+                    : $strp->format_datetime(
+                        DateTime->from_epoch(epoch => $ts,
+                                             time_zone => $h->{time_zone}));
+                push @res, $field eq 'date' ? $d : $bar->{$field};
+            }
+            print join("\t", @res).$/;
+        }
+        if ($show_tick) {
+            $data->run_ticks($bar->{index}, $bar->{index} + $bar->{ticks} - 1,
+                             sub {
+                                 print join("\t", @_).$/
+                             });
+        }
+    };
+
+    if ($bar_seconds) {
+        $data->run_bars_as( $bar_seconds, $offset_seconds || 0 , $cb);
+    }
+    else {
+        my $start = $data->bar_idx($start_at + $h->{bar_seconds});
+        my $i = 0;
+        $data->run_bars( $start, $start + $n - 1, sub {
+                             $cb->($data->{bar_ts}[$start + $i++], @_)
+                         });
+    }
+}
+
+__END__
+
+=encoding utf-8
+
+=for stopwords
+
+=head1 NAME
+
+fitf-dump - utlity for dumping fitf files
+
+=head1 SYNOPSIS
+
+  # show header
+  fitf-dump file.fitf
+
+  # dump all ticks
+  fitf-dump --tick --all file.fitf
+
+  # dump all bars as 5min bars
+  fitf-dump --bar --second 300 file.fitf
+
+=head1 AUTHOR
+
+Chia-liang Kao E<lt>clkao@clkao.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

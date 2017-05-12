@@ -1,0 +1,207 @@
+class 'Fl';
+
+=pod
+
+=head1 NAME
+
+Fl::Event - Event Loop Related Functions
+
+=head1 Synopsis
+
+    use Fl qw[:event];
+    # ...
+    run();
+
+=head1 Description
+
+The C<:event> import tag brings all of these functions into your
+namespace.
+
+
+=head1 Functions
+
+The following functions are exposed.
+
+=head2 belowmouse(...)
+
+    my $widget = Fl::belowmouse();
+    Fl::belowmouse($window);
+
+Get or set the widget below the mouse.
+
+Setting this value is This is for highlighting buttons. It is not used to send
+C<FL_PUSH> or C<FL_MOVE> directly, for several obscure reasons, but those
+events typically go to this widget. This is also the first widget tried for
+C<FL_SHORTCUT> events.
+
+If you change the belowmouse widget, the previous one and all parents (that
+don't contain the new widget) are sent C<FL_LEAVE> events. Changing this does
+not send C<FL_ENTER> to this or any widget, because sending C<FL_ENTER> is
+supposed to test if the widget wants the mouse (by it returning non-zero from
+C<handle()>).
+
+=cut
+
+xs {name        => 'Fl::belowmouse',
+    definitions => [
+        {returns => 'Fl_Widget *'},
+        {required => [['Fl_Widget *', 'widget']],
+            c_args => 'widget->cp_ctx',
+         returns => 'void'}
+    ],
+    export      => [qw[event]]
+};
+
+=pod
+
+=head2 run( )
+
+    ...
+    $window->show();
+    Fl::run();
+
+As long as any windows are displayed, this calles Fl::wait() repeatedly.
+
+When all windows are closed, it returns zero.
+
+=cut
+
+xs {name        => 'Fl::run',
+    definitions => [{returns => 'int'}],
+    export      => [qw[event]]
+};
+
+=pod
+
+=head2 check( )
+
+    while (!calculation_done()) {
+        calculate();
+        Fl::check();
+        last if user_hit_abort_button();
+    }
+
+This is the same as calling C<Fl::wait(0)>.
+
+Calling this during (for example) a long calculation process will keep the
+screen up to date and the interface responsive without forking or threading.
+
+This returns non-zero if any windws are displayed. Otherwise, zero is
+returned.
+
+=cut
+
+xs {name        => 'Fl::check',
+    definitions => [{returns => 'int'}],
+    export      => [qw[event]]
+};
+
+=pod
+
+=head2 wait(...)
+
+    Fl::wait();
+    Fl::wait(2);
+
+Waits until 'something happens' and then returns.
+
+Call this repeatedly to 'run' your program. You can also check what happened
+each time after this returns which is quite useful for managing program state.
+
+What this really does is call all idle callbacks, all elapsed timeouts, call
+Fl::flush() to get the screen to update, and then wait some time (zero if the
+are idle callbacks, the sortest of all pending timeouts, or infinity) for any
+events from the user or any Fl::ad_fd() callbacks. It then handles the events
+and calls the callbacks and then returns.
+
+The return value of Fl::wait() is non-zero if there are any visible windows.
+
+C<Fl::wait($time)> waits a maxium of C<$time> seconds. It may return much
+sooner if something happens.
+
+The return value is positive if an event or fd happens before the time
+elapsed. It is zero if nothing happens (on Windows this will only return zero
+if $time is zero). It is negative if an error occurs (this will happen on X11
+if a signal happens).
+
+=cut
+
+xs {name        => 'Fl::wait',
+    definitions => [{
+        optional => [['double', 'time']],
+        returns => 'double'}],
+    export      => [qw[event]]
+};
+
+=pod
+
+=head2 ready()
+
+    while (!calculation_done()) {
+        calculate();
+        if (Fl::ready()) {
+            do_expensive_cleanup();
+            Fl::check();
+            last if user_hit_abort_button();
+        }
+    }
+
+This is similar to C<Fl::check()> except this does not call C<Fl::flush()> or
+any callbacks, which is useful if your program is in a state where such
+callbacks are illegal.
+
+This returns true if C<Fl::check()> would do anything (it will continue to
+return true until you call C<Fl::check()> or C<Fl::wait()>).
+
+=cut
+
+xs {name        => 'Fl::ready',
+    definitions => [{returns => 'int'}],
+    export      => [qw[event]]
+};
+
+=pod
+
+=head2 event( )
+
+    my event = Fl::event();
+
+Returns the last event that was processed.
+
+This can be used to determine if a callback is being done in response to a
+keypress, mouse click, etc.
+
+=cut
+
+xs {name        => 'Fl::event',
+    definitions => [{returns => 'int'}],
+    export      => [qw[event]]
+};
+
+# TODO:
+#   - add_handler(...)
+#   - add_system_handler(...)
+#
+#
+#
+# Undocumented
+
+xs {name        => 'Fl::event_text',
+    definitions => [{returns => 'const char *'}],
+    export      => [qw[event]]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

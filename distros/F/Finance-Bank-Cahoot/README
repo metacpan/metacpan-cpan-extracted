@@ -1,0 +1,201 @@
+NAME
+    Finance::Bank::Cahoot - Check your Cahoot bank accounts from Perl
+
+DESCRIPTION
+    This module provides a rudimentary interface to the Cahoot online
+    banking system at "https://www.cahoot.com/". You will need either
+    "Crypt::SSLeay" or "IO::Socket::SSL" installed for HTTPS support to work
+    with WWW::Mechanize.
+
+SYNOPSIS
+      my $cahoot = Finance::Bank::Cahoot->new(credentials => 'Constant',
+                                              credentials_options => {
+                                                 account => '12345678',
+                                                 password => 'verysecret',
+                                                 place => 'London',
+                                                 date => '01/01/1906',
+                                                 username => 'dummy',
+                                                 maiden => 'Smith' } );
+
+      my $accounts = $cahoot->accounts;
+      $cahoot->set_account($accounts->[0]->{account});
+      my $snapshot = $cahoot->snapshot;
+      foreach my $row (@$snapshot) {
+        print join ',', @$row; print "\n";
+      }
+
+METHODS
+    new Create a new instance of a connection to the Cahoot server.
+
+        "new" can be called in two different ways. It can take a single
+        parameter, "credentials", which will accept an already created
+        credentials object, of type
+        "Finance::Bank::Cahoot::CredentialsProvider::*". Alternatively, it
+        can take two parameters, "credentials" and "credentials_options". In
+        this case "credentials" is the name of a credentials class to create
+        an instance of, and "credentials_options" is a hash of the options
+        to pass-through to the constructor of the chosen class.
+
+        If the second form of "new" is being used, and the chosen class is
+        *not* one of the ones supplied as standard then it will need to be
+        "required" first.
+
+        If any errors occur then "new" will "croak".
+
+          my $cahoot = Finance::Bank::Cahoot->new(credentials => 'Constant',
+                                                  credentials_options => {
+                                                     account => '12345678',
+                                                     password => 'verysecret',
+                                                     place => 'London',
+                                                     date => '01/01/1906',
+                                                     username => 'dummy',
+                                                     maiden => 'Smith' } );
+
+          # Or create the credentials object ourselves
+          my $credentials = Finance::Bank::Cahoot::CredentialsProvider::Constant->new(
+             account => '12345678', password => 'verysecret', place => 'London',
+             date => '01/01/1906', username => 'dummy', maiden => 'Smith' } );
+          my $cahoot = Finance::Bank::Cahoot->new(credentials => $credentials);
+
+    login
+        Login to the Cahoot server using the credentials supplied to "new".
+        This method is implicit for all data access methods, so typically
+        does not need to be called explicitly. The method takes no arguments
+        and will only call one of memorable place, date or mother's maiden
+        name as expected by the Cahoot portal.
+
+    accounts
+        Returns a list reference containing a summary of any accounts
+        available from the supplied credentials. If a login has yet to occur
+        "accounts" will automatically do this.
+
+          my $accounts = $cahoot->accounts;
+
+        Each item in the list is a hash reference that holds summary
+        information for a single account, and contains this data:
+
+        name - the text name of the account
+        account - the account number
+        balance - the current balance of the account
+        available - the currently available funds (including any overdrafts)
+
+    set_account
+        Select an account for data retrieval using an 8-digit account
+        number. If a login has yet to occur or a list of accounts has yet to
+        be retrieved, "set_account" will automatically do this and cache the
+        results.
+
+          my @accounts = $cahoot->accounts;
+          $cahoot->set_account($accounts->[0]->{account});
+
+          # Or without first loading a list of accounts
+          $cahoot->set_account('12345678);
+
+    statements
+        Returns a list reference containing a summary of all statements
+        available for an account. When called with the optional parameter
+        containing an 8-digit account number, "statements" will
+        automatically login (if required) and select that account.
+
+        If no account has been selected and no account is supplied by the
+        caller, "statements" will "croak".
+
+        Each item in the returned list is a hash reference that holds
+        summary information for a single statement, and contains this data:
+
+        description - a text description of the date of the statement,
+        typically in the form "DD/MM/YY - DD/MM/YY"
+        start - the date of the start of the statement as a time as returned
+        by the "time" function.
+        end - the date of the end of the statement as a time as returned by
+        the "time" function.
+
+    set_statement
+        Select a statement for data retrieval using a statement description
+        previously returned from "statements". The text description of the
+        statement must be supplied as a parameter to the method and an
+        account must have been selected using "set_account". If no account
+        has been selected or no statement name is supplied by the caller,
+        "statement" will "croak".
+
+          $cahoot->set_account('12345678);
+          my $statements = $cahoot->statements;
+          $cahoot->set_statement($statements->[0]->{description});
+
+    debits
+        Return a list of direct debits currently active on the account. An
+        optional account parameter may be supplied as an 8-digit account
+        number. If no account has previously been selected or no account
+        number is supplied, "debits" will "croak". The return value is a
+        reference to a list of "Finance::Bank::Cahoot::DirectDebit" objects.
+        Each entry in the list is a single direct debit.
+
+          $cahoot->set_account('12345678');
+          my $debits = $cahoot->debits;
+          foreach my $debit (@$debits) {
+            print $debit->payee, q{,},
+                  $debit->reference, q{,},
+                  $debit->amount || 0, q{,},
+                  $debit->date || 0, q{,},
+                  $debit->frequency || 0, qq{\n};
+          }
+
+    snapshot
+        Return a table of transactions from the account snapshot. An
+        optional account parameter may be supplied as an 8-digit account
+        number. If no account has previously been selected or no account
+        number is supplied, "snapshot" will "croak". The return value is a
+        reference to a list of list references. Each entry in the top-level
+        list is a row in the statement and the rows are data from the
+        account in the order date, description, amount withdrawn, amount
+        paid in.
+
+          $cahoot->set_account('12345678');
+          my $snapshot = $cahoot->snapshot;
+          foreach my $row (@$snapshot) {
+            print join ',', @$row; print "\n";
+          }
+
+    statement
+        Return a table of transactions from a selected statement. An
+        optional account parameter may be supplied as an 8-digit account
+        number. If no account has previously been selected or no account
+        number is supplied, "statement" will "croak". The return value is a
+        reference to a list of "Finance::Bank::Cahoot::Statement::Entry"
+        objects. Each entry in list is a row in the statement.
+
+          $cahoot->set_account('12345678');
+          my $statement = $cahoot->statement;
+          foreach my $transaction (@$statement) {
+            print $transaction->date, q{,},
+                  $transaction->details, q{,},
+                  $transaction->credit || 0, q{,},
+                  $transaction->debit || 0, q{,},
+                  $transaction->balance || 0, qq{\n};
+          }
+
+WARNING
+    This warning is from Simon Cozens' "Finance::Bank::LloydsTSB", and seems
+    just as apt here.
+
+    This is code for online banking, and that means your money, and that
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the source
+    of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to me,
+    but is provided under NO GUARANTEE, explicit or implied.
+
+NOTES
+    This has only been tested on my own accounts. I imagine it should work
+    on any account types, but I can't guarantee this.
+
+AUTHOR
+    Jon Connell <jon@figsandfudge.com>
+
+LICENSE AND COPYRIGHT
+    This module borrows heavily from Finance::Bank::Natwest by Jody Belka.
+
+    Copyright 2008 by Jon Connell Copyright 2003 by Jody Belka
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

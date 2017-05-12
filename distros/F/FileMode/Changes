@@ -1,0 +1,7 @@
+Revision history for Perl module File::Mode.
+
+0.01  Sat Jul  1 15:20:04 2000
+	- original version, created by h2xs 1.19
+
+0.05  Jul 29 2000
+        - Initial Release. added FileList method.

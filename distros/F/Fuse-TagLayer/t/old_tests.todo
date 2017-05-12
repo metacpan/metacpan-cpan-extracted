@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+# low level test: calls the routines of the real and virtual libs directly
+# and compares return values
+
+#
+# * need an update, this is from an older approach, right now
+# * we have no proper tests
+#
+
+use Data::Dumper;
+use File::Path;
+use File::Slurp;
+use lib 'lib';
+use Fuse::TagLayer;
+
+## prepare
+my $mountpoint = '/tmp';
+my $realdir = '/tmp/fuse-taglayer-test-'. time();
+mkdir($realdir);
+
+write_file($realdir .'/abc', (1,2,3) );
+write_file($realdir .'/def', (1,2,3) );
+
+mkdir($realdir.'/sub1') or die "$1";
+
+write_file($realdir .'/sub1/ghi', (1,2,3) );
+
+$Fuse::TagLayer::gid = 1000;
+$Fuse::TagLayer::uid = 1000;
+
+
+## readdir
+my @return = Fuse::TagLayer::real_readdir('/');
+print Dumper(\@return);
+
+my @return = Fuse::TagLayer::virt_readdir('/');
+print Dumper(\@return);
+
+my @return = Fuse::TagLayer::layer_readdir('/');
+print Dumper(\@return);
+
+
+## getattr
+my @return = Fuse::TagLayer::real_getattr('/abc');
+print Dumper(\@return);
+
+my @return = Fuse::TagLayer::virt_getattr('/abc');
+print Dumper(\@return);
+
+my @return = Fuse::TagLayer::real_getattr('/sub1');
+print Dumper(\@return);
+
+my @return = Fuse::TagLayer::virt_getattr('/sub1');
+print Dumper(\@return);
+
+my @return = Fuse::TagLayer::real_getattr('/nonexisting');
+print Dumper(\@return);
+
+my @return = Fuse::TagLayer::virt_getattr('/nonexisting');
+print Dumper(\@return);
+
+
+
+## finish
+print "Press ENTER to remove test realdir: $realdir";
+<STDIN>;
+
+## garbage collect
+File::Path::remove_tree($realdir);

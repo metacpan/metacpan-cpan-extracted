@@ -1,0 +1,35 @@
+Version    Date       Changes
+-------  -----------  ---------------------------------------------------------
+   0.01  06-OCT-1998  Initial release
+   0.02  06-OCT-1998  Fixed some archive problems; added CHANGES file
+   0.03  06-OCT-1998  Added home page to man page
+   0.04  11-OCT-1998  Fixed a problem that was causing getonequote not to work
+   0.05  26-OCT-1998  Stripped the trailing ^M from market cap and
+		      tightened up the parsing code.  Thanks to
+		      Jim Hulsey <jhulsey@genomesystems.com>
+   0.06  21-DEC-1998  Fixed a bug in getonequote that caused a choke when
+		      the query failed.  Thanks to Ralph Sobek <sobek@irit.fr>
+   0.07  17-MAR-1999  Fixed a bug that was causing Macs to get a LF at the end
+		      of each quote.  Thanks to Jim Miner <jfm@winternet.com>
+   0.08  20-MAR-1999  Re-fix of the same bug in 0.07.  Thanks again, Jim!
+   0.09  22-MAR-1999  Added the exchange to the returned array.  See the man
+		      page for more info.  Thanks to Dirk Eddelbuettel
+		      <edd@debian.org>
+   0.10  23-MAR-1999  Added dependencies to Makefile.PL.  Thanks again, Dirk!
+   0.11  23-MAR-1999  Added the FAQ section to the manpage.
+   0.12  24-JAN-2000  Added $ua->env_proxy() so that LWP will honor proxies.
+		      Thanks again, Dirk, and Hamish Moffatt
+		      <hamish@rising.com.au>!
+   0.13  02-MAR-2000  Added support for overriding the LWP timeout.  Thanks to
+		      Phillip Moore <pdm@inktomi.com>
+   0.14  24-MAR-2000  Removed a use of defined that causes a warning under
+		      PERL 5.6.  Thanks Bjoern Hansen <ask@valueclick.com>!
+		      Also, added a wantarray() check in getonequote, to make
+		      it consistent with getquote.
+   0.15  24-MAR-2000  Whoops...  That would be
+		      Ask Bjoern Hansen <ask@valueclick.com>!
+   0.16  17-APR-2000  Added a pointer to Dirk Eddelbüttel's Show Me The Money
+		      program.
+   0.17  24-APR-2000  Replaced parsing code with Text::ParseWords, to fix a
+		      small problem with foreign markets.  Thanks, Dirk, for
+		      pointing out the library!

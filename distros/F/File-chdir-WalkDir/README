@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution File-chdir-WalkDir,
+version 0.040:
+
+  Provides a convenient function (walkdir) for executing code on files in a directory structure recursively.
+
+This software is copyright (c) 2012 by Joel Berger.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

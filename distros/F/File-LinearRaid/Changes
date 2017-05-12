@@ -1,0 +1,13 @@
+Revision history for Perl extension File::LinearRaid:
+
+0.11	Tue Jun 22 2004
+	- Fixed a newline-related bug in test suite that caused it to fail
+	  when (length "\n" == 2), as in Windows.
+	- Slightly nicer error reporting.
+	- Optimizations in SEEK: Only seek() on individual handles if their
+	  position is wrong. This is just in case the OS is dumb and clobbers
+	  read-ahead buffers on every seek(). I don't know if this is ever the
+	  case, but just to be safe... Should help on sequential reads.
+
+0.10	Sat Feb 14 2004
+	- Initial release.

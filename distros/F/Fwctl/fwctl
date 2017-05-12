@@ -1,0 +1,234 @@
+#!/usr/bin/perl
+#
+#    fwctl: program to configure the linux firewall.
+#
+#    This file is part of Fwctl.
+#
+#    Author: Francis J. Lacoste <francis.lacoste@iNsu.COM>
+#
+#    Copyright (c) 1999,2000 iNsu Innovations Inc.
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+
+use strict;
+use Fwctl;
+use Getopt::Long;
+use Data::Dumper;
+
+sub usage() {
+die <<EOFU;
+usage: fwtcl [--aliases file] [ --interfaces file ] [--rules file]
+	     [--services-dir dir ]+ [--accounting-file file ]
+	     [--copy | --nocopy] [ --mark mark ]
+	     [--log | --nolog] [--default ACCEPT|REJECT|DENY]
+	(start|stop|restart|flush|dump-acct|check|dump-config)
+EOFU
+}
+my %opts = ();
+GetOptions( \%opts, "aliases=s", "interfaces=s", "rules=s",
+	    "services=s@", "accounting-file=s",  "copy!",
+	    "mark!", "log!", "default=s"
+	  )
+  or usage;
+
+# Translate options
+my %fwopts = ();
+$fwopts{interfaces_file}    = $opts{interfaces} if $opts{interfaces};
+$fwopts{aliases_file}	    = $opts{aliases}    if $opts{aliases};
+$fwopts{rules_file}	    = $opts{rules}	if $opts{rules};
+$fwopts{services_dir}	    = $opts{"services-dir"}
+  if $opts{"services-dir"};
+$fwopts{accounting_file}    = $opts{"accounting-file"}
+  if $opts{"accounting-file"};
+$fwopts{mark}		    = $opts{mark}	if exists $opts{mark};
+$fwopts{copy}		    = $opts{copy}	if exists $opts{copy};
+$fwopts{log}		    = $opts{log}	if exists $opts{log};
+$fwopts{default}	    = $opts{default}	if exists $opts{default};
+
+ARGS:
+for ( $ARGV[0] ) {
+  my $arg = $_;
+  /check|dump-config/ && do {
+    eval {
+      my $fwctl = new Fwctl( %fwopts );
+      print "fwctl: Configuration OK\n";
+      print Dumper( $fwctl ) if $arg =~ /dump-config/;
+    };
+    die "fwctl: Configuration error.\n$@\n" if $@;
+    last ARGS;
+  };
+  /start/ && do {
+    my $fwctl = new Fwctl( %fwopts );
+    $fwctl->configure;
+    last ARGS;
+  };
+  /stop/ && do {
+    my $fwctl = new Fwctl( %fwopts );
+    $fwctl->stop;
+    last ARGS;
+  };
+  /flush/ && do {
+      eval {
+	  my $fwctl = new Fwctl( %fwopts );
+	  $fwctl->flush_chains;
+      };
+      if ( $@) {
+	  warn "fwctl: problems with configuration file. Current accounting stats will be lost:\n$@";
+	  Fwctl->really_flush_chains;
+      }
+    last ARGS;
+  };
+  /dump-acct/ && do {
+    my $fwctl = new Fwctl( %fwopts );
+    $fwctl->dump_acct;
+    last ARGS;
+  };
+  usage;
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fwctl - Program to configure the Linux kernel firewall.
+
+=head1 SYNOPSIS
+
+fwtcl	[--aliases file] [ --interfaces file ] [--rules file]
+	[--services-dir dir ]+ [--accounting-file file ]
+	[--copy | --nocopy] [--mark mark] [--log | --nolog]
+	[--default ACCEPT|REJECT|DENY]
+	(start|stop|flush|restart|dump-acct|check|dump-config)
+
+=head1 DESCRIPTION
+
+fwctl configure the Linux kernel firewall using the Fwctl module.
+
+=head2 COMMAND
+
+=over
+
+=item start
+
+Reset and the firewall and configure using the Fwctl module
+according to the rules of the rules file.
+
+=item stop
+
+Reset the firewall and allow only loopback IP traffic.
+
+=item flush
+
+Remove all Chains and Rules
+
+=item restart
+
+Does the same thing as a B<start> since start already resets
+the firewall.
+
+=item check
+
+Parses the configuration files to see if there are any problems
+with them.
+
+=item dump-acct
+
+Dump the byte counters associated to accounting rules in the
+accounting log file. The counters are reset to zero by this
+operation.
+
+Note that the accounting rules are dumped before the firewall
+is reset, so there is no need to use this command before a 
+B<start> or B<stop>.
+
+=item dump-config
+
+Intended for debugging. The configuration files are parsed and
+the configuration object is printed on STDOUT using Data::Dumper.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item aliases
+
+Specifies the path to the F<aliases> file.
+Default is F</etc/fwctl/aliases>.
+
+=item interfaces
+
+Specifies the path to the F<interfaces> file.
+Default is F</etc/fwctl/interfaces>
+
+=item rules
+
+Specifies the path to the F<rules> file.
+Default is F</etc/fwctl/rules>
+
+=item services-dir
+
+Sets the search patch for service modules. The default is to look in
+I<PERLPATH> and F</etc/fwctl/services/>.
+Using this option removes the last  directory from the search path
+and adds the directory specified as option. Note that the default perl
+module path are always searched.
+
+This option may be specified multiple times.
+
+=item accounting-file
+
+Specifies the path to the accounting file.
+Default is F</var/log/fwctl_acct>.
+
+=item [no]log
+
+Determines the default logging policy for the firewall. The default is
+to log all packets which don't match explicitely any rules.
+
+=item [no]copy
+
+Determines the default copy policy for the firewall. The default is to
+mark for copy to user space all packets which don't match explicitely
+any rules.
+
+=item mark
+
+If this option is set, all packets which don't match explicitely one
+rule, will be marked with the specified mark.
+
+=item policy
+
+This sets the default policy for unknown packets. Default is DENY, can
+be one of ACCEPT, REJECT or DENY.
+
+=back
+
+=head1 AUTHOR
+
+Francis J. Lacoste <francis.lacoste@iNsu.COM>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999, 2000  iNsu Innovations Inc.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+Fwctl(3) Fwctl::RuleSet(3).
+
+=cut
+

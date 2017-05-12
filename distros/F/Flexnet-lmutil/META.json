@@ -1,0 +1,47 @@
+{
+   "abstract" : "Convenient OO-interface for Flexnet license server utility lmutil",
+   "author" : [
+      "Christopher Odenbach <odenbach@uni-paderborn.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Flexnet-lmutil",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "1.09",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Flexnet::lmutil" : {
+         "file" : "lib/Flexnet/lmutil.pm",
+         "version" : "1.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.5"
+}

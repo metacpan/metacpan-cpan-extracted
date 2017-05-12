@@ -1,0 +1,62 @@
+{
+   "abstract" : "Determine if files match a specific type",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-TypeCategories",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.0",
+            "File::chdir" : "0",
+            "Moo" : "1.0",
+            "Path::Tiny" : "0",
+            "Type::Tiny" : "1.0",
+            "Types::Standard" : "1.0",
+            "YAML" : "1.0",
+            "autodie" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "File::TypeCategories" : {
+         "file" : "lib/File/TypeCategories.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=File::TypeCategories"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/File-TypeCategories.git"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

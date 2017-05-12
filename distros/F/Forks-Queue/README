@@ -1,0 +1,85 @@
+Forks-Queue
+===========
+
+Forks::Queue - queue object that can be shared across processes
+
+A simple shared queue API for interprocess communication.
+This is useful for boss/worker models for performing several
+related tasks in parallel processes, or for creating persistent
+queues that can be shared by unrelated processes that may not
+even be running at the same time.
+
+This distribution comes with three implementations -- using
+flat files, shared memory, and SQLite databases -- for a simple
+and shared queue API for sharing information across different
+processes.
+
+
+SYNOPSIS
+
+    use Forks::Queue;
+    $q = Forks::Queue->new( impl => ... ); # File, Shmem, or SQLite
+
+    $q->put(42);                              # put simple items onto the queue
+    $q->put( { foo => 123, bar => \%ENV } );  # or bigger data structures
+    ...
+    $q->end;         # indicates that no more jobs will be added
+
+    $item = $q->get;            # retrieve item, possibly after a fork
+    @upto5_items = $q->get(5);  # retrieve several items
+    $item = $q->peek;           # retrieve without removing from queue
+    $remaining = $q->pending;
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+The JSON module is required for Forks::Queue and all its implementations.
+
+DBD::SQLite module and sqlite libraries are required for the
+Forks::Queue::SQLite implementation.
+
+Forks::Queue::Shmem will not work on systems that don't have a /dev/shm
+shared memory virtual filesystem.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Forks::Queue
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Forks-Queue
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Forks-Queue
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Forks-Queue
+
+    Search CPAN
+        http://search.cpan.org/dist/Forks-Queue/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2017 Marty O'Brien
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

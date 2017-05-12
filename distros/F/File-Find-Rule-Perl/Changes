@@ -1,0 +1,58 @@
+Revision history for Perl extension File-Find-Rule-Perl
+
+1.15    2015-04-05
+        - fix tests from 1.14 release
+
+1.14    2015-04-05
+        - fix tests for ExtUtils::MakeMaker 7.05_* (ETHER)
+        - use warnings in module and tests
+        - switch off of Module::Install again
+
+1.13 Wed 30 Oct 2012
+	- Updating Module::Install (ADAMK)
+
+1.12 Mon 31 Oct 2011
+	- Ignore debian directory in tests (ADAMK)
+	- Ignore all dot dirs in tests (ADAMK)
+
+1.11 Mon 31 Oct 2011
+	- Updating to Module::Install::DSL 1.04 (ADAMK)
+        - Skip MYMETA.json too (CHORNY)
+	- Do not import from Params::Util (ADAMK)
+
+1.10 Wed  6 Sep 2010
+	- Upgrading to Module::Install::DSL 1.00 (ADAMK)
+	- Removing nasty evil use UNIVERSAL (ADAMK)
+	- Fix 03_noindex.t to ignore MYMETA.yml (MIYAGAWA)
+
+1.09 Thu 30 Jul 2009
+	- 1.08 broke Windows. This unbreaks it again (ADAMK)
+
+1.08 Thu 16 Jul 2009
+	- Added the debian/ directory to the list of skipped paths (RT#47921)
+
+1.07 Wed 15 Jul 2009
+	- Fix no_index regression with absolute paths (RT#47633)
+
+1.06 Mon 13 Apr 2009
+	- Upgraded to Module::Install 0.82 (ADAMK)
+        - Additional test (without new) (Alexandr Ciornii)
+	- We can now use non-curdir() ->in targets (ADAMK)
+
+1.05 Thu 19 Feb 2009
+	- Updating to Module::Install 0.79
+	- Adding support for no_index exclusions
+
+1.04 Sat 10 May 2008
+	- Switching to a production version.
+	- Move ->name before ->file to significantly reduce the IO load
+	  when running a search.
+
+0.03 Mon 16 Oct 2006
+	- Adding support for empty files
+
+0.02 Mon  4 Sep 2006
+	- Upgrading to Module::Install 0.64
+
+0.01 Sat  8 Apr 2006
+	- Created the initial version of the module

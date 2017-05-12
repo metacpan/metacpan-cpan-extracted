@@ -1,0 +1,61 @@
+Copyright 2009, 2010, 2011, 2014, 2015 Kevin Ryde
+
+This file is part of Finance-Quote-Grab.
+
+Finance-Quote-Grab is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Finance-Quote-Grab is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 14, June 2015
+    - META.yml provides=> for the Finance::Quote::Grab dist name
+
+Version 13, February 2015
+    - MGEX add AJ apple juice
+    - new Ghana
+
+Version 12, October 2011
+    - oops, stray /p modifier
+
+Version 11, September 2011
+    - fix debian/control dependencies
+
+Version 10, September 2011
+    - new MGEX
+
+Version 9, February 2011
+    - fix Makefile.PL for perl 5.6 and earlier
+
+Version 8, October 2010
+    - tests avoid Test::More::explain() parsing problem
+
+Version 7, September 2010
+    - test manifest only as an author test
+
+Version 6,  August 2010
+    - drop Casablanca as web site changed too much
+
+Version 5,  May 2010
+    - Makefile.PL express Finance::Quote required version
+
+Version 4,  January 2010
+    - RBA web page update
+
+Version 3,  September 2009
+    - Casablanca - watch out for &nbsp; converted to \240 by the HTML parser
+    - fix example program on MLC symbols with parens
+
+Version 2,  June 2009
+    - drop stray Date::Calc from MLC
+
+Version 1,  June 2009
+    - the first version

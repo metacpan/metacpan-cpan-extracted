@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b90b80725c2e51ed0c32d8ceb3b0b0789a926f7b Changes
+SHA1 b11416b96d09d87dfa7c8596c7501b748d7c80a9 MANIFEST
+SHA1 dff11c978f0752ec1184ef4933dba69089385d58 MANIFEST.skip
+SHA1 4b9d64b3f0e3751c521c008bb854bfe6e65fcffd META.yml
+SHA1 13a5f9c06b51676a3dd650f15abfcd71b2596a03 Makefile.PL
+SHA1 cc6c23bac3b7f3d9da6fc88f2ff9d89025cc01b4 README
+SHA1 87a9fc32dfd2ad9ee5f2a56c80e163feec6fb906 TODO
+SHA1 13f17989129dbca584b1060136dc64998cdada1a lib/Form/Sensible/Reflector/MySQL.pm
+SHA1 ab1ce489c5081fc3c6dbb3774656b64fd3af0905 t/050_manifest.t
+SHA1 a1f76836c559630d33135e65c62b164922c75b17 t/060_pod.t
+SHA1 4445eb19bbacb6d6e5e10389031d351ec21f0cd7 t/100_basic.t
+SHA1 55508752f1e94e37650035d48121a70d75f2d242 t/120_defaults.t
+SHA1 e5bbb6411a8d6f3fe4f7a6402c0463a97f1a6cc1 t/150_only_columns.t
+SHA1 92d7a3694074a90db23712a0e470380c8966b0f4 t/200_populate.t
+SHA1 1c25a4cf337a9dbe5c7d45dcd75cd69a6388cc51 t/300_comments.t
+SHA1 2138e0ebe42e11fc1b38fcfaf5cadd1fe0909e75 t/510_floats.t
+SHA1 6c5a12404605dd72a4292d134202fc8a992291c1 t/520_datetimes.t
+SHA1 3d697a659292c2ee44dfe58df41c43a661c5e78b t/530_strings.t
+SHA1 de1b645297968ebd522537e287ce3cb8f4b4285e t/540_doubles.t
+SHA1 de2db39314e53267eb4ec6fcd17529993876d118 t/550_decmail.t
+SHA1 827a9bc81e44b93a2be2ad13ea6d4c48da8c87ad t/560_ints.t
+SHA1 51c511bf5d80f97d27fa6b6ad1da303d4d921827 t/570_bits.t
+SHA1 661fc2398b7cbf6fc59855135b484fa512d05f43 t/580_sets.t
+SHA1 8e7c61da6fa0dd6bfd2b3223a0cc84c3e6830169 t/lib/Local/Fixtures.pm
+SHA1 daef067b7eae90c4e8775b713c9f26b264d66ad1 t/lib/Local/Tests.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.14 (Darwin)
+
+iQEcBAEBAgAGBQJNhd0dAAoJEFbbDNKvu26X+EwH/jZlpv7WDiKF2wvEKG/k+DMq
+0XqMHP6fJ3L7mLXIxfPGxWfqbJwldux7iBlCWGhSnrzePPWGOXSqieGOEOuRI2I5
+McCKI8bJy7rpm3TAWVUld0ChA2EuUT8++Tl17lP3tXot1iEEqRjpZCd+aXcGedrD
+b4dALuNuQe+N+IHUUd6pMhmowAc94eFRuUDL2r3UCo+b0jwbeteAROtGVOd0z8Dp
+7bDso4KrCOKYuHU09l8g8cXQfRqllLP4iregq9cpfHYAHdmrnabEy7Q0uwqnyNYE
+v4nJ+fyTButCZ3bgUsDSHIZQa5I0fZ+lwG8gt+QUcGLfPRVJ33W/3y9R/H8BSEc=
+=YUOj
+-----END PGP SIGNATURE-----

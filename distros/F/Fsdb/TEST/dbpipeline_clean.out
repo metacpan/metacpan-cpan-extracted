@@ -1,0 +1,9 @@
+#fsdb name test1
+a	85
+b	75
+c	70
+d	95
+e	75
+f	95
+#   | dbcol name test1 --input - --output [::FsdbIPC]
+#  | dbroweval  '{ _test1 += 5; }'

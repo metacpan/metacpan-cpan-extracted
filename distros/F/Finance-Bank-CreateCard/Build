@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+BEGIN {
+  chdir('/accucard/home/rm2/cclive/Finance-Bank-CreateCard-1.02') or die 'Cannot chdir to /accucard/home/rm2/cclive/Finance-Bank-CreateCard-1.02: '.$!;
+  @INC = ('/usr/lib/perl5/5.6.1/i386-linux', '/usr/lib/perl5/5.6.1', '/usr/lib/perl5/site_perl/5.6.1/i386-linux', '/usr/lib/perl5/site_perl/5.6.1', '/usr/lib/perl5/site_perl/5.6.0', '/usr/lib/perl5/site_perl', '/usr/lib/perl5/vendor_perl/5.6.1/i386-linux', '/usr/lib/perl5/vendor_perl/5.6.1', '/usr/lib/perl5/vendor_perl', '.');
+}
+
+use Module::Build;
+
+# This should have just enough arguments to be able to bootstrap the rest.
+my $build = resume Module::Build (
+  properties => {
+    config_dir => '_build',
+    build_script => 'Build',
+  },
+);
+warn "WARNING: '$0' script was created with $build->{properties}{perl}, but\n".
+     "we are now using $^X\n" unless $^X eq $build->{properties}{perl};
+
+$build->dispatch;

@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+GPL-2
+lib/Finance/Bank/BR/Caixa/CSV.pm
+examples/caixa.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

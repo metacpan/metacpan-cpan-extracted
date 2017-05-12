@@ -1,0 +1,7 @@
+Revision history for FFmpeg-Thumbnail
+
+0.01    Jan 24, 2010
+        First version.  Basic thumbnail capture using ffmpeg.
+0.02	Jan 24, 2010
+	Switched Regexp::Common for Scalar::Utils to determine if $offset is non-numeric.
+

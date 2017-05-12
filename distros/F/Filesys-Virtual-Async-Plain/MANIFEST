@@ -1,0 +1,8 @@
+Plain.pm
+Makefile.PL
+Changes
+MANIFEST
+README
+t/00_require.t
+t/01_stat.t
+META.yml                                 Module meta-data (added by MakeMaker)

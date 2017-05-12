@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/File/Which/Cached.pm
+t/00.t
+t/01_File_Which_Cached.t
+META.yml                                 Module meta-data (added by MakeMaker)

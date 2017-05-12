@@ -1,0 +1,107 @@
+README for Filter::CBC 0.10.
+
+WHATIS
+
+Filter::CBC is a Perl Source Filter that uses CBC (Cipher Block Chaining) to 
+encrypt/decrypt your sourcecode during runtime.
+
+It uses the Filter module by Paul Marquess and Crypt::CBC by Lincoln Stein.
+
+
+INSTALLING
+
+Filter::CBC can be installed easily by using the CPAN module.
+
+perl -MCPAN -e"install Filter::CBC"
+
+or manually by untarring the archive and running the following commands.
+
+    perl Makefile.PM
+    make
+    make test
+    make install
+
+    
+TESTING
+
+This module has been tested on Linux 2.4.x (x86) with Perl 5.6.1
+
+
+EXAMPLES & SCRIPTS
+
+Examples are included for all the CBC compatible encryption routines.
+
+The code2cbc.pl script can encrypt your code by asking a number of simple
+questions. The autoencryption feature does the same thing, without the
+questions. code2cbc.pl can be found in the obsolete directory.
+
+The cbc2code.pl script can decrypt encrypted scripts.
+
+
+AUTOFILTER
+
+Filter::CBC can now encrypt your source code on the fly (similar to
+Acme::Bleach). Just add 
+
+use Filter::CBC 'Rijndael','my secret key';
+
+above the chunk you want to encrypt et voila.
+Change the use statement according to your requirements and run it.
+Filter::CBC will now encrypt the source and exit. Your code will not
+be executed at that time. PLEASE backup your code before running it.
+PRETTY PLEASE.
+
+
+REQUIREMENTS
+
+Filter::CBC requires at least
+
+    Filter - http://search.cpan.org/search?dist=Filter
+
+    Crypt::CBC - http://search.cpan.org/search?dist=Crypt-CBC
+
+    Crypt::Rijndael - http://search.cpan.org/search?dist=Crypt-Rijndael
+
+Also any Block Cipher routine you might want to use.
+Among those compatible with CBC are :
+
+    Crypt::Rijndael - http://search.cpan.org/search?dist=Crypt-Rijndael
+
+    Crypt::DES - http://search.cpan.org/search?dist=Crypt-DES
+
+    Crypt::IDEA - http://search.cpan.org/search?dist=Crypt-IDEA
+
+    Crypt::Blowfish - http://search.cpan.org/search?dist=Crypt-Blowfish
+
+    Crypt::GOST - http://search.cpan.org/search?dist=Crypt-GOST
+
+    Crypt::DES_EDE3 - http://search.cpan.org/search?dist=Crypt-DES_EDE3
+
+    Crypt::Twofish - http://search.cpan.org/search?dist=Crypt-Twofish
+
+    Crypt::NULL - http://search.cpan.org/search?dist=Crypt-NULL
+
+    Crypt::TEA - http://search.cpan.org/search?dist=Crypt-TEA
+
+    Crypt::RC6 - http://search.cpan.org/search?dist=Crypt-RC6
+
+    Crypt::Serpent - http://search.cpan.org/search?dist=Crypt-Serpent
+
+
+THANKS A MILLION
+
+Alot of thanks to Ray Brinzer (Petruchio on Perlmonks) for giving an example
+on how to handle parameters with use.
+
+Paul Marquess for writing Filter and pointing out that Filter does what it should and not what I expect it to.
+
+A bunch of monks at Perlmonks for giving some excellent and well appreciated feedback on 
+detecting code. Thank you Blakem, Petral, Chipmunk, Tilly, Jepri and Zaxo.
+
+
+AUTHOR
+
+Filter::CBC was written by Hendrik Van Belleghem. Suggestions & Questions
+are welcome at   hendrik dot vanbelleghem - at - gmail - dot - com.
+
+Yes, I love fanmail! No, I don't like spam.

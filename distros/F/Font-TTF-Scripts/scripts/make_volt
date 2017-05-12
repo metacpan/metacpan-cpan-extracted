@@ -1,0 +1,223 @@
+#!/usr/bin/perl
+use strict;
+use Font::TTF::Font;
+use Font::TTF::Scripts::Volt;
+use Getopt::Long;
+use Pod::Usage;
+
+our (%opts);
+GetOptions(\%opts, 
+	'ap|a=s', 
+	'b', 
+	'classfile|c=s',
+	'classprops',
+	# 'autodefines|d',	# used in make_gdl
+	# 'define|D=s%', 	# used in make_gdl
+	'empty|e=s', 
+	'forceadd|f=i', 
+	'help|h', 
+	'include|i=s@', 
+	'ligatures|l=s', 
+	'mark|m=s', 
+	'normalize|n=i', 
+	'omitaps|o=s', 
+	# 'positions|p=i', 	# used in make_gdl
+	# 'renameaps|r', 	# used in make_gdl
+	# 'substitutions|s=i',	# used in make_gdl
+	'outVOLT|t', 
+	'z=i');
+
+
+unless ($ARGV[1] || $opts{'h'} || ($opts{'outvolt'} && $ARGV[0]))
+{
+    pod2usage(1);
+    exit;
+}
+
+if ($opts{'h'})
+{
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit;
+}
+
+my %options;
+
+# Parse -e file if supplied
+if ($opts{'empty'}) 
+{
+	my @glist;
+	open (IN, "<$opts{'empty'}") or die "Couldn't open '$opts{'empty'}' for reading.";
+	while (<IN>)
+	{
+		s/[\r\n]*$//o;      # platform-safe chomp
+		s/;.*$//o;          # Strip comments
+		s/ //go;            # Strip whitespace
+		push (@glist, $_) unless $_ eq '';
+	}
+    close IN;
+	$options{'-knownemptyglyphs'} = \@glist if scalar(@glist);
+}
+
+$options{'-omittedAPs'} = $opts{'omitaps'} if $opts{'omitaps'};
+
+my $f = Font::TTF::Scripts::Volt->read_font($ARGV[0], $opts{'ap'}, %options) || die "Can't read font information";
+
+if (exists $f->{'WARNINGS'})
+{
+	warn $f->{'WARNINGS'};
+}
+
+
+my $comp = $1 if ($opts{'ligatures'} =~ s/(comp)$//o);
+
+$f->add_classfile($opts{'classfile'}, -p => $opts{'classprops'}) if ($opts{'classfile'});
+$f->make_classes(-ligatures => $opts{'ligatures'}, -ligtype => $comp, -notmark => $opts{'mark'});
+if ($opts{'include'})
+{
+    my ($fh, $dat, @map, $vtext);
+    if ($fh = Font::TTF::Font->open($opts{'include'}))
+    {
+        $vtext = $fh->{'TSIV'}->read->{' dat'};
+    }
+    elsif ($fh = IO::File->new("< $opts{'include'}"))
+    {
+        $vtext = join('', <$fh>);
+        $fh->close();
+    }
+    else
+    { warn "Can't open $opts{'include'} as a font or text file"; }
+
+    if ($vtext)
+    {
+        $dat = $f->parse_volt($vtext) || die "VOLT code failed to parse";
+        @map = $f->align_glyphs($dat);
+        $f->merge_volt($dat, \@map);
+    }
+}
+$f->make_anchors;
+$f->make_groups;
+unless ($opts{'forceadd'} == 2)
+{
+	$f->make_lookups($opts{'ligatures'}, {-force => $opts{'forceadd'}, -notmark => $opts{'mark'}});
+	$f->normal_rules(($opts{'z'} & 2), {-force => $opts{'forceadd'}} ) if ($opts{'normalize'});
+}
+
+my $res = $f->out_volt(-default_glyphtype => ($opts{'b'} ? 'BASE' : undef));
+
+if ($opts{'outvolt'})
+{ print $res; }
+else
+{
+    $res =~ s/\n/\r/og;
+    $res .= "\000" x 7;
+    $f->{'font'}{'TSIV'} = Font::TTF::Table->new(dat => $res, PARENT => $f->{'font'});
+    $f->{'font'}->out($ARGV[1]);
+}
+
+exit($f->{'error'});
+
+__END__
+
+=head1 NAME
+
+make_volt - Create VOLT code from a TrueType Font
+
+=head1 SYNOPSIS
+
+  make_volt [-a file] [-l ligtype] [-i file] [-n] infile outfile
+  make_volt -t [-a file] [-l ligtype] [-i file] [-n] infile
+
+Creates a copy of the infile font file adding a VOLT table to it.
+
+=head1 OPTIONS
+
+  -a file       Attachment Point database .xml file
+  -b            Set un-typed glyphs to type "BASE"
+  -c classfile  xml file of class and property information to merge in
+  --classproperties
+                specifies whether classes are made for property values in
+                the classfile
+  -e file       A file containing names (1 per line) of glyphs that are 
+                known to have no outline (thus shouldn't generate warning). 
+  -f level      Force value for adding OpenType lookups:
+                    0 create lookups only if not already present [default]
+                    1 re-create lookups even if same named exist
+                    2 don't build any lookups
+  -h            print manpage
+  -i fontfile   Merge VOLT table from this font or text file
+  -l type       How ligatures are built: type =
+                    first - class name is first code, contents other codes
+                    last  - class name is last code, contents other codes
+                    firstcomp - treat extensions as part of elements, as first
+                    lastcomp - treat extensons as part of elements, as last
+  -m "list"     List of anchors that do not imply a MARK glyph (e.g. "_R")
+  -n            Add a normalization ligature lookups
+  -o "list"     List of AP names to omit
+  -t            output volt code to stdout and don't generate a font file
+  -z bitfield   Bitfield of various controls:
+                    0 - n/a
+                    1 - normalise even if presentation is only references
+                    2 - n/a
+
+=head1 DESCRIPTION
+
+make_volt aims to make the creation of OpenType fonts much easier. It allows
+for a font designer to make changes and to feed that changed font forward
+to merge previously created VOLT code without losing that work. It also creates
+glyph names, key classes and lookups that can save a lot of work in VOLT.
+
+In addition, make_volt has the capability to merge the volt code it creates
+with existing volt code either in a font or in a text file.
+
+=head2 Glyph naming
+
+Glyphs are named based on the postscript name of the glyph with variants and
+illegal characters stripped from the name. Name clashes are simply numbered.
+
+=head2 Classes
+
+make_volt creates a number of different kind of class. For each attachment
+point base name (I<x>) a class is created. Class C<c>I<x>C<Dia>
+contains a list of all the glyphs with the attachment point C<_>I<x>. Class
+C<cTakes>I<x>C<Dia> contains all the glyphs with attachment point I<x>. Class
+C<cn>I<x>C<Dia> contains all the glyphs without attachment point C<_>I<X>. And
+the class C<cnTakes>I<x>C<Dia> contains all the glyphs without the I<x>
+attachment point.
+
+In addition for each glyph name variant (as labelled in a postscript name for
+a glyh using C<.>I<var>) a class named C<c>I<var> is created with all the glyphs
+with that variant in their name. A class named C<c_no>I<var> is also created
+containing all the corresponding glyphs without the variant, in direct
+correspondance, so that the non-variant form may be mapped to the variant
+form using a single rule, for all the glyphs in the class.
+
+Finally a class is created for ligature components. If a glyph is part of a
+ligature rule it is either the key glyph for the rule or part of the class
+for the rule. Thus for a rule keyed of a glyph named I<x> there will be two
+classese: C<cl_>I<x> which is the ligatures involving I<x> and C<clno_>I<x>
+which contains all the components that correspond to the ligatures found in
+the other class. This makes a ligature rule a simple 1:1 mapping from
+C<clno_>I<x> to C<cl_>I<x>.
+
+=head2 Ligatures
+
+make_volt has the ability to create ligature mapping lookups. These are controlled
+by glyph names and follow the approach taken in C<make_gdl>.
+
+=head1 SEE ALSO
+
+ttfbuilder, make_gdl
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

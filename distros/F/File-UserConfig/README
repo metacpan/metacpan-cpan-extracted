@@ -1,0 +1,187 @@
+NAME
+    File::UserConfig - Get a user's existing config directory, or copy in
+    defaults
+
+      # The most simple Do What I Mean usage.
+      $configdir = File::UserConfig->configdir;
+  
+      # Or without taking advantage of convention-based defaults
+      $configdir = File::UserConfig->new(
+            dist     => 'My-Application',
+            module   => 'My::Application',
+            dirname  => '.myapp',
+            sharedir => $defaults_here,
+            )->configdir;
+
+DESCRIPTION
+    Many modules or applications maintain a user-spec configuration data
+    directory. And the implementation pattern is generally the same.
+
+    A directory like /home/myuser/.application is created and populating by
+    a set of default files the first time an application runs, and from
+    there on, the files in that directory are modified.
+
+    "File::UserConfig" provides standard, light and sub-classable default
+    implementation of this concept that Does The Right Thing with the
+    directory names.
+
+  Applying Perl Conventions
+    "File::UserConfig" applies and automates the following conventions.
+
+    1. We are using the distribution name?
+
+    The use of "File::ShareDir" is based on distribution name (more on that
+    later) so we need to know it.
+
+    The CPAN convention is for a dist to be named "Foo-Bar" after the main
+    module "Foo::Bar" in the distribution, but sometimes this varies, and
+    sometimes you will want to call "File::UserConfig" from other than the
+    main module. But unless you say otherwise, "File::UserConfig" will
+    assume that if you call it from "Module::Name", that is probably the
+    main module, and thus your dist is probably called "Module-Name".
+
+    2. What config directory name is used
+
+    On platforms which keep application-specific data in its own directory,
+    well away from the data the user actually create themself, we just use
+    the dist name.
+
+    On Unix, which has a combined home directory, we remap the dist name to
+    be a lowercase hidden name with all '-' chars as '_'.
+
+    So on unix only, "Module::Name" will become ".module_name". Most of the
+    time, this will end up what you would have used anyway.
+
+    3. Where does the config directory live
+
+    "File::UserConfig" knows where your home directory is by using
+    File::HomeDir. And more specifically, on platforms that support
+    application data being kept in a subdirectory, it will use that as well.
+
+    On Unix, Windows, and Mac OS X, it will just Do The Right Thing.
+
+    4. Where do the defaults come from?
+
+    The ability for a distribution to provide a directory full of default
+    files is provided in Perl by File::ShareDir.
+
+    Of course, we're also assuming you are using Module::Install so you have
+    access to its "install_share" command, and that the only thing your dist
+    is going to install to it will be the default config dir.
+
+METHODS
+    The 6 accessors all feature implicit constructors.
+
+    In other words, the two following lines are equivalent.
+
+      # Explicitly
+      $configdir = File::UserConfig->new( ... )->configdir;
+  
+      # Auto-construction
+      $configdir = File::UserConfig->configdir( ... );
+  
+      # Thus, using all default params we can just
+      $configdir = File::UserConfig->configdir;
+
+  new
+      my $config = File::UserConfig->new(
+          dist      => 'Not-This-Class',
+          dirname   => '.myconfig',
+          sharedir  => 'defaultconfig',
+          homedir   => $username,
+          );
+
+    The "new" constructor takes a set of optional named params, and finds
+    the user's configuration directory, creating it by copying in a default
+    directory if an existing one cannot be found.
+
+    In almost every case, you will want to use all the defaults and let
+    everything be determined automatically for you. The sample above tries
+    to show some of the limited number of situations in which you might want
+    to consider providing your own values.
+
+    But most times, you don't want to or need to. Try it without params
+    first, and add some params if it isn't working for you.
+
+    If you want to do some custom actions after you copy in the directory,
+    the subclass and add it after you call the parent "new" method.
+
+    Returns a new "File::UserConfig" object, or dies on error.
+
+  dist
+      $name = File::UserConfig->new(...)->dist;
+  
+      $name = File::UserConfig->dist(...);
+
+    The "dist" accessor returns the name of the distribution.
+
+  module
+      $name = File::UserConfig->new(...)->module;
+  
+      $name = File::UserConfig->module(...);
+
+    The "module" accessor returns the name of the module.
+
+    Although the default dirname is based off the dist name, the module name
+    is the one used to find the shared dir.
+
+  dirname
+      $dir = File::UserConfig->new(...)->dirname;
+  
+      $dir = File::UserConfig->dirname(...);
+
+    The "dirname" accessor returns the name to be used for the config
+    directory name, below the homedir. For example '.foo_bar'.
+
+  sharedir
+      $dir = File::UserConfig->new(...)->sharedir;
+  
+      $dist = File::UserConfig->sharedir(...);
+
+    The "sharedir" accessor returns the name of the directory where the
+    shared default configuration is held.
+
+    Returns a path string, verified to exist before being returned.
+
+  homedir
+      $dir = File::UserConfig->new(...)->homedir;
+  
+      $dist = File::UserConfig->homedir(...);
+
+    The "homedir" accessor returns the location of the home direcotry, that
+    the config dir will be created or found below.
+
+    Returns a path string, verified to exist before being returned.
+
+  configdir
+      $dir = File::UserConfig->new(...)->configdir;
+  
+      $dist = File::UserConfig->configdir(...);
+
+    The "sharedir" accessor returns the name of the directory where the
+    shared default configuration is held.
+
+    Returns a path string, verified to exist before being returned.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-UserConfig>
+
+    For other issues, contact the maintainer
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    File::HomeDir, File::ShareDir
+
+COPYRIGHT
+    Copyright 2006 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,34 @@
+NAME
+    Finance::Instrument - Object representation of financial instruments
+
+SYNOPSIS
+      use Finance::Instrument;
+      # load all iso10383 market identification exchanges
+      Finance::Instrument->load_default_exchanges;
+      Finance::Instrument->get_exchange('XHKF');
+
+      my $spec = { type => 'Futures',
+                   exchange => 'XHKF',
+                   code => 'HSI',
+                   time_zone => 'Asia/Hong_Kong',
+                   currency => 'HKD',
+                   session => [[555, 720], [810, 975]] };
+
+      my $hsi = Finance::Instrument->load_instrument($spec);
+      my $contract = $hsi->contract(2012, 2);
+      $contract->trading_time_for_day(DateTime->now);
+
+DESCRIPTION
+    Finance::Instrument models financial instruments and provide utility
+    functions, such as calculating current or next trading hours for a given
+    DateTime, or retrieve near-term futures contract from futures contract
+    series.
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/File/LinearRaid.pm
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

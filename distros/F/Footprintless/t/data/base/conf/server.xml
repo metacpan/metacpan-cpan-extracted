@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE jndi-resources [
+  <!ENTITY jndi-resources SYSTEM "jndi-resources.xml">
+]>
+
+<Server port="8005" shutdown="SHUTDOWN">
+  <!--APR library loader. Documentation at /docs/apr.html -->
+  <Listener SSLEngine="on" className="org.apache.catalina.core.AprLifecycleListener"/>
+  <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html -->
+  <Listener className="org.apache.catalina.core.JasperListener"/>
+  <!-- Prevent memory leaks due to use of particular java/javax APIs-->
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
+
+  <GlobalNamingResources>
+    &jndi-resources;
+  </GlobalNamingResources>
+
+  <Service name="Catalina">
+    <Engine defaultHost="localhost" name="Catalina">
+      <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true" copyXML="true" deployXML="true">
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log." resolveHosts="false" suffix=".txt"/>
+      </Host>
+    </Engine>
+  </Service>
+</Server>

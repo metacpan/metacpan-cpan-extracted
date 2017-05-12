@@ -1,0 +1,96 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 dafc90c339daddf74c705149d2d27f9d24c5e83f Changes
+SHA1 517f229077eec7ea73fa9f9fc3e2431f0b8af472 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 b1dc1dc4c8090f33d8728d8686cf326d90209a17 META.json
+SHA1 e1102d887df2b95d98d2e655fe063d0096e0775d META.yml
+SHA1 ec96a0f9c2d32eb5f080815caadf31f0177e618e Makefile.PL
+SHA1 47c5364616c616ce10f5e3f32b572d0fca260010 README
+SHA1 7093af59ef1700c671d08b341b2ed8709c2dc15f debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 d133010245e956c3b179b03a62ad49a90b09c4b4 debian/control
+SHA1 cfa51a697fb0011133758c019e8ef91511c66cb8 debian/copyright
+SHA1 05c713a7a5bf44025c6984cd3bad51e201d2af7c debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 e51c311d83e5f16865eb7e63f2aa6baec728e0a9 debian/watch
+SHA1 d531043c7d477f54b5ebe5934a15722b15efc8c8 devel/AnyUncompress.pm
+SHA1 89b7b1a37e347e162114c52d3ac5f8d19a4f270a devel/Base-eof-check.pm
+SHA1 184eeae0b2d3470ab8c9a55e3e3c7e27af737012 devel/Base-final-status.pm
+SHA1 0039ea25cf14b51ed5bd8ee22b70f2a4b2595627 devel/Base.pm
+SHA1 f2b1ecf1982eeea6ef2eb71a1e487409137d3292 devel/Filter-bunzip2-Filter.pm
+SHA1 fdf395698360d240c34ae891b6d4596d081e2543 devel/GunzipNative.pm
+SHA1 ea6483e4c3b88eb88c63a7dd54c5d996e3dad66c devel/Makefile
+SHA1 71fd686ce635390877ad9ceb2dda4f80f72e2557 devel/Nofiles.pm
+SHA1 ddc73f3e44edf827e93ec73bbc4e98f23309b063 devel/data-gunzip.pl.gz
+SHA1 390ee5d1787794c1481616a2fd78ed300a854921 devel/data.pl
+SHA1 468c1a83be6d13574e6aeede1698cb972cd486b0 devel/exe-zlib-inflate.c
+SHA1 5daa60cd723f44d44aabfb2dbd654d2b5884e0c7 devel/exec-data.pl
+SHA1 2aa25a5f41359c257f768fa049b5c547de5ea505 devel/exec-nofiles.pl
+SHA1 2269cdb205d854ed579a101f1de76c8e374d7c7d devel/exec-nofork.pl
+SHA1 3b890f447846b76e61b72e7c12e7e4acba023967 devel/exec.pl.gz
+SHA1 319f83f9db6bff0ff888a07d4185e24d7c9adca9 devel/flock.pl
+SHA1 1007b384d380421f36c018af836fc6ceadd7d9dc devel/foo.pl.gz
+SHA1 019fb9dadb4e56ae9f77da8523b9fb141ef3509c devel/gunzip-data.pl.gz
+SHA1 752aa52140d3bfbfc6365607c66073b89a828ee6 devel/gunzip-with-exec.pl.gz
+SHA1 af978af4d3aa021e8a6c6afc7d94cfb26fd5b9bf devel/gunzip-with-smart.pl.gz
+SHA1 1af1f65fc59b31d48ccd9ff15292f870cd6ca49b devel/gunzip-with-tee.pl.gz
+SHA1 4352f813127f86a2f0b50efa0ab8d06817e08234 devel/inflateInit.pl
+SHA1 6c74d2d544acbb2784bed44120947e0d7c50ecd8 devel/nofiles-main.pl
+SHA1 5bf1bb26fddda8f564659675a1e6604e15a8681a devel/run.pl
+SHA1 e77b26d9f0dc2d67df25ed184e4617ce3c54165d devel/selfloader-fork.pl
+SHA1 f876b633458e0cb2c79c88152b934042638d2aa3 devel/selfloader-mmap.pl
+SHA1 1643c7a4afcc957571fb5e0e3047e9b2a3ae93c7 devel/selfloader.pl.gz
+SHA1 4698e4d101944266b645615efee62053cff041f0 devel/show-argv.pl.gz
+SHA1 5ac2fbc5d0a7713de8776bdade1480f2801a637e devel/smart.pl
+SHA1 8c60ea81290ea21066940168ba67173067190473 devel/tee-data.pl
+SHA1 9521792b680865ee72c8c3ca1291b303a48435b5 devel/uudecode.pl
+SHA1 3fa37ac5a1b1df7272bcd50ea62240d6e9bedea9 devel/zlib.pl
+SHA1 4285aafb753c9ba76d45158dc84b5eef306e4c03 examples/hello.pl.gz
+SHA1 0e674bed4b63088b84f0946ea6a9bcc4a33f2683 examples/self-gunzip-part.pl
+SHA1 f16b156e34ba6b809a44df39fad52f28189dabe8 examples/self-gunzip.pl
+SHA1 6b175ab81ca51bba0fccef882d0096019205e2f3 gunzip.xs
+SHA1 aef2550736933082ccf74fda116fd54216dfd0bf lib/Filter/gunzip.pm
+SHA1 3e22edc78d0fa35d4f3c314b0844e63a326c4ec3 lib/Filter/gunzip/Filter.pm
+SHA1 e2965242503050c505bb13de53735a4f2cc8b06a ppport.h
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 6885c43113f25f2b3dab5734083cd8921f04e8d2 t/gunzip-Filter.t
+SHA1 ec2d1607703dde5225ce3a1a79057e11e6babe10 t/gunzip.t
+SHA1 46c5f338fe1c23d89bc1664a4083e8b0b50ba026 t/test1.dat
+SHA1 c7f5ef26348708570f2aa8f8ca5d46d2d91c06d2 t/test1.in
+SHA1 aecc9692d7168a7bac42558f9f4ff421a47c0852 t/test2.dat
+SHA1 ce68002a6f34e97eaad212ad6ad4649094978753 t/test2.in
+SHA1 c157d3c9abb981c34a0b9f4c7d4ab86f6d1b4096 t/test2.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 aefbab9122821dc90c1ba9ce34f3aa6b393d984c xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 fa07c8e559adbd1af5ba613e021991b0819fc7ba xtools/my-deb.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFT9d0kLFMCIV9q3ToRAgrvAKCc909/Vak0B8aWFsarwq6Sthu7ZwCeLgjE
+xs6vUjZG5I9JNhjYMB/eDIs=
+=FuDh
+-----END PGP SIGNATURE-----

@@ -1,0 +1,104 @@
+NAME
+    File::PathList - Find a file within a set of paths (like @INC or Java
+    classpaths)
+
+SYNOPSIS
+      # Create a basic pathset
+      my $inc  = File::PathList->new( \@INC );
+  
+      # Again, but with more explicit params
+      my $inc2 = File::PathList->new(
+            paths => \@INC,
+            cache => 1,
+            );
+  
+      # Get the full (localised) path for a unix-style relative path
+      my $file = "foo/bar/baz.txt";
+      my $path = $inc->find_file( $file );
+  
+      if ( $path ) {
+          print "Found '$file' at '$path'\n";
+      } else {
+          print "Failed to find '$file'\n";
+      }
+
+DESCRIPTION
+    Many systems that map generic relative paths to absolute paths do so
+    with a set of base paths.
+
+    For example, perl itself when loading classes first turn a "Class::Name"
+    into a path like "Class/Name.pm", and thens looks through each element
+    of @INC to find the actual file.
+
+    To aid in portability, all relative paths are provided as unix-style
+    relative paths, and converted to the localised version in the process of
+    looking up the path.
+
+EXTENDING
+    The recommended method for extending "File::PathList" is to add
+    additional topic-specific find methods.
+
+    For example, a subclass that was attempting to duplicate the
+    functionality of perl's @INC and module location may wish to add a
+    "find_module" method.
+
+METHODS
+  new \@path | param => $value, ...
+    The "new" constructor creates a new "File::PathList".
+
+    It takes the following options as key/value pairs.
+
+    paths
+        The compulsory "paths" param should be a reference to an "ARRAY" of
+        local filesystem paths.
+
+    cache
+        If the optional "cache" param is set to true, the object will
+        internally cache the results of the file lookups. (false by default)
+
+    If the "new" contructor is provided only a single param, this will be
+    take to mean "paths =" $param>.
+
+    Returns a new "File::PathList" object, or "undef" if a valid path set
+    was not provided.
+
+  paths
+    The "paths" accessor returns the list of paths use to create the
+    "File::PathList" object.
+
+    Returns a list of localised path strings.
+
+  cache
+    The "cache" accessor indicates whether or not the "File::PathList"
+    object is caching the results of the file lookups.
+
+  find_file $unix_path
+    The "find_file" method takes a unix-style relative file path, and
+    iterates through the list of paths, checking for the file in it.
+
+    Returns the full path to the file, the false null string '' if the file
+    could not be found, or "undef" if passed a bad file name.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-PathList>
+
+    For other issues, contact the maintainer
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+ACKNOWLEDGEMENTS
+    Thank you to Phase N (<http://phase-n.com/>) for permitting the open
+    sourcing and release of this distribution.
+
+COPYRIGHT
+    Copyright 2005 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

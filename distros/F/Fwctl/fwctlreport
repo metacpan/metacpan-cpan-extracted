@@ -1,0 +1,814 @@
+#!/usr/bin/perl
+#
+#    fwctlreport:   Generates text report from the outputs of fwctllog
+#
+#    This file is part of Fwctl.
+#
+#    Author: Francis J. Lacoste <francis.lacoste@iNsu.COM>
+#
+#    Copyright (c) 1999,2000 iNsu Innovations Inc.
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+
+use strict;
+
+use Fwctl;
+use Fwctl::Report qw(:fields);
+use Getopt::Long;
+
+use POSIX qw( strftime );
+
+use vars qw( $fmt_report_start $fmt_report_end
+	     $fmt_current_report $fmt_start $fmt_end
+	     $fmt_host $fmt_alias $fmt_count $fmt_serv
+	     $fmt_src_ip $fmt_src_host $fmt_src_alias
+	     $fmt_dst_ip $fmt_dst_host $fmt_dst_alias
+	     $fmt_date $fmt_action
+	     $use_hostname
+	    );
+
+sub report_format_iterator {
+    my ( $report, $format ) = @_;
+
+    $fmt_current_report = $format->{title};
+    $~ = $format->{hdr_format};
+    write;
+    my $setter_func = $format->{record_setter_sub};
+
+    my $records = $format->{report_sub}->( $report );
+    unless ( @$records ) {
+	print " " x 32, "NO RECORDS\n\n";
+	return;
+    }
+    foreach my $key ( @$records ) {
+	$setter_func->( $key->[0] );
+	$~ = $format->{key_format};
+	write;
+	$~ = $format->{report_format};
+	foreach my $r ( @{$key}) {
+	    $setter_func->( $r );
+	    write;
+	}
+    }
+}
+
+sub summary_format_iterator {
+    my ( $report, $format ) = @_;
+
+    $fmt_current_report = $format->{title};
+    $~ = $format->{hdr_format};
+    write;
+    my $setter_func = $format->{record_setter_sub};
+    $~ = $format->{report_format};
+
+    my $records = $format->{report_sub}->( $report );
+    unless ( @$records ) {
+	print " " x 32, "NO RECORDS\n\n";
+	return;
+    }
+    foreach my $r ( @$records ) {
+	$setter_func->( $r );
+	write;
+    }
+}
+
+sub set_sum_fmt {
+    my $r = shift;
+
+    $fmt_start = strftime "%Y.%m.%d %H:%M:%S", localtime $r->{first};
+    $fmt_end   = strftime "%Y.%m.%d %H:%M:%S", localtime $r->{last};
+    $fmt_count = $r->{count};
+}
+
+sub set_service_fmt {
+    my $r = shift;
+
+    my $proto = $r->{proto_name} || $r->{proto};
+    if ( $r->{proto} == 6 || $r->{proto} == 17 ) {
+	my $port = $r->{dst_serv} || $r->{dst_port};
+	$fmt_serv = $proto . "(" . $port . ")";
+    } else {
+	my $src = $r->{src_serv} || $r->{src_port};
+	my $dst = $r->{dst_serv} || $r->{dst_port};
+	$fmt_serv = $proto . "(" . $src . ":" . $dst . ")";
+    }
+}
+
+sub set_record_fmt {
+    my $r = $_[0];
+    $fmt_date = strftime "%Y.%m.%d %H:%M:%S", localtime $r->[TIME];
+    set_service_fmt( { src_serv => $r->[SRC_SERV],
+		       src_port => $r->[SRC_PORT],
+		       dst_serv => $r->[DST_SERV],
+		       dst_port => $r->[DST_PORT],
+		       proto    => $r->[PROTO],
+		       proto_name => $r->[PROTO_NAME],
+		     } );
+    $fmt_src_ip    = $r->[SRC_IP];
+    $fmt_src_host  = $r->[SRC_HOST];
+    $fmt_src_alias = $r->[SRC_ALIAS];
+    $fmt_dst_ip    = $r->[DST_IP];
+    $fmt_dst_host  = $r->[DST_HOST];
+    $fmt_dst_alias = $r->[DST_ALIAS];
+    $fmt_action    = $r->[ACTION];
+}
+
+sub host_string {
+    my ( $host, $ip ) = @_;
+    if ( $use_hostname ) {
+	return $host || $ip;
+    } else {
+	return $ip;
+    }
+}
+
+my %REPORT_TABLE =
+  (
+   service_sum		=> {
+			    title	    => "Service Summary",
+			    hdr_format	    => "SERV_SUMMARY_HDR",
+			    report_format   => "SERV_SUMMARY",
+			    report_sub	    =>
+				sub { $_[0]->service_summary_report },
+			    record_setter_sub => sub {
+				set_service_fmt( $_[0] );
+				set_sum_fmt( $_[0] );
+			    },
+			    format_sub	    => \&summary_format_iterator,
+			   },
+   service		=> {
+			    title	    => "Service Report",
+			    hdr_format	    => "SERV_REPORT_HDR",
+			    report_format   => "SERV_REPORT",
+			    report_sub	    =>
+				sub { $_[0]->service_report },
+			    record_setter_sub => \&set_record_fmt,
+			    key_format	    => "SERV_REPORT_KEY",
+			    format_sub	    => \&report_format_iterator,
+			   },
+   service_alias_sum	=> {
+			    title	    => "Service Summary (By Alias)",
+			    hdr_format	    => "SERV_ALIAS_SUMMARY_HDR",
+			    report_format   => "SERV_ALIAS_SUMMARY",
+			    report_sub	    =>
+				sub { $_[0]->service_alias_summary_report },
+			    record_setter_sub => sub {
+				set_service_fmt( $_[0] );
+				$fmt_alias = $_[0]->{host_alias};
+				set_sum_fmt( $_[0] );
+			    },
+			    format_sub	    => \&summary_format_iterator,
+			   },
+   service_alias	=> {
+			    title	    => "Service Report (By Alias)",
+			    hdr_format	    => "SERV_ALIAS_REPORT_HDR",
+			    report_format   => "SERV_HOST_REPORT",
+			    report_sub	    =>
+				sub { $_[0]->service_alias_report },
+			    record_setter_sub => \&set_record_fmt,
+			    key_format	    => "SERV_ALIAS_REPORT_KEY",
+			    format_sub	    => \&report_format_iterator,
+			   },
+   service_host_sum	=> {
+			    title	    => "Service Summary (By Host)",
+			    hdr_format	    => "SERV_HOST_SUMMARY_HDR",
+			    report_format   => "SERV_HOST_SUMMARY",
+			    report_sub	    =>
+				sub { $_[0]->service_host_summary_report},
+			    record_setter_sub => sub {
+				set_service_fmt( $_[0] );
+				$fmt_host = host_string( $_[0]->{host_name},
+							 $_[0]->{host_ip} );
+				set_sum_fmt( $_[0] );
+			    },
+			    format_sub	    => \&summary_format_iterator,
+			   },
+   service_host		=> {
+			    title	    => "Service Report (By Host)",
+			    hdr_format	    => "SERV_HOST_REPORT_HDR",
+			    report_format   => "SERV_HOST_REPORT",
+			    report_sub	    =>
+				sub { $_[0]->service_host_report },
+			    record_setter_sub => \&set_record_fmt,
+			    key_format	    => "SERV_HOST_REPORT_KEY",
+			    format_sub	    => \&report_format_iterator,
+			   },
+   src_alias_sum	=> {
+			    title	    => "Source Summary (By Alias)",
+			    hdr_format	    => "SRC_ALIAS_SUMMARY_HDR",
+			    report_format   => "ALIAS_SUMMARY",
+			    report_sub	    =>
+				sub { $_[0]->src_alias_summary_report },
+			    record_setter_sub => sub {
+				$fmt_alias = $_[0]->{host_alias};
+				set_sum_fmt( $_[0] );
+			    },
+			    format_sub	    => \&summary_format_iterator,
+			   },
+   src_alias		=> {
+			    title	    => "Source Report (By Alias)",
+			    hdr_format	    => "SRC_ALIAS_REPORT_HDR",
+			    report_format   => "SRC_REPORT",
+			    report_sub	    =>
+				sub { $_[0]->src_alias_report },
+			    record_setter_sub => \&set_record_fmt,
+			    key_format	    => "SRC_ALIAS_REPORT_KEY",
+			    format_sub	    => \&report_format_iterator,
+			   },
+   src_host_sum		=> {
+			    title	    => "Source Summary (By Host)",
+			    hdr_format	    => "SRC_HOST_SUMMARY_HDR",
+			    report_format   => "HOST_SUMMARY",
+			    report_sub	    =>
+				sub { $_[0]->src_host_summary_report },
+			    record_setter_sub => sub {
+				$fmt_host = host_string( $_[0]->{host_name},
+							 $_[0]->{host_ip} );
+				set_sum_fmt( $_[0] );
+			    },
+			    format_sub	    => \&summary_format_iterator,
+			   },
+   src_host		=> {
+			    title	    => "Source Report (By Host)",
+			    hdr_format	    => "SRC_HOST_REPORT_HDR",
+			    report_format   => "SRC_REPORT",
+			    report_sub	    =>
+				sub { $_[0]->src_host_report },
+			    record_setter_sub => \&set_record_fmt,
+			    key_format	    => "SRC_HOST_REPORT_KEY",
+			    format_sub	    => \&report_format_iterator,
+			   },
+   dst_alias_sum	=> {
+			    title	    => "Destination Summary (By Alias)",
+			    hdr_format	    => "DST_ALIAS_SUMMARY_HDR",
+			    report_format   => "ALIAS_SUMMARY",
+			    report_sub	    =>
+				sub { $_[0]->dst_alias_summary_report },
+			    record_setter_sub => sub {
+				$fmt_alias = $_[0]->{host_alias};
+				set_sum_fmt( $_[0] );
+			    },
+			    format_sub	    => \&summary_format_iterator,
+			   },
+   dst_alias		=> {
+			    title	    => "Destination Report (By Alias)",
+			    hdr_format	    => "DST_ALIAS_REPORT_HDR",
+			    report_format   => "DST_REPORT",
+			    report_sub	    =>
+				sub { $_[0]->dst_alias_report },
+			    record_setter_sub => \&set_record_fmt,
+			    key_format	    => "DST_ALIAS_REPORT_KEY",
+			    format_sub	    => \&report_format_iterator,
+			   },
+   dst_host_sum		=> {
+			    title	    => "Destination Summary (By Host)",
+			    hdr_format	    => "DST_HOST_SUMMARY_HDR",
+			    report_format   => "HOST_SUMMARY",
+			    report_sub	    =>
+				sub { $_[0]->dst_host_summary_report },
+			    record_setter_sub => sub {
+				$fmt_host = host_string( $_[0]->{host_name},
+							 $_[0]->{host_ip} );
+				set_sum_fmt( $_[0] );
+			    },
+			    format_sub	    => \&summary_format_iterator,
+			   },
+   dst_host		=> {
+			    title	    => "Destination Report (By Host)",
+			    hdr_format	    => "DST_HOST_REPORT_HDR",
+			    report_format   => "DST_REPORT",
+			    report_sub	    =>
+				sub { $_[0]->dst_host_report },
+			    record_setter_sub => \&set_record_fmt,
+			    key_format	    => "DST_HOST_REPORT_KEY",
+			    format_sub	    => \&report_format_iterator,
+			   },
+   details 		=> {
+			    title	    => "Details Report",
+			    hdr_format	    => "DETAILS_HDR",
+			    report_format   => "DETAILS_REPORT",
+			    report_sub	    => sub { $_[0]->records },
+			    record_setter_sub => \&set_record_fmt,
+			    format_sub	    => \&summary_format_iterator,
+			   },
+  );
+
+sub usage(;$) {
+print <<EOFU;
+usage: fwctlreport [--start report_start]
+		   [--end report_end | --period report_period ]
+		   [--threshold cutoff_threshold]
+		   [--nohostname] [--limit expression]
+		   [--report report ...]
+
+or     fwctlreport --help
+EOFU
+    exit defined $_[0] ? $_[0] : 1;
+}
+
+my %opts = ( hostname => 1, );
+GetOptions( \%opts, "start=s", "end=s", "period=s", "threshold=s",
+	    "report=s@", "limit=s",  "hostname!", "help"
+	  )
+  or usage;
+
+usage(0) if $opts{help};
+
+push @{$opts{report}}, "details" unless exists $opts{report};
+
+$opts{files} = [ @ARGV ];
+my $report = new Fwctl::Report( %opts );
+
+$use_hostname = $opts{hostname};
+
+$fmt_report_start = strftime "%Y.%m.%d %H:%M", localtime $report->start();
+$fmt_report_end   = strftime "%Y.%m.%d %H:%M", localtime $report->end();
+
+foreach my $r ( @{$opts{report}} ) {
+    unless (  exists $REPORT_TABLE{ lc $r } ) {
+	warn "Unknown report : $r\n";
+	next;
+    }
+    my $format = $REPORT_TABLE{$r};
+    $format->{format_sub}->( $report, $format );
+}
+
+######################### format declarations ###################
+
+format STDOUT_TOP =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<< @>>>
+$fmt_current_report, $fmt_report_start, $fmt_report_end, $%
+
+.
+
+format HOST_SUMMARY =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+$fmt_host, $fmt_count
+.
+
+format ALIAS_SUMMARY =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+$fmt_alias, $fmt_count
+.
+
+format SRC_HOST_SUMMARY_HDR =
+
+
+		   Source Summary (By Host) Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+                   -------------------------------
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+"Host", "Count"
+.
+
+format SRC_HOST_REPORT_HDR =
+
+
+	      Packet Filters Log Report (By Source Host)
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+	      ------------------------------------------
+
+.
+
+format SRC_HOST_REPORT_KEY =
+
+@||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$fmt_src_host . " [" . $fmt_src_ip . "]"
+
+.
+
+format SRC_ALIAS_REPORT_HDR =
+
+
+	      Packet Filters Log Report (By Source Alias)
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+	      ------------------------------------------
+
+.
+
+format SRC_ALIAS_REPORT_KEY =
+
+@||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$fmt_src_alias
+
+.
+
+format DST_HOST_REPORT_HDR =
+
+
+	   Packet Filters Log Report (By Destination Host)
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+	   -----------------------------------------------
+
+.
+
+format DST_HOST_REPORT_KEY =
+
+@||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$fmt_dst_host . " [" . $fmt_dst_ip . "]"
+
+.
+
+format DST_ALIAS_REPORT_HDR =
+
+
+	   Packet Filters Log Report (By Destination Alias)
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+	   -----------------------------------------------
+
+.
+
+format DST_ALIAS_REPORT_KEY =
+
+@||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$fmt_dst_alias
+
+.
+
+format SERV_REPORT_HDR =
+
+
+		Packet Filters Log Report (By Service)
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+		--------------------------------------
+
+.
+
+format SERV_REPORT_KEY =
+
+@||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$fmt_serv
+
+.
+
+format SERV_HOST_REPORT_HDR =
+
+
+	     Packet Filters Log Report (By Host/Service)
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+	     -------------------------------------------
+
+.
+
+format SERV_HOST_REPORT_KEY =
+
+@||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$fmt_dst_host . " [" . $fmt_dst_ip . "]" . $fmt_serv
+
+.
+
+format SERV_ALIAS_REPORT_HDR =
+
+
+	     Packet Filters Log Report (By Alias/Service)
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+	     --------------------------------------------
+
+.
+
+format SERV_ALIAS_REPORT_KEY =
+
+@||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$fmt_dst_alias . " " . $fmt_serv
+
+.
+
+format SRC_REPORT =
+@<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>> @>>>>>
+$fmt_date, host_string( $fmt_dst_host, $fmt_dst_ip), $fmt_serv, $fmt_action
+.
+
+format DST_REPORT =
+@<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>> @>>>>>
+$fmt_date, host_string( $fmt_src_host, $fmt_src_ip ), $fmt_serv, $fmt_action
+.
+
+format SERV_REPORT =
+@<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>>>>>> @>>>>>
+$fmt_date, host_string( $fmt_src_host, $fmt_src_ip ), host_string( $fmt_dst_host, $fmt_dst_ip ), $fmt_action
+.
+
+format SERV_HOST_REPORT =
+@<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>
+$fmt_date, host_string( $fmt_src_host, $fmt_src_ip ), $fmt_action
+.
+
+format SRC_ALIAS_SUMMARY_HDR =
+
+
+		   Source Summary (By Alias) Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+                   -------------------------------
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+"Alias", "Count"
+
+.
+
+format DST_HOST_SUMMARY_HDR =
+
+
+		 Destination Summary (By Host) Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+                 ------------------------------------
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+"Host", "Count"
+
+.
+
+format DST_ALIAS_SUMMARY_HDR =
+
+
+		Destination Summary (By Alias) Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+                -------------------------------------
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+"Alias", "Count"
+
+.
+
+format SERV_SUMMARY_HDR =
+
+
+		 Service Summary (By Service) Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+                 -----------------------------------
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+"Service", "Count"
+
+.
+
+format SERV_SUMMARY =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>>
+$fmt_serv, $fmt_count
+.
+
+format SERV_HOST_SUMMARY_HDR =
+
+
+		   Service Summary (By Host) Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+                   --------------------------------
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>
+"Host", "Service", "Count"
+
+.
+
+format SERV_HOST_SUMMARY =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<< @>>>>>
+$fmt_host, $fmt_serv, $fmt_count
+.
+
+format SERV_ALIAS_SUMMARY_HDR =
+
+
+                  Service Summary (By Alias) Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+		  ---------------------------------
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<< @>>>>>
+"Alias", "Service", "Count"
+
+.
+
+format SERV_ALIAS_SUMMARY =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<< @>>>>>
+$fmt_alias, $fmt_serv, $fmt_count
+.
+
+format DETAILS_HDR =
+
+
+		  Details Packet Filters Log Report
+@>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> - @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fmt_report_start, $fmt_report_end
+                  ---------------------------------
+
+.
+
+format DETAILS_REPORT =
+@<<<<<<<<<<<<<<<<<<<<<<<<<<<< @|||||||| @>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+$fmt_date,                   $fmt_action, $fmt_serv
+Source:      @<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+             $fmt_src_ip, $          fmt_src_alias
+             @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+             $fmt_src_host
+Destination: @<<<<<<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+             $fmt_dst_ip,            $fmt_dst_alias
+             @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+             $fmt_dst_host
+
+.
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fwctlreport - Generates text reports from fwctllog output.
+
+=head1 SYNOPSIS
+
+fwctlreport [--start report_start]
+	    [--end report_end | --period report_period ]
+	    [--threshold cutoff_threshold] [--limit expression]
+	    [--nohostname]
+	    [--report report ...]
+	    logfile ...
+
+fwctlreport --help
+
+=head1 DESCRIPTION
+
+B<fwctlreport> can be use to generates several kind of reports from
+the kernel packet filters logs once processed by B<fwctllog>.
+
+=head1 INPUT OPTIONS
+
+The records on which the report will be generated can be customized
+with the following options.
+
+=over
+
+=item start
+
+Sets the start of the report's period. If the Date::Manip(3) module is
+installed, you can use any format that this module can parse. If that module
+is'nt installed you must use the following format YYYY-MM-DD HH:MM:SS or any
+meaningful subset of that format.
+
+If this option is not used, the report will start with the first record.
+
+=item end
+
+Sets the end of the report's period. If the Date::Manip(3) module is
+installed, you can use any format that this module can parse. If that module
+is'nt installed you must use the following format YYYY-MM-DD HH:MM:SS or any
+meaningful subset of that format.
+
+If this option is not used, the report will end with the last record.
+
+=item period
+
+Sets the length of the report's period. This length is interpreted relative
+to the report's start. This option has priority over the B<end> option.
+
+If you have the Date::Manip module installed, you can use any format that this
+module can parse. If that module isn't available, you can use a subset of the
+following format X weeks X days X hours X mins X secs.
+
+=item threshold
+
+This option will removed records identical in protocol, destination
+ports, source addresses and destination addressesses that appears in
+the time window specified by the threshold parameters. Defaults is 120
+(2 minutes). Use 0 to generates reports for all the packets.
+
+=item limit
+
+This parameter can be used to restrict the records over which the
+report is generated. It is an expression which will be used to select
+a subset of all the records. You can use the following fields :
+src_ip, dst_ip, src_host, dst_host, action, device, src_port,
+dst_port, src_serv, dst_serv, proto, proto_name, and the following
+operator =, !=, <, >, <=, >=, /regex/, /regex/i. Those operators have
+the same meaning as in perl. You can also use parentheses and the
+following logic operator : or, and, not .
+
+=over
+
+=item hostname or nohostname
+
+If you usee nohostname, only the IP address will appear in the report, even
+if the hostname is available.
+
+=item report
+
+You can use this option to specify the reports that will be generated. 
+By default, the I<details> report is generated.
+
+=back
+
+=head1 REPORT
+
+Here are the reports that can be generated :
+
+=over
+
+=item service_sum
+
+Report that shows the number of log entry for each services.
+
+=item service
+
+Report that shows the time, action and source host logged for each
+services.
+
+=item service_host_sum
+
+Report that shows the number of log entry for each destination host /
+service.
+
+=item service_host
+
+Report that shows the time, action and source host logged for each
+destination host / service.
+
+=item service_alias_sum
+
+Report that shows the number of log entry for each destination alias /
+service.
+
+=item service_alias
+
+Report that shows the time, action and source host logged for each
+destination alias / service.
+
+=item dst_alias_sum
+
+Report that shows the number of log entry for each destination alias.
+
+=item dst_alias
+
+Report that shows the time, action, source host and service logged for each
+destination alias.
+
+=item dst_host_sum
+
+Report that shows the number of log entry for each destination host.
+
+=item dst_host
+
+Report that shows the time, action, source host and service logged for each
+destination host.
+
+=item src_alias_sum
+
+Report that shows the number of log entry for each source alias.
+
+=item src_alias
+
+Report that shows the time, action, destination host and service logged
+for each source alias.
+
+=item src_host_sum
+
+Report that shows the number of log entry for each source host.
+
+=item src_host
+
+Report that shows the time, action, destination host and service 
+logged for each source host.
+
+=item details
+
+Reports that shows all the information associated with each log entry.
+
+=back
+
+=head1 AUTHOR
+
+Francis J. Lacoste <francis.lacoste@iNsu.COM>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000 iNsu Innovations Inc.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, you can get one at
+http://www.gnu.org/copyleft/gpl.html
+
+=head1 SEE ALSO
+
+Fwctl(3) Fwctl::RuleSet(3) fwctl(8) fwctllog(8) Fwctl::Report(3).
+
+=cut
+

@@ -1,0 +1,30 @@
+---
+abstract: 'Process and cache files based on the hash of their contents.'
+author:
+  - 'David Caldwell <david@porkrind.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.39
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-HashCache
+provides:
+  File::HashCache:
+    file: lib/File/HashCache.pm
+    version: v1.0.2
+  File::HashCache::JavaScript:
+    file: lib/File/HashCache/JavaScript.pm
+    version: v1.0.2
+recommends:
+  CSS::Minifier::XS: 0
+requires:
+  File::Slurp: 0
+  JSON: 0
+  JavaScript::Minifier::XS: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.0.2

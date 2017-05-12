@@ -1,0 +1,38 @@
+Revision history for Perl extension FileSystem::LL::FAT.
+
+0.01  Sat Mar 28 18:21:26 2009
+	- original version; created by h2xs 1.23 with options
+		-XAfn FileSystem::LL::FAT
+
+0.02
+	new functions		(UNDOCUMENTED).
+	 recurse_dir(), list_dir(), compress_FAT(), uncompress_FAT()
+        New key FAT_raw for process_FAT_data().
+	Reimplement write_dir() in terms of recurse_dir().
+	Fix docs of $exists for write_dir().
+	write_dir() would not recurse correct.
+	API change: write_dir() now takes a reference to directory string
+		and an extra optional arg $how.
+	FAT stored as string reference was wrong.
+	Stop cluster has leading 0 in FAT32 (OTHER PLACE???).
+
+0.03
+	recurse_dir() allows operation without FAT table (currently assumes
+		that subdirectories take at most 1 cluster).
+	recurse_dir() allows $how to be an array reference; hence the same
+		for write_dir(), list_dir().
+	output_cluster_chain() would repeat 16MB the same chunk...
+	output_cluster_chain() supports operation with $FAT undefined
+		(assumes continuous files); hence the same for write_file(),
+		write_dir().
+	recursing and listing works with deleted files and "." "..".
+
+0.04
+	New environment variable FAT_READ_NEEDS_1SECTOR to raw read by 512b.
+	recurse_dir() was mangling $FAT if undefined.
+	Argument $how to recurse_dir() etc changed to a hash reference.
+	Now actually used for system recovery...
+
+0.05
+	File time logic (without local --> global conversion).
+	Preallocate variable-to-sysread-to.

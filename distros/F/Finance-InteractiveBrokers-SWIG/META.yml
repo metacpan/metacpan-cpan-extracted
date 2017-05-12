@@ -1,0 +1,25 @@
+---
+abstract: 'InteractiveBrokers API C++ wrapper and connector'
+author:
+  - 'Jason McManus <infidel AT cpan.org>'
+build_requires:
+  Alien::InteractiveBrokers: '0'
+  Finance::InteractiveBrokers::API: 0.02_03
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Finance::InteractiveBrokers::API: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-InteractiveBrokers-SWIG
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Finance::InteractiveBrokers::API: '0.04'
+  Test::More: '0.88'
+version: '0.13'

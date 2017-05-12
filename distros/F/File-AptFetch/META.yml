@@ -1,0 +1,36 @@
+---
+abstract: 'perl interface onto APT-Methods'
+author:
+  - ADOPTME
+build_requires:
+  File::Temp: 0
+  POSIX: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-AptFetch
+provides:
+  File::AptFetch:
+    file: lib/AptFetch.pm
+    version: v0.1.14
+  File::AptFetch::Simple:
+    file: lib/Simple.pm
+    version: v0.1.7
+requires:
+  Carp: 0
+  Cwd: 0
+  IO::Pipe: 0
+  List::Util: 0
+  String::Truncate: 0
+  base: 0
+  perl: v5.8.0
+  version: v0.77.0
+resources:
+  license: http://www.gnu.org/licenses/lgpl-3.0.txt
+version: v0.1.14

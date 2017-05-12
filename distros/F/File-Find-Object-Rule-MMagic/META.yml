@@ -1,0 +1,46 @@
+---
+abstract: 'rule to match on mime types'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+keywords:
+  - file
+  - 'file extensions'
+  - file-find-object-rule
+  - file-find-rule
+  - 'file types'
+  - find
+  - mime
+  - MIME
+  - 'mime types'
+  - mmagic
+  - object
+  - types
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Find-Object-Rule-MMagic
+provides:
+  File::Find::Object::Rule::MMagic:
+    file: lib/File/Find/Object/Rule/MMagic.pm
+    version: v0.0.4
+requires:
+  File::Find::Object::Rule: 0
+  File::MMagic: 0
+  Text::Glob: 0
+  parent: 0
+  perl: 5.008
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  homepage: http://www.shlomifish.org/open-source/projects/File-Find-Object/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.berlios.de/svnroot/repos/web-cpan/File-Find-Object/
+version: v0.0.4

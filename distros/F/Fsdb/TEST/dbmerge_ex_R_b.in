@@ -1,0 +1,8 @@
+#fsdb -R I cid cname
+cid: 12
+cname: os
+
+cid: 13
+cname: statistics
+
+#   | dbfilealter -R C

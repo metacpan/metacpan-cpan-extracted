@@ -1,0 +1,11 @@
+Revision history for Perl extension Filesys::Virtual::Async::inMemory
+
+* 0.02
+
+	Kwalitee fixes + POD tweaks
+	Added missing prereq - File::Spec
+	Fixed readonly bugs
+
+* 0.01
+
+	initial release

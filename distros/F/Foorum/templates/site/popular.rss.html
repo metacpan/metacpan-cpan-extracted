@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+[% USE date %]
+[% title = c.loc('Popular')  _ ' : ' _ c.config.name %]
+<rss version="2.0">
+<channel>
+<title><![CDATA[[% title %]]]></title>
+<link>[% c.req.base _ 'site/popular/' _ type %]</link>
+<description><![CDATA[[% title %]]]></description>
+<pubDate>[% date.format(date.now, '%Y-%m-%dT%H:%M:%S+00:00') %]</pubDate>
+<lastBuildDate>[% date.format(date.now, '%Y-%m-%dT%H:%M:%S+00:00') %]</lastBuildDate>
+<generator>Foorum RSS Generator</generator>
+
+[% FOREACH obj IN objects %]
+<item>
+<title><![CDATA[[% obj.title %]]]></title>
+<link>[% base _ obj.url %]</link>
+<description><![CDATA[[% obj.text %]]]></description>
+<guid isPermaLink="true">[% base _ obj.url %]</guid>
+<pubDate>[% date.format(obj.last_update, format =>'%Y-%m-%dT%I:%M:%S') %]</pubDate>
+</item>
+[% END %]
+
+</channel>
+</rss>

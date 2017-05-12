@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               File-Slurp-Remote
+version:            0.44
+abstract:           Easy read/write of remote files
+author:
+    - David Muir Sharnoff <muir@idiom.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    File::Slurp:          0
+    File::Temp:           0
+    Sys::Hostname::FQDN:  0
+    Tie::Hash:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,64 @@
+[% WRAPPER 'forumadmin/bar.html' %]
+
+[% USE FillInForm %]
+[% UNLESS c.req.method == 'POST';
+    forum_name = forum.name | decodeHTML;
+    forum_description = forum.description | decodeHTML;
+    data = {
+        name  => forum_name,
+        description  => forum_description,
+        private    => private,
+        moderators => moderators,
+        forum_code => forum.forum_code,
+        can_post_threads => forum.settings.can_post_threads || 'Y',
+        can_post_replies => forum.settings.can_post_replies || 'Y',
+        can_post_polls   => forum.settings.can_post_polls   || 'Y',
+    };
+END; %]
+[% FILTER fillinform fdat => data || c.req.params %]
+<div class='one'>
+<form method='post'>
+<table align='center'>
+  [% IF is_site_admin %]
+    <tr class='forum2'><td>Forum Code:</td><td><input type='text' name='forum_code' />
+    [% IF c.form.error('forum_code') %]
+	    [% IF c.form.error('forum_code', 'HAS_BLANK') %]
+	    don't put blank in your forum_code.
+	    [% ELSIF c.form.error('forum_code', 'REGEX') %]
+	    only A-Z, a-z, 0-9, -, _ is allowed.
+	    [% ELSIF c.form.error('forum_code', 'HAS_RESERVED') %]
+	    this forum_code is reserved.
+	    [% ELSIF c.form.error('forum_code', 'DBIC_UNIQUE') %]
+	    This forum_code is used by another one.
+	    [% ELSE %]
+	    forum_code should be 6-20 chars.
+	    [% END %]
+	[% END %]</td></tr>
+  [% END %]
+    <tr class='forum1'><td>Forum Name:</td><td><input type='text' name='name' />
+    [% IF c.form.error('name') %]
+	the length of forum name should be more than 1 and less than 40
+	[% END %]</td></tr>
+    <tr class='forum2'><td>Forum Description</td><td><textarea name='description' rows='9' cols='40'></textarea>
+    [% IF c.form.error('description') %]
+	<br />description cann't be null.
+	[% END %]
+	</td></tr>
+    <tr class='forum1'><td>Forum Moderators</td><td><input type='text' name='moderators' /> use ',' to split if there are more than 1 moderator
+    [% IF c.form.error('moderators') %]
+	<br />no such user [% non_existence_user %]
+	[% END %]
+	</td></tr>
+    <tr class='forum2'><td>Policy</td><td><input type='checkbox' name='private' value='1' /> Private</td></tr>
+    <tr class='forum1'><td>Can Post Topics:</td><td><input type='radio' name='can_post_threads' value='Y' checked='checked' /> Yes <input type='radio' name='can_post_threads' value='N' /> No</td></tr>
+    <tr class='forum2'><td>Can Post Replies:</td><td><input type='radio' name='can_post_replies' value='Y' checked='checked' /> Yes <input type='radio' name='can_post_replies' value='N' /> No</td></tr>
+    [% IF c.config.function_on.poll %]
+    <tr class='forum1'><td>Can Post Polls:</td><td><input type='radio' name='can_post_polls' value='Y' checked='checked' /> Yes <input type='radio' name='can_post_polls' value='N' /> No</td></tr>
+    [% END %]
+    <tr class='forum1'><td colspan='2'><input type='submit' /></td></tr>
+</table>
+</form>
+</div>
+[% END %]
+
+[% END %]

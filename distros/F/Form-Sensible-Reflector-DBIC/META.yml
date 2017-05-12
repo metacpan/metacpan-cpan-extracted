@@ -1,0 +1,25 @@
+---
+abstract: 'A Form::Sensible::Reflector subclass to reflect off of DBIC schema classes'
+author:
+  - 'Devin Austin <dhoss@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Form-Sensible-Reflector-DBIC
+requires:
+  DBIx::Class: 0
+  Data::Dumper: 0
+  DateTime: 0
+  Form::Sensible: 0.20012
+  Moose: 0.93
+  SQL::Translator: 0.11002
+  Test::Simple: 0.88
+resources:
+  repository: git://github.com/dhoss/Form-Sensible-Reflector-DBIC.git
+version: 0.349

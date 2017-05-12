@@ -1,0 +1,10 @@
+Revision history for Perl extension File::Tail::Inotify2.
+
+1.00 2013-06-20T09:50:02Z
+    - Uses Minilla.
+    - Updates docs.
+
+0.01  Thu Jun  7 17:43 2012
+	- original version; created by h2xs 1.23 with options
+		-AXce --use-new-tests --skip-exporter -v 0.01 -b 5.8.8 -n File::Tail::Inotify2
+

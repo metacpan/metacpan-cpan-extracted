@@ -1,0 +1,21 @@
+2009-08-29 20:25  cvs
+
+	* Makefile.PL, lib/File/Find/Rule/DirectoryEmpty.pm: Made sure to
+	  specify all dependencies.  Made sure that perl gpl license shows
+	  up.  Cleaned up doc, README, and Changes
+
+2008-05-17 12:29  cvs
+
+	* lib/File/Find/Rule/DirectoryEmpty.pm, t/1.t, t/2.t: updated
+	  documentation and added tests
+
+2007-10-05 11:36  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/Find/Rule/DirectoryEmpty.pm,
+	  t/0.t: Initial revision
+
+2007-10-05 11:36  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/Find/Rule/DirectoryEmpty.pm,
+	  t/0.t: init
+

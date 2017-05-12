@@ -1,0 +1,7 @@
+Filesys::ZFS is a simple to use, object based interface to the /sbin/zfs and
+/sbin/zpool commands.
+
+Currently Filesys::ZFS only reports, though in future versions methods to
+set various items, create pools, manage pools, etc. may be added.
+
+

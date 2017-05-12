@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/FASTAParse.pm
+t/00.load.t
+t/pod.t
+t/nr.fa
+t/FASTAParse.t

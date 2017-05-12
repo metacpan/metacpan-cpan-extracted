@@ -1,0 +1,19 @@
+***************
+*** 6,13 ****
+  
+  use Moose::Util::TypeConstraints;
+  
+- enum 'ContributionSource' => qw(Deferral Match);
+- enum 'TradeSide' => qw(Buy Sell ShtSell);
+  
+  no Moose::Util::TypeConstraints;
+  
+--- 6,13 ----
+  
+  use Moose::Util::TypeConstraints;
+  
++ enum 'ContributionSource' => [qw(Deferral Match)];
++ enum 'TradeSide' => [qw(Buy Sell ShtSell)];
+  
+  no Moose::Util::TypeConstraints;
+  

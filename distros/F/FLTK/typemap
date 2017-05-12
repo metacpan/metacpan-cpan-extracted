@@ -1,0 +1,568 @@
+
+TYPEMAP
+const char *    T_PV
+uchar           T_U_CHAR
+uchar *         T_PV
+float           T_FLOAT
+const void *    T_PTR
+int *           T_IPTR
+const int *     T_IPTR
+Fl_Flags        T_IV
+Fl_Event        T_IV
+Fl_When         T_IV
+Fl_Mode         T_IV
+Fl_Damage       T_IV
+Fl_Align        T_IV
+Fl_Color        T_UV
+Fl_Cursor       T_ENUMCURS
+Fl_Widget *                     WIDGET_OBJECT
+const Fl_Widget *               WIDGET_OBJECT
+Fl_Group *                      GROUP_OBJECT
+const Fl_Group *                GROUP_OBJECT
+Fl_Align_Group *                AGRP_OBJECT
+const Fl_Align_Group *          AGRP_OBJECT
+Fl_List *                       LIST_OBJECT
+const Fl_List *                 LIST_OBJECT
+Fl_Window *                     WINDOW_OBJECT
+const Fl_Window *               WINDOW_OBJECT
+Fl_Double_Window *              DWINDOW_OBJECT
+const Fl_Double_Window *        DWINDOW_OBJECT
+Fl_Image *                      IMAGE_OBJECT
+const Fl_Image *                IMAGE_OBJECT
+Fl_Shared_Image *               SHRDIMG_OBJECT
+const Fl_Shared_Image *         SHRDIMG_OBJECT
+Fl_Pixmap *                     XPMIMG_OBJECT
+const Fl_Pixmap *               XPMIMG_OBJECT
+Fl_Boxtype_ *                   BOXTYPE_OBJECT
+const Fl_Boxtype_ *             BOXTYPE_OBJECT
+Fl_Boxtype                      BOXTYPE_OBJECT
+Fl_Boxtype *                    BOXTYPE_OBJECT
+Fl_Labeltype                    LABELTYPE_OBJECT
+Fl_Labeltype_ *                 LABELTYPE_OBJECT
+const Fl_Labeltype_ *           LABELTYPE_OBJECT
+Fl_Style *                      STYLE_OBJECT
+const Fl_Style *                STYLE_OBJECT
+Fl_Box *                        BOX_OBJECT
+const Fl_Box *                  BOX_OBJECT
+Fl_Button *                     BUTTON_OBJECT
+const Fl_Button *               BUTTON_OBJECT
+Fl_Check_Button *               CBUTTON_OBJECT
+const Fl_Check_Button *         CBUTTON_OBJECT
+Fl_Light_Button *               LBUTTON_OBJECT
+const Fl_Light_Button *         LBUTTON_OBJECT
+Fl_Round_Button *               RNDBTN_OBJECT
+const Fl_Round_Button *         RNDBTN_OBJECT
+Fl_Return_Button *              RTNBTN_OBJECT
+const Fl_Return_Button *        RTNBTN_OBJECT
+Fl_Repeat_Button *              RPTBTN_OBJECT
+const Fl_Repeat_Button *        RPTBTN_OBJECT
+Fl_Highlight_Button *           HILBTN_OBJECT
+const Fl_Highlight_Button *     HILBTN_OBJECT
+Fl_Radio_Button *               RADBTN_OBJECT
+const Fl_Radio_Button *         RADBTN_OBJECT
+Fl_Radio_Light_Button *         RADLBTN_OBJECT
+const Fl_Radio_Light_Button *   RADLBTN_OBJECT
+Fl_Radio_Round_Button *         RADRBTN_OBJECT
+const Fl_Radio_Round_Button *   RADRBTN_OBJECT
+Fl_Toggle_Button *              TOGBTN_OBJECT
+const Fl_Toggle_Button *        TOGBTN_OBJECT
+Fl_Toggle_Round_Button *        TOGRBTN_OBJECT
+const Fl_Toggle_Round_Button *  TOGRBTN_OBJECT
+Fl_Toggle_Light_Button *        TOGLBTN_OBJECT
+const Fl_Toggle_Light_Button *  TOGLBTN_OBJECT
+Fl_Input *                      INP_OBJECT
+const Fl_Input *                INP_OBJECT
+Fl_Float_Input *                FLTINP_OBJECT
+const Fl_Float_Input *          FLTINP_OBJECT
+Fl_Int_Input *                  INTINP_OBJECT
+const Fl_Int_Input *            INTINP_OBJECT
+Fl_Multiline_Input *            MULINP_OBJECT
+const Fl_Multiline_Input *      MULINP_OBJECT
+Fl_Secret_Input *               SECINP_OBJECT
+const Fl_Secret_Input *         SECINP_OBJECT
+Fl_Wordwrap_Input *             WWPINP_OBJECT
+const Fl_Wordwrap_Input *       WWPINP_OBJECT
+Fl_Tabs *                       TABS_OBJECT
+const Fl_Tabs *                 TABS_OBJECT
+Fl_Pack *                       PACK_OBJECT
+const Fl_Pack *                 PACK_OBJECT
+Fl_Scroll *                     SCROLL_OBJECT
+const Fl_Scroll *               SCROLL_OBJECT
+Fl_Tile *                       TILE_OBJECT
+const Fl_Tile *                 TILE_OBJECT
+Fl_Menu_ *                      MENU_OBJECT
+const Fl_Menu_ *                MENU_OBJECT
+Fl_Item_Group *                 MENU_OBJECT
+const Fl_Item_Group *           MENU_OBJECT
+Fl_Menu_Bar *                   BRMENU_OBJECT
+const Fl_Menu_Bar *             BRMENU_OBJECT
+Fl_Menu_Button *                BTMENU_OBJECT
+const Fl_Menu_Button *          BTMENU_OBJECT
+Fl_Choice *                     CHMENU_OBJECT
+const Fl_Choice *               CHMENU_OBJECT
+Fl_Item *                       ITEM_OBJECT
+const Fl_Item *                 ITEM_OBJECT
+Fl_Radio_Item *                 RITEM_OBJECT
+const Fl_Radio_Item *           RITEM_OBJECT
+Fl_Toggle_Item *                TITEM_OBJECT
+const Fl_Toggle_Item *          TITEM_OBJECT
+Fl_Output *                     OUTP_OBJECT
+const Fl_Output *               OUTP_OBJECT
+Fl_Multiline_Output *           MOUTP_OBJECT
+const Fl_Multiline_Output *     MOUTP_OBJECT
+Fl_Wordwrap_Output *            WWPOUTP_OBJECT
+const Fl_Wordwrap_Output *      WWPOUTP_OBJECT
+Fl_Browser *                    BROWSE_OBJECT
+const Fl_Browser *              BROWSE_OBJECT
+Fl_Hold_Browser *               HBROWSE_OBJECT
+const Fl_Hold_Browser *         HBROWSE_OBJECT
+Fl_Multi_Browser *              MBROWSE_OBJECT
+const Fl_Multi_Browser *        MBROWSE_OBJECT
+Fl_Select_Browser *             SBROWSE_OBJECT
+const Fl_Select_Browser *       SBROWSE_OBJECT
+Fl_Valuator *                   VALUATR_OBJECT
+const Fl_Valuator *             VALUATR_OBJECT
+Fl_Slider *                     SLIDER_OBJECT
+const Fl_Slider *               SLIDER_OBJECT
+Fl_Fill_Slider *                FSLIDER_OBJECT
+const Fl_Fill_Slider *          FSLIDER_OBJECT
+Fl_Hor_Fill_Slider *            HFSLIDER_OBJECT
+const Fl_Hor_Fill_Slider *      HFSLIDER_OBJECT
+Fl_Hor_Nice_Slider *            HNSLIDER_OBJECT
+const Fl_Hor_Nice_Slider *      HNSLIDER_OBJECT
+Fl_Hor_Slider *                 HSLIDER_OBJECT
+const Fl_Hor_Slider *           HSLIDER_OBJECT
+Fl_Hor_Value_Slider *           HVSLIDER_OBJECT
+const Fl_Hor_Value_Slider *     HVSLIDER_OBJECT
+Fl_Nice_Slider *                NSLIDER_OBJECT
+const Fl_Nice_Slider *          NSLIDER_OBJECT
+Fl_Value_Slider *               VSLIDER_OBJECT
+const Fl_Value_Slider *         VSLIDER_OBJECT
+Fl_Scrollbar *                  SCRLLB_OBJECT
+const Fl_Scrollbar *            SCRLLB_OBJECT
+Fl_Text_Selection *             TXTSEL_OBJECT
+const Fl_Text_Selection *       TXTSEL_OBJECT
+Fl_Text_Buffer *                TXTBUF_OBJECT
+const Fl_Text_Buffer *          TXTBUF_OBJECT
+Fl_Text_Display *               TXTDISP_OBJECT
+const Fl_Text_Display *         TXTDISP_OBJECT
+Fl_Text_Editor *                TXTEDIT_OBJECT
+const Fl_Text_Editor *          TXTEDIT_OBJECT
+Fl_Font_ *                      FONTT_OBJECT
+const Fl_Font_ *                FONTT_OBJECT
+
+OUTPUT
+T_ENUMCURS
+    sv_setiv($arg, (IV)$var);
+
+ANY_OBJECT
+    sv_setref_pv($arg, CLASS, (void*) $var);
+
+WIDGET_OBJECT
+    sv_setref_pv($arg, "Fl_Widget", (void*) $var);
+
+GROUP_OBJECT
+    sv_setref_pv($arg, "Fl_Group", (void*) $var);
+
+AGRP_OBJECT
+    sv_setref_pv($arg, "Fl_Align_Group", (void*) $var);
+
+LIST_OBJECT
+    sv_setref_pv($arg, "Fl_List", (void*) $var);
+
+WINDOW_OBJECT
+    sv_setref_pv($arg, "Fl_Window", (void*) $var);
+
+DWINDOW_OBJECT
+    sv_setref_pv($arg, "Fl_Double_Window", (void*) $var);
+
+IMAGE_OBJECT
+    sv_setref_pv($arg, "Fl_Image", (void*) $var);
+
+SHRDIMG_OBJECT
+    sv_setref_pv($arg, "Fl_Shared_Image", (void*) $var);
+
+XPMIMG_OBJECT
+    sv_setref_pv($arg, "Fl_Pixmap", (void*) $var);
+
+BOXTYPE_OBJECT
+    sv_setref_pv($arg, "Fl_Boxtype_", (void*) $var);
+
+LABELTYPE_OBJECT
+    sv_setref_pv($arg, "Fl_Labeltype_", (void*) $var);
+
+STYLE_OBJECT
+    sv_setref_pv($arg, "Fl_Style", (void*) $var);
+
+BOX_OBJECT
+    sv_setref_pv($arg, "Fl_Box", (void*) $var);
+
+BUTTON_OBJECT
+    sv_setref_pv($arg, "Fl_Button", (void*) $var);
+
+CBUTTON_OBJECT
+    sv_setref_pv($arg, "Fl_Check_Button", (void*) $var);
+
+LBUTTON_OBJECT
+    sv_setref_pv($arg, "Fl_Light_Button", (void*) $var);
+
+RNDBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Round_Button", (void*) $var);
+
+HILBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Highlight_Button", (void*) $var);
+
+RADBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Radio_Button", (void*) $var);
+
+RADLBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Radio_Light_Button", (void*) $var);
+
+RADRBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Radio_Round_Button", (void*) $var);
+
+TOGBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Toggle_Button", (void*) $var);
+
+TOGLBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Toggle_Light_Button", (void*) $var);
+
+TOGRBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Toggle_Round_Button", (void*) $var);
+
+
+RTNBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Return_Button", (void*) $var);
+
+RPTBTN_OBJECT
+    sv_setref_pv($arg, "Fl_Repeat_Button", (void*) $var);
+
+INP_OBJECT
+    sv_setref_pv($arg, "Fl_Input", (void*) $var);
+
+FLTINP_OBJECT
+    sv_setref_pv($arg, "Fl_Float_Input", (void*) $var);
+
+INTINP_OBJECT
+    sv_setref_pv($arg, "Fl_Int_Input", (void*) $var);
+
+MULINP_OBJECT
+    sv_setref_pv($arg, "Fl_Multiline_Input", (void*) $var);
+
+SECINP_OBJECT
+    sv_setref_pv($arg, "Fl_Secret_Input", (void*) $var);
+
+TABS_OBJECT
+    sv_setref_pv($arg, "Fl_Tabs", (void*) $var);
+
+PACK_OBJECT
+    sv_setref_pv($arg, "Fl_Pack", (void*) $var);
+
+SCROLL_OBJECT
+    sv_setref_pv($arg, "Fl_Scroll", (void*) $var);
+
+TILE_OBJECT
+    sv_setref_pv($arg, "Fl_Tile", (void*) $var);
+
+MENU_OBJECT
+    sv_setref_pv($arg, "Fl_Menu_", (void*) $var);
+
+BRMENU_OBJECT
+    sv_setref_pv($arg, "Fl_Menu_Bar", (void*) $var);
+
+BTMENU_OBJECT
+    sv_setref_pv($arg, "Fl_Menu_Button", (void*) $var);
+
+CHMENU_OBJECT
+    sv_setref_pv($arg, "Fl_Choice", (void*) $var);
+
+ITEM_OBJECT
+    sv_setref_pv($arg, "Fl_Item", (void*) $var);
+
+RITEM_OBJECT
+    sv_setref_pv($arg, "Fl_Radio_Item", (void*) $var);
+
+TITEM_OBJECT
+    sv_setref_pv($arg, "Fl_Toggle_Item", (void*) $var);
+
+OUTP_OBJECT
+    sv_setref_pv($arg, "Fl_Output", (void*) $var);
+
+MOUTP_OBJECT
+    sv_setref_pv($arg, "Fl_Multiline_Output", (void*) $var);
+
+BROWSE_OBJECT
+    sv_setref_pv($arg, "Fl_Browser", (void*) $var);
+
+HBROWSE_OBJECT
+    sv_setref_pv($arg, "Fl_Hold_Browser", (void*) $var);
+
+MBROWSE_OBJECT
+    sv_setref_pv($arg, "Fl_Multi_Browser", (void*) $var);
+
+SBROWSE_OBJECT
+    sv_setref_pv($arg, "Fl_Select_Browser", (void*) $var);
+
+WWPINP_OBJECT
+    sv_setref_pv($arg, "Fl_Wordwrap_Input", (void*) $var);
+
+WWPOUTP_OBJECT
+    sv_setref_pv($arg, "Fl_Wordwrap_Output", (void*) $var);
+
+VALUATR_OBJECT
+    sv_setref_pv($arg, "Fl_Valuator", (void*) $var);
+
+SLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Slider", (void*) $var);
+
+HFSLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Hor_Fill_Slider", (void*) $var);
+
+HNSLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Hor_Nice_Slider", (void*) $var);
+
+HSLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Hor_Slider", (void*) $var);
+
+HVSLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Hor_Value_Slider", (void*) $var);
+
+NSLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Nice_Slider", (void*) $var);
+
+VSLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Value_Slider", (void*) $var);
+
+FSLIDER_OBJECT
+    sv_setref_pv($arg, "Fl_Fill_Slider", (void*) $var);
+
+SCRLLB_OBJECT
+    sv_setref_pv($arg, "Fl_Scrollbar", (void*) $var);
+
+TXTSEL_OBJECT
+    sv_setref_pv($arg, "Fl_Text_Selection", (void*) $var);
+
+TXTBUF_OBJECT
+    sv_setref_pv($arg, "Fl_Text_Buffer", (void*) $var);
+
+TXTDISP_OBJECT
+    sv_setref_pv($arg, "Fl_Text_Display", (void*) $var);
+
+TXTEDIT_OBJECT
+    sv_setref_pv($arg, "Fl_Text_Editor", (void*) $var);
+
+FONTT_OBJECT
+    sv_setref_pv($arg, "Fl_Font_", (void*) $var);
+
+T_IPTR
+    sv_setiv($arg, (IV)*$var);
+
+
+INPUT
+T_ENUMCURS
+    $var = (Fl_Cursor)SvIV($arg);
+
+ANY_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+WIDGET_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+GROUP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+AGRP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+LIST_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+WINDOW_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+DWINDOW_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+IMAGE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+SHRDIMG_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+BOXTYPE_OBJECT
+    $var = (Fl_Boxtype_ *) SvIV((SV*)SvRV($arg));
+
+LABELTYPE_OBJECT
+    $var = (Fl_Labeltype_ *) SvIV((SV*)SvRV($arg));
+
+STYLE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+BOX_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+BUTTON_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+CBUTTON_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+LBUTTON_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+RNDBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+HILBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+RADBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+RADLBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+RADRBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TOGBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TOGLBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TOGRBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+RTNBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+RPTBTN_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+INP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+FLTINP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+INTINP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+MULINP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+SECINP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TABS_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+PACK_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+SCROLL_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TILE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+MENU_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+BRMENU_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+BTMENU_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+CHMENU_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+ITEM_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+RITEM_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TITEM_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+OUTP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+MOUTP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+BROWSE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+HBROWSE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+MBROWSE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+SBROWSE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+WWPINP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+WWPOUTP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+IMAGE_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+XPMIMG_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+VALUATR_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+SLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+FSLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+HFSLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+HNSLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+HSLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+HVSLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+NSLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+VSLIDER_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+SCRLLB_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TXTSEL_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TXTBUF_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TXTDISP_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+TXTEDIT_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+FONTT_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+T_IPTR
+    int tmpi = (int)SvIV($arg);
+    $var = ($type)&tmpi;

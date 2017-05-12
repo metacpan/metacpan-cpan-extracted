@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+BEGIN { unshift @INC,"./blib/lib/";}
+use File::Tail 0.8;
+
+$name="/var/log/syslog" unless $name=shift @ARGV;
+$debug=shift @ARGV || 0;
+$version=shift @ARGV || 0;
+print "Looking at $name \n";
+
+unless ($version) {
+#
+#  This is the old, pure object, interface
+#
+    $file=File::Tail->new(name=>$name,debug=>$debug,interval=>1,maxinterval=>5,
+			  adjustafter=>20,errmode=>"return") or
+			      die "Could not open $name: $!";
+    while ($line=$file->read) {
+	print "$line";
+    }
+} elsif ($version == 1) {
+#
+# The simplest tie, show's how you can set up parameters after a tie.
+#
+    local *FH;
+    $fh=*FH;
+    my $ref=tie $fh,"File::Tail",$name;
+    $ref->debug(1);
+    $ref->interval(1);
+    $ref->maxinterval(5);
+    $ref->adjustafter(4);
+    $ref->{'ignore_nonexistant'}=1;
+    while (<$fh>) {
+	print "$_";
+    }
+}  elsif ($version == 2) {
+#
+# Tie and pass all parameters at the same time
+#
+    local *FH;
+    $fh=*FH;
+    my $ref=tie $fh,"File::Tail",(name=>$name,debug=>$debug,
+				  interval=>1,maxinterval=>5, 
+				  adjustafter=>20,errmode=>"return");
+    while (<$fh>) {
+	print "$_";
+    }
+} elsif ($version == 3) {
+#
+# Tie without predeclaring the filehandle
+#
+    my $ref=tie *FH,"File::Tail",(name=>$name,debug=>$debug,
+				  interval=>1,maxinterval=>5,
+				  tail=>5,
+				  adjustafter=>20,errmode=>"return");
+    while (<FH>) {
+	print "$_";
+    }
+}
+
+

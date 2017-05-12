@@ -1,0 +1,23 @@
+Revision history for Format-Human-Bytes
+
+0.06    2010.09.14
+        Fix dependencies
+
+0.05    2010.04.08
+        Change license to perl because of Debian people request
+        Updated POD file
+
+0.04    2009.09.29
+        Allow decimals
+        Rewrote and improved the tests
+        Another installer fix which should stop the "unknown" test results
+
+0.03    2009.09.26
+        Fixed installer problem
+
+0.02    2009.09.25
+        Reformatting the source
+        Adding Module::Install as build dep
+
+0.01    2009.09.24
+        First version, released on an unsuspecting world.

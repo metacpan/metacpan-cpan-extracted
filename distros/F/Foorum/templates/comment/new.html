@@ -1,0 +1,144 @@
+[% USE FillInForm %]
+
+[% IF mode == 'edit' %]
+[% UNLESS c.req.method == 'POST';
+    comment_title = comment.title | decodeHTML;
+    filldata = {
+        title => comment_title,
+        text  => comment.text,
+        formatter => comment.formatter,
+    };
+END; %]
+[% ELSIF mode == 'topic' %]
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='[% forum.forum_url %]'><span>Topics</span></a></li>
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/polls'><span>Polls</span></a></li>
+        [% END %]
+        [% END %]
+        [% UNLESS forum.settings.can_post_threads AND forum.settings.can_post_threads == 'N' %]
+        <li selected="selected"><a href='[% forum.forum_url %]/topic/new'><span>[% c.loc("New Topic") %]</span></a></li>
+        [% END %]
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/poll/new'><span>[% c.loc("New Poll") %]</span></a></li>
+        [% END %]
+        [% END %]
+        <li><a href='[% forum.forum_url %]/action_log'><span>View Action Logs</span></a></li>
+    </ul>
+    <div>
+[% END %]
+
+[% FILTER fillinform fdat => filldata || c.req.params %]
+
+<div class='one'>
+<form method="post" enctype="multipart/form-data">
+<table align='center' border='1' cellpadding='6'>
+  <tr class='title'><td colspan='2'>
+    [% IF mode == 'edit' %]Eidt a Comment[% ELSIF mode == 'reply' %]Reply a Comment[% ELSIF mode == 'topic' %][% c.loc("New Topic") %][% END %]
+  </td></tr>
+  [% IF mode == 'reply' AND comment %]
+  <tr class='forum2'><td colspan='2' align='center'>
+    <table style='width:80%'>
+        <tr><td colspan='2' class='title'>[% comment.title %]</td></tr>
+        <tr class='forum1'><td width='150' valign='top'>
+            [% INCLUDE 'include/user_profile_simple.html' user = comment.author %]
+        </td><td>
+            [% comment.text %]
+        </td></tr>
+    </table>
+  </td></tr>
+  [% END %]
+  <tr class='forum1'><td align='right'>[% c.loc('Title') %]</td><td><input type='text' size='60' maxlength='80' name='title' />
+  [% IF c.form.error('title') %]title should be 1-80 chars.[% END %]
+  </td></tr>
+  <tr class='forum2'><td align="right">[% c.loc("Formatter") %]</td>
+    <td><input type='radio' name='formatter' value='ubb' checked='yes' onclick="javascript:switch_formatter()" />UBB &nbsp; <input type='radio' name='formatter' value='textile' onclick="javascript:switch_formatter()" />Textile &nbsp; <input type='radio' name='formatter' value='wiki' onclick="javascript:switch_formatter()" />Wiki &nbsp; <input type='radio' name='formatter' value='pod' onclick="javascript:switch_formatter()" />Pod &nbsp; <input type='radio' name='formatter' value='plain' onclick="javascript:switch_formatter()" />Plain &nbsp;[% IF roles.site.admin %] <input type='radio' name='formatter' value='html' onclick="javascript:switch_formatter()" />HTML &nbsp;[% END %] </td>
+  </tr>
+  <tr class='forum1'>
+    <td align='center' valign='middle'>
+    
+    <div class='ubb'>
+    [% INCLUDE format/emot.html %]
+    </div>
+    <div class='wiki' style='display:none'>
+<strong>Wiki Markup Help</strong><br />
+=Heading1=<br />
+==Heading2==<br />
+===Heading3===<br />
+<br />
+*bold*<br />
+_italic_<br />
+~~strike~~<br />
+^superscript^<br />
+,,subscript,,<br />
+`inline code`<br />
+<br />
+Indent lists 2 spaces:<br />
+  * bullet item<br />
+  # numbered list<br />
+<br />
+{{{<br />
+verbatim code block<br />
+}}}<br />
+<br />
+[http://domain/page label]<br />
+http://domain/page<br />
+<br />
+|| table || cells ||
+    </div>
+    
+    </td><td>
+
+    <div class='ubb'>
+    [% WRAPPER 'format/bbcode.html' %]
+    </div>
+
+	<textarea name="text" id='text' style='width: 90%' rows="15"></textarea>
+	[% IF c.form.error('text') %]text is required.[% END %]
+
+	<div class='ubb'>
+	[% END %]
+    </div>
+
+  </td></tr>
+  <tr class='forum2'><td align='right'>[% c.loc('Upload Attachment') %]</td><td>
+  [% IF mode == 'edit' AND upload %]
+  [% USE Math %]
+
+  [% upload_id = upload.upload_id;
+     filetype  = upload.filetype;
+     dir1 = upload_id / 3200 / 3200;
+     dir1 = Math.int(dir1);
+     dir2 = upload_id / 3200;
+     dir2 = Math.int(dir2);
+  %]
+  <input type='radio' name='attachment_action' value='stay' checked='yes' /> Stay as before [ <a href="[% c.config.dir.upload %]/[% dir1 _ '/' _ dir2 _ '/' _ upload.filename %]">[% upload.filename %]</a> ]<br />
+  <input type='radio' name='attachment_action' value='delete' /> Delete it<br />
+  <input type='radio' name='attachment_action' value='replace' /> Replace it<br />
+  [% END %]
+  [% INCLUDE upload/input.html %]
+  </td></tr>
+  <tr class='forum1'><td>&nbsp;</td><td><input type='submit' /> <input type='button' value='Preview' name='btn_preview' onclick="javascript:preview()" /></td></tr>
+  <tr class='forum2'><td>&nbsp;</td><td><div id='preview'></div></td></tr>
+</table>
+</form>
+</div>
+
+[% END %]
+
+[% IF mode == 'topic' %]
+    </div>
+</div>
+[% END %]
+
+[% c.load_once("site/new_post.js") %]
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

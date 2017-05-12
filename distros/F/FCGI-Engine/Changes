@@ -1,0 +1,200 @@
+Revision history for Perl extension FCGI-Engine
+
+0.22 Sun, Aug. 24th, 2014
+    - Add $request object to params passed to 
+      handle_request to support FCGI forking in 
+      request handler. (thanks to Robert Decker)
+
+0.21 Thu. Apr. 11, 2013
+    - Fix RT#83636 by correctly importing the Config module.
+
+0.20 Mon. Feb. 25, 2013
+    - Use Config to find perl to run RT#69473
+
+0.19 Wed. Oct. 5, 2011
+    - Fix tests to not fail when MooseX::NonMoose
+      isn't installed.
+    - exit 0 without writing a Makefile.PL rather than dieing
+      with an error code. exit(0) preferred by the toolchain.
+    - Add FCGI::Engine::ProcManager::Constrained subclass to manage
+      restarting children on over-memory or after a certtain number
+      of requests.
+
+0.18 Mon. Nov. 15, 2010
+    - fixing the plack -E flag (it changed)
+    - changing plackup usage to --daemonize
+      instead of --detach (it is more useful
+      this way)
+    - changing plackup usage to --pid instead
+      of --pidfile (also more useful this way)
+    - added optional --workers to plackup server
+      manager as an alternate to --nproc. this
+      makes it possible to use it with Starman,
+      and other plack backends too.
+
+      (^^ all these changes above thanks to bricas)
+
+0.17 Tues. Oct. 12, 2010
+    - fixing the TCP --listen option to follow
+      the correct :<port> format (thanks to
+      Andreas Marienborg for spotting this)
+
+0.16 Sat. July 10, 2010
+    - Fix bug: Exiting subroutine via next in
+      ProcManager (fixed by Johannes Plunien)
+    - add new attribute 'use_manager' so the
+      ProcManager can be used even if you're
+      not listening (thanks to Johannes Plunien)
+        - added tests for this as well
+    - updating the Plack tests to work with the
+      latest plack and it's Lighttd fixes
+
+0.15 Sat. April 17, 2010
+    - fixing Plack support to work with the latest
+      Plack version
+      - changed Plack::Server:: to Plack::Handler::
+          - Plack::Server:: is deprecated and will
+            be removed in subsequent releases
+          - adjusted tests to use Plack::Handler::
+      - updated FCGI::Engine::PSGI to more closely
+        follow what is in Plack::Handler::FCGI
+
+0.14 Mon. Feb. 22, 2010
+    - updating copyright on all files
+    - updating some test files to require YAML::XS since
+      YAML and YAML::Syck are not the suggested YAML parser
+      for Config::Any
+      - thanks to Justin "arcanez" Hunter
+
+0.13 Thurs. Dec. 31, 2009
+    - fixing test files that were causing false
+      CPAN Tester failings (Jay Shirley)
+    - pushed all dependencies up to the latest
+      versions, might also help some odd CPAN
+      Tester failures
+
+0.12 Tues. Dec. 29. 2009
+    + FCGI::Engine::PSGI
+      - run PSGI applications using FCGI::Engine
+        - added tests for this
+
+    + FCGI::Engine::Core
+      - base class for FCGI::Engine flavors
+
+    * FCGI::Engine
+      - refactored to use FCGI::Engine::Core
+
+    + Plack::Server::FCGI::Engine
+    + Plack::Server::FCGI::Engine::ProcManager
+      - subclasses to make it easier to use the
+        FCGI::Engine::ProcManager with your Plack
+        based application
+        - added tests for this
+
+    * FCGI::Engine::Manager::Server::Plackup
+      - this now uses Plack::Server::FCGI::Engine
+        by default (can be overriden with the
+        'server_type' option)
+
+0.11 Thurs. Dec. 10, 2009
+    + FCGI::Engine::Manager::Server::Plackup
+      - added support for running Plack based apps
+        using the FCGI::Engine::Manager controls
+        - added tests for this
+      - NOTE: we do not depend on Plack, you are
+        expected to have it installed if you use
+        this module.
+
+    * FCGI::Engine
+      - adding some more PATH_INFO and SCRIPT_NAME
+        fixes found in Catalyst::Engine::FastCGI
+        and Plack::Server::FCGI
+
+0.10 Fri. Aug. 7, 2009
+    * FCGI::Engine::Manager
+      - fixing broken call to remove pid object
+        in start (when a pid file exists but the
+        server is not running)
+
+0.09 Sat. July 18, 2009
+    * FCGI::Engine::Manager
+      - fixing broken call to remove pid object
+        in graceful restart (arcanez)
+
+0.08 Sun. Mar. 8, 2009
+    * FCGI::Engine::Types
+      - fixing this to work with the latest Moose
+        as well as older Moose
+
+    * FCGI::Engine::ProcManager
+      - removed usage of MooseX::Params::Validate
+
+0.07 Tues. Feb. 24, 2009
+    - Getting rid of the Mac resource forks (steve jobs--)
+
+0.06 Tues. Feb. 24, 2009
+    - Fix so start doesn't start another set of procs (marcus)
+    - Add graceful method to do a restart with start
+      before killing old processes. (marcus)
+    - Don't stop all servers if a server fails to start. (marcus)
+
+0.05 Sat. July 12, 2008
+
+    * FCGI::Engine::Manager
+      - added restart feature (thanks to Brian Cassidy)
+        - added tests for this
+      - added ability to start, stop and restart individual
+        servers within the conf (thanks to Brian Cassidy)
+        - added tests for this
+      - fixed my ugly hack of a ->status method
+        (thanks to Brian Cassidy)
+        - added tests for this
+      - tweaked the SYNOPSIS to provide a better example
+        of usage (also thanks to Brian Cassidy)
+
+0.04 Thurs. July 10, 2008
+    - upped the MooseX::Getopt dependency since the
+      old version was causing a test failure in certain
+      cases
+
+    * FCGI::Engine
+      - added docs about our usage of CGI::Simple (RT #35786)
+      - added docs about usage with Catalyst (RT #34488)
+      - added the handler_args_builder option to make
+        it easier to override the default arguments passed
+        into the handler_method (RT #33885)
+        (thanks to Bradley C. Bailey for the idea and initial patch)
+        - added tests for this
+
+    * FCGI::Engine::Manager
+      - added docs about usage with Catalyst (RT #34488)
+      - added example of the config file
+
+    * t/
+      - fixed the FCGI::Engine::Manager test to make sure there
+        is a YAML parser available for Config::Any to use.
+
+0.03 Sun. Feb. 3, 2008
+    * FCGI::Engine
+      - handler_method was not being used properly
+        to dispatch with (reported by Reed A. Cartwright)
+        - added tests for this
+
+      - %additional_options can now be passed to run, which
+        will then be passed to both the pre_fork_init sub and
+        the proc_manager's constructor
+        - added tests for this
+
+      - handler_class can now also be an instance if nessecary
+        (thanks to Chris Prather)
+
+    * FCGI::Engine::ProcManager
+      - added the manager_process_name and the process_name
+        options to allow custom process naming
+        - added test for this
+
+0.02 Fri. Jan. 11, 2008
+    - fixing dependency issues
+
+0.01 Fri. Jan. 11, 2008
+    - hello world

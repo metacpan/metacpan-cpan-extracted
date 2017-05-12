@@ -1,0 +1,10 @@
+lib/Filesys/CygwinPaths.pm    The Perl module.
+path_protocol.xs
+Cygwin.typemap
+exoMakefile.PL        See README file.
+Makefile.PL           May not be usable without editing. See README file.
+MANIFEST              This file.
+path_protocol.h
+README
+CHANGES
+test.pl               TODO

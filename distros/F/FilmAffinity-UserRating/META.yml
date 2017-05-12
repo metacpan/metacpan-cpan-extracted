@@ -1,0 +1,49 @@
+---
+abstract: 'Perl interface to FilmAffinity'
+author:
+  - 'William Belle <william.belle@gmail.com>'
+build_requires:
+  File::Find::Rule: '0.33'
+  Test::JSON: '0.11'
+  Test::LongString: '0.15'
+  Test::MockObject: '1.2'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FilmAffinity-UserRating
+provides:
+  FilmAffinity::Movie:
+    file: lib/FilmAffinity/Movie.pm
+    version: '0.1'
+  FilmAffinity::UserRating:
+    file: lib/FilmAffinity/UserRating.pm
+    version: '0.10'
+  FilmAffinity::Utils:
+    file: lib/FilmAffinity/Utils.pm
+    version: '0.1'
+requires:
+  Encode: '2.57'
+  File::Copy::Recursive: '0.38'
+  HTML::TreeBuilder: '5.03'
+  HTML::TreeBuilder::XPath: '0.14'
+  IO::All: '0.67'
+  IO::Interactive: '0.000006'
+  JSON: '2.9'
+  LWP::RobotUA: '6.03'
+  List::Compare: '0.39'
+  Moose: '2.12'
+  MooseX::Privacy: '0.05'
+  Readonly: '2'
+  Text::Trim: '1.02'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/williambelle/filmaffinity-userrating
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

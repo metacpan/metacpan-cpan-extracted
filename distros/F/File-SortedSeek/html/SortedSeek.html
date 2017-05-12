@@ -1,0 +1,476 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SortedSeek.pm</title>
+<link rel="stylesheet" href="../html/docs.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;SortedSeek.pm</span></strong></big>
+</td></tr>
+</table>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+    <li><a href="#name">NAME</a></li>
+    <li><a href="#synopsis">SYNOPSIS</a></li>
+    <li><a href="#description">DESCRIPTION</a></li>
+    <ul>
+
+        <li><a href="#numeric___and_alphabetic_____the_two_basic_methods"><code>numeric()</code> and <code>alphabetic()</code> - The two basic methods</a></li>
+        <ul>
+
+            <li><a href="#return_values_with_search_success_and_failure">Return values with search success and failure</a></li>
+            <li><a href="#adding_line_munging_to_make_the_basic_methods_more_useful">Adding line munging to make the basic methods more useful</a></li>
+        </ul>
+
+        <li><a href="#get_epoch_seconds_____convert_a_date_string_into_epoch_time"><code>get_epoch_seconds()</code> - Convert a date string into epoch time</a></li>
+        <li><a href="#find_time_____seek_to_a_specific_time_within_the_file"><code>find_time()</code> - Seek to a specific time within the file</a></li>
+        <li><a href="#get_between_____getting_lines_from_the_middle_of_a_file"><code>get_between()</code> - Getting lines from the middle of a file</a></li>
+        <li><a href="#get_last_____get_n_lines_from_the_end_of_a_file_"><code>get_last()</code> - Get N lines from the end of a file.</a></li>
+    </ul>
+
+    <li><a href="#export">EXPORT</a></li>
+    <li><a href="#options_and_accessors">OPTIONS and ACCESSORS</a></li>
+    <ul>
+
+        <li><a href="#file__sortedseek__error__">File::SortedSeek::error()</a></li>
+        <li><a href="#file__sortedseek__was_exact__">File::SortedSeek::was_exact()</a></li>
+        <li><a href="#file__sortedseek__set_cuddle__">File::SortedSeek::set_cuddle()</a></li>
+        <li><a href="#file__sortedseek__set_no_cuddle__">File::SortedSeek::set_no_cuddle()</a></li>
+        <li><a href="#file__sortedseek__set_descending__">File::SortedSeek::set_descending()</a></li>
+        <li><a href="#file__sortedseek__set_ascending__">File::SortedSeek::set_ascending()</a></li>
+        <li><a href="#file__sortedseek__set_verbose__">File::SortedSeek::set_verbose()</a></li>
+        <li><a href="#file__sortedseek__set_silent__">File::SortedSeek::set_silent()</a></li>
+    </ul>
+
+    <li><a href="#speed">SPEED</a></li>
+    <li><a href="#bugs">BUGS</a></li>
+    <li><a href="#credits">CREDITS</a></li>
+    <li><a href="#author">AUTHOR</a></li>
+    <li><a href="#license">LICENSE</a></li>
+    <li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>File::SortedSeek - A Perl module providing fast access to large files</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  <span class="keyword">use</span> <span class="variable">File::SortedSeek</span> <span class="string">':all'</span><span class="operator">;</span>
+  <span class="keyword">open</span> <span class="variable">BIG</span><span class="operator">,</span> <span class="variable">$file</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="comment"># find a number or the first number greater in a file (ascending order)</span>
+  <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">numeric</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$number</span> <span class="operator">);</span>
+  <span class="comment"># read a line in from where we matched in the file</span>
+  <span class="variable">$line</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">BIG</span><span class="operator">&gt;;</span>
+  <span class="keyword">print</span> <span class="string">"Found exact match as $line"</span> <span class="keyword">if</span> <span class="variable">File::SortedSeek</span><span class="operator">:</span><span class="variable">was_exact</span><span class="operator">();</span>
+</pre>
+<pre>
+  <span class="comment"># find a string or the first string greater in a file (alphabetical order)</span>
+  <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">alphabetic</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$string</span> <span class="operator">);</span>
+  <span class="variable">$line</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">BIG</span><span class="operator">&gt;;</span>
+</pre>
+<pre>
+  <span class="comment"># find a date in a logfile supplying a scalar localtime type string</span>
+  <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="string">"Thu Aug 23 22:59:16 2001"</span> <span class="operator">);</span>
+  <span class="comment"># or supplying GMT epoch time</span>
+  <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="number">998571554</span> <span class="operator">);</span>
+  <span class="comment"># get all the lines after our date</span>
+  <span class="variable">@lines</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">BIG</span><span class="operator">&gt;;</span>
+</pre>
+<pre>
+  <span class="comment"># get the lines between two logfile dates</span>
+  <span class="variable">$begin</span>  <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$start</span> <span class="operator">);</span>
+  <span class="variable">$end</span>    <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$finish</span> <span class="operator">);</span>
+  <span class="comment"># get lines as an array</span>
+  <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">get_between</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span> <span class="operator">);</span>
+  <span class="comment"># get lines as an array reference</span>
+  <span class="variable">$lines</span> <span class="operator">=</span> <span class="variable">get_between</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span> <span class="operator">);</span>
+</pre>
+<pre>
+  <span class="comment"># use you own sub to munge the file line data before comparison</span>
+  <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">numeric</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$number</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">epoch</span> <span class="operator">);</span>
+  <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">alphabetic</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$string</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">munge_line</span> <span class="operator">);</span>
+</pre>
+<pre>
+  <span class="comment"># use methods on files in reverse alphabetic or descending numerical order</span>
+  <span class="variable">File::SortedSeek::set_descending</span><span class="operator">();</span>
+</pre>
+<pre>
+  <span class="comment"># for inexact matches set FH so first value read is before and second after</span>
+  <span class="variable">File::SortedSeek::set_cuddle</span><span class="operator">();</span>
+</pre>
+<pre>
+  # get last $n lines of any file as an array
+  @lines = get_last( *BIG, $n )
+  # or an array reference
+  $lines = get_last( *BIG, $n )
+  # change the input record separator from the OS default
+  @lines = get_last( *BIG, $n, $rec_sep )</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>File::SortedSeek provides fast access to data from large files. Three
+methods <code>numeric()</code> <code>alphabetic()</code> and <code>find_time()</code> depend on the file data
+being sorted in some way. Dictionaries are and obvious example but log files
+are also sorted (by date stamp). The <code>get_between()</code> method can be used to get
+a chunk of lines efficiently from anywhere in the file. The required position(s)
+for the <code>get_between()</code> method are supplied by the previous methods. The
+<code>get_last()</code> method will efficiently get the last N lines of any file, sorted
+or not.</p>
+<p>With sorted data a linear search is not required. Here is a typical linear
+search</p>
+<pre>
+    <span class="keyword">while</span> <span class="operator">(&lt;</span><span class="variable">FILE</span><span class="operator">&gt;)</span> <span class="operator">{</span>
+        <span class="keyword">next</span> <span class="keyword">unless</span> <span class="regex">/$some_cond/</span>
+        <span class="comment"># found cond, do stuff</span>
+    <span class="operator">}</span>
+</pre>
+<p>Remember that old game where you try to guess a number between lets say 0
+and say 128? Let's choose 101 and now try to guess it.</p>
+<p>Using a linear search is the same as going 1 higher 2 higher 3 higher ...
+100 higher 101 correct! Consider a geometric approach: 64 higher 96 higher
+112 lower 104 lower 100 higher 102 lower - ta da must be 101! This is the
+halving the difference  or binary search method and can be applied to any data
+set where we can logically say higher or lower. In other words any sorted data
+set can be searched like this. It is a far more efficient method - see the
+SPEED section for a brief analysis.</p>
+<p>
+</p>
+<h2><a name="numeric___and_alphabetic_____the_two_basic_methods"><code>numeric()</code> and <code>alphabetic()</code> - The two basic methods</a></h2>
+<p>There are two basic methods - <code>numeric()</code> to do numeric searches and
+<code>alphabetic()</code> that does alphabetic searches.</p>
+<p>You call the functions like this:</p>
+<pre>
+    <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">numeric</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$find</span> <span class="operator">);</span>
+    <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">alphabetic</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$find</span> <span class="operator">);</span>
+</pre>
+<p>These methods take two required arguments. *BIG is a FILEHANDLE to read from.
+$find is the item you wish to find. $find must be appropriate to the function
+as the numeric method will make numeric comparisons ( == &lt; &gt; ). Similarly the
+alphabetic method makes string comparisons ( eq lt gt ). You will get strange
+results if you use the wrong method just as you do if you use &lt; when you
+actually meant lt</p>
+<p>
+</p>
+<h3><a name="return_values_with_search_success_and_failure">Return values with search success and failure</a></h3>
+<p>The return value from the <code>numeric()</code> and <code>alphabetic()</code> methods depend on the
+result of the search. If the search fails the return value is undef.
+A search can succeed in two ways. If an exact match is found then the
+current file position pointer is set to the beginning of the matching line.
+The return value is the corresponding response from <code>tell()</code>. This means that
+the next read from &lt;FILEHANDLE&gt; will return the matching line.
+Subsequent reads return the following lines as expected.</p>
+<p>Alternatively a search will succeed if a point in the file can be found such
+that $find is cuddled between two adjacent lines. For example consider
+searching for the number 42 in a file like this:</p>
+<pre>
+    ..
+    36
+    40  &lt;- Before
+    44  &lt;- After
+    48
+    ..</pre>
+<p>The number 42 is not actually there but the search will still succeed as it
+is between 40 and 44. By default the file position pointer is set to the
+beginning of the line '44' so the next read from &lt;FILEHANDLE&gt; will return
+this line. If the File::SortedSeek::set_cuddle() function is called then the
+file position pointer will be set to the beginning of line '40' so that the
+first two reads from &lt;FILEHANDLE&gt; will cuddle the in-between value in $find.</p>
+<p>You can find out if the match was exact by checking the value returned by
+File::SortedSeek::was_exact() which will be true if the match was exact.</p>
+<p>
+</p>
+<h3><a name="adding_line_munging_to_make_the_basic_methods_more_useful">Adding line munging to make the basic methods more useful</a></h3>
+<p>Both the numeric and alphabetic subs take an optional third argument.
+This optional argument is a reference to a subroutine to munge the
+file lines so that suitable values are extracted for comparison to $find.</p>
+<pre>
+    <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">numeric</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$find</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">munge_line</span> <span class="operator">);</span>
+    <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">alphabetic</span><span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$find</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">munge_line</span> <span class="operator">);</span>
+</pre>
+<p>A good example of this is the <code>find_time()</code> function. This is just an
+implementation of the basic numeric algorithm similar to this.</p>
+<pre>
+    <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">numeric</span> <span class="operator">(</span> <span class="variable">*BIG</span><span class="operator">,</span> <span class="variable">$epoch_seconds</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">get_epoch_seconds</span> <span class="operator">);</span>
+</pre>
+<p>As the search is made the test lines are passed to the munging sub. This sub
+needs to return a string or number that we can perform comparison on. In this
+case the get_epoch_seconds sub looks for something that resembles a date
+string, parses out the hh mm ss dd mm yyyy data, passes it to Time::Local for
+conversion to epoch seconds and returns this number.</p>
+<p>The optional arguments offered by Search::Dict to use dictionary order
+(by removing non word/whitespace chars) and to ignore case are not directly
+supported by File::SortedSeek, however they are easily implemented with a
+simple munge function that does this:</p>
+<pre>
+    <span class="keyword">sub</span><span class="variable"> munge </span><span class="operator">{</span>
+        <span class="keyword">local</span> <span class="variable">$_</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="regex">s/[^\w\s]//g</span><span class="operator">;</span>  <span class="comment"># removes non word/space chars for dictionary order</span>
+        <span class="keyword">return</span> <span class="keyword">lc</span> <span class="variable">$_</span><span class="operator">;</span>  <span class="comment"># makes comparison case insensistive</span>
+    <span class="operator">}</span>
+</pre>
+<p>
+</p>
+<h2><a name="get_epoch_seconds_____convert_a_date_string_into_epoch_time"><code>get_epoch_seconds()</code> - Convert a date string into epoch time</a></h2>
+<p>This function returns the epoch seconds represented by a date string in
+the most common log file formats namely:</p>
+<pre>
+    Asctime format: Tue May 27 15:45:00 2008
+    Apache format:  [21/May/2008:17:49:39 +1000]
+    Squid format:   1012429341.115</pre>
+<p>The <code>find_time()</code> method uses this function internally. You can write your own
+munge function if you need a different format. RTFS to see how but all the
+function needs to do is take a data line and return a number that represents
+the time. You could also use Date::Parse to do this for you.</p>
+<p>
+</p>
+<h2><a name="find_time_____seek_to_a_specific_time_within_the_file"><code>find_time()</code> - Seek to a specific time within the file</a></h2>
+<p>The <code>find_time()</code> function is an implementation of the basic numeric method as
+discussed briefly above. You call it like:</p>
+<pre>
+    <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="string">'Thu Jan  1 00:42:00 1970'</span> <span class="operator">);</span>
+    <span class="variable">$tell</span> <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$epoch_seconds</span> <span class="operator">);</span>
+</pre>
+<p>You may use either a date string recognised by <code>get_epoch_seconds()</code> or just
+epoch seconds directly.</p>
+<p>
+</p>
+<h2><a name="get_between_____getting_lines_from_the_middle_of_a_file"><code>get_between()</code> - Getting lines from the middle of a file</a></h2>
+<p>Say you have a logfile and you want to get the log between one date and
+another. You can simply use two calls to the <code>find_time()</code> to get the beginning
+and end positions and then use <code>get_between()</code> to get the lines.</p>
+<pre>
+    <span class="comment"># get the lines between two logfile dates</span>
+    <span class="variable">$begin</span>  <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$start</span> <span class="operator">);</span>
+    <span class="variable">$end</span>    <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$finish</span> <span class="operator">);</span>
+    <span class="comment"># get lines as an array</span>
+    <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">get_between</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span> <span class="operator">);</span>
+    <span class="comment"># get lines as an array reference</span>
+    <span class="variable">$lines</span> <span class="operator">=</span> <span class="variable">get_between</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span> <span class="operator">);</span>
+</pre>
+<p>The <code>get_between()</code> method returns an array in list context as above and a
+reference to an array in scalar context.</p>
+<p>This function splits the lines based on a non system specific default record
+separator heuristic. This is defined below:</p>
+<pre>
+    <span class="keyword">my</span> <span class="variable">$default_rec_sep</span> <span class="operator">=</span> <span class="string">qw/\015\012|\015|\012/</span><span class="operator">;</span>
+</pre>
+<p>It should DWIM most of the time. You can override this on a per file basis
+by passing the record separator to the <code>get_between()</code> function.</p>
+<pre>
+    <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">get_between</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span><span class="operator">,</span> <span class="variable">$rec_sep</span> <span class="operator">);</span>
+</pre>
+<p>Modifying $/ has no effect. Note that *the record separator is not returned*
+in the array. As a result the returned array has effectively had every
+element chomped.</p>
+<p>Using the <code>get_between()</code> method you can efficiently get the lines at the
+beginning of a file. Although you can just read in lines sequentially with
+a while loop this requires that you test each line. If you can find the
+end point using the <code>find_time()</code> <code>numeric()</code> or <code>alphabetic()</code> methods you
+can the just get what you need. For large files many thousands of
+unnecessary tests are avoided saving time. Using the example above
+you simply set $begin to 0</p>
+<pre>
+    <span class="variable">$begin</span>  <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+    <span class="variable">$end</span>    <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$finish</span> <span class="operator">);</span>
+    <span class="variable">@lines</span>  <span class="operator">=</span> <span class="variable">get_between</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span> <span class="operator">);</span>
+</pre>
+<p>You can similarly use get between to get all the lines from a specific point
+up to the end of the file. The end is just the size of the file so:</p>
+<pre>
+    <span class="variable">$begin</span> <span class="operator">=</span> <span class="variable">find_time</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$start</span> <span class="operator">);</span>
+    <span class="variable">$end</span>   <span class="operator">=</span> <span class="keyword">-s</span> <span class="variable">LOG</span><span class="operator">;</span>
+    <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">get_between</span><span class="operator">(</span> <span class="variable">*LOG</span><span class="operator">,</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span> <span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="get_last_____get_n_lines_from_the_end_of_a_file_"><code>get_last()</code> - Get N lines from the end of a file.</a></h2>
+<p>This method does not depend on the file being sorted to work.
+When you use the <code>get_last()</code> method the module estimates how many bytes at
+the end of the file to read in. To make the estimate the module  multiplies
+the default line length (80 chars) by the number of lines required and then
+doubles it.</p>
+<p>If it does not get sufficient lines on its first attempt it re-estimates
+the line length from the actual data read in, re-calculates
+the read, doubles it and then tries again. This algorithm is unlikely to
+take more than 2 reads but if you have unusually long of short lines you may
+get a small speed benefit by using the <code>set_line_length()</code> method to set the
+average line length. The default is 80 chars per line. Setting the line length
+close to the actual will also avoid reading a excessive quantity of data into
+memory.</p>
+<pre>
+    # get last $n lines of any file as an array
+    @lines = get_last( *BIG, $n )
+    # or an array reference
+    $lines = get_last( *BIG, $n )
+    # change the input record separator from the default
+    @lines = get_last( *BIG, $n, $rec_sep )</pre>
+<p>This function splits the lines based on a non system specific default record
+separator heuristic. This is defined below:</p>
+<pre>
+    <span class="keyword">my</span> <span class="variable">$default_rec_sep</span> <span class="operator">=</span> <span class="string">qw/\015\012|\015|\012/</span><span class="operator">;</span>
+</pre>
+<p>It should DWIM most of the time. You can override this on a per file basis
+by passing the record separator to the <code>get_between()</code> function.
+Example script in eg/tail.pl</p>
+<p>
+</p>
+<hr />
+<h1><a name="export">EXPORT</a></h1>
+<p>Nothing by default. The following 5 methods are available for import:</p>
+<pre>
+    alphabetic()
+    numeric()
+    find_time()
+    get_between()
+    get_last()</pre>
+<p>You can import just the method(s) you want with:</p>
+<pre>
+    <span class="keyword">use</span> <span class="variable">File::SortedSeek</span> <span class="string">qw(numeric)</span><span class="operator">;</span>
+</pre>
+<p>or all 5  methods using the ':all' tag.</p>
+<pre>
+    <span class="keyword">use</span> <span class="variable">File::SortedSeek</span> <span class="string">':all'</span><span class="operator">;</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="options_and_accessors">OPTIONS and ACCESSORS</a></h1>
+<p>There are some options available via non exported function
+calls. You will need to fully specify the name if you want to use these.</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__error__">File::SortedSeek::error()</a></h2>
+<p>If a function returns undefined there has been an error. <code>error()</code> will
+contain the text of the last error message or a null string if there
+was no error.</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__was_exact__">File::SortedSeek::was_exact()</a></h2>
+<p><code>was_exact()</code> will return true if an exact match was found. It will be
+false if the match was in between or failed.</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__set_cuddle__">File::SortedSeek::set_cuddle()</a></h2>
+<p><code>set_cuddle()</code> changes the default line returned for in between matches as
+discussed above.</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__set_no_cuddle__">File::SortedSeek::set_no_cuddle()</a></h2>
+<p><code>set_no_cuddle()</code> restores default behaviour</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__set_descending__">File::SortedSeek::set_descending()</a></h2>
+<p>By default ascending numerical order and alphabetical order are assumed.
+This assumption can be reversed by calling <code>set_descending()</code> and reset
+by calling <code>set_ascending()</code> We need to know the order to seek within the
+file in the correct direction.</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__set_ascending__">File::SortedSeek::set_ascending()</a></h2>
+<p>Reset sort order assumption to default.</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__set_verbose__">File::SortedSeek::set_verbose()</a></h2>
+<p>Activate error messages. This is the default.</p>
+<p>
+</p>
+<h2><a name="file__sortedseek__set_silent__">File::SortedSeek::set_silent()</a></h2>
+<p>Silence error messages</p>
+<p>
+</p>
+<hr />
+<h1><a name="speed">SPEED</a></h1>
+<p>Here is a table that demonstrates the advantage of using the binary search
+algorithm.</p>
+<pre>
+    Num items    Lin av    Bin av   Lin:Bin
+            2         1         1         1
+            4         2         2         1
+            8         4         3         1
+           16         8         4         2
+           32        16         5         3
+           64        32         6         5
+          128        64         7         9
+          256       128         8        16
+          512       256         9        28
+         1024       512        10        51
+         2048      1024        11        93
+         4096      2048        12       170
+         8192      4096        13       315
+        16384      8192        14       585
+        32768     16384        15      1092
+        65536     32768        16      2048
+       131072     65536        17      3855
+       262144    131072        18      7281
+       524288    262144        19     13797
+      1048576    524288        20     26214</pre>
+<p>Even though there is an overhead involved with this search this is minor
+as the number of tests required is so much less. Speed increases of 1000
+of times are typical.</p>
+<p>An OO interface slows things down by &gt; 50% so is not used.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>All previously known ones have been removed.</p>
+<p>
+</p>
+<hr />
+<h1><a name="credits">CREDITS</a></h1>
+<p>Peter (Stig) Edwards for bugfixes and getting the refactoring started using
+the cunning expedient of not just sending patches but also a refactored core.</p>
+<p>Search::Dict for the basis of the code used to replace the original core
+search function.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>(c) Dr James Freeman 2000-08 &lt;airmedical [TA] gmail.com&gt;
+All rights reserved.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This package is free software and is provided &quot;as is&quot; without express or
+implied warranty. It may be used, redistributed and/or modified under the
+terms of the Artistic License 2.0. A copy is include in this distribution.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>For details about the mystical significance of the number 42 and how it can
+be applied to Life the Universe and everything see The Hitch Hiker's Guide
+to the Galaxy 'trilogy' by the recently departed Douglas Adams.</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;SortedSeek.pm</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

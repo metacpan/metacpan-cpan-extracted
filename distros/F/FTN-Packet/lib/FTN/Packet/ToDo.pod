@@ -1,0 +1,119 @@
+=head1 FTN::Packet ToDo
+
+=head2 General
+
+As the packet file specification was originated on x86 systems, which are
+little endian, problems come up with reading/writing such files on big-endian
+systems. Use the explicit < (little endian) modifer for the pack/unpack
+functions?  Or change which format codes are being used? Reference also the
+Byte-order-modifiers section in perlpacktut.
+
+Use the same key names for the message hash for in the read and write packet
+functions, so as to avoid confusion; match them up as necessary to the names
+of the fields in the ftsc document.
+
+The $Origin, $seen_by, & $Path variables at Lines 322-324 in the write_ftn_packet
+function of Packet.pm. Should that creation of an origin line really be in the
+packet file creation? Or is that something that should be getting created in the
+message body and getting passed that way?  It also hard codes "1" as the origin
+point number, when that should be OrgPoint. Same for the $seen_by and $Path
+variables; they are part of the messages, but should not they already be in
+the message bodies being passed to the write_ftn_packet function?
+
+Fix the possible ftsc date related issues in the course of creating and
+using an ftsc_date function.
+
+Add a separate function for reading a packet header when passed the name and
+path of an FTN packet file. Also add other functions as necessary: like one for
+generating a serial number, one for generating a name for a standard packet
+file, one for generating an ftsc standard date.
+
+In order to provide Object Oriented functions for writing an FTN Packet,
+start with a merge of the code FTN::Pkt into FTN::Packet.
+
+The attribute word shouldn not be thrown away?  Just put it as is in the hash
+bing returned.
+
+
+=head2 write_ftn_packet()
+
+Areas & Tearline hash references should be in the packet_info hash or
+a message hash?  Certainly there is an area field included in the msg
+hash being returned by the read_ftn_packet.
+
+When doing, for instance, two messages: two messages were making it into the
+packets but they are both the text of the second message. The "foreach" line
+at 354 does appear to work (instead of the two commented out versions of
+initiating a loop at 355-356) because two messages are being put into the
+packet file, but the message body does not appear to be makeing it in. (Do
+the two commented out lines after that need to be kept?)  The line at 354
+should be bringing the Body of the message in; no apparent error when
+running a test script but is that line correct?
+
+Also the serial number for the MSGID is coming up as the same for both
+messages. When code a better way of getting a 8 char serial number to use,
+add it as a function to the module?
+
+The writeup and variable usages for the packet format per FTS-0001 could
+be rewritten to more closely match the current documentation, esp. the
+listed order.
+
+Change the name of the appropriate fields in the packet related hashes to
+being named after how they are named in the FTS-0001 documentation.
+
+
+=head2 read_ftn_packet()
+
+A second tear line of just "---" is showing up in the body of a message.
+
+A period is showing up at the end of the ftscdate variable; is that actually
+how the ftscdate is in the packet or is that an artifact of the code?
+
+Regardless of if they are to be used or not, the $packet_version, $attribute,
+and $cost information being pulled from the message headers should be returned
+in the message hash like the rest of the information.
+
+Change the name of the appropriate fields in the packet related hashes to
+being named after how they are in the fts-0001 documentation, possibly
+including how they are capitalized.
+
+The zone number information is not being pulled from what is available in the
+packet; need to set the from_node & to_node variables instead of assuming
+zone 1. It is in the packet header but is not being read in the current code,
+so at least that part of the packet header needs to be read.  
+
+Make the message Reply IDs availabe in the same way as the Msg IDs?  (Are they
+in use?)
+
+Provide the message control info as a hash?
+
+Actually process the packet header instead of just skipping over it, as there 
+are least some informtion (like zone numbers) are needed.
+
+=head2 read_ftn_packet_header
+
+A separate function read and return only the packet header information as hash.
+
+=head2 Test Scripts
+
+Can or should something else be used for testing the correct number of messages
+in a packet besides is_deeply()?
+
+
+=head1 SEE ALSO
+
+ L<FTN::Packet>, L<FTN::Packet::Examples>
+
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

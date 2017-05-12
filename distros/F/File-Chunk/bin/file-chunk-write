@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+# PODNAME: file-chunk-write
+# ABSTRACT: Write chunk files from the command line
+use strict;
+use warnings;
+use File::Chunk::Script::Write;
+
+File::Chunk::Script::Write->new_with_options->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+file-chunk-write - Write chunk files from the command line
+
+=head1 VERSION
+
+version 0.0035
+
+=head1 AUTHOR
+
+Dylan William Hardison <dylan@hardison.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

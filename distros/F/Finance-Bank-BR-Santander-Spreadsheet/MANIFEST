@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+GPL-2
+lib/Finance/Bank/BR/Santander/Spreadsheet.pm
+examples/santander.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

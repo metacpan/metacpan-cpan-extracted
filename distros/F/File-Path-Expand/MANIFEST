@@ -1,0 +1,7 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml
+lib/File/Path/Expand.pm
+t/File-Path-Expand.t

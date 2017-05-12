@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: File-Find-Rule-Type
+version: 0.05
+license: perl
+distribution_type: module
+requires:
+  File::Find::Rule: 0.07
+  File::Type: 0.05
+  Test::More: 0.01
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  File::Find::Rule::Type:
+    file: lib/File/Find/Rule/Type.pm
+    version: 0.05
+generated_by: Module::Build version 0.20

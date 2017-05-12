@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                File-NCopy
+version:             0.36
+abstract:            Deprecated module. Use File::Copy::Recursive instead. Copy file, file. Copy file[s] | dir[s], dir
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    File::Spec:                    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Alexandr Ciornii <alexchorny@gmail.com>

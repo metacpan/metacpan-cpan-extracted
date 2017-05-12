@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Flock
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: 0
+  Data::Structure::Util: 0
+  File::Slurp: 0
+  IO::Event: 0.812
+  Test::SharedFork: 0
+  Time::HiRes: 0
+version: 2014.01

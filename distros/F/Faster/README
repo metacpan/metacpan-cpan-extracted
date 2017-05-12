@@ -1,0 +1,94 @@
+NAME
+    Faster - do some things faster
+
+SYNOPSIS
+     use Faster;
+
+     perl -MFaster ...
+
+DESCRIPTION
+    This module implements a very simple-minded "JIT" (or actually AIT,
+    ahead of time compiler). It works by more or less translating every
+    function it sees into a C program, compiling it and then replacing the
+    function by the compiled code.
+
+    As a result, startup times are immense, as every function might lead to
+    a full-blown compilation.
+
+    The speed improvements are also not great, you can expect 20% or so on
+    average, for code that runs very often. The reason for this is that data
+    handling is mostly being done by the same old code, it just gets called
+    a bit faster. Regexes and string operations won't get faster. Airhtmetic
+    doresn't become any faster. Just the operands and other stuff is put on
+    the stack faster, and the opcodes themselves have a bit less overhead.
+
+    Faster is in the early stages of development. Due to its design its
+    relatively safe to use (it will either work or simply slowdown the
+    program immensely, but rarely cause bugs).
+
+    More intelligent algorithms (loop optimisation, type inference) could
+    improve that easily, but requires a much more elaborate presentation and
+    optimiser than what is in place. There are no plans to improve Faster in
+    this way, yet, but it would provide a reasonably good place to start.
+
+    Usage is very easy, just "use Faster" and every function called from
+    then on will be compiled.
+
+    Right now, Faster can leave lots of *.c and *.so files in your
+    $FASTER_CACHEDIR (by default $HOME/.perl-faster-cache), and it will even
+    create those temporary files in an insecure manner, so watch out.
+
+ENVIRONMENT VARIABLES
+    The following environment variables influence the behaviour of Faster:
+
+    FASTER_VERBOSE
+        Faster will output more informational messages when set to values
+        higher than 0. Currently, 1 outputs which packages are being
+        compiled, 3 outputs the cache directory and 10 outputs information
+        on which perl function is compiled into which shared object.
+
+    FASTER_DEBUG
+        Add debugging code when set to values higher than 0. Currently, this
+        adds 1-3 "assert"'s per perl op (FASTER_DEBUG > 1), to ensure that
+        opcode order and C execution order are compatible.
+
+    FASTER_CACHE
+        Set a persistent cache directory that caches compiled code
+        fragments. The default is "$HOME/.perl-faster-cache" if "HOME" is
+        set and a temporary directory otherwise.
+
+        This directory will always grow in size, so you might need to erase
+        it from time to time.
+
+BUGS/LIMITATIONS
+    Perl will check much less often for asynchronous signals in
+    Faster-compiled code. It tries to check on every function call, loop
+    iteration and every I/O operator, though.
+
+    The following things will disable Faster. If you manage to enable them
+    at runtime, bad things will happen. Enabling them at startup will be
+    fine, though.
+
+     enabled tainting
+     enabled debugging
+
+    Thread-enabled builds of perl will dramatically reduce Faster's
+    performance, but you don't care about speed if you enable threads
+    anyway.
+
+    These constructs will force the use of the interpreter for the currently
+    executed function as soon as they are being encountered during
+    execution.
+
+     goto
+     next, redo (but not well-behaved last's)
+     labels, if used
+     eval
+     require
+     any use of formats
+     .., ... (flipflop operators)
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

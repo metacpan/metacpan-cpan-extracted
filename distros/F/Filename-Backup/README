@@ -1,0 +1,19 @@
+SYNOPSIS
+
+     use Filename::Backup qw(check_backup_filename);
+     my $res = check_backup_filename(filename => "foo.txt~");
+     if ($res) {
+         printf "Filename indicates a backup, original name: %s\n",
+             $res->{original_filename};
+     } else {
+         print "Filename does not indicate a backup\n";
+     }
+
+DESCRIPTION
+
+SEE ALSO
+
+    Filename::Archive
+
+    Filename::Compressed
+

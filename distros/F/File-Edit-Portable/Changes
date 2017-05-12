@@ -1,0 +1,203 @@
+Revision history for File-Edit-Portable
+
+1.24    2016-03-14
+        - fixed bug where recsep() was producing uninit warnings if the file
+          we're looking for an rs in was empty (ie. "-z $fh" is true)
+          (closes #35)
+        - added new test file t/18-bug.t
+        - cleaned up a few Critic issues
+
+1.23    2016-03-10
+        - no code changes
+        - critic.t now only runs with AUTHOR_TESTING env var set
+        - corrected a couple of other tests that were failing on CPAN testers
+
+1.22    2016-03-07
+        - last two releases have focused primarily on reliability and far more
+          enhanced unit testing, with a couple new features
+        - recsep() and platform_recsep() can now be imported into the local
+          namespace (non-OO) (closes #23)
+        - cleaned up return structure for recsep types (closes #29)
+        - renamed _open() to _binmode_handle()
+        - cleanup and tidy of all test files
+        - cleanup of numerous unnecessary prereqs in Makefile.PL
+        - write() now uses the correct recsep for a file if multiple read()s
+          are concurrently open (fixes #30)
+        - catch warning and die if write() is called with the 'contents' param
+          set to a previously closed file handle (closes #31)
+        - read() now simply overwrites it's data for a file if it has been read
+          more than once prior to a write() (closes #32)
+        - added t/000-critic.t (closes #33)
+        - fixed minor issues to satisfy critic tests
+
+1.21    2016-03-07
+        - write() now dies if not called with the 'file' param and more than
+          one file is currently open with read() (fixes #21)
+        - write functions for regex and hex (closes #25)
+        - added _convert_recsep(), which consolidates repetitive code (#25)
+        - added 'type' param to recsep() and platform_recsep(), returns the
+          type of line ending (win, nix, mac, etc) (#25)
+        - added _recsep_regex(), returns the regex instead of having it
+          peppered throughout the code (#25)
+        - added _platform_replace(), replaces file's line endings to platform
+          recsep (de-duplicates code)
+        - added _strip_ends(), removes all line endings from file (also to
+          de-dup code)
+        - remove all requirements/uses of File::Spec::Function (closes #27)
+        - implemented recsep caching (#22), but after benchmarks, it performed
+          worse than no cache, so backed it all out
+        - added/updated numerous tests for recsep() and platform_recsep() due
+          to new 'type' param (closes #26)
+        - update/add other new tests, and small POD fixes/updates
+
+1.20    2016-02-26
+        - no functional changes
+        - code cleanup, slight refactoring
+        - changed from croak() to confess() for better diagnostics
+
+1.19    2016-02-20
+        - is_read check in write() is now performed before $copy assignment
+          to $file, so that the proper original file's recsep is used
+          (fixes #19)
+
+1.18    2016-01-28
+        - flock() now disabled for all FreeBSD amd64 versions
+
+1.17    2016-01-26
+        - dir() in write mode now does the transform with a file handle instead
+          of slurping the entire file into an array (performance) (closes #16)
+        - fixed bugtracker link in POD (fixes #17)
+        - bumped prereq version of Mock::Sub to 1.06 due to new efficiencies
+        - FreeBSD 10.1 and 9.2 amd64 fail on flock() in write(), so we check
+          for these versions and skip over the lock (prereq POSIX)
+
+1.16    2016-01-22
+        - removed the write() lock test completely (closes #15)
+        - platform_recsep() can be used as the custom recsep to write().
+          Added tests to confirm this (closes #12)
+        - splice() now croaks if the 'line' param is sent in, and it doesn't
+          consist of only an integer (closes #10)
+        - RHEL vendor .list build files now ignored in MANIFEST (closes #14)
+        - splice() now accepts both quoted strings and qr// objects in the
+          'find' parameter (closes #13)
+        - major POD updates/fixes (closes #11)
+
+1.15    2016-01-18
+        - we now LOCK_EX in write() (prereq Fcntl)
+        - new build prereqs File::Tempdir and File::Spec for tests
+        - cleaned up test data files
+        - all temporary test files created with File::Tempdir, removed several
+          unlink()s within tests (and their accompanying tests)
+
+1.14    20160115
+        - build prereq Mock::Sub 1.01 added
+        - test coverage now at 100%
+
+1.13    20151229
+        - closes #3; splice() now warns if both 'find' and 'line' params are
+          sent in, and 'line' takes precedence (and find isn't used)
+        - closes #4; in dir()s write() call, the recsep is now checked with
+          defined-or, not for truth
+
+1.12    20151209
+        - closes #1; Changes didn't contain 1.10 update
+        - POD updates
+
+1.11    20151209
+        - fixed issue in POD which broke POD tests using Test::Pod v1.40 
+          (preventing packaging into RedHat EL 6). Reported by Denis Fateyev
+
+1.10 	20151120
+        - fixed bug in recsep(). It was croaking if it couldn't read a file
+          to get a recsep, but it's supposed to just return the
+          platform_recsep() in that case
+
+1.09    20151031
+        - fixed regex issue where \d] sequences were getting borked
+
+1.08    20151029
+        - splice() now takes a 'limit => int' param, limiting how many 'find's
+          to insert after. Default is 1, set to 0 to insert after all
+        - added tempfile(), returns a writable handle to an empty file
+        - fixed logic bug in read() when returning a handle
+        - major performance enhancements all over, particularly in retrieving
+          a handle from read() when the file already has local recseps
+
+1.07    20151022
+        - we're now perl v5.6 compliant due to replacing \R with full string
+          regex
+        - fixed issue when trying to write to a non-existent file
+        - write() now accepts a file handle as a value to 'contents' param
+        - recsep() and platform_recsep() now both accept an optional string
+          param 'hex', which will return the hex representation of the recsep.
+          If not supplied, will return the string representation
+
+1.06    20151019
+        - removed non-OO interface, it started causing issues
+        - added extra layer to recsep internally... it fixes a bug where
+          if two files were read before one was written, the recsep of
+          the latter file would be incorrectly used. Now, a recsep is saved
+          for each file read
+        - read() doesn't need 'file => $file' anymore, just the filename as
+          a string is required. However, the old API will still work
+
+1.04    2015-10-16
+        - removed each() on array to prevent us from having to force
+          perl v5.12
+
+1.03    2015-10-16 
+        - added splice(), allows splicing in new contents while conforming
+          to the existing functionality of the module
+
+1.02    2015-10-14
+        - dir() method now uses File::Find::Rule for its ability to 
+          specify maxdepth, which we do too
+        - dir() takes wildcard globs in 'types' param in accordance with 
+          File::Find::Rule::name
+        - fixed undef warning bug in recsep() if file is empty. In this case,
+          we will return the platform's recsep
+
+1.01    2015-10-13
+        - new dir() method, rewrites files recursively
+
+0.10    2015-10-06
+        - Travis-CI integration
+        - now uses File::Temp (core) for anything requiring a temp file
+        - new functions read(), write() exported on demand. pread/pwrite are
+          still available
+        - performance/efficiency enhancements
+
+0.09    2015-10-01
+        - new non-OO functions, pread() and pwrite()
+
+0.08    2015-09-30
+        - fixed logic bugs in Makefile.PL, breaking tests on Win32
+
+0.07    2015-09-27
+        - new interal _open() method for r/w opens
+        - read() can now return a handle in scalar context, which will have
+          the native platform's recsep installed
+        - new internal _handle() method
+        - new public platform_recsep() method, returns the OSs recsep in string
+          form
+
+0.06    2015-09-26
+        - fixed a couple of bugs in write() if params aren't sent in
+        - cleaned up POD, SYNOPSIS was wrong
+
+0.05    2015-09-26
+        - write() now accepts 'recsep' parameter, uses this instead of the one
+          found by read()
+
+0.04    2015-09-26
+        - renamed pread(), pwrite() to read(), write()
+        - requires perl v5.10 due to \R
+
+0.02    2015-09-26
+        - POD
+        - added recsep(), returns string of hex eor 
+
+0.01    2015-09-25
+        - pread(), pwrite() completed
+        - all tests pass
+        

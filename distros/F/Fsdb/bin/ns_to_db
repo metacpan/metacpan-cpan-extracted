@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+
+#
+# dbcolize
+# Copyright (C) 1997-2008 by John Heidemann <johnh@isi.edu>
+# $Id$
+#
+# This program is distributed under terms of the GNU general
+# public license, version 2.  See the file COPYING
+# in $dblibdir for details.
+#
+
+=head1 NAME
+
+ns_to_db - convert one of ns's output format to jdb
+
+=head2 KNOWN BUGS
+
+No test case.
+
+=cut
+
+use Fsdb::Filter::dbcoldefine;
+my $f = new Fsdb::Filter::dbcoldefine(qw(event time hsrc hdst type size flags class srcad dstad));
+$f->setup_run_finish;  # or could just --autorun
+exit 0;

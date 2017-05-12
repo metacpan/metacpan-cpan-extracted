@@ -1,0 +1,191 @@
+NAME
+
+    FCGI::Daemon - Perl-aware Fast CGI daemon for use with nginx web server.
+
+VERSION
+
+    Version 0.20111121
+
+SYNOPSIS
+
+    This is executable FastCGI daemon i.e. modulino (it doesn't have any
+    Perl-module functionality).
+
+DESCRIPTION
+
+    FCGI::Daemon is a small FastCGI server for use as CGI-wrapper for CGI
+    applications.
+
+    Like mod_perl FCGI-Daemon stay persistent in memory and accelerate
+    unmodified CGI applications written in Perl.
+
+    FCGI-Daemon run CGI scripts with RLIMITs and predefined number of
+    workers.
+
+    It was developed as replacement for cgiwrap-fcgi.pl
+    (<http://wiki.nginx.org/SimpleCGI>) and fcgiwrap
+    (<http://nginx.localdomain.pl/wiki/FcgiWrap>)
+
+    FCGI-Daemon check for executable in path and correctly set PATH_INFO
+    environment variable which is crucial for some CGI applications like
+    fossil (<http://fossil-scm.org>). (Lack of this functionality make
+    cgiwrap-fcgi.pl unsuitable for some scripts.)
+
+FEATURES
+
+    *   drop privileges when run as root
+
+    *   setrlimit for RLIMIT_AS and RLIMIT_CPU
+
+    *   detection of script executable in path (PATH_INFO)
+
+    *   DOing .pl - run CGI scripts in Perl with persistent interpreter
+        (like mod_perl).
+
+    *   detection of memory leaks
+
+USAGE
+
+    It can be manually invoked as "perl /usr/share/perl5/FCGI/Daemon.pm" or
+    with included SysV init script.
+
+    Sock file should be write-able.
+
+OPTIONS
+
+    Options: (default arguments given for convenience)
+
+      -h                              # brief help message
+      -w 1                            # number of preforked processes (workers)
+      -q 96                           # max queue
+      -m 512                          # RLIMIT_AS in MiB (see setrlimit)
+      -c 32                           # RLIMIT_CPU in seconds (see setrlimit)
+      -e 10240                        # max evals before process restart. 0 disables DOing perl scripts.
+      -f \.pl                         # regex to match script file name
+                                       # script will be evaluated on match (if -e parameter allows)
+                                       # otherwise fallback to CGI exec mode.
+                                       # EXAMPLE: -f \.pl|perlcgi/[^/]+\.cgi
+      -l 1.3                          # memory leak threshold
+      -p /var/run/fcgi-daemon.pid     # write pId (process ID) to given file (only if daemonize)
+      -s /var/run/fcgi-daemon.sock    # socket file for Fast CGI communication
+      -u www-data                     # user name to become (if run as root)
+      -g www-data                     # group name to become (if run as root)
+      -d                              # daemonize (run in background)
+
+    All options are optional.
+
+    -e  By default FCGI::Daemon DOing .pl scripts up to -e times. This is
+        several times faster than invoking Perl for every call of CGI
+        script. This option define how often parent process (worker) should
+        restart. Warning: some scripts may be incompatible with this so
+        disable with "-e0" if necessary.
+
+    -f  By default only .pl scripts executed by persistent interpreter.
+        However some Perl scripts may have .cgi extension so to accelerate
+        such scripts a following regex may be used:
+        *perlcgi/[^/]+\.cgi|\.pl* Where *perlcgi* stands for path so not all
+        .cgi will be treated as perl but only ones from *perlcgi* folder (or
+        from folder which name ends with perlcgi). This regex is anchored to
+        end of file name.
+
+    -l  In DOing mode ( i.e. max_evals > 0 ) worker process terminates if
+        upon CGI execution VmSize/VmRSS < leak treshold.
+
+        This is helpful for scripts that are leaking memory
+
+PREREQUISITES
+
+    FCGI FCGI::ProcManager
+
+    For Debian GNU/Linux (recommended platform) required modules provided by
+    the following packages:
+
+    libbsd-resource-perl libfcgi-perl libfcgi-procmanager-perl
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+COMPATIBILITY
+
+    Tested only on GNU/Linux systems. NOT tested and not expected to work on
+    Windows.
+
+NOTES
+
+    Find init scripts and nginx configuration sniplets in examples/
+
+FAQ
+
+    Why not fcgiwrap?
+
+    fcgiwrap do not have special support for Perl scripts.
+
+    What's wrong with cgiwrap-fcgi.pl? <http://wiki.nginx.org/SimpleCGI>
+
+    Well, many things...
+    - It can't DO perl scripts.
+    - It is written in a strange way which is hard to read and understand.
+    Frankly, it is not very beautiful.
+    - It takes no options so you have to modify the code.
+    - It is incompatible with some CGI applications, notably with fossil due
+    to lack of support for PATH_INFO.
+
+BUGS
+
+    Please report any bugs or feature requests to "bug-fcgi-daemon at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FCGI-Daemon>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+    During development of this module a bug in Perl was discovered:
+    <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=600376>
+    <http://rt.perl.org/rt3//Public/Bug/Display.html?id=78436>
+
+SUPPORT
+
+    After installing, you can read documentation for this module with the
+    perldoc command.
+
+        perldoc FCGI::Daemon
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Daemon>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/FCGI-Daemon>
+
+    *   CPAN Ratings <http://cpanratings.perl.org/d/FCGI-Daemon>
+
+    *   Search CPAN <http://search.cpan.org/dist/FCGI-Daemon/>
+
+AUTHOR
+
+    Dmitry Smirnov, "<onlyjob at cpan.org>"
+
+LICENSE
+
+    FCGI::Daemon - FastCGI daemon Copyright (C) 2011,2015 Free Software
+    Foundation
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+    General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+

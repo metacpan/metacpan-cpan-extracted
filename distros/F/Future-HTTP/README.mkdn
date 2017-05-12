@@ -1,0 +1,121 @@
+# NAME
+
+Future::HTTP - provide the most appropriate HTTP client with a Future API
+
+# SYNOPSIS
+
+    my $ua = Future::HTTP->new();
+    $ua->http_get('http://www.nethype.de/')->then(sub {
+        my( $body, $data ) = @_;
+        ...
+    })
+
+This module is a wrapper combining [Future](https://metacpan.org/pod/Future) with the API provided
+by [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP). The backend used for the HTTP protocols
+depends on whether one of the event loops is loaded.
+
+## Supported event loops
+
+Currently only [HTTP::Tiny](https://metacpan.org/pod/HTTP::Tiny) and [AnyEvent](https://metacpan.org/pod/AnyEvent) are supported. Support
+is planned for [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent), [Mojolicious](https://metacpan.org/pod/Mojolicious) and [IO::Async](https://metacpan.org/pod/IO::Async)
+but has not materialized yet.
+
+# METHODS
+
+## `Future::HTTP->new()`
+
+    my $ua = Future::HTTP->new();
+
+Creates a new instance of the HTTP client.
+
+## `$ua->http_get($url, %options)`
+
+    $ua->http_get('http://example.com/',
+        headers => {
+            'Accept' => 'text/json',
+        },
+    )->then(sub {
+        my( $body, $headers ) = @_;
+        ...
+    });
+
+Retrieves the URL and returns the body and headers, like
+the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+
+## `$ua->http_head($url, %options)`
+
+    $ua->http_head('http://example.com/',
+        headers => {
+            'Accept' => 'text/json',
+        },
+    )->then(sub {
+        my( $body, $headers ) = @_;
+        ...
+    });
+
+Retrieves the header of the URL and returns the headers,
+like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+
+## `$ua->http_post($url, $body, %options)`
+
+    $ua->http_post('http://example.com/api',
+        '{token:"my_json_token"}',
+        headers => {
+            'Accept' => 'text/json',
+        },
+    )->then(sub {
+        my( $body, $headers ) = @_;
+        ...
+    });
+
+Posts the content to the URL and returns the body and headers,
+like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+
+## `$ua->http_request($method, $url, %options)`
+
+    $ua->http_request('PUT' => 'http://example.com/api',
+        headers => {
+            'Accept' => 'text/json',
+        },
+        body    => '{token:"my_json_token"}',
+    )->then(sub {
+        my( $body, $headers ) = @_;
+        ...
+    });
+
+Posts the content to the URL and returns the body and headers,
+like the function in [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP).
+
+# SEE ALSO
+
+[Future](https://metacpan.org/pod/Future)
+
+[AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP) for the details of the API
+
+# REPOSITORY
+
+The public repository of this module is 
+[http://github.com/Corion/future-http](http://github.com/Corion/future-http).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Future-HTTP](https://rt.cpan.org/Public/Dist/Display.html?Name=Future-HTTP)
+or via mail to [future-http-Bugs@rt.cpan.org](https://metacpan.org/pod/future-http-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2016 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

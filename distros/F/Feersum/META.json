@@ -1,0 +1,62 @@
+{
+   "abstract" : "A PSGI engine for Perl based on EV/libev",
+   "author" : [
+      "Jeremy Stashewsky <stash@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Feersum",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "eg",
+         "picohttpparser-git"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent" : "5.261",
+            "Guard" : "1.012",
+            "Test::Fatal" : "0.003",
+            "Test::LeakTrace" : "0.13",
+            "Test::More" : "0.94",
+            "Test::TCP" : "1.12"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "EV" : "4",
+            "ExtUtils::MakeMaker" : "6.51"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "EV" : "4",
+            "JSON::XS" : "2",
+            "Plack" : "0.995",
+            "Scalar::Util" : "1.19"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/stash/Feersum.git"
+      }
+   },
+   "version" : "1.404",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

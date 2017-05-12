@@ -1,0 +1,12 @@
+Revision history for Perl extension Finance::FITF
+
+0.31  Fri Jul 22 12:23:29 CST 2011
+        - support --offset in fitf-dump
+        - make format_timestamp work for sessions outside date_base.
+
+0.30  Sat Dec 25 20:50:01 CST 2010
+        - Use Class::XSAccessor if possbile.
+        - run_bars and run_bars_as helpers.
+
+0.29  Sun Dec  5 14:47:14 CST 2010
+        - original version

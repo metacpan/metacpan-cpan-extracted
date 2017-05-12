@@ -1,0 +1,36 @@
+<html>
+<title>Example of FLAP in action</title>
+<body>
+
+<center>
+<table cellspacing=10><tr>
+<td align=left width=400 valign=top>
+<H2>This is an example of <a href=http://www.simonf.com/flap/>FLAP</a> in action.</H2>
+<br>
+<p>
+Download Flash 6 player from <a href="http://www.macromedia.com/shockwave/download/alternates/">here</a> if you don't have it. It even works on Linux!
+<p>
+This is an example of a GUI control (Data Grid) that would be non-trivial to implement in straight HTML. Note that by clicking on column headers the values are sorted by that column, and the columns can be resized. Click on a grid row to open the browser!
+<br>
+The datagrid component is not freely available, unfortunately. You can buy it <a href=http://www.macromedia.com/software/drk/productinfo/all_volumes/>here from Macromedia</a>.
+<br><br>
+<a href=dataGrid.pl>This is the server-side Perl script dataGrid.pl.</a>
+</td>
+<td width=600>
+&nbsp;&nbsp;&nbsp;
+<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" id="DataGrid" width=550 height=350>
+<PARAM NAME=movie VALUE="dataGrid.swf"> 
+<PARAM NAME=quality VALUE=high>
+<PARAM NAME=bgcolor VALUE=#FFFFFF>
+
+<EMBED src="dataGrid.swf" quality=high bgcolor=#FFFFFF width=550 height=350
+NAME="DataGrid" ALIGN="" TYPE="application/x-shockwave-flash" 
+PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+</EMBED>
+</OBJECT>
+</td>
+</tr></table>
+</center>
+</body>
+</html>

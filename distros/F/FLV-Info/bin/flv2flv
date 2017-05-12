@@ -1,0 +1,119 @@
+#!/usr/bin/perl -w
+
+package main;
+
+use warnings;
+use strict;
+use 5.008;
+use Getopt::Long;
+use Pod::Usage;
+use English qw(-no_match_vars);
+use FLV::File;
+use FLV::Util;
+
+our $VERSION = '0.24';
+
+my %opts = (
+   video_only => 0,
+   audio_only => 0,
+   verbose    => 0,
+   help       => 0,
+   version    => 0,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+   'S|video-only' => \$opts{video_only},
+   'A|audio-only' => \$opts{audio_only},
+   'v|verbose'    => \$opts{verbose},
+   'h|help'       => \$opts{help},
+   'V|version'    => \$opts{version},
+) or pod2usage(1);
+if ($opts{help})
+{
+   pod2usage(-exitstatus => 0, -verbose => 2);
+}
+if ($opts{version})
+{
+   print "v$VERSION\n";
+   exit 0;
+}
+
+if (2 > @ARGV)
+{
+   pod2usage(1);
+}
+
+my $infile  = shift || q{-};
+my $outfile = shift || q{-};
+
+my $flv = FLV::File->new();
+$flv->parse(q{-} eq $infile ? \*STDIN : $infile);
+
+if ($opts{video_only}) {
+   $flv->get_body->set_tags(grep {!$_->isa('FLV::AudioTag')} $flv->get_body->get_tags);
+}
+if ($opts{audio_only}) {
+   $flv->get_body->set_tags(grep {!$_->isa('FLV::VideoTag')} $flv->get_body->get_tags);
+}
+
+$flv->populate_meta();
+
+my $outfh = FLV::Util->get_write_filehandle($outfile);
+if (!$outfh)
+{
+   die 'Failed to write FLV: ' . $OS_ERROR;
+}
+
+$flv->set_meta(creationdate => scalar gmtime);
+if (!$flv->serialize($outfh))
+{
+   die 'Failed to write FLV';
+}
+close $outfh or die 'Failed to finish writing FLV';
+
+__END__
+
+=for stopwords SWF FLV MX flv2flv flv2swf swf2flv flv2mp3 in.flv out.flv pre-computes
+
+=head1 NAME
+
+flv2flv - Populate FLV metadata
+
+=head1 SYNOPSIS
+
+flv2flv [options] in.flv out.flv
+
+ Options:
+   -S --video-only     Remove the audio track ('S' for silent)
+   -A --audio-only     Remove the video track
+   -v --verbose        Print diagnostic messages
+   -h --help           Verbose help message
+   -V --version        Print version
+
+Either of the in or out files can be C<->, meaning STDIN or STDOUT.
+
+=head1 DESCRIPTION
+
+Many FLV players need metadata that isn't guaranteed to be present in
+an FLV file.  This program pre-computes various quantities about an
+FLV file and saves the edited file.
+
+See FLV::File::populate_meta() for information about which metadata
+properties are computed.
+
+=head1 SEE ALSO
+
+flv2swf
+
+swf2flv
+
+flv2mp3
+
+=head1 AUTHOR
+
+Clotho Advanced Media Inc., I<cpan@clotho.com>
+
+Primary Developer: Chris Dolan
+
+=cut

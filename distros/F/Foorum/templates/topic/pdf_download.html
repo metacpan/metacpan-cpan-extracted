@@ -1,0 +1,13 @@
+
+[% url_prefix = forum.forum_url _ '/topic/' _ topic.topic_id %]
+
+
+[% msg = BLOCK %]
+
+<a href="[% download_url %]">Download</a> Or <a href="[% url_prefix %]">Back to [% topic.title %]</a>
+
+[% END %]
+
+[% INCLUDE 'simple/message.html' message = {
+    msg => msg,
+} %]

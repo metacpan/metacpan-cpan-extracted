@@ -1,0 +1,82 @@
+{
+   "abstract" : "Alternative interface to File::Find::Object",
+   "author" : [
+      "Richard Clamp <richardc@unixbeard.net> with input gained from this",
+      "and Andy Lester andy@petdance.com."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "keywords" : [
+      "directories",
+      "directory",
+      "directory-traversal",
+      "directory-tree",
+      "file",
+      "file-find-rule",
+      "find",
+      "instance",
+      "instantiated",
+      "instantiation",
+      "interface",
+      "iterative",
+      "object",
+      "rule",
+      "traversal",
+      "tree",
+      "wrapper"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Find-Object-Rule",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::XSAccessor" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Find::Object" : "v0.2.1",
+            "File::Spec" : "0",
+            "Number::Compare" : "0",
+            "Text::Glob" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Find::Object::Rule" : {
+         "file" : "lib/File/Find/Object/Rule.pm",
+         "version" : "0.0306"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.shlomifish.org/open-source/projects/File-Find-Object/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/shlomif/perl-file-find-object-rule"
+      }
+   },
+   "version" : "0.0306",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

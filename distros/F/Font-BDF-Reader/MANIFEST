@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+Reader.pm
+README
+bin/bdf2png
+t/1.t

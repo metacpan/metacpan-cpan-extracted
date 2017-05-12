@@ -1,0 +1,9 @@
+Revision history for FCGI-ProcManager-MaxRequests
+
+0.02 2008.11.23
+    - Refactor tests: remove dependency to IPC::Run
+    - Doc fixes
+
+0.01 2008.11.22
+    - First version.
+

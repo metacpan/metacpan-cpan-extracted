@@ -1,0 +1,47 @@
+File/Locate version 0.61
+========================
+
+File::Locate is a direct port of the GNU locate command. As of now, you can
+query an existing locate-db in a very similar way to locate(1L). The module
+can also deal with the more recent slocate-format.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+When using suncc under Solaris, you probably have to do
+
+   perl Makefile.PL CCFLAGS=-Xa
+
+in order to put ucbcc into ANSI mode.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    
+    Test::More
+
+An existing locate-db wont hurt, too. ;-) You can create one manually if 
+you have the frcode program:
+
+  find / | frcode > locatedb
+
+PLATFORMS
+
+Tested on Perl5.005_03, Perl5.8.4 and 5.6.1 under Linux (gcc3.2) and with Perl5.005_03 
+and various BSDs. 0.60 and later (unlike 0.01) not tested on Solaris.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2005 Tassilo von Parseval
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+

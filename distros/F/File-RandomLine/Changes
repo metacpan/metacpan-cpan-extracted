@@ -1,0 +1,45 @@
+Revision history for Perl module File::RandomLine
+
+0.20      2013-05-28 13:25:45 America/New_York
+
+    [FIXED]
+
+    - Fixed undef warning on lc() call
+
+    [CHANGED]
+
+    - Distribution managed with Dist::Zilla now
+
+    - Fixed up perlcritic lint
+
+0.19 Sat Nov  3 00:23:09 EDT 2007
+    - fix up badly formatted META.yml
+
+0.18 Thu Jul 20 12:23:00 EDT 2006
+    - added pod/coverage tests
+
+0.17 Mon Aug  1 11:06:59 EDT 2005
+    - build_requires to requires to work around CPANPLUS bug
+
+0.16 Sun Jul 17 23:53:22 EDT 2005
+    - updated Build.PL for dependencies
+
+0.15 Thu Jun  9 07:27:21 EDT 2005
+    - removed pod/podcoverage tests to minimize dependencies
+
+0.14 Tue Jun  7 18:00:45 EDT 2005
+    - updated Build.PL for dependencies
+    - changed Makefile compatibility to traditional
+
+0.13 Wed Mar  9 06:51:00 EST 2005
+    - added pod and pod coverage tests
+    
+0.12 Mon Jan 31 23:22:21 EST 2005
+    - fixed up an out of date README in the t directory
+
+0.11 Mon Jan 31 15:14:36 EST 2005
+    - added support for optional slow, uniform probability algorithm
+
+0.10 Sun Jan 30 16:16:34 EST 2005
+    - initial public release
+

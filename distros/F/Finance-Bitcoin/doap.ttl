@@ -1,0 +1,176 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010000"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ], [
+		doap-deps:on "JSON::RPC::Legacy::Client 0.93"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Finance-Bitcoin>;
+	doap:category        [ rdfs:label "JSONRPC"@en ], [ rdfs:label "JSON-RPC"@en ], [ rdfs:label "Finance"@en ], [ rdfs:label "Currency"@en ], [ rdfs:label "Currancy"@en ], [ rdfs:label "Bitcoin"@en ], [ rdfs:label "Micropayment"@en ], [ rdfs:label "Micropayments"@en ], [ rdfs:label "Commerce"@en ];
+	doap:created         "2010-07-26"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:documenter      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Finance-Bitcoin>;
+	doap:homepage        <https://metacpan.org/release/Finance-Bitcoin>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Finance-Bitcoin";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-902>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-finance-bitcoin>;
+	];
+	doap:shortdesc       "manage a bitcoin instance"@en;
+	doap:tester          <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Original version"@en;
+	dc:identifier        "Finance-Bitcoin-0.001"^^xsd:string;
+	dc:issued            "2010-07-26"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Finance-Bitcoin-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Finance-Bitcoin-0.002"^^xsd:string;
+	dc:issued            "2010-11-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add $minconf parameter to Finance::Bitcoin::Account::received (patch from Pavel Karoukin)."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Finance-Bitcoin-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Finance-Bitcoin-0.003"^^xsd:string;
+	dc:issued            "2011-10-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "use 5.010"@en ], [ rdfs:label "use common::sense"@en ], [
+			a doap-changeset:Addition;
+			rdfs:label "Include examples in distribution."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Finance-Bitcoin-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Finance-Bitcoin-0.004"^^xsd:string;
+	dc:issued            "2011-12-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Remove stub subs in BEGIN section. (They were only there for the benefit of Test::Pod::Coverage, but were causing problems.)"@en;
+			doap-changeset:fixed <http://purl.org/NET/cpan-uri/rt/ticket/71713>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "use Object::AUTHORITY"@en;
+		], [
+			rdfs:label "Swap from Class::Accessor to Any::Moose."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Finance-Bitcoin-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-900>
+	a                    doap:Version;
+	dc:identifier        "Finance-Bitcoin-0.900"^^xsd:string;
+	dc:issued            "2013-03-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Swap from Any::Moose to Moo."@en;
+		], [ rdfs:label "General tidy up."@en ];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Finance-Bitcoin-0.900.tar.gz>;
+	doap:revision        "0.900"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-901>
+	a                    doap:Version;
+	dc:identifier        "Finance-Bitcoin-0.901"^^xsd:string;
+	dc:issued            "2013-06-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Update;
+			rdfs:label "JSON::RPC::Client -> JSON::RPC::Legacy::Client."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/86193>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/cavac>;
+			rdfs:comment "Annoying upstream change!"@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Finance-Bitcoin-0.901.tar.gz>;
+	doap:revision        "0.901"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/v_0-902>
+	a                    doap:Version;
+	dc:identifier        "Finance-Bitcoin-0.902"^^xsd:string;
+	dc:issued            "2014-03-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Mention string/number encoding caveat for JSON-RPC.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/93524>;
+		], [ rdfs:label "Don't use Object::AUTHORITY." ], [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix link to repo - I haven't used that subversion repo in years.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Finance-Bitcoin-0.902.tar.gz>;
+	doap:revision        "0.902"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/cavac>
+	a                    foaf:Person;
+	foaf:name            "Rene Schickbauer";
+	foaf:nick            "CAVAC";
+	foaf:page            <https://metacpan.org/author/CAVAC>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/71713>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "71713"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=71713>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/86193>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "86193"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86193>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/93524>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "93524"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=93524>.
+

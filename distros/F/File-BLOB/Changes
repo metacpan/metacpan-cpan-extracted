@@ -1,0 +1,33 @@
+Revision history for Perl extension File-BLOB
+
+1.08 Tue 8 Nov 2011
+	- Upgrading to MOdule::Install::DSL 1.04
+	- Updating Perl dependency to reflect syntax needs
+
+1.07 Fri  4 Jul 2008
+	- Upgrading to Module::Install 0.76
+	- Localising $@ during evals
+
+1.06 Mon  2 Jun 2008
+	- No functional changes
+	- Moving to a production version
+	- Upgrading to Module::Install 0.75
+	- Bumping dependencies to take into account
+	  potentially-relevant bug fixes.
+	- Implemented the first half of save/read (undocumented)
+
+0.05 Sun 10 Feb 2008
+	- No functional changes
+	- Upgrading to new Module::Install
+
+0.04 Mon  4 Sep 2006
+	- Upgrading to Module::Install 0.64
+
+0.03 Tue Jan 17 2006
+	- Added missing dependency
+
+0.02 Thu Nov 17 2005
+	- Adding an initial implementation of File::BLOB::from_cgi
+
+0.01 Mon Nov 14 2005
+	- original version

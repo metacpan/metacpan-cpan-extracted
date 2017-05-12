@@ -1,0 +1,8 @@
+TYPEMAP
+ForexConnectWrapper *  O_OBJECT
+string T_STRING
+
+
+OUTPUT
+T_STRING
+    sv_setpvn($arg, $var.c_str(), $var.size());

@@ -1,0 +1,119 @@
+Revision history for Perl module FLV::Info
+
+0.24  13 Mar 2009
+      [ENHANCEMENTS]
+      - Added FLV::Body::set_tags method
+      - FLV::File::serialize now constructs a new header from scratch to avoid inconsistencies.
+      - Added "-S" and "-A" arguments to bin/flv2flv to remove audio and video respectively.
+        Thanks to Michael Sullivan for the idea.
+
+0.23  08 Mar 2009
+      [ENHANCEMENTS]
+      - Added FLV::Splice, financially supported by John Drago (CPAN:JOHND). 'Thanks! ' x 1e6
+      - Added rudimentary support for Speex audio and AVC video codecs.
+        Idea and initial patch from Elif Albuz of Nvidia.
+      [STANDARDS]
+      - Comply with Perl::Critic v1.098
+
+0.22  16 Oct 2008
+      [ENHANCEMENTS]
+      - Added FLV::Cut and bin/flvcut, which trim FLV content by time
+        Idea from http://www.cpanforum.com/threads/8165
+      [DOCUMENTATION]
+      - Fix FLV spec URL
+
+0.21  03 Oct 2008
+      [FIXES]
+      - Yet another Win32 binmode fix
+        (Taro Nishino via http://www.nntp.perl.org/group/perl.cpan.testers/2008/10/msg2368067.html)
+      [STANDARDS]
+      - Comply with Perl::Critic v1.093
+
+0.20  02 Oct 2008
+      [FIXES]
+      - Spurious test failures because I relied on English in warning messages
+        (IMACAT via http://www.nntp.perl.org/group/perl.cpan.testers/2008/08/msg1971646.html)
+        (why do I keep making this same mistake???)
+
+0.19  31 Jul 2008
+      [FIXES]
+      - Use binmode (speculative fix for RT#33284: Fails to install on Windows using Strawberry Perl Tag.pm line 87)
+      [STANDARDS]
+      - Comply with Perl::Critic v1.090
+
+0.18  05 Apr 2007
+      [FIXES]
+      - Correction for audio codec in metadata output
+      [INTERNALS]
+      - Changed maintainer from CLOTHO@cpan.org to CDOLAN@cpan.org
+
+0.17  17 Oct 2006
+      [ENHANCEMENTS]
+      - Support for keyframe file position metadata
+      - Support for multiple metadata tags
+      - Add merge_meta to combine zero or more metadata tags into one
+      - Change set_meta to allow multiple key-value pairs
+      [STANDARDS]
+      - Applied Perl::Tidy
+      - Comply with Perl::Critic v0.21 and Bangs
+      [INTERNALS]
+      - Rename FLV::Constants to FLV::Util
+      - Code coverage is down, but still close to 90%
+
+0.16  11 Oct 2006
+      [FIXES]
+      - bin/flv2flv now actually works
+      - Better rendering for complex metadata FLV::Info
+
+0.15  03 Oct 2006
+      [ENHANCEMENTS]
+      - Added bin/flv2flv metadata injector
+        Suggested by Stephen Jungels
+
+0.14  02 Oct 2006
+      [FIXES]
+      - Little endian extended timestamp support
+        (broken code worked on big endian by coincidence!)
+        Thanks to Alex Ciornii for smoking out the bug
+
+0.13  23 Sep 2006
+      [FIXES]
+      - Support for Sorenson SWFs -> FLV
+      [ENHANCEMENTS]
+      - Support for FLV8 extended timestamps
+      - Add more metadata fields
+      - Add a few more warnings when reading screwy files
+      - Undocumented --debug flag spews via Data::Dumper on parse failure
+      [STANDARDS]
+      - Comply with Perl::Critic v0.20
+
+0.12  31 Jul 2006
+      [FIXES]
+      - Remove spurious "use Readonly;" from a few files.  D'oh.
+
+0.11  25 Jul 2006
+      [ENHANCEMENTS]
+      - Better support for Flash 8 FLV and SWF
+
+0.10  21 Jul 2006
+      [ENHANCEMENTS]
+      - Add flv2swf transcoder
+      - Add flv2mp3 transcoder
+
+0.03  14 Jul 2006
+      [ENHANCEMENTS]
+      - Add swf2flv transcoder
+      - Verbose mode for flvinfo program lists tags
+      [PREREQS]
+      - Added Digest::MD5
+      - Added SWF::File
+
+0.02  13 Jul 2006
+      [ENHANCEMENTS]
+      - Add support for writing FLV data
+      [STANDARDS]
+      - Comply with Perl::Critic v0.18
+      - Test coverage is over 90% (Devel::Cover)
+
+0.01  30 Nov 2005
+      Initial release

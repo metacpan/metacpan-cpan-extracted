@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Freecell/App.pm
+lib/Freecell/App/Tableau.pm
+images/Freecell/c.png
+images/Freecell/d.png
+images/Freecell/h.png
+images/Freecell/s.png
+images/Freecell/fc#4003_37_100k_all.htm
+images/Freecell/sn#4003.txt
+bin/freecell-solver
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

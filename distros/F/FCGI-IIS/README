@@ -1,0 +1,47 @@
+FCGI-IIS version 0.02
+=====================
+
+This module has been created in response to Microsoft launching their 
+own FastCGI handler for IIS 5.1, 6 & 7. Based on the FastCGI specification
+http://www.fastcgi.org
+This module allows the running of Perl scripts as FastCGI with IIS.
+
+Details of using this module with IIS can be found at:-
+http://www.cosmicscripts.com/servers/fastcgi.html#iis
+
+ActivePerl ppm is available from:-
+http://www.cosmicscripts.com/modules
+from a windows command prompt type:-
+"ppm install http://www.cosmicscripts.com/modules/perl/FCGI-IIS.ppd"
+
+The author of this module, Lyle Hopkins is leader of the Perl M[ou]ngers 
+groups bristol.pm and bath.pm, you are welcome to stop by.
+
+Thanks very much to the support from Laura West...
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  FCGI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Lyle Hopkins
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

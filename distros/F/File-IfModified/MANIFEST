@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/File/IfModified.pm
+t/05-ifmodified.t
+META.yml                                 Module meta-data (added by MakeMaker)

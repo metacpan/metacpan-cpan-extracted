@@ -1,0 +1,7 @@
+; I am always using use strict. However, Dist::Zilla
+; PkgVersion will insert a $VERSION=... in the second
+; line of each module. This means that use strict will
+; come after that. Perl::Critic will freak out over
+; this, so I am explicitly excluding it
+
+exclude = RequireUseStrict

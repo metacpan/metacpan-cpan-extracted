@@ -1,0 +1,49 @@
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li[% IF type == 'today' %] selected="selected"[% END %]><a href='/site/popular/today'><span>Today</span></a></li>
+        <li[% IF type == 'yesterday' %] selected="selected"[% END %]><a href='/site/popular/yesterday'><span>Yesterday</span></a></li>
+        <li[% IF type == 'weekly' %] selected="selected"[% END %]><a href='/site/popular/weekly'><span>Weekly</span></a></li>
+        <li[% IF type == 'monthly' %] selected="selected"[% END %]><a href='/site/popular/monthly'><span>Monthly</span></a></li>
+        <li[% IF type == 'all' %] selected="selected"[% END %]><a href='/site/popular/all'><span>All</span></a></li>
+        
+        <li><a href='/site/recent'><span>[% c.loc("Recent Topics") %]</span></a></li>
+        <li><a href='/site/members'><span>[% c.loc("Recent Members") %]</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<table align='center'>
+<tr align='center' class='title'><td width='20'>Today Hits</td><td width='20'>Yesterday Hits</td><td width='20'>Weekly Hits</td><td width='20'>Monthly Hits</td><td width='20'>All Hits</td><td align='left'>[% c.loc("Subject") %]</td><td width='120'>[% c.loc("Author") %]</td><td width='120'>[% c.loc("Last Update") %]</td></tr>
+[% FOREACH item IN objects %]
+<tr align='center' class='misc[% IF loop.count mod 2 %]1[% ELSE %]2[% END %]'>
+
+<td>[% item.hit_rs.hit_today %]</td>
+<td>[% item.hit_rs.hit_yesterday %]</td>
+<td>[% item.hit_rs.hit_weekly %]</td>
+<td>[% item.hit_rs.hit_monthly %]</td>
+<td>[% item.hit_rs.hit_all %]</td>
+
+[% INCLUDE include/object_tds.html object = item %]
+
+</tr>
+[% END %]
+</table>
+
+<br />
+<table align='center'>
+<tr><td class='misc1'>[% INCLUDE sub/pager.html %]</td></tr>
+</table>
+</div>
+
+    </div>
+</div>
+
+[% RSS_URL = '/site/popular/'_ type _ '/rss' %]
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

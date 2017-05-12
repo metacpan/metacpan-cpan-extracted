@@ -1,0 +1,39 @@
+Font/BDF/Reader version 0.01
+=====================
+
+The Font::BDF::Reader module provides an OO interface to reading a BDF file.
+
+It has been built on Perl 5.8.0 on Linux Mandrake and tested only with
+one bdf file (kanji48.bdf from the Monash University's Nihongo FTP site),
+but should work with any other BDF file.
+
+See http://www.csse.monash.edu.au/~jwb/japanese.html to download the
+kanji48.bdf file.
+
+The bdf2png script, also included, breaks down a BDF file into
+one PNG file per character.  The PNG file is transparent, the foreground
+color black.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+To run the bdf2png script, both the Font::BDF and GD modules must
+be installed.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Desmond Lee <deslee@shaw.ca>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Test libraries for Fey distros",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Fey-Test",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : 0,
+            "File::Temp" : 0,
+            "List::MoreUtils" : 0,
+            "Test::MockObject" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-fey-test@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Fey-Test"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.urth.org/Fey-Test.git",
+         "web" : "http://git.urth.org/Fey-Test.git"
+      }
+   },
+   "version" : "0.10"
+}
+

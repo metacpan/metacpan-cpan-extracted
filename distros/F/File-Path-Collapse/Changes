@@ -1,0 +1,42 @@
+commit 389b827d06870c7f4fcc29c5b77b6cfa692c4106 (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:04:53 2009 +0100
+
+    FIXED: dependencies
+
+commit 04a6d0e67559ae84bf9a6525fcda4bfe264ceb08
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 16:31:39 2009 +0100
+
+    FIXED: missing test dependency name
+
+commit 6b644c0dda211800a4b20cd1698a2974f20ad6e0
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 16:30:57 2009 +0100
+
+    FIXED: missing test dependency
+
+commit e0f8e72055ea136c17eda0e6d3855f7e1fd33f15
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Jan 12 10:58:58 2009 +0100
+
+    FIXED: environment variable to use git with Build.PL
+
+commit 48be7d3e2fc41bab45961cb4e650da676a443309
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 02:06:38 2009 +0100
+
+    CHANGED: completely new implementation
+    ADDED: support for windows path separator
+
+commit 0bdc65ff41de4f1ca1342b934435b978038cf41b
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Jan 5 00:06:55 2009 +0100
+
+    ADDED: tests
+
+commit 4aa2b308c162ce2608a5eceb0ca718fc3db0100e
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sun Jan 4 23:46:36 2009 +0100
+
+    ADDED: Initial commit

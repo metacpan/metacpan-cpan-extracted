@@ -1,0 +1,27 @@
+---
+abstract: 'Temporarily ensure a file is writable, even if it is readonly'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Remove: 1.42
+  File::Spec: 0.80
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: File::IgnoreReadonly
+name: File-IgnoreReadonly
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::chmod: 0.32
+  constant: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

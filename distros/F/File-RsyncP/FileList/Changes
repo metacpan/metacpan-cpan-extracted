@@ -1,0 +1,107 @@
+Revision history for Perl module File::RsyncP::FileList.
+
+0.74 Sat Jan 17 16:50:43 PST 2015
+
+  - updated FileList/config.guess FileList/config.sub with more recent
+    versions from rsync.
+
+  - slight tweaks to FileList/t/exclude.t FileList/t/fileList.t.
+
+  - Updated license in headers.
+
+0.72 Sun Jan 11 13:52:23 PST 2015
+
+  - in FileList/flist.c, wrapped strlcpy() definition with
+    #ifndef HAVE_STRLCPY / #endif.  Report and patch by
+    Ryan Schmidt.
+
+  - in FileList/flist.c, fixed minor typecast in read_buf().
+
+0.70 Sat Jul 24 22:45:21 PDT 2010
+
+  - removed unused pool_stats() function
+
+  - removed TYPE_SOCKLEN_T from ./configure
+
+  - changed type of len in getHashString() to STRLEN
+
+0.66 Sun Oct 29 10:15:15 PST 2006
+
+  - Applied patches from Mark Weaver to handle skipping duplicate
+    file names.
+
+  - Added snprintf.c to handle solaris configure failures.
+
+0.64 Sun Jul 30 19:31:45 PDT 2006
+
+  - Fixed some compiler warnings and verbose declaration
+    reported by Guillaume Filion and Rodrigo Real.
+
+0.62 Sun Jul  9 11:18:32 PDT 2006
+
+  - Complete rewrite based on rsync 2.6.3.
+
+0.51 Sun May  9 23:42:56 PDT 2004
+
+  - No changes.
+
+0.50 Sat Mar 20 18:19:50 PST 2004
+
+  - Added flag set/get functions to new doPartial option.
+
+0.47 Sun Mar 14 21:37:22 PST 2004
+
+  - Changed FileList/FileList.xs so that uid, gid, mode and mtime
+    are forced to be unsigned.  This fixes a problem new to 0.46 that
+    was introduced when newSVuv was replaced with newSVnv to back
+    port to 5.005_03.
+
+0.46 Sun Feb  8 18:11:30 PST 2004
+
+  - No changes.
+
+0.45 Sat Feb  7 15:37:51 PST 2004
+
+  - Patch from Marlin Prowell for FileList/flist.c that solves a
+    subtle file list corruption problem.  In particular, f->lastdir
+    was being set too early in receive_file_entry(), potentially
+    before it returned to fetch more data and restart.
+
+  - Patches from Lars Thegler to back port to perl 5.005_03.
+
+0.44 Wed Jul 23 21:31:18 PDT 2003
+
+  - Fixes to FileList for large file support.
+
+0.43 Sun Jul 20 00:03:40 PDT 2003
+
+  - Changed file length, dev and inode to double.
+
+0.42 Sat Jul 12 09:53:40 PDT 2003
+
+  - Cleanup for gcc -Wall and removed some unneeded declarations that
+    caused compile errors on certain debian platforms.
+
+0.41 Sat May 10 20:39:33 PDT 2003
+
+  - Removed inline function in flist.h
+
+0.40 Sat May 10 11:51:58 PDT 2003
+
+  - No changes.
+
+0.31 Sun Feb 23 15:17:05 PST 2003
+
+  - No changes.
+
+0.30 Sun Feb  9 23:06:42 PST 2003
+
+  - No changes.
+
+0.20 Fri Jan 17 22:21:54 PST 2003
+
+  - changed fname argument to encode() to name.
+
+0.10 Fri Dec 20 17:25:21 PST 2002
+
+  - Initial version

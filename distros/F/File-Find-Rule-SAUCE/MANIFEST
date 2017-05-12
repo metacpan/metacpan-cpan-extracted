@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/File/Find/Rule/SAUCE.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-use.t
+t/10-has_sauce.t
+t/11-comments.t
+t/12-fields.t
+t/98-pod_coverage.t
+t/99-pod.t
+t/data/bogus.dat
+t/data/bogus_long.dat
+t/data/test.dat
+t/data/test_no_comments.dat

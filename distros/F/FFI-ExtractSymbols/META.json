@@ -1,0 +1,62 @@
+{
+   "abstract" : "Extract symbol names from a shared object or DLL",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FFI-ExtractSymbols",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "FFI::CheckLib" : "0",
+            "File::Which" : "0",
+            "Module::Build" : "0.28",
+            "Module::Build::FFI" : "0.18",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "FFI::Platypus" : "0.18",
+            "File::Which" : "0",
+            "base" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::CheckLib" : "0",
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/FFI-ExtractSymbols/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/FFI-ExtractSymbols",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/FFI-ExtractSymbols.git",
+         "web" : "https://github.com/plicease/FFI-ExtractSymbols"
+      }
+   },
+   "version" : "0.03"
+}
+

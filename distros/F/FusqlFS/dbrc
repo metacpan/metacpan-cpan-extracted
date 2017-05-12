@@ -1,0 +1,9 @@
+#!/usr/bin/fusqlfs --config
+#--nodaemon
+--host=localhost
+--engine=mysql
+--user=root
+--database=mysql
+--mountpoint=db
+--mkdir
+--rmdir

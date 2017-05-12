@@ -1,0 +1,22 @@
+---
+name: File-Coda
+version: 1.94
+author:
+  - 'Jim Meyering <jim@meyering.net>'
+abstract: a global destructor to close stdout carefully
+license: gpl
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+build_requires:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  File::Coda:
+    file: Coda.pm
+    version: 1.94
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

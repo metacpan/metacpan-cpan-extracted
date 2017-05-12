@@ -1,0 +1,38 @@
+Chain acct-in :
+Chain acct-fwd :
+Chain acct-out :
+Chain tcp-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-in     tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-in     tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+Chain tcp-fwd :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-fwd    tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-fwd    tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+Chain tcp-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+syn-out    tcp  -y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+ack-out    tcp  !y---- 0xFF 0x00  *                              0.0.0.0/0            0.0.0.0/0             * ->   *
+Chain udp-in :
+Chain udp-fwd :
+Chain udp-out :
+Chain icmp-in :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     icmp ------ 0xFF 0x00  lo                             192.168.1.1          192.168.1.0/24        5 ->   *
+Chain icmp-fwd :
+Chain icmp-out :
+target     prot opt    tosa tosx  ifname     mark       outsize  source                destination           ports
+ACCEPT     icmp ------ 0xFF 0x00  eth1                           192.168.1.1          192.168.1.0/24        5 ->   *
+ACCEPT     icmp ------ 0xFF 0x00  lo                             192.168.1.1          192.168.1.0/24        5 ->   *
+Chain all-in :
+Chain all-fwd :
+Chain all-out :
+Chain syn-in :
+Chain syn-fwd :
+Chain syn-out :
+Chain ack-in :
+Chain ack-fwd :
+Chain ack-out :
+Chain oth-in :
+Chain oth-fwd :
+Chain oth-out :

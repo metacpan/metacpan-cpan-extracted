@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Finance-InteractiveBrokers-TWS
+version:      0.1.1
+version_from: lib/Finance/InteractiveBrokers/TWS.pm
+installdirs:  site
+requires:
+    Class::InsideOut:              0
+    File::Spec:                    0
+    Inline:                        0
+    Inline::Java:                  0.5092
+    Test::More:                    0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

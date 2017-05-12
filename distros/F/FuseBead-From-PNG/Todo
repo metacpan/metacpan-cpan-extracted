@@ -1,0 +1,4 @@
+TODO list for Perl module FuseBead::From::PNG
+
+- add more bead colors
+- indexed pngs break the color optimization process, needs to be true rgb mode, figure out solution

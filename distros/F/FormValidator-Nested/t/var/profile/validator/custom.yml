@@ -1,0 +1,6 @@
+params:
+  mail:
+    name: 'メールアドレス'
+    validators:
+      - +My::CustomValidator#mycustom
+

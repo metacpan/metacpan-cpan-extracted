@@ -1,0 +1,72 @@
+NAME
+    "File::StatCache" - a caching wrapper around the "stat()" function
+
+DESCRIPTION
+    This module implements a cache of information returned by the "stat()"
+    function. It stores the result of a "stat()" syscall, to avoid putting
+    excess load on the host's filesystem in case many calls would be
+    generated.
+
+    By default the cache for any given filename will time out after 10
+    seconds; so any request for information on the same name after this time
+    will result in another "stat()" syscall, ensuring fresh information.
+    This timeout is stored in the package variable
+    $File::StatCache::STATTIMEOUT, and can be modified by other modules if
+    required.
+
+FUNCTIONS
+  $stats = get_stat( $path [, $now ] )
+    This function wraps a call to "File::stat::stat()", and caches the
+    result. If the requested file was "stat()"ed within $STATTIMEOUT
+    seconds, it will not be requested again, but the previous result (i.e.
+    an object reference or "undef") will be returned.
+
+    The $now parameter allows some other time than the current time to be
+    used, rather than re-request it from the kernel using the "time()"
+    function. This allows a succession of tests to be performed in a
+    consistent way, to avoid a race condition.
+
+    $path   The path to the filesystem item to "stat()"
+
+    $now    Optional. The time to consider as the current time
+
+  $stats = stat( $path )
+  @stats = stat( $path )
+    This is a drop-in replacement for either the perl core "stat()" function
+    or the "File::stat::stat" function, depending whether it is called in
+    list or scalar context. It behaves identically to either of these
+    functions, except that it returns cached results if the cached value is
+    recent enough.
+
+    Note that in the case of failure (i.e. "undef" in scalar context, empty
+    in list context), the value of $! is not reliable as the reason for
+    error. Error results are not currently cached.
+
+    $path   The path to the filesystem item to "stat()"
+
+  get_item_mtime( $path [, $now ] )
+    This function is equivalent to
+
+     (scalar get_stat( $path, $now ))->mtime
+
+    $path   The path to the filesystem item to "stat()"
+
+    $now    Optional. The time to consider as the current time
+
+LIMITATIONS
+    *   The shortcut tests (e.g. "-f", "-r", etc..) will not work with this
+        module.
+
+    *   The "last results" filename "_" cannot be used; the following code
+        will not work with this module:
+
+          my @stats = stat( _ );
+
+BUGS
+    *   The value of $! is not preserved for per-file failures. When "undef"
+        or the empty list are returned, the $! value may not indicate the
+        reason for this particular failure.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

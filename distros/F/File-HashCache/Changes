@@ -1,0 +1,47 @@
+File::HashCache::JavaScript (1.0.2)
+
+  * Fix test that was failing on non-English locales (thanks
+    syohex@gmail.com).
+
+ -- David Caldwell <david@porkrind.org>  Mon, 07 Oct 2013 13:32:59 -0700
+
+File::HashCache::JavaScript (1.0.1)
+
+  * Add duplicate $VERSION to File::HashCache::JavaScript to allow
+    File-HashCache to override File-HashCache-JavaScript in the PAUSE
+    indexer.
+
+ -- David Caldwell <david@porkrind.org>  Sun, 25 Aug 2013 19:33:14 -0700
+
+File::HashCache::JavaScript (1.0.0)
+
+  * Documented File::HashCache.
+  * Deprecated File::HashCache::Javascript (it really just saves 1 line of
+    code over using File::HashCache directly).
+  * Add ability to concatenate source files by passing multiple files into
+    the hash() method.
+  * Allow passing a single sub to the process_* handlers instead of
+    requiring them to be an array for handlers.
+
+ -- David Caldwell <david@porkrind.org>  Sun, 25 Aug 2013 16:08:13 -0700
+
+File::HashCache::JavaScript (0.10.0)
+
+  * Renamed JavaScript::Hash to File::HashCache::JavaScript.
+  * Split all non javascript related code to File::HashCache.
+  * Test a couple more things.
+
+ -- David Caldwell <david@porkrind.org>  Tue, 17 Nov 2009 16:02:52 -0800
+
+JavaScript::Hash (0.9.1)
+
+  * Fixed required modules in Build.PL.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 12 Nov 2009 14:14:16 -0800
+
+JavaScript::Hash (0.9.0)
+
+  * Cleaned up API and packaged for CPAN.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 12 Nov 2009 04:11:09 -0800
+

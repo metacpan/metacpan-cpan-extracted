@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: File-Find-Rule-CVS
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  File::Find::Rule: 0.20
+  Parse::CVSEntries: 0.03
+  version: 0
+recommends: {}
+build_requires:
+  File::Slurp::Tree: 0
+  Test::More: 0
+conflicts: {}
+provides:
+  File::Find::Rule::CVS:
+    file: lib/File/Find/Rule/CVS.pm
+    version: 0.01
+generated_by: Module::Build version 0.20

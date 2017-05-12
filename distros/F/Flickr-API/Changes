@@ -1,0 +1,147 @@
+Changes to Flickr::API
+
+1.28, 2016-10-11
+ * Add Flickr::API::Upload
+ * Flickr::API Be more consistent using my ($self, $args,...) = @_; and not shift
+ * Flickr::API Change from using $options to $args for consistancy
+ * Flickr::API Add upload method
+ * Flickr::API add api_type method
+ * Flickr::API add api_permissions method
+ * Flickr::API stop using "return undef;"
+ * Flickr::API begin *_silently_* enforcing api_key/api_secret over key/secret
+ * Flickr::API::Response Be more consistent using my ($self, $args,...) = @_; and not shift
+ * Added MAKETEST_OAUTH_AUTHED=1 and/or MAKETEST_FLICKR_AUTHED=1 for testing to allow testing
+   actual calls without re-authenticating
+ * Added more info on testing to README
+ * changes to tests for authentication to allow bypassing
+ * changes to tests for authentication to allow permissions other than read
+ * changes to tests to detect if deprecated key/secret become api_key/api_secret 
+ * changed script/flickr_dump_stored_config.pl to allow config file to be passed in ARGV
+ * changed script/flickr_make_stored_config.pl to shift configs from key/secret to
+   api_key/api_secret for Flickr Authentication and warn if key/secret are used.
+
+1.27, 2015-12-02 
+ * Get Flickr::API::People into shape for the Tools.
+ * Added some methods for asking about a people object's
+   calling user and searched user.
+
+1.26, 2015-11-17
+ * Removed references to oauth_token and oauth_token_secret since they
+   are redundant.
+ * Get some spelling consistent
+ * Tidy up a test script
+
+1.25, 2015-10-12
+ * Realizing that there is benefit to keeping Flickr::API as close to
+   perl core as practical and letting Flickr::Tools use Moo and more
+   abstraction, stopped moving all of Flickr::Tools into Flickr::API.
+*  Moved Person.pm and Types.pm to Flickr::Tools.
+*  Bumped version by five to keep it ahead of Tools, at least for
+   the time being.
+
+1.20, 2015-10-05
+ * moved Cameras.pm, Reflection.pm and People.pm  to new 
+   status reporting.
+ * Added Person.pm for the flickr.people methods other than finds
+ * Added tests for Person.pm
+ * Updated the MANIFEST
+ * Add tests to 02-oauth_api.t for new script and for private method
+ * Added Types.pm to define types for Moo types
+ * Consider splitting the Tools back into a separate distribution 
+   so Moo isn't required for the base API.
+
+1.19, 2015-09-16
+ * adding Flickr::API::People for the flickr.people methods that find
+ * adding t/09-people.t to test People module
+ * fixed Reflection.pm for argument lists that are only 1 deep.
+ * added test to 07-reflection for method that does not have argument
+   array, but rather just a single argument 
+ * moved flickr deprecated authentication from $api->{flickr} to
+  $api->{fauth} to make better use of $api->{flickr} for subclassing.
+ * added a number of status reporting methods to API.pm
+ * add _propagate_status to Response.pm
+ * add script/flickr_make_test_values.pl for more in-depth testing
+
+1.18, 2015-08-12
+ * adding Flickr::API::Cameras
+ * adding t/08-cameras.t to test Cameras module
+ * replaced the STUB on Reflection.pm POD with the intended text
+ * Merge in Pull Request from rjbs
+
+1.17, 2015-08-04
+ * adding Flickr::API::Reflection
+ * adding t/07-reflection.t to test Reflection module
+ * Fixed typo per RT-106107
+ * moved from @ISA to use parent in Request.pm and Response.pm
+ * added call to and method _initialize to API.pm to support
+   inheritance in Reflection.pm et. al.
+ * make import_storable_config more generic in API.pm
+ * make error_message a little prettier in Response.pm
+ * invert changes for chronological convenience
+
+
+1.16, 2015-07-17
+ * merged in horsepunchkid's $perms fixes. (API requires more explicit perms arguments)
+ * merged in horsepunchkid's fixes in examples/.
+ * fleshed out the $perms fixes, changed from warn to carp.
+ * Added to API.pm POD to reflect $perms fixes.
+ * Added tests to reflect $perms fixes.
+ * bumped version in prep for PAUSE upload.
+ 
+1.15
+ * Removed some debugging leftovers
+ * bumped version
+
+
+1.14
+ * Added 5.008 as minimum Perl version
+ * Moving from XML::Simple to XML::LibXML::Simple
+ * Remove example from automatically installing in scripts (Request 105426)
+ * move dump and make config scripts to bin and made them install-worthy (Request 105426)
+ * Clarified licenses in examples (Request 105426)
+ * Rename oauth_export_config to export_config and add ability to export
+   Flickr's native, if deprecated, configuration. Similar renames and
+   reasons for export_storable_config and import_storable_config.
+ * Added a hashref of the response content in addition to a tree
+ * Added a number of accessor methods to Response.pm
+ * Made code a little more "Perl Best Practices"-ish
+ * Rename sign_args to _sign_args
+
+1.12, 1.13, 2015-06-09
+ * Cleaned up minor bugs found by testers, improved kwalitee
+ * Clarified licensing
+
+1.11, 2014-12-27
+ * Added OAuth authentication to Flickr::API and Flickr::API::Request
+ * Added some examples
+
+1.08, 2013-06-19
+ * Various cleanup from Gabor Szabo
+
+1.07, 2013-05-23
+ * Added flag to enable handling of native Unicode strings
+
+1.06, 2013-05-11
+ * Added `lwpobj` argument, to allow using subclasses of LWP::UserAgent
+
+1.05, 2012-09-12
+ * Updated Flickr API urls from http://www.flickr.com/services/ to http://api.flickr.com/services/.
+
+1.04, 2009-08-25
+ * re-fix for perl5.6 - just require a newer version of HTTP::Message which supports
+   mime-decoding instead.
+
+1.03, 2009-08-23
+ * fix for perl5.6 - when HTTP::Message->decoded_content() comes back empty,
+   use content() instead.
+
+1.02, 2009-07-31
+ * license update for fedora
+
+1.01, 2008-09-30
+ * incorrectly numbered the previous release. gah
+ * updated tests to work when the flickr api isn't hit-able
+
+0.10, 2008-09-29
+ * Work correctly with latest XML::Parser::Lite::Tree (now requires 0.06)
+ * Added patch from Flavio Poletti to allow custom api & auth urls

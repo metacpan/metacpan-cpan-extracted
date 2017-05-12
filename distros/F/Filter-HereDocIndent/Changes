@@ -1,0 +1,22 @@
+Filter::HereDocIndent
+    Version 0.90 August 6, 2002
+
+      Initial release
+
+    Version 0.91 November 8, 2010
+
+      Modified to fit the situation where the heredoc is an argument in a
+      call to a function.
+
+      Minor edits to documentation.
+
+    Version 1.00 July, 2012
+
+      Added NWS option.
+
+      Minor edits to documentation.
+
+    Version 1.01 January 2, 2015
+
+      Fixed CR/LF and encoding issues with the files. Improved tests so
+      that they have test names.

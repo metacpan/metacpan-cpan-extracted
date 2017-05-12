@@ -1,0 +1,15 @@
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+README
+Makefile.PL
+META.yml
+Changes
+LICENSE
+
+lib/Filesys/Virtual/Async/inMemory.pm
+
+examples/simple.pl
+
+t/1_load.t
+t/apocalypse.t

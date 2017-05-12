@@ -1,0 +1,83 @@
+.highlight { color:[% style.highlight %]; }
+.semilight { color:[% style.semilight %]; }
+.tblr { border:1px solid [% style.tablebordercolor %] }
+.blr { border:1px solid [% style.tablebordercolor %];border-top:0px }
+.tlr { border:1px solid [% style.tablebordercolor %];border-bottom:0px }
+
+.one TABLE { border:1px solid [% style.tablebordercolor %];border-left: 0px;border-bottom: 0px;width:[% style.tablewidth %]%;border-collapse: collapse; }
+.one TD, .multi TD { border:1px solid [% style.tablebordercolor %];border-right: 0px;border-top: 0px;padding: 6px; }
+.multi TABLE { border:1px solid [% style.tablebordercolor %];border-left: 0px;border-bottom: 0px;border-top: 0px;width:[% style.tablewidth %]%;border-collapse: collapse; }
+.multi TD TABLE { border: 0px;width:100%; }
+.multi TD TABLE TD { border: 0px;text-align:left;padding:2px }
+
+.none TABLE { border:0px; width:[% style.tablewidth %]%; }
+.none TD { border: 0px; padding: 6px; }
+
+.tablewidth { width: [% style.tablewidth %]%; }
+.tablewidth TABLE { width: [% style.tablewidth %]% }
+
+.online,.online TABLE,.online TD { border: 0px;padding:0px }
+hr { background:[% style.tablebordercolor %];height:1 }
+body {
+    color: [% style.bg_fontcolor %];
+    background-color: [% style.bg_color %];
+    [% IF style.bg_image %]background-image: url("[% style.bg_image %]");[% END %]
+    
+}
+A:visited { color: [% style.vlink %] }
+A:active { color: [% style.alink %] }
+A:hover { color: [% style.hlink %] }
+A:link { color: [% style.link %] }
+
+#timer {
+    text-align: center;
+    clear: both;
+    color: [% style.bg_fontcolor %];
+}
+
+/* simple/message.html */
+.message {
+    position:absolute;
+    left:15%;top:25%;
+    padding:20px;
+    line-height:140%;
+    width:70%;
+    height:auto;
+    background:[% style.forumcolor1 %];
+    color: [% style.forumfont1 %];
+}
+
+.title { background: [% style.titlecolor %]; color: [% style.titlefont %];font-weight: bold }
+
+/* forum */
+.forum1 {
+    background: [% style.forumcolor1 %];
+    color: [% style.forumfont1 %];
+}
+.forum2 {
+    background: [% style.forumcolor2 %];
+    color: [% style.forumfont2 %];
+}
+.reply1 {
+    background: [% style.replycolor1 %];
+    color: [% style.replyfont1 %];
+}
+.reply2 {
+    background: [% style.replycolor2 %];
+    color: [% style.replyfont2 %];
+}
+.misc1 {
+    background: [% style.misccolor1 %];
+    color: [% style.miscfont1 %];
+}
+.misc2 {
+    background: [% style.misccolor2 %];
+    color: [% style.miscfont2 %];
+}
+
+/* topic */
+.plumbline { width: 1px; height: 100%;background: [% style.titlecolor %] }
+.horizontal { width: 100%; height: 1px;border-top:1px solid [% style.titlecolor %]; margin: 4px; }
+
+/* header bar */
+.barline { border-top:1px solid [% style.titlecolor %]; font-size:0; height:1px; clear:both; width:100% }

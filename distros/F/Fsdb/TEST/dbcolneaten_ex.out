@@ -1,0 +1,7 @@
+#fsdb -F s fullname       homedir     uid  gid
+Mr._John_Heidemann_Junior /home/johnh 2274 134
+Greg_Johnson              /home/greg  2275 134
+Root                      /root       0    0
+# this is a simple database
+#   | dbcol fullname homedir uid gid
+#   | dbcolneaten

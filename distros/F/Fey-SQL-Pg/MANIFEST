@@ -1,0 +1,16 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Fey/SQL/Pg.pm
+lib/Fey/SQL/Pg/Delete.pm
+lib/Fey/SQL/Pg/Insert.pm
+lib/Fey/SQL/Pg/Role/Returning.pm
+t/delete.t
+t/insert.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

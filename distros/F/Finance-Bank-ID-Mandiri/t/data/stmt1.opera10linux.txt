@@ -1,0 +1,35 @@
+ 
+ 13 Aug 2009, 22:39:28 	HELP
+
+
+		
+HISTORI TRANSAKSI
+
+Nomor Transaksi	:	0908130005808
+Nomor Rekening	:	1234567890123 Rp.
+Jenis Rekening	:	Tabungan 
+Periode Transaksi	:	13 Aug 2009- 13 Aug 2009 
+Tampilkan Berdasarkan	:	Tanggal
+Urutkan Berdasarkan	:	Mulai dari yang kecil
+
+Tanggal	Keterangan Transaksi	Debet	Kredit
+13/08/2009 	SA OB SA No Book
+#11111
+AAAA AAAA AAAAAA AAAAAAA	0,00	111.111,00
+13/08/2009 	SA OB SA No Book
+AAAAAAA #11112
+AAAA AAAA AAAAAA AAAAAAA	222.222,00	0,00
+
+ 
+Saldo Awal	:	15.719.093,73 
+Total Kredit	:	111.111,00 
+Total Debet	:	222.222,00 
+Saldo Akhir	:	15.607.982,73 
+ 
+ 	 	 
+ 	 	 
+
+
+	
+
+

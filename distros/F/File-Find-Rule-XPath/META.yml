@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         File-Find-Rule-XPath
+version:      0.03
+version_from: lib/File/Find/Rule/XPath.pm
+installdirs:  site
+requires:
+    File::Find::Rule:              
+    Test::Simple:                  0.41
+    XML::LibXML:                   
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.20

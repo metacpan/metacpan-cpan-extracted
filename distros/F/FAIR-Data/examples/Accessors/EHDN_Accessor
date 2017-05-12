@@ -1,0 +1,199 @@
+#!/usr/bin/perl -w
+
+package EHDN_Accessor;  # this should be the same as your filename!
+
+use strict;
+use warnings;
+use JSON;
+
+# use lib "../../lib/";
+
+#-----------------------------------------------------------------
+# Configuration and Daemon
+#-----------------------------------------------------------------
+
+use base 'FAIR::Accessor';
+
+my $config = {
+    title => 'European Huntington Disease Network Data Accessor',
+    serviceTextualDescription => 'Server for some ERDN Data',
+    textualAccessibilityInfo => "The information from this server requries no authentication",  # this could also be a $URI describing the accessibiltiy
+    mechanizedAccessibilityInfo => "",  # this must be a URI to an RDF document
+    textualLicenseInfo => "CC-BY",  # this could also be a URI to the license info
+    mechanizedLicenseInfo =>  "", # this must be a URI to an RDF document
+    baseURI => "", # I don't know what this is used for yet, but I have a feeling I will need it!
+    ETAG_Base => "EHDN_Accessor_For_RegInfo", # this is a unique identificaiton string for the service (required by the LDP specification)
+    localNamespaces => {ehdn => 'http://ehdn.org/some/items/',
+                        ehdnpred => 'http://ehdn.org/some/predicates/'},  # add a few new namespaces to the list of known namespaces....
+    localMetadataElements => [qw(erdnpred:fromHospital erdnpred:lastevaluatedDate) ],  # things that we use in addition to common metadata elements
+    basePATH => "EHDN_Accessor",
+
+};
+
+my $service = EHDN_Accessor->new(%$config);
+
+# start daemon
+$service->handle_requests;
+
+
+
+
+#-----------------------------------------------------------------
+# Accessor Implementation
+#-----------------------------------------------------------------
+
+
+
+=head2 MetaContainer
+
+ Function: returns the first-stage LD Platform list of contained URIs and the dataset metadata.
+ Args    : $starting_at_record : this will be passed-in to tell you what record to start with (for paginated responses)
+ $path : the webserver's PATH_INFO environment value (used to modify the behaviour of REST services)
+ Returns : JSON encoded listref of 'meta URIs' representing individual records
+ Note    :  meta URIs are generally URIs that point back to this same server; calling GET on a meta URI will
+            return an RDF description of the set of DCAT distributions for that record.\
+            this can be handled by the
+
+=cut
+
+sub MetaContainer {
+
+    my ($self, %ARGS) = @_;
+    my $PATH = $ARGS{'PATH'};  # this is the match from the configuration 'basePATH' regular expression, so that you can configure the RESTful behavior of your script appropriately
+    
+    # this is how you would manage "RESTful" references to different subsets of your data repository
+    if ($PATH =~ /DataSliceX/) {
+        # some behavior for Data Slice X
+    } elsif ($PATH =~ /DataSliceY/) {
+        # some behavior for Data Slice Y
+    }
+    
+    my %result =  (  # NOTE THAT ALL OF THESE ARE OPTIONAL!  (and there are more fields.... see DCAT...)
+                    'dc:title' => "EHDN Accessor Server",
+                   'dcat:description' => "the prototype Accessor server for EHDN",
+                    'dcat:identifier' => "handle:12345566798",
+                    'dcat:keyword' => ["medical records", "rare diseases", "EHDN", "Linked Data Platform", 'HTT', 'huntington disease', 'huntingtin'],
+                    'dcat:landingPage' => 'http://www.euro-hd.net/html/network',
+                    'dcat:language' => 'en',
+                    'dcat:publisher' => 'http://www.euro-hd.net',
+                    'dcat:temporal' => 'http://reference.data.gov.uk/id/quarter/2006-Q1',  # look at this!!  It doesn't have to be this complex, but it can be!
+                    'dcat:theme'  => 'http://biordf.org/DataFairPort/ConceptSchemes/Huntingtons.rdf',  # this is the URI to a SKOS Concept Scheme
+                    'daml:has-Technical-Lead' => "Joe Bloggs",
+                    'daml:has-Administrative-Contact' => "S.A. McCray",
+                    'daml:has-Program-Manager' => "Jane Doe",
+                    'daml:has-Principle-Investigator' => "Dr. B. Mueller",
+                    'dcat:contactPoint' => 'http://biordf.org/DataFairPort/MiscRDF/Mueller.foaf',
+                    'dcat:license' => 'http://purl.org/NET/rdflicense/cc-by-nc-nd3.0',
+                  );
+    
+    my $BASE_URL = "http://" . $ENV{'SERVER_NAME'} . $ENV{'REQUEST_URI'}; # this URI goes up to and including the script name... if you have basePATH set to include more than that, you need to deal with the logic yourself!
+    
+    my @known_records = ($BASE_URL . "/479-467-29X",
+                         $BASE_URL . "/768-599-467",
+                         # ...  you need to generate this list of record URIs here... somehow
+                        );
+    
+    $result{'void:entities'} = scalar(@known_records);  #  THE TOTAL *NUMBER* OF RECORDS THAT CAN BE SERVED
+    $result{'ldp:contains'} = \@known_records; # the listref of record ids
+    
+    return encode_json(\%result);
+
+}
+
+
+=head2 Distributions
+
+ Function: returns the second-stage LD Platform metadata describing the DCAT distributions, formats, and URLs
+           for a particular record
+ Args    : $ID : the desired ID number, as determined by the Accessor.pm module
+           $PATH_INFO : the webserver's PATH_INFO environment value (in case the $ID best-guess is wrong... then you're on your own!)
+ Returns : JSON encoded hashref of 'meta URIs' representing individual DCAT distributions and their mime-type (mime-type is the hash key)
+            The format for this response is (note that values are always allowed to be lists, if you wish):
+            
+            {"metadata":
+                {"rdf:type": ["edam:data_0006","sio:SIO_000088"],
+                 "my:metadatathingy":  "some value",
+                 "external:metadatatype":  "some other value"
+                },
+            "distributions":
+                {"application/rdf+xml" : "http://myserver.org/ThisScript/record/479-467-29X.rdf",
+                 "text/html" : "http://myserver.org/ThisScript/record/479-467-29X.html"
+                }
+            }
+
+=cut
+
+
+sub Distributions {
+    my ($self,%ARGS) = @_;
+
+    my $PATH = $ARGS{'PATH'};  
+    my $ID = $ARGS{'ID'};
+    
+    my %response;
+
+    my %formats;
+    my %metadata;
+
+    # this is how you would manage "RESTful" references to different subsets of your data repository
+    if ($PATH =~ /DataSliceX/) {
+        # some behavior for Data Slice X
+    } elsif ($PATH =~ /DataSliceY/) {
+        # some behavior for Data Slice Y
+    }
+    
+    $formats{'text/html'} = "http://myserver.org/ThisScript/record/$ID.html";
+    $formats{'application/rdf+xml'} = "http://myserver.org/ThisScript/record/$ID.rdf";
+
+    # set the ontological type for the record  (optional)
+    $metadata{'rdf:type'} = ['edam:data_0006', 'sio:SIO_001027'];
+    
+    # and whatever other metadata you wish (also optional)
+    extractDataFromSpreadsheet(\%metadata, $ID);    
+
+    $response{distributions} = \%formats;
+    $response{metadata} = \%metadata if (keys %metadata);  # only set it if you can provided something
+
+    my $response  = encode_json(\%response);
+    
+    return $response;
+
+}
+
+
+# this is a service-specific piece of code, completely optional!
+sub extractDataFromSpreadsheet{
+    my ($metadata, $ID) = @_;
+    
+
+    my $scriptname = $ENV{SCRIPT_NAME};
+    my $servername = $ENV{SERVER_NAME};
+
+    my $container_script = "http://$servername/$scriptname";
+    
+    use Spreadsheet::XLSX::Reader::LibXML;
+    my $db_file = "registry3-enrolment.xlsx.xlsx";
+    
+    my $excel = Spreadsheet::XLSX::Reader::LibXML->new();
+    my $workbook = $excel->parse($db_file);
+    my ($sheet) = $workbook->worksheets;
+    my ($first, $last) = $sheet->row_range;
+    foreach my $row ($first .. $last) {
+
+        next unless ($sheet->get_cell($row, 0)->value eq $ID);
+        
+        my $cell = $sheet->get_cell($row, 5);
+          $metadata->{'dcat:updateDate'} = $cell->value;
+        
+        $cell = $sheet->get_cell($row, 1);
+          $metadata->{'dcat:releaseDate'} = $cell->value;
+          
+        $cell = $sheet->get_cell($row, 3);
+          $metadata->{'ehdnpred:enrollmentState'} = $cell->value;
+
+         $metadata->{'dcat:license'} = 'http://purl.org/NET/rdflicense/cc-by-nc-nd3.0';
+         $metadata->{'ldp:membershipResource'} = $container_script;
+        last;
+    }
+
+}

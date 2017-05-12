@@ -1,0 +1,138 @@
+{
+   "abstract" : "Create runnable Perl files encrypted with OpenSSL libcrypto",
+   "author" : [
+      "Steve Hay <shay@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Filter-Crypto",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Filter::Crypto::_ConfigureBuild"
+      ]
+   },
+   "optional_features" : {
+      "critictest" : {
+         "description" : "Perl::Critic testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Perl::Critic" : "0"
+               }
+            }
+         }
+      },
+      "parfilter" : {
+         "description" : "PAR::Filter support",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "PAR::Filter" : "0"
+               }
+            },
+            "test" : {
+               "requires" : {
+                  "Archive::Zip" : "0"
+               }
+            }
+         }
+      },
+      "podcoveragetest" : {
+         "description" : "POD coverage testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod::Coverage" : "0.08"
+               }
+            }
+         }
+      },
+      "podtest" : {
+         "description" : "POD testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod" : "1.00"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "6.66",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "1.15",
+            "Text::Wrap" : "0",
+            "constant" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "6.66",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "1.15",
+            "Scalar::Util" : "0",
+            "Text::ParseWords" : "0",
+            "Text::Wrap" : "0",
+            "XSLoader" : "0",
+            "constant" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "blib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/steve-m-hay/Filter-Crypto.git"
+      }
+   },
+   "version" : "2.07"
+}

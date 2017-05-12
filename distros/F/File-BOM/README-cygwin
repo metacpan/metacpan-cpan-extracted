@@ -1,0 +1,19 @@
+Some notes concerning cygwin:
+
+It has been brought to my attention that several tests fail under cygwin, for
+that reason those tests will be disabled by default as of version 0.12.
+
+This behaviour can be disabled by setting TEST_FIFO to a true value.
+
+    e.g.
+
+    TEST_FIFO=1 ./Build test
+
+I have been informed that the the cause of this problem has been remedied in
+Cygwin dll 1.5.20
+
+It is also worth noting that some exception tests are known to fail under
+cygwin. This is because the read() call doesn't return undef on a failure. This
+is a problem with perl under cygwin, not with File::BOM.
+
+Matt Lawrence <mattlaw@cpan.org>

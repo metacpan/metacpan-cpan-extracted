@@ -1,0 +1,6 @@
+Revision history for Perl extension FCGI::Restarter.
+
+0.01  Wed Aug 17 12:19:49 2011
+	- original version; created by h2xs 1.23 with options
+		-A -n FCGI::Restarter -X -b 5.8.1
+

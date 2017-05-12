@@ -1,0 +1,7 @@
+Only in t10/old: ddd eee fff
+Files t10/old/ggg hhh iii and t10/new/ggg hhh iii differ
+Only in t10/new: jjj kkk lll
+Only in t10/old: uuu vvv www
+Files t10/old/xxx yyy zzz/bar and t10/new/xxx yyy zzz/bar differ
+Only in t10/new/xxx yyy zzz: bog
+Only in t10/old/xxx yyy zzz: foo

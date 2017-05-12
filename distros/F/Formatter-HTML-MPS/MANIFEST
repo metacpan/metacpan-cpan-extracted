@@ -1,0 +1,23 @@
+bin/mpslidemaker.pl
+lib/Formatter/HTML/MPS.pm
+lib/Formatter/HTML/MPS/OutputFormats.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/2slides.t
+t/default_css.t
+t/expected1.html
+t/expected2.html
+t/expected_defaultcss.html
+t/expected_inlinecss.html
+t/expected_singleslide_w_header.html
+t/header.t
+t/inline.css
+t/inline_css.t
+t/input1.mps
+t/input2.mps
+t/input_defaultcss.mps
+t/input_inlinecss.mps
+t/singleslide.t
+t/singleslide_w_header.mps
+META.yml                                 Module meta-data (added by MakeMaker)

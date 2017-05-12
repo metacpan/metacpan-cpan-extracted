@@ -1,0 +1,66 @@
+!
+!  Namelist as written by the Pathscale compiler (~ November 2006)
+!  Provided by Tobias Heinemann.
+!
+
+ &INIT_PARS  CVSID = '$Id: Pathscale.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $                                                           
+         ' IP = 14 XYZ0 = -1.65441024 -1.65441024 -2.61195993 XYZ1 = 1.65441048 1.65441048 0.593460083 LXYZ = 3.30882072 3.30882072
+ 3.20542002 LPERI = T T F LSHIFT_ORIGIN = F F F COORD_SYSTEM = 'cartesian' LEQUIDIST = T T T COEFF_GRID = 1. 1. 1. ZETA_GRID0 = 0.E+0
+  GRID_FUNC = 'linear                   ' 'linear                   ' 'linear                   ' XYZ_STAR = 0.E+0 0.E+0 0.E+0 
+  LWRITE_IC = F LNOWRITE = F UNIT_SYSTEM = 'cgs' UNIT_LENGTH = 100000000. UNIT_VELOCITY = 1000000. UNIT_DENSITY = 
+ 9.99999999999999955E-8 UNIT_TEMPERATURE = 1. C_LIGHT = 29979.245800000001 G_NEWTON = 6.67419999999999852E-11 HBAR = 
+ 1.05457159600000006E-58 RANDOM_GEN = 'min_std                  ' NFILTER = 0 LSERIAL_IO = F LREAD_OLDSNAP = F LREAD_OLDSNAP_NOMAG = 
+ F LREAD_OLDSNAP_NOPSCALAR = F LWRITE_AUX = T PRETEND_LNTT = F LPROCZ_SLOWEST = T LCOPYSNAPSHOTS_EXP = F BCX = 'p      ' 'p      ' 'p
+      ' 'p      ' 'p      ' 'p      ' 'p      ' 'p      ' 'p      ' 'p      ' BCY = 'p      ' 'p      ' 'p      ' 'p      ' 'p      '
+ 'p      ' 'p      ' 'p      ' 'p      ' 'p      ' BCZ = 's      ' 's      ' 'a      ' 'StS    ' 'StS    ' 's:c1   ' 's:nil  ' 'a:nil
+  ' 's      ' 's      ' R_INT = 0.E+0 R_EXT = 3.908499939E+37 R_REF = 0.E+0 MU0 = 1. FORCE_LOWER_BOUND = '                         '
+  FORCE_UPPER_BOUND = '                         ' FBCX1 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 FBCX2 = 0.E+0
+ 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 FBCY1 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 FBCY2 = 
+ 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 FBCZ1 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 
+  FBCZ2 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 FBCZ1_1 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0
+ 0.E+0 FBCZ1_2 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 FBCZ2_1 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0
+ 0.E+0 0.E+0 0.E+0 FBCZ2_2 = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 XYZ_STEP = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0
+ 0.E+0 XI_STEP_FRAC = 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 0.E+0 XI_STEP_WIDTH = 1.5 1.5 1.5 1.5 1.5 1.5 LCYLINDRICAL = F LLOCAL_ISO = F 
+  INIT_LOOPS = 1 LWRITE_2D = F /
+ &EOS_INIT_PARS  XHE = 0.100000001 LCONST_YH = F YH_CONST = 0.E+0 YMETALS = 0.E+0 LNPP_BOT = 0.E+0 SS_BOT = 0.E+0 TAU_RELAX = 1. 
+  VA2MAX_EOS = 6.805646933E+37 VA2POWER_EOS = 5 B_EXT_EOS = 0.E+0 0.E+0 0.E+0 /
+ &HYDRO_INIT_PARS  AMPLUU = 0.100000001 0.E+0 0.E+0 0.E+0 AMPL_UX = 0.E+0 AMPL_UY = 0.E+0 AMPL_UZ = 0.E+0 PHASE_UX = 0.E+0 PHASE_UY
+  = 0.E+0 PHASE_UZ = 0.E+0 INITUU = 'gaussian-noise           ' 'nothing                  ' 'nothing                  ' 'nothing     
+             ' WIDTHUU = 0.100000001 RADIUSUU = 1. URAND = 0.E+0 UU_LEFT = 0.E+0 UU_RIGHT = 0.E+0 UU_LOWER = 1. UU_UPPER = 1. KX_UU
+  = 1. KY_UU = 1. KZ_UU = 1. COEFUU = (0.E+0,0.E+0) (0.E+0,0.E+0) (0.E+0,0.E+0) UY_LEFT = 0.E+0 UY_RIGHT = 0.E+0 UU_CONST = 0.E+0
+ 0.E+0 0.E+0 OMEGA = 0.E+0 INITPOWER = 1. CUTOFF = 0.E+0 KEP_CUTOFF_POS_EXT = 6.805646933E+37 KEP_CUTOFF_WIDTH_EXT = 0.E+0 
+  KEP_CUTOFF_POS_INT = -6.805646933E+37 KEP_CUTOFF_WIDTH_INT = 0.E+0 U_OUT_KEP = 0.E+0 N_MODES_UU = 0 LCORIOLIS_FORCE = T 
+  LCENTRIFUGAL_FORCE = F LADVECTION_VELOCITY = T /
+ &DENSITY_INIT_PARS  AMPLLNRHO = 0.E+0 INITLNRHO = 'stratification           ' 'nothing                  ' 'nothing                  
+' 'nothing                  ' INITLNRHO2 = 'nothing                  ' WIDTHLNRHO = 0.100000001 RHO_LEFT = 1. RHO_RIGHT = 1. 
+  LNRHO_CONST = 0.E+0 RHO_CONST = 1. CS2BOT = 3.908499939E+37 CS2TOP = 3.908499939E+37 RADIUS_LNRHO = 0.5 EPS_PLANET = 0.5 B_ELL = 1.
+  Q_ELL = 5. HH0 = 0.E+0 RBOUND = 1. MPOLY = 3.908499939E+37 STRATI_TYPE = 'lnrho_lnTT               ' BETA_GLNRHO_GLOBAL = 
+ 3.908499939E+37 3.908499939E+37 3.908499939E+37 KX_LNRHO = 1. KY_LNRHO = 1. KZ_LNRHO = 1. AMPLRHO = 0.E+0 PHASE_LNRHO = 0.E+0 
+  COEFLNRHO = (0.E+0,0.E+0) CO1_SS = 0.E+0 CO2_SS = 0.E+0 SIGMA1 = 150. IDIFF = '                         ' '                        
+ ' '                         ' '                         ' LDENSITY_NOLOG = F WDAMP = 0.E+0 PLAW = 0.E+0 LCONTINUITY_GAS = T 
+  LSTRATIFIED = F /
+ &GRAV_INIT_PARS  GRAVX_PROFILE = 'zero                     ' GRAVY_PROFILE = 'zero                     ' GRAVZ_PROFILE = 'const     
+               ' GRAVX = 0.E+0 GRAVY = 0.E+0 GRAVZ = -2.75 XGRAV = 3.908499939E+37 YGRAV = 3.908499939E+37 ZGRAV = 3.908499939E+37 
+  KX_GG = 1. KY_GG = 1. KZ_GG = 1. DGRAVX = 0.E+0 NU_EPICYCLE = 1. POT_RATIO = 1. Z1 = 0.E+0 Z2 = 1. ZREF = 0.E+0 LNRHO_BOT = 0.E+0 
+  LNRHO_TOP = 0.E+0 SS_BOT = 0.E+0 SS_TOP = 0.E+0 LGRAVX_GAS = F LGRAVX_DUST = F LGRAVY_GAS = F LGRAVY_DUST = F LGRAVZ_GAS = T 
+  LGRAVZ_DUST = T XINFTY = 0.E+0 YINFTY = 0.E+0 ZINFTY = 0.E+0 REDUCED_TOP = 1. /
+ &ENTROPY_INIT_PARS  INITLNTT = 'nothing                  ' 'nothing                  ' 'nothing                  ' 'nothing         
+         ' RADIUS_LNTT = 0.100000001 AMPL_LNTT = 0.E+0 WIDTHLNTT = 1.192092896E-6 LNTT_LEFT = 1. LNTT_RIGHT = 1. LNTT_CONST = 0.E+0 
+  TT_CONST = 1. KX_LNTT = 1. KY_LNTT = 1. KZ_LNTT = 1. /
+ &MAGNETIC_INIT_PARS  B_EXT = 0.E+0 0.E+0 0.E+0 FRING1 = 0.E+0 IRING1 = 0.E+0 RRING1 = 1. WR1 = 0.300000012 AXISR1 = 0.E+0 0.E+0 1. 
+  DISPR1 = 0.E+0 0.5 0.E+0 FRING2 = 0.E+0 IRING2 = 0.E+0 RRING2 = 1. WR2 = 0.300000012 AXISR2 = 1. 0.E+0 0.E+0 DISPR2 = 0.E+0 -0.5
+ 0.E+0 RADIUS = 0.100000001 EPSILONAA = 9.999999776E-3 X0AA = 0.E+0 Z0AA = 0.E+0 WIDTHAA = 0.5 BY_LEFT = 0.E+0 BY_RIGHT = 0.E+0 
+  BZ_LEFT = 0.E+0 BZ_RIGHT = 0.E+0 INITAA = 'nothing                  ' 'nothing                  ' 'nothing                  ' 'noth
+ing                  ' AMPLAA = 0.E+0 0.E+0 0.E+0 0.E+0 KX_AA = 1. 1. 1. 1. KY_AA = 1. 1. 1. 1. KZ_AA = 1. 1. 1. 1. COEFAA = 
+ (0.E+0,0.E+0) (0.E+0,0.E+0) (0.E+0,0.E+0) COEFBB = (0.E+0,0.E+0) (0.E+0,0.E+0) (0.E+0,0.E+0) INCLAA = 0.E+0 LPRESS_EQUIL = F 
+  LPRESS_EQUIL_VIA_SS = F MU_R = -0.5 MU_EXT_POT = -0.5 LB_EXT_POT = F LFORCE_FREE_TEST = F AMPL_B0 = 0.E+0 INITPOWER_AA = 0.E+0 
+  CUTOFF_AA = 0.E+0 N_MODES_AA = 1 RMODE = 1. ZMODE = 1. RM_INT = 0.E+0 RM_EXT = 0.E+0 LGAUSS = F /
+ &RADIATION_INIT_PARS  RADX = 1 RADY = 1 RADZ = 1 RAD2MAX = 1 BC_RAD = 'p:p    ' 'p:p    ' 'S:c    ' LRAD_DEBUG = F KAPPA_CST = 1. 
+  TT_TOP = 4000. TT_BOT = 0.E+0 TAU_TOP = 0.200000003 TAU_BOT = 0.E+0 SOURCE_FUNCTION_TYPE = 'LTE                      ' OPACITY_TYPE
+  = 'Hminus                   ' SRAD_CONST = 1. AMPLSRAD = 1. RADIUS_SRAD = 1. KAPPARHO_CONST = 1. AMPLKAPPARHO = 1. RADIUS_KAPPARHO
+  = 1. LINTRINSIC = T LCOMMUNICATE = T LREVISION = T LRADFLUX = T FRAD_BOUNDARY_REF = 0.E+0 LRAD_COOL_DIFFUS = F LRAD_PRES_DIFFUS = F
+  LNATALIA = F /
+ &LPHYSICS  LHYDRO = T LDENSITY = T LENTROPY = F LMAGNETIC = T LTESTFIELD = F LPSCALAR = F LRADIATION = T LFORCING = F LGRAVZ = T 
+  LGRAVR = F LSHEAR = F LINTERSTELLAR = F LCOSMICRAY = F LCOSMICRAYFLUX = F LDUSTVELOCITY = F LDUSTDENSITY = F LSHOCK = T 
+  LRADIATION_FLD = F LEOS_IONIZATION = F LEOS_FIXED_IONIZATION = F LVISC_HYPER = F LCHIRAL = F LPLANET = F LEOS = T 
+  LEOS_TEMPERATURE_IONIZATION = T /

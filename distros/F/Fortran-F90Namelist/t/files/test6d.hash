@@ -1,0 +1,63 @@
+# test6d.hash                             -*-cperl-*-
+#
+# Hashref tree for the namelist in test6d.nml
+#
+
+$namesref = [ 'run_type', 'ionosphere_mdl', 'station_model' ];
+
+$hashref =
+  { 'run_type' =>
+    { 'sim'              => { value =>[ '.false.' ],
+                              stype => 'logical',             type => 3 },
+      'exteoprtls'       => { value =>[ '.false.' ],
+                              stype => 'logical',             type => 3 },
+      'tdppolyord'       => { value => [ 2 ],
+                              stype => 'integer',             type => 4 },
+    },
+    'ionosphere_mdl' =>
+    {
+    },
+    'station_model' =>
+    { 'nmlwahrk1'        => { value =>[ '.true.' ],
+                              stype => 'logical',             type => 3 },
+      'nmlpoltid'        => { value =>[ '.true.' ],
+                              stype => 'logical',             type => 3 },
+      'nmlname(1)'       => { value => [ 'ALBH' ],
+                              stype => 'single-quote string', type => 1 },
+      'nmltropmap(1)'    => { value => [ 'NIELL' ],
+                              stype => 'single-quote string', type => 1 },
+      'nmlmonument(1,1)' => { value => [ '-2341.3329423',
+                                         '-3539.0495211',
+                                         '4745.7913424' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlstaprtl(1,1)'  => { value => [ 'STA X', 'STA Y', 'STA Z', 'WETZTROP',
+                                         'TRPAZCOS', 'TRPAZSIN', 'STA BIAS',
+                                         ' ' ],
+                              stype => 'single-quote string', type => 1 },
+      'nmltrop_dry(1)'   => { value => [ 2.2911 ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmltrop_wet(1)'   => { value => [ '0.1000' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,1,1)'   => { value => [ '-0.0000005',  '0.0000006', '0.0001912' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,2,1)'   => { value => [ '-0.0000006', '-0.0000001', '0.0002201' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,3,1)'   => { value => [ '-0.0000002',  '0.0000017', '0.0001467' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,4,1)'   => { value => [ '-0.0000005',  '0.0000006', '0.0001912' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,5,1)'   => { value => [ '-0.0000006', '-0.0000001', '0.0002201' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,6,1)'   => { value => [ '-0.0000002',  '0.0000017', '0.0001467' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,7,1)'   => { value => [ '-0.0000006', '-0.0000001', '0.0002201' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,8,1)'   => { value => [  '0.0000000',  '0.0000000', '0.0001000' ],
+                              stype => 'unspecified float',   type => 5 },
+      'nmlsite(1,9,1)'   => { value => [  '0.0000000',  '0.0000000', '0.0001000' ],
+                              stype => 'unspecified float',   type => 5 },
+
+    },
+  };
+
+$nlists = (keys %$hashref) + 0.;

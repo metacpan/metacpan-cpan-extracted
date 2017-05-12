@@ -1,0 +1,11 @@
+[% title = 'Join to ' _ forum.name %]
+
+[% msg = BLOCK %]
+<form method='POST'>
+<p>It's a private forum. u must send a request to the admin and wait until admin approval your request.</p>
+<input type='submit' value='Join Us' />
+<input type='button' value="No, Thanks" onclick='javascript:history.back()' />
+</form>
+[% END %]
+
+[% INCLUDE 'simple/message.html' message.msg = msg %]

@@ -1,0 +1,26 @@
+!
+!  test6c.nml -- Namelist sniplet from qrgres.nml (qr_nml), using old-style
+!  F77 namelist delimiters 
+!
+
+$run_type
+
+    Sim = .false.
+    ExtEOPrtls = .false.
+  TdpPolyOrd = 2
+
+$end
+$ionosphere_mdl
+
+
+$end
+$station_model
+
+! 
+! Date Namelist generated Tue Apr  3 12:25:13 2007  
+! 
+! 
+    NMLWahrK1 = .true. 
+    NMLPolTid = .true. 
+! 
+$end

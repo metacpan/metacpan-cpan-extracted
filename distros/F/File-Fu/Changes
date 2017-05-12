@@ -1,0 +1,118 @@
+Revision history for File-Fu
+
+v0.0.8 2013-06-02
+
+  * fixed t/findknob.t failures / logic
+
+  * added File move(), mkfifo(), sysopen()
+
+  * made File write() chainable
+
+  * added write() and do() to temp filehandles
+
+  * added remove() to File
+
+  * added relative_to() method
+
+  * fixed a regression in the temp dir rename() method
+
+v0.0.7 2010-02-27
+
+  * much better documentation for File::Fu::Dir::find()
+
+  * added rename() for Dir objects
+
+  * allow Dir parts() and slice() to have negative indices
+
+  * improvements to temp_dir
+
+v0.0.6 2009-01-31
+
+  * added File::Fu->which() ala File::Which::which
+
+  * supporting e.g. 'use File::Fu::File' as the entry-point
+
+v0.0.5 2008-12-09
+
+  * added is_same() method
+
+  * added copy() method
+
+  * fix for $dir + 'path/and/file' bug
+
+  * added write() method to File objects
+
+  * added relative_symlink()
+
+  * corrected File SYNOPSIS pod (pointed out by John LoVerso)
+
+  * corrected 'dir/', 'foo/', 'bar/' error in introduction (pointed out
+    by Ron Savage)
+
+  * fixed perl 5.6.2 nit todo with chdir_for()
+
+v0.0.4 2008-09-07
+
+  * resolve() method
+
+  * File::Fu->THIS_FILE
+
+  * chdir_for() and chdir_local() methods for Dir
+
+  * added slice parameter to map() for Dir
+
+  * File::Fu->program_name() / program_dir()
+
+  * File::Fu->cwd
+
+  * absolutely() method for Cwd-style resolution
+
+  * updated %= documentation
+
+  * added pipe_open() method for files
+
+  * chmod(), chdir() methods
+
+  * some handling of auto cleanup in Temp
+
+  * create() and mkdir() return self
+
+  * mode support in mkdir()
+
+  * File::Fu->home()
+
+  * part() and slice() methods in dir
+
+  * relative() has an optional $to argument
+
+v0.0.3 2008-03-08
+
+  ! changed inner append to '%' from .
+
+v0.0.2 2008-02-27
+
+  ! still subject to API changes
+
+  * lots of new methods
+    (readlink, mkdir, rmdir, touch, stat)
+
+  * part() and end() methods (Dir)
+
+  * renamed listing() to list() and iterate_listing() to lister() (Dir)
+
+  * find()/finder() methods (Dir)
+
+  * temp_file()/temp_dir() methods (Dir)
+
+  * read() method for slurping (File)
+
+  * pod, tests, and other good stuff
+
+v0.0.1 2008-02-18
+
+  * first public release
+
+See the source code repository for more detail.
+  http://svn.scratchcomputing.com/File-Fu/trunk
+
+vim:ts=2:sw=2:et:sta

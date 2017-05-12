@@ -1,0 +1,136 @@
+#!perl
+package fabnewsru;
+$fabnewsru::VERSION = '0.01';
+use Fabnewsru::Parser;
+use Fabnewsru::Geo qw(yandex_geocoder);
+
+use Text::CSV;
+use Getopt::Long;
+use Data::Dumper;
+use feature 'say';
+
+# ABSTRACT: CLI tool for working with fabnews.ru website data
+
+
+sub map_array_to_hash_auto {
+	my $hash = shift;
+	my @array = map { $hash{$_} } sort { $a<=>$b } keys %$hash;
+	return \@array;
+}
+
+
+sub map_hash_to_array_manual {
+	my $hash = shift;
+	my $a = [ 
+		$hash->{name}, 
+		$hash->{location},  
+		$hash->{longlat}, 
+		$hash->{website}, 
+		$hash->{business_fields}, 
+		$hash->{phone},  
+		$hash->{email}, 
+		$hash->{foundation_date},
+		$hash->{fabnews_rating},
+		$hash->{fabnews_subscribers},
+		$hash->{last_post},
+	]
+}
+
+
+my %opts;
+
+GetOptions ("f=s"   => \$opts{file},    # string
+            "v"  => \$opts{v})    # flag
+or die("Error in command line arguments\n");
+
+
+sub timestamp {
+    my($sec,$min,$hour,$mday,$mon,$year,$wday, $yday,$isdst)=localtime(time);
+    my($result)=sprintf("%02d-%02d-%4d_%02d:%02d",$mday,$mon+1,$year+1900,$hour,$min);
+    return $result; # like '17-12-2016_17:54'
+}
+
+my $filename;
+warn "Will output to file: ".$opts{file};
+
+if ($opts{file}) {
+	$filename = $opts{file};
+} else {
+	$filename = 'fabnewsru_'.timestamp();
+}
+
+my $csv = Text::CSV->new() or die "Cannot use CSV: ".Text::CSV->error_diag ();
+open my $fh, ">:encoding(utf8)", $filename or die "$filename: $!";
+
+# print header
+
+
+my $fabnews = Fabnewsru::Parser->new;
+my $urls = $fabnews->get_paginated_urls("http://fabnews.ru/fablabs/");  # rerurn arrayref
+
+say "total pages: ".scalar @$urls if ($opts{v});
+
+for (my $i=0; $i < scalar @$urls; $i++) {   # $i = particular url (needed for verbose output only)
+
+	my $url = $urls->[$i];
+	my $labs_at_page = $fabnews->parse_labs_list($url); # return an arrayref containing hashes
+	say $url.", total rows: ".@$labs_at_page;
+
+	for my $lab (@$labs_at_page) {   # $j = lab item (hash)
+		# $lab->{url} url of lab at fabnews.ru
+		my $lab_more_details = $fabnews->parse_lab($lab->{url});
+		my $lab_data = {};
+		%$lab_data = (%$lab, %$lab_more_details);
+		$lab_data->{longlat} = yandex_geocoder($lab_more_details->{location});  # you can comment it if you don't need geocoding
+		
+		say "name:".$lab_data->{name}.",location:".$lab_data->{location}." (".$lab_data->{longlat}.")" if ($opts{v});
+
+		# delete $lab_data->{urls};
+
+		my $arref = map_hash_to_array_manual($lab_data);
+
+		for (@$arref) {
+			utf8::decode($_);
+		}
+
+		$csv->print ($fh, $arref);
+
+	}
+
+}
+
+close $fh or die "$filename: $!";
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fabnewsru - CLI tool for working with fabnews.ru website data
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+    fabnewsru -f <filename.csv>
+    fabnews -e parse_lab http://fabnews.ru/fablabs/item/ufo/ # not implemented yet
+
+    By default (with no options) it will create fabnewsru_<datetime>.csv file with 
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

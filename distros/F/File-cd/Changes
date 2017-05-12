@@ -1,0 +1,7 @@
+Revision history for perl module File::cd
+
+2013-09-23 13:49:12 Asia/Jakarta
+	- hide from the stacktrace with %Carp::Internal
+
+0.001 2013-08-31 22:09:03 Asia/Jakarta
+	- initial public release

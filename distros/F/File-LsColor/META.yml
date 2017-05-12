@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               File-LsColor
+version:            0.170
+abstract:           Colorize input filenames like ls(1)
+author:
+    - Magnus Woldrich <trapd00r@trapd00r.se>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Term::ExtendedColor:  0.182
+resources:
+    bugtracker:  https://github.com/trapd00r/File-LsColor/issues
+    repository:  https://github.com/trapd00r/File-LsColor
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

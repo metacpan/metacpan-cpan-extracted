@@ -1,0 +1,10 @@
+Changes
+lib/File/Namaste.pm
+Makefile.PL
+MANIFEST
+nam
+README
+t/nam.t
+t/elide.t
+VERSION
+META.yml                                 Module meta-data (added by MakeMaker)

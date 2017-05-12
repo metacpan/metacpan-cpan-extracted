@@ -1,0 +1,23 @@
+---
+abstract: 'Provides a convenient function (walkdir) for executing code on files in a directory structure recursively.'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-chdir-WalkDir
+requires:
+  Exporter: 0
+  File::Spec::Functions: 0
+  File::chdir: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+version: 0.040

@@ -1,0 +1,104 @@
+File::Random Version 0.17
+=========================
+NAME
+    File::Random - Perl module for random selecting of a file
+
+INSTALLATION
+
+The classic
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+will do this job.
+
+SYNOPSIS
+      use File::Random qw/:all/;
+ 
+      my $fname  = random_file();
+
+      my $fname2 = random_file(-dir => $dir);
+  
+      my $random_gif = random_file(-dir       => $dir,
+                                   -check     => qr/\.gif$/,
+                                   -recursive => 1);
+                                                           
+      my $no_exe     = random_file(-dir   => $dir,
+                                   -check => sub {! -x});
+                                                           
+      my @jokes_of_the_day = content_of_random_file(-dir => '/usr/lib/jokes');
+      my $joke_of_the_day  = content_of_random_file(-dir => '/usr/lib/jokes');
+      # or the shorter
+      my $joke = corf(-di r => '/usr/lib/jokes');
+  
+      my $word_of_the_day = random_line('/usr/share/dict/words');
+      my @three_words     = random_line('/usr/share/dict/words',3);
+      # or
+      my ($title,$speech,$conclusion) = random_line('/usr/share/dict/words');
+
+DESCRIPTION
+    This module simplifies the routine job of selecting a random file. (As
+    you can find at CGI scripts).
+
+    It's done, because it's boring (and errorprone), always to write
+    something like
+
+      my @files = (<*.*>);
+      my $randf = $files[rand @files];
+  
+    or
+
+      opendir DIR, " ... " or die " ... ";
+      my @files = grep {-f ...} (readdir DIR);
+      closedir DIR;
+      my $randf = $files[rand @files];
+ 
+    It also becomes very boring and very dangerous to write randomly
+    selection for subdirectory searching with special check-routines.
+
+    The simple standard job of selecting a random line from a file is
+    implemented, too.
+
+DEPENDENCIES
+  This module requires these other modules and libraries:
+
+    Want
+  
+  For the tests are also needed many more modules:
+
+    Test::More
+    Test::Exception
+    Test::Class
+    Set::Scalar
+    File::Temp
+    Test::Warn
+    Test::ManyParams
+  
+  Test::Class itselfs needs the following additional modules:
+    Attribute::Handlers             
+    Class::ISA                      
+    IO::File                        
+    Storable
+    Test::Builder
+    Test::Builder::Tester
+    Test::Differences    
+
+  All these modules are needed only for the tests.
+  You can work with the module even without them. 
+  These modules are only needed for my test routines,
+  not by the File::Random itself.
+  (However, it's a good idea most to install most of the modules anyway).
+
+COPYRIGHT
+    This Program is free software. You can change or redistribute it under
+    the same condition as Perl itself.
+
+    Copyright (c) 2002, Janek Schleicher, <bigj@kamelfreund.de>
+
+AUTHOR
+    Janek Schleicher, <bigj@kamelfreund.de>
+
+SEE ALSO
+    Tie::Pick Data::Random Algorithm::Numerical::Sample

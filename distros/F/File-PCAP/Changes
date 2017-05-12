@@ -1,0 +1,8 @@
+Revision history for File-PCAP
+
+v0.0.4  Thu May  4 10:47:42 CEST 2017
+	- edited POD
+
+v0.0.3  Thu Feb  2 16:56:35 CET 2017
+	- make 'make testpodcoverage' working
+

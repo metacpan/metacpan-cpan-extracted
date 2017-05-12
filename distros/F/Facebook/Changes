@@ -1,0 +1,26 @@
+Revision history for Facebook
+
+0.102     2011-03-29 14:48:06 America/Chicago
+	- Fix for creating Signed object with no cookie or signed_data
+
+0.101     2011-02-12 13:37:15 America/Chicago
+
+0.100     2011-02-11 18:29:53 America/Chicago
+
+0.010     2010-12-24 05:56:09 Europe/Berlin
+	- Change of the API structure, cleanup
+
+0.009     2010-12-21 04:10:42 Europe/Berlin
+	- Fixed automatic include of API classes
+
+0.008     2010-12-09 16:13:12 Europe/Berlin
+	- Fixed requirements
+
+0.007     2010-12-08 01:11:14 Europe/Berlin
+
+0.006     2010-11-04 22:46:51 Europe/Berlin
+	- switched to Dist::Zilla
+	- lots of stuff for Facebook::Manual
+
+0.005  2010-10-22 19:35:29
+	- situation normal, all ....

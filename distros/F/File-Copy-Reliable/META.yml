@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                File-Copy-Reliable
+version:             0.32
+abstract:            File copying and moving with extra checking
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    File::Copy:                    0
+    Path::Class:                   0
+    Test::Exception:               0
+    Test::File:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

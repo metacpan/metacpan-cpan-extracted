@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Finance::QuoteDB;
+use Finance::QuoteDB::Schema;
+use Getopt::Long qw(:config);
+use Config::IniFiles;
+use Pod::Usage;
+use Log::Log4perl qw(:easy);
+
+our $VERSION = '0.18'; # VERSION
+
+# enable Log::Log4perl to only output $ERRORS
+Log::Log4perl->easy_init(
+    {  level => $INFO,
+
+       #                            file    => ">>fqdb.log"
+    }
+);
+my $logger = Log::Log4perl::get_logger();
+if ( $ENV{"FQDBDEBUG"} ) {    # enable debug logging if FQDBDEBUG is set
+    $logger->level($DEBUG);
+}
+
+my $dsn        = 'dbi:SQLite:fqdb.db';
+my $dsnuser    = '';
+my $dsnpasswd  = '';
+my $market     = '';
+my $exchanges  = '';
+my $searchlist = '';
+my $stocks     = '';
+my $overwrite  = 1;                      # overwrite existing data by default
+my $startdate  = '1900-01-01';
+my $enddate    = '';
+my $configFile = '';
+
+license();
+
+GetOptions(
+    'dsn=s'                   => \$dsn,
+    'dsnuser=s'               => \$dsnuser,
+    'dsnpassword|dsnpasswd=s' => \$dsnpasswd,
+    'market=s'                => \$market,
+    'exchanges=s'             => \$exchanges,
+    'searchlist=s'            => \$searchlist,
+    'stocks=s'                => \$stocks,
+    'startdate=s'             => \$startdate,
+    'enddate=s'               => \$enddate,
+    'overwrite!'              => \$overwrite,
+    'configFile=s'            => \$configFile,
+    'h|help'                  => sub { pod2usage(1); },
+    'c|w'       => sub { print("Please read the LICENSE file\n") },
+    'v|version' => sub {
+        print(   "Finance::QuoteDB version is "
+               . Finance::QuoteDB->VERSION
+               . "\n" );
+        print("Finance::Quote version is " . Finance::Quote->VERSION . "\n" );
+    }
+) or pod2usage(2);
+
+my $command = shift(@ARGV) || '';
+
+if ($command) {
+    my $fqdb = Finance::QuoteDB->new(
+              { dsn => $dsn, dsnuser => $dsnuser, dsnpasswd => $dsnpasswd } );
+
+SWITCH: {
+        ( $command eq 'createdb' ) && do {
+            $fqdb->createdb();
+            last SWITCH;
+        };
+        ( $command eq 'addstock' ) && do {
+            $fqdb->addstock( $market, $stocks );
+            last SWITCH;
+        };
+        ( $command eq 'delstock' ) && do {
+            $fqdb->delstock($stocks);
+            last SWITCH;
+        };
+        ( $command eq 'updatedb' ) && do {
+            $fqdb->updatedb();
+            last SWITCH;
+        };
+        ( $command eq 'backpopulate' ) && do {
+            $fqdb->backpopulate( $startdate, $enddate, $overwrite, $stocks );
+            last SWITCH;
+        };
+        ( $command eq 'dumpquotes' ) && do {
+            $fqdb->dumpquotes( $stocks, $startdate, $enddate );
+            last SWITCH;
+        };
+        ( $command eq 'dumpstocks' ) && do {
+            $fqdb->dumpstocks();
+            last SWITCH;
+        };
+        ( $command eq 'GTWriteConfig' ) && do {
+            $fqdb->Finance::QuoteDB::Geniustrader::writeConfig($configFile);
+            last SWITCH;
+        };
+        ( $command eq 'addYahooStocks' ) && do {
+            my @searchlist = split( ',', $searchlist );
+            my $reflist = ( scalar(@searchlist) > 0 ) ? \@searchlist : undef;
+            $fqdb->add_yahoo_stocks( $exchanges, $reflist );
+            last SWITCH;
+        };
+        INFO("Nothing to do: No command given\n");
+    }
+}
+
+sub license {
+    print("Finance::QuoteDB  Copyright (C) 2008-2015  Erik Colson\n");
+    print(
+        "This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n"
+    );
+    print("This is free software, and you are welcome to redistribute it\n");
+    print("under certain conditions; type `fqdb -c' for details.\n\n");
+    print("You can read the doc with `fqdb -h'.\n");
+}
+
+
+=head1 NAME
+
+fqdb - Manage quote databases
+
+=head1 SYNOPSIS
+
+fqdb [options] command
+
+=head1 DESCRIPTION
+
+This script is the command-line interface to the Finance::QuoteDB
+module.
+
+=head1 COMMANDS
+
+  createdb      Creates a new database
+  addstock      Add stocks to database
+  delstock      Remove stocks from a database
+  updatedb      Updates a database
+  backpopulate  Retrieves history quotes and put them in the database
+  dumpquotes    Retrieves and outputs quotes from the database
+  dumpstocks    Retrieves and outputs stock symbols and info from the database
+  GTWriteConfig Writes a config file for usage with Geniustrader
+  addYahooStocks Retrieves and adds all yahoo known symbols for specified exchanges
+
+=head1 OPTIONS
+
+  -h --help     Shows help
+  --dsn         Which database to use. Defaults to 'dbi:SQLite:fqdb.db'.
+                format = 'dbi:$dbType:dbname=$dbname;host=$host;port=$port'
+  --dsnuser     Username if needed for dsn
+  --dsnpassword Password if needed for dsn
+  --market      Market from which stocks should be treated. See Finance::Quote submodules
+  --exchanges   Exchanges as the exchange set by Yahoo. NYQ for NYSE, PAR for PARIS etc, comma separated list
+  --searchlist  List of strings used to search symbols on yahoo's site
+  --stocks      Stock list (comma separated) use [] to specify your own ID
+                i.e. GOOG[GOOGLE]
+  --startdate   startdate for usage with backpopulate and dumpquotes defaults to '1900-01-01'
+  --enddate     enddate for usage with backpopulate and dumpquotes defaults to '' (today)
+  --overwrite   indicates if updates should overwrite previously saved data.
+                Defaults to yes. Only works for backpopulate for now...
+  --configFile  Name of file to create as configuration file.
+  -v --version  Returns version number of Finance::QuoteDB
+
+=head1 EXAMPLES
+
+=head2 fqdb createdb --dsn='dbi:SQLite:quotes.db'
+
+=head2 fqdb createdb --dsn='dbi:SQLite:dbname=quotes.db'
+
+Creates a new database in the current directory called quotes.db of
+type SQLite.
+
+=head2 fqdb updatedb --dsn='dbi:SQLite:quotes.db'
+
+Updates the database quotes.db with new quotes if available.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 Erik Colson, all rights reserved.
+
+This file is part of Finance::QuoteDB.
+
+Finance::QuoteDB is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+Finance::QuoteDB is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Finance::QuoteDB.  If not, see
+<http://www.gnu.org/licenses/>.
+
+=cut

@@ -1,0 +1,129 @@
+class 'Fl::Progress';
+isa 'Fl::Widget';
+include 'FL/Fl_Progress.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Progress - Displays a Progress Bar for the User
+
+=head1 Description
+
+The Fl::Progress is a simple progress bar.
+
+=for html <center><img src="http://seriss.com/people/erco/fltk/fltk-progress.png" /></center>
+
+A full example of this widget can be found in C<eg/progress.pl>
+
+=head1 Methods
+
+Fl::Progress inherits from Fl::Widget. On top of that, it exposes the
+following methods...
+
+=head2 new(...)
+
+    my $pro_a = Fl::Progress->new(0, 0, 250, 500, 'Important Stuff');
+    my $pro_b = Fl::Progress->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+You can set the background color with C<color()> and the progress bar color
+with C<selection_color()>, or you can set both colors together with
+C<color($bg, $sel)>.
+
+The default colors are FL_BACKGROUND2_COLOR and FL_YELLOW, resp.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Progress *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 maximum(...)
+
+    my $max = $pro_a->maximum();
+    $pro_a->maximum( 500.3 );
+
+Gets or sets the maximum value in the progress widget.
+
+=cut
+
+xs {name        => 'maximum',
+    definitions => [
+        {required => [[qw[float v]]]},
+        {returns  => 'float'}
+    ]
+};
+
+=pod
+
+=head2 minimum(...)
+
+    my $min = $pro_a->minimum();
+    $pro_a->minimum( 2 );
+
+Gets or sets the minimum value in the progress widget.
+
+=cut
+
+xs {name        => 'minimum',
+    definitions => [
+        {required => [[qw[float v]]]},
+        {returns  => 'float'}
+    ]
+};
+
+=pod
+
+=head2 maximum(...)
+
+    my $max = $pro_a->value();
+    $pro_a->value( 100 );
+
+Gets or sets the current value in the progress widget.
+
+=cut
+
+xs {name        => 'value',
+    definitions => [
+        {required => [[qw[float v]]]},
+        {returns  => 'float'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,3 @@
+#fsdb experiment mean1 stddev1 n1 mean2 stddev2 n2 diff diff_pct diff_conf_half diff_conf_low diff_conf_high diff_conf_pct_half diff_conf_pct_low diff_conf_pct_high
+e	81.31	7.79487	9	78.61	6.9455	15	2.7	3.4347	6.3538	-3.6538	9.0538	8.0827	-4.648	11.517
+#   | dbrvstatdiff mean2 stddev2 n2 mean1 stddev1 n1

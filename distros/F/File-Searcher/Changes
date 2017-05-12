@@ -1,0 +1,19 @@
+Revision history for Perl extension File::Searcher.
+
+
+0.92 Sun Apr 15 14:44:57 EDT 2007
+
+* Fixed Archive TAR compatibility
+* Fixed Class Struct compatibility
+
+
+0.91 Tue Sep 25 23:08:50 EDT 2001 
+
+* Updated POD
+
+0.9  Tue Nov 14 21:00:24 2000
+
+* Initial CPAN Release
+
+
+

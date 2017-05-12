@@ -1,0 +1,52 @@
+Revision history for Perl extension File::FDpasser.
+
+0.01  Wed Jul 14 12:40:32 1999
+	- original version; created by h2xs 1.18
+	Works on Linux and solaris - no OO interface yet
+	lots of cleanup needed... alpha stuff... no
+	documentation (except the source of course).
+
+0.02  Wed Jul 14 16:40:32 1999
+	- Removed stale Data:Dumper references from the
+	t/t*.t files.
+
+0.03  Thu Jul 22 10:39:11 1999
+	- Fixed t/t10*.t Write on listen fd was being
+	queried and some platforms therefore always
+	returned true from select when no new client
+	was on the other end.
+
+0.04  Tue Jul 27 17:46:17 1999 
+        - Changed all socket code to use perl sockets
+	and now everything is a Perl Filehandle - perl
+	wrappers get the File descriptor - for convenience
+	you can give them fd's too.  Only works on Solaris
+	so far. bsd43.c support is next.
+
+0.05  Wed Jul 28 02:03:02 1999
+        - Added some fixes for Dec unix.
+
+0.06  Thu Jul 29 02:40:07 1999
+		- Lots of clean up in the code, loops removed.
+	Fixed race conditions in test scripts.  Added bsd43.c
+	for (at least) irix.
+
+0.07  Fri Jul 30 02:19:10 1999
+		- Fixed things so hpux uses bsd 4.3 structures
+	and the bsd43.c file - other versions do not seem to
+	work - why I have no clue. Hopefully this will work
+	on Irix too.  Added AIX support and it seems to work
+	at least on AIX 4.3.2.
+
+0.08  Mon Aug  2 20:58:06 1999
+		- Added NetBSD and OpenBSD to the list of OSes
+	OpenBSD 2.5 has been tested already and worked - 
+	Netbsd hasn't been tested yet - along with Irix.
+	BSDi 4.4 hasn't been tested but should work.
+	Some tests were done on Windows NT and they failed
+	miserably. Also O_ACCMODE was replaced with 
+	(O_RDONYL|O_WRONLY|O_RDWR) since Fcntl under 5.004_04
+	doesn't create the constant.  Some documentation 
+	was added.
+
+

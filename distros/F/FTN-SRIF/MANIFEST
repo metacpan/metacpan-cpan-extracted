@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/ftn-srif
+bin/sriftst.sh
+doc/00000001.req
+doc/binkd.srf
+doc/file_id.diz
+doc/freqerr.txt
+doc/magic.txt
+doc/README
+doc/SRIF.TXT
+doc/TODO
+doc/txt2pkt.hlp
+lib/FTN/SRIF.pm
+t/00-load.t
+t/01-ParseRequired.t
+t/02-ParseOptional.t
+t/03-RequestList.t
+t/FTN/00000001.REQ
+t/FTN/BINKD.SRF
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

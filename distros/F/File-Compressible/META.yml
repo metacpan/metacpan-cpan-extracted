@@ -1,0 +1,33 @@
+---
+abstract: 'determine if a mime type is compressible'
+author:
+  - 'Mike Greb <michael@thegrebs.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Compressible
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/mikegrb/File-Compressible/issues
+  homepage: https://github.com/mikegrb/File-Compressible
+  repository: https://github.com/mikegrb/File-Compressible.git
+version: '1.00'
+x_contributors:
+  - 'Mike Greb <mikegrb@cpan.org>'
+  - 'Rev Michael Greb <michael@thegrebs.com>'

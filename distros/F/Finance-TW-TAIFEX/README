@@ -1,0 +1,83 @@
+NAME
+    Finance::TW::TAIFEX - Helper functions for Taiwan Futures Exchange
+
+SYNOPSIS
+      use Finance::TW::TAIFEX;
+
+      my $taifex = Finance::TW::TAIFEX->new();
+
+      $taifex->is_trading_day(); # is today a trading day?
+
+      my $date = DateTime->now;
+      $taifex->daily_futures_uri($date);
+      $taifex->daily_options_uri($date);
+
+      $taifex->contract('TX', '201001')->settlement_date;
+      $taifex->product('TX')->near_term;
+      $taifex->product('TX')->next_term;
+
+DESCRIPTION
+    Finance::TW::TAIFEX provides useful helper functions for the Taiwan
+    Future Exchanges.
+
+METHODS
+  product NAME
+    Returns the Finance::TW::TAIFEX::Product object represented by NAME.
+
+    Currently supported product names:
+
+    Futures
+        TX MTX TE TF T5F MSF CPF XIF GTF
+
+    Options
+        TXO TEO TFO MSO XIO GTO
+
+  has_product NAME
+    Checks if the given product exists.
+
+  contract NAME YEAR MONTH
+    Returns the Finance::TW::TAIFEX::Contract of the given product expires
+    on YEAR/MONTH.
+
+  calendar_for YEAR
+    Returns the trading calendar for YEAR.
+
+  is_trading_day [DATE]
+    Checks if the given DATE is a known trading day. Default DATE is the
+    date in the current context.
+
+  next_trading_day [DATE]
+    Returns the next known trading day in string after the given DATE.
+
+  previous_trading_day [DATE]
+    Returns the previous known trading day in string after the given DATE.
+
+  daily_futures_uri DATE
+    Returns the URI of the official TAIFEX futures trading records for DATE.
+
+  interday_futures_request($product, [$DATE])
+    Returns a HTTP::Request object that fetches futures monthly interday csv
+    file for $product of $DATE.
+
+  interday_options_request($product, [$DATE])
+    Returns a HTTP::Request object that fetches options monthly interday csv
+    file for $product of $DATE.
+
+  daily_options_uri DATE
+    Returns the URI of the official TAIFEX options trading records for DATE.
+
+  ensure_rpt DIR, TYPE, PREFIX
+CAVEATS
+    The URI returned by "daily_futures_uri" and "daily_options_uri" are only
+    valid for the last 30 trading days per the policy of TAIFEX.
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <http://www.taifex.com.tw/>
+

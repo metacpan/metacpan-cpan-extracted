@@ -1,0 +1,14 @@
+Revision history for Perl extension Faster
+
+TODO: optimise common cases of my $self = shift; my ($a,$b,$c) = @_; at function start
+
+0.1  Sat Feb 21 09:26:42 CET 2009
+	- optimised all PUSHMARKs into a single stack extend per function,
+          which hopefully is guarenteed to work.
+        - removed $Config{LIBS} from linker call: doesn't seem to be needed, and
+          contains a lot of garbage libs on debian.
+        - port to 5.10.0's xsub changes.
+ 
+0.01  Thu Mar  9 05:38:46 CET 2006
+	- original version; cloned from Convert::Scalar
+

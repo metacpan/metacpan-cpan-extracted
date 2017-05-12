@@ -1,0 +1,12 @@
+Revision history for File::Find::Object::Rule::VCS
+
+0.0.3   2014-01-30
+    - Add README , LICENSE , t/cpan-changes.t , t/style-trailing-space.t
+    (in part CPANTS Kwalitee)
+    - Minimum version of perl declared as 5.008.
+
+0.0.2   2009-12-31
+    - Add Text::Glob to the dependencies.
+
+0.0.1   2009-12-11
+    - Converted File-Find-Object-Rule-1.07 to this distribution.

@@ -1,0 +1,25 @@
+[% c.load_once("jquery.ui.css") %]
+
+[% url_base = '/forumadmin/' _ forum.forum_id %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='[% forum.forum_url %]'><span>Forum</span></a></li>
+        <li><a href='[% url_base %]/basic'><span>[% c.loc('Basic Setting') %]</span></a></li>
+        <li><a href='[% url_base %]/announcement'><span>[% c.loc('Announcement Setting') %]</span></a></li>
+        <li><a href='[% url_base %]/links'><span>[% c.loc('Forum Links') %]</span></a></li>
+        [% IF forum.policy == 'private' %]
+        <li><a href='[% forum.forum_url %]/members'><span>[% c.loc('Members Settings') %]</span></a></li>
+        [% END %]    </ul>
+    <div>
+
+[% content %]
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs', [% IF c.req.path.match('basic') %]1[% ELSIF c.req.path.match('announcement') %]2[% ELSIF c.req.path.match('links') %]3[% ELSE %]-1[% END %]);
+    });
+</script>

@@ -1,0 +1,14 @@
+Changes
+lib/FileCache/Appender.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.pod
+t/00-load.t
+t/appender.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

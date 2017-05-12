@@ -1,0 +1,6 @@
+params:
+  valid_flg:
+    name: '状態'
+    validators:
+      - Bool#bool
+

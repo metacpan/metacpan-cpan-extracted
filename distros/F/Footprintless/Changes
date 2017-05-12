@@ -1,0 +1,118 @@
+Revision history for Perl module Footprintless
+
+1.24 2017-03-16
+
+    - resolved https://github.com/lucastheisen/footprintless/issues/3 Add support for one action to be applied to multiple services in one call
+
+1.23 2016-12-16
+
+    - fixed multi-template support for resource based overlay
+
+1.22 2016-12-16
+
+    - added resource based overlay support
+
+1.21 2016-11-18
+
+    - added sorting to config dumper and changed json default to json3
+
+1.20 2016-10-21
+
+    - added support for resource manager provider configuration
+
+1.19 2016-10-20
+
+    - added support for clean in .footprintless placeholders for overlay update
+
+1.18 2016-10-12
+
+    - resolved https://rt.cpan.org/Ticket/Display.html?id=118019 Can't redeclare "my" in "my"
+    - resolved https://rt.cpan.org/Ticket/Display.html?id=118162 Using File::Temp::HIGH() is problematic
+    - resolved https://rt.cpan.org/Ticket/Display.html?id=114358 Fails with perls < 5.14
+
+1.17 2016-10-05
+
+    - fixed bug causing footprintless to get initialized 3 times
+
+1.16 2016-09-28
+
+    - added sudo_command command option
+
+1.15 2016-09-16
+
+    - updated Action to use pod description if present, abstract otherwise
+
+1.14 2016-09-16
+
+    - fixed --help to display command help when no action is specified and a default action is present
+
+1.13 2016-09-16
+ 
+    - sorted out --help content building
+
+1.12 2016-09-10
+
+    - added configuration capability to Plugin
+
+1.11 2016-09-05
+
+    - added ActionCommand and Action to cut down on boilerplate
+    - added MixableBase to cut down on boilerplate initialization
+    - added configurable tries and wait_seconds for tunnel startup
+    - modified tunnel init to allow options to override entity for config
+
+1.10 2016-08-20
+    - added Footprintless::Extract implementation
+
+1.09 2016-08-19
+    - added support for extract_to in resources for Deployment
+    - fixed overlay to use dot footprintless resolver on update as well as initialize
+    - added prefix to temp_[dir/file] to provide easier cleanup in case process exits abnormally
+
+1.08 2016-08-18
+    - changed Footprintless::agent from a singleton to a factory
+
+1.07 2016-08-17
+    - fixed deployment extra to supply actual to_dir even if there is a resource_dir
+
+1.06 2016-08-02
+    - added documentation for deploy option 'extra'
+    - add support for timeout and cookie_jar options to agent
+    - add support for extra deployment
+    - update to fix error message during testing on systems without ssh localhost key installed
+    - updated dependency on Maven::Agent
+
+1.05 2016-07-23
+    - added ability to configure custom resolver allowing for additional transforms
+    - made log configuration configurable in footprintless
+    - cleaned up dumper
+    - added pod documentation to tunnel
+
+1.04 2016-07-21
+    - added ability to pass runner options to service
+    - fixed logger message in Footprintless::_init
+    - fixed Footprintless_App_Command_log logger to use STDERR to avoid STDOUT conflicts
+    - fixed out_handle for until to print a newline after each line
+    - modified temp_dir and added temp_file both of which are now secure, reimplemented service status to better handle su
+    - added missing dependency on URI
+    - added resolution during overlay if .footprintless is encountered
+    - updated service to support sub commands with sudo if needed
+    - updated pod for Footprintless::Util::slurp
+    - fixed invalid variable reference in Footprintless::Util::exit_due_to, and added support for STDIN in Footprintless::
+    - added Tunnel.pm and associated factory methods
+    - updated tests to included --no-overwrite-dir for the cp_command tar
+    - added --no-overwrite-dir to the cp_command tar to avoid needing permissions on folders we are not adding to/deleting
+
+1.03 2016-04-30
+    - Fixed Bug #113348 for Footprintless: Undeclared dependency App::Cmd::Tester
+
+1.02 2016-04-30
+    - Added plugin capability.
+    - Added mixins feature.
+    - Migrated to Dist::Zilla::PluginBundle::Simple.
+
+1.01 2016-03-25
+    - Improved documentation.
+
+1.0  2016-03-24
+    - Initial release.

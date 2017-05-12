@@ -1,0 +1,212 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+rrr-news - list files added to the dataset
+
+=head1 SYNOPSIS
+
+  rrr-news [options]
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--after=s>
+
+List all new files after this point in time. The format of the
+timestamp is the unix epoch in floating point notation as used by
+recentfiles in general.
+
+=item B<--before=s>
+
+List all new files before this point in time. The format of the
+timestamp is the unix epoch in floating point notation as used by
+recentfiles in general.
+
+=item B<--contains_epoch=s>
+
+List this file if the epoch is in the collection. Implies --max=1. Can
+be combined with the other contains_* options to form a logical AND.
+
+=item B<--contains_path=s>
+
+List this file if the path is in the collection. Implies --max=1. Can
+be combined with the other contains_* options to form a logical AND.
+
+=item B<--contains_type=s>
+
+List this file if the type is in the collection. Implies --max=1. Can
+be combined with the other contains_* options to form a logical AND.
+
+=item B<--dry-run!>
+
+(TBD) Do not really run the command, ...
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--local=s>
+
+Specifies a local principal file. Nothing is mirrored, the list is
+constructed from local resources. Cannot be combined with the
+C<--remote> option.
+
+=item B<--localroot=s>
+
+Specifies the local root directory. C<--remote> must also be specified
+and mirroring is happening implicitly. If missing, a temporary
+directory is created to hold the data before constructing the list
+(but this is inefficient in case the program is called again later
+because the temporary directory is not persistent).
+
+=item B<--max=i>
+
+Limit the list to at max this many items.
+
+=item B<--remote=s>
+
+Specifies the remote principal file in rsync notation. This implies
+that the necessary remote files will be mirrored before constructing
+the list.
+
+=item B<--rsync_options|rsync=s@>
+
+Multiple options in the form of key=value pairs. E.g.
+
+  --rsync=compress=1 --rsync=links=1
+
+The options are passed to the underlying L<File::Rsync> objects.
+
+=item B<--skip-deletes!>
+
+Boolean. If true then delete events are skipped.
+
+=item B<--verbose|v+>
+
+More feedback.
+
+=back
+
+=head1 DESCRIPTION
+
+rersyncrecent is a project to get speedy rsync operation on large
+trees over multiple hosts. It maintains a collection of files with
+metadata (so called recentfiles) that represent adjacent overlapping
+timespans of file change events.
+
+rrr-news extracts from the recentfiles the new files added or
+modified. The remote-principal-file is the rsync-notation for the
+remote recentfile. The second argument is the path to the local mirror
+directory. If you omit the second argument, a temporary directory is
+taken instead.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use File::Rsync::Mirror::Recent;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+our %Opt;
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(2);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (@ARGV) {
+    pod2usage(2);
+}
+
+if ($Opt{'dry-run'}) {
+    die "FIXME: not yet implemented";
+}
+
+my @constr;
+for my $opt (qw(local remote localroot)) {
+    if (defined $Opt{$opt}) {
+        push @constr, $opt => $Opt{$opt};
+    }
+}
+my $rf = File::Rsync::Mirror::Recent->new
+    (
+     @constr,
+     # stupid, need no rsync options when running with -local!
+     rsync_options => {
+                       compress => 1,
+                       links => 1,
+                       times => 1,
+                       checksum => 1,
+                      },
+    );
+if ($rf->remote) {
+    unless ($rf->localroot) {
+        require File::Temp;
+        my $ldir = File::Temp::tempdir(
+                                       "rrr-news-XXXXXX",
+                                       TMPDIR => 1,
+                                      );
+        $rf->localroot($ldir);
+    }
+} elsif ($rf->local) {
+} else {
+    die "need either --local option or both of --remote and --localroot";
+}
+for my $passthrough (
+                     "locktimeout",
+                     "verbose",
+                    ) {
+    if (my $x = $Opt{$passthrough}) {
+        $rf->$passthrough($x);
+    }
+}
+{
+    my %rsopt;
+    for my $rsopt (@{$Opt{rsync_options}||[]}) {
+        my($key,$value) = $rsopt =~ /([^=]+)=(.+)/s;
+        $rsopt{$key} = $value;
+    }
+    $rf->rsync_options(\%rsopt);
+}
+my @nopt;
+for my $opt (qw(after before max skip-deletes)) {
+    if (defined $Opt{$opt}) {
+        push @nopt, $opt => $Opt{$opt}
+    }
+}
+my $contains;
+for my $opt (qw(path epoch type)) {
+    if (defined $Opt{"contains_$opt"}) {
+        $contains->{$opt} = $Opt{"contains_$opt"};
+    }
+}
+if ($contains) {
+    push @nopt, max => 1, contains => $contains;
+}
+print map {
+    sprintf
+        (
+         "%-20s %s\n",
+         scalar localtime($_->{epoch}),
+         $_->{path},
+        )} @{ $rf->news(@nopt) };
+
+__END__
+
+
+# Local Variables:
+# mode: cperl
+# coding: utf-8
+# cperl-indent-level: 4
+# End:

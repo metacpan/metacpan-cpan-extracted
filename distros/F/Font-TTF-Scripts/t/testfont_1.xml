@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<font coverage="4000000000000000001">
+
+<names>
+    <string num="name">Testing</string>
+    <string num="5">Version 1.0</string>
+    <string num="6">Testing <name num="2"/></string>
+    <string num="9">Annie Olsen and J. Victor Gaultney</string>
+    <string num="11">http://scripts.sil.org</string>
+    <string num="13">Released under the SIL Open Font License.</string>
+    <string num="14">http://scripts.sil.org/OFL</string>
+</names>
+
+<glyphs>
+<glyph UID="0030" PSName="zero"><base UID="0030"/></glyph>
+<glyph UID="0031" PSName="one"><base UID="0031"/></glyph>
+<glyph UID="0032" PSName="two"><base UID="0032"/></glyph>
+<glyph UID="0033" PSName="three"><base UID="0033"/></glyph>
+<glyph UID="0034" PSName="four"><base UID="0034"/></glyph>
+<glyph UID="0035" PSName="five"><base UID="0035"/></glyph>
+<glyph UID="0036" PSName="six"><base UID="0036"/></glyph>
+<glyph UID="0037" PSName="seven"><base UID="0037"/></glyph>
+<glyph UID="0038" PSName="eight">
+    <base UID="0038"/>
+    <point name="test" x="=(xMin + xMax)/2" y="=yMax + 100"/>
+</glyph>
+
+<glyph UID="0039" PSName="nine"><base UID="0039"/></glyph>
+
+<!-- and now for something a little more interesting -->
+
+<glyph UID="00C0">
+    <base UID="0041">
+        <attach UID="0060">
+            <shift y="300"/>
+        </attach>
+    </base>
+</glyph>
+<glyph UID="00E0">
+    <base UID="0061">
+        <attach UID="0060"/>
+    </base>
+</glyph>
+
+</glyphs>
+</font>
+

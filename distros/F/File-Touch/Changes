@@ -1,0 +1,47 @@
+Revision history for Perl module File::Touch
+
+0.11 2016-11-26 NEILB
+    - Document when reference gras the timestamps, and give example.
+      Thanks to SMYLERS for the PR with this.
+
+0.10 2015-10-24 NEILB
+    - Added [MetaJSON] to dist.ini, so we get a META.json in the release
+    - Auto tag and push to github on release
+    - Updated repo URL after changing my github username
+
+0.09 2014-05-07
+    - Added documention for the "time => $time" argument. RT#63233
+    - Restructured dist with lib/ and t/ directories
+    - Added basic testsuite that tests core functionality
+    - Min perl version 5.6.0
+
+0.08_01 2014-05-04
+    - Reformatted this file according to CPAN::Changes::Spec
+    - Moved Touch.pm into lib/File/Touch.pm and created t/ with 01-require.t
+    - Added a basic proper testsuite, that tests the core functionality
+    - Specified min perl version 5.6.0
+    - Switched to Dist::Zilla
+    - Got rid of tab characters
+
+0.08 2009-07-25
+    - Don't die if trying to use O_NONBLOCK fails.
+    - Set O_NOCTTY if the local OS supports it.
+      (If O_NOCTTY is set and path identifies a terminal device,
+      open() shall not cause the terminal device to become the controlling
+      terminal for the process).
+
+0.07 2009-07-25
+    - BUGFIX last fix caused probs (thanks Reini Urban)
+      see https://rt.cpan.org/Ticket/Display.html?id=48183
+
+0.06 2009-03-24
+    - now works on systems lacking O_NONBLOCK (thanks Ronald Fischer)
+    - BUG: no longer works adds O_NOCTTY with terminal devices
+
+0.02 2007-06-01
+    - fixed bareword filehandle (thanks Tolga Ceylan)
+    - I changed my name
+
+0.01 2001-07-05
+	- original version; created by Nigel Wetters
+

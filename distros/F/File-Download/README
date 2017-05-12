@@ -1,0 +1,34 @@
+
+File::Download 0.1 -- a module for downloading large files
+
+	Copyright (c) 2009 Byrne Reese, Gisle Aas. All rights reserved.
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+To install this module, please run:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+For more information on the module, please see the POD documentation
+inside Download.pm. ("perldoc File::Download", once it is installed.)
+
+DISCLAIMER
+
+The code for this module is taken almost entirely from the lwp-download
+script found in LWP or libwww-perl. It has been abstracted into a 
+module for better portability and re-use.
+
+USAGE
+
+my $dwn = File::Download->new({
+    file => $argfile,
+    overwrite => 1,
+    mode => ($opt{a} ? 'a' : 'b'),
+});
+
+print "Downloading $url\n";
+print $dwn->download($url);
+print $dwn->status();

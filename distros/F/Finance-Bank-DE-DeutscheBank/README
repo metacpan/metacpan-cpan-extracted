@@ -1,0 +1,34 @@
+Finance/Bank/DE/DeutscheBank version 0.06
+=========================================
+
+This is a module faciliating access to the german
+Deutsche Bank online banking website at
+https://meine.deutsche-bank.de.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  WWW::Mechanize
+  HTML::TreeBuilder
+  HTML::LinkExtractor
+  Text::CSV_XS
+  Class::Accessor
+
+  a SSL module for LWP
+
+
+COPYRIGHT AND LICENCE
+
+This module may be used under the same terms as Perl itself.
+
+Copyright (C) 2003 - 2010 Wolfgang Schlueschen <wschl@cpan.org>

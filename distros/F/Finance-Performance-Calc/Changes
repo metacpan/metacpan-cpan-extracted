@@ -1,0 +1,16 @@
+Revision history for Perl extension Finance::Performance::Calc.
+
+1.01 Wed Apr 21 23:00:00 2004
+	Substantive:
+	- Makefile.PL: Changed perl version pragma from 5.008001 to
+	5.006001 to match Calc.pm.
+
+	Cosmetic:
+	- README: Removed boilerplate text, added LASTEST CHANGES
+	section.
+	- Calc.pm  - Upped $VERSION.
+
+1.0  Tue Apr 20 20:47:02 2004
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Finance::Performance::Calc -v 1.0
+

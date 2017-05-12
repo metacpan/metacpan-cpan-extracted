@@ -1,0 +1,101 @@
+FreeRADIUS-Database version 0.0.2
+=======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL     
+   
+   # manual intervention is required during this step to
+   # provide the user the ability to specify alternate
+   # directory information
+   
+   make
+   make test
+   make install
+
+   # if you want to install the utilities
+
+   make scripts 
+
+
+
+NOTES
+
+- This distribution comes with a few management scripts that automate
+radacct grouping and aggregation tasks that aid in both database
+maintenance and UBB-type tasks
+
+- The configuration file will be installed into the directory you specified 
+during 'perl Makefile.PL' stage, or /usr/local/etc by default.
+
+You will need to rename the configuration file from freeradius_database.conf-dist 
+to freeradius_database.conf, and then set the config variables to suit your needs.
+
+The configuration file has its own documentation. See
+
+   perldoc FreeRADIUS::freeradius_database.conf 
+
+- Currently, only MySQL has been used in production. The tests use
+a dedicated SQLite database.
+
+
+
+DATABASE SCHEMA
+
+The daily and monthly aggregation routines require their own
+database tables, currently within the actual RADIUS database, and
+are for MySQL only.
+
+The schema files are located in src/schema. To implement:
+
+   mysql -u user -p [-h host] radius_db < src/schema/aggregate_daily.sql
+   mysql -u user -p [-h host] radius_db < src/schema/aggregate_monthly.sql
+
+... you'd be well advised to make a backup of your RADIUS database first.
+
+  
+
+ACCOMPANYING SCRIPTS
+
+There are a few accompanying scripts with this module so you can
+get up and running as soon as possible.
+
+Refer to the documentation of these scripts to get a full
+understanding of their purpose and usage:
+
+   perldoc aggregate_daily
+   perldoc aggregate_monthly
+   perldoc update_nas_ip_address
+   perldoc archive_radacct
+
+aggregate_daily, aggregate_monthly, and archive_radacct are
+designed to be run from cron.
+
+aggregate_daily should be run after midnight, with aggregate_monthly
+following the completion of the daily script. It may be prudent
+to chain the commands into a single cron entry to ensure
+that daily completes prior to the monthly script running.  
+
+
+
+DEPENDENCIES
+
+See the Makefile.PL file.
+
+
+
+COPYRIGHT
+
+Copyright (C) 2012 by Steve Bertrand <steveb@cpan.org>
+
+
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

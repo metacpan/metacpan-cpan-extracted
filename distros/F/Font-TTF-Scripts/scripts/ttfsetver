@@ -1,0 +1,110 @@
+#! /usr/bin/perl
+use strict;
+use Font::TTF::Font;
+use Getopt::Std;
+
+our ($opt_d, $VERSION);
+
+getopts('d:');
+
+$VERSION = '0.1'; # original 
+
+unless ($#ARGV == 2 and $ARGV[0] =~ /^\d+(\.\d+)?$/)
+{
+    die <<"EOT";
+
+ttfsetver [-d description] version infile outfile
+
+Sets font version (in both head and name tables). 
+version parameter must be fixed-point numeric (e.g., 2.3)
+
+-d, if supplied, is descriptive text to be appended to "Version n.nn " for
+the name table entry.
+
+Version $VERSION
+EOT
+}
+
+my ($newVer, $inFont, $outFont) = @ARGV;
+
+# Open font:
+my $f = Font::TTF::Font->open($inFont) || die ("Couldn't open TTF '$inFont'\n");
+
+# Set version in head table:
+my $h = $f->{'head'}->read() || die ("Couldn't open 'head' table.\n");
+$h->{'fontRevision'} = $newVer;
+
+# Set version string (#5) in name table (if it exists)
+if (exists $f->{'name'})
+{
+    my ($name) = $f->{'name'}->read->{'strings'};
+    
+    my $verstring = "Version $newVer";
+    
+   	# The OT spec suggests including semicolon to separate version number from descriptive text
+   	# Handle cases where caller provided semicolon and/or leading whitespace
+   	$opt_d =~ s/^;?\s*//;
+   	$verstring .= "; $opt_d" if (length($opt_d) > 0);
+       
+	do_name ($f, $verstring, 5);
+}
+
+# Write out new font
+$f->out($outFont);
+
+# Adapted from ttfbuilder
+sub do_name
+{
+    my ($f, $newname, $num) = @_;
+    my ($base) = $f->{'name'}{'strings'}[$num];
+    my ($pid, $eid, $lid);
+
+    for ($pid = 0; $pid <= $#{$base}; $pid++)
+    {
+        next unless $base->[$pid];
+        for ($eid = 0; $eid <= $#{$base->[$pid]}; $eid++)
+        {
+            next unless $base->[$pid][$eid];
+            next unless $f->{'name'}->is_utf8($pid, $eid);
+            foreach $lid (keys %{$base->[$pid][$eid]})
+            {
+                $base->[$pid][$eid]{$lid} = $newname;
+            }
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+ttfsetver - sets font version in a TrueType font
+
+=head1 SYNOPSIS
+
+  ttfsetver [-d description] version infile outfile
+
+=head1 OPTIONS
+
+  -d text   descriptive text to be appended to "Version n.nn " for
+            the name table entry.
+
+=head1 DESCRIPTION
+
+Sets font version (in both head and name tables). 
+version parameter must be fixed-point numeric (e.g., 2.3)
+
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

@@ -1,0 +1,383 @@
+#!/usr/bin/perl -w
+use POSIX;
+use Getopt::Long qw(:config bundling require_order auto_version);
+use Pod::Usage;
+use FAST;
+use FAST::Bio::SeqIO;
+use Carp;
+use strict;
+
+use vars qw($VERSION $DESC $NAME $COMMAND $DATE);
+$VERSION = $FAST::VERSION; 
+$DESC    = "Search features from GenBank files with regexes and print corresponding sequences.\n";
+$NAME    = $0;
+$NAME    =~ s/^.*\///;
+$COMMAND = join " ",$NAME,@ARGV;
+$DATE = POSIX::strftime("%c",localtime());
+
+use constant { true => 1, false => 0 };
+
+## DEFAULT OPTION VALUES
+my $def_format  = $FAST::DEF_FORMAT;  #7/1/13 "fasta";
+my $def_logname = $FAST::DEF_LOGNAME; #7/1/13 "FAST.log.txt";
+my $def_join_string =  $FAST::DEF_JOIN_STRING;
+
+
+## OPTION VARIABLES
+my $man                  = undef;  # --man
+my $help                 = undef;  # -h
+my $moltype              = undef;  # -m, in case bioperl can't tell
+my $format               = $def_format;  # --format
+my $log                  = undef;        # -l
+my $logname              = $def_logname; # -L
+my $comment              = undef;        # -C
+my $insensitive          = undef; # -i
+# my $negate               = undef; # -v
+my $qualifier            = undef; # -q 
+my $key                  = undef; # -k
+# my $verbose              = undef;
+my $context              = undef;
+my $join                 = $def_join_string; # -j
+
+GetOptions('help|h'         		 => \$help, 
+	   'man'            		 => \$man,
+	   'moltype|m=s'                 => sub{  my (undef,$val) = @_; 
+						  die "$NAME: --moltype or -m option must be either \"dna\", \"rna\" or \"protein\"" 
+						    unless $val =~ /dna|rna|protein/i; 
+						  $moltype = $val;
+						},
+	   'format=s'                    => \$format,
+	   'log'                         => \$log,
+	   'logname|L=s'                 => \$logname,
+	   'comment|C=s'                 => \$comment,
+	   'case-insensitive|i'          => \$insensitive,
+#	   'negate|v'                    => \$negate,
+	   ## @ allows for multiple use of the -q option
+	   'qualifier|q=s@'              => sub{  my (undef,$val) = @_; 
+						  die "$NAME: --qualifier or -q option argument must contain either \"=\" or \"^\", try perldoc $NAME" 
+						    unless $val =~ /[=\^]/; 
+						  push @$qualifier,$val;
+						},
+	   'key|k=s'                     => \$key,
+	   'context|c=i'                 => sub{  my (undef,$val) = @_; 
+						  die "$NAME: --context or -c option argument must be a positive integer. try perldoc $NAME" 
+						    unless ($val > 0); 
+						  $context = $val;
+						},
+	   'join|j=s'                    => \$join,
+	  ) 
+  or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+$join = "\t" if ($join eq '\t');
+
+my $fromSTDIN = ((-t STDIN) ? false : true);
+
+pod2usage("$NAME: Requires at least one argument unless connected to standard input. Try \"perldoc $NAME\"") if (!$fromSTDIN && @ARGV < 1);
+pod2usage("$NAME: Requires zero arguments if connected to standard input. Try \"perldoc $NAME\"") if ($fromSTDIN && @ARGV > 0);
+
+&FAST::log($logname, $DATE, $COMMAND, $comment) if ($log); 
+
+my @qua = ();
+my @op = ();
+my @qua_regex = ();
+
+
+if ($qualifier) { 
+  foreach my $qvp (@$qualifier) {
+    my ($qua,$op,$qua_regex) = split /([=\^])/,$qvp;
+    unless ($qua and $op and $qua_regex) {
+      die "$NAME: Bad format in -q option argument $qvp\n";
+    }
+    push @qua,$qua; 
+    push @op,($op eq "=" ? 1 : 0);
+    push @qua_regex,($insensitive ? qr/$qua_regex/i : qr/$qua_regex/);
+  }
+}
+
+my $OUT = FAST::Bio::SeqIO->newFh('-format' => 'fasta');
+my $IN;
+unless (@ARGV) {
+    $IN = FAST::Bio::SeqIO->new(-fh => *STDIN{IO}, '-format' => 'genbank');
+}
+
+while ($IN or @ARGV) {
+  if (@ARGV) {
+    my $file = shift (@ARGV);
+    unless (-e $file) {
+      warn "$NAME: Could not find file $file. Skipping.\n";
+      next;
+    }
+    $IN = FAST::Bio::SeqIO->new(-file => $file, '-format' => 'genbank');
+  }
+  if ($IN) { 
+    while (my $seqobj = $IN->next_seq()) {
+      my @features;
+      if ($key) {
+	@features = grep { $_->primary_tag =~ /$key/i } $seqobj->get_SeqFeatures();
+      }
+      else {
+	@features = $seqobj->get_SeqFeatures();
+      }
+      FEAT: foreach my $feat (@features) {
+	  foreach my $i (0..$#qua) {
+	    next FEAT unless (
+			      (
+			       ($feat->has_tag($qua[$i]) and $op[$i] and grep {/$qua_regex[$i]/} $feat->get_tag_values($qua[$i]))
+			       or
+			       ($feat->has_tag($qua[$i]) and not $op[$i] and not grep {/$qua_regex[$i]/} $feat->get_tag_values($qua[$i]))
+			      )
+			     );
+	  }
+
+	  ## TODO: handle context for split features, right now it just dies.
+	  
+	  if ($context and $feat->start > $feat->end) {
+	    $feat->start(($feat->start + $context > $seqobj->length ? $seqobj->length : $feat->start + $context));
+	    $feat->end  (($feat->end - $context < 0 ? 1 : $feat->end   - $context));
+	  }
+	  elsif ($context ) {
+	    $feat->start(($feat->start - $context < 0 ? 1 : $feat->start   - $context));
+	    $feat->end  (($feat->end + $context > $seqobj->length ? $seqobj->length : $feat->end + $context));
+	  }
+	  
+	  my $featseq = $feat->spliced_seq;
+	  my $id = $featseq->id();
+	  $id =~ s/_spliced_feat//;
+	  $featseq->id($id);
+
+	  my @data;
+	  push @data, (sprintf "key:%s",$feat->primary_tag());
+	  push @data, (sprintf "location:%s",$feat->location->to_FTstring());
+	  push @data, (sprintf "context:%s", $context) if ($context);
+	  foreach my $tag ($feat->get_all_tags()){
+	    foreach my $val ($feat->get_tagset_values($tag)){
+	      push @data, (sprintf "%s:\"%s\"",$tag,$val); 
+	    }
+	  }
+	  my $data = join $join,@data;
+	  $featseq->desc($data);
+	  
+	  print $OUT $featseq;
+	}
+    }
+    undef $IN;
+  }
+}
+
+
+
+__END__
+
+=head1 NAME
+
+B<gbfcut> - search features from GenBank files and print corresponding sequences
+
+=head1 SYNOPSIS
+
+B<gbfcut> [OPTIONS]... [GENBANK-FILE]...
+
+=head1 DESCRIPTION
+
+B<gbfcut> takes GenBank-sequence input and outputs subsequences that
+correspond to features annotated on all input sequences in Multi-Fasta
+format. Both simple and more complex split features are
+supported. Optionally, B<gbfcut> may be directed to only output
+sequences corresponding to features with one or more qualifiers, the
+values of match specific perl regular expressions
+(regexes). Alternatively, features may be filtered by regular
+expression matching against particular keys.  By default all features
+are printed.
+
+Options specific to B<gbfcut>:
+  B<-q>, B<--qualifier>=<string>          search features for qualifer values by regular expressions
+  B<-i>, B<--insensitive>                 case-insensitive pattern matching for qualifier regex matching 
+  B<-k>, B<--key>=<regex>                 restrict search to features whose keys match regex <regex>. 
+  B<-j>, B<--join>=<string>               use <string> to join feature annotations in descriptions
+  B<-c>, B<--context>=<int>               include <int> positions of sequence context for each sequence output
+
+Options general to FAST:
+  B<-h>, B<--help>                  	 print a brief help message
+  B<--man>             	           print full documentation
+  B<--version>                         print version
+  B<-l>, B<--log>                         create/append to logfile	
+  B<-L>, B<--logname=<string>>            use logfile name <string>
+  B<-C>, B<--comment=<string>>            save comment <string> to log
+  B<--format=<format>>                 use alternative format for input  
+  B<--moltype=<[dna|rna|protein]>>      specify input sequence type
+
+=head1 INPUT AND OUTPUT
+
+B<gbfcut> is part of FAST, the FAST Analysis of Sequences Toolbox, based
+on Bioperl. Most core FAST utilities expect input and return output in
+multifasta format. Input can occur in one or more files or on
+STDIN. Output occurs to STDOUT. The FAST utility B<fasconvert> can
+reformat other formats to and from multifasta.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-q> <qualifier>[=^]<perl-regex>,
+      B<--qualifier>=<qualifier>[=^]<perl-regex>
+
+Filter only features that have a specified qualifier and for each
+qualifier, at least one value that either matches (=) or no value that
+matches (^) their corresponding perl-regexes. Examples of qualifiers:
+'product', 'note', 'gene', 'db_xref'. Multiple qualifier option
+instances are allowed for the same command; features will be printed
+for which all qualifier expressions are true.
+
+=item B<-i>,
+      B<--case-insensitive>
+
+Enable case-insensitive matching of qualifiers.
+
+=item B<-k> <string>,
+      B<--key>=<string>
+
+Filter only features with keys that match perl-regex
+<string>. Matching is done case-insensitively.  Examples of
+key-matching regexes (called "primary-tags" in BioPerl): 'CDS', 'RNA',
+'CDS|RNA' 'UTR' This regex is always matched case-insensitively.
+
+=item B<-c> <int>,
+      B<--context>=<int>
+
+Include <int> positions of sequence context for each sequence record
+extracted.
+
+=item B<-j> <string>,
+      B<--join>=<string>
+
+Use <string> as delimiter to concatenate annotation data in output
+sequence record descriptions.
+
+=item B<-h>,
+      B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the manual page and exit.
+
+=item B<--version>
+
+Print version information and exit.
+
+=item B<-l>,
+      B<--log>
+
+Creates, or appends to, a generic FAST logfile in the current working
+directory. The logfile records date/time of execution, full command
+with options and arguments, and an optional comment.
+
+=item B<-L [string]>,
+      B<--logname=[string]>
+
+Use [string] as the name of the logfile. Default is "FAST.log.txt".
+
+=item B<-C [string]>,
+      B<--comment=[string]>
+
+Include comment [string] in logfile. No comment is saved by default.
+
+=item B<--format=[format]> 		  
+
+Use alternative format for input. See man page for "fasconvert" for
+allowed formats. This is for convenience; the FAST tools are designed
+to exchange data in Fasta format, and "fasta" is the default format
+for this tool.
+
+=item B<-m [dna|rna|protein]>,
+      B<--moltype=[dna|rna|protein]> 		  
+
+Specify the type of sequence on input (should not be needed in most
+cases, but sometimes Bioperl cannot guess and complains when
+processing data).
+
+=back
+
+=head1 EXAMPLES
+
+Output the 5' and 3' UTR sequences:
+
+=over 8
+
+B<gbfcut> -k UTR t/data/AF194338.1.gb
+
+=back
+
+Output all sequences under the feature "exon" and add location labels:
+
+=over 8
+
+B<gbfcut> -k exon t/data/AF194338.1.gb
+
+=back
+
+Output all feature sequences with a "note" qualifier containing "telomere":
+
+=over 8
+
+B<gbfcut> -q note=telomere t/data/AF194338.1.gb
+
+=back
+
+Output all feature sequences with an "organism" tag set to "Stylonychia lemnae":
+
+=over 8
+
+B<gbfcut> -q organism="Stylonychia lemnae" t/data/AF194338.1.gb
+
+=back
+
+Output all feature sequences with key "tRNA"
+
+=over 8
+
+B<gbfcut> -k tRNA t/data/mito-ascaris.gb
+
+=back
+
+Output all feature sequences with key "tRNA," with a qualifier
+"product" that has a value that matches the pattern "Ser" *and*
+a qualifier "note" that does *not* match the value  "AGN":
+
+=over 8
+
+B<gbfcut> -k tRNA -q product=Ser -q note^AGN t/data/mito-ascaris.gb
+
+=back
+
+
+
+=head1 SEE ALSO
+
+=over 8
+
+=item C<man perlre>
+
+=item C<perldoc perlre>
+
+Documentation on perl regular expressions.
+
+=item C<man FAST>
+
+=item C<perldoc FAST>
+
+Introduction and cookbook for FAST
+
+=item L<The FAST Home Page|http://compbio.ucmerced.edu/ardell/FAST>"
+
+=back 
+
+=head1 CITING
+
+If you use FAST, please cite I<Lawrence et al. (2015). FAST: FAST Analysis of
+Sequences Toolbox.> and Bioperl I<Stajich et al.>. 
+
+=cut

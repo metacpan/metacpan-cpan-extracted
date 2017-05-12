@@ -1,0 +1,12 @@
+README for File::Find::Object::Rule::VCS:
+
+File::Find::Object::Rule::VCS - Exclude files/directories for
+Version Control Systems
+
+To build use:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+

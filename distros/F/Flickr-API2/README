@@ -1,0 +1,54 @@
+Flickr::API2
+============
+
+Perl interface to the Flickr API.
+
+This module is based on Flickr::API by Cal Henderson, forked and updated.
+
+Changes from Version 1:
+
+ * Update API URLs to api.flickr.com
+ * UTF-8 support.
+ * Automatically retry API calls that time-out.
+ * Remove XML libraries
+ * Return Perl structure
+ * Use JSON API at Flickr
+ * Update inheritance methods
+ * Fix dependencies
+ * Use Module::Install instead of ExtUtils::MakeMaker
+ * Add unit tests
+ * Throw exceptions when deserved rather than return a hash containing
+   a "not ok" field in it.
+ * Remove the subclassed HTTP::Response object as your main returned item.
+ * Some initial helper methods to directly access photos/searches.
+
+Still to come:
+
+ * More helper methods and classes.
+
+REPOSITORY
+
+Development is on-going at:
+https://github.com/TJC/Flickr-API2
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+A list of dependencies is maintained in Makefile.PL; they should be
+automatically installed if they are missing.
+
+COPYRIGHT AND LICENCE
+
+Version 2.10 Copyright (C) 2011-2014 Toby Corkindale <tjc@wintrmute.net>
+
+Original version 1.xx Copyright (C) 2004-2009 Cal Henderson <cal@iamcal.com>
+
+License: Perl Artistic License 2.0

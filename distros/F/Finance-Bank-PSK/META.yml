@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Finance-Bank-PSK
+version:      1.04
+version_from: lib/Finance/Bank/PSK.pm
+installdirs:  site
+requires:
+    Class::MethodMaker:            1.06
+    HTML::TokeParser:              2.24
+    WWW::Mechanize:                0.57
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+use Win32::TieRegistry(Delimiter => '/', qw( REG_EXPAND_SZ));
+use Getopt::Std;
+# use Win32::MagicAPI qw(user32);
+use Win32::API;
+
+use bytes;
+
+getopts('d:r');
+
+$path = join(' ', @ARGV);
+
+unless ($path)
+{
+    die <<'EOT';
+    addpath [-r] [-d file] path
+    
+Adds the path to the system path or removes it (-r)
+
+  -d file   debug output to file
+  -r        removes path from system path
+EOT
+}
+
+my ($regKey) = "HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Session Manager/Environment//Path";
+open(DEBUG, ">$opt_d") if ($opt_d);
+
+if (Win32::IsWinNT())
+{
+    if ($opt_r)
+    { removepathnt($path); }
+    else
+    { addpathnt($path); }
+    
+    warn "Couldn't set PATH\n" unless defined $Registry->{$regKey};	# Might not have permission
+ 
+    # tell everyone that life has changed (0x1A = WM_SETTINGCHANGED) (-1 = HWND_TOPWINDOW)
+    # The following from http://www.perlmonks.org/?node=171505
+    my $SendMessage = new Win32::API("user32", "SendMessage", 'NNNP', 'N')  or die "Couldn't create SendMessage: $!\n";
+    my $RetVal = $SendMessage->Call(-1,0x1a,0,'Environment');
+}
+
+
+sub addpathnt
+{
+    my ($path) = @_;
+    my ($currPath) = $Registry->{$regKey};
+    my ($out);
+    
+    print DEBUG "adding $path to $currPath\n" . join(' ', unpack('C*', $currPath)) . "\n" if ($opt_d);
+    $out if ($currPath =~ s/\000(.*)$//o);
+    if ($currPath !~ m/(^|;)\Q$path\E(;|$)/oi)
+    { 
+        $currPath .= ";$path";
+        $out = 1;
+    }
+    elsif (!defined $currPath)
+    { 
+        $currPath = $path;
+        $out = 1;
+    }
+    $Registry->{$regKey} = [$currPath, REG_EXPAND_SZ] if ($out);
+    print DEBUG "Path is now $Registry->{$regKey}\n" if ($opt_d);
+}
+
+
+sub removepathnt
+{
+    my ($path) = @_;
+    my ($currPath) = $Registry->{$regKey};
+    
+    print DEBUG "removing $path from $currPath\n" if ($opt_d);
+    if ($currPath =~ s/;\Q$path//oi || $currPath =~ s/\Q$path;//oi)
+    { $Registry->{$regKey} = [$currPath, REG_EXPAND_SZ]; }
+    print DEBUG "path now $Registry->{$regKey}\n" if ($opt_d);
+}
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

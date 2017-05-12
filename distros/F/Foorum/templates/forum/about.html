@@ -1,0 +1,53 @@
+[% PROCESS sub/date.html %]
+
+[% title = 'About ' _ forum.name %]
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='[% forum.forum_url %]'><span>Topics</span></a></li>
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/polls'><span>Polls</span></a></li>
+        [% END %]
+        [% END %]
+        [% UNLESS forum.settings.can_post_threads AND forum.settings.can_post_threads == 'N' %]
+        <li><a href='[% forum.forum_url %]/topic/new'><span>[% c.loc("New Topic") %]</span></a></li>
+        [% END %]
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/poll/new'><span>[% c.loc("New Poll") %]</span></a></li>
+        [% END %]
+        [% END %]
+        <li><a href='[% forum.forum_url %]/action_log'><span>View Action Logs</span></a></li>
+        <li selected="selected"><a href='[% forum.forum_url %]/about'><span>About</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<table align='center'>
+<tr><td>
+    <ul>
+        <li>Can [% IF forum.settings.can_post_threads == 'N' %]<b>NOT</b>[% END %] Post Threads</li>
+        <li>Can [% IF forum.settings.can_post_replies == 'N' %]<b>NOT</b>[% END %] Post Replies</li>
+        <li>Can [% IF forum.settings.can_post_polls == 'N' %]<b>NOT</b>[% END %] Post Polls</li>
+        <li>Created On [% date_format(settings.created_time) %]</li>
+        <li>Admin: <a href='/u/[% forum_roles.${forum.forum_id}.admin.username %]'>[% forum_roles.${forum.forum_id}.admin.nickname %]</a>
+[% FOREACH moderator IN forum_roles.${forum.forum_id}.moderator %]
+[% IF loop.first %], [% END %]<a href='/u/[% moderator.username %]'>[% moderator.nickname %]</a>[% UNLESS loop.last %], [% END %]
+[% END %]</li>
+    </ul>
+</td>
+</tr>
+</table>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

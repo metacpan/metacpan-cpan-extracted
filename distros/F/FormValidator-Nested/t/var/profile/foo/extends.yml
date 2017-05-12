@@ -1,0 +1,6 @@
+extends: index
+params:
+  mail_array:
+    validators:
+      - Blank#not_blank
+

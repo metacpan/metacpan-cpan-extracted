@@ -1,0 +1,2017 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# Endre ZELENA <ezelena@users.sourceforge.net>, 2003.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2003-03-18 15:02+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Endre ZELENA <ezelena@users.sourceforge.net>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/FAQ/OMatic.pm:96 lib/FAQ/OMatic/install.pm:1079
+msgid "Warnings:"
+msgstr "Figyelmeztetés:"
+
+#: lib/FAQ/OMatic.pm:111
+msgid ""
+"Your Faq-O-Matic would have a title if it had an item 1, which it will when "
+"you've run the installer."
+msgstr ""
+
+#: lib/FAQ/OMatic.pm:114 lib/FAQ/OMatic/install.pm:1164
+msgid "Untitled Faq-O-Matic"
+msgstr "Untitled Faq-O-Matic"
+
+#: lib/FAQ/OMatic.pm:136 lib/FAQ/OMatic/authenticate.pm:151
+msgid "Log In"
+msgstr "Bejelentkezés"
+
+#: lib/FAQ/OMatic.pm:137
+msgid "Change Password"
+msgstr "Jelszó módosítás"
+
+#: lib/FAQ/OMatic.pm:138
+#, c-format
+msgid "Edit Title of %0 %1"
+msgstr "Cím szerkesztése: %0 %1"
+
+#: lib/FAQ/OMatic.pm:139
+#, c-format
+msgid "New %0"
+msgstr "Új %0"
+
+#: lib/FAQ/OMatic.pm:140
+#, c-format
+msgid "Edit Part in %0 %1"
+msgstr "Elem szerkesztése: %0 %1"
+
+#: lib/FAQ/OMatic.pm:141
+#, c-format
+msgid "Insert Part in %0 %1"
+msgstr "Elem beilelsztése: %0 %1"
+
+#: lib/FAQ/OMatic.pm:142
+#, c-format
+msgid "Move %0 %1"
+msgstr "Mozgat: %0 %1"
+
+#: lib/FAQ/OMatic.pm:143 lib/FAQ/OMatic/Appearance.pm:168
+msgid "Search"
+msgstr "Keresés"
+
+#: lib/FAQ/OMatic.pm:144
+msgid "Access Statistics"
+msgstr "Statisztikák"
+
+#: lib/FAQ/OMatic.pm:145 lib/FAQ/OMatic/submitPass.pm:138
+msgid "Validate"
+msgstr "Megerõsít"
+
+#: lib/FAQ/OMatic.pm:146
+msgid "%0 Permissions for %1"
+msgstr "%0 Permissions for %1"
+
+#: lib/FAQ/OMatic.pm:147
+#, c-format
+msgid "Upload bag for %0 %1"
+msgstr "Csomag feltöltése: %0 %1"
+
+#: lib/FAQ/OMatic.pm:1663
+msgid "http-charset"
+msgstr ""
+
+#: lib/FAQ/OMatic/Appearance.pm:177
+msgid "Appearance"
+msgstr "Megjelenés"
+
+#: lib/FAQ/OMatic/Appearance.pm:191
+msgid "Show Top Category Only"
+msgstr "Csak a top kategória mutatása"
+
+#: lib/FAQ/OMatic/Appearance.pm:198
+msgid "Show This <em>Entire</em> Category"
+msgstr "A <em>teljes</em> kategória megjelenítése"
+
+#: lib/FAQ/OMatic/Appearance.pm:209
+msgid "Show This Category As Text"
+msgstr "A kategória mutatása szövegként"
+
+#: lib/FAQ/OMatic/Appearance.pm:213
+msgid "Show This Answer As Text"
+msgstr "A válasz mutatása szövegként"
+
+#: lib/FAQ/OMatic/Appearance.pm:218
+msgid "Show This %0 As Text"
+msgstr "A %0 mutatása szövegként"
+
+#: lib/FAQ/OMatic/Appearance.pm:232
+msgid "Show This <em>Entire</em> Category As Text"
+msgstr "A <em>teljes</em> kategóriát mutatása szövegként"
+
+#: lib/FAQ/OMatic/Appearance.pm:244
+msgid "Hide Expert Edit Commands"
+msgstr "Szerkesztõ parancsok elrejtése"
+
+#: lib/FAQ/OMatic/Appearance.pm:253
+msgid "Show Expert Edit Commands"
+msgstr "Szerkesztõ parancsok mutatása"
+
+#: lib/FAQ/OMatic/Appearance.pm:269 lib/FAQ/OMatic/Item.pm:2224
+#: lib/FAQ/OMatic/stats.pm:133
+msgid "Return to the FAQ"
+msgstr "Vissza a kezdõoldalra"
+
+#: lib/FAQ/OMatic/Appearance.pm:276
+msgid "This is a"
+msgstr " "
+
+#: lib/FAQ/OMatic/Auth.pm:495
+msgid "the administrator of this Faq-O-Matic"
+msgstr "Ennek a Faq-O-Matic-nak az adminisztrátora"
+
+#: lib/FAQ/OMatic/Auth.pm:496
+msgid "someone who has proven their identification"
+msgstr "azonosított felhasználó"
+
+#: lib/FAQ/OMatic/Auth.pm:497
+msgid "someone who has offered identification"
+msgstr "someone who has offered identification"
+
+#: lib/FAQ/OMatic/Auth.pm:498
+msgid "anybody"
+msgstr "bárki"
+
+#: lib/FAQ/OMatic/Auth.pm:511
+msgid "the moderator of the item"
+msgstr "a terület moderátora"
+
+#: lib/FAQ/OMatic/Auth.pm:515
+#, c-format
+msgid "%0 group members"
+msgstr "a(z) %0 csoport tagjai"
+
+#: lib/FAQ/OMatic/Groups.pm:142
+msgid "Select a group to edit:"
+msgstr "Módosítani kívánt csoport:"
+
+#: lib/FAQ/OMatic/Groups.pm:150
+msgid ""
+"(Members of this group are allowed to access these group definition pages.)"
+msgstr "(Ennek a csoportnak a tagjai elérhetik ezeket az oldalakat.)"
+
+#: lib/FAQ/OMatic/Groups.pm:168
+msgid "Add Group"
+msgstr "Csoport létrehozása"
+
+#: lib/FAQ/OMatic/Groups.pm:175
+msgid "Up To List Of Groups"
+msgstr "Vissza a csoportok listájához"
+
+#: lib/FAQ/OMatic/Groups.pm:187
+msgid "Remove Member"
+msgstr "Eltávolítás a csoportból"
+
+#: lib/FAQ/OMatic/Groups.pm:196
+msgid "Add Member"
+msgstr "Tag felvétele a csoportba"
+
+#: lib/FAQ/OMatic/Groups.pm:206 lib/FAQ/OMatic/install.pm:467
+#: lib/FAQ/OMatic/install.pm:471
+msgid "Go to the Faq-O-Matic"
+msgstr "Tovább a fõoldalra"
+
+#: lib/FAQ/OMatic/Groups.pm:209 lib/FAQ/OMatic/maintenance.pm:134
+msgid "Go To Install/Configuration Page"
+msgstr "Tovább a beállítások oldalra"
+
+#: lib/FAQ/OMatic/Item.pm:83
+msgid "New Item"
+msgstr "Új elem"
+
+#: lib/FAQ/OMatic/Item.pm:727
+msgid "Parts"
+msgstr "Elemek"
+
+#: lib/FAQ/OMatic/Item.pm:750
+msgid "(missing or broken file)"
+msgstr ""
+
+#: lib/FAQ/OMatic/Item.pm:851
+msgid "Previous"
+msgstr "Elõzõ"
+
+#: lib/FAQ/OMatic/Item.pm:869
+msgid "Next"
+msgstr "Következõ"
+
+#: lib/FAQ/OMatic/Item.pm:968 lib/FAQ/OMatic/Item.pm:1382
+#: lib/FAQ/OMatic/Item.pm:1566
+msgid "Moderator"
+msgstr "Moderátor"
+
+#: lib/FAQ/OMatic/Item.pm:970
+msgid "(inherited from parent)"
+msgstr "(szülõ elemtõl származó)"
+
+#: lib/FAQ/OMatic/Item.pm:988
+msgid "Category Title and Options"
+msgstr "Kategória címe és tulajdonságai"
+
+#: lib/FAQ/OMatic/Item.pm:989
+msgid "Edit Category Permissions"
+msgstr "Engedélyek beállítása (kat.)"
+
+#: lib/FAQ/OMatic/Item.pm:990
+msgid "Move Category"
+msgstr "Kategória mozgatása"
+
+#: lib/FAQ/OMatic/Item.pm:991
+msgid "Trash Category"
+msgstr "Kategória törlése"
+
+#: lib/FAQ/OMatic/Item.pm:995
+msgid "Answer Title and Options"
+msgstr "Válasz címe és tulajdonságai"
+
+#: lib/FAQ/OMatic/Item.pm:996
+msgid "Edit Answer Permissions"
+msgstr "Engedélyek beállítása (válasz)"
+
+#: lib/FAQ/OMatic/Item.pm:997
+msgid "Move Answer"
+msgstr "Válasz mozgatása"
+
+#: lib/FAQ/OMatic/Item.pm:998
+msgid "Trash Answer"
+msgstr "Válasz törlése"
+
+#: lib/FAQ/OMatic/Item.pm:1004
+msgid "%0 Title and Options"
+msgstr "%0 címe és tulajdonságai"
+
+#: lib/FAQ/OMatic/Item.pm:1005 lib/FAQ/OMatic/Item.pm:1006
+msgid "Edit %0 Permissions"
+msgstr "Engedélyek beállítása (%0)"
+
+#: lib/FAQ/OMatic/Item.pm:1007
+#, c-format
+msgid "Move %0"
+msgstr "%0 mozgatása"
+
+#: lib/FAQ/OMatic/Item.pm:1008
+#, c-format
+msgid "Trash %0"
+msgstr "%0 törlése"
+
+#: lib/FAQ/OMatic/Item.pm:1046
+msgid "Duplicate Answer"
+msgstr "Válasz duplázása"
+
+#: lib/FAQ/OMatic/Item.pm:1047
+msgid "Duplicate Category as Answer"
+msgstr "Kategória duplázása válaszként"
+
+#: lib/FAQ/OMatic/Item.pm:1090
+msgid "Convert to Answer"
+msgstr "Válasszá alakít"
+
+#: lib/FAQ/OMatic/Item.pm:1100
+msgid "Convert to Category"
+msgstr "Kategóriává alakít"
+
+#: lib/FAQ/OMatic/Item.pm:1116 lib/FAQ/OMatic/Item.pm:1196
+msgid "New Answer in \"%0\""
+msgstr "Új válasz \"%0\"-ben"
+
+#: lib/FAQ/OMatic/Item.pm:1123
+msgid "New Subcategory of \"%0\""
+msgstr "Új kategória \"%0\"-ben"
+
+#: lib/FAQ/OMatic/Item.pm:1149 lib/FAQ/OMatic/Part.pm:346
+msgid "Insert Text Here"
+msgstr "Szöveg beszúrása ide"
+
+#: lib/FAQ/OMatic/Item.pm:1162 lib/FAQ/OMatic/Part.pm:357
+msgid "Insert Uploaded Text Here"
+msgstr "Szöveg feltöltése ide"
+
+#: lib/FAQ/OMatic/Item.pm:1212
+msgid "Append to This Answer"
+msgstr "Hozzáfûzés a válaszhoz"
+
+#: lib/FAQ/OMatic/Item.pm:1330
+msgid "This document is:"
+msgstr "Ennek az oldalnak a címe:"
+
+#: lib/FAQ/OMatic/Item.pm:1332
+msgid "This document is at:"
+msgstr "Ez a dokumentum megtalálható:"
+
+#: lib/FAQ/OMatic/Item.pm:1376
+#, c-format
+msgid "Group %0"
+msgstr "Csoport: %0"
+
+#: lib/FAQ/OMatic/Item.pm:1380
+msgid "Users giving their names"
+msgstr "Nevüket megadó felhasználók"
+
+#: lib/FAQ/OMatic/Item.pm:1381
+msgid "Authenticated users"
+msgstr "Azonosított felhasználók"
+
+#: lib/FAQ/OMatic/Item.pm:1396
+msgid "New Category"
+msgstr "Új kategória"
+
+#: lib/FAQ/OMatic/Item.pm:1398
+msgid "New Answer"
+msgstr "Új válasz"
+
+#: lib/FAQ/OMatic/Item.pm:1402
+msgid "Editing Category <b>%0</b>"
+msgstr "A(z) <b>%0</b> kategória szerkesztése"
+
+#: lib/FAQ/OMatic/Item.pm:1406
+msgid "Editing Answer <b>%0</b>"
+msgstr "A(z) <b>%0</b> válasz szerkesztése"
+
+#: lib/FAQ/OMatic/Item.pm:1411
+msgid "Editing %0 <b>%1</b>"
+msgstr "Editing %0 <b>%1</b>"
+
+#: lib/FAQ/OMatic/Item.pm:1441
+msgid "Title:"
+msgstr "Cím:"
+
+#: lib/FAQ/OMatic/Item.pm:1446
+msgid "<p>New Order for Text Parts:"
+msgstr "<p>A szövegelemek új sorrendje:"
+
+#: lib/FAQ/OMatic/Item.pm:1458
+msgid "Show attributions from all parts together at bottom"
+msgstr "Valamennyi rész tulajdonságának mutatása az oldal alján"
+
+#: lib/FAQ/OMatic/Item.pm:1471 lib/FAQ/OMatic/Item.pm:1667
+#: lib/FAQ/OMatic/Part.pm:560 lib/FAQ/OMatic/editBag.pm:122
+msgid "Submit Changes"
+msgstr "Változtatások mentése"
+
+#: lib/FAQ/OMatic/Item.pm:1472 lib/FAQ/OMatic/Item.pm:1668
+#: lib/FAQ/OMatic/Part.pm:561 lib/FAQ/OMatic/editBag.pm:123
+msgid "Revert"
+msgstr "Visszavonás"
+
+#: lib/FAQ/OMatic/Item.pm:1492
+msgid "Who can add a new text part to this item:"
+msgstr "Új szövegrész hozzáadására jogosultak:"
+
+#: lib/FAQ/OMatic/Item.pm:1494
+msgid "Who can add a new answer or category to this category:"
+msgstr "Kategórián belül új válasz vagy kategória hozzáadására jogosultak:"
+
+#: lib/FAQ/OMatic/Item.pm:1496
+msgid "Who can edit or remove existing text parts from this item:"
+msgstr "Meglévõ szövegrész eltávolítására jogosultak:"
+
+#: lib/FAQ/OMatic/Item.pm:1498
+msgid ""
+"Who can move answers or subcategories from this category; or turn this "
+"category into an answer or vice versa:"
+msgstr ""
+"Válasz vagy kategória áthelyezésére, valamint kategória - válasz "
+"konvertálásra jogosultak:"
+
+#: lib/FAQ/OMatic/Item.pm:1500
+msgid "Who can edit the title and options of this answer or category:"
+msgstr "A válasz vagy kategória címét és beállítását módosíthatja:"
+
+#: lib/FAQ/OMatic/Item.pm:1502
+msgid ""
+"Who can use untranslated HTML when editing the text of this answer or "
+"category:"
+msgstr "HTML-formátum hozzáadására/szerkesztésére jogosult:"
+
+#: lib/FAQ/OMatic/Item.pm:1504
+msgid "Who can change these moderator options and permissions:"
+msgstr "A moderátor beállításokat és a jogosultságokat módosíthatja:"
+
+#: lib/FAQ/OMatic/Item.pm:1506
+msgid "Who can create new bags:"
+msgstr "Új csomag feltöltésére jogosult:"
+
+#: lib/FAQ/OMatic/Item.pm:1508
+msgid "Who can replace existing bags:"
+msgstr "Meglévõ csomag csréjére jogosult:"
+
+#: lib/FAQ/OMatic/Item.pm:1510
+msgid "Who can access the installation/configuration page (use caution!):"
+msgstr "A telepítés/beállítások oldal elérésére jogosult (Óvatosan!):"
+
+#: lib/FAQ/OMatic/Item.pm:1512
+msgid "Who can use the group membership pages:"
+msgstr "Csoporttagság oldalakat elérheti:"
+
+#: lib/FAQ/OMatic/Item.pm:1529
+msgid "Moderator options for category"
+msgstr "Kaegória moderátor-beállításai"
+
+#: lib/FAQ/OMatic/Item.pm:1533
+msgid "Moderator options for answer"
+msgstr "Válasz moderátor-beállításai"
+
+#: lib/FAQ/OMatic/Item.pm:1538
+msgid "Moderator options for"
+msgstr "Moderátor beállítások:"
+
+#: lib/FAQ/OMatic/Item.pm:1556
+msgid "Name & Description"
+msgstr "Név és leírás"
+
+#: lib/FAQ/OMatic/Item.pm:1557
+msgid "Setting"
+msgstr "Beállítások"
+
+#: lib/FAQ/OMatic/Item.pm:1558
+msgid "Setting if Inherited"
+msgstr "Örökölt beállítások"
+
+#: lib/FAQ/OMatic/Item.pm:1567 lib/FAQ/OMatic/Item.pm:1604
+msgid "(will inherit if empty)"
+msgstr "(öröklõdik, ha üres)"
+
+#: lib/FAQ/OMatic/Item.pm:1577
+msgid ""
+"Send mail to the moderator when someone other than the moderator edits this "
+"item:"
+msgstr "Levélküldés a moderátornak, ha valaki más szerkeszti ezt az elemet:"
+
+#: lib/FAQ/OMatic/Item.pm:1583 lib/FAQ/OMatic/Item.pm:1620
+msgid "No"
+msgstr "Nem"
+
+#: lib/FAQ/OMatic/Item.pm:1583 lib/FAQ/OMatic/Item.pm:1620
+msgid "Yes"
+msgstr "Igen"
+
+#: lib/FAQ/OMatic/Item.pm:1583 lib/FAQ/OMatic/Item.pm:1620
+#: lib/FAQ/OMatic/Item.pm:1661
+msgid "undefined"
+msgstr "nincs meghatározva"
+
+#: lib/FAQ/OMatic/Item.pm:1602
+msgid "Notifier"
+msgstr "Értesítendõ"
+
+#: lib/FAQ/OMatic/Item.pm:1603
+msgid "Send mail to the Notifier when item is created or modified"
+msgstr "Értesítés küldése változás vagy új elem létrehozása esetén"
+
+#: lib/FAQ/OMatic/Item.pm:1614
+msgid ""
+"Send mail to the Notifier when someone other than the moderator edits this "
+"item:"
+msgstr ""
+"Levelet küld a megadott címre, ha a moderátoron kívül valaki módosítja ezt "
+"az elemet:"
+
+#: lib/FAQ/OMatic/Item.pm:1625
+msgid "Permissions"
+msgstr "Engedélyek"
+
+#: lib/FAQ/OMatic/Item.pm:1647
+msgid "Relax: New answers and subcategories will be moderated "
+msgstr "Relax: New answers and subcategories will be moderated "
+
+#: lib/FAQ/OMatic/Item.pm:1648
+msgid "by the creator of the item, allowing that person full "
+msgstr "by the creator of the item, allowing that person full "
+
+#: lib/FAQ/OMatic/Item.pm:1649
+msgid "freedom to edit that new item."
+msgstr "freedom to edit that new item."
+
+#: lib/FAQ/OMatic/Item.pm:1650
+msgid "Don't Relax: new items will be moderated by "
+msgstr "Don't Relax: new items will be moderated by "
+
+#: lib/FAQ/OMatic/Item.pm:1651
+msgid "the moderator of this item."
+msgstr "the moderator of this item."
+
+#: lib/FAQ/OMatic/Item.pm:1656 lib/FAQ/OMatic/Item.pm:1660
+msgid "Relax"
+msgstr "Relax"
+
+#: lib/FAQ/OMatic/Item.pm:1656 lib/FAQ/OMatic/Item.pm:1660
+msgid "Don't Relax"
+msgstr "Don't Relax"
+
+#: lib/FAQ/OMatic/Item.pm:1656
+msgid "Inherit"
+msgstr "Inherit"
+
+#: lib/FAQ/OMatic/Item.pm:1690 lib/FAQ/OMatic/Item.pm:1704
+msgid "(system default)"
+msgstr "(alapértelmezett)"
+
+#: lib/FAQ/OMatic/Item.pm:1696
+msgid "defined in"
+msgstr "defined in"
+
+#: lib/FAQ/OMatic/Item.pm:1775
+#, c-format
+msgid "File %0 seems broken."
+msgstr "File %0 seems broken."
+
+#: lib/FAQ/OMatic/Item.pm:2155
+msgid "Category"
+msgstr "Kategória"
+
+#: lib/FAQ/OMatic/Item.pm:2156
+msgid "Answer"
+msgstr "Válasz"
+
+#: lib/FAQ/OMatic/Item.pm:2226
+msgid ""
+"Either someone has changed the answer or category you were editing since you "
+"received the editing form, or you submitted the same form twice."
+msgstr ""
+"A szerkesztett válasz vagy kategória a szerkesztés kezdete óta megváltozott, "
+"vagy a változtatásokat többször küldte el."
+
+#: lib/FAQ/OMatic/Item.pm:2228
+msgid ""
+"Please %0 and start again to make sure no changes are lost. Sorry for the "
+"inconvenience."
+msgstr ""
+"Please %0 and start again to make sure no changes are lost. Sorry for the "
+"inconvenience."
+
+#: lib/FAQ/OMatic/Item.pm:2231
+msgid "(Sequence number in form: %0; in item: %1)"
+msgstr "(Sequence number in form: %0; in item: %1)"
+
+#: lib/FAQ/OMatic/Part.pm:270
+msgid "Edit This Text"
+msgstr "A fenti szöveg szerkesztése"
+
+#: lib/FAQ/OMatic/Part.pm:281
+msgid "Duplicate This Text"
+msgstr "A fenti szöveg megismétlése"
+
+#: lib/FAQ/OMatic/Part.pm:292 lib/FAQ/OMatic/Part.pm:305
+msgid "Remove This Text"
+msgstr "A szöveg törlése"
+
+#: lib/FAQ/OMatic/Part.pm:317
+msgid "Replace %0 with new upload"
+msgstr "%0 cseréje (feltöltéssel)"
+
+#: lib/FAQ/OMatic/Part.pm:324
+msgid "Select bag to replace with new upload"
+msgstr "Válassza ki a cserélni kívánt csomagot"
+
+#: lib/FAQ/OMatic/Part.pm:333
+msgid "Upload New Bag Here"
+msgstr "Új csomag feltöltése ide"
+
+#: lib/FAQ/OMatic/Part.pm:498
+msgid "Upload file:"
+msgstr "Feltöltendõ fájl:"
+
+#: lib/FAQ/OMatic/Part.pm:503
+msgid "Warning: file contents will <b>replace</b> previous text"
+msgstr "Figyelem! A fájl tartalma <b>felülírja</b> a korábbi szöveget!"
+
+#: lib/FAQ/OMatic/Part.pm:510
+msgid "Hide Attributions"
+msgstr "Tulajdonságok elrejtése"
+
+#: lib/FAQ/OMatic/Part.pm:513
+msgid "Format text as:"
+msgstr "Szövegformázás mint:"
+
+#: lib/FAQ/OMatic/Part.pm:523
+msgid "Directory"
+msgstr "Könyvtár"
+
+#: lib/FAQ/OMatic/Part.pm:530
+msgid "Natural text"
+msgstr "Normál szöveg"
+
+#: lib/FAQ/OMatic/Part.pm:534
+msgid "Monospaced text (code, tables)"
+msgstr "Formázott szöveg (forráskód, táblázat)"
+
+#: lib/FAQ/OMatic/Part.pm:549
+msgid "Untranslated HTML"
+msgstr "Módosítás nélküli HTML"
+
+#: lib/FAQ/OMatic/Part.pm:699 lib/FAQ/OMatic/addItem.pm:102
+#: lib/FAQ/OMatic/install.pm:1177 lib/FAQ/OMatic/submitAnsToCat.pm:67
+msgid "Answers in this category:"
+msgstr "Válaszok ebben a kategóriában:"
+
+#: lib/FAQ/OMatic/Slow.pm:138
+#, c-format
+msgid "This page will reload every %0 seconds,"
+msgstr "Az oldal %0 másodpercenként újratöltõdik,"
+
+#: lib/FAQ/OMatic/Slow.pm:141
+msgid "showing the entire process output."
+msgstr "a folyamat teljes kimenetét mutatva."
+
+#: lib/FAQ/OMatic/Slow.pm:142
+msgid "Show the tail of the process log"
+msgstr "A folyamatnapló végének mutatása"
+
+#: lib/FAQ/OMatic/Slow.pm:144
+#, c-format
+msgid "showing the last %0 lines of the process output."
+msgstr "a folyamat naplójának utolsó %0 sorát mutatva."
+
+#: lib/FAQ/OMatic/Slow.pm:145
+msgid "Show the entire process log"
+msgstr "A folyamat teljes naplójának mutatása"
+
+#: lib/FAQ/OMatic/addItem.pm:48 lib/FAQ/OMatic/delPart.pm:47
+#: lib/FAQ/OMatic/editItem.pm:50 lib/FAQ/OMatic/editModOptions.pm:50
+#: lib/FAQ/OMatic/faq.pm:74 lib/FAQ/OMatic/moveItem.pm:50
+#: lib/FAQ/OMatic/selectBag.pm:60 lib/FAQ/OMatic/submitAnsToCat.pm:49
+#: lib/FAQ/OMatic/submitCatToAns.pm:48 lib/FAQ/OMatic/submitItem.pm:48
+#: lib/FAQ/OMatic/submitModOptions.pm:47 lib/FAQ/OMatic/submitPart.pm:48
+msgid "The file (%0) doesn't exist."
+msgstr "A fájl (%0) nem létezik."
+
+#: lib/FAQ/OMatic/addItem.pm:67
+msgid "Copy of"
+msgstr "Copy of"
+
+#: lib/FAQ/OMatic/addItem.pm:102 lib/FAQ/OMatic/install.pm:1177
+#: lib/FAQ/OMatic/submitAnsToCat.pm:67
+msgid "Subcategories:"
+msgstr "Alkategóriák:"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:46
+msgid "Appearance Options"
+msgstr "Megjelenés beállítása"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60 lib/FAQ/OMatic/appearanceForm.pm:64
+#: lib/FAQ/OMatic/appearanceForm.pm:68 lib/FAQ/OMatic/appearanceForm.pm:84
+#: lib/FAQ/OMatic/appearanceForm.pm:92
+msgid "Show"
+msgstr "Mutatja"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60
+msgid "Compact"
+msgstr "Tömören"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60 lib/FAQ/OMatic/appearanceForm.pm:64
+#: lib/FAQ/OMatic/appearanceForm.pm:68 lib/FAQ/OMatic/appearanceForm.pm:84
+#: lib/FAQ/OMatic/appearanceForm.pm:92
+msgid "Hide"
+msgstr "Elrejti"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:62 lib/FAQ/OMatic/install.pm:803
+msgid "expert editing commands"
+msgstr "a haladó szerkesztési parancsokat"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:66 lib/FAQ/OMatic/install.pm:808
+msgid "name of moderator who organizes current category"
+msgstr "az aktuális kategória moderátorának nevét"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:70 lib/FAQ/OMatic/install.pm:813
+msgid "last modified date"
+msgstr "az utolsó módosítás dátumát"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:84
+msgid "Default"
+msgstr "Alapértelmezés"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:86 lib/FAQ/OMatic/install.pm:818
+msgid "attributions"
+msgstr "tulajdonságok"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:88
+msgid "Simple"
+msgstr "Egyszerû"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:88
+msgid "Fancy"
+msgstr "Fancy"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:94 lib/FAQ/OMatic/install.pm:823
+msgid "commands for generating text output"
+msgstr "a szöveges kimenetet készítõ parancsokat"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:126
+msgid "Accept"
+msgstr "Beállít"
+
+#: lib/FAQ/OMatic/authenticate.pm:55
+msgid "Set a New Password"
+msgstr "Új jelszó beállítása"
+
+#: lib/FAQ/OMatic/authenticate.pm:60
+msgid "Create a New Login"
+msgstr "Új azonosító létrehozása"
+
+#: lib/FAQ/OMatic/authenticate.pm:63
+msgid ""
+"That password is invalid. If you've forgotten your old password, you can"
+msgstr "A megadott jelszó hibás. Amennyiben elfelejtette itt megteheti:"
+
+#: lib/FAQ/OMatic/authenticate.pm:81
+#, c-format
+msgid "New items can only be added by %0."
+msgstr "Új eleme hozzáadására csak %0 jogosult."
+
+#: lib/FAQ/OMatic/authenticate.pm:83
+#, c-format
+msgid "New text parts can only be added by %0."
+msgstr "Új szövegrész hozzáadására csak %0 jogosult."
+
+#: lib/FAQ/OMatic/authenticate.pm:85
+#, c-format
+msgid "Text parts can only be removed by %0."
+msgstr "Szövegrész eltávolítására csak %0 jogosult."
+
+#: lib/FAQ/OMatic/authenticate.pm:89
+msgid ""
+"This part contains raw HTML. To avoid pages with invalid HTML, the moderator "
+"has specified that only %0 can edit HTML parts. If you are %0 you may "
+"authenticate yourself with this form."
+msgstr ""
+"Ez a rész html-kódot tartalmaz. A hibás html-kód használatának megelõzésére "
+"a terület moderátora csak %0 számára engedélyezte html-részek szerkesztését. "
+"%0-két ezen az oldalon tudja magát azonosítani."
+
+#: lib/FAQ/OMatic/authenticate.pm:91
+#, c-format
+msgid "Text parts can only be added by %0."
+msgstr "Új szövegrész hozzáadására csak %0 jogosult."
+
+#: lib/FAQ/OMatic/authenticate.pm:93
+#, c-format
+msgid "Text parts can only be edited by %0."
+msgstr "A szövegrészt csak %0 szerkesztheti."
+
+#: lib/FAQ/OMatic/authenticate.pm:96
+#, c-format
+msgid "The title and options for this item can only be edited by %0."
+msgstr "A címet és a beállításokat csak %0 szerkesztheti."
+
+#: lib/FAQ/OMatic/authenticate.pm:98
+#, c-format
+msgid "The moderator options can only be edited by %0."
+msgstr "A moderátor beállításokat csak %0 szerkesztheti."
+
+#: lib/FAQ/OMatic/authenticate.pm:101
+msgid ""
+"This item can only be moved by someone who can edit both the source and "
+"destination parent items."
+msgstr ""
+"Ezt az elemet csak olyan személy helyezheti át, aki szerkesztheti a forrás- "
+"és célkönyvtárat."
+
+#: lib/FAQ/OMatic/authenticate.pm:103
+#, c-format
+msgid "This item can only be moved by %0."
+msgstr "Ezt az elemet csak %0 helyezheti át."
+
+#: lib/FAQ/OMatic/authenticate.pm:110
+#, c-format
+msgid "Existing bags can only be replaced by %0."
+msgstr "Meglévõ csomagot csak %0 cserélhet."
+
+#: lib/FAQ/OMatic/authenticate.pm:112
+#, c-format
+msgid "Bags can only be posted by %0."
+msgstr "Csomagot csak %0 tölthet föl."
+
+#: lib/FAQ/OMatic/authenticate.pm:115
+#, c-format
+msgid "The FAQ-O-Matic can only be configured by %0."
+msgstr "A beállításokat csak %0 módosíthatja."
+
+#: lib/FAQ/OMatic/authenticate.pm:117
+msgid "The operation you attempted (%0) can only be done by %1."
+msgstr "A kért mûveletet (%0) csak %1 hajthatja végre."
+
+#: lib/FAQ/OMatic/authenticate.pm:120
+msgid ""
+"If you have never established a password to use with FAQ-O-Matic, you can"
+msgstr "Amennyiben még nincs azonosítója, itt létrehozhat egyet:"
+
+#: lib/FAQ/OMatic/authenticate.pm:121
+msgid "If you have forgotten your password, you can"
+msgstr "Ha elfelejtette a jelszavát itt lecserélheti:"
+
+#: lib/FAQ/OMatic/authenticate.pm:122
+msgid ""
+"If you have already logged in earlier today, it may be that the token I use "
+"to identify you has expired. Please log in again."
+msgstr "A bejelentkezése lejárt. Kérem, jelentkezzen be ismét."
+
+#: lib/FAQ/OMatic/authenticate.pm:136
+msgid "Please offer one of the following forms of identification:"
+msgstr "Válasszon az azonosítási lehetõségek közül:"
+
+#: lib/FAQ/OMatic/authenticate.pm:139
+msgid "No authentication, but my email address is:"
+msgstr "Azonosítás nélkül; az email-címem:"
+
+#: lib/FAQ/OMatic/authenticate.pm:140
+msgid "Email:"
+msgstr "Email:"
+
+#: lib/FAQ/OMatic/authenticate.pm:147
+msgid "Authenticated login:"
+msgstr "Azonosított bejelentkezés:"
+
+#: lib/FAQ/OMatic/authenticate.pm:149 lib/FAQ/OMatic/changePass.pm:71
+msgid "Password:"
+msgstr "Jelszó:"
+
+#: lib/FAQ/OMatic/changePass.pm:48
+msgid "Please enter your username, and select a password."
+msgstr "Adja meg a felhasználói azonosítóját, és válasszon jelszót."
+
+#: lib/FAQ/OMatic/changePass.pm:49
+msgid ""
+"I will send a secret number to the email address you enter to verify that it "
+"is valid."
+msgstr ""
+"A megadott e-mail címre elküldésre kerül egy titkos kód a cím ellenõrzése "
+"végett."
+
+#: lib/FAQ/OMatic/changePass.pm:50
+msgid ""
+"If you prefer not to give your email address to this web form, please contact"
+msgstr ""
+"Amennyiben nem szeretné megadni a címét vegye fel a kapcsolatot a "
+"rendszergazdával:"
+
+#: lib/FAQ/OMatic/changePass.pm:52
+msgid ""
+"Please <b>do not</b> use a password you use anywhere else, as it will not be "
+"transferred or stored securely!"
+msgstr ""
+"Figyelem! <b>Ne adjon meg</b> olyan jelszót, amit máshol is használ, mivel a "
+"továbbítása és a tárolása nem védett formában történik!"
+
+#: lib/FAQ/OMatic/changePass.pm:73
+msgid "Set Password"
+msgstr "Jelszó beállítása"
+
+#: lib/FAQ/OMatic/editBag.pm:75
+msgid "Replace bag"
+msgstr "Csomag cseréje"
+
+#: lib/FAQ/OMatic/editBag.pm:81
+msgid "Upload new bag to show in the %0 part in <b>%1</b>."
+msgstr "Csomag feltöltése <b>%1</b> %0 részéhez."
+
+#: lib/FAQ/OMatic/editBag.pm:96
+msgid "Bag name:"
+msgstr "Csomag neve:"
+
+#: lib/FAQ/OMatic/editBag.pm:98
+msgid ""
+"The bag name is used as a filename, so it is restricted to only contain "
+"letters, numbers, underscores (_), hyphens (-), and periods (.). It should "
+"also carry a meaningful extension (such as .gif) so that web browsers will "
+"know what to do with the data."
+msgstr ""
+"A csomag nevében csak betük, számok, aláhúzás (_), kötõjel valamint pont "
+"szerepelhet. Javasolt a tartalomra jellemzõ kiterjesztést használni "
+"(például .gif), hogy a böngészõ helyesen jelenítse meg a csomagot."
+
+#: lib/FAQ/OMatic/editBag.pm:99
+msgid "Hint: Leave blank and Bag Data filename will be used."
+msgstr "Megjegyzés: Üresen hagyva a csomag neve a fájl nevével fog megegyezni."
+
+#: lib/FAQ/OMatic/editBag.pm:102
+msgid "Bag data:"
+msgstr "Csomag tartalma:"
+
+#: lib/FAQ/OMatic/editBag.pm:106
+msgid "Inline (Images only):"
+msgstr "Az oldalban mutatva (csak kép):"
+
+#: lib/FAQ/OMatic/editBag.pm:110
+msgid ""
+"(Leave blank to keep original bag data and change only the associated "
+"information below.)"
+msgstr ""
+"(A csomag korábbi tartalmának meghagyásához hagyja üresen. Ekkor csak a "
+"lentebb módosított adatok változnak.)"
+
+#: lib/FAQ/OMatic/editBag.pm:114
+msgid "If this bag is an image, fill in its dimensions."
+msgstr "Amennyiben a csomag képfájl, adja meg a méretét."
+
+#: lib/FAQ/OMatic/editBag.pm:115
+msgid "Width:"
+msgstr "Szélesség:"
+
+#: lib/FAQ/OMatic/editBag.pm:117
+msgid "Height:"
+msgstr "Magasság:"
+
+#: lib/FAQ/OMatic/editPart.pm:147
+msgid "Enter the answer to <b>%0</b>"
+msgstr "Adja meg a választ a következõre: <b>%0</b>"
+
+#: lib/FAQ/OMatic/editPart.pm:149
+msgid "Enter a description for <b>%0</b>"
+msgstr "Adja meg <b>%0</b> leírását"
+
+#: lib/FAQ/OMatic/editPart.pm:151
+msgid "Edit duplicated text for <b>%0</b>"
+msgstr "Szöveg megismétlése a következõhöz: <b>%0</b>"
+
+#: lib/FAQ/OMatic/editPart.pm:153
+msgid "Enter new text for <b>%0</b>"
+msgstr "Szöveg megadása a következõhöz: <b>%0</b>"
+
+#: lib/FAQ/OMatic/editPart.pm:158
+msgid "Editing the %0 text part in <b>%1</b>."
+msgstr "A(z) <b>%1</b> %0 szövegrészének szerkesztése."
+
+#: lib/FAQ/OMatic/editPart.pm:172
+msgid ""
+"If you later need to edit or delete this text, use the [Appearance] page to "
+"turn on the expert editing commands."
+msgstr ""
+"Ha késõbb szerkeszteni vagy törölni szeretné ezt a szöveget, használja a "
+"[Megjelenés] oldalt a szerkesztõ parancsok bekapcsolásához."
+
+#: lib/FAQ/OMatic/install.pm:94
+msgid "Faq-O-Matic Installer"
+msgstr "Faq-O-Matic telepítõ"
+
+#: lib/FAQ/OMatic/install.pm:122
+#, c-format
+msgid "%0 failed: "
+msgstr "%0 sikertelen: "
+
+#: lib/FAQ/OMatic/install.pm:128
+msgid "Unknown step: \"%0\"."
+msgstr "Ismeretlen lépés: \"%0\"."
+
+#: lib/FAQ/OMatic/install.pm:139
+msgid "Updating config to reflect new meta location <b>%0</b>."
+msgstr "Beállítások frissítése a \"meta\" új helyéhez: <b>%0</b>."
+
+#: lib/FAQ/OMatic/install.pm:157
+msgid ""
+"(Can't find <b>config</b> in '%0' -- assuming this is a new installation.)"
+msgstr "(Nem találtam a %0/<b>config</b>-ot -- új telepítés feltételezve)"
+
+#: lib/FAQ/OMatic/install.pm:181
+#, c-format
+msgid "Click here</a> to create %0."
+msgstr "Kattintson ide</a> a %0 elkészítéséhez."
+
+#: lib/FAQ/OMatic/install.pm:183
+msgid ""
+"If you want to change the CGI stub to point to another directory, edit the "
+"script and then"
+msgstr ""
+"If you want to change the CGI stub to point to another directory, edit the "
+"script and then"
+
+#: lib/FAQ/OMatic/install.pm:186
+msgid "click here to use the new location"
+msgstr "click here to use the new location"
+
+#: lib/FAQ/OMatic/install.pm:188
+msgid ""
+"FAQ-O-Matic stores files in two main directories.<p>The <b>meta/</b> "
+"directory path is encoded in your CGI stub (%0). It contains:"
+msgstr ""
+"FAQ-O-Matic stores files in two main directories.<p>The <b>meta/</b> "
+"directory path is encoded in your CGI stub (%0). It contains:"
+
+#: lib/FAQ/OMatic/install.pm:189
+msgid ""
+"<ul><li>the <b>config</b> file that tells FAQ-O-Matic where everything else "
+"lives. That's why the CGI stub needs to know where meta/ is, so it can "
+"figure out the rest of its configuration. <li>the <b>idfile</b> file that "
+"lists user identities. Therefore, meta/ should not be accessible via the web "
+"server. <li>the <b>RCS/</b> subdirectory that tracks revisions to FAQ items. "
+"<li>various hint files that are used as FAQ-O-Matic runs. These can be "
+"regenerated automatically.</ul>"
+msgstr ""
+"<ul><li>the <b>config</b> file that tells FAQ-O-Matic where everything else "
+"lives. That's why the CGI stub needs to know where meta/ is, so it can "
+"figure out the rest of its configuration. <li>the <b>idfile</b> file that "
+"lists user identities. Therefore, meta/ should not be accessible via the web "
+"server. <li>the <b>RCS/</b> subdirectory that tracks revisions to FAQ items. "
+"<li>various hint files that are used as FAQ-O-Matic runs. These can be "
+"regenerated automatically.</ul>"
+
+#: lib/FAQ/OMatic/install.pm:190
+msgid ""
+"<p>The <b>serve/</b> directory contains three subdirectories <b>item/</b>, "
+"<b>cache/</b>, and <b>bags/</b>. These directories are created and populated "
+"by the FAQ-O-Matic CGI, but should be directly accessible via the web server "
+"(without invoking the CGI)."
+msgstr ""
+"<p>The <b>serve/</b> directory contains three subdirectories <b>item/</b>, "
+"<b>cache/</b>, and <b>bags/</b>. These directories are created and populated "
+"by the FAQ-O-Matic CGI, but should be directly accessible via the web server "
+"(without invoking the CGI)."
+
+#: lib/FAQ/OMatic/install.pm:191
+msgid ""
+"<ul><li>serve/item/ contains only FAQ-O-Matic formatted source files, which "
+"encode both user-entered text and the hierarchical structure of the answers "
+"and categories in the FAQ. These files are only accessed through the web "
+"server (rather than the CGI) when another FAQ-O-Matic is mirroring this one. "
+"<li>serve/cache/ contains a cache of automatically-generated HTML versions "
+"of FAQ answers and categories. When possible, the CGI directs users to the "
+"cache to reduce load on the server. (CGI hits are far more expensive than "
+"regular file loads.) <li>serve/bags/ contains image files and other ``bags "
+"of bits.'' Bit-bags can be linked to or inlined into FAQ items (in the case "
+"of images). </ul>"
+msgstr ""
+"<ul><li>serve/item/ contains only FAQ-O-Matic formatted source files, which "
+"encode both user-entered text and the hierarchical structure of the answers "
+"and categories in the FAQ. These files are only accessed through the web "
+"server (rather than the CGI) when another FAQ-O-Matic is mirroring this one. "
+"<li>serve/cache/ contains a cache of automatically-generated HTML versions "
+"of FAQ answers and categories. When possible, the CGI directs users to the "
+"cache to reduce load on the server. (CGI hits are far more expensive than "
+"regular file loads.) <li>serve/bags/ contains image files and other ``bags "
+"of bits.'' Bit-bags can be linked to or inlined into FAQ items (in the case "
+"of images). </ul>"
+
+#: lib/FAQ/OMatic/install.pm:203 lib/FAQ/OMatic/install.pm:218
+#: lib/FAQ/OMatic/install.pm:277 lib/FAQ/OMatic/install.pm:631
+msgid "I couldn't create <b>%0</b>: %1"
+msgstr "Nem tudom létrehozni: %1 <b>%0</b>."
+
+#: lib/FAQ/OMatic/install.pm:207 lib/FAQ/OMatic/install.pm:222
+#: lib/FAQ/OMatic/install.pm:634
+msgid "Created <b>%0</b>."
+msgstr "<b>%0</b> létrehozva."
+
+#: lib/FAQ/OMatic/install.pm:210 lib/FAQ/OMatic/install.pm:225
+#: lib/FAQ/OMatic/install.pm:637
+msgid "I don't have write permission to <b>%0</b>."
+msgstr "Nincs jogom írni: <b>%0</b>."
+
+#: lib/FAQ/OMatic/install.pm:269
+msgid "Created new config file."
+msgstr "Új konfigurációs állomány létrehozva."
+
+#: lib/FAQ/OMatic/install.pm:283
+msgid "The idfile exists."
+msgstr "Az <em>idfile</em> már létezik."
+
+#: lib/FAQ/OMatic/install.pm:332
+msgid "Configuration Main Menu (install module)"
+msgstr "Beállítások fõmenü (telepítési mód)"
+
+#: lib/FAQ/OMatic/install.pm:333
+msgid "Perform these tasks in order to prepare your FAQ-O-Matic version %0:"
+msgstr "A FAQ-O-Matic %0 használatba vételéhez szükséges tevékenységek:"
+
+#: lib/FAQ/OMatic/install.pm:338
+msgid "Define configuration parameters"
+msgstr "Rendszerparaméterek beállítása"
+
+#: lib/FAQ/OMatic/install.pm:343 lib/FAQ/OMatic/install.pm:348
+msgid "Set your password and turn on installer security"
+msgstr "Állítsa be a jelszavát és kapcsolja be a telepítõ védelmét"
+
+#: lib/FAQ/OMatic/install.pm:349
+#, fuzzy
+msgid "(Need to configure \\$mailCommand and \\$adminAuth)"
+msgstr "(Need to configure $mailCommand and $adminAuth)"
+
+#: lib/FAQ/OMatic/install.pm:355
+msgid "(Installer security is on)"
+msgstr "(Telepítõ védelme: <em>aktív</em>)"
+
+#: lib/FAQ/OMatic/install.pm:360
+msgid "Create item, cache, and bags directories in serve dir"
+msgstr "Az elemeket tároló könyvtárak (item, cache, bags) létrehozása"
+
+#: lib/FAQ/OMatic/install.pm:368
+msgid "Copy old items</a> from <tt>%0</tt> to <tt>%1</tt>."
+msgstr "Régi elemek másolása</a>. Forrás:<tt>%0</tt>, cél: <tt>%1</tt>."
+
+#: lib/FAQ/OMatic/install.pm:375
+msgid "Install any new items that come with the system"
+msgstr "Install any new items that come with the system"
+
+#: lib/FAQ/OMatic/install.pm:380
+msgid "Create system default items"
+msgstr "A rendszer alapvetõ elemeinek létrehozása (súgó, szemetes, stb.)"
+
+#: lib/FAQ/OMatic/install.pm:388
+msgid "Rebuild the cache and dependency files"
+msgstr "A függõségek és a cache-állományok frissítése"
+
+#: lib/FAQ/OMatic/install.pm:395
+msgid "Install system images and icons"
+msgstr "A rendszer képeinek és ikonjainak telepítése"
+
+#: lib/FAQ/OMatic/install.pm:403
+msgid "Update mirror from master now. (this can be slow!)"
+msgstr "Tükör frissítése az eredetibõl. (Ez lassú lehet!)"
+
+#: lib/FAQ/OMatic/install.pm:409
+msgid "Set up the maintenance cron job"
+msgstr "A karbantartást végzõ cron job beállítása"
+
+#: lib/FAQ/OMatic/install.pm:415 lib/FAQ/OMatic/install.pm:420
+msgid "Run maintenance script manually now"
+msgstr "Karbantartás kézi futtatása"
+
+#: lib/FAQ/OMatic/install.pm:422
+msgid "(Need to set up the maintenance cron job first)"
+msgstr "(Elõbb be kell állítani a karbantartást végzõ cron job-ot)"
+
+#: lib/FAQ/OMatic/install.pm:430
+msgid "Maintenance last run at:"
+msgstr "Utolsó karbantartás idõpontja:"
+
+#: lib/FAQ/OMatic/install.pm:435
+#, c-format
+msgid "Mark the config file as upgraded to Version %0"
+msgstr "A verziószám (%0) bejegyzése a konfigurációs állományba"
+
+#: lib/FAQ/OMatic/install.pm:441
+msgid "Select custom colors for your Faq-O-Matic</a> (optional)"
+msgstr "Egyedi szinek beállítása</a> (opcionális)"
+
+#: lib/FAQ/OMatic/install.pm:445
+msgid "Define groups</a> (optional)"
+msgstr "csoportok létrehozása</a> (opcionális)"
+
+#: lib/FAQ/OMatic/install.pm:451
+msgid "Upgrade to CGI.pm version 2.49 or newer."
+msgstr "Frissítés a CGI.pm 2.49-es vagy frissebb verzióra."
+
+#: lib/FAQ/OMatic/install.pm:454
+msgid "(optional; older versions have bugs that affect bags)"
+msgstr "(opcionális, a korábbi verzók hibája a csomagok kezelését érinti)"
+
+#: lib/FAQ/OMatic/install.pm:457
+#, c-format
+msgid "You are using version %0 now."
+msgstr "A CGI.pm verziója: %0"
+
+#: lib/FAQ/OMatic/install.pm:462
+msgid "Bookmark this link to be able to return to this menu."
+msgstr "Könyvjelzõ beállítása erre az oldalra."
+
+#: lib/FAQ/OMatic/install.pm:473
+msgid "(need to turn on installer security)"
+msgstr "(A telepítõ biztonságának aktiválása szükséges)"
+
+#: lib/FAQ/OMatic/install.pm:476
+msgid "Other available tasks:"
+msgstr "Egyéb tevékenységek:"
+
+#: lib/FAQ/OMatic/install.pm:480
+msgid "See access statistics"
+msgstr "Statisztika megtekintése"
+
+#: lib/FAQ/OMatic/install.pm:485
+msgid "Examine all bags"
+msgstr "Valamennyi csomag vizsgálata"
+
+#: lib/FAQ/OMatic/install.pm:491
+msgid "Check for unreferenced bags (not linked by any FAQ item)"
+msgstr "Nem hivatkozott (nem mutat rá link sehonnan) csomagok vizsgálata."
+
+#: lib/FAQ/OMatic/install.pm:497
+msgid "Empty old trash now"
+msgstr "Kuka ürítése"
+
+#: lib/FAQ/OMatic/install.pm:503
+msgid "fsck (check and repair tree structure) now"
+msgstr "A struktúra ellenõrzése és javításe (fsck)"
+
+#: lib/FAQ/OMatic/install.pm:509
+msgid "rebuild search database now"
+msgstr ""
+
+#: lib/FAQ/OMatic/install.pm:517
+msgid "Rebuild the cache and dependency files now"
+msgstr "A függõségek és a cache-állományok frissítése"
+
+#: lib/FAQ/OMatic/install.pm:522
+#, c-format
+msgid "The Faq-O-Matic modules are version %0."
+msgstr "A FAQ-O-Matic modulok verziószáma: %0."
+
+#: lib/FAQ/OMatic/install.pm:641
+msgid ""
+"I wasn't able to change the permissions on <b>%0</b> to 755 (readable/"
+"searchable by all)."
+msgstr ""
+"Nem sikerült <b>%0</b> elérhetõségét 755-re (olvasható/kereshetõ "
+"mindenkinek) beállítani."
+
+#: lib/FAQ/OMatic/install.pm:656 lib/FAQ/OMatic/install.pm:657
+msgid "updated config file:"
+msgstr "Beállítások frissítve:"
+
+#: lib/FAQ/OMatic/install.pm:664
+msgid "Redefine configuration parameters to ensure that <b>%0</b> is valid."
+msgstr "Redefine configuration parameters to ensure that <b>%0</b> is valid."
+
+#: lib/FAQ/OMatic/install.pm:676
+msgid "Jon made a mistake here; key=%0, property=%1."
+msgstr "Jon made a mistake here; key=%0, property=%1."
+
+#: lib/FAQ/OMatic/install.pm:705
+msgid "<b>Mandatory:</b> System information"
+msgstr "<b>Kötelezõ:</b> Rendszerinformációk"
+
+#: lib/FAQ/OMatic/install.pm:708
+msgid "Identity of local FAQ-O-Matic administrator (an email address)"
+msgstr "A FAQ-O-Matic adminisztrátor e-mail címe:"
+
+#: lib/FAQ/OMatic/install.pm:710
+msgid ""
+"A command FAQ-O-Matic can use to send mail. It must either be sendmail, or "
+"it must understand the -s (Subject) switch."
+msgstr ""
+"E-mail küldésére használható parancs. A programnak ismernie kell a -s "
+"(Tárgy) kapcsolót."
+
+#: lib/FAQ/OMatic/install.pm:712
+msgid "The command FAQ-O-Matic can use to install a cron job."
+msgstr "A cron job létrehozására szolgáló parancs."
+
+#: lib/FAQ/OMatic/install.pm:716
+msgid "Path to the <b>ci</b> command from the RCS package."
+msgstr "Az RCS csomag <b>ci</b> parancsának elérési útvonala."
+
+#: lib/FAQ/OMatic/install.pm:719
+msgid "Path to the <b>co</b> command from the RCS package."
+msgstr "Az RCS csomag <b>co</b> parancsának elérési útvonala."
+
+#: lib/FAQ/OMatic/install.pm:722
+msgid "<b>Mandatory:</b> Server directory configuration"
+msgstr "<b>Kötelezõ:</b> Szerver-könyvtárak beállítása"
+
+#: lib/FAQ/OMatic/install.pm:724
+msgid ""
+"Protocol, host, and port parts of the URL to your site. This will be used to "
+"construct link URLs. Omit the trailing '/'; for example: <tt>http://www."
+"dartmouth.edu</tt>"
+msgstr ""
+"A FAQ-O-Matic-ban használt URL-ek protokoll, szervernév, port része. (A "
+"záró / elhagyásával, például <tt>http://www.dartmouth.edu</tt>)"
+
+#: lib/FAQ/OMatic/install.pm:727
+msgid ""
+"The path part of the URL used to access this CGI script, beginning with '/' "
+"and omitting any parameters after the '?'. For example: <tt>/cgi-bin/cgiwrap/"
+"jonh/faq.pl</tt>"
+msgstr ""
+"Ennek a cgi-scriptnek az elérésére szolgáló url-bõl az útvonal, /-rel "
+"kezdve, és elhagyva a paramétereket, például: <tt>/cgi-bin/cgiwrap/jonh/faq."
+"pl</tt>"
+
+#: lib/FAQ/OMatic/install.pm:730
+msgid ""
+"Filesystem directory where FAQ-O-Matic will keep item files, image and other "
+"bit-bag files, and a cache of generated HTML files. This directory must be "
+"accessible directly via the http server. It might be something like /home/"
+"faqomatic/public_html/fom-serve/"
+msgstr ""
+"Könyvtár a fájlrendszerben, ahol a FAQ-O;Matic a \"csomagokat\", képeket és "
+"a gyorsítótár állományait (elõre elkészített html-fájlokat) tárolhatja. Ezt "
+"a könyvtárat a webkiszolgálónak közvetlenül el kell érnie!"
+
+#: lib/FAQ/OMatic/install.pm:732
+#, fuzzy
+msgid ""
+"The path prefix of the URL needed to access files in <b>\\$serveDir</b>. It "
+"should be relative to the root of the server (omit http://hostname:port, but "
+"include a leading '/'). It should also end with a '/'."
+msgstr ""
+"Az URL-ben használandó útvonal a <b>$serveDir</b>-ben lévõ állományok "
+"eléréséhez. (Elhagyva a http://gépnév:port részt, például: '/fom/')."
+
+#: lib/FAQ/OMatic/install.pm:735
+msgid "<i>Optional:</i> Miscellaneous configurations"
+msgstr "<i>Opcionális:</i> Egyéb beállítások"
+
+#: lib/FAQ/OMatic/install.pm:740
+msgid "Select the display language."
+msgstr "A megjelenítés nyelve"
+
+#: lib/FAQ/OMatic/install.pm:741
+msgid "'en'"
+msgstr "'hu'"
+
+#: lib/FAQ/OMatic/install.pm:745
+msgid "Show dates in 24-hour time or am/pm format."
+msgstr "Az idõadatok mutatása 24 órás vagy de/du formában."
+
+#: lib/FAQ/OMatic/install.pm:749
+msgid ""
+"If this parameter is set, this FAQ will become a mirror of the one at the "
+"given URL. The URL should be the base name of the CGI script of the master "
+"FAQ-O-Matic."
+msgstr ""
+"If this parameter is set, this FAQ will become a mirror of the one at the "
+"given URL. The URL should be the base name of the CGI script of the master "
+"FAQ-O-Matic."
+
+#: lib/FAQ/OMatic/install.pm:751
+msgid ""
+"An HTML fragment inserted at the top of each page. You might use this to "
+"place a corporate logo."
+msgstr ""
+"Valamennyi oldal elejére beszúrandó html-kódrészlet. (Például cégembléma "
+"megjelenítése.)"
+
+#: lib/FAQ/OMatic/install.pm:753 lib/FAQ/OMatic/install.pm:766
+msgid ""
+"If this field begins with <tt>file=</tt>, the text will come from the named "
+"file in the meta directory; otherwise, this field is included verbatim."
+msgstr ""
+"Ha a mezõ tartalma <tt>file=</tt> -vel kezdõdik, a beillesztett kódot a "
+"\"meta\" könyvtár megadott állományából veszi, egyébként a mezõ tartalma "
+"kerül beillesztésre."
+
+#: lib/FAQ/OMatic/install.pm:761
+#, fuzzy
+msgid ""
+"The <tt>width=</tt> tag in a table. If your <b>\\$pageHeader</b> has "
+"<tt>align=left</tt>, you will want to make this empty."
+msgstr ""
+"The <tt>width=</tt> tag in a table. If your <b>$pageHeader</b> has "
+"<tt>align=left</tt>, you will want to make this empty."
+
+#: lib/FAQ/OMatic/install.pm:764
+msgid ""
+"An HTML fragment appended to the bottom of each page. You might use this to "
+"identify the webmaster for this site."
+msgstr ""
+"Valamennyi oldal végére beszúrandó html-kódrészlet. (Például a webmaster/"
+"adminisztrátor neve.)"
+
+#: lib/FAQ/OMatic/install.pm:769
+#, fuzzy
+msgid ""
+"Where FAQ-O-Matic should send email when it wants to alert the administrator "
+"(usually same as \\$adminAuth)"
+msgstr ""
+"Where FAQ-O-Matic should send email when it wants to alert the administrator "
+"(usually same as $adminAuth)"
+
+#: lib/FAQ/OMatic/install.pm:771
+msgid ""
+"If true, FAQ-O-Matic will mail the log file to the administrator whenever it "
+"is truncated."
+msgstr ""
+"If true, FAQ-O-Matic will mail the log file to the administrator whenever it "
+"is truncated."
+
+#: lib/FAQ/OMatic/install.pm:774
+msgid "User to use for RCS ci command (default is process UID)"
+msgstr "User to use for RCS ci command (default is process UID)"
+
+#: lib/FAQ/OMatic/install.pm:778
+msgid ""
+"Links from cache to CGI are relative to the server root, rather than "
+"absolute URLs including hostname:"
+msgstr ""
+"Links from cache to CGI are relative to the server root, rather than "
+"absolute URLs including hostname:"
+
+#: lib/FAQ/OMatic/install.pm:782
+msgid ""
+"mailto: links can be rewritten such as jonhATdartmouthDOTedu (cheesy), jonh "
+"(nameonly), or e-mail addresses suppressed entirely (hide)."
+msgstr ""
+"A mailto: linkek megjelenési formája: jonhATdartmouthDOTedu (cheesy), jonh "
+"(nameonly), vagy az e-mail cím teljes elhagyása (hide)."
+
+#: lib/FAQ/OMatic/install.pm:786
+msgid ""
+"Number of seconds that authentication cookies remain valid. These cookies "
+"are stored in URLs, and so can be retrieved from a browser history file. "
+"Hence they should usually time-out fairly quickly."
+msgstr ""
+"Number of seconds that authentication cookies remain valid. These cookies "
+"are stored in URLs, and so can be retrieved from a browser history file. "
+"Hence they should usually time-out fairly quickly."
+
+#: lib/FAQ/OMatic/install.pm:790
+msgid ""
+"Number of days that trash sits in the trash category before maintenance "
+"cleans it up. '0' lets it stay forever."
+msgstr ""
+"Napok száma ameddig a törölt elemek a \"trash\" kategóriában maradnak. Ha 0,"
+"nem kerülnek törlésre a \"trash\" kategóriából."
+
+#: lib/FAQ/OMatic/install.pm:793
+msgid "<i>Optional:</i> These options set the default [Appearance] modes."
+msgstr "<i>Optional:</i> These options set the default [Appearance] modes."
+
+#: lib/FAQ/OMatic/install.pm:798
+msgid "Page rendering scheme. Do not choose 'text' as the default."
+msgstr "Page rendering scheme. Do not choose 'text' as the default."
+
+#: lib/FAQ/OMatic/install.pm:826
+msgid ""
+"<i>Optional:</i> These options fine-tune the appearance of editing features."
+msgstr ""
+"<i>Optional:</i> These options fine-tune the appearance of editing features."
+
+#: lib/FAQ/OMatic/install.pm:829
+msgid "The old [Show Edit Commands] button appears in the navigation bar."
+msgstr "The old [Show Edit Commands] button appears in the navigation bar."
+
+#: lib/FAQ/OMatic/install.pm:833
+msgid "Navigation links appear at top of page as well as at the bottom."
+msgstr "Navigation links appear at top of page as well as at the bottom."
+
+#: lib/FAQ/OMatic/install.pm:837
+msgid "Hide [Append to This Answer] and [Add New Answer in ...] buttons."
+msgstr "Hide [Append to This Answer] and [Add New Answer in ...] buttons."
+
+#: lib/FAQ/OMatic/install.pm:842
+msgid "Editing commands appear with neat-o icons rather than [In Brackets]."
+msgstr "Editing commands appear with neat-o icons rather than [In Brackets]."
+
+#: lib/FAQ/OMatic/install.pm:845
+msgid ""
+"<i>Optional:</i> Other configurations that you should probably ignore if "
+"present."
+msgstr ""
+"<i>Optional:</i> Other configurations that you should probably ignore if "
+"present."
+
+#: lib/FAQ/OMatic/install.pm:849
+msgid "Draw Item titles John Nolan's way."
+msgstr "Draw Item titles John Nolan's way."
+
+#: lib/FAQ/OMatic/install.pm:853
+msgid "Hide sibling (Previous, Next) links"
+msgstr "Hide sibling (Previous, Next) links"
+
+#: lib/FAQ/OMatic/install.pm:857
+msgid "Use DBM-based search databases. Faster on machines with non-broken DBM."
+msgstr ""
+"Use DBM-based search databases. Faster on machines with non-broken DBM."
+
+#: lib/FAQ/OMatic/install.pm:860
+msgid ""
+"Links from search results page point into cache (do not highlight search "
+"terms)"
+msgstr ""
+
+#: lib/FAQ/OMatic/install.pm:974
+msgid "This is a command, so only letters, hyphens, and slashes are allowed."
+msgstr "Ez egy parancs, tehát csak betük, kötõjelek, és '/' megengedett."
+
+#: lib/FAQ/OMatic/install.pm:1033
+msgid ""
+"If this is your first time installing a FAQ-O-Matic, I recommend only "
+"filling in the sections marked <b>Mandatory</b>."
+msgstr ""
+"Amennyiben elõször telepíti a FAQ-O-Matic rendszert, javasolt, hogy csak a "
+"<b>Kötelezõ</b>-nek jelölt részeket állítsa be."
+
+#: lib/FAQ/OMatic/install.pm:1037
+msgid "Define"
+msgstr "Define"
+
+#: lib/FAQ/OMatic/install.pm:1080
+msgid "You should <a href=\"%0\">go back</a> and fix these configurations."
+msgstr "You should <a href=\"%0\">go back</a> and fix these configurations."
+
+#: lib/FAQ/OMatic/install.pm:1083
+msgid "Rewrote configuration file."
+msgstr "Rewrote configuration file."
+
+#: lib/FAQ/OMatic/install.pm:1097
+msgid ""
+"%0 (%1) has an internal apostrophe, which will certainly make Perl choke on "
+"the config file."
+msgstr ""
+"%0 (%1) aposztrófot tartalmaz. Ez hibát okozhat a konfigurációs állomány "
+"feldolgozásában."
+
+#: lib/FAQ/OMatic/install.pm:1101 lib/FAQ/OMatic/install.pm:1107
+msgid "%0 (%1) doesn't look like a fully-qualified email address."
+msgstr "%0 (%1) nem tûnik korrekt e-mail címnek."
+
+#: lib/FAQ/OMatic/install.pm:1113 lib/FAQ/OMatic/install.pm:1118
+msgid "%0 (%1) isn't executable."
+msgstr "%0 (%1) nem futtatható."
+
+#: lib/FAQ/OMatic/install.pm:1135
+msgid "%0 has funny characters."
+msgstr "%0 érdekes karaktereket tartalmaz."
+
+#: lib/FAQ/OMatic/install.pm:1170
+msgid ""
+"To name your FAQ-O-Matic, use the [Appearance] page to show the expert "
+"editing commands, then click [Edit Category Title and Options]."
+msgstr ""
+"To name your FAQ-O-Matic, use the [Appearance] page to show the expert "
+"editing commands, then click [Edit Category Title and Options]."
+
+#: lib/FAQ/OMatic/install.pm:1180 lib/FAQ/OMatic/install.pm:1192
+#: lib/FAQ/OMatic/install.pm:1204
+msgid "Created category \"%0\"."
+msgstr "Created category \"%0\"."
+
+#: lib/FAQ/OMatic/install.pm:1182 lib/FAQ/OMatic/install.pm:1194
+#: lib/FAQ/OMatic/install.pm:1206
+msgid "<b>%0</b> already contains a file '%1'."
+msgstr "<b>%0</b> already contains a file '%1'."
+
+#: lib/FAQ/OMatic/install.pm:1244
+msgid "Copied %0 items from <tt>%1</tt> to <tt>%2</tt>."
+msgstr "Copied %0 items from <tt>%1</tt> to <tt>%2</tt>."
+
+#: lib/FAQ/OMatic/install.pm:1301
+msgid "Attempting to install cron job:"
+msgstr "Megkísérlem beállítani a karbantartó job-ot:"
+
+#: lib/FAQ/OMatic/install.pm:1349
+msgid ""
+"I replaced this old crontab line, which appears to be an older one for this "
+"same FAQ:"
+msgstr ""
+"I replaced this old crontab line, which appears to be an older one for this "
+"same FAQ:"
+
+#: lib/FAQ/OMatic/install.pm:1358
+msgid "I thought I installed a new cron job, but it didn't appear to take."
+msgstr "I thought I installed a new cron job, but it didn't appear to take."
+
+#: lib/FAQ/OMatic/install.pm:1360
+msgid ""
+"You better add %0 to some crontab yourself with <b><tt>crontab -e</tt></b>"
+msgstr ""
+"You better add %0 to some crontab yourself with <b><tt>crontab -e</tt></b>"
+
+#: lib/FAQ/OMatic/install.pm:1366
+msgid "Cron job installed. The maintenance script should run hourly."
+msgstr "Cron job installed. The maintenance script should run hourly."
+
+#: lib/FAQ/OMatic/install.pm:1422
+msgid "Use the <u>%0</u> links to change the color of a feature."
+msgstr "Use the <u>%0</u> links to change the color of a feature."
+
+#: lib/FAQ/OMatic/install.pm:1436
+msgid "An Item Title"
+msgstr "Az elem címe"
+
+#: lib/FAQ/OMatic/install.pm:1444
+msgid ""
+"A regular part is how most of your content will appear. The text colors "
+"should be most pleasantly readable on this background."
+msgstr ""
+"A regular part is how most of your content will appear. The text colors "
+"should be most pleasantly readable on this background."
+
+#: lib/FAQ/OMatic/install.pm:1446 lib/FAQ/OMatic/install.pm:1458
+#: lib/FAQ/OMatic/install.pm:1485
+msgid "A new link"
+msgstr "Új link"
+
+#: lib/FAQ/OMatic/install.pm:1447 lib/FAQ/OMatic/install.pm:1459
+#: lib/FAQ/OMatic/install.pm:1489
+msgid "A visited link"
+msgstr "Megtekintett link"
+
+#: lib/FAQ/OMatic/install.pm:1449 lib/FAQ/OMatic/install.pm:1461
+#: lib/FAQ/OMatic/install.pm:1494
+msgid "A search hit"
+msgstr "Találat (keresésnél)"
+
+#: lib/FAQ/OMatic/install.pm:1457
+msgid "A directory part should stand out"
+msgstr "A directory part should stand out"
+
+#: lib/FAQ/OMatic/install.pm:1481
+msgid "Regular text"
+msgstr "Normál szöveg"
+
+#: lib/FAQ/OMatic/install.pm:1506
+msgid "Select a color for %0:"
+msgstr "Szín választása (%0):"
+
+#: lib/FAQ/OMatic/install.pm:1517
+msgid "Or enter an HTML color specification manually:"
+msgstr "Or enter an HTML color specification manually:"
+
+#: lib/FAQ/OMatic/install.pm:1520
+msgid "Select"
+msgstr "Select"
+
+#: lib/FAQ/OMatic/install.pm:1529
+msgid "Unrecognized config parameter"
+msgstr "Unrecognized config parameter"
+
+#: lib/FAQ/OMatic/install.pm:1577
+#, c-format
+msgid "Proceed to step '%0'"
+msgstr "Proceed to step '%0'"
+
+#: lib/FAQ/OMatic/install.pm:1708
+msgid ""
+"You must enter the correct temporary password to install this FAQ-O-Matic. "
+"If you don't know it, remake the CGI stub to have a new one assigned."
+msgstr ""
+
+#: lib/FAQ/OMatic/install.pm:1711
+msgid "Temporary password: "
+msgstr ""
+
+#: lib/FAQ/OMatic/moveItem.pm:114
+msgid "Make <b>%0</b> belong to which other item?"
+msgstr "Make <b>%0</b> belong to which other item?"
+
+#: lib/FAQ/OMatic/moveItem.pm:118
+msgid "No item that already has sub-items can become the parent of"
+msgstr "No item that already has sub-items can become the parent of"
+
+#: lib/FAQ/OMatic/moveItem.pm:120
+msgid "No item can become the parent of"
+msgstr "No item can become the parent of"
+
+#: lib/FAQ/OMatic/moveItem.pm:124
+msgid ""
+"Some destinations are not available (not clickable) because you do not have "
+"permission to edit them as currently authorized."
+msgstr ""
+"Some destinations are not available (not clickable) because you do not have "
+"permission to edit them as currently authorized."
+
+#: lib/FAQ/OMatic/moveItem.pm:127
+msgid "Click here</a> to provide better authentication."
+msgstr "Click here</a> to provide better authentication."
+
+#: lib/FAQ/OMatic/moveItem.pm:133
+msgid "Hide answers, show only categories"
+msgstr "Válaszok elrejtése, csak kategóriák mutatása"
+
+#: lib/FAQ/OMatic/moveItem.pm:136
+msgid "Show both categories and answers"
+msgstr "Kategóriák és válaszok mutatása"
+
+#: lib/FAQ/OMatic/recent.pm:62
+#, c-format
+msgid "No items were modified in the last %0."
+msgstr "Nincs az utóbbi %0-ban módosított elem."
+
+#: lib/FAQ/OMatic/recent.pm:65
+msgid "Items modified in the last %0:"
+msgstr "Az utóbbi %0-ben módosított elemek:"
+
+#: lib/FAQ/OMatic/search.pm:72
+msgid "No items matched all of these words"
+msgstr "Nincs találat az összes szóra"
+
+#: lib/FAQ/OMatic/search.pm:76
+#, c-format
+msgid "No items matched at least %0 of these words"
+msgstr "Nincs találat legalább %0 szóra ezek közül"
+
+#: lib/FAQ/OMatic/search.pm:85
+msgid "Search results for all of these words"
+msgstr "Keresés eredménye az összes szóra"
+
+#: lib/FAQ/OMatic/search.pm:89
+#, c-format
+msgid "Search results for at least %0 of these words"
+msgstr "Keresés eredménye legalább %0 szóra ezek közül"
+
+#: lib/FAQ/OMatic/search.pm:106
+msgid ""
+"Results may be incomplete, because the search index has not been refreshed "
+"since the most recent change to the database."
+msgstr ""
+"Az eredmény lehet, hogy nem teljes. A keresési adatbázis nem tartalmazza a "
+"legutolsó módosítások adatait."
+
+#: lib/FAQ/OMatic/searchForm.pm:53
+msgid "search for keywords"
+msgstr "<b>Keresés kulcsszóra:</b>"
+
+#: lib/FAQ/OMatic/searchForm.pm:58
+msgid "Search for"
+msgstr "Keresés:"
+
+#: lib/FAQ/OMatic/searchForm.pm:59
+msgid "matching"
+msgstr "matching"
+
+#: lib/FAQ/OMatic/searchForm.pm:61
+msgid "all"
+msgstr "valamennyi"
+
+#: lib/FAQ/OMatic/searchForm.pm:62
+msgid "any"
+msgstr "bármely"
+
+#: lib/FAQ/OMatic/searchForm.pm:63
+msgid "two"
+msgstr "két"
+
+#: lib/FAQ/OMatic/searchForm.pm:64
+msgid "three"
+msgstr "három"
+
+#: lib/FAQ/OMatic/searchForm.pm:65
+msgid "four"
+msgstr "négy"
+
+#: lib/FAQ/OMatic/searchForm.pm:66
+msgid "five"
+msgstr "öt"
+
+#: lib/FAQ/OMatic/searchForm.pm:68
+msgid "words"
+msgstr "szóra"
+
+#: lib/FAQ/OMatic/searchForm.pm:76
+msgid "search for recent changes"
+msgstr "<b>A legutóbbi módosítások:</b>"
+
+#: lib/FAQ/OMatic/searchForm.pm:82
+msgid "Show documents"
+msgstr "Azok a dokumentumok,"
+
+#: lib/FAQ/OMatic/searchForm.pm:83
+msgid "modified in the last"
+msgstr "amelyek módosultak az utóbbi"
+
+#: lib/FAQ/OMatic/selectBag.pm:69
+msgid "Replace which bag?"
+msgstr "Melyik csomagot cseréli?"
+
+#: lib/FAQ/OMatic/stats.pm:69
+msgid "Hits Per Day"
+msgstr "Letöltés/nap"
+
+#: lib/FAQ/OMatic/stats.pm:70
+msgid "Cumulative Hits"
+msgstr "Összes letöltés"
+
+#: lib/FAQ/OMatic/stats.pm:74
+msgid "New Hosts Per Day"
+msgstr "Új kliens/nap"
+
+#: lib/FAQ/OMatic/stats.pm:75
+msgid "Total Hosts"
+msgstr "Összes kliens"
+
+#: lib/FAQ/OMatic/stats.pm:79
+msgid "Hits Per Host"
+msgstr "Letöltés/kliens"
+
+#: lib/FAQ/OMatic/stats.pm:80
+msgid "Cumulative Searches"
+msgstr "Összes keresés"
+
+#: lib/FAQ/OMatic/stats.pm:83
+msgid "Submissions Per Day"
+msgstr "Feltöltés/nap"
+
+#: lib/FAQ/OMatic/stats.pm:84
+msgid "Cumulative Submissions"
+msgstr "Összes feltöltés"
+
+#: lib/FAQ/OMatic/stats.pm:87
+msgid "Please be patient ... the image files are generated dynamically, and can take from 20 to 50 seconds to create.\n"
+msgstr "Kérem várjon! A grafikonok elkészítése 20-50 másodpercig is tarthat. <br>&nbsp;"
+
+#: lib/FAQ/OMatic/stats.pm:137
+msgid "Change View Duration"
+msgstr "Idõtartam módosítása"
+
+#: lib/FAQ/OMatic/stats.pm:140
+msgid "One Month"
+msgstr "Egy hónap"
+
+#: lib/FAQ/OMatic/stats.pm:142
+msgid "Two Months"
+msgstr "Két hónap"
+
+#: lib/FAQ/OMatic/stats.pm:144
+msgid "Three Months"
+msgstr "Három hónap"
+
+#: lib/FAQ/OMatic/stats.pm:146
+msgid "History"
+msgstr "Elõzmények"
+
+#: lib/FAQ/OMatic/submitBag.pm:74
+msgid ""
+"Bag names may only contain letters, numbers, underscores (_), hyphens (-), "
+"and periods (.), and may not end in '.desc'. Yours was"
+msgstr ""
+"Bag names may only contain letters, numbers, underscores (_), hyphens (-), "
+"and periods (.), and may not end in '.desc'. Yours was"
+
+#: lib/FAQ/OMatic/submitItem.pm:61
+msgid "Your browser or WWW cache has truncated your POST."
+msgstr "Your browser or WWW cache has truncated your POST."
+
+#: lib/FAQ/OMatic/submitItem.pm:72
+msgid "Changed the item title, was \"%0\""
+msgstr "Changed the item title, was \"%0\""
+
+#: lib/FAQ/OMatic/submitItem.pm:88 lib/FAQ/OMatic/submitItem.pm:98
+msgid "Your part order list (%0) "
+msgstr "Your part order list (%0) "
+
+#: lib/FAQ/OMatic/submitItem.pm:89
+msgid "doesn't have the same number of parts (%0) as the original item."
+msgstr "doesn't have the same number of parts (%0) as the original item."
+
+#: lib/FAQ/OMatic/submitItem.pm:99
+#, c-format
+msgid "doesn't say what to do with part %0."
+msgstr "doesn't say what to do with part %0."
+
+#: lib/FAQ/OMatic/submitMove.pm:51
+msgid "The moving file (%0) is broken or missing."
+msgstr "The moving file (%0) is broken or missing."
+
+#: lib/FAQ/OMatic/submitMove.pm:57
+msgid "The newParent file (%0) is broken or missing."
+msgstr "The newParent file (%0) is broken or missing."
+
+#: lib/FAQ/OMatic/submitMove.pm:66
+msgid "The oldParent file (%0) is broken or missing."
+msgstr "The oldParent file (%0) is broken or missing."
+
+#: lib/FAQ/OMatic/submitMove.pm:74
+msgid "The new parent (%0) is the same as the old parent."
+msgstr "The new parent (%0) is the same as the old parent."
+
+#: lib/FAQ/OMatic/submitMove.pm:79
+msgid "The new parent (%0) is the same as the item you want to move."
+msgstr "The new parent (%0) is the same as the item you want to move."
+
+#: lib/FAQ/OMatic/submitMove.pm:86
+msgid "The new parent (%0) is a child of the item being moved (%1)."
+msgstr "The new parent (%0) is a child of the item being moved (%1)."
+
+#: lib/FAQ/OMatic/submitMove.pm:92
+msgid "You can't move the top item."
+msgstr "You can't move the top item."
+
+#: lib/FAQ/OMatic/submitMove.pm:130
+#, c-format
+msgid "moved a sub-item to %0"
+msgstr "moved a sub-item to %0"
+
+#: lib/FAQ/OMatic/submitMove.pm:133
+#, c-format
+msgid "moved a sub-item from %0"
+msgstr "moved a sub-item from %0"
+
+#: lib/FAQ/OMatic/submitPass.pm:49
+msgid "An email address must look like 'name\\@some.domain'."
+msgstr "Az E-mail cím formátuma: 'nev\\@domain' legyen"
+
+#: lib/FAQ/OMatic/submitPass.pm:51
+msgid ""
+"If yours (%0) does and I keep rejecting it, please mail the administrator of "
+"this FAQ at %1 and tell him or her what's happening."
+msgstr ""
+"Ha az öné (%0) ilyen, és mégis ezt a figyelmeztetést kapta, vegye fel a "
+"kapcsolatot a rendszergazdával a(z) %1 címen."
+
+#: lib/FAQ/OMatic/submitPass.pm:58
+msgid "Your password may not contain spaces or carriage returns."
+msgstr "A jelszava nem tartalmazhat szóköz, tabulátor vagy újsor karaktert."
+
+#: lib/FAQ/OMatic/submitPass.pm:97
+msgid "Your Faq-O-Matic authentication secret"
+msgstr "Az on Faq-O-Matic azonositokodja:"
+
+#: lib/FAQ/OMatic/submitPass.pm:98
+msgid ""
+"To validate your Faq-O-Matic password, you may either enter this secret into "
+"the Validation form:"
+msgstr ""
+"A Faq-O-Matic jelszavanak a megerositesehez vagy az alabbi kodot kell "
+"megadni a megerosites urlapon,"
+
+#: lib/FAQ/OMatic/submitPass.pm:99 lib/FAQ/OMatic/submitPass.pm:136
+msgid "Secret:"
+msgstr "Titkos kód:"
+
+#: lib/FAQ/OMatic/submitPass.pm:100
+msgid ""
+"Or access the following URL. Be careful when you copy and paste the URL that "
+"the line-break doesn't cut the URL short."
+msgstr ""
+"vagy az alabbi url-t kell elerni. Az url masolasanal figyeljen arra, hogy az "
+"url-be ne keruljon sortores."
+
+#: lib/FAQ/OMatic/submitPass.pm:101
+msgid "Thank you for using Faq-O-Matic."
+msgstr "Koszonjuk, hogy hasznalja a Faq-O-Matic-ot."
+
+#: lib/FAQ/OMatic/submitPass.pm:102
+msgid ""
+"(Note: if you did not sign up to use the Faq-O-Matic, someone else has "
+"attempted to log in using your name. Do not access the URL above; it will "
+"validate the password that user has supplied. Instead, send mail to %0 and I "
+"will look into the matter.)"
+msgstr ""
+"(Megjegyzes: Amennyiben nem on hozott letre az e-mail cimevel felhasznalot a "
+"Faq-O-Matic-ban, ugy _ne_ lepjen ra a fenti url-re, mert az az on neveben "
+"bejelentkezett felhasznalo jelszavat erositene meg. Ebben az esetben "
+"forduljon az adminisztratorhoz a(z) %0 cimen.)"
+
+#: lib/FAQ/OMatic/submitPass.pm:106
+msgid ""
+"I couldn't mail the authentication secret to \"%0\" and I'm not sure why."
+msgstr ""
+"I couldn't mail the authentication secret to \"%0\" and I'm not sure why."
+
+#: lib/FAQ/OMatic/submitPass.pm:116
+msgid "The secret you entered is not correct."
+msgstr "The secret you entered is not correct."
+
+#: lib/FAQ/OMatic/submitPass.pm:118
+msgid "Did you copy and paste the secret or the URL completely?"
+msgstr "Did you copy and paste the secret or the URL completely?"
+
+#: lib/FAQ/OMatic/submitPass.pm:122
+msgid "I sent email to you at \"%0\". It should arrive soon, containing a URL."
+msgstr "A megadott címre (%0) egy hivatkozást tartalmazó e-mail elküldve."
+
+#: lib/FAQ/OMatic/submitPass.pm:126
+msgid ""
+"Either open the URL directly, or paste the secret into the form below and "
+"click Validate."
+msgstr ""
+"Kattintson a levélben található hivatkozásra, vagy másolja az alábbi mezõbe "
+"a levélben kapott kódot és kattintson a <em>Megerõsít</em> gombra."
+
+#: lib/FAQ/OMatic/submitPass.pm:128
+msgid "Thank you for taking the time to sign up."
+msgstr "Köszönjük, hogy idõt szakított a bejelentkezésre."
+
+#: lib/FAQ/OMatic/SearchMod.pm:293
+msgid "zero days"
+msgstr "napon belül"
+
+#: lib/FAQ/OMatic/SearchMod.pm:294
+msgid "day"
+msgstr "nap"
+
+#: lib/FAQ/OMatic/SearchMod.pm:295
+msgid "two days"
+msgstr "két napon"
+
+#: lib/FAQ/OMatic/SearchMod.pm:296
+msgid "week"
+msgstr "héten"
+
+#: lib/FAQ/OMatic/SearchMod.pm:297
+msgid "fortnight"
+msgstr "fortnight"
+
+#: lib/FAQ/OMatic/SearchMod.pm:298
+msgid "month"
+msgstr "hónapban"
+
+#: lib/FAQ/OMatic/SearchMod.pm:299
+msgid "three months"
+msgstr "negyedévben"
+
+#: lib/FAQ/OMatic/SearchMod.pm:300
+msgid "six months"
+msgstr "fél évben"
+
+#: lib/FAQ/OMatic/SearchMod.pm:301
+msgid "year"
+msgstr "évben"
+
+#: lib/FAQ/OMatic/SearchMod.pm:314
+msgid "days"
+msgstr "napon"

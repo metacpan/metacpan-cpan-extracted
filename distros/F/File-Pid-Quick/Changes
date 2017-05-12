@@ -1,0 +1,15 @@
+Revision history for Perl extension File::Pid::Quick.
+
+1.02  Fri Feb  5 18:09:34 2010
+    - updated open operations to rely on 5.6 filehandle
+      autovivification behavior
+
+1.01  Fri Feb  5 16:55:44 2010
+	- updated open syntax to three-argument version;
+	  added support for closing filehandle before unlinking
+	  on Windows (thanks to Josh Rabinowitz of
+	  http://search.cpan.org/~JOSHR/ for the suggestion)
+
+1.00  Fri Dec  7 16:11:57 2007
+	- original version; created by h2xs 1.21
+

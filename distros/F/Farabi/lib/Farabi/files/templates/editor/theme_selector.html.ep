@@ -1,0 +1,45 @@
+<select id="theme_selector" class="input-medium">
+<%
+	my @themes = (
+   		"default",
+		"3024-day",
+		"3024-night",
+		"ambiance",
+		"base16-dark",
+		"base16-light",
+		"blackboard",
+		"cobalt",
+		"eclipse",
+		"elegant",
+		"erlang-dark",
+		"lesser-dark",
+		"mbo",
+		"mdn-like",
+		"midnight",
+		"monokai",
+		"neat",
+		"neo",
+		"night",
+		"paraiso-dark",
+		"paraiso-light",
+		"pastel-on-dark",
+		"rubyblue",
+		"solarized dark",
+		"solarized light",
+		"the-matrix",
+		"tomorrow-night-eighties",
+		"twilight",
+		"vibrant-ink",
+		"xq-dark",
+		"xq-light",
+	);
+   for my $theme (@themes) {
+   		my $name = $theme;
+   		$name =~ s/\-/ /g;
+   		$name =~ s/\b(\w)/\U$1/g;
+%>
+   		<option value="<%=$theme%>"<%=($theme eq 'default') ? ' selected' : ''%>><%=$name%></option>
+<%
+   }
+%>
+</select>

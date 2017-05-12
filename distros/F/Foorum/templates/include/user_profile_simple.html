@@ -1,0 +1,11 @@
+[% IF user %]
+ [% IF user.gender != 'NA' %]<span style='float:right'><img src='[% c.config.dir.images %]/site/gender_[% user.gender %].gif' width='20' height='14' align='absmiddle' /></span>[% END %]
+ <a href='/u/[% user.username %]'>[% user.nickname %]</a><br />
+ 
+ [% INCLUDE include/user_profile_photo.html %]
+ 
+ <br /><br />
+ [% IF user.status %][% c.loc('Status:') %] [% user.status %]<br />[% END %]
+[% ELSE %]
+ [% c.loc('Anonymous') %]
+[% END %]

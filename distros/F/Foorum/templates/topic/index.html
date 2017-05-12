@@ -1,0 +1,86 @@
+[% title = topic.title _ ' : ' _ forum.name %]
+
+[% url_prefix = forum.forum_url _ '/topic/' _ topic.topic_id %]
+[% RSS_URL = url_prefix _ '/rss' %]
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='[% forum.forum_url %]'><span>Topics</span></a></li>
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/polls'><span>Polls</span></a></li>
+        [% END %]
+        [% END %]
+        [% UNLESS forum.settings.can_post_threads AND forum.settings.can_post_threads == 'N' %]
+        <li><a href='[% forum.forum_url %]/topic/new'><span>[% c.loc("New Topic") %]</span></a></li>
+        [% END %]
+        [% IF c.config.function_on.poll %]
+        [% UNLESS forum.settings.can_post_polls AND forum.settings.can_post_polls == 'N' %]
+        <li><a href='[% forum.forum_url %]/poll/new'><span>[% c.loc("New Poll") %]</span></a></li>
+        [% END %]
+        [% END %]
+        <li><a href='[% forum.forum_url %]/action_log'><span>View Action Logs</span></a></li>
+        <li selected="selected"><a href='javascript:void(0)'><span>[% topic.title %]([% topic.hit %])</span></a></li>
+        [% UNLESS topic.closed OR (forum.settings.can_post_replies AND forum.settings.can_post_replies == 'N') %]
+        [% IF top_comment_id %]
+        <li><a href='/comment/[% top_comment_id %]/reply'><span>Reply Topic</span></a></li>
+        [% END %]
+        [% END %]
+    </ul>
+    <div>
+
+[% IF c.user_exists %]
+[% c.load_once("site/star.js") %]
+[% END %]
+
+<div class='one'>
+<table align='center'>
+[% IF roles.is_moderator %]
+<tr class='title'>
+    <td width='100'>Operation</td><td align='center'>
+    <a href='[% url_prefix %]/[% IF topic.sticky %]unsticky[% ELSE %]sticky[% END %]'>[% IF topic.sticky %][% c.loc('Unsticky') %][% ELSE %][% c.loc('Sticky') %][% END %]</a> |
+    <a href='[% url_prefix %]/[% IF topic.closed %]unlock[% ELSE %]lock[% END %]'>[% IF topic.closed %][% c.loc('Unlock') %][% ELSE %][% c.loc('Lock') %][% END %]</a> |
+    <a href='[% url_prefix %]/[% IF topic.elite %]unelite[% ELSE %]elite[% END %]'>[% IF topic.elite %][% c.loc('Unelite') %][% ELSE %][% c.loc('Elite') %][% END %]</a> |
+    <a href='[% url_prefix %]/[% IF topic.status == 'banned' %]unban[% ELSE %]ban[% END %]'>[% IF topic.status == 'banned' %][% c.loc('Unban') %][% ELSE %][% c.loc('Ban') %][% END %]</a>
+    </td>
+</tr>
+[% END %]
+<tr class='title'>
+    <td colspan='2'>
+    [% IF c.user_exists %]
+    <a href="javascript:star('topic', '[% topic.topic_id %]', 'starDiv')"><span id='starDiv'><img src="[% c.config.dir.images %]/site/t/star_[% IF is_starred;'on';ELSE;'off';END %].gif" align='absmiddle' /> [% IF is_starred;'Unstar';ELSE;'Star';END %]</span></a>
+     | <a href="javascript:share('topic', '[% topic.topic_id %]', 'shareDiv')"><span id='shareDiv'><img src='[% c.config.dir.images %]/site/t/[% IF is_shared;'unshare';ELSE;'share';END %].gif' /> [% IF is_shared;'Unshare';ELSE;'Share';END %]</span></a>
+    [% END %]
+    <a href='http://del.icio.us/post?url=[% c.req.base _ c.req.path  | uri %]&title=[% title | uri %]'><img src='[% c.config.dir.images %]/site/s/delicious.gif' align='absmiddle' />del.icio.us</a> 
+    <a href='http://digg.com/submit?phase=2&URL=[% c.req.base _ c.req.path | uri %]'><img src='[% c.config.dir.images %]/site/s/digg.gif' align='absmiddle' />digg</a> 
+    [% IF c.config.function_on.topic_pdf %]
+    <a href="[% url_prefix %]?format=pdf"><img src="[% c.config.dir.images %]/site/s/pdf.gif" width='16' height='16'>View as PDF</a>
+    [% END %]
+    <a href="[% url_prefix %]/print"><img src="[% c.config.dir.images %]/site/s/print.gif" width='18' height='18'>Print</a>
+    [% IF previous_topic_id %]
+    <a href="/forum/[% forum.forum_code %]/topic/[% previous_topic_id %]">Previous</a>
+    [% END %]
+    [% IF next_topic_id %]
+    <a href="/forum/[% forum.forum_code %]/topic/[% next_topic_id %]">Next</a>
+    [% END %]
+    </td>
+</tr>
+</table>
+</div>
+
+[% INCLUDE comment/show.html %]
+
+[% IF c.user_exists AND NOT (topic.closed OR (forum.settings.can_post_replies AND forum.settings.can_post_replies == 'N')) %]
+[% INCLUDE comment/post.html %]
+[% END %]
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

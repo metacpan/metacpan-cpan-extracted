@@ -1,0 +1,95 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+=head1 NAME
+
+wgetp - Fetch large files from the web
+
+=head1 SYNOPSIS
+
+B<wgetp> [B<-a>] <I<url>> [<I<local path>>]
+
+=head1 DESCRIPTION
+
+The B<wgetp> program will save the file at I<url> to a local
+file.
+
+If I<local path> is not specified, then the current directory is
+assumed.
+
+If I<local path> is a directory, then the basename of the file to save
+is picked up from the Content-Disposition header or the URL of the
+response.  If the file already exists, then B<lwp-download> will
+prompt before it overwrites and will fail if its standard input is not
+a terminal.  This form of invocation will also fail is no acceptable
+filename can be derived from the sources mentioned above.
+
+If I<local path> is not a directory, then it is simply used as the
+path to save into.
+
+The I<wgetp> program is implemented using the I<libwww-perl>
+library.  It is better suited to down load big files than the
+I<lwp-request> program because it does not store the file in memory.
+Another benefit is that it will keep you updated about its progress
+and that you don't have much options to worry about.
+
+Use the C<-a> option to save the file in text (ascii) mode.  Might
+make a difference on dosish systems.
+
+=head1 EXAMPLE
+
+Fetch the newest and greatest perl version:
+
+ $ wgetp http://www.perl.com/CPAN/src/latest.tar.gz
+ Saving to 'latest.tar.gz'...
+ 11.4 MB received in 8 seconds (1.43 MB/sec)
+
+=head1 AUTHOR
+
+Gisle Aas <gisle@aas.no>
+Byrne Reese <byrne@majordojo.com>
+
+=cut
+
+#' get emacs out of quote mode
+
+use strict;
+
+use File::Download;
+
+my $progname = $0;
+$progname =~ s,.*/,,;    # only basename left in progname
+$progname =~ s,.*\\,, if $^O eq "MSWin32";
+$progname =~ s/\.\w*$//; # strip extension if any
+
+#parse option
+use Getopt::Std;
+my %opt;
+unless (getopts('a', \%opt)) {
+    usage();
+}
+
+my $url = URI->new(shift || usage());
+my $argfile = shift;
+usage() if defined($argfile) && !length($argfile);
+
+$SIG{INT} = sub { die "Interrupted\n"; };
+
+$| = 1;  # autoflush
+
+my $dwn = File::Download->new({
+    file => $argfile,
+    overwrite => 1,
+    mode => ($opt{a} ? 'a' : 'b'),
+});
+
+print "Downloading $url\n";
+print $dwn->download($url);
+print $dwn->status();
+
+sub usage
+{
+    die "Usage: $progname [-a] <url> [<lpath>]\n";
+}

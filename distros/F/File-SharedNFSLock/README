@@ -1,0 +1,137 @@
+NAME
+    File::SharedNFSLock - Inter-machine advisory file locking on NFS volumes
+
+SYNOPSIS
+      use File::SharedNFSLock;
+      my $flock = File::SharedNFSLock->new(
+        file => 'some_file_on_nfs',
+      );
+      my $got_lock = $flock->lock(); # blocks for $timeout_acquire seconds if necessary
+      if ($got_lock) {
+        # hack hack hack...
+      }
+      $flock->unlock;
+  
+      # meanwhile, on another machine or in another process:
+      my $flock = File::SharedNFSLock->new(
+        file => 'some_file_on_nfs',
+      );
+      my $got_lock = $flock->lock(); # blocks for timeout or until first process is done
+      # ...
+
+DESCRIPTION
+    This module implements advisory file locking on NFS (or non-NFS)
+    filesystems.
+
+    NFS (at least before v4) is evil. File locking on NFS volumes is worse.
+    This module attempts to implement file locking on NFS volumes using lock
+    files and hard links. It's in production use at our site, but if it
+    doesn't work for you, I'm not surprised!
+
+    Note that the lock files are always written to the same directory as the
+    original file! There is always one lock file per process that tries to
+    acquire the lock. This module does NOT do signal handling. You will have
+    to do that yourself.
+
+  ALGORITHM
+    I use the fact that hard links are (err, appear to be) atomic even with
+    NFS. So I write a process-specific, unique lock file and then hard-link
+    it to the real thing. Afterwards, `stat()' tells me the number of
+    hard-linked instances of the file (when polling my unique, private
+    file). This indicates that I have acquired the lock.
+
+    The algorithm was snatched from a document called *NFS Considered
+    Harmful* by *Shane Kerr*. I found it at
+    http://www.time-travellers.org/shane/papers/NFS_considered_harmful.html.
+    Look for chapter III, *List of Concerns*, concern *d*: *Exclusive File
+    Creation*. The described workaround is, I quote:
+
+      The solution for performing atomic file locking using a lockfile
+      is to create a unique file on the same fs (e.g., incorporating
+      hostname and pid), use link(2) to make a link to the lockfile and
+      use stat(2) on the unique file to check if its link count has
+      increased to 2. Do not use the return value of the link() call.
+
+METHODS
+  new
+    Creates a new lock object but does NOT attempt to acquire the lock (see
+    `lock()' below). Takes named arguments. All times in the parameters are
+    in seconds and can be floating point values, indicating a fraction of a
+    second.
+
+    Mandatory argument: *file* pointing at the file that is to be locked.
+
+    Optional arguments: *poll_interval* indicates the number of seconds to
+    wait between attempts to acquire the lock. Defaults to 1 second.
+
+    *timeout_acquire* indicates the total time that may be spent trying to
+    acquire a lock when `lock()' is called. After this time has elapsed, we
+    bail out without having acquired a lock. Default: 60 seconds. If set to
+    0, the lock acquisition effectively becomes non-blocking.
+
+    *timeout_stale* indicates the number of seconds since the creation of an
+    existing lock file, after which this alien lock file is to be considered
+    stale. A stale lock will be removed and replaced with our own lock
+    (watch out!). Default: 5 minutes. Set this to 0 to disable the feature.
+
+    *unique_token* is an optional parameter that will uniquely identify the
+    lock. If you want to attempt locking the same file from the same process
+    in different locations, they must set a unique token (host name, process
+    id and thread id are used additionally). Set this to `1' to have a
+    random token auto-generated.
+
+  lock
+    Attempts to acquire a lock on the file. Returns 1 on success, 0 on
+    failure (time out).
+
+  unlock
+    Releases the lock, deletes the lock file. This is automatically called
+    on destruction of the lock object!
+
+  got_lock
+    Checks whether we have the lock on the file. Prefer calling got_lock()
+    instead of its older form, locked().
+
+    *Note:* This is a fairly expensive operation requiring a `stat' call.
+
+  is_locked
+    Checks file is currently locked by someone.
+
+  wait
+    Wait until the file becomes free of any lock. This uses the
+    *poll_interval* constructor passed to new().
+
+CAVEATS
+  Lack of link() support
+    Some filesystems such as FAT32 do not support linking files. If the file
+    you want to lock is on such a filesystem, you will receive an error
+    message.
+
+    Note: FAT32 is mostly relegated to USB sticks nowadays. No sane server
+    will use NFS-mounted FAT32 filesystems.
+
+  Testing
+    Basic unit tests are in place for this module. However, it is not
+    extensively tested (Patches welcome!). While the module is used on
+    production systems here, do your own testing since it may contain hidden
+    race conditions.
+
+    Born out of frustration with existing locking modules.
+
+SEE ALSO
+    File::NFSLock, but that doesn't work for multiple machines (just for a
+    single machine and multiple processes).
+
+    Time::HiRes is used to implement fractional-second `sleep()' and
+    `time()' calls.
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2011 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

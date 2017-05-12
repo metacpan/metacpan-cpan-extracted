@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Finance-NASDAQ-Markets,
+version 0.006:
+
+  Perl extension to download realtime quotes for all major markets indices sectors
+
+This software is copyright (c) 2013 by hagen geissler santex@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

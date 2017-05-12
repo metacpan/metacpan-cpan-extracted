@@ -1,0 +1,15 @@
+Revision history for Finance-USDX
+
+0.03    2014-09-22
+        - Added metainfo for metacpan;
+
+0.02    2012-11-13
+        - Fixed parent prereq;
+        - Fixed test with rounding errors;
+
+0.01    2012-10-23
+        - First version.
+        - A single function is exported (usdx).
+        - Can compute live USDX using Finance::Quote, or compute USDX
+          based on specific convertion rates.
+

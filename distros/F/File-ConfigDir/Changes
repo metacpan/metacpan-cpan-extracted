@@ -1,0 +1,79 @@
+Revision history for Perl module File::ConfigDir
+
+0.017 2015-04-27
+    - add irc channel and mailing list to meta data
+    - apply fix regarding "Cwd::abs_path is not portable" from jddurand
+
+0.016 2015-02-06
+    - Update copyright year
+    - use FindBin instead of $0 (suggested by Tina Müller via RT#101699)
+    - style fixes
+    - metadata updates and tweaks
+
+0.015 2014-11-25
+    - replace README by README.md for better welcome on eg. GitHub
+    - improve related author test
+
+0.014 2014-11-11
+    - Rework Makefile.PL and add more author tests
+    - fix typo in pod
+    - Update README - Installation instructions (contributed by Martin
+      McGrath)
+
+0.013 2014-04-28
+    - fix upcoming LMU preparation (keep L::MU a recommendation)
+
+0.012 2014-03-21
+    - prepare for upcoming List::MoreUtils 0.4xx
+
+0.011 2014-01-06
+    - add forgotton 0.010 Changelog
+
+0.010 2014-01-06
+    - bump copyright year
+    - improve acknowledgements
+    - rely on BAIL_OUT of Test::More instead of simulating it
+
+0.009 2013-10-25
+    - add API to allow plugins to improve registration (speeds
+      up loading)
+    - switch to ExtUtils::MakeMaker, 'cause Module::Build had
+      trouble with recent meta spec ...
+
+0.008 2013-10-19
+    - introduce pluggable dir sources
+    - add developer requires for runs from repository clones
+
+0.007 2013-09-21
+    - Update copyright year (just to make sure everybody recognizes)
+
+0.006 2013-09-20
+    - Reformatted as per CPAN::Changes::Spec by Neil Bowers
+    - Fix rt#88616 (test didn't work according to XDG Base Directory
+      Specification) - thanks to Alex Hartmaier.
+    - Fix typo in regex for testing the amount of expected directories
+    - Improve documentation
+
+0.005 2013-09-03
+    - move to GitHub
+    - fix xdg_config_dir/xdg_config_home
+    - commit fox for rt#69263 (includes fix for rt#82696)
+
+0.004 2010-07-30
+    - make helper function uniq private (_uniq) to avoid
+      Pod::Coverage test fail on systems without List::MoreUtils
+
+0.003 2010-07-30
+    - fix typo and use here_cfg_dir instead of user_cfg_dir twice
+    - add singleapp_cfg_dir and locallib_cfg_dir to free local_cfg_dir
+      for FHS /usr/local/etc (suggested by mst)
+    - add XDG Base Directory Specification support (suggested by
+      daxim)
+    - update test for config_dirs - BinGOs test system users don't
+      have a home directory
+
+0.002 2010-07-27
+    - add here_cfg_dir
+
+0.001 2010-07-26
+    - First version, released on an unsuspecting world.

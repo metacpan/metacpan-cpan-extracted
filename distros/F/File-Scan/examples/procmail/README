@@ -1,0 +1,11 @@
+Installation:
+
+1. Get "MIME::Explode" module from the CPAN and install it.
+
+2. Create a "bin" directory in your home and copy scanvirus.pl to it.
+
+3. Copy .procmailrc file to your home.
+
+4. Edit the scanvirus.pl file with your favorite editor.
+
+5. Change the configuration.

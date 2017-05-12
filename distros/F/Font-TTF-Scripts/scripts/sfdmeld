@@ -1,0 +1,462 @@
+#!/usr/bin/perl
+
+use IO::File;
+use Encode::Unicode;
+use Pod::Usage;
+use Getopt::Std;
+use Encode;
+use Font::TTF::Scripts::AP;
+use XML::Parser;
+
+getopts('a:hp');
+
+unless ($ARGV[0] || $opt_h)
+{
+    pod2usage(1);
+    exit;
+}
+
+if ($opt_h)
+{
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit;
+}
+
+my ($currchar, $font);
+my %plabels = (
+    'basechar' => '',
+    'mark' => '_',
+    'entry' => '>',
+    'exit' => '<',
+    'baselig' => ':',
+    'basemark' => '+');
+my %ptypes = join('', values %plabels);
+
+my (%aps, $curname, $curpt);
+
+$xml = XML::Parser::Expat->new();
+$xml->setHandlers('Start' => sub {
+    my ($xml, $tag, %attrs) = @_;
+
+    if ($tag eq 'glyph' && defined $attrs{'PSName'})
+    { $curname = $attrs{'PSName'}; }
+    elsif ($tag eq 'point')
+    { $curpt = $attrs{'type'}; }
+    elsif ($tag eq 'location')
+    { $aps{$curname}{$curpt} = [$attrs{'x'}, $attrs{'y'}]; }
+    });
+
+if ($opt_a)
+{
+    $xml->parsefile($opt_a) || die "Can't read XML file $opt_a";
+}
+
+$s = Font::TTF::Scripts::SFD->new(
+    'AnchorClass2' => sub {
+        my ($str) = @_;
+        my (@a) = split(' ', $str);
+        shift @a;
+        while (@a) {
+            my ($name) = shift @a;
+            my ($subname) = shift @a;
+            $name =~ s/^(['"])(.*?)\1/$2/o;   # "'
+            $subname =~ s/^(['"])(.*?)\1/$2/o;   # "'
+            $$font->{'anchor_classes'}{$name} = $subname;
+        }
+        return undef
+    }, 'BeginChars' => sub {
+        my ($str) = @_;
+        my (@nums) = split(' ', $str);
+        $$font->{'numg'} = $nums[1];
+        return undef;
+    }, 'Encoding' => sub {
+        my ($str, $currchar) = @_;
+        my (@vals) = split(' ', $str);
+        $currchar->{'encoded'} = $vals[0];
+        $currchar->{'uni'} = [hex($vals[1])];
+        $currchar->{'gnum'} = $vals[2];
+        $$font->{'glyphs'}[$vals[2]] = $currchar;
+        $$font->{'gnames'}{$currchar->{'post'}} = $vals[2];
+        $$font->{'numg'} = $vals[2] + 1 if ($$font->{'numg'} <= $vals[2]);
+        return undef;
+    }, 'AnchorPoint' => sub {
+        my ($str, $currchar) = @_;
+        my (@values) = split(' ', $str, 5);
+        my ($name) = $values[0];
+        my ($pname);
+
+        $name =~ s/^(['"])(.*?)\1/$2/o;   # "'
+        $pname = $plabels{$values[3]} . $name;
+        $currchar->{'points'}{$pname} = {'name' => $name,
+            'x' => $values[1],
+            'y' => $values[2],
+            'type' => $values[3],
+            'rest' => $values[4] || "0"};
+        return undef;
+    });
+
+$struct = bless {}, "Font::TTF::Scripts::AP";
+$design = bless {}, "Font::TTF::Scripts::AP";
+$font = \$struct;
+$s->parse_file($ARGV[0], $struct);
+$font = \$design;
+$s->parse_file($ARGV[1], $design);
+
+$struct->make_names;
+$design->make_names;
+@map = $struct->align_glyphs($design);  # map from design -> struct
+for ($i = 0; $i < @map; $i++)
+{ $revmap[$map[$i]] = $i; } 
+
+# Anchors position comes from design, but list from struct
+for ($i = 0; $i < $design->{'numg'}; $i++)
+{
+    my ($char) = $design->{'glyphs'}[$i];
+    my ($other) = $struct->{'glyphs'}[$map[$i]];
+    my ($str);
+    next unless (defined $other);
+
+    $other->{'used'} = 1;
+    foreach $p (keys %{$char->{'points'}})
+    {
+        next unless (defined $other->{'points'}{$p});
+        my ($point) = $opt_p ? $other->{'points'}{$p} : $char->{'points'}{$p};
+        $str .= "AnchorPoint: \"$point->{'name'}\" $point->{'x'} $point->{'y'} $point->{'type'} $point->{'rest'}";
+        $allpoints{$p} = 1;
+    }
+
+# insert AP points here
+    if (defined $aps{$char->{'PSName'}})
+    {
+        foreach $bp (keys %{$aps{$char->{'PSName'}}})
+        {
+            my ($p) = $bp;
+            my ($t) = $p =~ s/^(_)//o;
+            next if (defined $char->{'points'}{$p});
+            my ($x, $y) = @{$aps{$char->{'PSName'}}{$p}};
+            $char->{'points'}{$p} = {'x' => $x, 'y' => $y, 'name' => $p, 'type' => $t ? "mark" : "base"};
+            $str .= "AnchorPoint: \"$char->{'name'}\" $char->{'x'} $char->{'y'} $char->{'type'} $point->{'rest'}";
+            $allpoints{$p} = 1;
+        }
+    }
+
+    foreach $p (keys %{$other->{'points'}})
+    {
+        next if (defined $char->{'points'}{$p});
+        my ($point) = $other->{'points'}{$p};
+        $str .= "AnchorPoint: \"$point->{'name'}\" $point->{'x'} $point->{'y'} $point->{'type'} $point->{'rest'}";
+        $allpoints{$p} = 1;
+    }
+
+    foreach $p (@{$char->{'commands'}{'AnchorPoint'}})
+    { $char->{'lines'}[$p] = ''; }
+    push (@{$char->{'lines'}}, $str);
+
+    my ($res);
+    foreach $p (qw(Substitution2 Ligature2 AlternateSubs2 MultipleSubs2))
+    {
+        foreach $i (@{$char->{'commands'}{$p}})
+        { $char->{'lines'}[$i] = ''; }
+        foreach $i (@{$other->{'commands'}{$p}})
+        {
+            my ($str) = $other->{'lines'}[$i];
+            $str =~ s/^(\S+\s*\"[^"]*\")\s*//o;
+            my ($pref) = $1;
+            my (@gs) = split(' ', $str);
+            my (@l) = ();
+            foreach $g (@gs)
+            {
+                my ($i) = $revmap[$struct->{'gnames'}{$g}]; 
+                push(@l, $design->{'glyphs'}[$i]{'post'}) if ($i);
+            }
+            $res .= "$pref " . join(' ', @l) . "\n" if (scalar @l);
+        }
+    }
+# need to merge Kerns2, PairPos2 & Position2 with values coming from the design
+    my (%scratch);
+    foreach $i (@{$char->{'commands'}{'PairPos2'}})
+    {
+        my ($str) = $char->{'lines'}[$i];
+        $char->{'lines'}[$i] = '';
+        $str =~ s/^\S+\s*\"([^"]*)\"\s*(\S+)\s*//o;
+        my ($look) = $1;
+        my ($name) = $2;
+        $scratch{$look}{$name} = $str;
+    }
+    foreach $i (@{$other->{'commands'}{'PairPos2'}})
+    {
+        my ($str) = $other->{'lines'}[$i];
+        $str =~ s/^\S+\s*\"([^"]*)\"\s*(\S+)\s*//o;
+        my ($look) = $1;
+        my ($nameid) = $revmap[$struct->{'gnames'}{$2}];
+        next unless ($nameid);
+        my ($name) = $design->{'glyphs'}[$nameid]{'post'};
+        if (defined $scratch{$look}{$name})
+        { $res .= "PairPos2: \"$look\" $name $scratch{$look}{$name}"; }
+        else
+        { $res .= "PairPos2: \"$look\" $name $str"; }
+    }
+
+    %scratch = ();
+    foreach $i (@{$char->{'commands'}{'Position2'}})
+    {
+        my ($str) = $char->{'lines'}[$i];
+        $char->{'lines'}[$i] = '';
+        $str =~ s/^\S+\s*\"([^"]*)\"\s*//o;
+        my ($look) = $1;
+        $scratch{$look} = $str;
+    }
+    foreach $i (@{$other->{'commands'}{'Position2'}})
+    {
+        my ($str) = $other->{'lines'}[$i];
+        $str =~ s/^\S+\s*\"([^"]*)\"\s*//o;
+        my ($look) = $1;
+        if (defined $scratch{$look})
+        { $res .= "Position2: \"$look\" $scratch{$look}"; }
+        else
+        { $res .= "Position2: \"$look\" $str"; }
+    }
+    
+    foreach $p (qw(LCarets2 AltUni2 GlyphClass))
+    {
+        foreach $i (@{$char->{'commands'}{$p}})
+        { $char->{'lines'}[$i] = ''; }
+        foreach $i (@{$other->{'commands'}{$p}})
+        { $res .= $other->{'lines'}[$i]; }
+    }
+    push (@{$char->{'lines'}}, "$res") if ($res);
+
+    push (@{$char->{'lines'}}, $char->{'lines'}[$char->{'commands'}{'EndChar'}[-1]]);
+    $char->{'lines'}[$char->{'commands'}{'EndChar'}[-1]] = '';
+}
+
+for ($i = 0; $i < $struct->{'numg'}; $i++)
+{
+    my ($char) = $struct->{'glyphs'}[$i];
+    next if ($char->{'used'});
+
+    $char->{'gnum'} = $design->{'numg'}++;
+    foreach (@{$char->{'lines'}})
+    {
+        if (m/^Encoding:\s+/o)
+        {
+            $_ = sprintf("Encoding: %d %04X %d\n", $char->{'gnum'}, $char->{'uni'}[0], $char->{'gnum'});
+            last;
+        }
+    }
+    push (@{$design->{'glyphs'}}, $char);
+}
+
+# copy lookups from struct -> design
+foreach $t (qw(Lookup ChainSub2 ChainPos2 ContextSub2 ContextPos2 ReverseChain2))
+{
+    foreach $i (@{$design->{'commands'}{$t}})
+    { $design->{'lines'}[$i] = ''; }
+    $design->{'commands'}{$t} = [];
+    next unless (defined $struct->{'commands'}{$t});
+    foreach $i (@{$struct->{'commands'}{$t}})
+    {
+        my ($str) = $struct->{'lines'}[$i];
+        push (@{$design->{'commands'}{$t}}, $#{$design->{'lines'}} - 1);
+        $str =~ s/(Class|Coverage|String):\s+(.*?)\n/"$1: " . process_names($2, $struct, $design, \@revmap) . "\n"/oge;
+        push (@{$design->{'lines'}}, $str);
+    }
+} 
+
+foreach $t (@{$design->{'commands'}{'AnchorClass2'}})
+{ $design->{'lines'}[$t] = ''; }
+my ($str) = '';
+foreach $t (@{$struct->{'commands'}{'AnchorClass2'}})
+{ $str .= $struct->{'lines'}[$t]; }
+push (@{$design->{'lines'}}, $str);
+
+
+# now tidy up header so that BeginChars is at the end
+push (@{$design->{'lines'}}, $design->{'lines'}[$design->{'commands'}{'BeginChars'}[0]]);
+$design->{'lines'}[$design->{'commands'}{'BeginChars'}[0]] = '';
+
+if (defined $ARGV[2])
+{ $fh = IO::File->new("> $ARGV[2]") || die "Can't create $ARGV[2]"; }
+else
+{ $fh = STDOUT; }
+
+$s->print_font($design, $fh);
+
+if (defined $ARGV[2])
+{ $fh->close(); }
+
+sub process_names
+{
+    my ($str, $s, $d, $m) = @_;
+    my (@n) = split(' ', $str);
+    my ($res);
+
+    shift (@n); # dump the length
+    $res = join(" ", map {$i = $m->[$s->{'gnames'}{$_}]; $i ? $d->{'glyphs'}[$i]{'post'} : ""} @n);
+    $res =~ s/\s{2,}//og;
+    return length($res) . " $res";
+}
+
+
+package Font::TTF::Scripts::SFD;
+
+use IO::File;
+
+sub new
+{
+    my ($class, %info) = @_;
+    my ($self) = {%info};
+    return bless $self, ref $class || $class;
+}
+
+sub parse_file
+{
+    my ($self, $fname, $base) = @_;
+    my ($fh);
+    my ($command, $text);
+    my %modes = (
+        'TtTable' => 'EndTTInstrs',
+        'TtInstrs' => 'EndTTInstrs',
+        'Image' => 'EndImage',
+        'TtfInstrs' => 'EndTtf',
+        'ChainSub2' => 'EndFPST',
+        'ChainPos2' => 'EndFPST',
+        'ContextSub2' => 'EndFPST',
+        'ContextPos2' => 'EndFPST',
+        'ReverseChain2' => 'EndFPST',
+        'ShortTable' => 'EndShort'
+    );
+
+    if (ref $fname)
+    { $fh = $fname; }
+    else
+    { $fh = IO::File->new("< $fname") || die "Can't open $fname for reading"; }
+
+    while (<$fh>)
+    {
+        my ($res);
+
+        if ($_ =~ m/^[\s\d"]/o || $mode)
+        {
+            $text .= $_;
+            if ($_ =~ m/^$mode/)
+            { $mode = ''; }
+            next;
+        }
+        elsif (defined $self->{$command})
+        {
+            my ($t) = $text;
+            $t =~ s/^\s*//o;
+
+            $res = &{$self->{$command}}($t, $base);
+            $base = $res if ($res);
+        }
+        if ($command)
+        {
+            my ($commstr) = $command;
+            if ($text =~ m/^\s*$/o)
+            { }
+            elsif ($modes{$command})
+            { $commstr .= ":"; }
+            elsif ($text =~ m/\n.+\n/o)
+            { }
+            else
+            { $commstr .= ":"; }
+            if ($command eq 'StartChar')
+            {
+                $text =~ s/\s*$//o;
+                $text =~ s/^\s*//o;
+                $base = {'post' => $text, 'PSName' => $text, 'parent' => $base};
+                $text = " $text\n";
+            }
+            elsif ($command eq 'EndChars')
+            {
+                $base->{'final'} = {'base' => $base};
+                $base = $base->{'final'};
+            }
+            push (@{$base->{'lines'}}, "$commstr$text");
+            push (@{$base->{'commands'}{$command}}, scalar @{$base->{'lines'}} - 1);
+            if ($command eq 'EndChar')
+            { $base = $base->{'parent'} if defined ($base->{'parent'}); }
+            $command = '';
+            $text = '';
+        }
+
+        if (s/^([^\s:]+)://o)
+        {
+            $command = $1;
+            $text = $_ || "\n";
+            $mode = $modes{$command};
+        }
+        else
+        {
+            $command = $_;
+            $command =~ s/(\s*)$//o;
+            $text = $1;
+        }
+    }
+    if (defined $self->{$command})
+    { &{$self->{$command}}($text); }
+    push (@{$base->{'lines'}}, "$command$text");
+    push (@{$base->{'commands'}{$command}}, scalar @{$base->{'lines'}});
+}
+
+
+sub print_font
+{
+    my ($self, $font, $fh) = @_;
+    my ($g, $l);
+
+    foreach $l (@{$font->{'lines'}})
+    { $fh->print($l); }
+    foreach $g (@{$font->{'glyphs'}})
+    {
+        foreach $l (@{$g->{'lines'}})
+        { $fh->print($l); }
+    }
+    if (defined $font->{'final'})
+    {
+        foreach $l (@{$font->{'final'}{'lines'}})
+        { $fh->print($l); }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+sfdmeld - merges sfd files
+
+=head1 SYNOPSIS
+
+  sfdmeld [-a ap.xml] [-p] structure.sfd design.sfd output.sfd
+
+Merges two FontForge font files such that the lookups and behaviour in the
+second (design) file is overridden by that in the first file. So for example,
+which attachment points a glyph has are governed by the structure file but
+their positions are taken from the design file. Lookups are taken from the
+structure file.
+
+=head1 OPTIONS
+
+  -a file.xml   Optional AP database to merge APs from
+  -h            print manpage
+  -p            Take attachment point positions from the structure file
+
+=head1 SEE ALSO
+
+ttfbuilder, sfd2ap
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

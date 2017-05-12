@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use Data::Dumper;
+use Finance::Quant;
+use Finance::Quant::Quotes;
+use Finance::Quant::Charter;
+use Test;
+BEGIN { plan tests => 42 }
+my $home = undef;
+$SIG{CHLD} = 'IGNORE';
+# my $a;
+$ARGV[0] = "AAPL" unless($ARGV[0]);
+       $home = Finance::Quant->new($ARGV[0]);
+       $home->createDataDir();
+       $home->Home($home->{config});
+     #foreach(@{$home->{'result'}->{symbols}}){}
+    #   my ($stocksymbol, $startdate, $enddate, $interval, $agent,$ma, $diff) = ($_,"1-15-2011",0,"d","Mozilla/4.0",20, 1);
+     #  my $q = get($stocksymbol, $startdate, $enddate, $interval, $agent);
+      #$home->{'result'}->{extended}->{$stocksymbol}=extended($stocksymbol, $q, $ma, $diff);
+      #}
+print Dumper [
+       $home];
+1;
+__DATA__

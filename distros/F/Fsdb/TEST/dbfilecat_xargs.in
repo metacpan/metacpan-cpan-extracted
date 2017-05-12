@@ -1,0 +1,3 @@
+TEST/dbmerge_ex.in
+TEST/dbmerge_ex_b.in
+# this comment from xargs input should appear in output

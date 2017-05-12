@@ -1,0 +1,37 @@
+---
+abstract: 'Localize the newlines for one or more files'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.42
+  Test::More: 0.42
+  Test::Script: 1.02
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: File::LocalizeNewlines
+name: File-LocalizeNewlines
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Default: 1.0
+  File::Find::Rule: 0.20
+  File::Slurp: 9999.04
+  File::Spec: 0.80
+  FileHandle: 0
+  Getopt::Long: 0
+  Params::Util: 0.10
+  perl: 5.005
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/File-LocalizeNewlines
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/File-LocalizeNewlines
+version: 1.12

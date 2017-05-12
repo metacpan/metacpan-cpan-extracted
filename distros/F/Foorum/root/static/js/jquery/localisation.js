@@ -1,0 +1,6 @@
+/* http://keith-wood.name/localisation.html
+   Localisation assistance for jQuery v1.0.2.
+   Written by Keith Wood (kbwood@iprimus.com.au) June 2007. 
+   Under the Creative Commons Licence http://creativecommons.org/licenses/by/3.0/
+   Share or Remix it but please Attribute the author. */
+(function($){$.localise=function(c,d){var e={async:$.ajaxSettings.async,timeout:$.ajaxSettings.timeout};$.ajaxSetup({async:false,timeout:(d&&d.timeout?d.timeout:500)});var f=function(a,b){if(d&&d.loadBase){$.getScript(a+'.js')}if(b.length>=2){$.getScript(a+'-'+b.substring(0,2)+'.js')}if(b.length>=5){$.getScript(a+'-'+b.substring(0,5)+'.js')}};var g=normaliseLang(d&&d.language?d.language:$.defaultLanguage);if(isArray(c)){for(i=0;i<c.length;i++){f(c[i],g)}}else{f(c,g)}$.ajaxSetup(e)};$.defaultLanguage=normaliseLang(navigator.language?navigator.language:navigator.userLanguage);function normaliseLang(a){a=a.replace(/_/,'-').toLowerCase();if(a.length>3){a=a.substring(0,3)+a.substring(3).toUpperCase()}return a}function isArray(a){return(a.constructor&&a.constructor.toString().match(/\Array\(\)/))}})(jQuery);

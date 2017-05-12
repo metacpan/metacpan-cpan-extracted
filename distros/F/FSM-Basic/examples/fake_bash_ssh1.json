@@ -1,0 +1,45 @@
+{
+  "close": {
+    "final": 1,
+    "output": "__PROMPT__"
+  },
+  "prompt": {
+    "expect": {
+      "default": {
+        "do": "return \"not the correct IP \n\n\""
+      },
+      "exit": {
+        "final": 0,
+        "matching": "close"
+      },
+      "timeout": {
+        "final": 0,
+        "matching": "timeout"
+      },
+      "h(elp)?|\\?": {
+        "output": "default\nexit\n__PROMPT__"
+      }
+    },
+    "not_matching": "prompt",
+    "not_matching_info": "% Unknown command or computer name, or unable to find computer address",
+    "output": "__PROMPT__",
+    "timeout": "timeout",
+    "timer": 5
+  },
+  "timeout": {
+    "expect": {
+      "prompt": {
+        "final": 0,
+        "matching": "prompt"
+      },
+      "exit": {
+        "final": 0,
+        "matching": "close"
+      },
+      "h(elp)?|\\?": {
+        "output": "\nexit\n__PROMPT__"
+      }
+    },
+    "output": "__PROMPT__"
+  }
+}

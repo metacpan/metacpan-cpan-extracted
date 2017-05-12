@@ -1,0 +1,55 @@
+Revision history for Find-Lib
+1.04    Sat Sep 17 15:33:00 PDT 2011
+        - Fix a minor bug where Cwd module is not required. RT#70768
+
+1.03    Mon Jul 4 00:20:00 PDT 2011
+        - Making this the final 1.03. All tests pass on cpantesters.
+
+1.03_01 Wed Jun 29 11:05:00 PDT 2011
+        - Revert 1.02 change, but keep a default to Cwd::cwd()
+
+1.02    Mon Jun 20 22:00:00 PDT 2011
+        - Fix a portabality issue s/$ENV{PWD}/Cwd::cwd()/ RT#68967
+          Thanks to Tatsuhiko Miyagawa and Jesse Luehrs.
+
+1.01    Tue Nov 10 12:30:00 PDT 2009
+        - Fix a problem with File::Spec::Functions use of Exporter
+          making Find::Lib->cat(dir|file) behaving incorrectly.
+
+1.0     Tue Oct 27 13:40:00 PDT 2009
+        *** Incompatible changes see details in 0.99 releases below. ***
+        - Better diagnostics for some obscur test issues on obscur OSes
+
+0.99_02 Fri Oct 23 18:00:00 PDT 2009
+        - test change to try to make CPANTESTERS happy
+
+0.99_01 Thu Oct 22 14:00:00 PDT 2009
+        - Adds the shorter form "Find::Lib 'lib1', 'lib2', 'lib3';"
+        - Add convenience  base(), catfile(), catdir() methods
+        *** INCOMPATIBLE CHANGES ***
+        - 'pkg' option is gone
+        - the list arguments won't do any 'use' anymore
+
+0.06    Thu May  8 22:30:00 PDT 2009
+        - Still working on the test suite (I wish I could use cpantesters
+        without making a release)
+
+0.05    Thu May  7 19:52:00 PDT 2009
+        - Minor fixes attempt for the test suite (CPANTESTERS)
+
+0.04    Mon May  5 21:05:00 PDT 2009
+        - Fixed the test suite for a warning that generates tons of FAIL report
+
+0.03    Mon May  5 14:05:00 PDT 2009
+        - Uses $ENV{PWD} to allow more DWIM, compared to the previous method
+          that used resolved paths all over the place.
+          Teamed up with Jonathan Steinert (hachi) for this idea.
+
+0.02    Sat Dec  8 11:16:09 PDT 2007
+        - POD fixes
+        - Changed tests suite to make it compatible with perl 5.005
+          (hopefully)
+
+0.01    Fri Dec  7 19:30:31 PDT 2007
+        First version, released on an unsuspecting world.
+

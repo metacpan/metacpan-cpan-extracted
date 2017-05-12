@@ -1,0 +1,17 @@
+CHANGES
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/Filter/Template.pm
+lib/Filter/Template/UseBytes.pm
+t/000-report-versions.t
+t/01_inline.t
+t/02_usebytes.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

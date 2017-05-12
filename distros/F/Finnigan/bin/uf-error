@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Finnigan;
+
+@ARGV == 1 or do {
+  say STDERR "Usage: $0 <file>";
+  exit -1;
+};
+my $file = $ARGV[0];
+-e $file or do {
+  say STDERR "file '$file' does not exist";
+  exit -1;
+};
+-f $file or do {
+  say STDERR "'$file' is not a plain file";
+  exit -1;
+};
+-s $file or do {
+  say STDERR "'$file' has zero size";
+  exit -1;
+};
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $header->version);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+my $rfi = Finnigan::RawFileInfo->decode(\*INPUT, $header->version);
+
+my $run_header_addr = $rfi->preamble->run_header_addr;
+
+# fast-forward to RunHeader
+seek INPUT, $run_header_addr, 0;
+my $run_header = Finnigan::RunHeader->decode(\*INPUT, $header->version);
+my $error_log_addr = $run_header->error_log_addr;
+
+# and now skip to the error log
+seek INPUT, $error_log_addr, 0;
+my $error_log_length = Finnigan::Decoder->read(\*INPUT, ['length' => ['V', 'UInt32']])->{data}->{length}->{value};
+exit 0 unless $error_log_length;
+
+foreach my $i ( 0 .. $error_log_length - 1) {
+  my $e = Finnigan::Error->decode(\*INPUT);
+  say STDERR $e->time . "\t" . $e->message;
+}
+
+__END__
+=head1 NAME
+
+uf-error - print the error log entries from a Finnigan raw file
+
+=head1 SYNOPSIS
+
+uf-log <file>
+
+=head1 DESCRIPTION
+
+B<uf-error> prints the list of messages from the embedded error log in
+a Finnigan raw file. The messages are timestamped with retention time.
+
+It will exit with no output if there are no error messages.
+
+=head1 SEE ALSO
+
+Finnigan::Error
+
+=cut

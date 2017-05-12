@@ -1,0 +1,29 @@
+Fuse-Filesys-Virtual
+
+Mount perl module as filesystem written using Filesys::Virtual
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Fuse::Filesys::Virtual
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Toshimitsu FUJIWARA
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,2 @@
+dbcolrename: column `bogus_fullname' is not in input stream.
+ at blib/script/dbcolrename line 999.

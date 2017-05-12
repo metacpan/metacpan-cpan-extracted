@@ -1,0 +1,4 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+0.5 8.165e+19 1.633e+22 1.299e+20 -1.299e+20 1.299e+20 0.95 2 2e+40 -1e+20 1e+20 4
+# mean should be 0.5, and because of ordering here it works out.
+#   | dbcolstats x

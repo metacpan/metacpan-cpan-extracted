@@ -1,0 +1,16 @@
+#fsdb -F S -R C name id email submit_time newfield emptyfield
+name: test
+id: 111-11-1111
+email: test@usc.edu
+submit_time: Tue Jan 14 11:32:39 2003
+newfield: -
+emptyfield: -
+
+name: test2
+id: 222-22-2222
+email: test2@usc.edu
+submit_time: Tue Jan 24 22:32:39 2003
+newfield: foo
+emptyfield: -
+
+#   | cgi_to_db TEST/cgi_to_db_ex.in TEST/cgi_to_db_ex.in-2

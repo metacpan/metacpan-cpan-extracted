@@ -1,0 +1,10 @@
+# You can use this file to play with the filters.
+#
+# If you type 
+#
+#	make mytest 
+#
+# this file will get executed with the same 'environment' as the
+# scripts in the t subdirectory.
+
+print "hello\n" ;

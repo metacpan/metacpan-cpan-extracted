@@ -1,0 +1,26 @@
+$Id: Changes,v 1.10 2004/11/12 00:57:12 roel Exp $
+Revision history for Perl extension FrameMaker-MifTree.
+
+0.043 02 Mar 2004
+      - original version; created by h2xs 1.22 with options
+        -XA -b 5.6.0 FrameMaker-MifTree
+0.044 05 Mar 2004
+      - changed MifTreeTags:
+        "Element" may now have daughter "ElementReferenced";
+        added "BNextUnique" for book files
+0.05  24 Mar 2004
+      - changed MifTreeTags again: added tags for backward
+        compatibility
+0.06  15 Apr 2004
+      - small bugfixes
+0.071 09 May 2004
+      - added FrameMaker character set <-> Unicode string 
+        conversion
+0.072 22 July 2004
+      - bugfix release
+0.074 11 November 2004
+      - updated documentation
+      - changed some syntax issues; added global $use_unicode
+      - preparations for Util subclass
+0.075 02 May 2006
+      - added Pod tests

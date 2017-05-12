@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/FTN/JAM.pm
+lib/FTN/JAM/Attr.pm
+lib/FTN/JAM/Errnum.pm
+lib/FTN/JAM/Subfields.pm
+lib/FTN/JAM/ToDo.pod
+t/00-load.t
+t/01-basic.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

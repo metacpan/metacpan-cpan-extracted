@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+
+use File::Rdiff qw(:trace :nonblocking);
+
+trace_level(LOG_INFO);
+
+if ($ARGV[0] eq "signature") {
+   open $basis, "<", $ARGV[1]
+      or die "$ARGV[1]: $!";
+   open $sig, ">", $ARGV[2]
+      or die "$ARGV[2]: $!";
+
+   my $job = new_sig File::Rdiff::Job 128;
+   my $buf = new File::Rdiff::Buffers 4096;
+
+   while ($job->iter($buf) == BLOCKED) {
+      # fetch more input data
+      $buf->avail_in or do {
+         my $in;
+         65536 == sysread $basis, $in, 65536 or $buf->eof;
+         $buf->in($in);
+      };
+      print $sig $buf->out;
+   }
+   print $sig $buf->out;
+
+} elsif ($ARGV[0] eq "delta") {
+   open $sig,   "<$ARGV[1]" or die "$ARGV[1]: $!";
+   open $new,   "<$ARGV[2]" or die "$ARGV[2]: $!";
+   open $delta, ">$ARGV[3]" or die "$ARGV[3]: $!";
+
+   # first load the signature into memory
+   my $job = new_loadsig File::Rdiff::Job;
+   my $buf = new File::Rdiff::Buffers 0;
+
+   do {
+      $buf->avail_in or do {
+         my $in;
+         65536 == sysread $sig, $in, 65536 or $buf->eof;
+         $buf->in($in);
+      };
+   } while $job->iter($buf) == BLOCKED;
+
+   $sig = $job->signature;
+
+   $sig->build_hash_table;
+
+   # now create the delta file
+   my $job = new_delta File::Rdiff::Job $sig;
+   my $buf = new File::Rdiff::Buffers 65536;
+
+   do {
+      $buf->avail_in or do {
+         my $in;
+         65536 == sysread $new, $in, 65536 or $buf->eof;
+         $buf->in($in);
+      };
+      print $delta $buf->out;
+   } while $job->iter($buf) == BLOCKED;
+   print $delta $buf->out;
+
+} elsif ($ARGV[0] eq "patch") {
+   open $base,  "<$ARGV[1]" or die "$ARGV[1]: $!";
+   open $delta, "<$ARGV[2]" or die "$ARGV[2]: $!";
+   open $new,   ">$ARGV[3]" or die "$ARGV[3]: $!";
+
+   # NYI
+   File::Rdiff::patch_file $base, $delta, $new;
+} else {
+   print <<EOF;
+$0 signature BASIS SIGNATURE
+$0 delta SIGNATURE NEW DELTA
+$0 patch BASE DELTA NEW
+EOF
+   exit (1);
+}
+

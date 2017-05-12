@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/File/Tail/Inotify2.pm
+minil.toml
+t/000_use.t
+t/001_new.t
+t/002_poll.t
+META.yml
+MANIFEST

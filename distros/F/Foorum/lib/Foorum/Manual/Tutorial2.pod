@@ -1,0 +1,79 @@
+
+=pod
+
+=head1 NAME
+
+Foorum::Manual::Tutorial2 - Tutorial 2: Dive into Foorum: TheSchwartz
+
+=head2 TheSchwartz introduction
+
+L<TheSchwartz>
+
+As CPAN perldoc says: reliable job queue. Basically it splitted into two parts, one is worker while the other is client.
+
+Worker script:
+
+  * L<http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_worker.pl>
+  * L<http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartzI<worker>scraper.pl>
+
+We may have several workers to deal with different tasks. For example TheSchwartzI<worker.pl deal with some tasks while TheSchwartz>worker_scraper.pl deal with scraper task.
+
+What's worker for? In my idea, that's just a script to monitor a table in database (check if there is any task to do) every 5 secs. Faked code like this:
+
+  while (1) {
+      # check if there is any new TODO task in one table of theschwartz database.
+      if ($has_new_task) { # scalar @new_tasks
+          foreach my $new_task (@new_tasks) {
+              $new_task->worker();
+          }
+      }
+      sleep 5;
+
+
+Where does new task from? Foorum has two ways, always one is form Foorum/Controller|Model, the other is from cron scripts.
+
+example code:
+
+  # in Foorum/Model
+
+  use Foorum::ExternalUtils qw/theschwartz/;
+  my $client = theschwartz();
+  $client->insert(
+      'Foorum::TheSchwartz::Worker::WorkerExample',
+      @args
+  );
+
+  # in cron script. L<http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_client.pl>
+
+That's a simple introduction. Maybe I'm wrong here. :)
+
+=head2 Worker in Foorum
+
+For now, we have several workers:
+
+  * Foorum::TheSchwartz::Worker::DailyChart
+  * Foorum::TheSchwartz::Worker::DailyReport
+  * Foorum::TheSchwartz::Worker::Hit
+  * Foorum::TheSchwartz::Worker::RemoveOldDataFromDB
+  * Foorum::TheSchwartz::Worker::ResizeProfilePhoto
+  * Foorum::TheSchwartz::Worker::SendScheduledEmail
+  * Foorum::TheSchwartz::Worker::SendStarredNofication
+  * etc.
+
+There is a simple L<Foorum::Manual::RULES> that why we use TheSchwartz, put heavy code on backend script instead of httpd.
+
+  * Hit is a cron script to update topic hits and Popular.
+  * RemoveOldDataFromDB - remove useless data from database because it's outdated.
+  * ResizeProfilePhoto  - let httpd load Image::Magick is not so good.
+  * SendScheduledEmail  - send email, web insert data into table then this worker send email behind
+  * SendStarredNofication - oh, typo here, should be Notification. ;)
+
+=head2 How to write a Worker in Foorum?
+
+OK, please borrow code from exist ones.
+
+=head1 SEE ALSO
+
+L<Foorum::Manual::Tutorial1>, L<Foorum::Manual::Tutorial3>, L<Foorum::Manual::Tutorial4>, L<Foorum::Manual::Tutorial5>
+
+=cut

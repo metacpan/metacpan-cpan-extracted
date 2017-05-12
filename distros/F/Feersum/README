@@ -1,0 +1,31 @@
+INSTALLATION
+
+If you downloaded this module from a git repository, be sure to run:
+
+   git submodule init
+   git submodule update
+
+You need to have EV 3.9 and at least ExtUtils::MakeMaker 6.50 installed to
+build and install this module.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make test
+   make install
+
+Please report any bugs using the github issue tracker:
+
+   http://github.com/stash/Feersum/issues/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Jeremy Stashewsky & Socialtext Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+picohttpparser is Copyright 2009 Kazuho Oku and is released under the same
+terms as Perl itself.

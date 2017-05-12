@@ -1,0 +1,29 @@
+This is File::Sort, for sorting files similarly to sort(1).  Written
+primarily for MacPerl users who do not have sort(1) and because of memory
+limitations cannot sort files in memory, but works on all perls, and can
+be useful for portable sorting of large files, or for any system that
+doesn't have a sort(1) and is virtual-memory-deprived (including Windows).
+
+See HISTORY in the POD for changes.
+
+This archive can always be obtained from:
+
+    http://sf.net/projects/file-sort/
+    http://www.cpan.org/authors/id/CNANDOR/
+    http://www.cpan.org/modules/by-module/File/
+
+Please let me know how well it does(n't) work, and any changes you'd 
+like to see.
+
+The sort.pudge program in eg/ does not actually use the File::Sort
+module; the actual File::Sort module sources are included in the
+program itself, as it is written for distribution with the PPT
+project <URL:http://sf.net/projects/ppt/>.
+
+Copyright (c) 1997-2002 Chris Nandor.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+-- 
+Chris Nandor                      pudge@pobox.com    http://pudge.net/
+Open Source Development Network    pudge@osdn.com     http://osdn.com/

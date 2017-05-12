@@ -1,0 +1,150 @@
+Revision history for Form::Sensible
+
+0.20023 2012-02-05
+        * restore removed version from Reflector.pm
+        
+0.20022 2012-02-05
+        * Update MANIFEST to include missing files
+        
+0.20021 2012-02-03
+        * Fix broken use lib for reflector base test
+
+0.20020 2012-02-02
+		* Reflector allows skipping fields by leaving them out of the field definition
+		* added "additional_tt_options" option to Form::Sensible::Renderer::HTML->render() to pass options to Template::Toolkit
+		* Corrected bug in Number that caused warnings when invalid number input was provided
+		* Numerous documentation fixes (Thanks unobe)
+		* Added Datetime fields and tests (Thanks unobe)
+
+0.20012 2011-02-01
+    * BUGFIX FileSelector problem related to basename usage
+    * Addition of 'with_trigger' to options processing in Reflector
+
+0.20011 2011-01-09
+    * Minor fixes related to Reflector that slipped us by.
+
+0.20010 2011-01-08
+    * More comprehensive Select tests
+    * More Numbers tests
+    * Add 'add_selection' method, for adding new selected options to a Select's value
+    * BUGFIX - Correct 'set_selection' to set selection to provided options ONLY
+    * Add 'additional_fields' handling to Reflector base class
+    * Enhance FileSelector to be able to cope with a different 'full path' than 
+      its 'user supplied filename' Catalyst users rejoice
+    * BEHAVIOR CHANGE: Reflector base class no longer adds a submit button by default.
+      If you want this behavior, you need to use 'additional_fields' going forward, or 
+      add the trigger yourself.
+    * DOCFIX - A Select field's value should be a value when accepts_multiple is false, and an array 
+      when 'accepts_multiple' is true, even when only a single value was selected;
+    * BUGFIX - in Number - Default Number regex was broken.
+    * DOCFIX - Add note in Number field type indicating that validation is limited to numbers Perl can process directly.
+    * BUGFIX - When setting select value when accepts_multiple is turned on, first set_selection
+      call fails due to no array to push into.  FIXED.  Thanks Lee.
+    * BUGFIX - Integer check regex was broken.  FIXED.  Thanks Lee.
+    * BEHAVIOR CHANGE: Regex and coderef validations now takes place in the field's 
+      validate() routine rather than in validator module.  This makes $field->validate() 
+      behave more predictably by performing all general field validation.
+
+0.20002 2010-08-06
+    * Correct typo in Select that causes generic error messages to appear wrong.
+    * Add some things to the FAQ
+
+
+0.20001 2010-07-25
+
+    * Reduce redundancy in templates by revamping HTML templates to include just field input elements and a wrapper 
+    * Set HTML template fallback order so that missing files in the current theme fall-back to default theme
+    * Major release mainly related to the addition of delegation to Form::Sensible
+    * Add delegation of field values
+    * Add delegation of select field options
+    * Added ability to set fields as not editable
+    * TONS of documentation
+    * slight addition to Reflector to add a submit button automatically
+    * error message preparation delegation in validation (for localization, etc.)
+    * BEHAVIOR CHANGE: HTML Renderer now sets the CSS id of the form element to 'fs_' + formname + '_form' this was 
+      previously used on the enclosing div.  Now the CSS id of the enclosing div is now 'fs_' + formname + '_form_div'  
+    * BEHAVIOR CHANGE: Field validate() routines are expected to return an array containing errors 
+      or undef on 'passing validation' 
+    * DEPRECATION NOTICE: Form::Sensible::Form's 'fields' method Deprecated.  
+      use 'get_fields' instead
+    
+    
+0.11222 2010-05-15
+
+    * Corrected an error in the message templates of HTML renderer that
+      prevented status messages from showing up.
+
+0.11221 2010-05-07
+
+    * Corrected an error in select field rendering that would cause 
+      selects rendered as checkboxes to not render existing values 
+      properly
+
+
+0.11220 2010-04-21
+
+    * Moved 'accepts_multiple' into the base field class along with
+      adjustment to ignore multiple values when accept_multiple is false.
+    * Corrected a number of bugs in the select field that were introduced
+      who knows when.
+    * Added basic Select test     
+
+0.11212 2010-03-29
+
+    * Added message_for() call to Validator::Results to easily retrieve 
+      all the error messages for the given field
+
+0.11211 2010-03-28
+
+    * Added ability to wrap all fields with a common wrapper (thanks lukes)
+    * Change fieldname-based templates in HTML renderer to be 
+      suffixed with _field (username_field, etc.)
+    * Added ability to pass stash variables to field rendering (also thanks lukes)
+
+0.11210 2010-03-03
+
+    * Added minimum_length to Text field (thanks lukes)
+    * Added first per-field-type test in t/fields/ (also thanks lukes)
+    * Added ability to clear form state ($form->clear_state()) 
+    * Added ability to perform complete validation easily on a single 
+      field ( $validator->validate_field($form->field('fieldname')) )
+
+0.11202 2010-02-25
+
+    * fixed leftover warns in Reflector.pm
+
+0.11201 2010-02-22
+
+    * fixed bug in Reflector.pm... Need MOAR Tests
+
+0.11200 2010-02-21
+
+    * Added Overview doc
+    * corrected bug in validation which considered values which evaluated to 'false' to be the same as 'empty'
+    * adjusted Text field rendering to include render_as => 'password' to render a text field as a password
+    * adjusted password rendering to not include the existing value (for security purposes)
+    * moved 'required' flag out of main field object and into validation hashref.
+
+0.11103 2010-02-19
+
+    * Added table based templates for HTML rendering.
+    * Switched to <label> in most places for specifying a field label
+
+0.11102 2010-02-19
+
+    * fixed File::ShareDir capitalization in Makefile.PL
+
+0.11101 2010-02-19
+
+    * dropped dump_basic.t as it uses deprecated Renderer::Dump
+    * FS::Renderer::Dump officially dropped due to redundancy with $form->flatten
+
+0.11100 2010-02-17
+
+    * Added validation tests
+    * Corrected warning in coderef processing.
+    * Changed coderef function format to make it easier to handle simple validation - field value passed in first.
+    * Every class now has docs.  Validation docs more significant.
+    
+    
+    

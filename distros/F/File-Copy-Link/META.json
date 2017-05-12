@@ -1,0 +1,56 @@
+{
+   "abstract" : "extension for replacing a link by a copy of the linked file",
+   "author" : [
+      "Robin Barker <rmbarker@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Copy-Link",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cwd" : "2.18"
+         },
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "File::Copy::Link" : {
+         "file" : "lib/File/Copy/Link.pm",
+         "version" : "0.06"
+      },
+      "File::Spec::Link" : {
+         "file" : "lib/File/Spec/Link.pm",
+         "version" : "0.073"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.140"
+}

@@ -1,0 +1,6 @@
+#fsdb n
+#  | dbsetheader size bw
+#  | /home/johnh/BIN/DB/dbmultistats size bw
+#  | /home/johnh/BIN/DB/dbcol size mean stddev pct_rsd
+3
+#  | dbroweval -b '{ @out_args = (-cols => [qw(n)]); my $count = 0; }'  '{ $count++; }' -e '{ $ofref = [ $count ]; }'

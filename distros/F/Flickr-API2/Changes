@@ -1,0 +1,52 @@
+Changes to Flickr::API2
+
+2.00  2011-04-28
+    * Initial version, forked from Flickr::API 1.04
+
+2.01  2011-04-29
+    * Added missing dependency upon JSON.
+
+2.02  2011-05-02
+    * Skip online API tests unless HTTP access is available.
+    * Adjust Makefile META info regarding Perl versions.
+    * Minor other test improvements.
+    * Use test_requires instead of build_requires in Makefile.
+
+2.03  2011-05-09
+    * Fixes for UTF-8 encoded parameters.
+    * Automatically retry API calls if they time-out.
+
+2.04  2011-08-22
+    * added url_o support
+    * Update dependencies entry in README
+    * Add test for searching by utf8 tags
+    * Adjusted metadata
+
+2.05  2011-10-05
+    * Added support for shortened URLs from photos
+
+2.06  2011-10-13
+    * Added support for retrieving a photo by ID
+    * Added square and thumbnail sizes to photo URLs
+
+2.07  2014-05-20
+  * use ssl api endpoint by default
+  * Fixed some typeos in Base _response_to_photos & added attributes
+  * added attributes to by_id in Photos as per issue #5
+  * Fix UTF8 test
+
+2.08  2014-05-22
+  * Add LWP::Protocol::https as requirement
+
+2.09  2014-07-07
+  * use Carp::croak instead of die for better error reporting.
+
+2.10  2014-08-04
+  * Add support for returning favourite counts in searches
+  * Bump minimum required Perl version to 5.10.1
+
+2.50  2016-07-07
+  * Switch to Moo from Mouse
+  * Update failing people.t test
+  * Bump min perl version to 5.12
+

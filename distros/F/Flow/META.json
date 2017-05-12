@@ -1,0 +1,90 @@
+{
+   "abstract" : "Make data flow processing easy",
+   "author" : [
+      "Zahatski Aliaksandr zag@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Flow",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.21",
+            "XML::Flow" : "0.85"
+         }
+      }
+   },
+   "provides" : {
+      "Flow" : {
+         "file" : "lib/Flow.pm",
+         "version" : "1.01"
+      },
+      "Flow::Code" : {
+         "file" : "lib/Flow/Code.pm",
+         "version" : "0.1"
+      },
+      "Flow::From::JXML" : {
+         "file" : "lib/Flow/From/JXML.pm",
+         "version" : "0.1"
+      },
+      "Flow::From::XML" : {
+         "file" : "lib/Flow/From/XML.pm",
+         "version" : "0.1"
+      },
+      "Flow::Grep" : {
+         "file" : "lib/Flow/Grep.pm",
+         "version" : "0.1"
+      },
+      "Flow::Join" : {
+         "file" : "lib/Flow/Join.pm",
+         "version" : "0.1"
+      },
+      "Flow::NamedPipesPack" : {
+         "file" : "lib/Flow/Join.pm",
+         "version" : "0.1"
+      },
+      "Flow::Splice" : {
+         "file" : "lib/Flow/Splice.pm",
+         "version" : "0.1"
+      },
+      "Flow::Split" : {
+         "file" : "lib/Flow/Split.pm",
+         "version" : "0.1"
+      },
+      "Flow::Test" : {
+         "file" : "lib/Flow/Test.pm",
+         "version" : "0.1"
+      },
+      "Flow::To::JXML" : {
+         "file" : "lib/Flow/To/JXML.pm",
+         "version" : "0.1"
+      },
+      "Flow::To::Null" : {
+         "file" : "lib/Flow/To/Null.pm",
+         "version" : "0.1"
+      },
+      "Flow::To::XML" : {
+         "file" : "lib/Flow/To/XML.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.01"
+}

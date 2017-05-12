@@ -1,0 +1,4 @@
+dbfilepivot: unanticipated pivot value 3 (forgot it in --possible-pivots?).
+ at blib/script/dbfilepivot line 999.
+#fsdb name hw_1 hw_2
+Fsdb::Support::Freds: ending, but running process: dbpipeline_filter

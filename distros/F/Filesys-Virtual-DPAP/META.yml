@@ -1,0 +1,17 @@
+---
+name: Filesys-Virtual-DPAP
+version: 0.01
+author:
+  - Jack Bates <ms419@freezone.co.uk>
+abstract: Filesys::Virtual interface to DPAP (iPhoto) shares
+license: perl
+requires:
+  Class::Accessor::Fast: 0
+  Filesys::Virtual: 0
+  Net::DPAP::Client: 0
+  perl: 5
+provides:
+  Filesys::Virtual::DPAP:
+    file: lib/Filesys/Virtual/DPAP.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

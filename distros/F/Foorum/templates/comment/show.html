@@ -1,0 +1,89 @@
+[% PROCESS sub/date.html %]
+
+[% FOREACH comment IN comments %]
+<a name="c[% comment.comment_id %]"></a>
+<div class='multi'[% IF comment.level %]style="margin-left: [% comment.level * 15 %]px"[% END %]>
+<table align='center'>
+<tr class='reply[% IF loop.count mod 2;'2';ELSE;'1';END; %]'>
+    <td valign='top' width='157'>
+        [% INCLUDE include/user_profile.html user = comment.author %]
+    </td>
+	<td valign='top' width='*'>
+	  <div><b>[% comment.title %]</b><!-- [% comment.comment_id %] --></div>
+	  <div class='horizontal'></div>
+	  <table width='100%' cellpadding='0' cellspacing='0' height='120' style="TABLE-LAYOUT: fixed">
+	  <tr valign='top'><td class="textbody">
+	  <span class="postclass" id='comment_text'>
+	  [% IF comment.author.status == 'banned' %]
+	    The author is banned.
+	  [% ELSE %]
+	    [% IF comment.upload %]
+	    [% PROCESS upload/upload.html upload = comment.upload %]
+	    [% END %]
+	    [% comment.text %]
+	    [% comment_text = comment.text;
+	       IF comment_text.search('<img'); global_has_photos = 1; END; %]
+	  [% END %]
+	  </span>
+      </td></tr>
+      </table>
+      <br>
+      <div class='horizontal'></div>
+       [% IF topic AND topic.closed; no_reply = 1; END %]
+       [% IF forum.settings.can_post_replies AND forum.settings.can_post_replies == 'N'; no_reply = 1; END %]
+       [% UNLESS no_reply %]
+       <a href='/comment/[% comment.comment_id %]/reply'><img src='[% c.config.dir.images %]/replynow.gif' width='16' height='15' align='absmiddle'> Reply</a>
+       [% END %]
+       [% IF c.user_exists AND comment.author.user_id == c.user.user_id %]
+       <a href='/comment/[% comment.comment_id %]/edit'><img src='[% c.config.dir.images %]/edit.gif' width='16' height='15' align='absmiddle'> Edit</a>
+       [% END %]
+       [% IF c.user_exists AND roles.is_moderator %]
+       <a href='/comment/[% comment.comment_id %]/delete'><img src='[% c.config.dir.images %]/del.gif' width='16' height='15' align='absmiddle'> Delete</a>
+       [% END %]
+       <img src='[% c.config.dir.images %]/posttime.gif' width='16' height='15' align='absmiddle'> <span class='date'>[% date_format(comment.post_on) %]</span>
+    </td>
+</tr>
+</table>
+</div>
+[% END %]
+[% IF comments.size %]
+<div class='none'>
+<table align='center'>
+    <tr><td>[% INCLUDE 'sub/pager.html' pager = comments_pager %]</td></tr>
+</table>
+</div>
+[% END %]
+
+[% IF global_has_photos == 1 %]
+
+[% c.load_once('jquery/jquery.lightbox-0.4.css') %]
+[% c.load_once('jquery/jquery.lightbox-0.4.js') %]
+
+<script>
+    $(function() {
+        if ($('span.postclass img').length) {
+            $('span.postclass img').filter(function (index) {
+                return $(this).width() > 640;
+            } ).width(640).filter(function(index) {
+                var parentTag = $(this).parent().get(0).tagName;
+                if (parentTag != 'A') {
+                    $(this).wrap("<a href='" + $(this).attr('src') + "'></a>");
+                } else if ($(this).attr('src') != $(this).parent().attr('href')) {
+                    return false;
+                }
+                return true;
+            } )
+            if ($('span.postclass a img').length) {
+                $('span.postclass a img').parent().lightBox( {
+                	imageLoading:  '[% c.config.dir.images %]/lightbox/lightbox-ico-loading.gif',
+                	imageBtnClose: '[% c.config.dir.images %]/lightbox/lightbox-btn-close.gif',
+                	imageBtnPrev:  '[% c.config.dir.images %]/lightbox/lightbox-btn-prev.gif',
+                	imageBtnNext:  '[% c.config.dir.images %]/lightbox/lightbox-btn-next.gif',
+                	imageBlank:    '[% c.config.dir.images %]/lightbox/lightbox-blank.gif'
+                } );
+            }
+        }
+    });
+</script>
+
+[% END %]

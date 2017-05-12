@@ -1,0 +1,28 @@
+---
+abstract: 'Model class for Form Processor using DBIx::Class'
+author:
+  - 'Gerda Shank, gshank@cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.89
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Form-Processor-Model-DBIC
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+requires:
+  Carp: 0
+  DBIx::Class: 0
+  Form::Processor: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10001

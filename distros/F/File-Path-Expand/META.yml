@@ -1,0 +1,14 @@
+---
+name: File-Path-Expand
+version: 1.02
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: expand filenames
+license: perl
+requires:
+  Test::More: 0
+provides:
+  File::Path::Expand:
+    file: lib/File/Path/Expand.pm
+    version: 1.02
+generated_by: Module::Build version 0.261

@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Filter/PPI/Transform.pm
+perlcritic.rc
+t/Test.pm
+t/TestTransform.pm
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/test.t

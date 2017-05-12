@@ -1,0 +1,29 @@
+ftn-srif
+
+This is the Readme file for the ftn-srif doc directory
+
+Copyright (c) 2001-2003,2010 Robert James Clay 
+All Rights Reserved. This is free software;  you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+Perl script to process incoming SRIF (Standard Request Information
+File) files.
+============================================================
+
+
+Files
+----------------
+README  	Readme file for Doc directory
+TODO		What needs to be, or is being, worked on
+
+00000001.req	Example mailer request file
+SRIF.TXT	SRIF documentation
+binkd.srf	Example SRIF file, created by binkd
+freqerr.txt	Example file to send when requested file(s) not found
+magic.txt	Example file listing "magic" filenames & the filenames/
+	        paths that they match up to.
+		
+========================
+
+Robert J. Clay, jame@users.sf.net, 1:120/544@fidonet
+http://ftnpl.sourceforge.net

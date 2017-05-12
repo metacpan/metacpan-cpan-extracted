@@ -1,0 +1,8 @@
+[%
+    SET tabs = [
+        { template = 'AUTODOC.html' label = 'Schema' }
+        { template = 'AUTODOC-graph.html' label = 'Relationship Graph' }
+        { template = 'AUTODOC-inheritance.html' label = 'Inheritance Graph' }
+    ]
+%]
+[%# $Id: tabs.tt2 16 2007-11-20 19:16:29Z jason $ #%]

@@ -1,0 +1,100 @@
+#!/bin/bash
+#
+# /etc/init.d/funifs
+#
+# Copyright (C) Vladimir V. Kolpakov 2006-2011
+# All rights reserved.
+#
+### BEGIN INIT INFO
+# Provides:         funifs
+# Required-Start:   $local_fs $remote_fs $network
+# Should-Start:     $syslog
+# Required-Stop:    $local_fs $remote_fs $network
+# Should-Stop:      $syslog
+# Default-Start:    3 5
+# Default-Stop:     0 1 2 6
+# Short-Description:    Funifs filesystems
+# Description:      Mount Funifs filesystem unions
+### END INIT INFO
+
+. /etc/rc.status
+
+collect_funifs () {
+  auto=$1
+  funifs=()
+  while read  what where type options rest ; do
+    [[ $what != \#* && $type = fuse.funifs ]] || continue
+    [[ -n $auto && $options = *noauto* ]] && continue
+    funifs+=( $where )
+  done < /etc/fstab
+  mounted=()
+  unmounted=()
+  for n in ${funifs[@]} ; do
+    if fgrep -q " $n " /proc/mounts ; then
+      mounted+=( $n )
+    else
+      unmounted+=( $n )
+    fi
+  done
+  test -n "$funifs"
+}
+
+rc_reset
+case "$1" in
+  start|reload)
+    echo -n "Mounting Funifs userland file systems"
+    collect_funifs auto || rc_failed 3
+    for n in ${unmounted[@]} ; do
+      node=
+      while read  what where type options rest ; do
+	[[ $what != \#* && $type = fuse.funifs && $where = $n ]] || continue
+	[[ -n $node ]] && { echo -n ' ***' Duplicate of $n in /etc/fstab ; rc_failed ; break 2 ; }
+	/sbin/mount.fuse $what $n -o $options -t /usr/sbin/funifs || { rc_failed ; break 2 ; }
+	node=$n
+      done < /etc/fstab
+    done
+    rc_status -v
+    ;;
+  stop)
+    echo -n "Unmounting Funifs userland file systems"
+    collect_funifs || rc_failed 3
+    for n in ${mounted[@]} ; do
+      umount $n || rc_failed
+    done
+    rc_status -v
+    ;;
+  restart|force-reload)
+    ## Stop the service and regardless of whether it was
+    ## running or not, start it again.
+    $0 stop
+    $0 start
+    rc_status
+    ;;
+  status)
+    collect_funifs || rc_failed 3
+    if test -n "$mounted" ; then
+      echo -n "Mounted Funifs nodes: "${mounted[@]}
+      rc_status -v
+    fi
+    collect_funifs auto
+    if test -n "$unmounted" ; then
+      echo -n "Unmounted Funifs nodes: "${unmounted[@]}
+      rc_failed
+      rc_status -v
+    fi
+    ;;
+  try-restart|condrestart)
+    $0 status
+    if test $? = 0; then
+      $0 restart
+    else
+      rc_reset
+    fi
+    rc_status
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status|reload|force-reload|restart|try-restart|condrestart}"
+    exit 1
+esac
+rc_exit
+

@@ -1,0 +1,144 @@
+File-MultilineGrep
+
+To be considered text files having repeated structures. These structures possess repeated
+start delimiter, optional stop delimiter and variable contents. That is some or all fields
+of these structures are optional.
+A task is to select all whole structures, that contain a specified pattern.
+This can be done using a multiline regular expressions. But there is a performance issue:
+Processing time using regular expression is not directly proportional to amount of structures,
+so that increasing of this amount might cause the reqular expression will never finish.
+Processing time of the proposed function is directly proportional to amount of structures.
+
+   file_multiline_grep( $begin_pattern      #                     regular expression
+                      , $finish_pattern     # optional parameter, regular expression
+                      , $middle_pattern     #                     regular expression
+                      , $numeration         # if false - not enumerate output lines
+                      , $input_file         # optional parameter
+                                            # if false - read from STDIN
+                      , $output_separator); # optional parameter
+
+
+EXAMPLE
+
+   use File::MultilineGrep;
+
+   file_multiline_grep ('person_id'
+                      , 'end_person'
+                      , 'Giant'
+                      , 'enumerate_lines'
+                      , 'most_famous_people'
+                      , '------
+
+reads all records from a file 'most_famous_people' 
+(where line enumeration doesn't belong to the file):
+
+  1 person_id  - 001
+  2 profession - Prophet
+  3 first name - Moses
+  4 birthyear  - 1391 BCE
+  5 end_person    
+  6    ...
+  7 person_id  - 002
+  8 profession - Giant
+  9 first name - Samson
+ 10 birthyear  - Unknown
+ 11 end_person   
+ 12    ...
+ 13 person_id  - 003
+ 14 profession - King
+ 15 first name - David
+ 16 birthyear  - 1040 BCE
+ 17 end_person   
+ 18    ...
+ 19 person_id  - 004
+ 20 profession - Giant
+ 21 first name - Goliath
+ 22 birthyear  - 135  BCE
+ 23 end_person   
+
+that begin with 'person_id', finish with 'end_person' and contain a pattern 'Giant':
+
+   7: person_id  - 002 
+   8= profession - Giant
+   9: first name - Samson
+  10: birthyear  - Unknown
+  11: end_person
+ ------
+  19: person_id  - 004 
+  20= profession - Giant
+  21: first name - Goliath
+  22: birthyear  - 135  BCE 
+  23: end_person
+ ------
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::MultilineGrep
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-MultilineGrep
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-MultilineGrep
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-MultilineGrep
+
+    Search CPAN
+        http://search.cpan.org/dist/File-MultilineGrep/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Mart E. Rivilis
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

@@ -1,0 +1,18 @@
+
+PICS= test.gif 
+
+PS2GIF = ps2gif
+
+.SUFFIXES: .ps .gif .pic
+
+.ps.gif: 
+	$(PS2GIF) < $*.ps > $*.gif
+
+.pic.ps: 
+	pic $*.pic | groff > $*.ps
+
+default: $(PICS) 
+
+test.pic:  test.pl FakeHash.pm
+	./test.pl
+

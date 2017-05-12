@@ -1,0 +1,62 @@
+Sys-CpuLoadX 0.04
+=================
+
+The Sys::CpuLoadX module started out as an integration of
+the Sys::CpuLoad and Win32::SystemInfo::CpuUsage modules
+to provide a more portable interface for obtaining
+system CPU loads in Perl. 
+
+INSTALLATION
+
+To install this module, the Module::Build module must be
+installed on your system. Then you may run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sys::CpuLoadX
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sys-CpuLoadX
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sys-CpuLoadX
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Sys-CpuLoadX
+
+    Search CPAN
+        http://search.cpan.org/dist/Sys-CpuLoadX/
+
+
+LICENSE AND COPYRIGHT
+
+Portions of this module are from Sys::CpuLoad, which is:
+
+    Copyright (c) 1999-2002 Clinton Wong. All rights reserved.
+
+    This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+Other portions are from Win32::SystemInfo::CpuUsage, which
+does not seem to have any explicit copyright.
+
+The remainder of the module is 
+
+    Copyright (C) 2010-2011 Marty O'Brien
+
+    This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.
+

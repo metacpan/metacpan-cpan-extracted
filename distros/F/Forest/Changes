@@ -1,0 +1,104 @@
+Revision history for Perl extension Forest
+
+0.10 Wed. Dec. 8th, 2013
+    - remove MooseX::AttributeHelpers
+      dependency (doy)
+
+0.09 Mon. Sep. 27, 2010
+    - silence warnings on new Moose (doy)
+
+0.08 Wed. Jan. 13, 2010
+    *** MAJOR REFACTORINGS ***
+         (by nothingmuch)
+
+    + Forest::Tree::Pure
+    + Forest::Tree::Constructor
+    + Forest::Tree::Builder
+    + Forest::Tree::Builder::Callback
+    + Forest::Tree::Builder::SimpleTextFile
+      - added these packages as well as tests
+
+    * Forest::Tree
+      - this is now a subclass of Forest::Tree::Pure
+
+    - many other changes all over the place as well
+      as best we can tell this is still 100% back-compat
+      but if you experience anything to the contrary
+      please let us know ASAP. Thanks.
+
+0.07 Sat. July 18, 2009
+    - Fix spelling of weak_ref in some
+      attrs (cory watson)
+
+    * Forest::Tree::Writer
+      - no longer a weak-ref on the tree
+        because that is probably not what
+        we actually want.
+
+0.06 Fri. Feb. 27, 2009
+    - whoops, tons of .git stuff in that last
+      release
+    - updated MANIFEST.SKIP so don't get all
+      that git stuff
+
+0.05 Fri. Feb. 27, 2009
+    - fixed all the test plans and updated copyright
+
+0.04 Sun. Sept. 7, 2008
+    * Forest::Tree::Writer::SimpleHTML
+      - removed Sub::Current dependency because it
+        cannot be compiled on Win32 with 5.8.*
+        (thanks to Nilson Santos Figueiredo Junior)
+
+0.03 Sun. Aug. 10, 2008
+    * Forest::Tree
+      - fixing bug where children were not getting
+        the parent sorted correctly
+        - added several tests for this
+
+0.02 Sat. July 12, 2008
+    ~ converted from Module::Build to Module::Install
+
+    -- removed Forest::Tree::Service::* this will be
+       moved to another distro soon.
+
+    * Forest::Tree
+      - added size and height attributes (groditi)
+
+    * Forest::Tree::Writer
+      Forest::Tree::Writer::SimpleASCII
+      Forest::Tree::Writer::SimpleHTML
+      - added node_formatter support
+        - added tests for this
+
+    * Forest::Tree::Writer::ASCIIWithBranches
+      - added this module for drawing ASCII trees
+        with nice little branches and such.
+        - added tests for this
+
+    * Forest::Tree::Roles::CanCreateSubTree
+      - refactored out some common functionality
+        into roles
+
+    * Forest::Tree::Loader
+      - added this generic role for loading of
+        trees.
+
+    * Forest::Tree::Loader::SimpleUIDLoader
+      - added this module as a way to load a tree
+        from a simple ArrayOfHash tables
+        - added tests for this
+
+    * Forest::Tree::Roles::LoadWithMetaData
+      - simple role to work with loaders and add
+        the metadata in as the tree is being created
+        - added tests for this
+
+    * Forest::Tree::Reader
+      - this now also ->does(Forest::Tree::Loader)
+        so that you can be more general about how
+        your stuff gets loaded.
+        - added tests for this
+
+0.01 Wed. Feb. 13, 2008
+    - filling a need

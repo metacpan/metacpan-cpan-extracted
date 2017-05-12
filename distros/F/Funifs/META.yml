@@ -1,0 +1,19 @@
+---
+abstract: 'FUSE read-only Union Filesystem'
+author:
+  - 'Vladimir Kolpakov <vova@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Funifs
+requires:
+  Filesys::Statvfs: 0
+  Fuse: 0.09
+  Unix::Syslog: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.3

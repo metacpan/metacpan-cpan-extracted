@@ -1,0 +1,34 @@
+---
+abstract: ~
+author:
+  - 'Atsushi Nagase <ngs@cpan.org>'
+build_requires:
+  Config::Pit: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Bank-JP-Mizuho
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  DateTime: 0
+  Encode: 0
+  Finance::OFX::Parse::Simple: 0
+  HTTP::Cookies: 0
+  IO::Socket::SSL: 0
+  LWP::UserAgent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/ngs/p5-finance-bank-jp-mizuho
+version: 0.02

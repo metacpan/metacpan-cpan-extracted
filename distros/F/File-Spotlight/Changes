@@ -1,0 +1,18 @@
+Revision history for Perl extension File::Spotlight
+
+0.05  Thu Jul 23 13:33:21 PDT 2009
+        - Now uses the updated Mac::Spotlight::* binding to avoid forking subprocess.
+          (This might not work with OS X system default Perl)
+
+0.04  Thu Jun  4 23:34:39 PDT 2009
+        - CHANGED API: takes .savedSearch in new() rather than list() to represnt Smart Folder as an object.
+
+0.03  Wed Jun  3 10:52:47 PDT 2009
+        - Parsing plist falls back to Mac::PropertyList when running without Foundation.pm (non-Apple perl)
+          (Thanks to hanekomu)
+
+0.02  Wed Jun  3 04:33:29 PDT 2009
+        - Do not use IPC::Open2 to run on HTTP::Engine (and HTTP::Server::Simple)
+
+0.01  Wed Jun  3 02:28:22 2009
+        - original version

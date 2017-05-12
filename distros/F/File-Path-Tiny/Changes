@@ -1,0 +1,32 @@
+Revision history for File-Path-Tiny
+
+0.8  2016-01-26 14:44:57
+    - rt 88849: allow multiple processes to operate on the same paths (thanks HELENA!)
+    - Add github to POD
+    - rt 96842: Fix mk() to work correctly w/ UNC paths on windows (thanks MITHUN!)
+
+0.7  2013-09-26 18:46:19
+    - add =encoding to POD due to test failure on certain boxes
+    - add several perl, pkg, and pod tests
+
+0.6  2013-09-24 05:51:54
+    add mk_parent()
+
+0.5  2012-09-06 07:38:06
+    rt 79472 (thanks Lachlan!) fix absolute path bug introduced in 0.4
+    
+0.4  2012-09-03 17:50:41
+    rt 79345 (thanks Gian!): Failed to recursively create dir if the first part solves to false
+
+0.3  2013-04-06 19:39:52
+    rt 76061 No LICENSE in META.yml
+    rt 68950 break out rm() code into empty() type function, use it in rm()
+
+0.2  2012-03-11 16:50:44
+    rt 51728 Missing colon in synopsis
+    rt 75688 using deprecated for qw() in 00.load.t
+    perltidy
+
+0.1  2008 -11-17 20:09:59
+       Initial release.
+

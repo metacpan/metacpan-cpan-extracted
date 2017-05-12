@@ -1,0 +1,17 @@
+2009-04-22 10:20  cvs
+
+	* lib/File/Which/Cached.pm, t/00.t: Added another test, to make
+	  sure we bonk out as expected- that it behaves as expected in
+	  unforeseen usage context.  Fixed up documentation and code a
+	  little bit.  Made it a little bit faster.
+
+2008-01-01 08:35  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/Which/Cached.pm,
+	  t/01_File_Which_Cached.t: Initial revision
+
+2008-01-01 08:35  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/Which/Cached.pm,
+	  t/01_File_Which_Cached.t: init import
+

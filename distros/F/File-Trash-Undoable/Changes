@@ -1,0 +1,181 @@
+Revision history for File-Trash-Undoable
+
+0.21    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.20    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Move spec prereq from DevelopRecommends to DevelopSuggests
+	  with _SPEC:: prefix.
+
+        - Split trash-u script to its own dist perl-App-trash-u to reduce
+          dependencies for this dist.
+
+        - [build] Rebuild to remove extraneous dependencies.
+
+
+0.19    2016-06-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Replace File::Slurp::Tiny with File::Slurper.
+
+	- [dist] Bump prereq version Test::Perinci::Tx::Manager -> 0.56.
+
+
+0.18    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.17    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.16    2015-02-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to Perinci::CmdLine -> Perinci::CmdLine::Classic.
+
+
+0.15    2014-12-19 (PERLANCAR)
+
+        - [Bugfix] Update old code (which didn't adjust to pericmd 1.17+, where
+          all pericmd's run methods return envres directly).
+
+
+0.14    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed module SHARYANTO::File::Util ->
+	  File::MoreUtil.
+
+
+0.13    2014-10-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add screenshot.
+
+
+0.12    2014-08-24 (SHARYANTO)
+
+        - No functional changes.
+
+        - Adjust to Perinci::CmdLine 1.20.
+
+
+0.11    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.10    2013-05-10 (SHARYANTO)
+
+        - No functional changes. Adjust to Perinci::CmdLine 0.76.
+
+
+0.09    2012-09-06 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - trash() returns path of file in trash.
+
+
+0.08    2012-09-04 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Adjust to Rinci 1.1.29 & Perinci::Tx::Manager 0.38 (descriptive
+          check_state result message & dry_run message).
+
+        - Adjust to Rinci 1.1.28 (use suffix from -tx_action_id).
+
+        [BUG FIXES]
+
+        - A couple of other fixes.
+
+
+0.07    2012-08-28 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Update to File::Trash::FreeDesktop 0.08. Replace using mtime with
+          using suffix.
+
+
+0.06    2012-08-24 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Replace Cwd::abs_path() with SHARYANTO::File::Util::l_abs_path() to
+          avoid problem with trashing symlinks.
+
+
+0.05    2012-08-24 (SHARYANTO)
+
+        [REMOVED FEATURES]
+
+        - dry_run is removed; it will be provided by Perinci::CmdLine via
+          -tx_action=check_state. Until the new Perinci::CmdLine is out,
+          dry-running is not available.
+
+        [ETC]
+
+        - Add 'mtime' argument.
+
+        - Update to Rinci::Transaction protocol version v=2. No longer uses
+          Perinci::Sub::Gen::Undoable.
+
+
+0.04    2012-08-16 (SHARYANTO)
+
+        - Update to using Perinci::Sub::Gen::Undoable 0.25 (v=2).
+
+        - Allow empty_trash() to work without Perinci::CmdLine.
+
+
+0.03    2012-07-27 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Rename script from u-trash to trash-u
+
+        [ENHANCEMENTS]
+
+        - Nicer log message, don't show absolute path, show original path
+          entered by user.
+
+
+0.02    2012-07-27 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - --dry-run messages can now been seen at log level 'info' (VERBOSE=1)
+            as documented.
+
+        - Rollback properly when encountering errors in trashing (file not
+          found, permission denied).
+
+
+0.01    2012-07-26 (SHARYANTO)
+
+        - First version.

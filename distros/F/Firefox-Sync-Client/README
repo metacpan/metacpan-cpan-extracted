@@ -1,0 +1,48 @@
+Firefox Sync Client version 0.04
+================================
+
+This module provides an API to connect to a Firefox Sync Server.
+
+For now it is only possible to get a collection of things from the server.
+Later it will also be possible to change items on the server.
+
+Requests to the server can be cached in a temporary file.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+You will need the following modules and their dependencies from CPAN:
+
+    Digest::SHA
+    Crypt::Rijndael
+    JSON
+    LWP::UserAgent
+    LWP::Protocol::https
+    MIME::Base32
+    MIME::Base64
+    Storable
+
+
+EXAMPLES
+
+After installation, you can find examples in the pod documentation of the
+module. Call it with:
+
+    perldoc Firefox::Sync::Client
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Robin Schroeder
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

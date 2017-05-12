@@ -1,0 +1,11 @@
+lib/File/Overwrite.pm
+Makefile.PL
+MANIFEST
+README
+t/00_tests.t
+ARTISTIC.txt
+GPL2.txt
+CHANGES
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

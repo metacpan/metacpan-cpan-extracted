@@ -1,0 +1,272 @@
+#!/usr/bin/perl
+#############################################################################
+#
+# Fedora::App::ReviewTool invocation script, plus documentation 
+#
+# Author:  Chris Weyl (cpan:RSRCHBOY), <cweyl@alumni.drew.edu>
+# Company: No company, personal work
+# Created: 01/05/2009 06:56:51 PM PST
+#
+# Copyright (c) 2009 Chris Weyl <cweyl@alumni.drew.edu>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+#############################################################################
+
+use strict;
+use warnings;
+
+# quiet some "...too late to run" warnings
+use IO::Prompt;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+# FIXME temp until we get Fedora::Bugzilla installed on its own
+use lib "$FindBin::Bin/../../Fedora-Bugzilla/lib";
+use lib "$FindBin::Bin/../../MooseX-Role-XMLRPC-Client/lib";
+
+use Fedora::App::ReviewTool;
+
+Fedora::App::ReviewTool->run;
+
+__END__
+
+=head1 NAME
+
+reviewtool - Handle Fedora package reviews
+
+=head1 SYNOPSIS
+
+    # push one or more packages for review
+    reviewtool submit ~/rpms/perl-Foo/perl-Foo-1-1.fc11.src.rpm
+
+    # submit a branch request...
+    reviewtool branch perl-Foo
+    
+    # take one or more packages for review (bug # or alias)
+    reviewtool take 123456 perl-Foo
+
+=head1 DESCRIPTION
+
+reviewtool is designed to help automate some of the more mundane bits of
+posting a package for review.  It handles everything from running koji scratch
+builds, pushing specs/srpms to a publically accessible space (e.g.
+fedorapeople.org), tracking status, to creating and updating review bugs.   It
+does not rely on any external tools, aside from the standard Fedora
+infrastructure resources available to any packager:  fedorapeople.org,
+Bugzilla, and Koji.
+
+It's also possible to use reviewtool to assist from the reviewer side of the
+process.  One can take, pull down specs/srpms, kick off scratch builds, check
+upstream, generate a review template, etc.  Right now this functionality is
+more limited than the posting bits, but it's not likely to stay this way for
+long.
+
+reviewtool does NOT try to take the human out of the review process.  It
+simply tries to hide the routine, common parts of submitting and reviewing
+packages.
+
+=head1 COMMAND SUMMARY
+
+Detailed listings of options available to each command can be found by running
+as:
+
+    reviewtool help [command]
+
+Generally speaking, each command takes as an argument either a list of srpms
+or bug numbers/aliases to work on.
+
+=over 4
+
+=item B<setup>
+
+Do some initial setup:  check to make sure fedorapeople.org is set up to host
+your packages and specs (aka fedorapeople.org:public_html/review/ exists, and
+is web accessible).  It'll also ask for your bugzilla email addy and password,
+though you don't need to store those.
+
+Right now this part isn't too smart.  If anything looks "odd", we just die.
+
+=item B<status> - get status on current reviews (taken and submitted)
+
+Displays a snazzy little table of the review bugs we've submitted that're
+still open.
+
+=back
+
+=head2 Submitter Commands
+
+Note that you can start using reviewtool on packages you submitted manually.
+We get all our bug data from Bugzilla directly, so we should find any review
+bugs you've submitted.
+
+=over 4
+
+=item B<submit> - create a review ticket
+
+Submit one or more packages (srpms) for review.  This generally entails:
+
+=over 4
+
+=item * scratch run through rawhide via koji
+
+=item * pushing the srpm and spec to your fedorapeople space
+
+=item * creating a new review tix with the above details
+
+=back
+
+=item B<branch> - create a package branch request
+
+Submit a branch request in the requisite format; set the 'fedora-cvs' flag to
+'?'.
+
+For more information on the branching procedure, please see
+L<http://fedoraproject.org/wiki/CVSAdminProcedure>.
+
+=item B<close> - close a review ticket
+  
+This action can be used to close review bugs after successful branching;
+they're set to CLOSED/NEXTRELEASE.  You will be prompted before closing each
+bug that appears ready (unless, of course, you've passed "--yes").
+
+=item B<update> - update an already submitted review tix with a new srpm/spec
+
+=back
+
+=head2 Reviewer Commands
+
+TODO.
+
+=head1 SUBMITTING A PACKAGE
+
+The process doesn't change too much when using reviewtool.  First, create your
+spec and srpm as normal.  When you're satisfied with them, issue a "reviewtool
+submit"; this will run a scratch build and build out a bug.
+
+As your review progresses, you can use "reviewtool update" to run new scratch
+builds, push the packages, and update the review bug.
+
+After approval, you can use "reviewtool branch" to submit a branch request.
+
+After branching, "reviewtool close" will prompt you to close bugs that are
+ready for closure.
+
+=head1 REVIEWING A PACKAGE
+
+This functionality is not yet available.  Stay tuned! :-)
+
+=head1 CONFIGURATION
+
+reviewtool does a pretty decent job of guessing defaults (including pulling
+info from your ~/.fedora.cert).  It keeps non-default information in
+~/.reviewtool.ini.
+
+=head2 Koji
+
+Note that you need to have your workstation already configured to run koji
+builds.  If you can't successfully run "koji build --scratch ..." on your own,
+then reviewtool can't either.
+
+=head1 DIAGNOSTICS
+
+Right now we tend to die() or confess() our errors.
+
+=head2 Submitter
+
+TODO.
+
+=head2 Reviewer
+
+TODO.
+
+=head1 CAVEATS
+
+We don't try to be too smart about things; we just stick to doing the basic,
+mundane things that are identical no matter what sort of package we're
+reviewing.  If you're expecting this to be a magical review-oh-matic tool,
+you're going to be disappointed.
+
+We hit up Bugzilla for bug info at every stage, rather than keeping it
+locally.  This is saner than keeping data locally, as the advantage to that is
+minimal, and has the nice side-effect that changes made to a review bug
+through some other means (or by someone else) are always reflected in our
+data.
+
+We're confused by situations in which multiple review bugs exist for the same
+package, and were closed at different times for different reasons.  e.g.
+packager A submits "foo" for review at some point, abandons it and closes the
+bug; packager B goes to submit the same package at some later point.  The
+result here is undefined, is known to be wonky, and will be fixed at some
+point.
+
+=head1 DEPENDENCIES
+
+If you're seeing this, it probably means you've installed it via yum and all
+needful deps have been automagically pulled in.  If not, you know to run 'perl
+./Makefile.PL' and see what it complains about :-)
+
+Successful usage depends on a number of things, not the least of which is
+access to the main fedora infrastructure tools.  If you're a sponsored
+packager you should have all the needful access; if not, please follow the
+"How to Get Sponsored" guidelines (lack of sponsorship will really just
+prevent from running koji scratch builds and certain reviewing functions).
+
+
+=head1 INCOMPATIBILITIES
+
+None known.  Persons desiring a Python version of this package are encouraged
+to examine Damian Conway's L<Acme::Python> package.
+
+=head1 TODO
+
+Lots!  This is an evolving package; there are going to be rough edges and poor
+documentation for a while.  Patches are very welcome :-)
+
+The most significant thing lacking at the moment is any reviewer
+functionality.  For initial work on this, please see the mercurial repository.
+
+=head1 SEE ALSO
+
+L<http://fedoraproject.org/wiki/ReviewTool>,
+L<http://camelus.fedorahosted.org>, L<http://fedorapeople.org>, etc.
+
+=head1 BUGS AND LIMITATIONS
+
+All complex software has bugs lurking in it, and this module is no
+exception. If you find a bug please either email me, or add the bug to
+the trac tickets under the "camelus" instance at:
+
+    L<http://camelus.fedorahosted.org>
+
+=head1 AUTHOR
+
+Chris Weyl  <cweyl@alumni.drew.edu>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009 Chris Weyl <cweyl@alumni.drew.edu>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the 
+
+    Free Software Foundation, Inc.
+    59 Temple Place, Suite 330
+    Boston, MA  02111-1307  USA
+
+=cut
+

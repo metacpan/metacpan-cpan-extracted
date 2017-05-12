@@ -1,0 +1,189 @@
+# NAME
+
+File::Basename::Extra - Extension to File::Basename, adds named access to file parts and handling of filename suffixes
+
+# VERSION
+
+version 0.003
+
+# SYNOPSIS
+
+    # Note: by default no symbols get exported so make sure you export
+    # the ones you need!
+    use File::Basename::Extra qw(basename);
+
+    # basename and friends
+    my $file      = basename('/foo/bar/file.txt');          # "file.txt"
+    my $fileext   = basename_suffix('/foo/bar/file.txt');   # ".txt"
+    my $filenoext = basename_nosuffix('/foo/bar/file.txt'); # "file"
+
+    # dirname
+    my $dir       = dirname('/foo/bar/file.txt');           # "/foo/bar/"
+
+    # fileparse
+    my ($filename, $dirs, $suffix) = fileparse('/foo/bar/file.txt', qr/\.[^.]*/);
+                                                            # ("file", "/foo/bar/", ".txt")
+
+    # pathname
+    my $path      = pathname('/foo/bar/file.txt');          # "/foo/bar/"
+
+    # fullname and friends
+    my $full      = fullname('/foo/bar/file.txt');          # "/foo/bar/file.txt"
+    my $fullext   = fullname_suffix('/foo/bar/file.txt');   # ".txt"
+    my $fullnoext = fullname_nosuffix('/foo/bar/file.txt'); # "/foo/bar/file"
+
+    # getting/setting the default suffix patterns
+    my @patterns = default_suffix_patterns(); # Returns the currently active patterns
+
+    # setting the default suffix patterns
+    my @previous = default_suffix_patterns(qr/[._]bar/, '\.baz');
+                   # Now only .bar, _bar, and .baz are matched suffixes
+
+# DESCRIPTION
+
+This module provides functionalty for handling file name suffixes (aka
+file name extensions).
+
+# FUNCTIONS
+
+## fileparse FILEPATH
+
+## fileparse FILEPATH PATTERN\_LIST
+
+## basename FILEPATH
+
+## basename FILEPATH PATTERN\_LIST
+
+## dirname FILEPATH
+
+## fileparse\_set\_fstype FSTYPE
+
+These functions are exactly the same as the corresponding ones from
+[File::Basename](https://metacpan.org/pod/File::Basename) except that they aren't exported by default.
+
+## basename\_suffix FILEPATH
+
+## basename\_suffix FILEPATH PATTERN\_LIST
+
+Returns the file name suffix part of the given filepath. The default
+suffix patterns are used if none are provided. Behaves the same as
+`basename`, i.e., it uses the last last level of a filepath as
+filename, even if the last level is clearly directory.
+
+Also, like `basename`, files that consist of only a matched suffix
+are treated as if they do not have a suffix. So, using the default
+suffix pattern, `basename_suffix('/Users/home/.profile')` would
+return an empty string.
+
+Note: Like the original `basename` function from [File::Basename](https://metacpan.org/pod/File::Basename),
+suffix patterns are automatically escaped so pattern `.bar` only
+matches `.bar` and not e.g., `_bar` (this is **not** done for the
+default suffix patterns, nor for patterns provided to the non-basename
+family functions of this module!).
+
+## basename\_nosuffix FILEPATH
+
+## basename\_nosuffix FILEPATH PATTERN\_LIST
+
+Acts basically the same as the original `basename` function, except
+that the default suffix patterns are used to strip the name of its
+suffixes when none are provided.
+
+Also, like `basename`, files that consist of only a matched suffix
+are treated as if they do not have a suffix. So, using the default
+suffix pattern, `basename_nosuffix('/Users/home/.profile')` would
+return `.profile`.
+
+Note: Like the original `basename` function from [File::Basename](https://metacpan.org/pod/File::Basename),
+suffix patterns are automatically escaped so pattern `.bar` only
+matches `.bar` and not e.g., `_bar` (this is **not** done for the
+default suffix patterns, nor for patterns provided to the non-basename
+family of functions of this module!).
+
+## filename FILEPATH
+
+## filename FILEPATH PATTERN\_LIST
+
+Returns just the filename of the filepath, optionally stripping the
+suffix when it matches a provided suffix patterns. Basically the same
+as calling `fileparse` in scalar context.
+
+## filename\_suffix FILEPATH
+
+## filename\_suffix FILEPATH PATTERN\_LIST
+
+Returns the matched suffix of the filename. The default suffix
+patterns are used when none are provided.
+
+## filename\_nosuffix FILEPATH
+
+## filename\_nosuffix FILEPATH PATTERN\_LIST
+
+Returns the filename with the the matched suffix stripped. The default
+suffix patterns are used when none are provided.
+
+## pathname FILEPATH
+
+Returns the path part of the file. Contrary to `dirname`, a filepath
+that is clearly a directory, is treated as such (e.g., on Unix,
+`pathname('/foo/bar/')` returns `/foo/bar/`).
+
+## fullname FILEPATH
+
+## fullname FILEPATH PATTERN\_LIST
+
+Returns the provided filepath, optionally stripping the filename of
+its matching suffix.
+
+## fullname\_suffix FILEPATH
+
+## fullname\_suffix FILEPATH PATTERN\_LIST
+
+Synonym for filename\_suffix.
+
+## fullname\_nosuffix FILEPATH
+
+## fullname\_nosuffix FILEPATH PATTERN\_LIST
+
+Returns the full filepath with the the matched suffix stripped. The
+default suffix patterns are used when none are provided.
+
+## default\_suffix\_patterns
+
+## default\_suffix\_patterns NEW\_PATTERN\_LIST
+
+The default suffix pattern list (see the `fileparse` function in
+[File::Basename](https://metacpan.org/pod/File::Basename) for details) is `qr/\.[^.]*/`. Meaning that this
+defines the suffix as the part of the filename from (and including)
+the last dot. In other words, the part of a filename that is popularly
+known as the file extension.
+
+You can alter the suffix matching by proving this function with a
+different pattern list.
+
+This function returns the pattern list that was effective _before_
+optionally changing it.
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker
+[website](https://github.com/HayoBaan/File-Basename-Extra/issues).
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+# SEE ALSO
+
+[File::Basename](https://metacpan.org/pod/File::Basename) for the suffix matching and platform specific details.
+
+# AUTHOR
+
+Hayo Baan <hayobaan@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Hayo Baan.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

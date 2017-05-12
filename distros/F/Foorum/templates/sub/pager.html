@@ -1,0 +1,53 @@
+[% IF pager %]
+<div class='pager'>
+Page [% pager.current_page %] of [% pager.last_page %]
+[% IF pager.last_page > 1%] - 
+
+    [% UNLESS url_prefix;
+        path_query = c.req.uri.path_query;
+        IF (matches = path_query.match('^(.*?)/page=(\w+)(/|$)(.*?)$'));
+            url_prefix = matches.0; url_postfix = matches.3;
+        ELSE;
+            url_prefix = c.req.uri.path;
+            IF c.req.uri.query;
+                url_postfix = '?' _ c.req.uri.query;
+            END;
+        END;
+    END; %]
+    [% url_prefix  = url_prefix.replace('/$', '');
+       url_postfix = url_postfix.replace('^/', ''); %]
+
+    [% IF pager.current_page - 9 > 0 %]
+	    [% start_page = pager.current_page - 9 %]
+	[% ELSE %]
+	    [% start_page = 1 %]
+    [% END %]
+    [% IF pager.last_page > pager.current_page + 10 %]
+        [% end_page = pager.current_page + 10 %]
+	[% ELSE %]
+	    [% end_page = pager.last_page %]
+    [% END %]
+
+    [% IF start_page != 1 %]
+        <a href="[% url_prefix %]/page=1/[% url_postfix %]" title="First">|&lt;&lt;</a>
+    [% END %]
+    [% IF pager.previous_page %]
+        <a href="[% url_prefix %]/page=[% pager.previous_page %]/[% url_postfix %]">&lt; Prev</a> 
+    [% END %]
+    [% FOREACH page = [ start_page .. end_page ] %]
+        [% IF page == pager.current_page %]
+        <strong>[% page %]</strong>
+	    [% ELSE %]
+	    <a href='[% url_prefix %]/page=[% page %]/[% url_postfix %]'>[% page %]</a>
+	    [% END %]
+    [% END %]
+    [% IF pager.next_page %]
+    <a href="[% url_prefix %]/page=[% pager.next_page %]/[% url_postfix %]">Next &gt;</a> 
+    [% END %]
+    [% IF end_page != pager.last_page %]
+        <a href="[% url_prefix %]/page=[% pager.last_page %]/[% url_postfix %]" title="Last">&gt;&gt;|</a>
+    [% END %]
+    
+[% END %]
+</div>
+[% END %]

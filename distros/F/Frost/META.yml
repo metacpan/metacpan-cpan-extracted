@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name:               Frost
+version:            0.70
+abstract:           Feasible Referential Object STorage
+author:
+    - Ernesto <ernesto@dienstleistung-kultur.de>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    BerkeleyDB:           0.43
+    Carp:                 1.04
+    Class::MOP:           1.08
+    Data::Dumper:         1.125
+    Data::UUID:           1.202
+    DateTime::Format::MySQL:  0
+    Exporter:             0
+    Fcntl:                1.05
+    File::Path:           2.04
+    IO::File:             0
+    List::MoreUtils:      0
+    List::Util:           0
+    Log::Log4perl:        1.24
+    Moose:                1.14
+    Scalar::Util:         0
+    Storable:             2.21
+    Test::Deep:           0
+    Test::Differences:    0
+    Test::Exception:      0
+    Test::More:           0.88
+    Test::Requires:       0
+    Tie::Cache::LRU:      20081023.2116
+    Time::HiRes:          1.9719
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

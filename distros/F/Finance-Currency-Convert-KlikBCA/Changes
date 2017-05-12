@@ -1,0 +1,98 @@
+Revision history for Finance-Currency-Convert-KlikBCA
+
+0.13    2016-10-14 (PERLANCAR)
+
+	- [ux] Bail earlier when to is not 'IDR' before actually retrieving
+	  the currencies.
+
+
+0.12    2016-07-22 (PERLANCAR)
+
+        - Update/unbreak (URL changed).
+
+        - Switch to using Mojo::DOM and Mojo::UserAgent.
+
+
+0.11    2015-10-23 (PERLANCAR)
+
+	- Add 'which' option for convert_currency().
+
+	- [doc] Add documentation for get_currencies.
+
+
+0.10    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.09    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.08    2015-07-10 (PERLANCAR)
+
+	- Split pericmd CLI scripts to App-IndonesianFinanceUtils to reduce
+	  dependencies on our dist.
+
+
+0.07     2014-09-05 (PERLANCAR)
+
+         - No functional changes.
+
+         - [Build] Move third party test to xt/smoke/ so it's tested during
+           release using 'dzil test --all'.
+
+
+0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - Update URL (moved).
+
+         - Add a CLI script.
+
+
+0.05    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.04    2014-03-12 (SHARYANTO)
+
+        [REMOVED FEATURES]
+
+        - Remove caching. Users should cache on their own.
+
+        [INTERNAL]
+
+        - Use Perinci::Import (with exit_on_error=>1 property).
+
+
+0.03    2014-02-18 (SHARYANTO)
+
+        - Update against site changes.
+
+        - Use specific error code for scraping/parsing/sanity failure, to aid
+          third-party testing smoker to detect parsing error immediately
+          (instead of just network error).
+
+        - Add warnings/errors for convert_currency().
+
+        - Add unit tests as well as third party tests in xt-3rd/.
+
+
+0.02    2012-07-18 (SHARYANTO)
+
+        - No functional changes. Rebuild (error in weaver.ini).
+
+
+0.01    2012-07-17 (SHARYANTO)
+
+        - First release.

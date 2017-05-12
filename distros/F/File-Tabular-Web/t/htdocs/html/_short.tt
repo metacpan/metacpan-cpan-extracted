@@ -1,0 +1,41 @@
+[%- WRAPPER entities_main.tt -%]
+
+
+[%- BLOCK links_prev_next %]
+  [%- IF found.prev_link; -%]
+    <a href="[% found.prev_link %]">[Previous &lt;&lt;]</a>
+  [%- END; # IF -%]
+  Display : <b>[% found.start %]</b> 
+         to <b>[% found.end %]</b> 
+     out of <b>[% found.count %]</b>
+  [%- IF found.next_link; -%]
+    &nbsp;<a href="[% found.next_link %]">[&gt;&gt; Next]</a>
+  [%- END; # IF -%]
+  <br>&nbsp;
+[%- END # BLOCK -%]
+
+
+<small>
+  <b>Request </b> : [[% self.getCGI('SS') %]]
+  <br>
+  <b>[% found.count %]</b> results found, max [% self.max %] done<br>
+  [% PROCESS links_prev_next %]
+</small>
+
+<table>
+
+[% FOREACH r IN found.records; %]
+  <tr>
+    <td><a href="?L=[% r.Num %]">[% r.Num %]</a></td>
+    <td><b>[% r.Name %] : [% r.Char %]</b></td>
+    <td><em>[% r.Description %]</em></td>
+  </tr>
+[% END # FOREACH r IN found.records; %]
+</table>
+
+<small>
+[% PROCESS links_prev_next %]
+</small>
+
+[%- END -%]
+

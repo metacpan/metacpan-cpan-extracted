@@ -1,0 +1,512 @@
+Thu Mar 10 07:52:24 CST 2016 ( leakin at japh dot net )
+
+	* version 0.49: fix infun, broken since 0.46 refactor
+
+	Michal Krupicka ( Michal dot Krupicka at skoda-auto dot cz ) reported
+	that I broke the the input function (it worked differently from 0.45
+	and the documentation) when I converted to using IPC::Run3.  This restores
+	compatability with 0.45. Thanks Michal.
+
+Mon Sep 21 15:58:35 CDT 2015 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.48: fix list option parsing
+
+	Bill Shunn ( proprietor at shunn dot net ) found a bug in list option
+	parsing that broke filters (and probably others as well).
+
+Fri Sep 11 08:36:39 CDT 2015 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.47: fixed hash ref parsing
+
+	Andreas Koenig ( andk at cpan dot org ) pointed out a problem
+	with the hash ref compatibility code, and then graciously provided
+	a test case to help me track down the problem. Added another
+	test to confirm.
+
+Wed Jul 29 09:32:05 CDT 2015 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.46: added support for new options up to 3.1.1
+
+	Max Maischein ( corion at corion dot net ) provided code and
+	insight on how to support Windows OS, as well as some improved
+	tests.  IPC::Open3 was replaced with IPC::Run3 as part of this
+	effort, thanks to Max for showing me this module.  It simplified
+	a big chunk of code and I was able to take advantage of its
+	features in a few places (see infun and files-from below).
+
+	Gavin Carr ( gavin at openfusion dot com dot au ) enlightened me
+	some time ago of the advantages of ordered args with rsync.
+	Order of args is now preserved.  This is a long overdue change.
+	Rsync itself performs some things differently based on the order
+	of some args, hopefully this is a big improvement in functionality
+	and doesn't break anyone.  Passing options as a hash ref is now
+	deprecated.  Thanks Gavin, sorry it took me so long to implement.
+
+	Petya Kohts ( kohts at yandex-team dot ru ) suggested code
+	for srchost that would properly handle the rsync:// prefix
+
+	Neil Hooey ( nhooey at gmail dot com) provided a better
+	algorithm for the status method.
+
+	Erez Schatz ( moonbuzz at gmail dot com ) sent improved pod
+	formatting that should work better with pod2html
+
+	The module debug option has become moddebug so it does not conflict
+	with the rsync debug option.
+
+	infun can now be an array ref, contents are fed to stdin via IPC::Run3
+
+	files-from can also be an array ref, this is handled in the module
+	by setting infun to the array ref and --files-from='-'
+
+	Added several more tests.
+
+Fri Nov  7 08:45:42 CST 2014 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.45: removed 'use File::Rsync::Config', oops
+
+Thu Nov  6 10:03:01 CST 2014 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.44: long overdue fix for automated builds, removed
+	prompt for rsync path to use PATH environment instead.
+
+Tue Aug 18 10:56:10 CDT 2009 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.43: Gavin Carr ( gavin at openfusion dot com dot au )
+	sent a patch to make include-from and exclude-from allow multiple
+	arguments.  This oversight was a misunderstanding on my part as to
+	how these actually work.  Many thanks to Gavin for correcting my
+	perception in the form of a very helpful patch.
+
+	also added support for new options in 2.6.7
+
+	removed 1 second sleep based on Petya Kohts testing ( kohts at
+	yandex-team dot ru ) as this is un-needed paranoia
+
+	added test to check for rsync binary in configured location
+
+Fri Jun 24 21:11:04 CDT 2005 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.42: added Scalar::Util as a required module since it was
+	not part of core before perl 5.8 (sorry).  Also changed build-name for
+	the config file so it will not clobber perl's Config.pm for odd
+	@INC orders.  Thanks again to Simon Myers (Smylers at stripey dot com )
+	for pointing out the potential problem.
+
+Tue May 24 11:28:43 CDT 2005 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.41: fixed 'use Scalar::Util' again (hopefully correct this
+	time).  Trying to do too many things at once, and need work on tests
+	to catch my bonehead mistakes.  Improved test.pl coming soon.
+
+Mon May 23 16:51:42 CDT 2005 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.40: I missed one critical line in the patch from Smylers
+	and broke more than I fixed.  This update includes the 'use' statement.
+
+Sun May 22 17:13:16 CDT 2005 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.39: Simon Myers ( Smylers at stripey dot com ) sent
+	a patch to allow Path::Class objects as source paths.  The previous
+	error checking only allowed source to be a string or an array.
+	This update bypasses the sanity-check if the source is a blessed
+	object and now assumes the programmer knows what they are doing
+	and that the object can be read as a string.
+
+	Added support for the only-write-batch option in rsync-2.6.5-pre1
+
+Wed Mar 30 22:06:04 CST 2005 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.38: Harald Flaucher ( Harald dot Flaucher at
+	mondial dot de ) requested support for the --acls option, which
+	is not part of rsync, but an included patch that some use.  His
+	request inspired the idea for the 'literal' option in the module
+	to allow passing arbitrary literal arguments to rsync so other
+	patches or even newer versions of rsync can be used.  Also added
+	support for the protocol option that was previously undocumented.
+
+Sat Mar  5 19:59:01 CST 2005 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.37: added support for new options in 2.6.4-pre1:
+	del, delete-before, delete-during, delay-updates, dirs, filter,
+	fuzzy, itemize-changes, list-only, omit-dir-times, remove-sent-files,
+	and max-size.  See the rsync manpage for full details on these options.
+
+	Fixed a type-o that kept partial-dir from being handled properly.
+
+	Bill Uhl ( buhl at web-services dot net ) provided a patch to
+	split out the creation of the rsync command from the exec function.
+	The new call (getcmd) returns a reference to an array of the command
+	to be executed.  Bill is working on a graphical interface to rsync
+	using this module and wants an alternate exec wrapper.  This version
+	includes a variation on his patch.
+
+Tue Jan 18 17:05:00 CST 2005 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.36: fix for "uninitialized value" warning submitted
+	thru rt.cpan.org.  Thanks go to the anonymous Debian user (HTH).
+
+Wed Dec  8 18:33:45 CST 2004 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.35: test 4 was failing due to bad pattern match in the
+	test code. no functional changes (error message changed for 2.6.3).
+
+Thu Aug 12 20:45:43 CDT 2004 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.34: added support for new options in 2.6.3: partial-dir,
+	checksum-seed, keep-dirlinks, inplace, ipv4, and ipv6.
+
+Tue Jun  1 12:59:36 CDT 2004 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.33: Fixed a type-o in parsing of quote-dst tag.
+	Peter teStrake (peter dot testrake at tradingscreen dot com)
+	pointed out that the exec method did not protect itself from a
+	user-defined SIGCHLD handler and could miss the exit of rsync and
+	report a false error.  A local reset of the handler should protect
+	it and still leave the handler in place for the rest of the user
+	code.
+
+Sun Dec 21 03:18:26 CST 2003 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.32: Added support for new option in 2.6.0: --from0,
+	--no-relative, --no-implied-dirs, and --files-from.  A new
+	infun option has been added so a user-supplied function can print the
+	list to --files-from=-.  See the rsync man page and the pod doc for
+	more info.  Also fixed a bug underscores were not recognized as the
+	hyphen equivalent for quote_dst, quote_src and path_to_rsync.
+	An anonymous user submitted a fix where parens were needed due to
+	precedence problems when srchost is defined.  The fix is included
+	in this release.
+
+Tue Jul 29 22:13:50 CDT 2003 ( leakin at dfw dot nostrum dot com )
+
+	* version 0.31: Bill Uhl ( buhl at web-services dot net ) sent a
+	patch to add the missing ignore-existing option and make write-batch
+	a scalar option (both were oversights on my part).  He also
+	suggested quoting the source paths.  Since this could break intended
+	actions, There are now 2 options to do this if desired.  The
+	quote-src and quote-dst flags will add double-quotes around each
+	path in the source or the destination when set.  This should help
+	avoid with pathnames containing spaces.  James CE Johnson sent a
+	patch to add the no-stdin flag since calling the module under
+	mod_perl was having problems.  Bill also reported problems on win32
+	and I found strange behavior myself during some tests, so I have
+	backed-out the passing of stdin (from 0.27) entirely.
+
+Tue Jun 10 14:41:54 CDT 2003 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.30: Paul Egan sent a patch that does a much better
+	job of cleaning up the select loop.  I was still not taking full
+	advantage of the features of IO::Select or IO::Handle.  Thanks
+	go to Paul for a much simplified loop, and hopefully an end to
+	the hangs (at least those due to the perl code).
+
+Mon Jun  9 17:39:42 CDT 2003 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.29: Paul Egan had another suggestion I liked very much.
+	I switched to using IO::Select rather than calling select directly.
+	I've always hated the ugly vec code that must be added in order to use
+	select.  It clutters the program with lots of unrelated but essential
+	cruft.  The module keeps all that separate from what is going on in the
+	rsync wrapper.  Paul was still seeing a hang in certain cases, and
+	Ronald J Kimball ( rjk at linguist dot thayer dot dartmouth dot edu )
+	was having similar problems.  Both were seeing a hang on the eof tests,
+	so I removed them (eof does not play well with sysread, but we need
+	sysread to make sure we don't block).  I have not been able to make it
+	hang (at least not yet).
+
+Thu May 29 21:33:07 CDT 2003 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.28: Paul Egan ( paulegan at mail dot com ) found one of the
+	cases where the module could block, and provided a patch to fix it.  The
+	cost is a going thru select again after each block is read, but he was
+	able to prove it stops the hang.  Paul also suggested an improvement on
+	the sysread.  I am now using the block size of the file descriptor
+	(defaulting back to 1024 if that fails for some reason).  Many thanks to
+	Paul for not only finding a way to reproduce the hang, but also finding
+	a fix.
+
+Sat Feb  1 23:03:55 CST 2003 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.27: got into too big a rush and forgot to test.
+	The STDIN hack caused IPC::Open3 to spew, so I had to change
+	it to glob to work properly.  0.26 was never released, but
+	now I'm thinking seriously about breaking the link between
+	the module version and RCS.  I'll have to do this anyway
+	if I move to Subversion for revision control, since it's versions
+	are handled in a different manner.
+
+Mon Jan 13 11:25:42 CST 2003 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.26: Added link-dest option (new in 2.5.6pre1).
+	I previously closed stdin of the forked rsync command since rsync
+	didn't really use it.  Now the include-from and exclude-from options
+	may be set to '-' and rsync will read the list from stdin.  I've
+	attempted to pass STDIN directly to rsync in case someone wants
+	to use this option.  In my simple tests the code works, but I have
+	not done extensive tests, and do not know if you can pass other data
+	such as passwords (not a good idea in terms of security).  This
+	may also have other side effects since STDIN could be a tty in some
+	instances and not in others (may cause the underlying rsh, ssh, or
+	other transport to behave differently during testing versus cron or
+	other unattended execution).  If this becomes a problem for anyone
+	I'll figure out some way to make it optional.
+
+Tue Jan  7 13:46:56 CST 2003 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.25: Tong Zhu ( tongzhu at thereinc dot com ) found an error
+	where use of errfun and/or outfun exposed possible use of uninitialized
+	variables (those used to break output into individual lines).  Thanks
+	for pointing out my error, and the useful 'diff' output making my coding
+	error easy to track down and fix.
+
+Wed Dec 11 17:57:25 CST 2002 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.24: Heiko Jansen ( heiko_jansen at web dot de ) found an
+	error in the exec function where I was accessing the errfun and outfun
+	functions from the main object, and ignoring them if they were passed to
+	'exec'.  Thanks for pointing out the error, hopefully this will work
+	much better for you know.
+
+Wed Dec  4 22:38:14 CST 2002 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.23: I got 3 separate reports of hangs, but cannot reproduce
+	the error (yet).  Added a trap and more eof tests to hopefully catch
+	and exit properly.
+
+Thu Mar 14 23:19:35 CST 2002 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.22: added options for rsync 2.5.4, no-blocking-io, no-detach,
+	and no-whole-file.
+
+Thu Dec 20 13:52:33 CST 2001 Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.21: added rsync+ options from 2.4.7pre4/2.5.0, read-batch
+	and write-batch.
+
+	Thanks to Jonathan Pelletier ( jonathan dot pelletier at matrox dot com
+	) for catching (and supply a fix for) an output message loss.  This
+	version contains a variation on his patch.  Jonathan also suggested the
+	new method 'lastcmd' to return the last 'rsync' command passed to the
+	system for debugging and error messages.
+
+Fri Sep  7 15:18:58 CDT 2001  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.20: made changes to test.pl so failed tests would
+	return non-zero exit and actually fail the tests.  Also corrected
+	several type-os in the POD documentation (thanks to Joe Smith
+	( Joe dot Smith at wcom dot com ) for pointing them out).
+
+Wed May 16 21:11:31 CDT 2001  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.19: discovered the new makefile was installing
+	into the wrong path.  It should follow the proper naming convention
+	now.
+
+Thu May 10 22:28:28 CDT 2001  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.18: Many thanks to Andreas Koenig ( andreas dot koenig at
+	dubravka dot kbx dot de ) for setting me straight on the architecture
+	specific versus the arch-independent directory usage, and for explaining
+	why this wasn't showing up in the by-module listings.  The tar file now
+	has a recognizable .pm file in it for proper CPAN distribution.  There
+	is also a File::Rsync::Config.pm in the arch-specific dir where the
+	build process stores the path to the rsync executable.
+
+Mon May  7 01:07:44 CDT 2001  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.17: I decided it is better for the out and err methods
+	to return any collected output regardless of whether or not an output
+	function has been defined.  This way you can process each line yourself
+	and still print the entire output in bulk if desired.  This also
+	keeps me from having to work out what these methods should return
+	if called when an output function has been defined.
+
+Thu Feb 15 21:25:23 CST 2001  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.16: James Mello ( kingjamm at colltech dot com ) submitted a
+	patch to add a 'list' function, and educated me on the interesting
+	aspect of calling rsync without a destination in order to obtain an 'ls
+	-l' or 'ls -lr' (with -r or -a) style output.  Rather than duplicating
+	the exec function I made modifications to it and built a wrapper to get
+	the list functionality.  This has all kinds of possibilities.  Many
+	thanks to James for the great idea and the education on an option I had
+	never explored.
+
+	use File::Rsync;$rs=File::Rsync->new(srchost => 'localhost:');
+	print $rs->list; will list available modules on the local daemon.
+
+Tue Nov 28 10:22:50 CST 2000  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.15: After more thought and discussion with Boris we decided
+	a second arg of either 'out' or 'err' should be passed to the functions
+	so a single user-defined function could be used and it will be able to
+	determine the source of the text in arg 1.  Simple functions can ignore
+	the second arg.  The examples below would need to change to 'outfun =>
+	sub {print shift}' and 'errfun => sub {print shift}' to keep from
+	printing the source string. (version 0.14 was not released to CPAN)
+
+Fri Nov 17 23:03:00 CST 2000  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.14: Per suggestion from Boris Goldowsky ( boris at range dot
+	infoplease dot com ), added 'outfun' and 'errfun' options.  If you
+	supply a function (CODE) reference to these the stderr and stdout from
+	rsync is passed to these functions one output line at a time and is not
+	collected internally for post examination.  Providing a function like
+	'outfun => sub {print @_}' will cause each line to be printed as they
+	arrive.  A function like 'outfun => sub {print "."}' will simply shows
+	progress dots like cpio's -V option.  Thanks to Boris for the
+	suggestion.  Sorry it took me so long to get it added.
+
+Sat Sep 16 23:32:59 CDT 2000  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.13: added suport for new flags blocking-io and ignore-errors,
+	as well as scalars bwlimit, max-delete, and modify-window.  I also
+	rearranged the options hashes into a vertical sort similar to 'ls'.
+	This makes additions a bit more difficult, but makes reading and
+	verifying the options much easier (at least for me).
+
+Tue Feb 29 17:41:14 CST 2000  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.12: pervious version fixed blocking, but was not clean
+	and caused the tests to fail in odd ways.  This should be better.
+
+	* also added code to treat underscore the same as hyphen in option keys
+	similar to Tk.  This allows the use of bareword keys in hashes without
+	being mis-interpreted as subtraction.
+
+Fri Feb 18 17:45:13 CST 2000  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.11: fixed a blocking problem in the exec function
+	If one of the output pipes filled up it hung forever (oops).
+
+Mon Feb  7 14:05:37 CST 2000  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.10: removed comments about rsync not considering some things
+	to be errors.  This appears to be a bug in 2.3.2 on Linux.  It has been
+	submitted to the rsync team.  On Solaris rsync properly returns a non-zero
+	exit status if the source path does not exist.  The bug was fixed in the
+	CVS tree, and in the release 2.4.1.
+
+	* added support for --backup-dir and --existing options (new in 2.4.1)
+
+	* Since I've not heard from anyone about keeping the command-line style
+	options, I've dropped them.  The hash-style affords more flexibility
+	anyway.  I also removed some duplicate code in parseopts since I can now
+	treat all args as a hash.
+
+	* After some discussion on the rsync mailing list I was told about a
+	method of passing multiple source arguments for a remote server.  I've
+	added a new hash key 'srchost' to be used in combination with the 'source'
+	array to make it easier to use this capability.  If the source host is
+	remote, and you have multiple source paths, you can put the source
+	hostname in 'srchost', and the paths in the 'source' array.  The module
+	will assemble them as a single argument to rsync.  If 'srchost' is null
+	then the 'source' array is passed to exec as separate arguments.
+
+Wed Dec  1 21:55:44 CST 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.09: removed bareword keys in hashes (5.00404 doesn't like
+	my use of 'scalar' as a key)
+
+	* version 0.08: changed test 5 in test.pl to account for different
+	return status between Solaris and Linux.  I'll need to look into why
+	one detects the error and the other doesn't (rsync itself, not perl).
+
+Tue Nov 30 20:46:00 CST 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.07:
+
+	* removed global $pkgname, now uses 'my $pkgname=ref $self' instead.
+	I also had to bless $self earlier in 'new' so defopts, and parseopts can
+	use 'ref $self' to determine the package name.  It was not too bright
+	to hardcode the package name (vacations can have odd effects on the brain)
+
+	* changed saveopts and parseopts to begin with underscore since they
+	are for internal use only.
+
+Sun Nov 28 19:41:31 CST 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.06:
+
+	* added $pkgname for 'carp' messages to make it clearer where they came
+	from.
+
+	* added missing check for 'include' in exec method
+
+	* other misc cleanup and clarification of code and documentation
+
+Sun Nov 28 02:47:34 CST 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.05: major re-organization and re-writing of internal
+	functions to add the ability to pass a hash reference for perl-style
+	options handling.  (Thanks to Greg Ward for the suggestion)  This gives
+	increased flexibility including the ability to turn off boolean flags,
+	and to build your own include or exclude list as an array and pass a
+	reference to the array to the module.  The same can be done for source
+	paths.
+
+	* removed leading double-dashes from the option keys.  It is easier to
+	add them in the parser for command-line style than to remove them for
+	perl-style hashes.
+
+	* changed 'err' and 'out' methods to return an empty string or an empty
+	list if no output was generated.  If there was output they return it as
+	an array or a reference to an array as before.  This should make testing
+	for the existence of output more efficient.  Before you had to call them
+	in a scalar context and dereference the return in order to check.  Now
+	you can use a simple truth test.  Also added a note about conditions
+	where rsync itself can return a true (0) exit but the programmer may
+	consider it an error.  In these situations you need to check stderr for
+	error messages (such as 'no such file or directory').  See 'exec' method
+	in the manpage.
+
+	* removed newlines from carp messages so the 'at <prog> line ##' is on
+	the same line as the rest of the error message (bad habit from die).
+
+	* changed all return values except 'new' to zero instead of undef so
+	-w won't complain about use of un-initialized values.  If anyone has
+	a good reason to put this back (like good/standard coding practices) let
+	me know.
+
+	* added test.pl script for 'make test'.
+
+Sun Nov 21 02:18:56 CST 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.04: added missing 'next' that would cause a parsing
+	error if -P was used.
+
+	* Renamed module to File::Rsync (Thanks to Tim Bunce for the suggestion)
+	It really fits better here than in Net::, but once I thought of it
+	as a network-based program I had a mental block when considering other
+	groups.
+
+Fri Nov 19 13:25:18 CST 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.03: --address should be a scalar, not a flag (the
+	rsync man page is unclear on this).
+
+Wed Nov 17 21:20:16 CST 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.02:
+
+	* wrote first draft of Makefile.PL and makepm.PL to wrap it all up
+	as a real perl module.
+
+	* added new options for rsync 2.3.2 (-P, --delete-after, and
+	--address)
+	-P is short for --partial and --progress. --address is only
+	used in server mode.  I don't know what good these are inside
+	this module, but you should still be able to pass them if you
+	want.
+	--delete-after allows the user to delay any --delete actions
+	until after all other files are synced.  The default is to
+	perform any deletes before in order help insure sufficient disk
+	space is available.  See the rsync (1) man page for more
+	details.
+
+	* remove any chance of clobbering $_ (mostly paranoia I hope)
+
+Tue Jun 15 15:27:20 CDT 1999  Lee Eakin  ( leakin at dfw dot nostrum dot com )
+
+	* version 0.01: (initial) based on rsync 2.3.1

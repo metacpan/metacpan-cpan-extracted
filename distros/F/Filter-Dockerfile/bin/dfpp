@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+exec $^X, "-MFilter::Dockerfile", @ARGV;
+
+__END__
+
+=head1 NAME
+
+dfpp - Dockerfile preprocessor
+
+=head1 SYNOPSIS
+
+    $ perl -MFilter::Dockerfile Dockerfile.pre > Dockerfile
+
+    # Dockerfile Syntax:
+    INCLUDE ./Dockerfile.inc
+    INCLUDE http://path/to/Dockerfile.inc
+    INCLUDE ./Dockerfile.inc http://path/to/Dockerfile.inc
+
+    INCLUDE MERGE a.inc b.inc
+
+    # include only RUN instructions
+    INCLUDE RUN a.inc b.inc
+
+    # include only RUN and ENV instructions
+    INCLUDE RUN ENV a.inc b.inc
+   
+    # include only RUN and ENV instructions but merge them
+    INCLUDE MERGE RUN ENV a.inc b.inc
+
+    # exclude FROM instructions
+    INCLUDE -FROM a.inc b.inc
+
+=head1 DESCRIPTION
+
+C<dfpp> was written to allow simple pre-processing of Dockerfiles to add
+capabilities currently unsupported by docker build.
+
+=head1 INSTRUCTIONS
+
+=head2 INCLUDE [MERGE] [FILTERS] [file|uri] ...
+
+This will inline a file or uri into the Dockerfile being generated.
+
+=head3 MERGE
+
+When including multiple Dockerfile snippets this will attempt to merge common instructions.  Currently only 
+ENV, LABEL and RUN are merged, otherwise multiple instructions will be repeated.  RUN instructions are merged with "&&" while other
+instructions are merged with a space.
+
+=head3 FILTERS
+
+=head4 [-]ADD
+
+Include or Exclude ADD instructions from inlined Dockerfile snippets
+
+=head4 [-]CMD
+
+Include or Exclude CMD instructions from inlined Dockerfile snippets
+
+=head4 [-]COPY
+
+Include or Exclude COPY instructions from inlined Dockerfile snippets
+
+=head4 [-]ENTRYPOINT
+
+Include or Exclude ENTRYPOINT instructions from inlined Dockerfile snippets
+
+=head4 [-]ENV
+
+Include or Exclude ENV instructions from inlined Dockerfile snippets
+
+=head4 [-]EXPOSE
+
+Include or Exclude EXPOSE instructions from inlined Dockerfile snippets
+
+=head4 [-]FROM
+
+Include or Exclude FROM instructions from inlined Dockerfile snippets
+
+=head4 [-]INCLUDE
+
+Include or Exclude INCLUDE instructions from inlined Dockerfile snippets
+
+=head4 [-]LABEL
+
+Include or Exclude LABEL instructions from inlined Dockerfile snippets
+
+=head4 [-]MAINTAINER
+
+Include or Exclude MAINTAINER instructions from inlined Dockerfile snippets
+
+=head4 [-]ONBUILD
+
+Include or Exclude ONBUILD instructions from inlined Dockerfile snippets
+
+=head4 [-]RUN
+
+Include or Exclude RUN instructions from inlined Dockerfile snippets
+
+=head4 [-]USER
+
+Include or Exclude USER instructions from inlined Dockerfile snippets
+
+=head4 [-]VOLUME
+
+Include or Exclude VOLUME instructions from inlined Dockerfile snippets
+
+=head4 [-]WORKDIR
+
+Include or Exclude WORKDIR instructions from inlined Dockerfile snippets
+
+=head1 AUTHOR
+
+2015, Cory Bennett <cpan@corybennett.org>
+
+=head1 SOURCE
+
+The Source is available at github: https://github.com/coryb/perl-filter-dockerfile
+
+=head1 SEE ALSO
+
+L<Filter::Dockerfile>, L<Filter::Util::Call>
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2015 Netflix Inc. All rights reserved. The copyrights to the contents of this file are licensed under the Perl Artistic License (ver. 15 Aug 1997).
+

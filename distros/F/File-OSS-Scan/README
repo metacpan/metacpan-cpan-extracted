@@ -1,0 +1,20 @@
+File-OSS-Scan version 0.04
+
+DESCRIPTION
+-----------
+This module allows you to scan your project directory based on a set of pre-defined
+but also customizable rules, to detect all the used source files that originate from
+OSS ( or commercial software ).
+
+DEPENDENCIES
+------------
+This module requires Cache::FileCache for persistence of previous matching results.
+
+INSTALLATION
+------------
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+(I'd be lying if I said there was a real test suite at the moment...)

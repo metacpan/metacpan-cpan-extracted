@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Flux/Log.pm
+lib/Flux/Log/In.pm
+lib/Flux/Log/Types.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/test.t
+tfiles/log
+tfiles/log.1
+tfiles/log.pos/abc

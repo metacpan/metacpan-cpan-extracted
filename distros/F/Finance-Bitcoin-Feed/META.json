@@ -1,0 +1,78 @@
+{
+   "abstract" : "Collect bitcoin real-time price from many sites' streaming data source",
+   "author" : [
+      "Chylli  C<< <chylli@binary.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-Bitcoin-Feed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Carp" : "0",
+            "EV" : "0",
+            "JSON" : "0",
+            "Mojolicious" : "0",
+            "Protocol::WebSocket" : "0",
+            "Scalar::Util" : "0",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.96",
+            "Test::Perl::Critic" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-Finance-Bitcoin-Feed/issues"
+      },
+      "homepage" : "https://github.com/binary-com/perl-Finance-Bitcoin-Feed",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/binary-com/perl-Finance-Bitcoin-Feed.git",
+         "web" : "https://github.com/binary-com/perl-Finance-Bitcoin-Feed"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Chylli <chylli.email@gmail.com>",
+      "Fayland Lam <fayland@gmail.com>",
+      "Jean-Yves Sireau <jy@binary.com>"
+   ]
+}
+

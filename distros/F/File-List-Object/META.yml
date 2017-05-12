@@ -1,0 +1,26 @@
+---
+abstract: 'Object containing a list of files (filelist, packlist).'
+author:
+  - 'Curtis Jewell <csjewell@cpan.org>'
+build_requires:
+  Test::More: 0.61
+configure_requires:
+  Module::Build: 0.32
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-List-Object
+provides:
+  File::List::Object:
+    file: lib/File/List/Object.pm
+    version: 0.202
+requires:
+  Exception::Class: 1.29
+  Moose: 0.9
+  Params::Util: 0.35
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.202

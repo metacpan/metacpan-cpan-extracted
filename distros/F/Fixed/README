@@ -1,0 +1,112 @@
+NAME
+    Fixed - a readonly variable that you can assign to
+
+SYNOPSIS
+       use 5.012;
+       use strict;
+       use warnings;
+       use Fixed;
+   
+       fix $x = 42;
+       $x++;  # croaks
+
+DESCRIPTION
+    `Fixed` is a little like Readonly; the main difference is that you can
+    assign to fixed variables.
+
+    What?! Then how are they fixed?
+
+    Because you can only assign to them once!
+
+       use 5.012;
+       use strict;
+       use warnings;
+       use Fixed;
+   
+       fix $x;  # declared but not initialized
+   
+       given ($author) {
+          when ("Adams")   { $x = 42    }  # ok
+          when ("Heller")  { $x = 22    }  # ok
+          default          { $x = undef }  # ok
+       }
+   
+       $x = 99; # croaks, even when $x is undef
+
+    Note that Fixed differentiates between a variable which has no value, and
+    a variable explicitly set to undef.
+
+    `Fixed` does not currently support arrays and hashes. (See "Internals"
+    below for the reason.) You can of course assign an arrayref or hashref to
+    a fixed variable, but this does not fix the contents of the array or hash.
+    Use Readonly if you want readonly arrays and hashes.
+
+  Syntax
+    Fixed allows variables to be declared as fixed in several ways:
+
+       fix $variable = $value;
+       fix $variable;
+   
+       fix ($var1, $var2, ...) = ($val1, $val2, ...);
+       fix ($var1, $var2, ...);
+
+    When a single variable is declared and initialized in the same statement
+    (i.e. the first syntax), Fixed is able to use some optimizations, so this
+    form should be preferred when possible.
+
+    Note that declaration of a variable with `fix` must be a statement on its
+    own; `fix` cannot be slipped into the middle of an expression.
+
+       if (fix $result = $search->get_result) {  # no!
+          ...;
+       }
+
+    This is a limitation inherited from Keyword::Simple.
+
+  Internals
+    The `fix` keyword is defined using Keyword::Simple and is parsed as if
+    you'd witten:
+
+       Fixed::Scalar(my $variable, $value);  # ... or ...
+       Fixed::Scalar(my $variable);
+
+    If given a value, the `Fixed::Scalar` method will attempt to discover if
+    Readonly's XS support is available, and if so will define the variable and
+    use XS to set the scalar's `SvREADONLY` flag.
+
+    If XS is not available, or no initial value is provided, `Fixed::Scalar`
+    will fall back to Perl's `tie` mechanism.
+
+    Arrays and Hashes do not have a `SvREADONLY` flag, plus the tie mechanism
+    doesn't really have any way to differentiate between the initial list
+    assignment to an uninitialized array or hash, and subsequent assignments.
+    This is why `Fixed` does not support arrays or hashes.
+
+  Fixed without the Syntax Hacks
+    If you'd rather not enable the `fix` keyword and would prefer to just
+    define fixed variables using `Fixed::Scalar(my $variable => $value)`, then
+    that's OK. Just include some empty parentheses when loading `Fixed`:
+
+       use Fixed ();
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Fixed>.
+
+SEE ALSO
+    Readonly, Readonly::XS, MooseX::SetOnce.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013, 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

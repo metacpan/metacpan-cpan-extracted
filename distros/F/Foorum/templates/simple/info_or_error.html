@@ -1,0 +1,30 @@
+[% c.load_once("jquery.ui.css") %]
+
+[% st_num = st || c.req.params.st %]
+[% stext = BLOCK %]
+
+[% SWITCH st_num;
+   CASE 1; %]
+<strong>Success!</strong>
+[% CASE 101 %]
+Reset Password OK
+[% CASE 102 %]
+The instruction to rest your password is sent to your email, please have a check
+[% CASE 103 %]
+register success!
+[% CASE 301; %]
+<strong>FAIL!</strong>
+[% END %]
+
+[% END %]
+
+<div class="ui-widget">
+	<div class="[% IF st_num < 300 %]ui-state-highlight[% ELSE %]ui-state-error[% END %] ui-corner-all" style="padding: 0 .7em; margin: 20px 10% 20px 10%;"> 
+		<p>
+		    <span class="ui-icon [% IF st_num < 300 %]ui-icon-info[% ELSE %]ui-icon-alert[% END %]" style="float: left; margin-right: .3em;"></span>
+		
+		[% stext %]
+		
+		</p>
+	</div>
+</div>

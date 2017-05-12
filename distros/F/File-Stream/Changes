@@ -1,0 +1,27 @@
+Revision history for Perl extension File::Stream.
+
+2.30  Sun Feb  6 19:13:00 2011
+	- Require YAPE::Regex 4.00 for perl 5.14 compatibility.
+
+2.20  Wed Jul 16 12:24:21 2008
+        - supply die_on_anchors option to constructor to suppress the
+          fatal error thrown for anchors in regexes.
+
+2.10  Mon Dec 19 16:11:42 2005
+	- Added an implementation of SEEK and TELL. Idea and implementation were
+	  kindly supplied by Phil Whineray.
+
+2.00  Tue Nov 15 15:45:18 2005
+	- Now requiring YAPE::Regex 3.02 since 3.01 contained a
+	  show-stopping bug.
+	- Switched to using Module::Build.
+
+1.11  Tue Mar  2 13:46:44 2003
+	- Added test for anchors in regex delimiter. croaks on detection.
+
+1.10  Sun Oct 12 14:17:56 2003
+	- Added funky regex heuristics. :)
+
+1.00  Sat Oct  4 14:36:13 2003
+	- original version as uploaded to CPAN
+

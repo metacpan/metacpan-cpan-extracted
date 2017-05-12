@@ -1,0 +1,89 @@
+{
+   "abstract" : "manage a bitcoin instance",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.014, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [
+      "Bitcoin",
+      "Commerce",
+      "Currancy",
+      "Currency",
+      "Finance",
+      "JSON-RPC",
+      "JSONRPC",
+      "Micropayment",
+      "Micropayments"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-Bitcoin",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::RPC::Legacy::Client" : "0.93",
+            "Moo" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "provides" : {
+      "Finance::Bitcoin" : {
+         "file" : "lib/Finance/Bitcoin.pm",
+         "version" : "0.902"
+      },
+      "Finance::Bitcoin::API" : {
+         "file" : "lib/Finance/Bitcoin/API.pm",
+         "version" : "0.902"
+      },
+      "Finance::Bitcoin::Address" : {
+         "file" : "lib/Finance/Bitcoin/Address.pm",
+         "version" : "0.902"
+      },
+      "Finance::Bitcoin::Role::HasAPI" : {
+         "file" : "lib/Finance/Bitcoin/Role/HasAPI.pm",
+         "version" : "0.902"
+      },
+      "Finance::Bitcoin::Wallet" : {
+         "file" : "lib/Finance/Bitcoin/Wallet.pm",
+         "version" : "0.902"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Finance-Bitcoin"
+      },
+      "homepage" : "https://metacpan.org/release/Finance-Bitcoin",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/tobyink/p5-finance-bitcoin"
+      }
+   },
+   "version" : "0.902"
+}

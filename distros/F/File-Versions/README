@@ -1,0 +1,96 @@
+   _____ _ _             __     __            _                 
+  |  ___(_) | ___   _ _  \ \   / /__ _ __ ___(_) ___  _ __  ___ 
+  | |_  | | |/ _ \ (_|_)  \ \ / / _ \ '__/ __| |/ _ \| '_ \/ __|
+  |  _| | | |  __/  _ _    \ V /  __/ |  \__ \ | (_) | | | \__ \
+  |_|   |_|_|\___| (_|_)    \_/ \___|_|  |___/_|\___/|_| |_|___/
+                                                                
+
+
+This is the README for File::Versions version 0.08.
+
+File::Versions is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+File::Versions - Emacs-like versioned file names
+
+This module duplicates the behaviour of programs like the Emacs text
+editor under Unix, where the environment variables "VERSION_CONTROL"
+and "SIMPLE_VERSION_CONTROL" allow one to make numbered backups of a
+file.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?File::Versions
+    * http://metacpan.org/release/File-Versions
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc File::Versions
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan File::Versions
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm File::Versions
+
+To install the module from the source file, File-Versions-0.08.tar.gz,
+follow this sequence of commands:
+
+    tar xfz File-Versions-0.08.tar.gz
+    cd File-Versions-0.08
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/File-Versions/issues>,
+
+or if you want to alter the source code of File::Versions, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/File-Versions>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Jan 19 09:57:23 2017.
+
+-----------------------------------------------------------------------------

@@ -1,0 +1,24 @@
+# Aliases for fwctl
+# 
+# These names can be used instead of IP/Netmask pair in
+# the rules files.
+# 
+# fwctl automatically creates the followiing aliases ses for each 
+# interfaces defined in the file interfaces(5). 
+# <NAME>_IF = the name of the interface
+# <NAME>_IP = the IP of the interface
+# <NAME>_NET= the network of the interface
+# <NAME>_NETS= all the networks attached to the interface
+#
+# You can define others aliases here
+# You guessed that comments starts by # and that
+# blank lines are ignored ? Good for you.
+# 
+# Now alias are alphanumeric (underscore also allowed) and
+# their expansion is separated by a = or :, whichever 
+# you prefer. (You may also use := or =: if that please you.
+# (or ======== for that matter)). As always TMTOWTDI!
+
+# ROUTER	    = 
+# NTP_SERVERS	    = 
+# REMOTE_SUPPORT    =

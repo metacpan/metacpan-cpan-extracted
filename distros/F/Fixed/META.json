@@ -1,0 +1,69 @@
+{
+   "abstract" : "a readonly variable that you can assign to",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Fixed",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Readonly::XS" : "0"
+         },
+         "requires" : {
+            "Keyword::Simple" : "0",
+            "Readonly" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Fixed" : {
+         "file" : "lib/Fixed.pm",
+         "version" : "0.003"
+      },
+      "Fixed::Scalar" : {
+         "file" : "lib/Fixed.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Fixed/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Fixed"
+      },
+      "homepage" : "https://metacpan.org/release/Fixed",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-fixed.git",
+         "web" : "https://github.com/tobyink/p5-fixed"
+      }
+   },
+   "version" : "0.003"
+}

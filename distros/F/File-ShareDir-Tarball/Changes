@@ -1,0 +1,21 @@
+Revision history for File-ShareDir-Tarball
+
+0.2.2 2013-01-13
+ [BUG FIXES]
+ - Test requires Test::File::Sharedir v0.3.0 or higher.
+
+ [STATISTICS]
+ - code churn: 3 files changed, 8 insertions(+), 4 deletions(-)
+
+0.2.1 2012-11-03
+ [DOCUMENTATION]
+ - Add mention to Module::Build::CleanInstall
+
+0.2.0 2012-10-20
+ [NEW FEATURES]
+ - Extracted directories are cached within the life of an application.
+ - Add the function 'dist_file'.
+
+0.1.0 2012-10-18
+ - First version, unleashed on an unsuspecting world.
+

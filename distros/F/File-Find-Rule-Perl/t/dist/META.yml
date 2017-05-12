@@ -1,0 +1,30 @@
+---
+abstract: 'Common rules for searching for Perl things'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.82'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: File::Find::Rule::Perl
+name: File-Find-Rule-Perl
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Find::Rule: 0.20
+  File::Spec: 3.27
+  Params::Util: 0.38
+  Parse::CPAN::Meta: 0.04
+  perl: 5.00503
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.05

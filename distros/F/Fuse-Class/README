@@ -1,0 +1,38 @@
+Fuse-Class
+
+Fuse::Class - Base clsas for Fuse module implementation using class.
+
+This module supports writing Fuse callback as method.
+Method name is same as Fuse callback, but first argment is object.
+
+This is a small change for Fuse, but you can use power of OO like
+inheritance, encapsulation, ...
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+(For the full test, you need Test::Virtual::Filesystem module.)
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Fuse::Class
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Toshimitsu FUJIWARA
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

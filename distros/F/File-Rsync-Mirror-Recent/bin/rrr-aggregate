@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+rrr-aggregate - merge a set of recentfiles
+
+=head1 SYNOPSIS
+
+  rrr-aggregate [options] file
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--dry-run!>
+
+(TBD) Do not really run the command, ...
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--locktimeout=s>
+
+Sets the locktimeout. See L<File::Rsync::Mirror::Recentfile>.
+
+=item B<--verbose|v+>
+
+More feedback.
+
+=back
+
+=head1 DESCRIPTION
+
+rersyncrecent is a project to get speedy rsync operation on large
+trees over multiple hosts. It maintains a collection of files with
+metadata (so called recentfiles) that represent adjacent or
+overlapping timespans of file change events.
+
+rrr-aggregate merges the recentfiles that describe a tree. The file
+argument is the path to the principal (the shortest) in a collection
+of recentfiles.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use File::Rsync::Mirror::Recentfile;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+our %Opt;
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(2);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (! @ARGV) {
+    pod2usage(2);
+}
+
+if ($Opt{'dry-run'}) {
+    die "FIXME: not yet implemented";
+}
+
+my $rf = File::Rsync::Mirror::Recentfile->new_from_file($ARGV[0]);
+if (my $tout = $Opt{locktimeout}) {
+    $rf->locktimeout($tout);
+}
+$rf->aggregate();
+
+__END__
+
+
+# Local Variables:
+# mode: cperl
+# coding: utf-8
+# cperl-indent-level: 4
+# End:

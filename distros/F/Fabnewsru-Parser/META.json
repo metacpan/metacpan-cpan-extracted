@@ -1,0 +1,60 @@
+{
+   "abstract" : "Parser of fabnews.ru",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Fabnewsru-Parser",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "List::MoreUtils" : "0",
+            "Mojo::UserAgent" : "0",
+            "Text::CSV" : "0",
+            "common::sense" : "0",
+            "feature" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper::AutoEncode" : "0",
+            "Mojo::DOM" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.006",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pavelsr/Fabnews-Parser/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pavelsr/Fabnews-Parser.git",
+         "web" : "https://github.com/pavelsr/Fabnews-Parser"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

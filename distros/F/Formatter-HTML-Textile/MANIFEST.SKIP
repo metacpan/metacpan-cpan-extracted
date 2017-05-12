@@ -1,0 +1,15 @@
+#defaults
+^Build$
+^_build/
+^Makefile$
+^blib/
+^blibdirs$
+^pm_to_blib$
+~$
+tar.gz$
+.bak$
+.tmp$
+.old$
+^.svn/
+/.svn/
+^Formatter-HTML-Textile-

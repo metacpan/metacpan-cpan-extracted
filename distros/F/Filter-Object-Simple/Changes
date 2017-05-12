@@ -1,0 +1,6 @@
+Revision history for Perl extension Object::Builtin.
+
+0.01  Wed Oct  3 23:34:53 2007
+	- original version; created by h2xs 1.23 with options
+		-AX Object::Builtin
+

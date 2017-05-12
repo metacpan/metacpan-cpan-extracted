@@ -1,0 +1,3 @@
+a 1 80
+b 2 70
+# no header on first line; always makes dbcolcreate fail

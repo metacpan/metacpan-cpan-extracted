@@ -1,0 +1,34 @@
+Changes
+lib/Form/Processor/Model/RDBO.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00load.t
+t/01pod.t
+t/02pod-coverage.t
+t/changes.t
+t/create-many-to-many.t
+t/create-many-to-one.t
+t/create-one-to-many.t
+t/create.t
+t/guess_field_type.t
+t/lib/DB.pm
+t/lib/DB/Object.pm
+t/lib/Form/Album.pm
+t/lib/Form/AlbumAuto.pm
+t/lib/Form/Artist.pm
+t/lib/NewDB.pm
+t/lib/RDBO/Album.pm
+t/lib/RDBO/Artist.pm
+t/lib/RDBO/ArtistGenreMap.pm
+t/lib/RDBO/Genre.pm
+t/lookup_options-many-to-many.t
+t/lookup_options-many-to-one.t
+t/lookup_options-one-to-many.t
+t/unique.t
+t/update-many-to-many.t
+t/update-many-to-one.t
+t/update-one-to-many.t
+t/update.t
+t/zzcleanup.t
+META.yml                                 Module meta-data (added by MakeMaker)

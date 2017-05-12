@@ -1,0 +1,87 @@
+Revision history for Perl module File::RsyncP::Digest
+
+0.74 Sat Jan 17 16:50:43 PST 2015
+
+  - Updated license in headers.
+
+0.72 Sun Jan 11 13:52:23 PST 2015
+
+  - Changed reset(), protocol() and add() in Digest.xs to be void.
+
+0.70 Sun Sat Jul 10 09:54:12 PDT 2010
+
+  - Fixed adler32_checksum() in Digest/rsync_lib.c for case
+    where native char is unsigned (eg: arm architecture).
+
+  - Changed print format for error message in blockDigestUpdate().
+
+0.68 Sat Nov 18 18:29:31 PST 2006
+
+  - Fixed 2nd digest returned by File::RsyncP::Digest->digest2()
+    when protocol_version <= 26.
+
+0.64 Sun Jul 30 19:31:45 PDT 2006
+
+  - Fixed some compiler warnings and verbose declaration
+    reported by Guillaume Filion and Rodrigo Real.
+
+0.51 Sun May  9 23:42:56 PDT 2004
+
+  - Changed newSVpv() to newSVpvn() in Digest/Digest.xs to allow
+    empty argument to blockDigestExtract().
+
+0.50 Sat Mar 20 18:19:50 PST 2004
+
+  - No changes.
+
+0.47 Sun Mar 14 21:37:22 PST 2004
+
+  - No changes.
+
+0.46 Sun Feb  8 18:11:30 PST 2004
+
+  - No changes.
+
+0.45 Sat Feb  7 15:37:51 PST 2004
+
+  - Patches from Lars Thegler to back port to perl 5.005_03.
+
+0.44 Wed Jul 23 21:31:18 PDT 2003
+
+  - No changes.
+
+0.43 Sun Jul 20 00:03:40 PDT 2003
+
+  - Added File::RsyncP::Digest->protocol, including support for
+    protocol version >= 27 (after MD4 fixes).
+
+  - Added File::RsyncP::Digest->digest2 that returns the old (buggy)
+    and new styles of the MD4 digest.
+
+0.42 Sat Jul 12 09:53:40 PDT 2003
+
+  - Cleanup for gcc -Wall
+
+0.41 Sat May 10 20:39:33 PDT 2003
+
+  - No changes.
+
+0.40 Sat May 10 11:51:58 PDT 2003
+
+  - No changes.
+
+0.31 Sun Feb 23 15:17:05 PST 2003
+
+  - No changes
+
+0.30 Sun Feb  9 23:06:42 PST 2003
+
+  - No changes
+
+0.20 Fri Jan 17 22:21:40 PST 2003
+ 
+  - No changes
+
+0.10 Fri Dec 20 17:25:43 PST 2002
+
+  - Initial version

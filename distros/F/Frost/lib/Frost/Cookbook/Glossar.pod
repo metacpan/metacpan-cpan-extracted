@@ -1,0 +1,314 @@
+
+=pod
+
+=head1 NAME
+
+Frost::Cookbook::Glossar - The meaning of life
+
+=head1 ABSTRACT
+
+Some explanations of words used with L<Frost|Frost>.
+
+=head1 GLOSSAR
+
+Source is L<http://en.wiktionary.org/wiki/> unless otherwise noted.
+
+=head2 Asylum
+
+=over
+
+=item A place of safety
+
+=item The protection, physical and legal, afforded by such a place.
+
+=item A place of protection or restraint for one or more classes of the disadvantaged, especially the mentally ill.
+
+=back
+
+=head3 Synonyms
+
+=over
+
+=item sanctuary
+
+=item shelter
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Object factory and storage management
+
+=back
+
+=head2 Burial
+
+=over
+
+=item The act of burying
+
+=back
+
+=head3 Synonyms
+
+=over
+
+=item deposition
+
+=item inhumation
+
+=item interment
+
+=item deep six
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Object storage backend
+
+=back
+
+=head2 Cemetery
+
+=over
+
+=item A place where the dead are buried.
+
+=back
+
+=head3 Synonyms
+
+=over
+
+=item graveyard
+
+=item memorial park
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Object storage
+
+=back
+
+=head2 Illuminator
+
+=head3 to illuminate
+
+=over
+
+=item to shine light on something
+
+=item to decorate something with lights
+
+=item to clarify or make something understandable
+
+=item to decorate the page of a manuscript book with ornamental designs
+
+=item to glow
+
+=item to be exposed to light
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Object index
+
+=back
+
+=head2 Locum
+
+=head3 Abbreviated form of locum tenens.
+
+=over
+
+=item A professional person (such as a doctor or clergyman) who temporarily fulfills the duties of another.
+
+=back
+
+=head3 Synonyms
+
+=over
+
+=item proxy
+
+=item stand-in
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Proxying base object
+
+=back
+
+=head2 Inquisition
+
+=over
+
+=item an investigation or inquiry into the truth of some matter
+
+=item an inquest
+
+=item a questioning
+
+=back
+
+=head3 Frost
+
+=over
+
+=item FAQ - frequently asked question
+
+=back
+
+=head2 Mortician
+
+=over
+
+=item An undertaker or funeral director
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Object storage management helper
+
+=back
+
+=head2 Necromancer
+
+=over
+
+=item A person who practices necromancy.
+
+=back
+
+=head3 necromancy
+
+=over
+
+=item Divination involving the dead or death.
+
+=back
+
+=head3 divination
+
+=over
+
+=item The act of divining, a foreseeing or foretelling of future events.
+
+=item The pretended art of discovering secrets or the future by preternatural means.
+
+=item An indication of what is future or secret, augury omen, conjectural presage, prediction.
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Object storage manager
+
+=back
+
+=head2 Twilight
+
+=over
+
+=item The soft light in the sky seen before the rising and
+(especially) after the setting of the sun, occasioned by the
+illumination of the earth's atmosphere by the direct rays of the sun
+and their reflection on the earth.
+
+=item The time when this light is visible, the period between daylight and darkness.
+
+=item Any faint light through which something is seen, an in-between or fading condition.
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Object cache
+
+=back
+
+=head2 Vault
+
+=over
+
+=item An arched structure of masonry, forming a ceiling or canopy.
+
+=item A structure resembling a vault, especially (poetic) that formed by the sky.
+
+=item A secure, enclosed area, especially an underground room used for burial, or to store valuables, wine etc.
+
+=back
+
+=head3 Frost
+
+=over
+
+=item Persistent options
+
+=back
+
+=head2 VERBOTEN
+
+=over
+
+=item From German verboten ("forbidden").
+
+=item A loanword with connotations of state authoritarianism, derived from a perception of the German Empire under Wilhelm II or Nazi Germany. Contemporary usage may be jocular.
+
+=item Germany's most favourite word [source: Everyone's experience ;-) ]
+
+=back
+
+=head1 GETTING HELP
+
+I'm reading the Moose mailing list frequently, so please ask your
+questions there.
+
+The mailing list is L<moose@perl.org>. You must be subscribed to send
+a message. To subscribe, send an empty message to
+L<moose-subscribe@perl.org>
+
+=head1 BUGS
+
+All complex software has bugs lurking in it, and this module is no
+exception.
+
+Please report any bugs to me or the mailing list.
+
+=head1 AUTHOR
+
+Ernesto L<ernesto@dienstleistung-kultur.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Dienstleistung Kultur Ltd. & Co. KG
+
+L<http://dienstleistung-kultur.de/frost/>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

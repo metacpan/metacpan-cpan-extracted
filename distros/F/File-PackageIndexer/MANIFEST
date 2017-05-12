@@ -1,0 +1,18 @@
+Changes
+lib/File/PackageIndexer.pm
+lib/File/PackageIndexer/PPI/ClassXSAccessor.pm
+lib/File/PackageIndexer/PPI/Inheritance.pm
+lib/File/PackageIndexer/PPI/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01load.t
+t/02self.t
+t/03xsaccessor.t
+t/04accessor.t
+t/05base.t
+t/06parent.t
+t/07pushisa.t
+t/08assignisa.t
+t/20mergeresults.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+#fsdb name hw score
+John	1	97
+John	2	98
+Paul	2	80
+John	3	99
+Paul	3	82
+#   | dbsort -n hw

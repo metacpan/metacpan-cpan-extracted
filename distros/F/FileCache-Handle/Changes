@@ -1,0 +1,8 @@
+0.002  Tue Jan  4 23:59:15 GMT 2005
+    - Fix scope of 'MAX'
+    - Report errors
+    - Reduce maximum file count upon reaching OS limit
+    - Support file closing
+
+0.001  Mon Jan  3 14:44:50 GMT 2005
+    - Initial release

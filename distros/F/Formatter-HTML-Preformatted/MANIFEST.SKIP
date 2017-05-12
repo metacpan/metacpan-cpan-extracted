@@ -1,0 +1,12 @@
+#defaults
+^Makefile$
+^blib/
+^blibdirs$
+^pm_to_blib$
+~$
+tar.gz$
+.bak$
+.tmp$
+^.svn/
+/.svn/
+t/03escaping.t

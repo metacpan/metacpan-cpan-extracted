@@ -1,0 +1,71 @@
+{
+   "abstract" : "turn tabular files into web applications",
+   "author" : [
+      "Laurent Dami <laurent.dami@justice.ge.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Tabular-Web",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Search::Indexer" : "0.75"
+         },
+         "requires" : {
+            "AppConfig" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Tabular" : "0.71",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "POSIX" : "0",
+            "Plack::Component" : "0",
+            "Plack::Request" : "0",
+            "Plack::Response" : "0",
+            "Scalar::Util" : "0",
+            "Search::QueryParser" : "0.92",
+            "Template" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Tabular::Web" : {
+         "file" : "lib/File/Tabular/Web.pm",
+         "version" : "0.22"
+      },
+      "File::Tabular::Web::Attachments" : {
+         "file" : "lib/File/Tabular/Web/Attachments.pm"
+      },
+      "File::Tabular::Web::Attachments::Indexed" : {
+         "file" : "lib/File/Tabular/Web/Attachments/Indexed.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/File-Tabular-Web"
+      }
+   },
+   "version" : "0.22"
+}

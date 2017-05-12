@@ -1,0 +1,137 @@
+=head1 NAME
+
+Froody::Error::Standard - Documentation describing the standard errors
+
+=head1 DESCRIPTION
+
+This page describes the standard errors that you can get with Froody
+
+=over
+
+=item froody
+
+Errors coming from withing the Froody system, normally because someone
+hasn't declared everything right for a method, or there's a missing method
+or something like that
+
+=item froody.convert
+
+Problem involving converting one Froody::Response to another.
+
+=item froody.convert.nomethod
+
+There's no method defined for this response, and we need it to do
+the conversion of one response to another.
+
+=item froody.convert.nostructure
+
+There's no response specification for the method that this response uses
+and we need it to do the conversion from one type of response to the other.
+
+=item froody.invoke
+
+Problem invoking a method
+
+=item froody.invoke.badresponse
+
+We dispatched the method okay, and everything's fine, apart from the fact
+that we didn't get a valid Froody::Response back.  Ooops.
+
+=item froody.invoke.noinvoker
+
+There isn't an invoker defined for this method, and you tryed to invoke it.
+
+=item froody.invoke.nomethod
+
+No method name was passed to the dispatcher.  It's hard to dispatch without
+one. We're not clairvoyant you know.
+
+=item froody.invoke.nosuchmethod
+
+You asked for a method that hasn't been registered with this repository.
+
+=item froody.invoke.nosucherrortype 
+
+You asked for a errortype that hasn't been registered with this repository.
+
+=item froody.invoke.remote
+
+Something went wrong on the remote end of the invokation.  This happens
+when you're using Froody::Implementation::Remote and the remote server
+returns something like a Server Error or a 404.
+
+=item froody.response
+
+Somehow the response has become corrupt internally (this should never happen,
+but since we have a check for it, we have to define an error for it.)
+
+=item froody.xml
+
+Something went wrong with froody's xml parsing.  You probably did something
+wrong in the XML spec.
+
+=item froody.xml.invalid
+
+We couldn't parse the XML from the string - i.e. XML::LibXML barfed on the
+input.  I bet it wasn't valid XML.
+
+=item froody.xml.nomethods
+
+The XML spec you passed in didn't contain any methods.
+
+=item perl
+
+Errors coming from Perl code, i.e. nothing wrong with what the user
+has done, but rather there's something wrong with the way the code
+was written
+
+=item perl.methodcall
+
+There was a problem with a method call.
+
+=item perl.methodcall.class
+
+A method was called in object context when it was an instance method.
+
+=item perl.methodcall.instance
+
+A method was called in class context when it was an object method.
+
+=item perl.methodcall.param
+
+You called the method with invalid parameters
+
+=item perl.methodcall.unimplemented
+
+You called ab 'abstract' method that should have been overriden in a concrete base class
+
+=item perl.use
+
+There was a problem loading a class or requiring some code.
+
+=back
+
+=head1 BUGS
+
+None known.
+
+Please report any bugs you find via the CPAN RT system.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Froody>
+
+=head1 AUTHOR
+
+Copyright Fotango 2005.  All rights reserved.
+
+Please see the main L<Froody> documentation for details of who has worked
+on this project.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Froody::Error::Standard>, L<Froody::Response::Error>
+
+=cut
+
+1;

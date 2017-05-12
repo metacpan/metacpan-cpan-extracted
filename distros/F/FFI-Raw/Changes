@@ -1,0 +1,189 @@
+Revision history for FFI-Raw
+
+0.32      2014-06-02 15:11:41+02:00 Europe/Rome
+
+ - Fix memory leak in Callback objects (GH#46) (thanks, @plicease!)
+ - Use PkgConfig when building, if it's available (GH#48) (thanks, @plicease!)
+ - Do not require Alien::MSYS if system libffi is available
+   (GH#47) (GH#49) (thanks, @plicease!)
+
+0.31      2014-04-30 10:23:28+02:00 Europe/Rome
+
+ - Re-upload to CPAN (was deleted by accident -.-")
+
+0.30      2014-03-27 16:44:42+01:00 Europe/Rome
+
+ - Fix build on Windows (GH#45)
+
+0.29      2014-03-27 14:07:49+01:00 Europe/Rome
+
+ - Avoid warnings when using undef to mean NULL (GH#44) (thanks, @plicease!)
+ - Support returning pointers and strings from callbacks
+   (GH#42) (GH#43) (thanks, @plicease!)
+ - Update to libffi 3.1-rc1 (should hopefully fix a few build failures)
+
+0.28      2014-02-14 13:09:10 Europe/Rome
+
+ - Correctly handle unsigned values
+ - Correctly handle return values on big endian platforms (GH#38)
+ - Correctly handle absolute paths on Cygwin (GH#39) (thanks, @plicease!)
+
+0.27      2014-02-03 19:44:11 Europe/Rome
+
+ - Skip int64 tests if LLONG constants are not available
+   (GH#35) (thanks, @plicease!)
+ - Fix build on Cygwin64 (GH#37) (thanks, @plicease!)
+ - Use ExtUtil::PkgConfig, if available, to detect system libffi
+   (GH#36) (thanks, @plicease!)
+
+0.26      2014-02-01 17:22:03 Europe/Rome
+
+ - Import FFI::Raw::Ptr in FFI::Raw to avoid a bug in perl < 5.10.1
+   (GH#23) (thanks, @plicease!)
+ - Require perl >= 5.10
+ - Add boolean override for FFI::Raw objects (GH#28) (thanks, @calid!)
+ - Fix build on non-threaded perl (like OpenBSD's) (GH#29) (thanks, @plicease!)
+ - Use system libffi if available (GH#30) (GH#32) (thanks, @plicease!)
+ - Allow resolving functions in the main program (GH#33) (thanks, @plicease!)
+
+0.25      2014-01-23 11:52:49 Europe/Rome
+
+ - Fix build under MSWin32 64-bit (GH#17) (thanks, @plicease!)
+ - Support explicit string length of 0 in MemPtr -> tostr()
+   (GH#18) (thanks, @klaus)
+ - Add FFI::Raw::Ptr base class for pointer objects
+   (GH#20) (GH#22) (thanks, @plicease!)
+ - Fix build under MS Visual C++ (GH#19) (thanks, @plicease!)
+
+0.24      2013-12-19 16:44:50 Europe/Rome
+
+ - Build libffi on MSWin32 (GH#15) (thanks, @plicease!)
+ - Correctly translate undef to NULL and vice versa, when passing or returning
+   a FFI::Raw::str or FFI::Raw::ptr (GH#16) (thanks, @plicease for the test!)
+
+0.23      2013-12-04 20:45:24 Europe/Rome
+
+ - Update libffi to 356b2cb
+ - Fix some examples
+ - (Try to )Fix a few build failures (again)
+
+0.22      2013-12-01 17:51:57 Europe/Rome
+
+ - Correctly handle callback coderef refcount (GH#14) (thanks, @plicease!)
+ - Use ExtUtils::CBuilder for compiling C tests
+
+0.21      2013-11-24 20:15:32 Europe/Rome
+
+ - Add MemPtr -> new_from_ptr() (GH#12)
+ - Fix a few build failures
+ - Only recommend Math::Int64
+
+0.20      2013-11-18 14:57:38 Europe/Rome
+
+ - Fix warnings in the tests
+ - Try to fix build failures on *BSD
+
+0.19      2013-11-10 18:46:54 Europe/Rome
+
+ - Revert libffi update (for some reason it makes the build fail sometimes)
+
+0.18      2013-11-10 18:25:09 Europe/Rome
+
+ - Add long and unsigned long ffi types (GH#7) (thanks, @calid!)
+ - Add support for 64 bit ffi integer types (GH#9) (thanks, @calid!)
+ - Fix invalid memory accesses in struct tests (should fix many failures)
+ - Update libffi to 2f5b7ce
+
+0.17      2013-03-02 19:20:35 Europe/Rome
+
+ - Update libffi to 61a0549
+ - Add FFI::Raw::MemPtr -> new_from_buf() method
+ - Improve documentation for FFI::Raw::MemPtr and FFI::Raw::Callback
+ - FFI::Raw::MemPtr -> tostr() method now takes an optional length parameter
+
+0.16      2012-10-02 18:30:12 Europe/Rome
+
+ - Fix build on OpenBSD
+
+0.15      2012-09-30 14:35:47 Europe/Rome
+
+ - Fix a number of test failures
+
+0.14      2012-09-22 15:00:05 Europe/Rome
+
+ - Fix build on Windows (GH#5)
+ - Embed libffi sources to ease building
+
+0.13      2012-09-19 18:44:55 Europe/Rome
+
+ - Make types constants inlineable by perl (GH#2) (thanks, DOLMEN!)
+ - Add a proper Changes file (GH#3)
+ - Overload &{} to make a FFI::Raw object similar to a CODE ref (GH#4)
+
+0.12      2012-08-20 11:34:16 Europe/Rome
+
+ - Rebuild to update META.* repository links (no functional changes)
+
+0.11      2012-08-14 12:07:18 Europe/Rome
+
+ - Rebuild to remove internal test module from prereqs (no functional changes)
+
+0.10      2012-08-14 11:40:47 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+ - Code clean-up (no functional changes)
+
+0.09      2012-07-19 09:36:28 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+ - Remove experimental code notice (no functional changes)
+
+0.08      2012-07-07 12:54:34 Europe/Rome
+
+ - Rebuild to update META.* repository links (no functional changes)
+
+0.07      2012-05-31 13:36:58 Europe/Rome
+
+ - Make xt test suite the default (no functional changes)
+
+0.06      2012-05-15 17:33:49 Europe/Rome
+
+ - Add support for Perl callbacks
+ - Add short and ushort types
+ - Add experimental xt test suite
+ - Fix libc path in tests (no functional changes)
+ - Documentation fixes (no functional changes)
+
+0.05      2012-05-09 11:32:43 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+ - Add libuuid example
+ - Add new_from_ptr() and ptr_to_str() subs
+ - Use XS functions directly
+ - Check for NULL library handle before closing it
+
+0.04      2012-04-28 14:04:54 Europe/Rome
+
+ - Fix libc test on Windows (no functional changes)
+ - Fix FFI::Raw::MemPtr docs (no functional changes)
+
+0.03      2012-04-26 16:35:05 Europe/Rome
+
+ - Documentation improvements (no functional changes)
+ - Add zeromq examples
+ - Update malloc.pl example
+ - Add FFI::Raw::MemPtr type and memptr() sub
+ - Use perl's memory allocation macros
+
+0.02      2012-04-19 15:12:42 Europe/Rome
+
+ - Unload libraries on DESTROY
+ - Fix argc check
+ - Use a typemap
+ - Check number of arguments in call()
+ - Add uint and uchar types
+ - Documentation fixes (no functional changes)
+
+0.01      2012-04-18 15:36:21 Europe/Rome
+
+ - Initial version

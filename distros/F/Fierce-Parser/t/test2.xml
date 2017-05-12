@@ -1,0 +1,87 @@
+<fiercescan args=" -dns test2.com -format xml" startscan="1221528441" startscanstr="Mon Sep 15 21:27:21 2008"> 
+<domainscan domain="test2.com" startscan="1221528441" startscanstr="Mon Sep 15 21:27:21 2008">
+    <!--  Name Servers -->
+    <nameservers starttime="1221528441" starttimestr="Mon Sep 15 21:27:21 2008" endtime="1221528441" endtimestr="Mon Sep 15 21:27:21 2008" elapsedtime="0">
+            <node ip="1.1.1.1" hostname="dns038.c.register.com"/>
+            <node ip="1.2.1.1" hostname="dns010.d.register.com"/>
+            <node ip="1.3.1.1" hostname="dns206.b.register.com"/>
+            <node ip="1.4.1.1" hostname="dns222.a.register.com"/>
+    </nameservers>
+
+    <zonetransfers starttime="1221528441" starttimestr="Mon Sep 15 21:27:21 2008" endtime="1221528442" endtimestr="Mon Sep 15 21:27:22 2008" elapsedtime="1">
+    </zonetransfers>
+
+    <!--  Prefix Brute Force DNS -->
+    <bruteforce starttime="1221528442" starttimestr="Mon Sep 15 21:27:22 2008" endtime="1221528444" endtimestr="Mon Sep 15 21:27:24 2008" elapsedtime="2">
+               <node ip="100.91.9.5" hostname="imap.test2.com"/>
+               <node ip="100.91.9.5" hostname="www.test2.com"/>
+               <node ip="100.91.9.5" hostname="mail.test2.com"/>
+               <node ip="100.91.9.5" hostname="files.test2.com"/>
+               <node ip="100.91.9.5" hostname="file.test2.com"/>
+               <node ip="100.91.9.5" hostname="ftp.test2.com"/>
+               <node ip="100.91.9.5" hostname="dns.test2.com"/>
+               <node ip="100.91.9.5" hostname="smtp.test2.com"/>
+               <node ip="100.91.9.5" hostname="ns.test2.com"/>
+               <node ip="100.91.9.5" hostname="mx.test2.com"/>
+               <node ip="100.91.9.5" hostname="dev.test2.com"/>
+               <node ip="100.91.9.5" hostname="devel.test2.com"/>
+               <node ip="100.91.9.5" hostname="svn.test2.com"/>
+               <node ip="100.91.9.5" hostname="cvs.test2.com"/>
+               <node ip="100.91.9.5" hostname="test.test2.com"/>
+               <node ip="100.91.9.5" hostname="vpn.test2.com"/>
+               <node ip="100.91.9.5" hostname="unix.test2.com"/>
+               <node ip="100.91.9.5" hostname="webmail.test2.com"/>
+    </bruteforce>
+
+    <!--  Extension Brute Force DNS -->
+    <extbruteforce starttime="1221528444" starttimestr="Mon Sep 15 21:27:24 2008" endtime="1221528445" endtimestr="Mon Sep 15 21:27:25 2008" elapsedtime="1">
+               <node ip="100.91.9.5" hostname="test2.com"/>
+               <node ip="100.91.9.5" hostname="test2.co.uk"/>
+               <node ip="100.91.9.5" hostname="test2.org"/>
+               <node ip="100.91.9.5" hostname="test2.net"/>
+    </extbruteforce>
+    <!--  Subdomain Brute Force DNS -->
+    <subdomainbruteforce starttime="1242762092" starttimestr="Tue May 19 15:41:32 2009" endtime="1242762099" endtimestr="Tue May 19 15:41:39 2009" elapsedtime="7">
+	    <node ip="206.190.60.37" hostname="www.mail.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail2.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail3.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail4.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail5.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail6.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail7.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail8.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail9.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail10.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail11.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail12.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail13.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail14.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail15.yahoo.com"/>
+	    <node ip="206.190.60.37" hostname="www.mail16.yahoo.com"/>
+    </subdomainbruteforce>
+    
+    <!--  Find MX Record-->
+    <findmx starttime="1221528445" starttimestr="Mon Sep 15 21:27:25 2008" endtime="1221528445" endtimestr="Mon Sep 15 21:27:25 2008" elapsedtime="0">
+    </findmx>
+
+
+    <!--  Check for Wildcard -->
+    <wildcard starttime="1221528445" starttimestr="Mon Sep 15 21:27:25 2008" endtime="1221528445" endtimestr="Mon Sep 15 21:27:25 2008" elapsedtime="0">
+               <node ip="100.91.9.5" hostname="9451117496.test2.com"/>
+    </wildcard>
+
+    <!--  Whois -->
+    <whois starttime="" starttimestr="" endtime="" endtimestr="" elapsedtime="">
+    </whois>
+
+     <!--  Reverse Lookup -->
+    <reverselookup starttime="1221528445" starttimestr="Mon Sep 15 21:27:25 2008" endtime="1221528445" endtimestr="Mon Sep 15 21:27:25 2008" elapsedtime="0">
+               <node ip="100.91.9.5" hostname="test2.com"/>
+    </reverselookup>
+
+
+<endtimedetails endtime="1221528445" endtimestr="Mon Sep 15 21:27:21 2008" elapsedtime="4"/>
+</domainscan>
+
+<endscan endtime="1221528445" endtimestr="Mon Sep 15 21:27:25 2008" elapsedtime="4"/>
+</fiercescan>

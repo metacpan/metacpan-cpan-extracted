@@ -1,0 +1,12 @@
+bin/tmfs
+lib/Fuse/TM.pm
+Makefile.PL
+MANIFEST
+t/01read.t
+t/02write.t
+t/03writeautocreate.t
+t/04mapsave.t
+testdata/gis.atm
+testdata/greek.atm
+
+META.yml                                 Module meta-data (added by MakeMaker)

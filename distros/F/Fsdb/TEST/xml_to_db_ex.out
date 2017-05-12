@@ -1,0 +1,5 @@
+#fsdb -F S addtime album artist title
+3389919728  Born to Pick  7th Day Buskers  Loch Lamor
+3389919728  Born to Pick  7th Day Buskers  The Floods
+3389919735  Copland Conducts Copland  Aaron Copland  Our Town
+#   | xml_to_db -k files/file

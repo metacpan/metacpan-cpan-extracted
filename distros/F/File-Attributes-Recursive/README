@@ -1,0 +1,44 @@
+File-Attributes-Recursive
+
+File::Attributes::Recursive works like File::Attributes, but
+allows files to inherit attributes from parent directories.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If make test fails, don't install the module.  File a bug report
+instead!
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Attributes::Recursive
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/File-Attributes-Recursive
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Attributes-Recursive
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/File-Attributes-Recursive
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/File-Attributes-Recursive
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Jonathan Rockway
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

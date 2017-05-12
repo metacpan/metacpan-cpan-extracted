@@ -1,0 +1,45 @@
+File/Signature version 1.009
+============================
+
+NAME
+    File::Signature - Detect changes to a file's content or attributes.
+
+ABSTRACT
+    This perl library uses perl5 objects to assist in determining whether a
+    file's contents or attributes have changed. It maintains several pieces
+    of information about the file: a digest (currently only MD5 is
+    supported), its inode number, its mode, the uid of its owner, the gid of
+    its group owner, and its last modification time. A File::Signature
+    object is closely associated with a single pathname. It provides a way
+    to compare the state of a file over different points in time; it isn't
+    useful for comparing different files.
+
+OPERATING SYSTEMS
+
+File::Signature uses stat() to get attributes about a file. This works on Unix
+and "unix like" operating systems. I don't know if it will work on Windows. I
+suspect it won't though. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Digest::MD5
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Jeremy Madea. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

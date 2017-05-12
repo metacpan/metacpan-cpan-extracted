@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+#Copyright (c) 2008, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use FreeBSD::Pkgs::FindUpdates;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "pkg_findupdates 0.1.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-d  Print downgraded ports.\n".
+		      "-u  Print upgraded ports.\n".
+			  "-r  print requirements";
+}
+
+#gets the options
+my %opts=();
+getopts('dur', \%opts);
+
+if (!defined($opts{d}) && !defined($opts{u})) {
+	warn('pkg_findupdates: Neither -d or -u given');
+	exit 1;
+}
+
+my $pkgsupdate = FreeBSD::Pkgs::FindUpdates->new(); #finds changes
+my %changes=$pkgsupdate->find();
+
+#prints downgraded ports if needed
+if ($opts{u}) {
+	while(my ($name, $pkg) = each %{$changes{upgrade}}){
+        print $name.' updated from "'.
+        $pkg->{oldversion}.'" to "'.
+        $pkg->{newversion}."\"\n";
+		if ($opts{r}) {
+			my $fdeps=join("\n  ", @{$pkg->{Fdeps}});
+			if ($fdeps ne '') {
+				print " Fdeps...\n  ".$fdeps."\n";
+				if (!$fdeps =~ /\n$/) {
+					print "\n";
+				}
+			}
+			my $edeps=join("\n  ", @{$pkg->{Edeps}});
+			if ($fdeps ne '') {
+				print " Edeps...\n  ".$edeps."\n";
+			}
+			my $bdeps=join("\n  ", @{$pkg->{Bdeps}});
+			if ($bdeps ne '') {
+				print " Bdeps...\n  ".$bdeps."\n";
+				if (!$fdeps =~ /\n$/) {
+					print "\n";
+				}
+			}
+			my $rdeps=join("\n  ", @{$pkg->{Rdeps}});
+			if ($rdeps ne '') {
+				print " Rdeps...\n  ".$rdeps."\n";
+				if (!$fdeps =~ /\n$/) {
+					print "\n";
+				}
+			}
+			my $pdeps=join("\n  ", @{$pkg->{Pdeps}});
+			if ($pdeps ne '') {
+				print " Pdeps...\n  ".$pdeps."\n";
+
+			}
+		}
+	}
+}
+
+#prints upgraded if needed
+if ($opts{d}) {
+	while(my ($name, $pkg) = each %{$changes{downgrade}}){
+        print $name.' downgraded from "'.
+        $pkg->{oldversion}.'" to "'.
+        $pkg->{newversion}."\"\n";
+		if ($opts{r}) {
+			my $fdeps=join("\n  ", @{$pkg->{Fdeps}});
+			if ($fdeps ne '') {
+				print " Fdeps...\n  ".$fdeps."\n";
+				if (!$fdeps =~ /\n$/) {
+					print "\n";
+				}
+			}
+			my $edeps=join("\n  ", @{$pkg->{Edeps}});
+			if ($fdeps ne '') {
+				print " Edeps...\n  ".$edeps."\n";
+			}
+			my $bdeps=join("\n  ", @{$pkg->{Bdeps}});
+			if ($bdeps ne '') {
+				print " Bdeps...\n  ".$bdeps."\n";
+				if (!$fdeps =~ /\n$/) {
+					print "\n";
+				}
+			}
+			my $rdeps=join("\n  ", @{$pkg->{Rdeps}});
+			if ($rdeps ne '') {
+				print " Rdeps...\n  ".$rdeps."\n";
+				if (!$fdeps =~ /\n$/) {
+					print "\n";
+				}
+			}
+			my $pdeps=join("\n  ", @{$pkg->{Pdeps}});
+			if ($pdeps ne '') {
+				print " Pdeps...\n  ".$pdeps."\n";
+
+			}
+		}
+	}
+}
+
+=head1 NAME
+
+pkg_findupdates - Finds updated packages.
+
+=head1 SYNOPSIS
+
+pkg_findupdates -u [B<-r>]
+pkg_findupdates -d [B<-r>]
+pkg_findupdates -d -u [B<-r>]
+
+=head1 ARGUEMENTS
+
+=head2 -u
+
+Print updated ports.
+
+=head2 -d
+
+Print downgraded ports.
+
+=head2 -r
+
+Print depedency information.
+
+=cut
+

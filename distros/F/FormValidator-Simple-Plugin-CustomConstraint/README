@@ -1,0 +1,49 @@
+NAME
+    FormValidator::Simple::Plugin::CustomConstraint - Custom constraint
+    support for FormValidator::Simple
+
+SYNOPSIS
+      use FormValidator::Simple qw/CustomConstraint/;
+
+      my $input_params = {
+        username => 'someone'
+      };
+
+      #limit search to 10 records for example
+      my $arg_limit = 'LIMIT 10';
+
+      #run the check
+      my $result = FormValidator::Simple->check(
+        $input_params => [
+          username => [ 'NOT_BLANK', [ 'CUSTOM_CONSTRAINT', \&validate_username, $arg_limit ] ]
+        ]
+      );
+
+      #define our custom validation rule
+      sub validate_username {
+        my ( $constraint_value, $other_args ) = @_;
+        #check the database to see if username exists for example and use passed in argument ...
+        $exists = $dbh->selectrow_arrayref( $sql, {}, $other_args->[0] )->[0];
+        return $exists ? 1 : 0;
+      }
+
+DESCRIPTION
+     This module provides a plugin for FormValidator::Simple that allows for custom constraint definitions
+     or custom validation rules to be specified.
+
+  EXPORT
+    None by default.
+
+SEE ALSO
+    Catalyst::Plugin::FormValidator::Simple, FormValidator::Simple
+
+AUTHOR
+    Alex Pavlovic, <alex.pavlovic@taskforce-1.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Alex Pavlovic ( alex.pavlovic@taskforce-1.com )
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

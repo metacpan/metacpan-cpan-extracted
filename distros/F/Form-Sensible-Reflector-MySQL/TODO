@@ -1,0 +1,44 @@
+TO DO
+
+* Check the float validation and tests
+
+* Form::Simple::Field::Number bugs as reported to the Google Group:
+	* Check they are fixed
+	* Remove the TODO around the effected tests
+
+***
+
+<URL: https://rt.cpan.org/Ticket/Display.html?id=64528 >
+
+On Thu, Jan 06, 2011 at 05:33:08AM -0500, Lee Goddard via RT wrote:
+> > Thu Jan 06 05:32:58 2011: Request 64528 was acted upon.
+> > Transaction: Ticket created by LGODDARD
+> >        Queue: Test-Database
+> >      Subject: Install fails to generate config
+> >    Broken in: 1.11
+> >     Severity: Critical
+> >        Owner: Nobody
+> >   Requestors: LGODDARD@cpan.org
+> >       Status: new
+> >  Ticket <URL: https://rt.cpan.org/Ticket/Display.html?id=64528 >
+> > 
+> > 
+> > I ran 'cpan Test::Database' but then get nothing from:
+> > 
+> >   die Dumper (
+> >     Test::Database->handles( { dbd    => 'mysql' } )
+> >   );
+> > 
+> > No config file appears in ~/.test-database.
+Actually, you have to create the config file. Long ago, I put that quote
+at the beginning of the module, which leads people to believe it describes
+what the module does. That was a bit stupid, and I'll change that in a future
+version.
+
+> > This looks like a really very useful module, but how to get it working...?
+> >
+See also Test::Database::Tutorial for more details.
+
+Please let me know how it is working for you.
+
+-- Philippe Bruhat (BooK) There are two sides to every cause. Do not join one until you know the other. (Moral from Groo The Wanderer #105 (Epic)) 

@@ -1,0 +1,13 @@
+MANIFEST
+MANIFEST.SKIP
+VERSION
+README
+INSTALL
+Makefile.PL
+t/MakeMakerFix.pm
+t/0.t
+t/gen-stat.c
+t/configure.sh
+Bits.pm
+perl-File-Stat-Bits.spec
+

@@ -1,0 +1,62 @@
+File::Stream version 2.20
+=========================
+
+Perl filehandles are streams, but sometimes they just aren't powerful enough.
+This module offers to have streams from filehandles searched with regexes
+and allows the global input record separator variable to contain regexes.
+
+Thus, readline() and the <> operator can now return records delimited
+by regular expression matches.
+
+Please see the POD documentation in the module file for important CAVEATS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+On platforms that don't support the "./" notation, that would be:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you wish, you may use the old MakeMaker style instead:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  Test::More
+  YAPE::Regex
+
+CONTRIBUTIONS
+
+Many thanks go to Simon Cozens for the original idea and much valuable
+input. It was great fun talking about some of the weirder features of Perl.
+Equally many thanks to Autrijus Tang for much help with the fiendish regexes
+I couldn't handle and Ben Tilly for suggesting the use of the ${} regex
+construct.
+
+Also, I owe thanks to Jeff 'japhy' Pinyan for writing the YAPE::Regex
+module which made my life much easier.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2008 Steffen MÅller
+Author can be reached at stream-module at steffen-mueller dot net.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

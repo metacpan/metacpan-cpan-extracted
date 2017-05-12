@@ -1,0 +1,37 @@
+
+Feature oriented Revision history for File-Corresponding
+==========================================================
+
+
+0.004 -- 2014-10-12 14:02:45 UTC
+
+* Use Dist::Zilla
+
+* Fix brittle test by creating File::Class object the same way in test
+  and source
+
+
+
+0.003
+-----
+
+* Minor doc fixes
+
+
+
+0.002
+-----
+
+* Added deps
+
+* Renamed rouge Config::Find module (oops)
+
+* Lots of docs cleanup
+
+
+
+0.001
+-----
+
+* First release. Initial feature complete, let's see how a release
+  looks like on CPAN.

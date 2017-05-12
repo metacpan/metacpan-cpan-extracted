@@ -1,0 +1,175 @@
+=pod
+
+=head1 NAME
+
+gbsed - Search/replace in binary files.
+
+=head1 VERSION
+
+This document describes gbsed version 1.0.
+
+=head1 SYNOPSIS
+
+    gbsed [-m <min>|-M <max>|-x|-X] [-s|-S] <search for> infile
+    gbsed [-m <min>|-M <max>|-x|-X] [-s|-S] <search for> [-r|-R] <replace with> infile outfile
+    gbsed -D <text>
+    gbsed [--help|--version
+
+=head1 DESCRIPTION
+
+gbsed lets you search and replace binary strings
+and text strings in binary files.\nIf no replace
+string is given, it will only print out the number
+of matches found in the file.
+
+you can search by using hex values in text strings, you can also use
+wildcard matches (C<??>), which will match any wide byte.
+
+Wildcards can not be used with the text search.
+
+Standard in/out will be used if the input/output file
+name argument is C<->.
+
+These are all valid search strings:
+
+    --search "0xffc300193ab2f63a"
+    --search "0xff??00??3ab2f??a"
+    --search "FF??00??3AB2F??A"
+
+while these are not:
+
+    --search "the quick brown fox" # must use --searchstr option for text
+    --search "0xff?c33ab3?accc"    # no nybbles only wide bytes. (??  not ?).
+
+=head1 OPTIONS
+
+=head2 C<--search, -s>
+
+A string of hex values to search for.
+
+=head2 C<-r, --replace>
+
+A string of hex values to replace with.
+
+=head2 C<-S, --searchstr>
+
+Search for string instead of hex.
+
+=head2 C<-R, --replacestr>
+
+Replace with a string.
+
+=head2 C<-m, --min>
+
+Need atleast these many matches.
+
+=head2 C<-M, --max>
+
+Stop at a number of matches.
+
+=head2 C<-D, --dump>
+
+Dump hex representation of a text string (shows what is done to a -S or -R argument).
+
+=head2 C<-x, --silent>
+
+Suppress warnings.
+
+=head2 C<-X, --very-silent>
+
+Suppress all output.
+
+=head2 C<-v, --version>
+
+Print version information and exit.
+
+=head2 C<-h, --help>
+
+This help screen.
+
+=head1 EXAMPLES
+
+        gbsed --search 0xffc3 /bin/ls
+        gbsed --search 0xffc3 --replace 0x00ea /bin/ls ./ls.patched
+        gbsed --search --min 3 --max 12000 0xff /bin/ls
+        gbsed --searchstr HELLO /bin/ls
+        cat /bin/ls | gbsed -x -S connected -R corrupted - - | od -cx
+        gbsed -D "hello world"
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<libgbsed> requires no configuration file or environment variables.
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-file-bsed@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<libgbsed>
+
+=back
+
+=head1 AUTHOR
+
+Ask Solem,   C<< ask@0x61736b.net >>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Dave Dykstra C<< dwdbsed@drdykstra.us >>.
+for C<bsed> the original program,
+
+I<0xfeedface>
+for the wildcards patch.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2007 Ask Solem <ask@0x61736b.net>
+
+gbsed is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+gbsed is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE
+SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE
+STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE
+SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND
+PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE,
+YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY
+COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE
+SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR
+THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER
+SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+
+
+=cut
+

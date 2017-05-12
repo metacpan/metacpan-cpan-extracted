@@ -1,0 +1,6 @@
+SYNOPSIS
+
+     use Finance::Currency::Convert::KlikBCA qw(convert_currency);
+    
+     printf "1 USD = Rp %.0f\n", convert_currency(1, 'USD', 'IDR');
+

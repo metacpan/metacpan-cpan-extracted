@@ -1,0 +1,17 @@
+File::Find;;Repository
+======================
+
+This module will find files in a set of repositories.
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

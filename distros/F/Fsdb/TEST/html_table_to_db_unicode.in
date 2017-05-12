@@ -1,0 +1,11 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<table>
+<tr><th>account</th> <th>passwd</th> <th>uid</th> <th>gid</th> <th>fullname</th> <th>homedir</th> <th>shell</th> </tr>
+<tr bgcolor="#f0f0f0"><td>root</td> <td>*</td> <td>0</td> <td>0</td> <td>Root</td> <td>/root</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#f0f0f0"><td>jose</td> <td>*</td> <td>2274</td> <td>134</td> <td>José</td> <td>/home/johnh</td> <td>/bin/bash</td> </tr>
+<tr bgcolor="#f0f0f0"><td>lin</td> <td>*</td> <td>2275</td> <td>134</td> <td>林</td> <td>/home/greg</td> <td>/bin/bash</td> </tr>
+</table>
+</body>

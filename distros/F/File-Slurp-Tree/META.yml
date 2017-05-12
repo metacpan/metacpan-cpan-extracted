@@ -1,0 +1,18 @@
+---
+name: File-Slurp-Tree
+version: 1.24
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: slurp and emit file trees as nested hashes
+license: perl
+requires:
+  File::Find::Rule: 0
+  File::Path: 0
+  File::Slurp: 0
+build_requires:
+  Test::More: 0
+provides:
+  File::Slurp::Tree:
+    file: lib/File/Slurp/Tree.pm
+    version: 1.24
+generated_by: Module::Build version 0.25

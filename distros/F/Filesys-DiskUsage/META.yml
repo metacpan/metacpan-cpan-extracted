@@ -1,0 +1,29 @@
+---
+abstract: 'Estimate file space usage (similar to `du`)'
+author:
+  - 'Jose Castro <cog@cpan.org>'
+build_requires:
+  File::Find: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Filesys-DiskUsage
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  perl: '5.006'
+resources:
+  repository: http://github.com/manwar/Filesys-DiskUsage.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

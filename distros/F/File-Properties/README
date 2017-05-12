@@ -1,0 +1,56 @@
+File::Properties
+================
+
+This module provides a class representing properties of a disk file,
+with particular emphasis on media (image, video, and audio) files. The
+mime type and a SHA-2 digest can be computed for any regular file, and
+these properties are also available for the content of bzip2 and gzip
+compressed files. Additional mime type and EXIF properties are
+available for media files, and a SHA-2 digest of the actual pixel data
+is available for image files. Since some of these properties can be
+expensive to compute, data is cached in an SQLite database so that
+properties only need to be computed from file data on the initial
+access.
+
+There should be no machine dependencies as the module is 
+written purely in Perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Error
+  DBI
+  DBD::SQLite
+  Cwd
+  File::stat
+  Fcntl
+  File::Type
+  File::Basename
+  Digest::SHA
+  IO::File
+  File::Temp
+  Compress::Bzip2
+  Compress::Zlib
+  Storable
+  Image::ExifTool
+  Image::Magick
+  Time::HiRes
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011 Brendt Wohlberg  <wohl@cpan.org>
+
+This library is available under the terms of the GNU General Public
+License (GPL), version 2, described in the GPL file included in this
+distribution.

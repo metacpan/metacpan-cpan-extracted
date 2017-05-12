@@ -1,0 +1,48 @@
+[% USE date %]
+[% PROCESS sub/date.html %]
+
+[% title = 'Online' %]
+
+<div class='one'>
+<table align='center'>
+	<tr class="title" align='center'>
+	<td width='100'>[% c.loc("User") %]</td>
+	<td>[% c.loc('Path') %]</td>
+	<td width='120'>[% c.loc('Visit Time') %]</td>
+	<td width='120'>[% c.loc('Active Time') %]</td>
+	</tr>
+[% FOREACH r IN results %]
+
+    [% IF r == 'SELF';
+          r = {
+            user_id => c.user_exists ? c.user_id : 0,
+            user    => c.user_exists ? c.user : undef,
+            sessionid => c.sessionid,
+            path    => c.req.path,
+            title   => title || 'unknown',
+            start_time => date.now,
+            last_time  => date.now
+          };
+       END; %]
+
+	<tr align='center'>
+	<td class='forum1'>
+	    [% IF r.user %]
+	    <a href='/u/[% r.user.username %]'>[% r.user.nickname %]</a>
+	    [% ELSE %]
+	     Guest
+	    [% END %]
+	</td>
+	<td class='forum2'>
+		<a href='/[% r.path %]'>[% r.title || r.path %]</a>
+	</td>
+	<td class='forum1'>
+	    <span class='date'>[% date_format(r.start_time) %]</span>
+	</td>
+	<td class='forum2'>
+	    <span class='date'>[% date_format(r.last_time) %]</span>
+	</td>
+	</tr>
+[% END %]
+</table>
+</div>

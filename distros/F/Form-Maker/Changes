@@ -1,0 +1,6 @@
+Revision history for Perl extension Form::Maker.
+
+0.01  Fri Dec 10 07:32:01 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.0 -n Form::Maker
+

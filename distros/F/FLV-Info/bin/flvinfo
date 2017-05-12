@@ -1,0 +1,110 @@
+#!/usr/bin/perl -w
+
+package main;
+
+use warnings;
+use strict;
+use 5.008;
+use FLV::Info;
+use Getopt::Long;
+use Pod::Usage;
+use English qw(-no_match_vars);
+use Digest::MD5 qw(md5_hex);
+
+our $VERSION = '0.24';
+
+my %opts = (
+   debug   => 0,
+   verbose => 0,
+   help    => 0,
+   version => 0,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+   'd|debug'   => \$opts{debug},
+   'v|verbose' => \$opts{verbose},
+   'h|help'    => \$opts{help},
+   'V|version' => \$opts{version},
+) or pod2usage(1);
+if ($opts{help})
+{
+   pod2usage(-exitstatus => 0, -verbose => 2);
+}
+if ($opts{version})
+{
+   print "v$VERSION\n";
+   exit 0;
+}
+
+if (@ARGV < 1)
+{
+   pod2usage(1);
+}
+
+while (@ARGV > 0)
+{
+   my $filename = shift;
+
+   my $i = FLV::Info->new();
+
+   if (!eval { $i->parse($filename); 1; })
+   {
+      my $err = $EVAL_ERROR;
+      if ($opts{debug})
+      {
+         require Data::Dumper;
+         print Data::Dumper::Dumper($i);
+      }
+      die $err;
+   }
+   print $i->report();
+   if ($opts{verbose})
+   {
+      for my $tag ($i->{file}->{body}->get_tags())
+      {
+         (my $type = ref $tag) =~ s/\A FLV:://xms;
+         my $len    = length $tag->{data};
+         my $md5hex = md5_hex("$tag->{data}");
+         print "    $type $tag->{start} ms, $len bytes, md5 $md5hex\n";
+      }
+   }
+   if (@ARGV > 0)
+   {
+      print "---------------------------------\n";
+   }
+}
+
+__END__
+
+=for stopwords flv flvinfo file.flv
+
+=head1 NAME
+
+flvinfo - Print information about FLV file(s)
+
+=head1 SYNOPSIS
+
+flvinfo [options] file.flv [file.flv ...]
+
+ Options:
+   -v --verbose        Print diagnostic messages
+   -h --help           Verbose help message
+   -V --version        Print version
+
+=head1 DESCRIPTION
+
+Prints to STDOUT various basic details about the specified FLV
+file(s).
+
+=head1 SEE ALSO
+
+FLV::Info
+
+=head1 AUTHOR
+
+Clotho Advanced Media Inc., I<cpan@clotho.com>
+
+Primary Developer: Chris Dolan
+
+=cut

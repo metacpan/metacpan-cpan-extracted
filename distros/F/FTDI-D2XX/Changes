@@ -1,0 +1,25 @@
+Revision history for Perl extension FTDId2xx.
+
+0.06  May 10 2010
+	- Debug message of FT_Write removed
+
+0.05  May 01 2010
+	- Typo in constant for bit mode selection corrected
+	- Documentation extended
+
+0.04  Dec 21 2009
+	- Get it running on windows with ActivePerl, nmake, Visual C++
+
+0.03  Dec 21 2009
+	- FTDI.pm (docu only) file added
+	- Simple tests added
+	- typemap for xs added
+
+0.02  Dec 20 2009
+	- Typos in the POD documentation corrected
+	- Missing file WinTypes.h added
+
+0.01  Fri Dec 11 21:15:45 2009
+	- original version; created by h2xs 1.23 with options
+		-A -n FTDI::D2XX
+

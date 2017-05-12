@@ -1,0 +1,221 @@
+#!/usr/bin/env perl
+=encoding utf8
+
+=head1 NAME
+
+fspot-tool
+
+=head1 DESCRIPTION
+
+Script to use the FSpot::DbTool and related tools
+
+=head1 SYNOPSIS
+
+ fspot-tool.pl [options]
+
+Options:
+  --action
+           move_dir
+               Requires: from, to
+               Optional: merge, rename
+           replace_path
+               Requires: from, to
+           find_lost
+               Requires: path
+           find_orphans
+           clean_trailing_slashes
+           tag_no_description
+           backup_db
+           check_db
+           compact_db
+
+   --from   Path from
+   --to     Path to
+   --path   It's a path!
+   --merge  Do a merge
+   --rename Rename files if necessary
+
+=head2 Actions
+
+=cut
+
+use strict;
+use warnings;
+use lib '../lib';
+use FSpot::DbTool;
+use YAML::Any qw/Dump/;
+use Getopt::Long;
+use Pod::Usage;
+
+if( -f 'log4perl.conf' ){
+    Log::Log4perl->init( 'log4perl.conf');
+}
+my $logger = Log::Log4perl->get_logger('fspot');
+
+my $args = {};
+my $result = GetOptions( $args,
+                         'action=s',
+                         'from=s',
+                         'to=s',
+                         'path=s',
+                         'merge',
+                         'rename',
+                         'help' );
+
+# If the Getoptions did not complete, show the usage and exit
+if( ! $result ){
+    pod2usage( { -message => "Invalid options",
+                 -exitval => 2,
+                 -verbose => 1,
+                 } );
+}
+
+# User requested some help: show full documentation
+if( $args->{help} ){
+    pod2usage( {  -exitval => 1,
+                  -verbose => 2,
+                 } );
+    exit;
+}
+
+
+# Check that action defined
+if( ! $args->{action} ){
+    pod2usage( { -message => "action not defined",
+                 -exitval => 2,
+                 -verbose => 1,
+                 } );
+}
+
+my $fsdb = FSpot::DbTool->new();
+
+=head3 move_dir
+
+Move pictures from one directory to another.  Does the move on the filesystem, and the corresponding
+move of the path in the FSpot database afterwards
+
+=cut
+
+if( $args->{action} eq 'move_dir' ){
+    $fsdb->load_tool( tool => 'Paths' );
+    $fsdb->backup_db();
+    $fsdb->move_dir( 'from'   => $args->{from},
+                    'to'     => $args->{to},
+                    'merge'  => $args->{merge},
+                    'rename' => $args->{rename} );
+
+=head3 replace_path
+
+Useful if you have already moved files in your filesystem (e.g. moved your entire photo folder to 
+a new location.  Will replace all instances of a path with a new path
+
+e.g.
+
+  from = /home/clarkero/my_pictures
+  to   = /home/rcl/pictures/processed
+
+=cut
+
+}elsif( $args->{action} eq 'replace_path' ){
+    $fsdb->load_tool( tool => 'Paths' );
+    $fsdb->backup_db();
+    $fsdb->replace_path( 'from' => $args->{from},
+                         'to'   => $args->{to} );
+
+=head3 clean_trailing_slashes
+
+Clean trailing slashes off the end of paths in the database
+
+=cut
+
+}elsif( $args->{action} eq 'clean_trailing_slashes' ){
+    $fsdb->load_tool( tool => 'Paths' );
+    $fsdb->backup_db();
+    $fsdb->clean_trailing_slashes();
+
+=head3 find_lost
+
+Find files which exist in the filesystem, but do not exist in the database
+
+=cut
+
+}elsif( $args->{action} eq 'find_lost' ){
+    $fsdb->load_tool( tool => 'Paths' );
+    my $lost_files = $fsdb->find_lost_files( 'path' => $args->{path} );
+    print Dump( $lost_files );
+
+=head3 find_orphans
+
+Find orphaned files (files which exist in in the database, but not on the filesystem)
+
+=cut
+
+}elsif( $args->{action} eq 'find_orphans' ){
+    $fsdb->load_tool( tool => 'Paths' );
+    my $orphans = $fsdb->find_orphans();
+    my $f = File::Util->new();
+    foreach my $photo_id( keys( %{ $orphans } ) ){
+        printf( "%s  %s\n", $orphans->{$photo_id}->{_path}, $orphans->{$photo_id}->{description} );
+    }
+
+=head3 tag_no_description
+
+Tag all photos which do not yet have a description
+
+=cut
+
+}elsif( $args->{action} eq 'tag_no_description' ){
+    $fsdb->load_tool( tool => 'Tags' );
+    $fsdb->tag_no_description();
+
+=head3 check_db
+
+Confirms you have the correct database version for this script to work with
+
+=cut
+
+}elsif( $args->{action} eq 'check_db' ){
+    my $dbh = $fsdb->dbh();
+
+=head3 backup_db
+
+Make a backup of the database
+This is carried out automatically for move_dir, replace_path and compact_db actions.
+
+=cut
+
+}elsif( $args->{action} eq 'backup_db' ){
+    $fsdb->backup_db();
+
+=head3 compact_db
+
+Carries out the SQLite compact function (VACUUM) on the database.
+
+=cut
+
+}elsif( $args->{action} eq 'compact_db' ){
+    $fsdb->backup_db();
+    $fsdb->compact_db();
+}elsif( $args->{action} eq 'test' ){
+    printf "Tools before loading Test: %s\n", join( ', ', sort{ $a cmp $b } @{ $fsdb->tools() } );
+    $fsdb->load_tool( tool => 'Test' );
+    printf "Tools after loading Test: %s\n", join( ', ', sort{ $a cmp $b } @{ $fsdb->tools() } );
+    $fsdb->test();
+    printf "Designed for db: %s\n", $fsdb->designed_for_db_version();
+}else{
+    pod2usage( { -message => "Unknown action: $args->{action}",
+                 -exitval => 2,
+                 -verbose => 1,
+               } );
+}
+
+exit( 0 );
+
+
+__END__
+
+=head1 AUTHOR
+
+Robin Clarke C<perl@robinclarke.net>
+
+=cut

@@ -1,0 +1,57 @@
+{
+   "abstract" : "parse email notifications",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-Bank-SK-SLSP-Notification",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Email::Address" : "0",
+            "Email::MIME" : "0",
+            "Encode" : "0",
+            "File::Find::Rule" : "0",
+            "File::Temp" : "0",
+            "Path::Class" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Finance::Bank::SK::SLSP::Notification" : {
+         "file" : "lib/Finance/Bank/SK/SLSP/Notification.pm",
+         "version" : "0.02"
+      },
+      "Finance::Bank::SK::SLSP::Notification::Transaction" : {
+         "file" : "lib/Finance/Bank/SK/SLSP/Notification/Transaction.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

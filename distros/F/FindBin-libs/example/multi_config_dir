@@ -1,0 +1,15 @@
+#!/bin/env perl
+########################################################################
+# locate the first config file named "LocalPaths.conf" looking up the 
+# tree in ./etc dir's above FinBin::Bin.
+########################################################################
+
+use Scalar::Util    qw( first );
+
+use FindBin::libs   qw( base=etc export );
+
+my $base    = 'LocalPaths.conf';
+
+my $found   = first { -e "$_/$base } @etc
+or die "No config files found ($base)";
+

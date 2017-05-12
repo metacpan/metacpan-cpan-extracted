@@ -1,0 +1,9 @@
+the .sql files for SQLite and PostgreSQL are produced by SQL::Translator
+
+$ cpan SQL::Translator
+
+$ sqlt --from MySQL --to SQLite foorum.sql > foorum.sqlite.sql
+$ sqlt --from MySQL --to SQLite theschwartz.sql > theschwartz.sqlite.sql
+
+$ sqlt --from MySQL --to PostgreSQL foorum.sql > foorum.pg.sql
+$ sqlt --from MySQL --to PostgreSQL theschwartz.sql > theschwartz.pg.sql

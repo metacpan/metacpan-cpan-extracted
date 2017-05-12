@@ -1,0 +1,38 @@
+README for Finance::YahooQuote
+
+This is a Perl 5 module that will pull one or more stock quotes from
+Yahoo! Finance. It was written by Dj Padzensky <djpadz@padz.net>, and is
+now maintained by Dirk Eddelbuettel <edd@debian.org>.  See CHANGES.old
+for DJ's log of changes, and ChangeLog for changes since Dirk took over.
+
+Once the archive has been unpacked, the following steps are needed
+to build and install the module (to be done in the directory which
+contains the Makefile.PL)
+
+  perl Makefile.PL
+  make
+
+Two simple tests have been provided. Please note that the second test
+may fail if your internet connection is down, requires a proxy or if
+Yahoo! is down. That said,
+
+  make test
+
+can be used to test the integrity of the module prior to installation.
+
+If the build and test succeed, install it with the following command:
+
+  make install
+
+An example script is installed as 'yahooquote'. Two more example scripts
+are include to help examine available services at different Yahoo! servers,
+and to examine the possible mapping between stock symbols for a given
+company. 
+
+For Debian GNU/Linux, a package is available via
+   $ apt-get install libfinance-yahooquote-perl
+
+For Windows users, ActiveState does maintain a pre-build package that can be
+installed with their ppm tool
+
+Please send questions, comments, etc. to Dirk Eddelbuettel <edd@debian.org>.

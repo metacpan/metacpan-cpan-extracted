@@ -1,0 +1,14 @@
+#!/usr/bin/env perl -w
+
+use strict;
+use warnings;
+use FindBin qw/$Bin/;
+use lib "$Bin/../lib";
+use Finance::Bitcoin::Feed;
+use feature qw(say);
+our $|++;
+
+
+Finance::Bitcoin::Feed->new(output => sub { shift; say join " : ", @_})->run();
+
+

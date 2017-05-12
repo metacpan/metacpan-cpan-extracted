@@ -1,0 +1,60 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)
+
+lib/Finance/Bank/IE/AIB.pm				 AIB support
+lib/Finance/Bank/IE/AvantCard.pm	 	 AvantCard support
+lib/Finance/Bank/IE/BankOfIreland.pm	 Bank of Ireland support
+lib/Finance/Bank/IE/PTSB.pm				 Permanent TSB support
+lib/Finance/Bank/IE.pm					 Superclass holding WWW::Mech object
+
+example.pl								 Sample code
+
+t/lib/Test/Util.pm						 Utilities to support testing
+t/PTSB.t								 Tests for PTSB.pm
+t/BankOfIreland.t						 Tests for BankOfIreland.pm
+t/pod.t									 Tests for documentation
+t/separation.t							 Tests for class separation
+t/scrubbing.t                            Tests for page scrubbing
+t/IE.t									 Tests for IE.pm superclass
+t/lib/Test/MockBank/BankOfIreland.pm	 Mock version of BoI website
+t/lib/Test/MockBank/PTSB.pm				 Mock version of PTSB website
+t/lib/Test/MockBank.pm					 Superclass of mock websites
+
+data/pii.txt							 Empty file, fodder for scrubbing.t
+
+#
+# Data files to support offline testing
+#
+data/PTSB/unscrubbed					 Permanent TSB unscrubbed page
+data/PTSB/Account.aspx					 Permanent TSB account summary page
+data/PTSB/DoLogOff.aspx					 Permanent TSB logged out page
+data/PTSB/Login2.aspx					 Permanent TSB PIN entry page
+data/PTSB/Incorrect1.aspx				 Permanent TSB missing credentials page
+data/PTSB/StateMini.aspx_ref=0			 Permanent TSB mini statement page
+data/PTSB/login.aspx_ref5				 Permanent TSB login page
+data/PTSB/PayAndTransfer.aspx
+data/PTSB/TransfereeManage.aspx
+data/PTSB/TransfereeManage.aspx_ddlPaymentType=1
+data/PTSB/TransfereeManage.aspx_ddlPaymentType=2
+data/PTSB/TransfereeManage.aspx_ddlPaymentType=3
+
+# Bank of Ireland test files
+data/BankOfIreland/accountSummary_execution=e2s1   BoI account summary page
+data/BankOfIreland/authentication_execution=e1s1   BoI Login 1
+data/BankOfIreland/authentication_execution=e1s2   BoI Login 2
+data/BankOfIreland/authentication_execution=e1s3   BoI app advert
+data/BankOfIreland/authentication_execution=e1s4   BoI login failed
+data/BankOfIreland/manageAccounts_execution=e5s1   BoI manage accounts
+data/BankOfIreland/managePayees_execution=e6s1     BoI mange payees
+data/BankOfIreland/statements_execution=e1s1       BoI account statement
+data/BankOfIreland/moneyTransfer_execution=e7s1    BoI Funds Transfer 1
+data/BankOfIreland/moneyTransfer_execution=e7s2    BoI Funds Transfer 2
+data/BankOfIreland/moneyTransfer_execution=e7s3    BoI Funds Transfer 3
+data/BankOfIreland/moneyTransfer_execution=e7s4    BoI Funds Transfer 4
+data/BankOfIreland/moneyTransfer_execution=e7s5    BoI Funds Transfer 5
+data/BankOfIreland/unscrubbed                      BoI unscrubbed
+data/BankOfIreland/sessionExpired                  BoI Timeout
+META.json                                Module JSON meta-data (added by MakeMaker)

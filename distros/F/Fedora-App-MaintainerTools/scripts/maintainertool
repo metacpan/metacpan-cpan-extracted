@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+#############################################################################
+#
+# Run the maintainer tools commands.
+#
+# Author:  Chris Weyl (cpan:RSRCHBOY), <cweyl@alumni.drew.edu>
+# Company: No company, personal work
+# Created: 06/16/2009
+#
+# Copyright (c) 2009  <cweyl@alumni.drew.edu>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+#############################################################################
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../../CPAN-MetaMuncher/lib";
+
+use Fedora::App::MaintainerTools;
+use Log::Log4perl ':easy';
+
+BEGIN { Log::Log4perl->easy_init($INFO) }
+
+Fedora::App::MaintainerTools->run;
+
+1;
+
+__END__
+
+=head1 NAME
+
+maintainertool - Common tasks a Fedora maintainer may need to undertake
+
+
+=head1 SYNOPSIS
+
+    maintainertool updatespec perl-Foo.spec
+
+=head1 DESCRIPTION
+
+B<WARNING: This is *VERY* early code.  While it's not likely to, if it breaks
+something, you're entitled to all the pieces.>
+
+The maintainertool automates certain common tasks the maintainer of Fedora
+Perl packages may do.  Right now, we only support updating spec files with
+new versions and metadata from the CPAN; we're even pretty restrictive there.
+
+This is a very early release.
+
+=head1 DIAGNOSTICS
+
+We log most things to stderr; on unexpected situations weird errors may be
+generated.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+TODO.
+
+=head1 SEE ALSO
+
+L<http://fedoraproject.org>
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module; but like any reasonably complex system
+there are undoubtedly any.
+
+Please report problems to Chris Weyl <cweyl@alumni.drew.edu>, or (preferred) 
+to this package's RT tracker at <bug-Fedora-App-MaintainerTools@rt.cpan.org>.
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Chris Weyl  <cweyl@alumni.drew.edu>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009  <cweyl@alumni.drew.edu>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the 
+Free Software Foundation, Inc.
+
+    59 Temple Place, Suite 330
+    Boston, MA  02111-1307  USA
+
+=cut
+

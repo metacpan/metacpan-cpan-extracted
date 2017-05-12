@@ -1,0 +1,101 @@
+NAME
+    Finance::Bank::BNPParibas - Check your BNP bank accounts from Perl
+
+SYNOPSIS
+     use Finance::Bank::BNPParibas;
+
+     my @accounts = Finance::Bank::BNPParibas->check_balance(
+        username => "$username",  # Be sure to put the numbers
+        password => "$password",  # between quote.
+     );
+
+     foreach my $account ( @accounts ){
+        local $\ = "\n";
+        print "       Name ", $account->name;
+        print " Account_no ", $account->account_no;
+        print "    Balance ", $account->balance;
+        print "  Statement\n";
+
+        foreach my $statement ( $account->statements ){
+            print $statement->as_string;
+        }
+     }
+
+DESCRIPTION
+    This module provides a rudimentary interface to the BNPNet online
+    banking system at <https://www.bnpnet.bnp.fr/>. You will need either
+    Crypt::SSLeay or IO::Socket::SSL installed for HTTPS support to work
+    with LWP.
+
+    The interface of this module is directly taken from Simon Cozens'
+    Finance::Bank::LloydsTSB.
+
+WARNING
+    This is code for online banking, and that means your money, and that
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the source
+    of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to me,
+    but is provided under NO GUARANTEE, explicit or implied.
+
+METHODS
+  check_balance( username => $username, password => $password, ua => $ua )
+    Return a list of account (F::B::B::Account) objects, one for each of
+    your bank accounts. You can provide to this method a WWW::Mechanize
+    object as third argument.
+
+Account methods
+  sort_code()
+    Return the sort code of the account. Currently, it returns an undefined
+    value.
+
+  name()
+    Returns the human-readable name of the account.
+
+  account_no()
+    Return the account number, in the form "XXX YYYYYYYYY ZZ", where X, Y
+    and Z are numbers.
+
+  balance()
+    Returns the balance of the account. Note that the BNP site displays them
+    in French format (i.e "123,75"), but the string returns a number perl
+    understands (i.e 123.75).
+
+  statements()
+    Return a list of Statement object
+    (Finance::Bank::BNPParibas::Statement).
+
+Statement methods
+  date()
+    Returns the date when the statement occured, in YYYY-MM-DD format.
+
+  value_date()
+    Returns the date the transfer entry to an account is considered
+    effective, in YYYY-MM-DD format.
+
+  description()
+    Returns a brief description of the statement.
+
+  amount()
+    Returns the amount of the statement (expressed in Euros).
+
+  as_string($separator)
+    Returns a tab-delimited representation of the statement. By default, it
+    uses a tabulation to separate the fields, but the user can provide its
+    own separator.
+
+BUGS
+    Please report any bugs or comments using the Request Tracker interface:
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-Bank-BNPParibas>
+
+COPYRIGHT
+    Copyright 2002-2003, Briac Pilpré. All Rights Reserved. This module can
+    be redistributed under the same terms as Perl itself.
+
+AUTHOR
+    Briac Pilpré <briac@cpan.org>
+
+    Thanks to Simon Cozens for releasing Finance::Bank::LloydsTSB
+
+SEE ALSO
+    Finance::Bank::LloydsTSB, WWW::Mechanize
+

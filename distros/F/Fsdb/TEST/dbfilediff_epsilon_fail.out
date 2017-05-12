@@ -1,0 +1,12 @@
+#fsdb -F t a_short moving_mean moving_stddev diff
+0.8307	0.85053	0.035783	~
+0.7976	0.84881	0.037506	~
+0.8178	0.84727	0.038142	~
+0.806	0.84931	0.035787	~
+0.7293	0.78536	0.050969	~
+0.7474	0.77379	0.04636	~
+0.7938	0.76523	0.04191	~
+0.8144	0.76484	0.041385	~
+0.833	0.76449	0.040741	~
+0.8647	0.76864	0.047607	~
+#   | dbfilediff -E --quiet --input TEST/dbfilediff_epsilon_fail.in --input TEST/dbfilediff_epsilon_fail.in-2

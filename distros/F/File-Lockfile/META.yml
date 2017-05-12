@@ -1,0 +1,23 @@
+---
+abstract: 'create lockfile to prevent process simultaneous run'
+author:
+  - 'Sergey Sinkovskiy <glorybox@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Lockfile
+provides:
+  File::Lockfile:
+    file: lib/File/Lockfile.pm
+    version: v1.0.5
+requires:
+  Class::Data::Inheritable: 0.06
+  File::Temp: 0.21
+  perl: v5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.0.5

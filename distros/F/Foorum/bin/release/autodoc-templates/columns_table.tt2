@@ -1,0 +1,13 @@
+<h3 name="[% source.moniker %]-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    [% FOR col IN source.columns %]
+        [% INCLUDE columns_row.tt2 %]
+    [% END %]
+</table>
+
+[%# $Id$ #%]

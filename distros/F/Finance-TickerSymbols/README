@@ -1,0 +1,62 @@
+Finance-TickerSymbols version 0.01
+==================================
+
+SYNOPSIS
+
+use Finance::TickerSymbols  ;
+
+  for my $symbol ( symbols_list( 'nasdaq' ) ) {
+
+     # do something with $symbol
+     # for example:
+#    use Finance::YahooQuote ;
+#    my @Q = getonequote $symbol ;
+#    print "$Q[1] ($Q[0]) is $Q[2]\n" ;
+  }
+
+  for my $industry ( industries_list()) {
+
+     for my $symbol ( industry_list($symbol) ) {
+
+         # do something with $symbol and $industry
+
+     }
+  }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+
+  (one way of installing LWP bundle is:
+   % perl -MCPAN -e 'install Bundle::LWP'
+  )
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Josef Ezra
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+DISCLAIMER
+
+The data returned from these modules is in no way guaranteed, nor are
+the developers responsible in any way for how this data (or lack
+thereof) is used.
+(In other words: one can only use it on his you own risk)
+
+AUTHOR
+
+Josef Ezra <jezra@cpan.org>

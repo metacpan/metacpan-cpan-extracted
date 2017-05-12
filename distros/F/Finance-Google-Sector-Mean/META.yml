@@ -1,0 +1,24 @@
+---
+abstract: 'Perl extension shows you the finance.google.com sectors and there realtime quote+performance grouped in [negative,positive,above average performance]'
+author:
+  - 'santex <santex@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Google-Sector-Mean
+requires:
+  Exporter: 0
+  HTML::TreeBuilder: 0
+  LWP::Simple: 0
+  List::Util: 0
+  Statistics::Basic: 0
+version: 0.08

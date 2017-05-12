@@ -1,0 +1,13 @@
+Revision history for Filter::Rijndael
+
+0.01  
+    - first public version
+
+0.02  Tue Mar  6 04:54:14 EST 2012
+    - fixed dependencies
+
+0.03  Sat Oct 18 00:21:48 EST 2014
+    - fixed Filter dependency name
+
+0.04  Sat Oct 18 02:38:25 EST 2014
+    - fixed tests (thanks Alexandr Ciornii)

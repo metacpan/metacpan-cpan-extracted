@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>WordPress Development Blog</title>
+	<atom:link href="http://wordpress.org/development/feed/" rel="self" type="application/rss+xml" />
+	<link>http://wordpress.org/development</link>
+	<description>WordPress development and updates</description>
+	<lastBuildDate>Wed, 18 Nov 2009 03:49:38 +0000</lastBuildDate>
+	<generator>http://wordpress.org/?v=2.9-beta-1</generator>
+	<language>en</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+			<item>
+		<title>WordPress Wins CMS Award</title>
+		<link>http://wordpress.org/development/2009/11/wordpress-wins-cms-award/</link>
+		<comments>http://wordpress.org/development/2009/11/wordpress-wins-cms-award/#comments</comments>
+		<pubDate>Wed, 18 Nov 2009 03:48:04 +0000</pubDate>
+		<dc:creator>Matt</dc:creator>
+				<category><![CDATA[General]]></category>
+		<category><![CDATA[award]]></category>
+		<category><![CDATA[cms]]></category>
+		<category><![CDATA[packt]]></category>
+
+		<guid isPermaLink="false">http://wordpress.org/development/?p=978</guid>
+		<description><![CDATA[I was very excited last week to learn that WordPress has been awarded the Overall Best Open Source CMS Award in the 2009 Open Source CMS Awards. This is a landmark for us, as it is the first time we&#8217;ve won this award, and it marks a shift in the public perception of WordPress, from [...]]]></description>
+			<content:encoded><![CDATA[<p>I was very excited last week to learn that WordPress has been awarded the Overall Best Open Source CMS Award in the <a href="http://www.packtpub.com/award">2009 Open Source CMS Awards</a>. This is a landmark for us, as it is the first time we&#8217;ve won this award, and it marks a shift in the public perception of WordPress, from blog software to full-featured CMS. No small contest, the Open Source CMS Awards received over 12,000 nominations and more than 23,000 votes across five categories. </p>
+<p>As Hiro Nakamura said when he first bent time and space to land in Times Square: &#8220;Yatta!&#8221;</p>
+<p>In addition to winning in the Overall Best Open Source CMS category, WordPress was named first runner-up in the Best Open Source PHP CMS category. This is significant because we weren&#8217;t even in the top 5 last year, and now we&#8217;re #2, ahead of Joomla! As is stated on the Award site, &#8220;WordPress made its way into the top five for the first time. The fact that it was outranked by Drupal by a very slight margin indicates how popular it has become with users as well as developers over the past year.&#8221;</p>
+<p>Every day thousands of new people are embracing WordPress to power not just their blogs but entire sites and communities without compromising on usability or scalability (as would be the case with a legacy CMS). Every member of the WordPress community, from core developer to beginning user, should be proud to be part of this momentum: congratulations to us all!</p>
+]]></content:encoded>
+			<wfw:commentRss>http://wordpress.org/development/2009/11/wordpress-wins-cms-award/feed/</wfw:commentRss>
+		<slash:comments>5</slash:comments>
+		</item>
+		<item>
+		<title>Core Contributors at WordCamp NYC</title>
+		<link>http://wordpress.org/development/2009/11/core-wordcamp-nyc/</link>
+		<comments>http://wordpress.org/development/2009/11/core-wordcamp-nyc/#comments</comments>
+		<pubDate>Tue, 17 Nov 2009 13:14:57 +0000</pubDate>
+		<dc:creator>Jane Wells</dc:creator>
+				<category><![CDATA[WordCamp]]></category>
+		<category><![CDATA[#wordpress-dev]]></category>
+		<category><![CDATA[core contributors]]></category>
+
+		<guid isPermaLink="false">http://wordpress.org/development/?p=971</guid>
+		<description><![CDATA[WordCamp NYC was last weekend, and it was crazy awesome to have so many WordPress users and developers together in one place (final numbers to come, but looks like over 700). One of my favorite moments was right at the end, when someone suggested getting a picture of the core contributors (I&#8217;d asked them all [...]]]></description>
+			<content:encoded><![CDATA[<p>WordCamp NYC was last weekend, and it was crazy awesome to have so many WordPress users and developers together in one place (final numbers to come, but looks like over 700). One of my favorite moments was right at the end, when someone suggested getting a picture of the core contributors (I&#8217;d asked them all to stand so people could applaud them when we were doing the closing remarks). Some of them were camera shy and kept out of the happysnap, but here&#8217;s a handful of the people who make WordPress what it is.</p>
+<p><a href="http://jane.wordpress.com/files/2009/11/core-contributors.jpg"><img title="Core Contributors at WordCamp NYC" src="http://jane.wordpress.com/files/2009/11/core-contributors.jpg" alt="Core Contributors at WordCamp NYC" width="649" height="295" /></a><br />
+From left: <a href="http://sivel.net/">Matt Martz</a> (sivel), <a href="http://simianuprising.com/ ">Jeremy Clarke</a>, <a href="http://bugssite.org/">Shane Froebel</a> (^BuGs^), <a href="http://jane.wordpress.com">Jane Wells</a>, <a href="http://ma.tt">Matt Mullenweg</a>, <a href="http://markjaquith.com/">Mark Jaquith</a>, <a href="http://dentedreality.com.au">Beau Lebens</a>, <a href="http://apeatling.wordpress.com/">Andy Peatling</a>, <a href="http://johnjamesjacoby.com/">John James Jacoby</a> (jjj).<br />
+<em>Photo by <a href="http://www.nothingcliche.com/">Chris Cochran</a></em>.</p>
+]]></content:encoded>
+			<wfw:commentRss>http://wordpress.org/development/2009/11/core-wordcamp-nyc/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+	</channel>
+</rss>

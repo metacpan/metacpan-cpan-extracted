@@ -1,0 +1,6 @@
+#fsdb -F S sid cid
+1  10
+2  11
+1  12
+2  12
+#  | dbsort -n cid

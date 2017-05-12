@@ -1,0 +1,25 @@
+1.0.6 - Fixed MkTemp.pm - wasn't exporting what it needed to use subs correctly.
+1.0.5 - Minor synopsis correction pointed out by Bob Wilkinson.
+1.0.4 - Someone smacked me upside the head with a perl module book and the 
+        advanced perl programming book.  After reading a couple of chapters on
+        modules, I was displeased to learn that my module was probably 
+        considered a hack.  Therefore I have gone through and made changes to
+        File::MkTemp so it is written in as correct PERL form as I could make
+        it.  I hope that if it is still considered a hack someone will
+        tell me.
+
+        During the time of the changes to MkTemp I decided it would be fun to
+        learn how objects work in PERL.  What better way than to write a module
+        that is object oriented:)  I now introduce MkTempO, an object oriented
+        version of MkTemp.
+
+        The MkTemp module got the mkstempt function which returns the file 
+        handle and the scalar representation of the file handle.
+1.0.3 - Minor Changes. 
+1.0.2 - Changed from File::Spec::Functions to File::Spec->catfile.  This allows
+        backward compat for older File::Spec module.
+        Added mkstemp() function that returns an open file handle.
+        Corrected $keepgen = 0 to $keepgen == 0 at the next stmt.
+1.0.1 - Started using File::Spec to create the directory/tempfile string.
+        This is better so that the function can be used on different os.
+1.0.0 - First release to public.  mktemp() function.

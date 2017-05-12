@@ -1,0 +1,143 @@
+README
+Business::FedEx v.0.10
+
+
+Copyright (c) 2000 Patrick Tully.  All rights reserved.
+
+This Perl module uses the conditions given by Perl.  This module may only
+be distributed and or modified under the conditions given by Perl.
+
+Contents
+===========================================
+
+  Contents
+  Overview
+  Obtaining Distribution
+  Installation
+  Usage
+  Contacting the Author
+
+
+
+Overview
+===========================================
+
+The FedEx modual will allow you to track a package, request a 
+shipping rate, and ship a package via FedEx.  It returns info
+such as a shipping label(gif), tracking number, price, etc.  It allows
+you to communicate with the FedEx ShipAPI Manager (win32).  There is a
+catch, however.  Somewhere along the line, You will need a 
+Win32 box.  If you plan on developing on the Win32 platform,
+then you are all set.  Just install and run.  YOU CAN STILL
+USE THIS IF YOU ARE DEVELOPING ON ANOTHER PLATFORM BY USING A PROXY.
+	
+
+
+
+Obtaining Distribution
+===========================================
+
+Businsess::FedEx:
+  CPAN - http://www.perl.com/CPAN/modules/by-module/Business/
+
+FedEx ShipAPI Manager (REQIRED Win32):
+  https://www.fedex.com/globaldeveloper/shipapi/register.html
+
+
+
+
+Installation
+===========================================
+
+REQUIRMENTS:
+  1. MUST have an available win32 box somewhere on 
+     the Internet.
+  2. Perl 5.x
+  3. FedEx ShipAPI Manager (WIN32).
+     https://www.fedex.com/globaldeveloper/shipapi/register.html
+
+There are two ways to do this.  If you are developing on 
+a Win32 platform, follow 'INSTALL WIN32'.  Otherwise
+use the 'INSTALL (USING WIN32 PROXY)'.
+
+-INSTALL WIN32
+  1. Install the FedEx Ship Manager API (WIN32).
+  2. Create a directory under one of your @INC paths to 
+     Business if it does not already exist.
+  3. Copy the file FedEx.pm to the new Business directory.
+  4. Copy the directory FedEx to the new Business directory.
+  DONE 
+
+-INSTALL (USING WIN32 PROXY)
+  1. On PLATFORM (Linux, UNIX, etc)
+
+  	perl Makefile.PL
+  	make
+  	make install
+
+  2. Install distribution on Win32 Platform (must be running perl)
+  3. On Win32, Copy fedex.pl to your local cgi-bin (tested ok on 
+     apache web server but failed with dll errors on IIS...what a surprise :).
+  DONE
+
+
+
+
+Using the Module
+===========================================
+
+The best way to see how to use the FedEx modual, is to take a look at
+the examples track.pl, ship.pl, rate.pl under the examples directory.
+Its also documented in POD format perldoc Business::FedEx::Constants and 
+Business::FedEx::ShipRequest.  Also, Please take a look at the 
+FedEx ShipAPI Manager User Manual for required input:
+http://www.fedex.com/globaldeveloper/shipapi/shipAPI_userGuide.pdf
+
+CREATE A SHIPPING OBJECT:
+
+     #Refer to Business::FedEx::Constants or the FedEx ShipAPI documentation for the required fields.
+
+     use Business::FedEx::ShipRequest;
+     $s = Business::FedEx::ShipRequest->new(constant_name=>'value',constant_name2=>'value',etc...);
+
+SHIP A PACKAGE:
+
+     $s->ship('username','secret','localhost','domestic');
+     $s->ship('username','secret','localhost','international');
+
+RATE A PACKAGE:
+
+     $s->rate('username','secret','localhost','domestic');
+     $s->rate('username','secret','localhost','international');
+
+TRACK A PACKAGE:
+
+     $s->track('username','secret','localhost','123456789098');
+
+USE PROXY:	
+     #In order to use fedex.pl (proxy interface), you must install Business::FedEx on a Win32 web 
+     #server and put the fedex.pl script in Win32's cgi-bin.  You can then make a ShipRequest from 
+     #any box just by including the url in the method call (instead of 'localhost').
+
+     $s->ship('username','secret','http://www.hostname.com/cgi-bin/fedex.pl','domestic');
+
+GET REPLY INFO:
+     #Refer to Business::FedEx::Constants for constant_name information or refer to the FedEx ShipAPI documentation.
+
+     $data = $s->get_data('constant_name');
+
+
+
+
+Contacting the Author
+===========================================
+
+Please feel free to contact me with any comments/questions/suggestions/improvements reguarding this
+modual.  PLEASE DO NOT CONTACT ME REGUARDING FEDEX SHIPAPI MANAGER QUESTIONS.  FedEx makes available
+the FedEx Ship API Manager to Win32 AND Solaris operating environments.  I hope, in the near future,
+to make available a Solaris version of Business::FedEx::ShipAPI.  If you would like to contribute to 
+this effort, please contact me.
+
+	-Patrick Tully- <ptully@avatartech.com>
+
+

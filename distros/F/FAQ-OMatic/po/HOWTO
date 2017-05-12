@@ -1,0 +1,38 @@
+How to use xgettext with Perl.
+==============================
+
+1. Requirements to source code:
+
+   strings that you plane to extract should be in double quotes ("");
+
+   these strings should be marked by gettext(), gettext_noop() or any
+   other keyword that you add to xgettext invocation (see --keyword
+   option of xgettext);
+
+   these strings should not have any escape sequence that represent
+   backslash (`\') symbol itself (not as "\\" nor "\x5c" nor in any
+   other way).  If you want output it -- use constructs like following
+   instead:
+
+        $str = sprintf(gettext("string %s continue"), "\\");
+
+   Sorry for inconvenience, but it meets seldom, and the prize from
+   using of xgettext, msgmerge and friends should be greater.
+
+2. Just call xgettext.  It make big amount of warnings but work.
+
+3. After this scan resulting .po file and replace any accurences of `\\'
+   (doubled backslash) by `\' (single backslash).
+
+   After this we have some uniform data that can be processed for
+   building hash with translation or what you want.
+
+   This can be done by po2pm.
+
+4. Build from msgstr/msgid pairs a hash with translations, required by
+   faqomatic.
+
+   This can be done by po2pm.
+
+FIXME: awn@bcs.zp.ua: if you understand, what I wrote here and know
+English enoug for make this text "more English" -- do it!

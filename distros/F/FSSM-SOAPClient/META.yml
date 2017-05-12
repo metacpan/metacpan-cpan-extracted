@@ -1,0 +1,31 @@
+---
+name: FSSM-SOAPClient
+version: 0.012
+author:
+  - Mark A. Jensen
+abstract: Access the Fortinbras FSSM web service
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Module::Build: 0
+  SOAP::Lite: 0.69
+  Test::Exception: 0
+requires:
+  SOAP::Lite: 0.69
+  perl: 5.008
+configure_requires:
+  Module::Build: 0.35
+provides:
+  FSSM::SOAPClient:
+    file: lib/FSSM/SOAPClient.pm
+    version: 0.012
+  FSSM::SOAPClient::Config:
+    file: lib/FSSM/SOAPClient/Config.pm
+    version: 0.01
+  FSSM::SOAPClient::Result:
+    file: lib/FSSM/SOAPClient.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

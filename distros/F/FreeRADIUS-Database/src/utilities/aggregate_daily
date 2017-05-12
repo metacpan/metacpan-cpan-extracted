@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+# - aggregate_daily
+# - utility script for FreeRADIUS::Database
+# - aggregates totals from radacct into new table
+# - same license as module itself
+
+use strict;
+use warnings;
+
+use DateTime;
+use Getopt::Long;
+Getopt::Long::Configure qw( bundling );
+use Pod::Usage;
+use FreeRADIUS::Database;
+
+my ( $month, $num_days, $classify, $help, $man, $verbose ) = 0;
+
+my $result = GetOptions(                
+        'month|m=s'     => \$month,                
+        'days|d=i'      => \$num_days,
+        'classify|c'    => \$classify,
+        'help|h'        => \$help,                
+        'man|M'         => \$man,            
+        'verbose|v'     => \$verbose,
+    );
+
+# begin pod2usage
+
+pod2usage({ -verbose => 1 }) if $help;
+pod2usage({ -verbose => 2 }) if $man;
+
+if ( $month && $month !~ m{ \A \d{4}-\d{2} \z }xms ){
+
+    pod2usage({ 
+        -msg        => "\n\n--month argument requires a parameter in the form YYYY-MM\n\n",
+        -verbose    => 1,        
+    }) 
+}
+
+if ( $num_days && $num_days !~ /\d+/ ){
+    
+    pod2usage({
+        -msg        => "\n\n--days argument requires an integer as a parameter\n\n",
+        -verbose    => 1,
+    }); 
+}
+
+if ( $num_days && ! $month ) {
+
+    pod2usage({
+        -msg        => "\n\n--days argument requires that you specify a month with --month\n\n",
+        -verbose    => 1,
+    })
+}
+
+if ( $month && ! $num_days ) {
+
+    pod2usage({
+        -msg        => "\n\n--month argument requires the --days argument to be specified\n\n",
+        -verbose    => 1,
+    })
+}
+
+# end pod2usage, begin code
+
+my $radius  = FreeRADIUS::Database->new();
+
+# set classification
+
+$classify   = ($classify)
+    ? $classify
+    : $radius->RAS_CLASSIFICATION;
+
+my $date;
+
+if ( $month ) {
+
+    my ( $y, $m ) = ( split( /-/, $month ) );  
+
+    $date = DateTime->new( 
+    
+                            time_zone   => $radius->TIMEZONE(),
+                            year        => $y,
+                            month       => $m,
+                            day         => '01',
+                        );
+    
+    for ( 1..$num_days ) {
+
+        my $day = $date->ymd();
+
+        my $agg_result = $radius->aggregate_daily( { 
+                        day         => $day,
+                        classify    => $classify,
+                    } );
+    
+        if ( $verbose && $agg_result ) {
+            print "aggregate_daily failed for day $day after being called with the --month parameter!: $!";
+        }
+
+        $date->add( days => 1 );
+
+    }   
+}
+else {
+
+    my $agg_result = $radius->aggregate_daily({ classify => $classify });
+    
+    if ( $verbose && $agg_result ) {
+        print "aggregate_daily failed during its automated run!: $!";
+    }
+}
+
+if ( $verbose ) {
+    print "aggregate_daily completed successfully\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+aggregate_daily - Utility script for use with FreeRADIUS::Database
+
+=head1 SYNOPSIS
+
+  # aggregate yesterday as designed to be run via cron.
+  # This is the natural, designed, daily operation
+
+  ./aggregate_daily
+
+  # aggregate a specific month. Pass the --day argument
+  # to inform the system how many days since the 1st of the
+  # month to process. In this case, the month of June, 2009
+
+  aggregate_daily --month|-m 2009-06 --days|-d 30
+
+  # perform a run for a longer period of time
+  # in this case, we run a year commencing June 1st, 2009
+
+  aggregate_daily --month|-m 2009-06 --days|-d 365
+
+  # override the configuration file nas classification setting.
+  # 1 enables classification, 0 disables it
+
+  # NOTE: performing this override is NOT recommended.
+
+  aggregate_daily --classify|-c 1
+  
+  # display help
+
+  aggregate_daily --help|-h
+
+  # display the manual page
+
+  aggregate_daily --man|-M
+
+  # add verbosity
+
+  aggregate_daily --verbose|-v
+
+=head1 OPTIONS
+
+=over 1
+
+=item --month | -m
+
+Specify the month in which you want to work on in the form YYYY-MM. If
+the month parameter is not supplied, we will work on the date that was
+existent yesterday. 
+
+When the month argument is specified, we start at the 1st day of that month.
+
+=item --days | -d
+
+Specify the number of days that you want to process, commencing from the first
+day of the month specified with the --month argument
+
+=item --classify | -c
+
+Provides the ability to override the 'ras_classification' variable in the
+underlying module's configuration file. It is highly recommended that this
+parameter is not used, unless you understand the consequences.
+
+=item --verbose | -v
+
+Prints out whether the underlying aggregation task failed or finished successfully.
+Very handy for email coming out of cron.
+
+=back
+
+=head1 DESCRIPTION
+
+aggregate_daily is a utility script for the FreeRADIUS::Database module.
+
+It aggregates the entries from the RADIUS `radacct` table by UserName and
+NASIPAddress, and inserts the aggregated information into a `aggregated_daily`
+table.
+
+If month 'reruns' are performed, we clean out the aggregation table prior to
+re-aggregating.
+
+NOTE: The 'ras_classification' directive in the freeradius_database.conf config file
+determines whether the NASIPAddress will be converted into a group name. Using
+the 'classify' override is NOT recommended. To conform with site database
+consistency, it is recommended to change the option globally in the configuration
+file instead.
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012 by Steve Bertrand
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

@@ -1,0 +1,26 @@
+group1 :
+    - name
+    - [ [NOT_BLANK] ]
+    - email
+    - [ [NOT_BLANK], [EMAIL_LOOSE] ]
+    - tel
+    - [ [NOT_BLANK], [NUMBER_PHONE_JP] ]
+    - content
+    - [ [NOT_BLANK] ]
+group2 :
+   subgroup1 :
+       - userid
+       - [ [NOT_BLANK]]
+       - password
+       - [ [NOT_BLANK]]
+       - name
+       - [ [NOT_BLANK] ]
+       - email
+       - [ [NOT_BLANK], [EMAIL_LOOSE] ]
+   subgroup2 :
+       - tel
+       - [ [NOT_BLANK], [NUMBER_PHONE_JP] ]
+       - { zip : [zip1, zip2] }
+       - [ [ZIP_JP] ]
+       - address
+       - [ [NOT_BLANK] ]

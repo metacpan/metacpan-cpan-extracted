@@ -1,0 +1,20 @@
+Revision history for Perl extension Flow.
+1.0 01 Mar, 2015
+  - fix random order of pipes
+0.9 02 Mar, 2013
+   - clear UTF-X bit 
+0.8 12 May, 2012
+   - make pretty json
+0.6 13 Feb, 2011
+   - add Grep 
+
+0.5  20 Dec, 2010
+    - fix named pipes at Split 
+
+0.04   27 Oct, 2010
+    - fix Splice ( hate $_);
+0.02   12.07.2010 
+  - add import from JXML format;
+  - enhance Join
+ 0.01  14.06.2010 11:21:37 MSD
+ - initial version

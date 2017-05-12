@@ -1,0 +1,475 @@
+=encoding utf-8
+
+=head1 NAME
+
+FormValidator::LazyWay - フォーム検証用モジュール
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+    use Data::Dumper;
+    use CGI;
+    use FormValidator::LazyWay;
+    
+    my $config = {
+        'setting' => {
+            'strict' => {
+                'email'    => { 'rule' => [ 'Email#email' ] },
+                'password' => {
+                    'rule' => [
+                        {   'String#length' => {
+                                'min' => '4',
+                                'max' => '12'
+                            }
+                        },
+                        'String#ascii'
+                    ]
+                }
+            }
+        },
+        'lang'   => 'ja',
+        'labels' => {
+            'ja' => {
+                'email'    => 'メールアドレス',
+                'password' => 'パスワード'
+            }
+        },
+        'rules' => [ 'Email', 'String' ]
+    };
+    
+    my $fv  = FormValidator::LazyWay->new(config => $config);
+    my $cgi = new CGI( { password => 'e' } );
+    my $res = $fv->check( $cgi, { required => [qw/email password/], } );
+    
+    if ( $res->has_error ) {
+        print Dumper $res->error_message;
+        # output  
+        #$VAR1 = {
+        #  'email' => 'メールアドレスが空です。',
+        #  'password' => 'パスワードには4文字以上12文字以下が使用できます。'
+        #};
+    }
+    else {
+    
+        # OK!
+        print Dumper $res->valid;
+    }
+    
+
+=head1 DESCRIPTION
+
+このモジュールはまだ開発段階ですので、仕様が変更される恐れがあります。
+
+フォーム検証用モジュールL<FormValidator::LazyWay>は各フォームごとではなく、アプリケーション全体で使用する目的で作成しております。
+フォームごとに検証ルールを設定するのではなく、フィールド名ごとに検証ルールを設定することにより、よりDRYなコードを書くことのお手伝いをします。
+
+また、検証用モジュールごとに、検証内容を設定することができます。その情報を元に、エラーメッセージを作成するので、
+エラーメッセージを考える手間も短縮できるようになっています。
+
+=head1 QUICK START
+
+簡単な問い合わせフォームを例を基に、使い方の説明をいたします。
+
+=head2 コンフィグ設定
+
+今回はYAMLで設定ファイルを作成しています。
+使用するのは、このデータをハッシュにしたデータですので、あなたの好きな方法をご利用下さい。
+
+rulesで指定されているのは、使用する検証用モジュール名です。
+詳細は L<FormValidator::LazyWay::Rule::Email> L<FormValidator::LazyWay::Rule::String> をご確認下さい。
+
+    rules :
+        - Email
+        - String
+    lang : ja
+    setting :
+        strict :
+            email :
+                rule :
+                    - Email#email
+            message :
+                rule :
+                    - String#length :
+                        min : 1
+                        max : 500
+            user_key :
+                rule :
+                    - String#length :
+                        min : 4
+                        max : 12
+                    - String#ascii 
+    labels :
+        ja :
+            email    : メールアドレス
+            message  : お問い合わせ内容
+            user_key : ユーザID
+
+=head2 準備
+
+設定ファイルから取り出したデータを、newの引数として渡すだけです。これで準備完了です。
+
+    use FormValidator::LazyWay;
+    use YAML::Syck;
+    use FindBin;
+    use File::Spec;
+
+    my $conf_file = File::Spec->catfile( $FindBin::Bin, 'conf/inquery-sample.yml' );
+    my $config = LoadFile($conf_file);
+    my $fv = FormValidator::LazyWay->new( config => $config );
+
+=head2 検証フィールドの設定
+
+検証フィールドの設定をおこないます。そのフィールドが必須の場合は、required , 
+あってもなくても良い場合は、optional に設定します。
+
+    my $cgi = new CGI() ;
+
+    my $res = $fv->check( $cgi , {
+        required => [qw/email message/],
+        optional => [qw/user_key/],
+    });
+
+    # 検証がエラーだった場合
+    if( $res->has_error ) {
+        warn Dumper $res->error_message;
+    }
+    else {
+        # 検証がうまくいった場合 
+        warn Dumper $res->valid;
+    }
+
+=head2 実行結果
+
+=over
+
+=item 正常なデータで試した際
+ 
+    my $cgi = new CGI( { email => 'tomohiro.teranishi@gmail.com' , use_key => 'tomyhero' , message => 'うごきません' } ) ;
+
+$res->valid の中身が dump されます。
+
+    $VAR1 = {
+        'email' => 'tomohiro.teranishi@gmail.com',
+        'message' => 'うごきません'
+    };
+
+
+=item 必要なデータが足らない場合
+ 
+    my $cgi = new CGI( { message => 'うごきません' } ) ;
+
+$res->error_message には以下のデータが格納されます。
+
+    $VAR1 = {
+        'email' => 'メールアドレスが空です。'
+    };
+
+=item フォーマットが間違ってる場合
+
+    my $cgi = new CGI( { email => 'email' , use_key => 'tom' , message => 'うごかないよ！'  } ) ;
+
+$res->error_message には以下のデータが格納されます。
+
+    $VAR1 = {
+        'email' => 'メールアドレスにはメールアドレスの書式が使用できます。'
+    };
+
+=back
+
+=head1 設定の説明
+
+=head2 rules
+
+使用する設定のモジュールを指定します。指定していない、検証ルールを実行しようとするとエラーになるので、ご注意ください。
+
+指定の際には、FormValidator::LazyWay::Rule:: の部分は省略できます。
+また、独自で作成した検証モジュールの場合は、頭に+をつけることで、指定することができます。
+
+ rules :
+    - String
+    - +OreOre::Rule
+
+=head2 lang
+
+デフォルトで使用する言語を設定します。値のデフォルトはenです。
+
+ lang : ja
+
+=head2 langs
+
+使用する言語をすべて指定します。複数の言語を使用するサイトの際に設定します。
+複数の言語を使用しない場合は、設定する必要はありません。
+
+ langs : 
+    - ja
+    - en
+
+
+=head2 setting
+
+検証ルールなどを、フィールド名にマッピングさせます。
+    以下のような、フォーマットになります。
+
+ レベル :
+    フィールド名 :
+        設定名 :
+            設定名ごとに定義された設定
+
+=over 
+
+=item レベル
+
+同じフィールド名で、違う検証モジュールを指定できるように、レベルという仕組みがあります。
+何も設定しなければ、strict という検証ルールが読み込まれます。
+
+例えばemailというフィールドがあった場合に、登録時のフォームでは strict レベルの検証ルールを、
+検索時にはlooseレベルの検証ルールを使用したい場合など、そうした際に使用することになります。
+
+ setting :
+    stcit : 
+        email :
+            rule :
+                - Email#email
+    loose :
+        email :
+            rule :
+                - Email#much_alias
+ 
+登録フォームでは、strict なので指定をする必要なく実行できます。
+
+    my $res = $fv->check( $cgi , { required => [qw/email/] } );
+
+検索フォームでは、loose を使用するので、level の設定を使って使用します。
+
+    my $res = $fv->check( $cgi , { required => [qw/email/] , level => { email => 'loose' }   } );
+
+また、特別にスペシャルレベルが二つあります。
+一つめは regex_map というスペシャルレベルです。
+このレベルを使用すると、正規表現をフィールド名に使用することができます。
+
+ setting :
+    regex_map :
+        '_id$' :
+            rule :
+                - Number#int
+    strict :
+        foo_id :
+            rule :
+                - Email#email
+        
+このようにセットすることにより、_idで終わるすべてのフィールドは、Number#intの検証ルールが適応されます。
+ただし、他のレベルの設定の方が強い仕様になっており、strict で foo_idを設定した場合、そちら側を優先的に反映させます。
+
+二つめは merge というスペシャルレベルです。
+このレベルを使用すると、複数の項目をマージした結果を検証に使用することが出来るようになります。
+
+  merge:
+    date:
+      format: "%04d-%02d-%02d"
+      fields:
+        - year
+        - month
+        - day
+  strict:
+    date:
+      rule:
+        - DateTime#date
+
+このようにセットすることにより、year, month, day を format に従って入
+力内容をマージして date と言う項目を作ります。
+この date という項目にはその他の通常の項目と同じように検証することが出
+来ます。
+
+=item フィールド名
+
+フィールド名を指定します。
+
+=item 設定名
+
+現在 rule, filter, fix という設定名があり、この配下には各々のモジュールの設定を書くことができます。
+
+=over
+
+=item rule 
+
+フィールドと、検証用モジュールのマッピングをする設定です。以下のように、配列で、検証用モジュールを複数指定することができます。
+また、検証用モジュールは、引数を設定することができます。 検証用モジュール名は、rules で指定したナマエと、関数名を # でつなぐことにより設定できます。
+
+ rule :
+    - String#length :
+        min : 4
+        max : 12
+    - String#ascii
+    - +OreOre#rule
+
+=item filter
+
+検証用モジュールにかける前に入力された内容を変化させることができる設定です。
+以下の例では utf8 で入力された内容を decode して String#length にかかります。
+String#length は入力された内容の長さを検証しますが、この場合だと日本語でも1文字を1文字として検証されます。
+（LazyWay 内部は flagged utf-8 で保たれるような設計になっています。
+　入力内容が flagged utf-8 であればこのフィルタは不要です。）
+
+  name :
+    rule :
+      - String#length:
+          min : 4
+          max : 12
+    filter :
+      - Encode#decode:
+          encoding: utf8
+
+=item fix
+
+検証が完了した後に入力された内容をオブジェクトなどに変化させます。
+以下の例では DateTime#date の検証を経て、入力された内容を DateTime オブジェクトにします。
+L<FormValidator::LazyWay::Result>オブジェクトの valid メソッドで取り出すときにはオブジェクトになっているはずです。
+（fix という名前は妥当？）
+
+  date:
+    rule:
+      - DateTime#date
+    fix:
+      - DateTime#format:
+          - '%Y-%m-%d'
+
+=back
+
+=back 
+
+=head2 labels
+
+フィールド名の表示名を設定します。
+
+ labels :
+    ja :
+        email     : メールアドレス
+        user_name : ユーザ名
+        user_id   : ユーザーID
+
+=head2 messages
+
+検証モジュール自身に設定されている、メッセージに内容を上書きするのに使用できます。
+特に問題ない場合は、使用する必要はありません。言語ごとに指定することができ、
+rule_messageで、大枠のレイアウト、 rule で、各検証モジュールのメッセージを上書きすることができます。
+
+    messages :
+        ja :
+            rule_message : __field__には__rule__が使用できます。
+            rule :
+                Email#email  : メイルアドレス
+                String#length : $_[min]文字以上で、$_[max]文字以下
+
+
+=head1 Profile
+
+check()メソッドの二つ目の引数に入るデータを、profile と呼びます。
+
+=head2 required
+
+必須項目を指定します。ここで指定されたフィールド名が存在しない場合、missing エラーになります。
+
+ my $profile 
+    = {
+        required => [qw/email name/],
+    }
+
+=head2 optional
+
+必須ではなく、あってもなくても良いフィールド名を指定します。
+
+ my $profile 
+    = {
+        optional => [qw/zip/],
+    }
+
+=head2 defaults
+
+フィールド名が空欄だった場合、デフォルト値を設定いたします。requiredのチェックより先に、
+デフォルト値を設定しますので、defaultsを設定した場合、入力がなくても、必須条件を満たすことができます。
+
+ my $profile 
+    = {
+        required => [qw/email name/],
+        defaults => {
+            email => 'tomohiro.teranishi@gmail.com',
+            name => 'Tomohiro',
+        },
+    }
+
+
+=head2 want_array
+
+一つのフィールドに対して、複数の値が送られてきた場合、１つ目以外を無視するのですが、この設定をした場合、
+複数のフィールドの値を取得することができます。また、配列の参照として取得することができます。
+
+ my $profile 
+    = {
+        required => [qw/email name/],
+        optional => [qw/hobby/],
+        want_array => [qw/hobby/],
+    }
+
+=head2 lang
+
+言語設定を指定することができます。ここで指定する言語は、設定のlangsで指定されている必要があります。
+
+ my $profile 
+    = {
+        required => [qw/email name/],
+        lang => 'ja',
+    }
+
+=head2 level
+
+検証レベルを変更したい場合に使用します。レベルとフィールド名とのマッピングは、設定にて定義している必要があります。
+
+ my $profile 
+    = {
+        required => [qw/email name/],
+        level => {
+            email => 'loose',
+            name  => 'special',
+        }
+    }
+
+=head2 dependencies
+
+特定の項目に依存した項目を作りたい場合に使用します。
+以下の設定例は、配送先オプションにチェックを入れた場合に配送先住所と配送先氏名を必須にします。
+
+ my $profile 
+    = {
+        required => [qw/name address/],
+        dependencies => {
+           delivery => {
+               1 => [qw/address_for_delivery name_for_delivery/]
+           }
+        }
+    }
+
+=head2 use_fixed_method
+
+use_fixed_method を使用すると fix でオブジェクトになった項目を fixed() メソッドで受け取れるようにして、valid() メソッドでは fix される前のデータを受け取れるようになります。
+
+    my $profile = {
+       required => [qw/date/],
+       use_fixed_method => { 
+           date => 'date_obj', 
+       },
+    };
+   
+    $res->valid('date'); # raw data
+    $res->fixed('date_obj'); #fixed obj
+ 
+=head1 結果
+
+L<FormValidator::LazyWay::Result>オブジェクトを戻り値として取得することができます。そちらを参照してください。
+
+=head1 AUTHOR
+
+Tomohiro Teranishi <tomohiro.teranishi@gmail.com>
+
+=cut
+

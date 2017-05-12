@@ -1,0 +1,45 @@
+params:
+  not_blank_start:
+    name: 'not_blank_開始日'
+    filters:
+      - DateTime#date:
+          prefix: not_blank_start
+    validators:
+      - Blank#not_blank
+  start:
+    name: '開始日'
+    filters:
+      - DateTime#date:
+          prefix: start
+    validators:
+      - DateTime#date:
+          prefix: start
+  greater_start:
+    name: &greater_start_name 'greater_開始日'
+    filters:
+      - DateTime#date:
+          prefix: greater_start
+  greater_end:
+    name: 'greater_終了日'
+    filters:
+      - DateTime#date:
+          prefix: greater_end
+    validators:
+      - DateTime#greater_than_equal:
+          target: greater_start
+          target_name: *greater_start_name
+  greater2_start:
+    name: &greater2_start_name 'greater2_開始日'
+    filters:
+      - DateTime#date:
+          prefix: greater2_start
+  greater2_end:
+    name: 'greater2_終了日'
+    filters:
+      - DateTime#date:
+          prefix: greater2_end
+    validators:
+      - DateTime#greater_than:
+          target: greater2_start
+          target_name: *greater2_start_name
+

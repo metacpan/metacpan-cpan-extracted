@@ -1,0 +1,49 @@
+FCGI::ProcManager::Dynamic version 0.8
+===============
+
+FCGI::ProcManager::Dynamic - extension for FCGI::ProcManager, 
+it can dynamically control number of work processes depending 
+on the load.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  FCGI::ProcMananger
+  Time::HiRes
+  IPC::SysV
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 3 of the License, or (at your option) any later version.
+
+BECAUSE THIS LIBRARY IS LICENSED FREE OF CHARGE, THIS LIBRARY IS
+BEING PROVIDED "AS IS WITH ALL FAULTS," WITHOUT ANY WARRANTIES
+OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, WITHOUT
+LIMITATION, ANY IMPLIED WARRANTIES OF TITLE, NONINFRINGEMENT,
+MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, AND THE
+ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY,
+AND EFFORT IS WITH THE YOU.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+
+Copyright (C) 2012 by Andrey Velikoredchanin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,84 @@
+NAME
+    File::ShareDir::PAR - File::ShareDir with PAR support
+
+SYNOPSIS
+      use File::SharedDir::PAR ':ALL';
+      # exact same interface as the normal File::ShareDir:
+  
+      # Where are distribution-level shared data files kept
+      $dir = dist_dir('File-ShareDir');
+  
+      # Where are module-level shared data files kept
+      $dir = module_dir('File::ShareDir');
+  
+      # Find a specific file in our dist/module shared dir
+      $file = dist_file(  'File-ShareDir',  'file/name.txt');
+      $file = module_file('File::ShareDir', 'file/name.txt');
+  
+      # Like module_file, but search up the inheritance tree
+      $file = class_file( 'Foo::Bar', 'file/name.txt' );
+
+WARNING
+    This module contains *highly experimental* code. If you want to load
+    modules from ".par" files using PAR and then access their shared
+    directory using File::ShareDir, you probably have no choice but to use
+    it. But beware, here be dragons.
+
+DESCRIPTION
+    "File::ShareDir::PAR" provides the same functionality as File::ShareDir
+    but tries hard to be compatible with PAR packaged applications.
+
+    The problem is, that the concept of having a distribution or module
+    specific *share* directory becomes a little hazy when you're loading
+    everything from a single file. PAR uses an @INC hook to intercept any
+    attempt to load a module. File::ShareDir uses the directory structure
+    that is typically found in the directories that are listed in @INC for
+    storing the shared data. In a "PAR" enviroment, this is not necessarily
+    possible.
+
+    When you call one of the functions that this module provides, it will
+    take care to search in any of the currently loaded ".par" files before
+    scanning @INC. This is the same order of preference you get for loading
+    modules when PAR is in effect. If the path or file you are asking for is
+    found in one of the loaded ".par" files, that containing ".par" file is
+    extracted and the path returned will point to the extracted copy on
+    disk.
+
+    Depending on how you're using PAR, the files that are extracted this way
+    are either cleaned up after program termination or cached for further
+    executions. Either way, you're safe if you use the shared data as
+    read-only data. If you write to it, your changes may be lost after the
+    program ends.
+
+    For any further usage information, including the list of exportable
+    functions, please refer to the documentation of File::ShareDir.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-ShareDir-PAR>
+
+    For other issues, contact the PAR mailing list: <par@perl.org>
+
+AUTHOR
+    Steffen Mueller <smueller@cpan.org>
+
+    The code was adapted from Adam Kennedy's work on "File::ShareDir"
+
+SEE ALSO
+    File::ShareDir, File::HomeDir, Module::Install, Module::Install::Share
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 Steffen Mueller This program is free software; you
+    can redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+    The portions of code that were copied from "File::ShareDir" are:
+
+    Copyright (c) 2005, 2006 Adam Kennedy. This program is free software;
+    you can redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

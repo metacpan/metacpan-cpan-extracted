@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>File::Type - determine file type using magic</title>
+<link rev="made" href="mailto:blech@piezo.dev-fotango.com" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+    <li><a href="#name">NAME</a></li>
+    <li><a href="#synopsis">SYNOPSIS</a></li>
+    <li><a href="#description">DESCRIPTION</a></li>
+    <li><a href="#methods">METHODS</a></li>
+    <ul>
+
+        <li><a href="#new">new</a></li>
+        <li><a href="#checktype_filename__filename_"><code>checktype_filename($filename)</code></a></li>
+        <li><a href="#checktype_contents__data_"><code>checktype_contents($data)</code></a></li>
+    </ul>
+
+    <li><a href="#todo">TODO</a></li>
+    <li><a href="#bugs">BUGS</a></li>
+    <ul>
+
+        <li><a href="#notes">NOTES</a></li>
+    </ul>
+
+    <li><a href="#author">AUTHOR</a></li>
+    <li><a href="#see_also">SEE ALSO</a></li>
+    <li><a href="#licence">LICENCE</a></li>
+    <li><a href="#cvs">CVS</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>File::Type - determine file type using magic</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>my $ft = File::Type-&gt;new();</p>
+<p># read in data from file to $data, then
+my $type_from_data = $ft-&gt;checktype_data($data);</p>
+<p># alternatively, check file from disk
+my $type_from_file = $ft-&gt;checktype_filename($file);</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>File::Type uses magic numbers (typically at the start of a file) to 
+determine the MIME type of that file.</p>
+<p>File::Type can use either a filename, or file contents, to determine the
+type of a file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="new">new</a></h2>
+<p>Returns a new File::Type object.</p>
+<p>
+</p>
+<h2><a name="checktype_filename__filename_"><code>checktype_filename($filename)</code></a></h2>
+<p>Opens $filename (if possible) and returns the MIME type of the file.</p>
+<p>
+</p>
+<h2><a name="checktype_contents__data_"><code>checktype_contents($data)</code></a></h2>
+<p>Matches $data against the magic database criteria and returns the MIME
+type of the file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="todo">TODO</a></h1>
+<p>* Add additional magic match criteria</p>
+<p>* Automatically find mime type whether passed data or a filename.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>None known.</p>
+<p>
+</p>
+<h2><a name="notes">NOTES</a></h2>
+<p>Some magic definitions in the mime-magic file vary from those in other apps
+(eg image/x-png not image/png).</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Paul Mison &lt;<a href="mailto:pmison@fotango.com">pmison@fotango.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/File/MMagic.html">the File::MMagic manpage</a> and <a href="/File/MimeInfo.html">the File::MimeInfo manpage</a> do the same job, but parse the magic file
+at runtime, rather than compiling it into code beforehand.</p>
+<p><a href="/File/Type/Builder.html">the File::Type::Builder manpage</a>, which generates the code at the heart of this module.</p>
+<p>
+</p>
+<hr />
+<h1><a name="licence">LICENCE</a></h1>
+<p>This module is released under the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="cvs">CVS</a></h1>
+<p>$Header: /usr/local/repository/Vendor/Fotango/File-Type/t/files/File-Type.html,v 1.1 2003/08/22 15:43:23 paul Exp $</p>
+
+</body>
+
+</html>

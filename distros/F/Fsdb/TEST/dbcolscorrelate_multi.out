@@ -1,0 +1,3 @@
+#fsdb test1_test2 test1_test2b test2_test2b
+0.83329 0.73801 0.73801
+#   | dbcolscorrelate --sample test1 test2 test2b

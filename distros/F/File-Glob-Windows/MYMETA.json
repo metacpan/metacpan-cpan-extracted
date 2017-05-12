@@ -1,0 +1,43 @@
+{
+   "abstract" : "glob routine for Windows environment.",
+   "author" : [
+      "tateisu <tateisu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.26, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Glob-Windows",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : 0
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Module::Install" : 0,
+            "Module::Install::AuthorTests" : 0,
+            "Test::Pod" : 0,
+            "Test::Pod::Coverage" : 0
+         },
+         "requires" : {
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "provides" : {
+      "File::Glob::Windows" : {
+         "file" : "lib/File/Glob/Windows.pm",
+         "version" : "v0.1.5"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1.5"
+}

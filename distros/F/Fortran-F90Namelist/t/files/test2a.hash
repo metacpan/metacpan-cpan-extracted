@@ -1,0 +1,27 @@
+# test2a.hash                             -*-cperl-*-
+#
+# Name and hashref for the namelist in test1b.nml
+#
+$name = "init_pars";
+$hashref =
+  {
+   'strarr'      => { value => [ 'Once', 'upon',
+				 'a   ', 'midnight', 'dreary' ],
+		      stype => 'single-quote string',              type => 1 },
+   'boolarr'     => { value => [ 'T', 'T', 'F' ],
+		      stype => 'logical',                          type => 3 },
+   'intarr'      => { value => [ '2', '3', '5', '7', '11', '13', '17' ],
+		      stype => 'integer',                          type => 4 },
+   'realarr'     => { value => [ '-.5', '-0.1', '6.', '1' ],
+		      stype => 'unspecified float',                type => 5 },
+   'dblarr'      => { value => [ '-.5D0', '-1D-1', '60D-1', '1' ],
+		      stype => 'double precision float',           type => 7 },
+   'complexarr'  => { value => [ '(0.,1.)', '(0.707,0.707)', '(1., 0)',
+				 '(-0.707, 0.7070)' ],
+		      stype => 'complex number',                   type => 8 },
+   'dcomplexarr' => { value => [ '(0.D0,1.D0)', '(7.07D-1,7.07D-1)',
+				 '(1.D0, 0D0)', '(-0.707D0, 0.7070D0)' ],
+		      stype => 'double precision complex number',  type => 9 }
+  };
+
+$nslots = (keys %$hashref)+0.;

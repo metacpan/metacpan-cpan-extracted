@@ -1,0 +1,187 @@
+% layout 'default';
+% title 'Welcome to Flower';
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="/assets/js/main.js" data-turbolinks-track="true"></script>
+  <script src="/assets/js/headroom.min.js"></script>
+  <link href='/assets/css/ionicons.min.css' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" media="all" href="/assets/css/main.css" data-turbolinks-track="true" />
+  <script src="/assets/js/jquery.js"></script>
+
+</head>
+<body>
+<div class="app-header">
+  <div class="container">
+    <div class="item">
+      <a href="/" class="branding">
+        <img style="border:0;" class="icon" alt="Flower" src="/assets/img/icon.png" />
+        <img style="border:0;" class="logo" alt="Flower" src="/assets/img/logo.png" />
+      </a>
+    </div>
+    <div data-react-class="Auth.Logout" data-react-props="{}"></div>
+    <div data-react-class="Auth.Login" data-react-props="{}"></div>
+  </div>
+</div>
+<div class="header-push"></div>
+<div class="homepage">
+  <div class="splash">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h1 class="animated fadeIn">A better way.</h1>
+        </div>
+        <div class="ten columns offset-by-one">
+          <div class="tech-icons">
+            <img style="border:0;" class="delay-8" src="/assets/img/angular.png" alt="Angular" />
+            <img style="border:0;" class="delay-1" src="/assets/img/react.png" alt="React" />
+            <img style="border:0;" class="delay-85" src="/assets/img/mean.png" alt="Mean" />
+            <img style="border:0;" class="delay-95" src="/assets/img/ionic-icon.png" alt="Ionic icon" />
+            <img style="border:0;" class="delay-9" src="/assets/img/swift.png" alt="Swift" />
+          </div>
+        </div>
+        <div class="twelve columns">
+          <h5>Supercharge your knowledge <span class="breaker">by using <b>pasive web &amp; mobile agents.</span></h5>
+        </div>
+        <div class="six columns offset-by-three">
+          <a href="#start-learning" class="getstarted">start learning &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="start-now" id="start-learning">
+    <div class="container">
+      <div class="row">
+        <div class="twelve columns">
+          <h5>Choose a technology. Start learning <b>right now</b>.</h5>
+        </div>
+      </div>
+      <div class="row card-list">
+        <div class="four columns">
+          <a href="/topics/angular" class="tech-card">
+            <img style="border:0;" class="logo" src="/assets/img/angular.png" alt="Angular" />
+            <h5>AngularJS</h5>
+            <p>Learn how to build fully fledged single page web apps (SPAs).</p>
+            <i class="ion-ios-arrow-thin-right"></i>
+          </a>
+        </div>
+        <div class="four columns">
+          <a href="/topics/react" class="tech-card">
+            <img style="border:0;" class="logo" src="/assets/img/react.png" alt="React" />
+            <h5>React</h5>
+            <p>Create web and mobile applications with reusable components</p>
+            <i class="ion-ios-arrow-thin-right"></i>
+          </a>
+        </div>
+        <div class="four columns">
+          <a href="/topics/mean" class="tech-card">
+            <img style="border:0;" class="logo" src="/assets/img/mean.png" alt="Mean" />
+            <h5>MEAN Stack</h5>
+            <p>Build full stack web apps with MongoDB, Express, Angular and Node.</p>
+            <i class="ion-ios-arrow-thin-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="row card-list">
+        <div class="four columns">
+          <a href="/topics/ionic" class="tech-card">
+            <img style="border:0;" class="logo" src="/assets/img/ionic.png" alt="Ionic" />
+            <h5>Ionic</h5>
+            <p>Make native-feeling iOS and Android apps with AngularJS.</p>
+            <i class="ion-ios-arrow-thin-right"></i>
+          </a>
+        </div>
+        <div class="four columns">
+          <a href="/topics/rails" class="tech-card">
+            <img style="border:0;" class="logo" src="/assets/img/rails.png" alt="Rails" />
+            <h5>Rails</h5>
+            <p>Integrate Rails with popular frontend Javascript frameworks.</p>
+            <i class="ion-ios-arrow-thin-right"></i>
+          </a>
+        </div>
+        <div class="four columns">
+          <a href="/topics/firebase" class="tech-card">
+            <img style="border:0;" class="logo" src="/assets/img/firebase.png" alt="Firebase" />
+            <h5>Firebase</h5>
+            <p>Build real-time web and mobile applications that scale.</p>
+            <i class="ion-ios-arrow-thin-right"></i>
+          </a>
+        </div>
+      </div>
+      <div class="row card-list">
+        <div class="four columns">
+          <a href="/topics/swift" class="tech-card">
+            <img style="border:0;" class="logo" src="/assets/img/swift.png" alt="Swift" />
+            <h5>Swift</h5>
+            <p>Master the new language used for building iOS and Mac apps.</p>
+            <i class="ion-ios-arrow-thin-right"></i>
+          </a>
+        </div>
+        <div class="eight columns" style="text-align:center;padding-top:120px;font-weight:500;font-size:2.5rem">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container why-us">
+  <div class="row">
+    <h2>Perl Peer mesh file list</h2>
+  </div>
+</div>
+<div class="container quote">
+  <div class="row">
+    <div class="six columns"><table class="stats"></table></div>
+    <div class="six columns"><table class="files"></table></div>
+  </div>
+</div>
+<div class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="six columns offset-by-one sharer">
+        Help us educate millions of people around the world for free&nbsp;&nbsp;<i class="ion-heart heart"></i>
+        <div data-react-class="Global.FollowButton" data-react-props="{}"></div>
+      </div>
+      <div class="four columns map">
+        <div class="links">
+          <a href="/">Home</a>
+          <a href="/#start-learning">Topics</a>
+          <a href="/pro">Pro</a>
+          <a href="/about">About</a>
+          <a href="mailto:hello@Flower.io">Contact Us</a>
+        </div>
+        <div class="legal">
+        <span class="copy">&copy; 2015 Flower</span>
+        <a href="/privacy-policy">Privacy Policy</a> | <a href="/tos">Terms of Use</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div data-react-class="Global.Modal" data-react-props="{}"></div>
+<div data-react-class="Global.Snackbar" data-react-props="{}"></div>
+
+<script>
+  $(document).ready(function() {
+    update_files();
+    setInterval("update_files()", 5000);
+  });
+  function update_files() {
+    $.getJSON("/REST/1.0/files/all", function(result) {
+      $(".files").empty();
+      $(".files").append("<tr><th>filename</th><th>size</th><th>age</th></tr>");
+      // should check this is ok - result.result
+      $.each(result.files, function(i, a_file) {
+        $(".files").append("<tr><td>" + a_file.filename + "</td>" +
+         "<td>" + a_file.nice_size + "</td>" +
+         "<td>" + a_file.age + "</td></tr>");
+      $(".stats").empty();
+      $(".stats").append("<tr><th>Nodes</th><th>Files</th><th>Bytes</th></tr>");
+      $(".stats").append("<tr><td>" + result.stats.total_nodes + "</td>" +
+        "<td>" + result.stats.total_files + "</td>" +
+        "<td>" + result.stats.total_bytes + "</td></tr>");
+      });
+    });
+  }
+</script>
+</body>
+</html>

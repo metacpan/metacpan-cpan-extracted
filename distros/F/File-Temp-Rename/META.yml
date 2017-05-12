@@ -1,0 +1,16 @@
+---
+abstract: 'Create a temporary file object for output, and rename it when done.'
+author:
+  - 'T. Nishimura <tnishimura@fastmail.jp>'
+build_requires:
+  Test::Exception: 0.31
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Temp-Rename
+version: 0.02

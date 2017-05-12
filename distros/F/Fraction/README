@@ -1,0 +1,67 @@
+This is Math::Fraction v.53b
+
+Purpose: To Manipulate Exact Fractions
+
+by Kevin Atkinson, kevina@clark.net
+
+Copyright (c) 1997 Kevin Atkinson.  All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Version .53b  (2 Feb 1998)
+Beta Release
+
+Originally Developed with Perl v 5.003_37 for Win32.
+Has been testing on Perl Ver 5.003 on a solaris machine and Perl 5.004
+on Windows 95
+Built on a Linux 2 machine with perl v5.003
+
+Please send me feedback at kevina@clark.net
+
+This program is meant to replace the old bigrat perl library.  It can do
+everything it can do and a lot more.
+
+Some of its features include:
+  - Being able to add, subtract, multiply, and divide, among other things
+    just like you would normal numbers that's to the overload module.
+  - Being able to convert a decimal, including repeating ones, into a
+    fraction.  For example, 1.142857142857 would become 8/7.
+  - Being able to control how the fraction is displayed.  For example
+    8/7 verses 1 1/7
+  - Being able to use arbitrary size numbers in the numerator and the
+    denominator.
+  - Being able to covert between SMALL (using normal floats/integers) and
+    BIG (using arbitrary size floats/integers) as needed so you do not have
+    to worry about it. (New as of ver .4a)
+  - Being able to have multiple default sets so that a function can modify
+    the defaults with out effecting other functions (New as of ver .4a)
+
+This is my first real attempt at writing a Perl Module and at
+Object-Oriented Programming. (Although I know this is not a true-true
+Object-Oriented Module as I cheated a little). I mainly wrote it to
+teach my self how to program Object-Oriently in Perl and for the challenge.
+
+If you know of any faster or simpler way of doing any this please let me
+know.
+
+This module is a pure Perl module with no C code or complicated install
+procedures.
+
+To install the module type:
+perl Makefile.PL
+make
+make text
+ (please report any failures to me at kevina@clark.net)
+make install
+
+-or-
+
+If you don't wish to formally install it just type:
+  perl QuickInst.pl
+to install it in this dir  or
+  perl QuickInst.pl <Install Dir>
+to install it in another location.
+
+To test the module out use 'perl -e "use Math::FractionDemo; frac_calc"'.
+Type frac_demo to see a small demonstration of its features.
+

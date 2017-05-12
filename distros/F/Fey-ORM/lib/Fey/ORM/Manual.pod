@@ -1,0 +1,31 @@
+=pod
+
+=head1 NAME
+
+Fey::ORM::Manual - Fey::ORM Manual Index
+
+=head1 DESCRIPTION
+
+The index for the L<Fey::ORM> manual.
+
+=head1 INDEX
+
+=head2 L<Fey::ORM::Manual::Intro>
+
+An introduction to using L<Fey::ORM>.
+
+=head1 RECOMMENDED READING
+
+This is a list of module POD you should read:
+
+=head2 L<Fey::ORM::Table>
+
+=head2 L<Fey::Object::Table>
+
+=head2 L<Fey::ORM::Schema>
+
+=head2 L<Fey::Object::Schema>
+
+=cut
+
+

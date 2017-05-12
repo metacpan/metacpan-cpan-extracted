@@ -1,0 +1,7 @@
+Only in t12/old: aaa
+Only in t12/new: bbb
+Files t12/old/ccc and t12/new/ccc match
+Files t12/old/ddd and t12/new/ddd differ
+File t12/old/eee is a directory while file t12/new/eee is a regular file
+File t12/old/fff is a regular file while file t12/new/fff is a directory
+Only in t12/new: ggg

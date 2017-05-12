@@ -1,0 +1,36 @@
+NAME
+
+	Finance::Bank::CreateCard - Check your CreateCard account from Perl.
+
+LICENSE
+
+	This module is distributed under the standard perl license.
+
+DESCRIPTION
+
+	This module provides programmatic access to the CreateCard account
+	servicing website (www.createcard.co.uk). It does this by
+	translating class method calls into HTTP transactions. The module 
+	is entirely dependent on the site HTML on the createcard servicing
+	website. If this should change the module will break and a new
+	version will have to be released.  This program is licensed under
+	the standard perl license.
+
+WARNINGS
+
+	This module requires your online banking password to work. By 
+	giving your online banking password to this module, you are giving
+	it full control over YOUR MONEY! If you have not reviewed the 
+	module and are comfortable that it's not doing anything untoward
+	you probably shouldn't be using it. In addition, changes to the
+	HTML of the createcard website could prevent this module from
+	working, or make it do unpredictable things. You have been warned.
+
+
+AUTHOR
+
+	Robert J. McKay <robert@mckay.com>
+
+
+
+

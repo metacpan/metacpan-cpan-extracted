@@ -1,0 +1,36 @@
+# Changes file for File::Find::Closures
+
+1.11 - Thu Dec 25 10:57:50 2014
+	* Fix for v5.21.7 and UNIVERSAL (RT #101065)
+
+1.10_01 - Tue Dec 23 20:46:06 2014
+	* Don't import isa, which disappears in Perl 5.22
+
+1.10 - Fri Jan  3 14:12:45 2014
+	* Get rid of MYMETA
+
+1.08 - Wed Jul 18 18:24:46 2012
+	* Add the File::Spec::Functions prereq (RT #39826)
+
+1.07 - Fri Nov  9 05:51:33 2007
+	* updates for the move from CVS to SVN, and latest kwalitee
+	* require Perl 5.6
+	* no need to upgrade
+
+1.06 - Sat Jan 13 14:56:47 2007
+	* adjusted some tests that were failing because they weren't
+	doing the right thing
+	* No need to upgrade if you already have this installed.
+
+1.05 - Wed Jan 10 00:01:41 2007
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+	* bumped version number to 1.x
+
+0.10_03 - Wed Jan 26 12:27:48 2005
+	* small documentation and testing fix: no big whoop.
+
+0.010_01 - Thu Sep 30 01:10:59 2004
+	* implemented find_by_ (name, regex, max_size, min_size, zero_size)
+	* still plenty of functions to implement
+

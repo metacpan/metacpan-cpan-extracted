@@ -1,0 +1,14 @@
+^\.
+\.bak$
+\.swp$
+^Makefile$
+^File-Extractor-
+^cover_db\b
+^blib\b
+^pm_to_blib$
+\.o$
+\.bs$
+\.gcov$
+\.gcda$
+\.gcno$
+Extractor.c

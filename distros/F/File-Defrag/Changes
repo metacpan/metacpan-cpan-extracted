@@ -1,0 +1,12 @@
+Revision history for Perl extension File::Defrag.
+
+0.03  Tue May  3 00:19:00 CEST 2005
+	- make filenames with embedded newlines work.
+
+0.02
+	- implement some options.
+        - if O_DIRECT open fails, try without O_DIRECT.
+
+0.01  Wed Apr  6 01:24:19 CEST 2005
+	- original version;
+

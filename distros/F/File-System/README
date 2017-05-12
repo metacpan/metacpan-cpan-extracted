@@ -1,0 +1,38 @@
+File::System
+============
+
+Andrew Sterling Hanenkamp, <hanenkamp@users.sourceforge.net>
+
+This is another Perl-based virtual file system module. I know that an API for
+such a thing already exists in CPAN under the name of Filesys::Virtual, but I
+consider File::System different and, in my opinion, superior.
+
+The goal of the File::System module is to provide a very general framework for
+providing access to a heirarchical data structure. Each member of this data
+structure has a set of properties and is marked as containing "content" and/or
+as a "container". Something that only provides content is analogous to a file.
+Something that only contains other things is analogous to a directory. However,
+this framework doesn't exclude the possibility that a thing could have the
+features of both.
+
+These features are important if one wishes to make a non-filesystem interface
+appear as such. For example, this system allows for the possibility of an
+LDAP-accessible database or RDBMS being used as if they were file systems. This
+might seem a little senseless at first, but if we wish to provide a system for
+mapping a VFS like this to URLs for web or other purposes, it begins to make
+more sense.
+
+INSTALLATION
+
+This module is Module::Build based:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+Copyright 2005 Andrew Sterling Hanenkamp. All Rights Reserved.
+
+This library is distributed and licensed under the same terms as Perl itself.

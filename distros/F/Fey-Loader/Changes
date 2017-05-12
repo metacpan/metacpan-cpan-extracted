@@ -1,0 +1,94 @@
+0.13    2011-09-14
+
+- Make the DBD::mysql statistics_info monkey patch work again. Reported by
+  keedi.
+
+
+0.12    2010-02-06
+
+- The DBD::mysql foreign_key_info method is _very_ slow. Instead of using
+  that, the mysql Loader class now parses the output from SHOW TABLE. Patch by
+  Aristotle Pagaltzis.
+
+
+0.11    2009-11-17
+
+- Fixed a bug in the SQLite loader where it expected identifiers like
+  "autoincrement" or "current_date" to only appear in lower case. These are
+  now checked for case-insensitively.
+
+
+0.10    2009-03-09
+
+- For Pg and mysql, we not just query the dbms to get the current
+  database name. This is much safer than trying to parse the DSN. DSN
+  parsing is still used as a fallback for any other dbms, and has been
+  improved a bit.
+
+
+0.09    2009-03-01
+
+- Foreign key handling for MySQL was broken because of an incorrect
+  use of $dbh->{Name}. Fey::Loader::DBI now does some rudimentary DSN
+  parsing to get the database name when it is needed. Reported by
+  Andrew Baumhauer.
+
+
+0.08    2009-02-06
+
+- Use MooseX::Params::Validate instead of the no-longer-in-Fey
+  Fey::Validate.
+
+
+0.07    2008-12-31
+
+- Added parameters to Fey::Loader::DBI which allow you to specify
+  alternate schema, table, column, and fk classes. Mostly patched by
+  Dieter Pearcey.
+
+
+0.06    2008-12-09
+
+- When adding a primary key, the code only worked if the primary key
+  was the "first" column(s) of the table, where "first" is defined as
+  the order returned by DBI. Reported by Dieter Pearcey.
+
+- I said I did this in 0.05, but apparently I lied ... Pass catalog
+  and schema name to all the DBI information methods used in
+  Fey::Loader::DBI. This should make it easier to support these
+  properly for future loaders, like Oracle or Sybase. Patch by Todd
+  Hepler.
+
+- If two tables used the same foreign key name to refer to the same
+  foreign table, the loader would blow up. Reported by Dieter Pearcey.
+
+
+0.05    2008-02-24
+
+- Added DBI as a prereq.
+
+
+0.04    2008-02-05
+
+- Moved test libraries to Fey-Test distro, and added it as a build
+  prereq.
+
+
+0.03    2008-02-03
+
+- More test fixes. Skip tests gracefully (rather than failing badly)
+  unless we have DBD::SQLite 1.14+.
+
+
+0.02    2008-02-03
+
+- Some tests failed when DBD::SQLite was not installed. These are now
+  skipped.
+
+- Require DBD::SQLite 1.14+ for SQLite support.
+
+
+0.01    2008-02-02
+
+- First release upon an unsuspecting world.
+

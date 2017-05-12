@@ -1,0 +1,21 @@
+File::LogReader - tail log files with state between runs
+
+Tail log files across multiple runs over time.
+
+    use File::LogReader;
+
+    my $lr = File::LogReader->new( filename => $filename );
+    while( my $line = $lr->read_line ) {
+        # do stuff with $line
+    }
+    $lr->commit;
+
+This module makes it easy to periodically check a file for new content
+and act on it.  For instance, you may want to parse a log file whenever
+it is updated.
+
+
+The code is kept in a git repository at:
+
+  http://wikrad.com/cgi-bin/gitweb.cgi?p=File-LogReader.git
+

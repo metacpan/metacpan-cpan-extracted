@@ -1,0 +1,68 @@
+Revision history for File::Gettext
+
+0.33.1    2017-03-01 21:50:53
+          - Bumped dependency versions
+
+0.32.1    2016-12-02 21:24:04
+          - Added broken smoker
+
+0.31.1    2016-12-01 01:28:53
+          - Toolchain update
+
+0.30.1    2016-02-02 12:07:10
+          - Constructor accepts builder arguement
+          - Added Travis coverage summary and badge
+          - Refactored smoker exceptions to dump file
+          - Better attribute and method naming
+          - Schema attribute values collected from configuration
+          - Switched Travis to a containerised build
+          - Better attribute naming
+            Replaced abbreviation with full length names
+          - Short circuit load if files do not exist
+          - Toolchain update
+
+0.29.1    2015-06-03 21:09:05
+          - Disabled testing on broken smoker
+            18d8a57e-0a22-11e5-9d49-e60ed23c8333
+
+0.28.1    2015-06-02 16:03:23
+          - Updated prereqs
+          - Method get_lang_file returns an object
+          - Gettext get_path renamed to get_lang_file
+          - Prereq badges and copyright year
+
+0.27.1    2014-12-19 13:13:01
+          - Storage API methods now called read_from_file and write_to_file
+          - Switched to lexical subroutines
+          - Dropped Class::Method::ModifiersX::Augment
+
+0.26.1    2014-11-11 18:17:33
+          - Dropped support for NTFS
+
+0.25.1    2014-08-26 17:44:28
+          - Updated dependency version on File::DataClass
+          - Updated prereqs
+          - Added Travis, badges, and MANIFEST to repository
+          - Adjusted toolchain for Github
+          - Added diagnostic to test since
+            f3a3dae7-6bf7-1014-bf26-fc13b95c3ac1
+
+0.24.1    2014-07-05 10:35:52
+          - Replace namespace::sweep with namespace::autoclean
+          - Resultset::create now returns object not id
+          - Replaced ::Result::_resultset with result_source
+
+0.23.1    2014-05-17 13:16:29
+          - 39fc0b7c-6bf6-1014-8e34-bbd22f9ba488 Test::Requires Hash::MoreUtils
+          - Removed Ident and Version lines
+          - Fixed unwanted SEP bug in ::Storage::PO::make_key
+
+0.22.1    2014-01-01 15:29:44
+          - Uses default exception error stings for NothingUpdated
+          - Tests select storage class since JSON is now the default
+
+0.21.1    2013-09-29 02:08:24
+          - Function merge_hash_data rename merge_file_data
+
+0.20.0    2013-08-15 18:14:56
+          - Switched to Dist::Zilla

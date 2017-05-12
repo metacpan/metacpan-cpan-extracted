@@ -1,0 +1,30 @@
+---
+abstract: 'Implements a flat filesystem'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Find: 0
+  Test::ClassAPI: 1.04
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: File-Flat
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Cwd: 0
+  File::Copy: 0
+  File::Copy::Recursive: 0.35
+  File::Remove: 0.38
+  File::Spec: 0.85
+  File::Temp: 0.17
+  IO::File: 0
+  perl: 5.005
+  prefork: 0.02
+version: 1.04

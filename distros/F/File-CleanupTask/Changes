@@ -1,0 +1,45 @@
+Revision history for File-CleanupTask
+
+0.11    Web Nov 26 17:50:62 BST 2014
+        * We now test times on symlinks rather than the files they link to
+
+0.10    Fri Jul 04 19:44:35 BST 2014
+        * Backwards incompatible change: prune_empty_directories now respects max_days
+        * Update and improve POD
+
+0.09    Sat Apr 13 16:04:40 BST 2013 
+        * fixed a typos in debug output
+        * fixed some pod
+        * updated copyright in LICENSE
+        * tests to not throw an exception when File::Temp 0.23 is used
+
+0.08    Mon Aug  6 21:23:44 BST 2012
+        * added run-file-cleanuptask binary
+        * improved --help usage message
+
+0.07    Mon May 14 09:26:12 BST 2012
+        * more informative warning message in _path_check()
+        * fixed _parent_path() when a relative file name is specified
+
+0.06    Fri May  4 10:02:09 BST 2012
+        * fixed warnings
+
+0.05    Thu May  3 10:04:18 BST 2012
+        * using File::Path::mkpath/rmtree instead of 
+          File::Path::make_path/remove_tree, as the longer version is not
+          supported in older File::Path (e.g., v2.04)
+
+0.04    Wed May  2 11:30:07 BST 2012
+        * disabled a verbose test that was mixing with the TAP output
+        * relaxed any requirement on package version to test on more platforms
+        
+0.03    Tue May  1 15:45:08 BST 2012
+        * changed code for better compatibility with older versions of perl
+        * specified version numbers in Build.PL
+
+0.02    Mon Apr 30 08:41:03 BST 2012
+        * removed ._CleanupTask.pm, which caused some tests to fail on CPAN
+
+0.01    Fri Apr 27 11:14:27 BST 2012
+        * backup/delete functionality
+        * tests

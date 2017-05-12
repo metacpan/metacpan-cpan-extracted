@@ -1,0 +1,73 @@
+Revision history for Perl extension File::Random.
+
+0.17  Tue Aug 20
+        - changed random_line method that it detects also how many lines are wanted
+          * my ($line1, $line2, $line3) = random_line $fname
+
+0.16  Mon Aug 19
+        - added option to random_line method to return more than one random_line
+          * random_line($fname [, $nr_of_lines ])
+        - added Test::Warn 0.05 (was 0.03) to the test requirements
+        - added Test::ManyParams to the test requirements
+
+0.15  Fri Aug 16
+        - improved the documentation
+
+0.14  Mon Jul 27
+        - removed Bug
+          you had to say
+            use File::Random qw/all/ instead of the usual
+            use File::Random qw/:all/;
+        - added corf as alias to content_of_random_file
+
+0.13  Tue Jul 16
+        - print *carped* warnings when random_file or content_of_random_file are called with unknown parameters
+        - use now Test::Warn to test it
+
+0.12  Wed Jul 03
+        - created aliases -dir = -d = -directory and
+                          -recursive = -r = -rec
+                          -check = -c
+
+0.11  Thu Jun 27
+        - print warnings when random_file or content_of_random_file are called with unknown parameters
+
+0.10  Wed Jun 26
+        - random_line method implemented
+
+0.09  Wed Jun 26
+        - fixed: Forgot to add Test::Class as required module to the Makefile.PL
+
+0.08  Wed Jun 26
+        - Required Modules of Test::Class added to the Makefille.PL
+        - made some internal refacturings
+
+0.07  Tue Jun 25
+        - content_of_random_file returns in scalar context the content of the file in one (multiline) string
+        - changed argument passed to the checkroutine:
+            now the filename including the relative path is passed
+            (instead of only the filename without any path information)
+
+0.06  Tue Jun 25
+        - Refactoring of the test design: Use now Test::Class module
+        - Implemented content_of_random_file method
+
+0.05  Thu Jun 20
+        - changed return value of random_file when using recursive option
+          [now the relative path is a part of the return, not only a filename]
+
+0.04  Wed Jun 19
+        - -recursive option implemented
+
+0.03  Wed Jun 19
+        - -check option implemented
+        - pre-required modules in Makefile.PL written
+
+0.02  Wed Jun 19
+        - -dir option implemented: random_file(-dir => $dir)
+
+0.01  Tue Jun 18 10:57:17 2002
+	- original version; created by h2xs 1.21 with options
+		-XA File::Random
+	- can only one thing: return a random File from the current directory
+

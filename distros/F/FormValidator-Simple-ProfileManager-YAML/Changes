@@ -1,0 +1,21 @@
+Revision history for Perl extension FormValidator::Simple::ProfileManager::YAML
+0.06  Sun Apr 09 19:32:56 2006
+   -  Now you can use dot syntax to get nested profile.
+
+0.05  Sun Mar 12 20:27:46 2006
+   -  Modify method extract. Return undef if passed group doesn't exist.
+
+0.04  Sun Mar 12 17:16:42 2006
+   -  Add method extract.
+   -  Add method add_profile.
+   -  Add method remove_profile.
+   -  Modify Pod.
+
+0.03  Fri Mar 10 14:42:46 2006
+   -  Change interface of constructor. it is not compatible with 0.02.
+
+0.02  Fri Mar 10 13:42:11 2006
+    - Fix bug.
+
+0.01  Fri Mar 10 11:31:37 2006
+	- original version

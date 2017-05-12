@@ -1,0 +1,2532 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Foorum::Schema version 0.003001</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style type="text/css">
+body {
+    color:  #000000;
+    background-color: #FFFFFF;
+    font-family: Helvetica, sans-serif;
+}
+
+p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+ol {
+    list-style-type: upper-alpha;
+}
+
+hr {
+    color: #00FF00;
+    background-color: #808080;
+}
+
+table {
+    border-width: medium;
+    padding: 3px;
+    background-color: #000000;
+    margin: 5px;
+}
+
+caption {
+    font-weight : bold;
+    font-size: 14pt;
+}
+
+th {
+    color: #FFFFFF;
+    background-color: #000000;
+    text-align: left;
+}
+
+tr {
+    color: #000000;
+    background-color: #000000;
+    vertical-align: top;
+}
+
+tr.even { background-color: #F0F0F0 }
+tr.odd { background-color: #D8D8D8 }
+td { font-size: 12pt }
+
+div.comment {
+    font-style: italic;
+    padding:    3px;
+}
+
+#tabs {
+    position:           relative;
+    float:              left;
+    width:              100%;
+    padding:            0;
+    margin:             0;
+    list-style:         none;
+    line-height:        1em;
+}
+
+#tabs li {
+    float:              left;
+    margin:             0;
+    padding:            0;
+}
+
+#tabs a {
+    display:            block;
+    color:              #444;
+    text-decoration:    none;
+    font-weight:        bold;
+    background:         #ddd;
+    margin:             0;
+    padding:            0.25em 1em;
+    border-left:        1px solid #fff;
+    border-top:         1px solid #fff;
+    border-right:       1px solid #aaa;
+}
+
+#tabs a:hover, #tabs a:active, #tabs a.here:link, #tabs a.here:visited {
+    background:#bbb;
+}
+
+#tabs a.here:link, #tabs a.here:visited {
+    position:relative;
+    z-index:102;
+}
+
+</style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body>
+<h1><a name="index">Foorum::Schema version 0.003001</a></h1>
+
+
+
+<ul>
+
+<li><a href="#BannedIp">BannedIp</a></li>
+
+<li><a href="#Comment">Comment</a></li>
+
+<li><a href="#FilterWord">FilterWord</a></li>
+
+<li><a href="#Forum">Forum</a></li>
+
+<li><a href="#ForumSettings">ForumSettings</a></li>
+
+<li><a href="#Hit">Hit</a></li>
+
+<li><a href="#LogAction">LogAction</a></li>
+
+<li><a href="#LogError">LogError</a></li>
+
+<li><a href="#LogPath">LogPath</a></li>
+
+<li><a href="#Message">Message</a></li>
+
+<li><a href="#MessageUnread">MessageUnread</a></li>
+
+<li><a href="#Poll">Poll</a></li>
+
+<li><a href="#PollOption">PollOption</a></li>
+
+<li><a href="#PollResult">PollResult</a></li>
+
+<li><a href="#ScheduledEmail">ScheduledEmail</a></li>
+
+<li><a href="#SecurityCode">SecurityCode</a></li>
+
+<li><a href="#Session">Session</a></li>
+
+<li><a href="#Share">Share</a></li>
+
+<li><a href="#Star">Star</a></li>
+
+<li><a href="#Stat">Stat</a></li>
+
+<li><a href="#Topic">Topic</a></li>
+
+<li><a href="#Upload">Upload</a></li>
+
+<li><a href="#User">User</a></li>
+
+<li><a href="#UserActivation">UserActivation</a></li>
+
+<li><a href="#UserDetails">UserDetails</a></li>
+
+<li><a href="#UserForum">UserForum</a></li>
+
+<li><a href="#UserOnline">UserOnline</a></li>
+
+<li><a href="#UserProfilePhoto">UserProfilePhoto</a></li>
+
+<li><a href="#UserRole">UserRole</a></li>
+
+<li><a href="#UserSettings">UserSettings</a></li>
+
+<li><a href="#Variables">Variables</a></li>
+
+<li><a href="#Visit">Visit</a></li>
+
+</ul>
+<hr />
+
+
+    <h2>
+        <a name="BannedIp">BannedIp</a>
+        (table banned_ip)
+    </h2>
+
+    <h3 name="BannedIp-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>ip_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>cidr_ip </td> <td>VARCHAR(20) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="BannedIp-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>ip_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Comment">Comment</a>
+        (table comment)
+    </h2>
+
+    <h3 name="Comment-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>comment_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>reply_to </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>text </td> <td>TEXT(65535) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>post_on </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>update_on </td> <td>INT(11) </td> <td> </td>
+
+    
+        <tr class="even"> <td>post_ip </td> <td>VARCHAR(32) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>formatter </td> <td>VARCHAR(16) </td> <td>NOT NULL, DEFAULT VALUE 'ubb' </td>
+
+    
+        <tr class="even"> <td>object_type </td> <td>VARCHAR(30) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>object_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>author_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>title </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>upload_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Comment-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>comment_id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+    
+    
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="Comment-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="Comment-relationships-might_have" style="float: left">
+    <caption>might_have</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>upload</td> <td><a href="#"></a></td> <td> foreign.upload_id =&gt; self.upload_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="FilterWord">FilterWord</a>
+        (table filter_word)
+    </h2>
+
+    <h3 name="FilterWord-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>word </td> <td>VARCHAR(64) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>type </td> <td>ENUM(19) </td> <td>NOT NULL, PRIMARY KEY, DEFAULT VALUE 'username_reserved' </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="FilterWord-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>word, type</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Forum">Forum</a>
+        (table forum)
+    </h2>
+
+    <h3 name="Forum-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>forum_code </td> <td>VARCHAR(25) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>name </td> <td>VARCHAR(100) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>description </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>forum_type </td> <td>VARCHAR(16) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>policy </td> <td>ENUM(9) </td> <td>NOT NULL, DEFAULT VALUE 'public' </td>
+
+    
+        <tr class="odd"> <td>total_members </td> <td>INT(8) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>total_topics </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>total_replies </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>status </td> <td>ENUM(7) </td> <td>NOT NULL, DEFAULT VALUE 'healthy' </td>
+
+    
+        <tr class="odd"> <td>last_post_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Forum-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>forum_id</td> </tr>
+    
+        
+        <tr class="even"> <td>forum_code</td> <td>forum_code</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="Forum-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="Forum-relationships-has_many" style="float: left">
+    <caption>has_many</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>topics</td> <td><a href="#"></a></td> <td> foreign.forum_id =&gt; self.forum_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="ForumSettings">ForumSettings</a>
+        (table forum_settings)
+    </h2>
+
+    <h3 name="ForumSettings-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>type </td> <td>VARCHAR(48) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="odd"> <td>value </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="ForumSettings-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>forum_id, type</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Hit">Hit</a>
+        (table hit)
+    </h2>
+
+    <h3 name="Hit-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>hit_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>object_type </td> <td>VARCHAR(12) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>object_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>hit_new </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>hit_today </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>hit_yesterday </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>hit_weekly </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>hit_monthly </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>hit_all </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>last_update_time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Hit-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>hit_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="LogAction">LogAction</a>
+        (table log_action)
+    </h2>
+
+    <h3 name="LogAction-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>action </td> <td>VARCHAR(24) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>object_type </td> <td>VARCHAR(12) </td> <td> </td>
+
+    
+        <tr class="even"> <td>object_id </td> <td>INT(11) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>text </td> <td>TEXT(65535) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="LogError">LogError</a>
+        (table log_error)
+    </h2>
+
+    <h3 name="LogError-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>error_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>level </td> <td>SMALLINT(1) </td> <td>NOT NULL, DEFAULT VALUE '1' </td>
+
+    
+        <tr class="odd"> <td>text </td> <td>TEXT(65535) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="LogError-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>error_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="LogPath">LogPath</a>
+        (table log_path)
+    </h2>
+
+    <h3 name="LogPath-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>path_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>session_id </td> <td>VARCHAR(72) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>path </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>get </td> <td>VARCHAR(255) </td> <td> </td>
+
+    
+        <tr class="even"> <td>post </td> <td>TEXT(65535) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>loadtime </td> <td>DOUBLE(64) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="LogPath-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>path_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Message">Message</a>
+        (table message)
+    </h2>
+
+    <h3 name="Message-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>message_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>from_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>to_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>title </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>text </td> <td>TEXT(65535) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>post_on </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>post_ip </td> <td>VARCHAR(32) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>from_status </td> <td>ENUM(7) </td> <td>NOT NULL, DEFAULT VALUE 'open' </td>
+
+    
+        <tr class="odd"> <td>to_status </td> <td>ENUM(7) </td> <td>NOT NULL, DEFAULT VALUE 'open' </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Message-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>message_id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+            
+        
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="Message-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="Message-relationships-has_one" style="float: left">
+    <caption>has_one</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>recipient</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.to_id </td> </tr>
+    
+        
+        <tr class="even"> <td>sender</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.from_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="MessageUnread">MessageUnread</a>
+        (table message_unread)
+    </h2>
+
+    <h3 name="MessageUnread-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>message_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="MessageUnread-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>message_id, user_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Poll">Poll</a>
+        (table poll)
+    </h2>
+
+    <h3 name="Poll-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>poll_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>author_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>multi </td> <td>ENUM(1) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>anonymous </td> <td>ENUM(1) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>time </td> <td>INT(10) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>duration </td> <td>INT(10) </td> <td> </td>
+
+    
+        <tr class="even"> <td>vote_no </td> <td>MEDIUMINT(8) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>title </td> <td>VARCHAR(128) </td> <td> </td>
+
+    
+        <tr class="even"> <td>hit </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Poll-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>poll_id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+            
+        
+    
+        
+    
+    
+    
+        <h3 name="Poll-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="Poll-relationships-might_have" style="float: left">
+    <caption>might_have</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>author</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.author_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+        
+    
+    
+    
+    
+        
+            
+        
+    
+        
+    
+        
+            
+        
+    
+    
+    
+
+    <table cellspacing="0" cellpadding="3" name="Poll-relationships-has_many" style="float: left">
+    <caption>has_many</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>options</td> <td><a href="#"></a></td> <td> foreign.poll_id =&gt; self.poll_id </td> </tr>
+    
+        
+        <tr class="even"> <td>results</td> <td><a href="#"></a></td> <td> foreign.poll_id =&gt; self.poll_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="PollOption">PollOption</a>
+        (table poll_option)
+    </h2>
+
+    <h3 name="PollOption-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>option_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>poll_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>text </td> <td>VARCHAR(255) </td> <td> </td>
+
+    
+        <tr class="even"> <td>vote_no </td> <td>MEDIUMINT(8) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="PollOption-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>option_id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+            
+        
+    
+        
+    
+    
+    
+        <h3 name="PollOption-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="PollOption-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>poll</td> <td><a href="#"></a></td> <td> foreign.poll_id =&gt; self.poll_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+            
+        
+    
+    
+    
+
+    <table cellspacing="0" cellpadding="3" name="PollOption-relationships-has_many" style="float: left">
+    <caption>has_many</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>results</td> <td><a href="#"></a></td> <td> foreign.option_id =&gt; self.option_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="PollResult">PollResult</a>
+        (table poll_result)
+    </h2>
+
+    <h3 name="PollResult-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>option_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>poll_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>poster_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>poster_ip </td> <td>VARCHAR(32) </td> <td> </td>
+
+    
+</table>
+
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+            
+        
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="PollResult-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="PollResult-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>option</td> <td><a href="#"></a></td> <td> foreign.option_id =&gt; self.option_id </td> </tr>
+    
+        
+        <tr class="even"> <td>poll</td> <td><a href="#"></a></td> <td> foreign.poll_id =&gt; self.poll_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="ScheduledEmail">ScheduledEmail</a>
+        (table scheduled_email)
+    </h2>
+
+    <h3 name="ScheduledEmail-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>email_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>email_type </td> <td>VARCHAR(24) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>processed </td> <td>ENUM(1) </td> <td>NOT NULL, DEFAULT VALUE 'N' </td>
+
+    
+        <tr class="even"> <td>from_email </td> <td>VARCHAR(128) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>to_email </td> <td>VARCHAR(128) </td> <td> </td>
+
+    
+        <tr class="even"> <td>subject </td> <td>TEXT(65535) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>plain_body </td> <td>TEXT(65535) </td> <td> </td>
+
+    
+        <tr class="even"> <td>html_body </td> <td>TEXT(65535) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="ScheduledEmail-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>email_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="SecurityCode">SecurityCode</a>
+        (table security_code)
+    </h2>
+
+    <h3 name="SecurityCode-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>security_code_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>type </td> <td>TINYINT(1) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>code </td> <td>VARCHAR(12) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>note </td> <td>VARCHAR(255) </td> <td> </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="SecurityCode-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>security_code_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Session">Session</a>
+        (table session)
+    </h2>
+
+    <h3 name="Session-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>id </td> <td>CHAR(72) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>session_data </td> <td>TEXT(65535) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>expires </td> <td>INT(11) </td> <td> </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Session-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Share">Share</a>
+        (table share)
+    </h2>
+
+    <h3 name="Share-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>object_type </td> <td>VARCHAR(12) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="odd"> <td>object_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>time </td> <td>INT(10) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Share-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id, object_id, object_type</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Star">Star</a>
+        (table star)
+    </h2>
+
+    <h3 name="Star-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>object_type </td> <td>VARCHAR(12) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="odd"> <td>object_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>time </td> <td>INT(10) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Star-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id, object_id, object_type</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Stat">Stat</a>
+        (table stat)
+    </h2>
+
+    <h3 name="Stat-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>stat_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>stat_key </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>stat_value </td> <td>BIGINT(21) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>date </td> <td>INT(8) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Stat-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>stat_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Topic">Topic</a>
+        (table topic)
+    </h2>
+
+    <h3 name="Topic-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>topic_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>post_on </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>title </td> <td>VARCHAR(255) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>closed </td> <td>ENUM(1) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>sticky </td> <td>ENUM(1) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>elite </td> <td>ENUM(1) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>hit </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>last_updator_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>last_update_date </td> <td>INT(11) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>author_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>total_replies </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>status </td> <td>ENUM(7) </td> <td>NOT NULL, DEFAULT VALUE 'healthy' </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Topic-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>topic_id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+    
+        
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="Topic-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="Topic-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>forum</td> <td><a href="#"></a></td> <td> foreign.forum_id =&gt; self.forum_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+            
+        
+    
+        
+            
+        
+    
+        
+    
+    
+    
+
+    <table cellspacing="0" cellpadding="3" name="Topic-relationships-might_have" style="float: left">
+    <caption>might_have</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>author</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.author_id </td> </tr>
+    
+        
+        <tr class="even"> <td>last_updator</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.last_updator_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="Upload">Upload</a>
+        (table upload)
+    </h2>
+
+    <h3 name="Upload-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>upload_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>filename </td> <td>VARCHAR(36) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>filesize </td> <td>DOUBLE(64) </td> <td> </td>
+
+    
+        <tr class="even"> <td>filetype </td> <td>VARCHAR(4) </td> <td> </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Upload-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>upload_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="User">User</a>
+        (table user)
+    </h2>
+
+    <h3 name="User-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>username </td> <td>VARCHAR(32) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>password </td> <td>VARCHAR(32) </td> <td>NOT NULL, DEFAULT VALUE '000000' </td>
+
+    
+        <tr class="even"> <td>nickname </td> <td>VARCHAR(100) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>gender </td> <td>ENUM(2) </td> <td>NOT NULL, DEFAULT VALUE 'NA' </td>
+
+    
+        <tr class="even"> <td>email </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>point </td> <td>INT(8) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>register_time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>register_ip </td> <td>VARCHAR(32) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>last_login_on </td> <td>INT(11) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>last_login_ip </td> <td>VARCHAR(32) </td> <td> </td>
+
+    
+        <tr class="even"> <td>login_times </td> <td>MEDIUMINT(8) </td> <td>NOT NULL, DEFAULT VALUE '1' </td>
+
+    
+        <tr class="odd"> <td>status </td> <td>ENUM(10) </td> <td>NOT NULL, DEFAULT VALUE 'unverified' </td>
+
+    
+        <tr class="even"> <td>threads </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>replies </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>lang </td> <td>CHAR(2) </td> <td>DEFAULT VALUE 'cn' </td>
+
+    
+        <tr class="odd"> <td>country </td> <td>CHAR(2) </td> <td>DEFAULT VALUE 'cn' </td>
+
+    
+        <tr class="even"> <td>state_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>city_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="User-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>email</td> <td>email</td> </tr>
+    
+        
+        <tr class="even"> <td>primary</td> <td>user_id</td> </tr>
+    
+        
+        <tr class="odd"> <td>username</td> <td>username</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+    
+    
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="User-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="User-relationships-might_have" style="float: left">
+    <caption>might_have</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>details</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.user_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="UserActivation">UserActivation</a>
+        (table user_activation)
+    </h2>
+
+    <h3 name="UserActivation-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>activation_code </td> <td>VARCHAR(12) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>new_email </td> <td>VARCHAR(255) </td> <td> </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="UserActivation-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="UserDetails">UserDetails</a>
+        (table user_details)
+    </h2>
+
+    <h3 name="UserDetails-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>qq </td> <td>VARCHAR(14) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>msn </td> <td>VARCHAR(64) </td> <td> </td>
+
+    
+        <tr class="even"> <td>yahoo </td> <td>VARCHAR(64) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>skype </td> <td>VARCHAR(64) </td> <td> </td>
+
+    
+        <tr class="even"> <td>gtalk </td> <td>VARCHAR(64) </td> <td> </td>
+
+    
+        <tr class="odd"> <td>homepage </td> <td>VARCHAR(255) </td> <td> </td>
+
+    
+        <tr class="even"> <td>birthday </td> <td>DATE(10) </td> <td> </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="UserDetails-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="UserDetails-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="UserDetails-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>user</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.user_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="UserForum">UserForum</a>
+        (table user_forum)
+    </h2>
+
+    <h3 name="UserForum-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>forum_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="odd"> <td>status </td> <td>ENUM(9) </td> <td>NOT NULL, DEFAULT VALUE 'user' </td>
+
+    
+        <tr class="even"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="UserForum-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id, forum_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="UserOnline">UserOnline</a>
+        (table user_online)
+    </h2>
+
+    <h3 name="UserOnline-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>sessionid </td> <td>VARCHAR(72) </td> <td>PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>path </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>title </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>start_time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>last_time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="UserOnline-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>sessionid</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="UserProfilePhoto">UserProfilePhoto</a>
+        (table user_profile_photo)
+    </h2>
+
+    <h3 name="UserProfilePhoto-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>type </td> <td>ENUM(6) </td> <td>NOT NULL, DEFAULT VALUE 'upload' </td>
+
+    
+        <tr class="odd"> <td>value </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>width </td> <td>SMALLINT(6) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>height </td> <td>SMALLINT(6) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>time </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="UserProfilePhoto-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="UserRole">UserRole</a>
+        (table user_role)
+    </h2>
+
+    <h3 name="UserRole-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>role </td> <td>ENUM(9) </td> <td>DEFAULT VALUE 'user' </td>
+
+    
+        <tr class="odd"> <td>field </td> <td>VARCHAR(32) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="UserRole-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="UserRole-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>user</td> <td><a href="#"></a></td> <td> foreign.user_id =&gt; self.user_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="UserSettings">UserSettings</a>
+        (table user_settings)
+    </h2>
+
+    <h3 name="UserSettings-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>type </td> <td>VARCHAR(48) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="odd"> <td>value </td> <td>VARCHAR(48) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="UserSettings-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id, type</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Variables">Variables</a>
+        (table variables)
+    </h2>
+
+    <h3 name="Variables-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>type </td> <td>ENUM(6) </td> <td>NOT NULL, PRIMARY KEY, DEFAULT VALUE 'global' </td>
+
+    
+        <tr class="even"> <td>name </td> <td>VARCHAR(32) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="odd"> <td>value </td> <td>VARCHAR(255) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Variables-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>type, name</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+    <h2>
+        <a name="Visit">Visit</a>
+        (table visit)
+    </h2>
+
+    <h3 name="Visit-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>user_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>object_type </td> <td>VARCHAR(12) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="odd"> <td>object_id </td> <td>INT(11) </td> <td>NOT NULL, PRIMARY KEY </td>
+
+    
+        <tr class="even"> <td>time </td> <td>INT(10) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Visit-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>user_id, object_type, object_id</td> </tr>
+    
+</table>
+
+
+    
+    
+
+    <hr />
+
+
+
+
+    <p>
+        Generated Sun Nov  2 20:46:04 2008
+        by <a href="http://www.jasonkohles.com/projects/DBICx-AutoDoc/">DBICx::AutoDoc</a>
+        version 0.04
+    </p>
+</body>
+</html>
+
+
+

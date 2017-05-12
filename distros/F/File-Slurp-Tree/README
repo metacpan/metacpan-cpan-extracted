@@ -1,0 +1,76 @@
+README for File::Slurp::Tree 1.24
+
+=head1 NAME
+
+File::Slurp::Tree - slurp and emit file trees as nested hashes
+
+=head1 SYNOPSIS
+
+ # (inefficiently) duplicate a file tree from path a to b
+ use File::Slurp::Tree;
+ my $tree = slurp_tree( "path_a" );
+ spew_tree( "path_b" => $tree );
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ File::Find::Rule
+ File::Path
+ File::Slurp
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 1.24    Friday 14th July, 2006
+
+	Cope with slurp_tree("some_path/") (ie, with a trailing slash) and
+	slurp_tree("/") (still not really recommended).
+
+
+=item 1.23	Thursday 11th May, 2006
+
+	Specify binmode in the calls to read_file and write_file - should
+	hopefully fix http://rt.cpan.org/Ticket/Display.html?id=14665
+	(problem with images on Win32)
+	Drop reference to rt.cpan in L</BUGS>
+
+
+=item 1.22	Tuesday, 12th August 2003
+
+	lose the dependency on Exporter::Simple, which opens us up to
+	5.6 users.  Thanks to Gavin Estey for this work.
+	
+	went one step further and backported to 5.00503.  Thank the
+	Northern Line for being slow
+
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003, 2006 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<File::Slurp>, L<Test::More>
+

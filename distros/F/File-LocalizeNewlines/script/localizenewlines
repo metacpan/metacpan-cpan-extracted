@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+# Script to localize newlines
+
+use 5.005;
+use strict;
+use Getopt::Long;
+use File::Spec;
+use File::Find::Rule;
+use File::LocalizeNewlines;
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '1.12';
+}
+
+# Create the filter
+my $filter = File::Find::Rule->file->not_binary->writable;
+
+# Handle options
+my $QUIET   = '';
+my $SKIPSVN = '';
+GetOptions( quiet => \$QUIET, svn => \$SKIPSVN );
+
+# Check the target
+my $target = @ARGV ? $ARGV[0] : File::Spec->curdir;
+unless ( -e $target ) {
+	bail("Cannot localize '$target', does not exist");
+}
+
+# Create the localizer
+if ( $SKIPSVN ) {
+	$filter = File::Find::Rule->or(
+		File::Find::Rule->name('.svn')->directory->discard->prune,
+		$filter,
+		);
+}
+		
+my $localizer = File::LocalizeNewlines->new(
+	filter => $filter,
+	$QUIET ? () : ( verbose => 1 ),
+	) or bail("Failed to create localizer");
+
+# Run the localization
+$localizer->localize( $target );
+
+exit(0);
+
+
+
+
+
+#####################################################################
+# Support Functions
+
+sub bail ($) {
+	print "$_[0]\n";
+	exit(255);
+}

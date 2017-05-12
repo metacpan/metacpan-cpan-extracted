@@ -1,0 +1,27 @@
+1.1.0:
+
+'dump' should accept $fh as first parameter
+
+Way to "register" handler classes, such that the base Chunk class automatically
+re-blesses itself into that class.  e.g., LIST/INFO class, RIFF/WAVE class,
+IENG class, etc.  Chunk should do the read_header/data, and then call an
+oninit.  List class should do the same for LISTs.
+
+ability to specify chunks by their "path" (made up of "type"s of nested
+containers; multiple chunks having the same "id" and "type" in the same
+parent container can be differentiated by order; or, defaults to first match)
+ex: "INFO/IAUT"; if multiple IAUT's, "INFO/IAUT1" -- assume 0 if not specified
+
+RIFX
+
+
+1.2.0:
+
+ability to leave data on disk instead of slurping everything into memory
+
+ability to do buffered read/write of data
+
+
+1.3.0:
+
+way to validate that the appropriate chunks for a given type are present

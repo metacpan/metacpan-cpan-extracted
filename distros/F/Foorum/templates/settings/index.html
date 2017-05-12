@@ -1,0 +1,42 @@
+[% USE FillInForm %]
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='/profile/edit'><span>[% c.loc('Edit Profile') %]</span></a></li>
+        <li selected="selected"><a href='javascript:void(0);'><span>Settings</span></a></li>
+    </ul>
+    <div>
+
+[% FILTER fillinform fdat => settings || c.req.params %]
+<div class='one'>
+<form method='post'>
+<table align='center'>
+	<tbody>
+	[% IF thanks %]
+    <tr class='misc2'><td colspan='2' align="center"><strong><span class='highlight'>Settings OK</span></strong></td></tr>
+	[% END %]
+	<tr class='misc1'>
+	    <td width='40%' align='right'><label for='send_starred_notification'>Send Update Notification for <a href='/my/starred'><img src='[% c.config.dir.images %]/site/t/star_on.gif' align='absmiddle' /> [% c.loc("My Starred Items") %]</a>:</label></td>
+	    <td><input type='radio' name='send_starred_notification' id='send_starred_notification' checked='checked' value='Y' />Yes <input type='radio' name='send_starred_notification' id='send_starred_notification' value='N' />No</td>
+	</tr>
+	<tr class='misc2'>
+	    <td align='right'><label for='show_email_public'>Show My Email in <a href='/u/[% c.user.username %]'>My Profile Page</a>:</label></td>
+	    <td><input type='radio' name='show_email_public' id='show_email_public' checked='checked' value='Y' />Yes <input type='radio' name='show_email_public' id='show_email_public' value='N' />No</td>
+	</tr>
+	<tr class='misc2'><td></td><td><input type='submit' /></td></tr>
+	</tbody>
+</table>
+</form>
+</div>
+[% END %]
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:                FreeHAL
+version:             71
+abstract:            ~
+license:             ~
+author:              
+    - Tobias Schulz <info@freehal.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Algorithm::Diff:               0
+    Data::Dumper:                  0
+    enum::fields:                  0
+    File::Copy::Recursive:         0
+    HTTP::Request:                 0
+    IO::Socket:                    0
+    Lingua::DE::Tagger:            0
+    Lingua::EN::Tagger:            0
+    List::Util:                    0
+    LWP:                           0
+    LWP::Protocol:                 0
+    LWP::Protocol::http:           0
+    LWP::UserAgent:                0
+    Net::HTTP:                     0
+    Socket:                        0
+    Storable:                      0
+    URI::Escape:                   0
+    version:                       0
+    XML::Parser::Lite:             0
+    XML::RSS::Parser::Lite:        0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

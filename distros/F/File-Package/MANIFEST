@@ -1,0 +1,16 @@
+lib/Docs/Site_SVD/File_Package.pm
+MANIFEST
+Makefile.PL
+README
+lib/File/Package.pm
+t/File/Package.d
+t/File/Package.pm
+t/File/Package.t
+t/File/_File_/BadLoad.pm
+t/File/_File_/BadPackage.pm
+t/File/_File_/Hyphen-Test.pm
+t/File/_File_/Multi.pm
+t/File/Test/Tech.pm
+t/File/Data/Secs2.pm
+t/File/Data/SecsPack.pm
+t/File/Data/Startup.pm

@@ -1,0 +1,44 @@
+FrameMaker/FromHTML
+===================
+
+Sub-classed from HTML::Parser, FrameMaker::FromHTML
+converts (some) HTML files into FrameMaker MIF format, 
+compatible with all versions of FrameMaker from v.3 upwards.
+
+Probably has some difficulty with nested tables, and 
+likely to be buggy -- particularly if HTML it processes
+is not well formed.
+
+The example file, htmltofm.pl, shows one way to handle
+this -- by shelling out to a routine to run HTML-Tidy
+over the input file before processing it.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires 
+
+HTML::Parser
+Image::Size
+
+and will really only work properly if you've used
+something like HTML-Tidy on your HTML before processing it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Peter G. Martin
+
+peterm@zeta.org.au
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

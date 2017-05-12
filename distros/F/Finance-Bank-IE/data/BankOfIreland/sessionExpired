@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" >
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:c="http://java.sun.com/jsp/jstl/core" xml:lang="en" lang="en">
+        
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+
+            <meta http-equiv="Cache-Control" content="no-cache" />
+            <meta http-equiv="Cache-Control" content="no-store" />
+            <meta http-equiv="Cache-Control" content="must-revalidate" />
+            <meta http-equiv="Expires" content="0" />
+            
+            
+            <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" />     
+
+            <link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/basic_classes.xcss/DATB/eAELXT5DOhSIAQ!sA18_" rel="stylesheet" type="text/css" /><link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/extended_classes.xcss/DATB/eAELXT5DOhSIAQ!sA18_" media="rich-extended-skinning" rel="stylesheet" type="text/css" /><script src="/online365/spring/resource/org.ajax4jsf.javascript.AjaxScript" type="text/javascript"></script><script src="/online365/spring/resource/org/ajax4jsf/javascript/scripts/form.js" type="text/javascript"></script><script src="/online365/spring/resource/org.ajax4jsf.javascript.PrototypeScript" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/available.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/jquery/jquery.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/script/controlUtils.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/utils.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/browser_info.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/modalPanel.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/modalPanelBorders.js" type="text/javascript"></script><link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/modalPanel.xcss/DATB/eAELXT5DOhSIAQ!sA18_" rel="stylesheet" type="text/css" /><script type="text/javascript">window.RICH_FACES_EXTENDED_SKINNING_ON=true;</script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/skinning.js" type="text/javascript"></script><link rel="icon" href="/online365/favicon.ico" type="image/x-icon" />
+            <link rel="SHORTCUT ICON" href="/online365/favicon.ico" />
+            <link rel="apple-touch-icon" href="/online365/images/extras/smartPhoneIcon.png" />
+            <link rel="stylesheet" type="text/css" href="/online365/css/boi_online.css" />
+        <meta name="keywords" content="Bank of Ireland, Session Expired, " />
+        <meta name="description" content="Bank of Ireland 365 Online, Session Expired" />
+        
+        <title>Bank of Ireland 365 Online | Session Expired</title>
+
+            <script type="text/javascript" src="/online365/js/defaultFocus.js"></script>
+            <script type="text/javascript" src="/online365/js/autoTab.js"></script>
+            <script type="text/javascript" src="/online365/js/loadMonitor.js"></script>
+            
+            <script type="text/javascript"> 
+                function hide_element(element_name) {
+                    element = document.getElementById(element_name);  
+                    element.style.display = 'none';
+                }
+            </script>
+        </head>
+ 
+        <body onload="pageIsLoaded();defaultFocus();" onbeforeunload="pageUnloaded()"><form id="form" name="form" method="post" action="/online365/WEB-INF/page/sessionExpired.faces"><input id="form:ajaxRequestStatus" type="hidden" name="form:ajaxRequestStatus" value="AJAX REQUEST PROCESSOR INACTIVE" />
+	            <ul id="hide">
+	                <li><a href="#content">skip navigation</a></li>
+	                <li><a href="/online365/spring/accessibility">Accessibility</a></li>
+	            </ul>
+   
+        <div id="container">
+	        <div id="masthead"><img src="/online365/images/header/bankofireland_online.gif" alt="Bank of Ireland 365 Online" />
+	            <p>For more information 
+	            	<img src="/online365/images/extras/icon_popup.gif" alt="Contact Us opens up in a new window" /><a id="form:j_id6:contactLink" name="form:j_id6:contactLink" href="#" class="strong"> Contact Us<script type="text/javascript">Richfaces.componentControl.attachAvailable('#form\\:j_id6\\:contactLink','onclick','#form\\:j_id14\\:j_id29\\:contactPanel','show')</script></a>
+	            </p>
+			</div>
+        </div>
+    
+    <div class="container">
+        <div id="shade">
+            <div class="content">
+                <div class="height">
+                    <a name="content"></a>
+                    <h1>Logged Out</h1>
+            
+                    <div class="msg">
+                        <h3>The system has logged you out, if you wish to continue please click 'Login'.</h3>   
+                    </div>
+
+                    <span class="curve_msg"></span>
+            
+                    <a href="/online365/spring/authentication" class="btn_go_blue">Login</a>
+                </div>
+            </div>
+                    <br class="clear" />
+            <br class="clear" />
+            <br class="clear" />
+            <br class="clear" />
+              <br class="clear" />
+            <br class="clear" />
+        </div>
+    </div>
+
+	<br class="clear" />
+
+	<div class="container">
+	<div class="hr_blue"></div>
+
+	<div id="footer">
+	<span class="server">J5
+	</span>
+	<ul>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="About Us opens up in a new window" /> <a href="/online365/spring/about" target="_blank">About
+		Us</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Security opens up in a new window" /> <a href="/online365/spring/security" target="_blank">Security</a>
+		|</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Privacy Policy opens up in a new window" /> <a href="/online365/spring/privacy" target="_blank">Cookie and Privacy Policy</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Terms and Conditions opens up in a new window" /> <a href="/online365/spring/termsAndConditions" target="_blank">Terms and Conditions</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="FAQs opens up in a new window" /> <a href="/online365/spring/faqs" target="_blank">FAQs</a>
+		|</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Accessibility opens up in a new window" /> <a href="/online365/spring/accessibility" target="_blank">Accessibility</a></li>
+
+	</ul>
+	
+	</div>
+	</div><div id="form:j_id14:j_id29:contactPanel" style="display: none;"><input autocomplete="off" id="form:j_id14:j_id29:contactPanelOpenedState" name="form:j_id14:j_id29:contactPanelOpenedState" type="hidden" /><div class="rich-modalpanel sortable" id="form:j_id14:j_id29:contactPanelContainer" style="position: absolute; display: none; z-index: 100; background-color: inherit;"><div class="rich-mpnl-mask-div-opaque rich-mpnl-mask-div" id="form:j_id14:j_id29:contactPanelDiv" style="z-index: -1;"><button class="rich-mpnl-button" id="form:j_id14:j_id29:contactPanelFirstHref"></button></div><div class="rich-mpnl-panel"><div class="rich-mp-container" id="form:j_id14:j_id29:contactPanelCDiv" style="position: absolute; left: 0px; top: 0px; z-index: 9;"><div class="rich-mpnl-shadow" id="form:j_id14:j_id29:contactPanelShadowDiv"></div><div class="rich-mpnl-ovf-hd rich-mpnl-trim rich-mpnl-content" id="form:j_id14:j_id29:contactPanelContentDiv"><div class="rich-mpnl-text rich-mpnl-controls ">
+				<a href="#" id="hideContactUs" class="calc_close">Close</a><script type="text/javascript">Richfaces.componentControl.attachAvailable('#hideContactUs','onclick','#form\\:j_id14\\:j_id29\\:contactPanel','hide')</script></div><table border="0" cellpadding="0" cellspacing="0" class="rich-mp-content-table" id="form:j_id14:j_id29:contactPanelContentTable" style="height: 100%; width: 100%;"><tr style="height: 1%;"><td class="rich-mpnl-header-cell"><div class="rich-mpnl-text rich-mpnl-header " id="form:j_id14:j_id29:contactPanelHeader" style="white-space: nowrap;">
+				<h2>Contact Us</h2></div></td></tr><tr style="height: 99%"><td class="rich-mpnl-body" valign="top">
+		
+		<div class="container">
+   			<div class="content">
+       			<div class="height">
+           			<a name="content"></a>
+         			<br class="clear" />
+					<h2 class="contact_details">From Republic of Ireland:   <span>0818 365 365</span></h2>
+					<h2 class="contact_details">From Northern Ireland:          <span> 0845 7 365 555</span></h2>
+					<h2 class="contact_details">From Great Britain:            <span>0845 7 365 333</span></h2>
+					<h2 class="contact_details">Outside these locations:      <span>+ 353 1 404 4000</span></h2>
+					<p>
+						<strong>Opening Hours:</strong> 8am to Midnight, Monday to Friday or 10am to 2pm on Saturdays
+							(excluding Bank / Public Holidays).
+					</p>
+					<br class="clear" />
+				</div>
+			</div>    
+		</div></td></tr></table></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerN" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerE" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerS" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerW" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerNWU" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerNEU" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerNEL" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerSEU" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerSEL" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerSWL" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerSWU" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id14:j_id29:contactPanelResizerNWL" style="height: 40px; width: 4px;"></div></div></div><div class="rich-mpnl-mask-div rich-mpnl-mask-div-transparent" id="form:j_id14:j_id29:contactPanelCursorDiv" style="z-index: -200;"><button class="rich-mpnl-button" id="form:j_id14:j_id29:contactPanelLastHref"></button></div><script type="text/javascript">new ModalPanel('form:j_id14:j_id29:contactPanel',
+				{
+					width: 700,
+					height: 300,
+
+					minWidth: -1,
+					minHeight: -1,
+
+					resizeable: true,
+					moveable: true,
+
+					left: "auto",
+					top: "auto",
+
+					zindex: 100,onresize: '',onmove: '',onshow: '',onhide: '',onbeforeshow: '',onbeforehide: '',
+					domElementAttachment: "",				
+					keepVisualState: false,
+					showWhenRendered: false,
+					selectBehavior: "disable",
+
+					autosized: false,
+					overlapEmbedObjects: false});</script></div><script type="text/javascript"></script></div>
+	            
+				<div class="container">
+					<p>Bank of Ireland is regulated by the Central Bank of Ireland in Ireland. Bank of Ireland (UK) plc is authorised and regulated by the Financial Services Authority.</p>
+				</div><input type="hidden" autocomplete="off" name="form" value="form" /><input type="hidden" autocomplete="off" name="autoScroll" value="" /><input type="hidden" autocomplete="off" name="form:j_idcl" value="" /><input type="hidden" autocomplete="off" name="form:_link_hidden_" value="" /><script type="text/javascript">function clear_form() {
+_clearJSFFormParameters('form','',['form:j_idcl','form:_link_hidden_']);
+}
+function clearFormHiddenParams_form(){clear_form();}
+function clearFormHiddenParams_form(){clear_form();}
+clear_form();</script><input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="j_id1" autocomplete="off" /></form>
+        </body>
+</html>

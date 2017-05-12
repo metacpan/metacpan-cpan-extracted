@@ -1,0 +1,41 @@
+0.349   2011-2-03
+ - added documentation patch via
+   https://github.com/amoore/Form-Sensible-Reflector-DBIC/commit/cf6edad3d7036c9e12c9ccaee3f3d426039b18bf
+ - fixed tests per CPAN Testers results
+0.348   2011-1-31
+ - added dzil toys: twitter notification and readmefrompod
+0.347   2011-1-31
+ - moved reflector with_trigger stuff per jayk's patch/pull request
+   (https://github.com/jayk/Form-Sensible-Reflector-DBIC/commit/85231d912bc5af1e159aa335d76ff812d37ee0ef)
+ - fixed tests
+0.346   2011-01-26
+ - fixed tests to pass with current Form::Sensible
+ - updated dist.ini with new dzil api requirements
+ - added Form::Sensible::Reflector as dependency
+0.344   2010-11-28
+ - added form name auto-detection code
+ - adjusted to accept resultset, row, or result_source as a handle.
+0.343   2010-06-25
+ - added new API changes to make compatible with FSDelegateConnection stuff
+ - added ability to define validation inside schema
+0.342   2010-02-26
+ - fixed docs
+ - added default_form_value for *inside* schemas, rendered as default_value in the form
+0.341   2010-02-23
+ - added prereq for SQL::Translator v. 0.11002 
+0.34    2010-02-21
+ - updated to new reflector API
+0.33    2010-02-21
+ - added more sane pod
+0.32    2010-02-21
+ - removed share/ directory
+ - updated tests accordingly
+0.31    2010-02-20
+ - first release
+ - schema is now a resultset
+0.01    2010-01-18
+ - First official working version. Tests pass
+ - Completed initial API
+ - Fixed get_types to return the appropriate hash for the updated Form::Sensible API
+ - made tests pass
+ - drank coffee

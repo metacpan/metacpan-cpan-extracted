@@ -1,0 +1,115 @@
+8.01 Thu Apr 27 20:55:29 CEST 2017
+
+     - adapt to new labanquepostale.fr changes
+
+8.00 Wed Apr  5 14:58:44 CEST 2017
+
+     - adapt to new labanquepostale.fr changes
+     - Account "name" is now split into "name" and "owner"
+     - not all accounts are listed by default, so:
+     - use option "cb_accounts" if you want credit card accounts
+     - use option "all_accounts" if you want savings accounts
+
+7.11  Sun Dec 25 20:48:17 CET 2016
+
+     - adapt to labanquepostale.fr changes:
+       it requires clean urls
+       
+7.10  Fri Jul  8 10:32:23 CEST 2016
+
+     - adapt to labanquepostale.fr changes:
+       it requires some kind of standard User-Agent
+
+7.09  Fri Jun 20 23:51:36 CEST 2014
+
+     - adapt to labanquepostale.fr changes:
+       4x4 image changed + md5sum of digits changed 
+
+7.08 Sat Aug 31 14:10:00 CEST 2013
+
+     - adapt to labanquepostale.fr change: md5sum of digits changed
+
+7.07 Tue Apr 16 21:39:02 CEST 2013
+
+     - adapt to labanquepostale.fr changes:
+       password mangling for login need need cropping/thresolding
+       a 4x4 image containing 0-9 digits
+     - new requirement: Graphics::Magick
+
+7.06 Wed Aug 31 21:41:54 CEST 2011
+
+     - adapt to labanquepostale.fr changes (credit cards) 
+
+7.05 Sun Apr 10 12:27:28 CEST 2011
+
+     - adapt to labanquepostale.fr changes (mostly login) 
+
+7.04 Thu Mar 17 10:01:15 CET 2011
+
+     - add more requires to ensure cpantesters work
+
+7.03 Sun Oct  3 14:41:58 CEST 2010
+
+     - adapt to labanquepostale.fr change: md5sum of button "9" changed
+
+7.02 Wed Nov 18 21:39:57 CET 2009
+
+     - some more adaptation to new labanquepostale.fr architecture:
+       drop `relevesEpargnes-X' intermediate link (thanks to gmondon)
+     - handle "affichage tout en euros" mode (thanks to gmondon)
+
+7.01 Thu Nov  5 22:41:38 CET 2009
+
+     - fix requires (rt.cpan.org#50854)
+
+7.00 Sat Oct 24 19:12:09 CEST 2009
+
+     - adapt to new labanquepostale.fr architecture
+       (`clavier_statique.html' is no more available.
+        relying on md5sums of button images to recognize them 
+	to be able to compute the mangled password)
+       (drop `relevesCCP-X' intermediate link)
+       (fix accessing "cartes à débit différé")
+
+6.00 Fri Jun 26 19:16:37 CEST 2009
+     - adapt to new labanquepostale.fr architecture
+       (including "cartes à débit différé")
+
+5.00 Wed Nov  5 09:30:54 CET 2008
+     - adapt to new labanquepostale.fr architecture (rt.cpan.org#40635)
+
+4.00 Fri Apr  4 14:50:16 CEST 2008
+     - adapt to new labanquepostale.fr architecture
+
+3.00 Mon Jun 25 09:20:50 CEST 2007
+     - adapt to new www.videoposte.com architecture (liste_comptes.jsp)
+
+2.00 Mon Aug 14 19:21:08 CEST 2006
+     - adapt to www.videoposte.com architecture
+     - drop default_account() since you must _list_accounts to obtain anything
+       (fortunately it was not documented and hopefully unused)
+     - be warning free when running with -w (thanks to Jean-Marie Renouard for reporting this)
+
+1.03 Tue Sep 20 12:41:59 CEST 2005
+     - handle delayed-debit credit card pseudo account
+     - allow choosing the number of operations in default_account()
+     - allow choosing the account type in default_account()
+       (allowing to choose the delayed-debit pseudo account)
+
+1.02 Thu Jan 20 11:13:05 CET 2005
+     - fix _get_cookie() which generated many redirects before giving up, causing some failure
+     - fix _list_accounts()
+     - fix ->as_string on a Statement
+
+1.01 Sat Jan  1 20:42:37 CET 2005
+     - minor fix for setting the year of the statements at the beginning of a new year
+       with no statements for this new year 
+
+1.00 Fri Jun 25 11:40:18 CEST 2004
+     - adapt to www.videoposte.com layout
+
+0.02 Thu Jan  8 12:03:33 CET 2004
+     - internal change (the Finance::Bank::LaPoste::Statement hash now contains the "year")
+
+0.01 Wed Oct  8 11:00:07 CEST 2003
+     - initial release

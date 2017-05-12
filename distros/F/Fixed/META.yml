@@ -1,0 +1,41 @@
+---
+abstract: 'a readonly variable that you can assign to'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Fixed
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Fixed:
+    file: lib/Fixed.pm
+    version: '0.003'
+  Fixed::Scalar:
+    file: lib/Fixed.pm
+recommends:
+  Readonly::XS: '0'
+requires:
+  Keyword::Simple: '0'
+  Readonly: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Fixed/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Fixed
+  homepage: https://metacpan.org/release/Fixed
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-fixed.git
+version: '0.003'

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# lame tool to prove t/ across all available perlbrew versions
+# Please don't judge my bash scripting too harshly, I like bash scripting quite a bit
+
+source ~/perl5/perlbrew/etc/bashrc
+perlbrew list | cut -b 3- | (while read ver; do
+    perlbrew use $ver;
+    echo "proving $ver to prove.$ver"
+    (prove t/ 2>&1) | tee prove.$ver
+done)

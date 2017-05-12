@@ -1,0 +1,14 @@
+
+CMS-Mandiri
+Bank Statement
+Account No : 	1234567890123 	Period : 	10/08/2009 - 15/08/2009
+Account Name : 	MAJU MUNDUR
+Currency : 	IDR
+Branch : 	11111 	As Of : 	16/08/2009
+
+Date 	Value
+Date 	Description 	Amount    	Balance   
+10/08 	10/08 	Setor Tunai 	AAAAAA AAAAAAA AAAAAA (AAAAAAAAAAAA) 	111.111,00 C 	6.140.671,20 C
+10/08 	11/08 	Transfer IB 	1111111 1111 CA LC Deposit (PDC) 	2.000,00 D 	6.138.671,20 D
+11/08 	11/08 	Transfer IB 		5.000.000,00 C 	11.138.671,20 C
+- End Of Statement -

@@ -1,0 +1,27 @@
+---
+abstract: 'Regular expression delimited records from streams'
+author:
+  - 'Steffen Mueller <stream-module at steffen-mueller dot net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Stream
+provides:
+  File::Stream:
+    file: lib/File/Stream.pm
+    version: 2.30
+recommends:
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+requires:
+  Carp: 0
+  YAPE::Regex: 4.00
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.30

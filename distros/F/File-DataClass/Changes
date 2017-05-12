@@ -1,0 +1,255 @@
+Revision history for File::DataClass
+
+0.72.1    2017-04-02 09:19:50
+          - Toolchain update CVE-2016-1238
+          - Better error message in cache set
+
+0.71.1    2016-07-29 19:58:01
+          - Added broken smoker
+
+0.70.1    2016-07-29 16:23:42
+          - Toolchain update
+
+0.69.1    2016-07-05 01:36:01
+          - Fixed cache invalidation for multifile reads
+
+0.68.1    2016-02-01 14:31:42
+          - Fixed bug calling push_layer on mswin32
+
+0.67.1    2016-02-01 00:18:31
+          - Improved test coverage
+          - Fixed coverage token it's specific to the repository
+          - Added coverage badge and coverage report posting
+          - Added parameter checking to IO iterator
+          - Refactored smoker exceptions to dump file
+          - Cache class and attributes settable from configuration
+          - Made result creation more efficient
+          - Proxy fdopen on io_handle
+          - Added more tests
+          - IO constructor without args creates a new IO::Handle
+          - Toolchain update
+
+0.66.1    2015-08-29 09:58:19
+          - Broken smoker 7d05f746-6cb1-1014-afba-1d3088877a71
+
+0.65.1    2015-08-12 23:36:59
+          - Broken smoker 72b36e62-3f5b-11e5-9808-9febf015f39b
+
+0.64.1    2015-08-09 20:28:41
+          - Fix tests on cygwin
+          - Stop using feature state
+          - Replaced 01always_pass.t with 00report_metadata.t
+
+0.63.1    2015-06-21 22:41:24
+          - Skip tests if Test::Deep 0.116 installed
+          - Added F:DC:IO:clone
+          - Protect against undefined values in IO constructor array refs
+
+0.62.1    2015-05-24 12:50:58
+          - Stopped IO substitute useless perms call
+          - IO no longer uses Exporter to export io constructor function
+          - IO::_proxy function now use Sub::Install
+          - Added global destruction flag to DEMOLISH subs
+
+0.61.1    2015-05-11 13:12:04
+          - Improved test coverage
+          - Allow a file name of 0 in IO
+          - Default reboolify false. Issue using boolean with Type::Tiny
+          - Use boolean to reboolify JSON data when reading. mst++
+          - Added IO::sibling and IO::visit
+          - Added IO::child
+          - Removed HashMerge. Renamed merge to merge_for_update
+          - Storage drops locks on destruction
+          - Removed Schema::extensions
+          - POD updates
+
+0.60.1    2015-04-09 00:09:00
+          - Added strict warnings to main module. Kwalitee
+          - Better Octalum implementation
+
+0.59.1    2015-04-05 18:56:50
+          - Fixed bad format test
+
+0.58.1    2015-04-04 21:14:40
+          - Removed VERSION from Schema due to indexing problems
+
+0.57.1    2015-04-04 20:59:17
+          - Added Kwakitee badge
+          - Refactored cache of cache objects
+          - Fixed bug in ::IO::exists
+          - Added IO::Handle proxy methods to ::IO
+          - Improved test coverage
+          - Overload stringify in ::IO uses handle if no name
+
+0.56.1    2015-03-19 14:57:54
+          - Deleted _lock_obj from ::IO. Unusable misfeature
+          - Fixed IO::seek
+          - Added IO::tell
+          - IO::stat returns undef if no name or file handle
+          - Will stat an open file handle
+          - Added explicite ::IO bool overload
+          - Added IO::hexdigest. IO::digest now returns an object ref
+          - Added result source types
+
+0.55.1    2015-02-05 00:03:07
+          - Replaced MooX::ClassStash with Subclass::Of and a factory pattern
+          - Changed default perms to 640
+
+0.54.1    2014-12-19 22:52:50
+          - Updated prereqs. Slaven is testing with modules from the back
+            pan again 0b1e0b44-87ba-11e4-ac75-b26ee0bfc7aa
+
+0.53.1    2014-12-19 11:47:56
+          - Storage API methods now called read_from_file and write_to_file
+          - Dropped Class::Method::ModifiersX::Augment
+          - Coverted rest to lexical subroutines
+          - Converted ::IO to lexical subroutines
+          - Added ::IO->digest. Robbed from Path::Tiny
+
+0.52.1    2014-11-10 12:40:46
+          - Fixed NTFS skip in tests
+
+0.51.1    2014-11-09 15:49:44
+          - Mark NTFS as unsupported
+          - Make ::IO::atomic a no op on mswin32
+            f1cbd4c4-6bf5-1014-bf4f-15730ce696e1 - which didn't work
+            so behaviour restored
+          - Added t/boilerplate.pm
+          - New win32 fail added debug to tests
+            7ccf4f62-8e65-1014-a370-e51e2b825c07
+
+0.50.1    2014-11-07 18:49:49
+          - Added async locking and constants
+          - Added IO::has_lock to track the state of the flock
+          - Changed IO::_lock from a bool to an enumerated type
+            Can be FALSE, LOCK_BLOCKING, or LOCK_NONBLOCKING
+
+0.49.1    2014-10-02 20:57:55
+          - Updated prereqs
+          - Spelling fixes
+          - Removed Hash::MoreUtils require from tests
+
+0.48.1    2014-09-03 23:22:44
+          - Removed CHI. Reduces dependencies
+
+0.47.1    2014-08-27 17:15:48
+          - Have new one liner to feature test this particular insanity
+            d26d4928-6bf5-1014-99ad-e1a5890cd912
+
+0.46.1    2014-08-26 17:40:30
+          - Hate win32 smokers
+            0b96e4a1-6bf7-1014-b852-a17c890cd912
+          - Added MANIFEST to repository
+          - Fixed dependency version
+          - Added Travis integration and badges
+          - Adjusted toolchain for Github
+
+0.45.1    2014-08-18 23:58:19
+          - Bumped Type:Tiny version RT#98113
+
+0.44.1    2014-07-16 13:37:02
+          - Deleted dependency on strictures
+          - Deleted some exception tests
+
+0.43.1    2014-07-04 13:17:32
+          - Releasing
+          - Fixed resultset update and added tests
+          - Added backwards bool to ::IO
+          - Skipping heads / tails test on win32 since it's too flakey
+            29a2bb0c-6bf4-1014-974a-4394dad81770
+
+0.42.1    2014-07-04 00:27:00
+          - Releasing
+          - Fixed type error in ::ResultSet::delete
+          - Replaced namespace::sweep with ::autoclean
+          - Fixed obscure syntax in ::Storage::txn_do
+          - Deprecated name attribute in favour of id
+          - Restored binmode default for NTFS
+
+0.41.1    2014-05-28 11:27:00
+          - Can now pass just a record name to find
+          - Stopped txn_do from adding extra exception leader
+          - Storage exceptions should be a full package name
+          - Prevent duplicate IO layers
+          - Attempting to fix tail test in win31
+
+0.40.1    2014-05-22 10:35:56
+          - Added head and tail methods to ::IO
+          - Fixed PerlIO layers in ::IO
+          - Using strict UTF-8 in ::IO
+
+0.39.1    2014-05-16 09:17:58
+          - 6fbe5176-dcb6-11e3-84c4-fc77f9652e90 Added Test::Requires
+            Hash::MoreUtils
+
+0.38.1    2014-05-15 01:09:50
+          - cad362f6-dba6-11e3-84c4-fc77f9652e90 Random WTF
+
+0.37.1    2014-05-13 22:04:43
+          - Fixed crappy test. So system error messages can be garbage
+
+0.36.1    2014-05-13 11:02:40
+          - Improved test coverage
+          - Added reverse attr to ::IO. Reverse sort directory listings
+
+0.35.1    2014-05-01 15:28:33
+          - Moo / Role::Tiny upgrade must expicitely use feature 'state'. Thanks
+          - Call to n::s now excepts import
+          - Moved location of namespace::clean calls. Yuck
+          - Replaced JSON with JSON::MaybeXS
+          - Deprecated ::IO::empty in favour of is_empty
+          - Fixed ::IO::iterator sort order
+
+0.34.1    2014-04-04 11:50:35
+          - Improved test coverage
+          - Fixed directory pattern match
+          - Fixed definedness bug in ::HashMerge
+          - JSON storage gives better error messages
+          - Removed Ident: labels and VERSION
+
+0.33.1    2014-01-24 20:54:00
+          - Updated gitpre commit hook
+          - Updated Unexpected dependency
+          - Took ::Resulset find_and_update private
+
+0.32.1    2014-01-15 17:17:35
+          - Use Unexpected::Functions::has_exception not add_exception
+          - Except old WithLanguage storage subclass from extension_map
+
+0.31.1    2014-01-13 18:34:25
+          - Create extension_map stateful function
+          - Improved test coverage
+          - Created STORAGE_BASE constant
+          - Refactored extension to storage class mapping
+          - Fixed requiring Cwd in ::IO
+
+0.30.1    2014-01-02 02:31:15
+          - Skipped stale cache test on NTFS
+
+0.29.1    2014-01-01 17:01:42
+          - Fixed regex where clause matching
+          - Fixed hash order bug in tests
+
+0.28.1    2014-01-01 14:52:36
+          - Define and use exception classes
+          - Split out Storage::XML to own distribution
+          - Made spell checking work with utf8
+          - Simplified Build.PL. Updated test boilerplate
+          - Uses DZ::P::AbstractFromPOD and LicenseFromModule
+          - Dropped dependency on Class::Load
+
+0.27.1    2013-11-22 09:40:23
+          - Bumped Unexpected dependency to v0.15
+          - ::IO::rel2abs stringifies the base arg
+          - Updated git hooks
+
+0.26.1    2013-09-26 17:02:33
+          - Increased test coverage
+
+0.25.1    2013-09-03 12:57:12
+          - Bumped Unexpected version
+
+0.24.3    2013-08-16 23:45:37
+          - Updated toolchain
+          - Converted to dist.ini. Dropped XML::DTD
+

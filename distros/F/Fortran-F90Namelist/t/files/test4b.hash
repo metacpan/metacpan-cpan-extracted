@@ -1,0 +1,102 @@
+# test4b.hash                             -*-cperl-*-
+#
+# Hashref tree for the namelist in test4b.nml
+#
+
+$namesref = [
+             'run_pars',
+             'hydro_run_pars',
+             'density_run_pars',
+	     'grav_run_pars',
+             'entropy_run_pars',
+             'magnetic_run_pars'
+            ];
+
+$hashref =
+  { 'run_pars' =>
+    { 'cvsid'    => { value => [ '@Id: run.in,v 1.9 2004/07/02 10:08:17 brandenb Exp @' ],
+		      stype => 'single-quote string',   type => 1 },
+      'ip'       => { value => [ '13' ],
+		      stype => 'integer',               type => 4 },
+      'nt'       => { value => [ '50' ],
+		      stype => 'integer',               type => 4 },
+      'it1'      => { value => [ '20' ],
+		      stype => 'integer',               type => 4 },
+      'isave'    => { value => [ '200' ],
+		      stype => 'integer',               type => 4 },
+      'itorder'  => { value => [ '3' ],
+		      stype => 'integer',               type => 4 },
+      'cdt'      => { value => [ '0.4' ],
+		      stype => 'unspecified float',     type => 5 },
+      'cdtv'     => { value => [ '0.3' ],
+		      stype => 'unspecified float',     type => 5 },
+      'dtmin'    => { value => [ '1e-6' ],
+		      stype => 'single precision float', type => 6 },
+      'dsnap'    => { value => [ '2.' ],
+		      stype => 'unspecified float',     type => 5 },
+      'd2davg'   => { value => [ '.5' ],
+		      stype => 'unspecified float',     type => 5 },
+      'dvid'     => { value => [ '1000.' ],
+		      stype => 'unspecified float',     type => 5 },
+      'slice_position' => { value => [ 'm' ],
+			    stype => 'single-quote string',   type => 1 },
+      'bcx'      => { value => [ 'a','s','s','a2','sT','a','s','s' ],
+		      stype => 'single-quote string',   type => 1 },
+      'bcy'      => { value => [ 's','a','s','a2','sT','s','a','s' ],
+		      stype => 'single-quote string',   type => 1 },
+      'bcz'      => { value => [ 's','s','a','a2','sT','s','s','a' ],
+		      stype => 'single-quote string',   type => 1 },
+      'tavg'     => { value => [ '10.' ],
+		      stype => 'unspecified float',     type => 5 },
+      'random_gen' => { value => [ 'nr_f90' ],
+			stype => 'single-quote string',   type => 1 },
+    },
+
+    'hydro_run_pars' =>
+    { 'nu'       => { value => [ '10.e-4' ],
+		      stype => 'single precision float', type => 6 },
+      'ivisc'    => { value => [ 'nu-const' ],
+		      stype => 'single-quote string',   type => 1 },
+      'dampuext' => { value => [ '5' ],
+		      stype => 'integer',               type => 4 },
+      'rdampext' => { value => [ '1.1' ],
+		      stype => 'unspecified float',     type => 5 },
+      'wdamp'    => { value => [ '0.1' ],
+		      stype => 'unspecified float',     type => 5 },
+      'omega'    => { value => [ '0.5' ],
+		      stype => 'unspecified float',     type => 5 },
+      'theta'    => { value => [ '0.' ],
+		      stype => 'unspecified float',     type => 5 },
+    },
+
+    'density_run_pars' => {},
+
+    'grav_run_pars' => {},
+
+    'entropy_run_pars' =>
+    { 'iheatcond' => { value => [ 'chi-const' ],
+		       stype => 'single-quote string',   type => 1 },
+      'chi'      => { value => [ '10e-4' ],
+		      stype => 'single precision float', type => 6 },
+      'luminosity' => { value => [ '.01' ],
+			stype => 'unspecified float',     type => 5 },
+      'wheat'    => { value => [ '0.18' ],
+		      stype => 'unspecified float',     type => 5 },
+      'cooltype' => { value => [ 'cs2-rho' ],
+		      stype => 'single-quote string',   type => 1 },
+      'cool'     => { value => [ '5.' ],
+		      stype => 'unspecified float',     type => 5 },
+      'rcool'    => { value => [ '1.1' ],
+		      stype => 'unspecified float',     type => 5 },
+      'wcool'    => { value => [ '0.1' ],
+		      stype => 'unspecified float',     type => 5 },
+    },
+
+    'magnetic_run_pars' =>
+    { 'eta'      => { value => [ '6.e-4' ],
+		      stype => 'single precision float', type => 6 },
+    }
+
+  };
+
+$nlists = (keys %$hashref) + 0.;

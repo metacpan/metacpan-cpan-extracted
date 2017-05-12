@@ -1,0 +1,26 @@
+#fsdb -R C name id test1
+name: a
+id: 1
+test1: 80
+
+name: b
+id: 2
+test1: 70
+
+name: c
+id: 3
+test1: 65
+
+name: d
+id: 4
+test1: 90
+
+name: e
+id: 5
+test1: 70
+
+name: f
+id: 6
+test1: 90
+
+#   | dbfilealter -R C

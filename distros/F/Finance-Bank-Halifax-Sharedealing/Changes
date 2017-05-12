@@ -1,0 +1,10 @@
+Revision history for Finance-Bank-Halifax-Sharedealing
+
+0.03    2011/04/03 21:10
+        Fixed module dependencies in Makefile.PL.
+
+0.02    2011/03/31 21:10
+        Cleaned up and expanded POD slightly.
+
+0.01    2011/03/31 15:56
+        First version, released on an unsuspecting world.

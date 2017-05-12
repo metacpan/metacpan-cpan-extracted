@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use diagnostics;
+use Storable;
+use Data::Dumper;
+no warnings 'redefine';
+use Finance::Quant;
+use File::Spec;
+use Time::HiRes qw(usleep);
+use Cache::Memcached;
+
+my @symbols = ();
+my $DEBUG = 10;
+my $DEBUG_TO_SYSLOG=1;
+my $LOGGER_EXE="/usr/bin/logger";
+my $dir = File::Spec->tmpdir();
+my $memd = new Cache::Memcached {
+	'servers' => [ "127.0.0.1:11211"],
+	'debug' => 0,
+	'compress_threshold' => 10_000,
+} or warn($@);
+
+
+BEGIN{
+
+system("FINANCE_QUANT_TRAY &");
+
+}
+&Dbg(2,"start monitor ");        
+
+
+sub Dbg {
+  my $level=shift @_;
+  my $msg = shift @_;
+  # If the $DEBUG level exceeds the level at which we log this mess
+      my @args=`echo '$0 $msg' | $LOGGER_EXE`;
+      printf("\n",$msg);
+}
+###################
+#DONE DATA GOES TO TMP DIRECTORY
+
+
+my $self = Finance::Quant->recommended;
+   $self->Home();
+
+
+    @symbols = keys %{$self->{result}} unless(!defined($self->{result}));
+
+    store $self, 'master-run';
+    store $self, 'master-run-BACKUP';
+    store {'master-run-SYMBOLS'=>\@symbols}, 'master-run-SYMBOLS';
+
+    $memd->set("master-run",$self);
+    $memd->set("master-run-BACKUP",$self);
+    $memd->set("master-run-SYMBOLS",\@symbols);
+
+    @symbols = $memd->get("master-run-SYMBOLS");
+
+        
+
+
+    `FINANCE_QUANT_R_CMD`;
+
+    &Dbg(2,"BACKTESTING");        
+
+    `FINANCE_QUANT_CACHE`;
+
+    &Dbg(2,"CALCULATING");        
+
+    `FINANCE_QUANT_XML_RESULTS`;
+
+    &Dbg(2,"EXPORTING XML");        
+
+
+print Dumper [ $self,@symbols ];
+1;
+__DATA__
+
+	 

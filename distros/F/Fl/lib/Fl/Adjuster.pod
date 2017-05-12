@@ -1,0 +1,100 @@
+class 'Fl::Adjuster';
+isa 'Fl::Valuator';
+include 'FL/Fl_Adjuster.H';
+
+=pod
+
+=head1 NAME
+
+Fl::RepeatButton - Button that Reapeats Callback when Held
+
+=head1 Synopsis
+
+    use Fl;
+    my $adj = Fl::Adjuster->new(0, 0, 100, 200, 'Hello, World!');
+
+=head1 Description
+
+The Fl::Adjuster class represents a widget for large dynamic ranges.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/adjuster1.png" /></center>
+
+When you press a button and drag to the right the value increases. When you
+drag to the left it decreases. The largest button adjusts by 100 * step(),
+the next by 10 * step() and that smallest button by step(). Clicking on the
+buttons increments by 10 times the amount dragging by a pixel does. Shift +
+click decrements by 10 times the amount.
+
+=head1 Methods
+
+Fl::Adjuster inherits from Fl::Valuator which in turns inherits from
+Fl::Widget. On top of that, it exposes the following methods...
+
+=head2 new(...)
+
+    my $adj_a = Fl::Adjuster->new(0, 0, 250, 500, 'Important Stuff');
+    my $adj_b = Fl::Adjuster->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label. It looks best if one of the dimensions is 3 times the other.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Adjuster *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 soft(...)
+
+    my $adj_a->soft( 1 );
+    my soft = $adj_b->soft( );
+
+If "soft" is turned on, the user is allowed to drag the value outside the
+range.
+
+If they drag the value to one of the ends, let go, then grab again and
+continue to drag, they can get to any value. Default is on (1).
+
+=cut
+
+xs {name        => 'soft',
+    definitions => [
+            {required => [[qw[int w]]]},
+            {returns => 'int'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

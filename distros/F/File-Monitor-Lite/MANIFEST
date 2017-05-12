@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README.mkd
+t/01use.t
+t/02behavior.t
+t/03multiple_files.t
+lib/File/Monitor/Lite.pm
+META.yml                                 Module meta-data (added by MakeMaker)

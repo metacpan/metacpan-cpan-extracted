@@ -1,0 +1,29 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use Finance::Bank::Cahoot;
+
+my $cahoot = Finance::Bank::Cahoot->new(
+               credentials => 'ReadLine',
+	       credentials_options => { account => '12345678',
+					username => 'acmeuser' });
+$cahoot->login;
+my $accounts = $cahoot->accounts;
+
+foreach my $account (@$accounts) {
+  next unless $account->{name} =~ /current/;
+  $cahoot->set_account($account->{account});
+}
+
+my $statements = $cahoot->statements;
+$cahoot->set_statement($statements->[-1]->{description});
+my $statement = $cahoot->statement;
+foreach my $transaction (@$statement) {
+    print $transaction->date, q{,},
+          $transaction->details, q{,},
+          $transaction->credit || 0, q{,},
+          $transaction->debit || 0, q{,},
+          $transaction->balance || 0, qq{\n};
+}

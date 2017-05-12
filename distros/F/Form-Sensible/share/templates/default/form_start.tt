@@ -1,0 +1,6 @@
+<div id="[% css_prefix _ form.name %]_form_div" class="[% css_prefix %]form_container [% css_prefix _ form.name %]_form_container">
+    <form action="[% action %]" method="[% method %]" id="[% css_prefix _ form.name %]_form" class="[% css_prefix %]form [% css_prefix _ form.name %]_form" accept-charset="utf-8" [% IF form_enctype %]enctype="[% form_enctype %]"[% END %]>
+[% IF render_hints.legend %]
+        <fieldset class="[% css_prefix %]fieldset [% css_prefix _ form.name %]_fieldset"> 
+        <legend class="[% css_prefix %]legend [% css_prefix _ form.name %]_legend">[% render_hints.legend %]</legend> 
+[% END %]

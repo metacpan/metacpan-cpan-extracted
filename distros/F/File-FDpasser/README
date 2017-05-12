@@ -1,0 +1,17 @@
+File::FDpasser is a module for passing open filedescriptors between
+unrelated processes.  This is Unix Capabable only - if you don't have it -
+get it.  Under BSD systems open filedescriptors are passed over Unix Domain
+Sockets. Under SysV open filedescriptors are passed over pipes.
+
+If you add stuff for new platforms or fixes send it!
+
+All mail should go to: addi@umich.edu
+(http://www.eecs.umich.edu/~addi/)
+
+Thanks go to: Practically all of efnet #perl esp. the people who tested
+the module on various platforms, and akana of ircnet #perl.  Also thanks
+to TonyC for testing on Darwin.
+
+
+
+

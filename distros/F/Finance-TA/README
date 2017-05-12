@@ -1,0 +1,24 @@
+NAME
+
+    Finance::TA - Perl wrapper for Technical Analysis Library (http://ta-lib.org)
+
+INSTALLATION
+
+    You need to have TA-Lib - version 0.4.0 or better - installed on your system
+    in order to install Finance::TA perl module.
+
+    Finance::TA module checks during its installation (in given order):
+
+    * Environment variables C<TALIB_CFLAGS> and C<TALIB_LIBS>
+
+    # you can use these variables like this:
+    TALIB_CFLAGS='-I/usr/local/include/ta-lib' TALIB_LIBS='-L/usr/local/lib -lta_lib' perl Makefile.PL
+
+    * Config script C<ta-lib-config --cflags> and C<ta-lib-config --libs>
+
+    # BEWARE!!! check whether your ta-lib-config returns correct info
+    $ ta-lib-config --cflags
+    -I/usr/local/include/ta-lib
+    
+    $ ta-lib-config --cflags
+    -L/usr/local/lib -lta_lib

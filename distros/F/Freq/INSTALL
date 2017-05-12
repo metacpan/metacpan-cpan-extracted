@@ -1,0 +1,9 @@
+There is a conflict between Inline 0.44 version of Inline::MakeMaker and the default layout of modules in Perl. To get around this the following procedure must be used:
+
+tar zxvf Freq.tar.gz
+cd Freq
+perl Makefile.PL
+[edit Makefile. Change ".pm.inl" to "Freq.inl" close to the end of the file.]
+make test
+make install
+

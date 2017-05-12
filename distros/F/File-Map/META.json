@@ -1,0 +1,102 @@
+{
+   "abstract" : "Memory mapping made simple and safe.",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "keywords" : [
+      "mmap",
+      "memory",
+      "mapping"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Map",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "perl" : "5.008008"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "PerlIO::Layers" : "0",
+            "Sub::Exporter::Progressive" : "0.001005",
+            "XSLoader" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "subs" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Handle" : "0",
+            "IO::Socket::INET" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0.005",
+            "Time::HiRes" : "0",
+            "open" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Map" : {
+         "file" : "lib/File/Map.pm",
+         "version" : "0.64"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-file-map at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=File-Map"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/file-map.git",
+         "web" : "https://github.com/Leont/file-map"
+      }
+   },
+   "version" : "0.64",
+   "x_contributors" : [
+      "Jan Dubois <jand@activestate.com>",
+      "Sisyphus <sisyphus@cpan.org>",
+      "Tim Jenness <t.jenness@jach.hawaii.edu>"
+   ]
+}
+

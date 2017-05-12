@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+rrr-update - add a file to/delete a file from the dataset
+
+=head1 SYNOPSIS
+
+  rrr-update [options] principalfile file
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--add>
+
+Inject a 'new' event.
+
+=item B<--delete>
+
+Inject a 'delete' event.
+
+=item B<--dry-run|n>
+
+Does nothing, only prints what it would do.
+
+=item B<--epoch=s>
+
+Set the epoch of the file to this value. Normally epoch is set to
+current time as a floating point value. This option can be used to
+inject old events that have been forgotten somehow. Triggers setting
+of the dirtymark of the whole dataset which means all slaves are
+forced to restart their mirroring activity.
+
+Be aware that this is not only costly to downstream servers, it is
+also slow: it calls aggregate twice with force.
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--verbose|v+>
+
+More feedback.
+
+=back
+
+=head1 DESCRIPTION
+
+When you later discover missing files...
+
+The principalfile argument is the path to local principal recentfile.
+
+The file argument is a relative path calculated from the localroot
+directory of the recentfile object.
+
+
+=cut
+
+
+use strict;
+use warnings;
+
+use File::Find qw(find);
+use File::Rsync::Mirror::Recent;
+use File::Spec;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+our %Opt;
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(1);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (@ARGV != 2) {
+    pod2usage(1);
+}
+
+my($principal,$file) = @ARGV;
+my $recc = File::Rsync::Mirror::Recent->new
+    (local => $principal);
+my($rf) = $recc->principal_recentfile;
+my($abs_file,$rel_file);
+if (File::Spec->file_name_is_absolute($file)) {
+    $rel_file = substr($file,length $rf->localroot);
+    $abs_file = $file;
+} else {
+    $rel_file = $file;
+    $abs_file = File::Spec->catfile($rf->localroot,$file);
+}
+
+my $type = "new";
+if ($Opt{delete}) {
+    my $news = $recc->news(contains => { path => $rel_file });
+    if (@$news) {
+        warn "Found file:\n".YAML::Syck::Dump $news;
+    } else {
+        die "Didn't find '$file' in this recentfile collection, giving up.";
+    }
+    $type = "delete";
+} elsif ($Opt{add}) {
+    my $news = $recc->news(contains => { path => $rel_file });
+    if (@$news) {
+        warn "Info: found file in index:\n".YAML::Syck::Dump $news;
+    }
+    $type = "new";
+}
+
+my $epoch = $Opt{epoch};
+if (defined $epoch) {
+    if ($Opt{"dry-run"}) {
+        warn sprintf "Would call update on directory %s with args abs_file[%s], type[%s], epoch[%s] and then aggregate with force twice.\n",
+            $rf->localroot, $abs_file, $type, $epoch;
+    } else {
+        $rf->update($abs_file,$type,$epoch);
+        warn localtime()." starting first aggregate\n";
+        $rf->aggregate(force => 1);
+        warn localtime()." starting second aggregate\n";
+        $rf->aggregate(force => 1);
+    }
+} else {
+    if ($Opt{"dry-run"}) {
+        warn sprintf "Would call update on directory %s with args abs_file[%s], type[%s].\n",
+            $rf->localroot, $abs_file, $type, $epoch;
+    } else {
+        $rf->update($abs_file,$type);
+    }
+}
+
+
+__END__
+
+
+# Local Variables:
+# mode: cperl
+# coding: utf-8
+# cperl-indent-level: 4
+# End:

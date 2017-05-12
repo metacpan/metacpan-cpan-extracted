@@ -1,0 +1,4 @@
+#fsdb a b c
+00000000	00000000	0000
+# test case from yuri
+#   | dbmapreduce -M -S cat

@@ -1,0 +1,37 @@
+params:
+  name:
+    name: '名前'
+    validators:
+      - String#max_length:
+          max: 30
+  name_length:
+    name: '名前_length'
+    validators:
+      - String#length:
+          length: 30
+  name_between_length:
+    name: '名前_between_length'
+    validators:
+      - String#between_length:
+          min: 30
+          max: 50
+  alnum:
+    name: 'alnumキー'
+    validators:
+      - String#alpha_num
+  ascii:
+    name: 'asciiキー'
+    validators:
+      - String#ascii
+  in:
+    name: 'inキー'
+    validators:
+      - String#in:
+          list:
+            - abc
+            - cde
+  no_break:
+    name: 'no_breakキー'
+    validators:
+      - String#no_break
+

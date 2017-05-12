@@ -1,0 +1,69 @@
+NAME
+
+    Finance::Bank::IE::PermanentTSB - Perl Interface to the PermanentTSB
+    Open24 homebanking on <http://www.open24.ie>
+
+DESCRIPTION
+
+    This is a set of functions that can be used in your Perl code to perform
+    some operations with a Permanent TSB homebanking account.
+
+    Features:
+
+    * account(s) balance: retrieves the balance for all the accounts you
+      have set up (current account, visa card, etc.). 
+
+    * account(s) statement: retrieves the statement for
+      a particular account, in a range of date.Graph supported
+      using GnuPlot.
+
+    * mobile phone top-up (to be implemented): top up your mobile phone!
+
+    * funds transfer (to be implemented): transfer money between your
+      accounts or third party accounts.
+
+    Together with the module you can find a CLI utility to perform
+    operation on your homebanking.
+
+DEPENDENCIES
+
+    This module requires these other modules and libraries:
+
+        WWW::Mechanize
+        HTML::TokeParser
+        Date::Calc
+        Test::MockObject
+
+    The ptsb CLI interface requires this 3rd party components:
+
+    * GnuPlot (not mandatory, to graph)
+    * GnuPG (mandatory, to secure the ~/.ptsbrc config file)
+
+MODULE HOMEPAGES
+
+    * Project homepage on Google code (with SVN repository):
+
+        <http://code.google.com/p/finance-bank-ie-permanenttsb>
+
+    * Project homepage on CPAN.org:
+
+        <http://search.cpan.org/~pallotron/Finance-Bank-IE-PermanentTSB/>
+
+SEE ALSO
+
+    * Ronan Waider's "Finance::Bank::IE::BankOfIreland" -
+    <http://search.cpan.org/~waider/Finance-Bank-IE/>
+
+AUTHOR
+
+    Angelo "pallotron" Failla, <pallotron@freaknet.org> -
+    <http://www.pallotron.net> - <http://www.vitadiunsysadmin.net>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2009 by Angelo "pallotron" Failla
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

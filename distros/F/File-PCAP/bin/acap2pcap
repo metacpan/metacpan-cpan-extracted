@@ -1,0 +1,192 @@
+#!/usr/bin/env perl
+#
+# acap2pcap - convert ASA capture to PCAP
+#
+use strict;
+
+use File::PCAP::ACAP2PCAP;
+use Getopt::Long;
+use Pod::Usage;
+
+my %opt = ();
+my @optdefs = qw(
+	dlt=i
+    help|?
+    man
+    output=s
+);
+GetOptions(\%opt, @optdefs);
+
+pod2usage(-exitstatus => 0, -input => \*DATA)                if $opt{help};
+pod2usage(-exitstatus => 0, -input => \*DATA, -verbose => 2) if $opt{man};
+
+my $a2popts = {};
+
+if (exists $opt{dlt}) {
+	$a2popts->{dlt} = $opt{dlt};
+}
+if (exists $opt{output}) {
+	$a2popts->{output} = $opt{output};
+}
+
+if (scalar @ARGV) {                     # either open the file and parse ...
+    if (open(my $input,'<',$ARGV[0])) {
+        if (not exists $opt{output}) {
+            $a2popts->{output} = $ARGV[0] . ".pcap"
+        }
+        my $a2p = File::PCAP::ACAP2PCAP->new($a2popts);
+        $a2p->parse($input);
+        close $input;
+    }
+    else {
+        die "can't open file `$ARGV[0]` to read ASA capture output";
+    }
+}
+else {                                  # or parse <STDIN>
+    my $a2p = File::PCAP::ACAP2PCAP->new($a2popts);
+    $a2p->parse(\*STDIN);
+}
+
+__END__
+
+=head1 NAME
+
+acap2pcap - convert Cisco ASA capture text to PCAP file
+
+=head1 SYNOPSIS
+
+  acap2pcap [options] [filename]
+
+=head1 OPTIONS
+
+=head2 --help | -?
+
+Show a short help text and exit.
+
+=head2 --man
+
+Show the full manual page and exit.
+
+=head2 --dlt $data_link_type
+
+Specify the data link type for the PCAP file.
+
+=head2 --output
+
+Specify the name of the PCAP file (default: I<< asa.pcap >>)
+
+=head1 DESCRIPTION
+
+This program reads a packet capture from the Cisco ASA and writes it to
+a file in PCAP format.
+To use it, you can start the C<< show capture >> command on the command line
+interface and send the output to this program.
+
+  ssh asa show capture $name dump | acap2pcap
+
+If you saved the output of the C<< show capture >> command to a file,
+you may instead give the name of the file as an argument to the program.
+
+  acap2pcap $filename
+
+=head2 ASA output
+
+A typical packet capture on a Cisco ASA looks like the following:
+
+  pix515# show capture test dump
+  522 packets captured
+   1: 21:24:38.629087 192.168.1.2 > 192.168.1.1: icmp: echo request
+  0x0000   4500 003c 12a7 0000 7e01 9781 ac11 2324       E..<....~.....#$
+  0x0010   c0a8 02bb 0800 35cb 0001 1790 6162 6364       ......5.....abcd
+  0x0020   6566 6768 696a 6b6c 6d6e 6f70 7172 7374       efghijklmnopqrst
+  0x0030   7576 7761 6263 6465 6667 6869                 uvwabcdefghi
+   2: 21:24:38.630765 192.168.1.1 > 192.168.1.2: icmp: echo reply
+  0x0000   4500 003c 4656 0000 ff01 e2d1 c0a8 02bb       E..<FV..........
+  0x0010   ac11 2324 0000 3dcb 0001 1790 6162 6364       ..#$..=.....abcd
+  0x0020   6566 6768 696a 6b6c 6d6e 6f70 7172 7374       efghijklmnopqrst
+  0x0030   7576 7761 6263 6465 6667 6869                 uvwabcdefghi
+
+This output shows raw IP traffic without layer 2 headers.
+To convert this to a readable PCAP file, you would choose the data link type
+101 (see next section).
+
+The program takes the timestamp from the first line of each packet and the
+hex values from the following lines to create the packet header and buffer
+for the PCAP file.
+
+=head2 Data link type
+
+The data link type defaults to 1, also named DLT_EN10MB.
+You use this if the output from the ASA shows the Ethernet header,
+that means the MAC addresses of the sender and receiver.
+
+For ASA captures that only contain the raw IP traffic without link level
+header please use data link type 101 (DLT_RAW).
+
+Use the option C<< --dlt >> to change the data link type.
+
+If you try to open the PCAP file with wireshark or tcpdump and it
+complains about corrupt packets, try the other data link type.
+
+=head1 DIAGNOSTICS
+
+=head2 Can't open file $filename to read ASA capture output
+
+You can either feed the ASA output via standard input or a file.
+If you specify a filename, make sure that the file exists, and that it is
+readable.
+
+=head1 SEE ALSO
+
+Libpcap File Format
+  L<https://wiki.wireshark.org/Development/LibpcapFileFormat>
+
+Link-Layer Header Types
+  L<http://www.tcpdump.org/linktypes.html>
+
+=head1 AUTHOR
+
+Mathias Weidner <mamawe@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Mathias Weidner.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
+# vim: set sw=4 ts=4 et:

@@ -1,0 +1,27 @@
+Revision history for Fuse::PerlSSH::FS
+
+0.13	2013-02-28
+	- Fixed symlink() and readlink()
+	- Moved seek()s to RemoteFunctions to reduce the number
+	  of network round-trips per read/write
+	- Removed seek from RemoteFunctions
+
+0.12	2013-02-24
+	- daemonizing is buggy, so foreground operation
+	  is forced for now
+
+0.11	2013-02-22
+	- Changes file
+	- perlssh can now print version information
+	- we can now pass mountopts to FUSE
+	- perlssh accepts a --no-xattr option
+	- replaced statfs with something that actually probes the
+	  remote filesystem
+	- two new capabilities checks to find out if the remote
+	  filesystem is able to store xattribs
+	- Removed Carp dependency
+	- perlsshfs by default now daemonizes itself (new
+	  dependency Daemon::Daemonize)
+
+0.10	2013-02-17
+	First public version, released on an unsuspecting world.

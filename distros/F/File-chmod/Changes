@@ -1,0 +1,85 @@
+Revision history for Perl extension File-chmod.
+
+0.42      2015-02-14
+	- improve deprecation docs
+
+0.41      2015-02-14
+	[DEPRECATIONS]
+	- revert the decision to not deprecate UMASK=0, re-deprecating GH #5
+
+0.40      2013-11-15
+	- fix prototype mismatch with chmod() when autodie is used. GH #3 (arrestee)
+	[DEPRECATIONS]
+	- undeprecating the default of $UMASK is true
+	  tested against my local chmod and it does obey umask. This will no
+	  longer be removed.
+
+0.39      2013-09-14
+	- fix tests failing to run as user with override privileges
+	  RT #88543 ( zefram )
+	- add more tests
+
+0.38      2013-09-09
+	- fix sticky bit tests for BSD ( Slaven Rezić )
+	- disable windows tests
+
+0.37      2013-09-08
+	- verify and fix RT #78107 chmod('o+t') should set sticky-bit like unix
+	  chmod o+t
+
+0.36      2013-09-08
+	- improve Pod using Pod::Weaver, this will allow better linking on web
+	  interfaces
+
+0.35      2013-09-08
+	- add read/write tests
+	- remove REVISIONS from pod
+	- add Test::PodSpelling, and fix spelling errors
+
+0.34      2013-09-08
+	- fix basic.t to not fail on windows
+
+0.33      2013-09-07
+	[DEPRECATIONS]
+	- $UMASK is true, this behavior is surprising if you're used to UNIX chmod
+	[NEWS]
+	- new maintainer Caleb Cushing
+	- migrate to Dist::Zilla
+	- add tests (note test failures are likely to be a result of new tests,
+	  the code hasn't really changed)
+
+0.32  2007-07-28
+	- added copyright and license
+
+0.31  1999-07-21
+	- fixed getsymchmod() bug
+	- was using map() incorrectly in getmod().
+	- condensed lschmod()
+
+0.30  1999-07-21
+	- added umask() honoring for symchmod()
+	- function name changes
+	- fixed debugging bugs
+	- fixed set-uid and set-gid bug
+	- fixed file lock/set-gid bug
+	- removed useless data structures
+	- compacted code
+	- see the new REVISIONS section in the docs for explanations
+
+0.22  1999-04-24
+	- refixed the untarring error (now it works nicely)
+
+0.20  1999-04-03
+	- fixed the untarring error (didn't appear in a directory)
+
+0.12  1999-02-13
+	- fixed determine_mode() method for determining mode
+
+0.11  1999-02-12
+	- fixed determine_mode() bug
+
+0.10  1999-02-12
+	- changed @EXPORT and @EXPORT_OK functions
+
+0.01  1999-02-06
+	- original version; created by h2xs 1.18

@@ -1,0 +1,15 @@
+---
+name: Fortran-F90Namelist
+version: 0.5.1
+author:
+  - Wolfgang Dobler <Wolfgang.Dobler@kis.uni-freiburg.de>
+abstract: Parse F90 namelists into hash and export in different formats
+license: perl
+provides:
+  Fortran::F90Namelist:
+    file: lib/Fortran/F90Namelist.pm
+    version: 0.5.1
+  Fortran::F90Namelist::Group:
+    file: lib/Fortran/F90Namelist/Group.pm
+    version: 0.5.1
+generated_by: Module::Build version 0.261

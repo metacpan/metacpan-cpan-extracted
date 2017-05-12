@@ -1,0 +1,4 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n q1 q2 q3
+37.3 0.08165 0.2189 0.1299 37.17 37.43 0.95 149.2 5565.2 37.2 37.4 4 37.2 37.3 37.3
+#   | dbrow _experiment =~ /mab/
+#   | dbcolstats -q 4 duration

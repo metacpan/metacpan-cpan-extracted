@@ -1,0 +1,22 @@
+---
+name: File-Find-Rule-DIZ
+version: 0.06
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+abstract: Rule to match the contents of a FILE_ID.DIZ
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Archive::Zip: 0
+  File::Find::Rule: 0
+build_requires:
+  Test::More: 0
+provides:
+  File::Find::Rule::DIZ:
+    file: lib/File/Find/Rule/DIZ.pm
+    version: 0.06
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

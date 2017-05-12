@@ -1,0 +1,28 @@
+use Finance::QIF;
+
+if ( $#ARGV != 1 ) {
+    print STDERR "USAGE: readwrite <inputfile> <outputfile>\n";
+    exit;
+}
+
+my $in = Finance::QIF->new(
+    file       => $ARGV[0],
+    autodetect => 1
+);
+
+my $out = Finance::QIF->new(
+    file             => ">" . $ARGV[1],
+    record_separator => $in->record_separator
+);
+
+my $header = "";
+while ( my $record = $in->next() ) {
+    if ( $header ne $record->{header} ) {
+        $out->header( $record->{header} );
+        $header = $record->{header};
+    }
+    $out->write($record);
+}
+
+$in->close();
+$out->close();

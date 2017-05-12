@@ -1,0 +1,7 @@
+#fsdb cid sid cname
+10	1	pascal
+11	2	numanal
+12	1	os
+12	2	os
+#  | dbsort -n cid
+#   | dbjoin -S --input TEST/dbjoin_ex.in-2 -n cid

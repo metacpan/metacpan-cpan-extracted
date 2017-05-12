@@ -1,0 +1,31 @@
+[% PROCESS sub/date.html %]
+
+[% WRAPPER 'admin/bar.html' %]
+
+<div class='one'>
+<table align='center'>
+<tr class='misc2'><td colspan='4'>
+    <span style='float:right; clear: right'>
+        <form method='get'>
+        Search Text: <input type='text' name='text' /><input type='submit' />
+        </form>
+    </span>
+    Type: <a href='[% url_prefix %]'>ALL</a> | <a href='[% url_prefix %]?level=info'>Info</a> | <a href='[% url_prefix %]?level=debug'>Debug</a> | <a href='[% url_prefix %]?level=warn'>Warn</a> | <a href='[% url_prefix %]?level=error'>Error</a> | <a href='[% url_prefix %]?level=fatal'>Fatal</a>
+</td></tr>
+<tr class='misc1'><td colspan='4'>[% INCLUDE 'sub/pager.html' %]</td></tr>
+<tr class='title'><td>ID</td>
+    [% UNLESS has_level %]<td>Level</td>[% END %]
+    <td>Text</td><td>Time</td></tr>
+[% FOREACH error IN errors %]
+<tr class='misc[% IF loop.count mod 2;'2';ELSE;'1';END; %]'>
+    <td>[% error.error_id %]</td>
+    [% UNLESS has_level %]<td>[% error.level %]</td>[% END %]
+    <td><textarea cols='85'>[% error.text | html %]</textarea></td>
+    <td>[% date_format(error.time) %]</td>
+</tr>
+[% END %]
+<tr class='misc1'><td colspan='4'>[% INCLUDE 'sub/pager.html' %]</td></tr>
+</table>
+</div>
+
+[% END %]

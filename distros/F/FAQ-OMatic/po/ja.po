@@ -1,0 +1,2040 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2003-03-23 08:01+0900\n"
+"PO-Revision-Date: 2002-12-05 23:20+0900\n"
+"Last-Translator: Oota Toshiya <oota@itp.nec.co.jp>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=EUC-JP\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/FAQ/OMatic.pm:96 lib/FAQ/OMatic/install.pm:1079
+msgid "Warnings:"
+msgstr "警告:"
+
+#: lib/FAQ/OMatic.pm:111
+#, fuzzy
+msgid ""
+"Your Faq-O-Matic would have a title if it had an item 1, which it will when "
+"you've run the installer."
+msgstr "アイテム1が存在するならば、あなたのFaq-O-Maticは"
+
+#: lib/FAQ/OMatic.pm:114 lib/FAQ/OMatic/install.pm:1164
+msgid "Untitled Faq-O-Matic"
+msgstr "未タイトルの Faq-O-Matic"
+
+#: lib/FAQ/OMatic.pm:136 lib/FAQ/OMatic/authenticate.pm:151
+msgid "Log In"
+msgstr "ログイン"
+
+#: lib/FAQ/OMatic.pm:137
+msgid "Change Password"
+msgstr "パスワード変更"
+
+#: lib/FAQ/OMatic.pm:138
+msgid "Edit Title of %0 %1"
+msgstr "%0のタイトル %1 を編集"
+
+#: lib/FAQ/OMatic.pm:139
+#, c-format
+msgid "New %0"
+msgstr "新規 %0\t"
+
+#: lib/FAQ/OMatic.pm:140
+msgid "Edit Part in %0 %1"
+msgstr "%0 中のパート %1 を編集"
+
+#: lib/FAQ/OMatic.pm:141
+msgid "Insert Part in %0 %1"
+msgstr "%0 中に %1 を挿入"
+
+#: lib/FAQ/OMatic.pm:142
+msgid "Move %0 %1"
+msgstr "%0 を %1 に移動"
+
+#: lib/FAQ/OMatic.pm:143 lib/FAQ/OMatic/Appearance.pm:168
+msgid "Search"
+msgstr "検索"
+
+#: lib/FAQ/OMatic.pm:144
+msgid "Access Statistics"
+msgstr "アクセス統計"
+
+#: lib/FAQ/OMatic.pm:145 lib/FAQ/OMatic/submitPass.pm:138
+msgid "Validate"
+msgstr "認証"
+
+#: lib/FAQ/OMatic.pm:146
+msgid "%0 Permissions for %1"
+msgstr "%1のパーミッションを %0"
+
+#: lib/FAQ/OMatic.pm:147
+msgid "Upload bag for %0 %1"
+msgstr "%0 向けのbagのアップロード %1"
+
+#: lib/FAQ/OMatic.pm:1663
+msgid "http-charset"
+msgstr "EUC-JP"
+
+#: lib/FAQ/OMatic/Appearance.pm:177
+msgid "Appearance"
+msgstr "見た目"
+
+#: lib/FAQ/OMatic/Appearance.pm:191
+msgid "Show Top Category Only"
+msgstr "トップカテゴリのみ表示"
+
+#: lib/FAQ/OMatic/Appearance.pm:198
+msgid "Show This <em>Entire</em> Category"
+msgstr "この<em>全部の</em> カテゴリを表示"
+
+#: lib/FAQ/OMatic/Appearance.pm:209
+msgid "Show This Category As Text"
+msgstr "このカテゴリをテキストとして表示"
+
+#: lib/FAQ/OMatic/Appearance.pm:213
+msgid "Show This Answer As Text"
+msgstr "この回答をテキストとして表示"
+
+#: lib/FAQ/OMatic/Appearance.pm:218
+msgid "Show This %0 As Text"
+msgstr "%0 をテキストとして表示"
+
+#: lib/FAQ/OMatic/Appearance.pm:232
+msgid "Show This <em>Entire</em> Category As Text"
+msgstr "この<em>全部の</em> カテゴリをテキストとして表示"
+
+#: lib/FAQ/OMatic/Appearance.pm:244
+msgid "Hide Expert Edit Commands"
+msgstr "上級編集コマンドを隠す"
+
+#: lib/FAQ/OMatic/Appearance.pm:253
+msgid "Show Expert Edit Commands"
+msgstr "上級編集コマンドを表示"
+
+#: lib/FAQ/OMatic/Appearance.pm:269 lib/FAQ/OMatic/Item.pm:2224
+#: lib/FAQ/OMatic/stats.pm:133
+msgid "Return to the FAQ"
+msgstr "FAQに戻る"
+
+#: lib/FAQ/OMatic/Appearance.pm:276
+msgid "This is a"
+msgstr "これは"
+
+#: lib/FAQ/OMatic/Auth.pm:495
+msgid "the administrator of this Faq-O-Matic"
+msgstr "FAQ-O-Maticの管理者"
+
+#: lib/FAQ/OMatic/Auth.pm:496
+msgid "someone who has proven their identification"
+msgstr "だれかがかれらの識別を検査した"
+
+#: lib/FAQ/OMatic/Auth.pm:497
+msgid "someone who has offered identification"
+msgstr "だれかが識別子を提供した"
+
+#: lib/FAQ/OMatic/Auth.pm:498
+msgid "anybody"
+msgstr "全員"
+
+#: lib/FAQ/OMatic/Auth.pm:511
+msgid "the moderator of the item"
+msgstr "このアイテムのモデレータ"
+
+#: lib/FAQ/OMatic/Auth.pm:515
+#, c-format
+msgid "%0 group members"
+msgstr "グループメンバー %0"
+
+#: lib/FAQ/OMatic/Groups.pm:142
+msgid "Select a group to edit:"
+msgstr "編集対象のグループを選択:"
+
+#: lib/FAQ/OMatic/Groups.pm:150
+msgid ""
+"(Members of this group are allowed to access these group definition pages.)"
+msgstr "(グループのメンバはそのグループ定義ページにアクセスできる。)"
+
+#: lib/FAQ/OMatic/Groups.pm:168
+msgid "Add Group"
+msgstr "グループ追加"
+
+#: lib/FAQ/OMatic/Groups.pm:175
+msgid "Up To List Of Groups"
+msgstr "グループのリストの上へ"
+
+#: lib/FAQ/OMatic/Groups.pm:187
+msgid "Remove Member"
+msgstr "メンバ削除"
+
+#: lib/FAQ/OMatic/Groups.pm:196
+msgid "Add Member"
+msgstr "メンバ追加"
+
+#: lib/FAQ/OMatic/Groups.pm:206 lib/FAQ/OMatic/install.pm:467
+#: lib/FAQ/OMatic/install.pm:471
+msgid "Go to the Faq-O-Matic"
+msgstr "Faq-O-Maticに移動"
+
+#: lib/FAQ/OMatic/Groups.pm:209 lib/FAQ/OMatic/maintenance.pm:134
+msgid "Go To Install/Configuration Page"
+msgstr "インストール/構成ページに移動"
+
+#: lib/FAQ/OMatic/Item.pm:83
+msgid "New Item"
+msgstr "新しいアイテム"
+
+#: lib/FAQ/OMatic/Item.pm:727
+msgid "Parts"
+msgstr "パート"
+
+#: lib/FAQ/OMatic/Item.pm:750
+msgid "(missing or broken file)"
+msgstr "(不明または壊れたファイル)"
+
+#: lib/FAQ/OMatic/Item.pm:851
+msgid "Previous"
+msgstr "前"
+
+#: lib/FAQ/OMatic/Item.pm:869
+msgid "Next"
+msgstr "次"
+
+#: lib/FAQ/OMatic/Item.pm:968 lib/FAQ/OMatic/Item.pm:1382
+#: lib/FAQ/OMatic/Item.pm:1566
+msgid "Moderator"
+msgstr "モデレータ"
+
+#: lib/FAQ/OMatic/Item.pm:970
+msgid "(inherited from parent)"
+msgstr "(親から継承)"
+
+#: lib/FAQ/OMatic/Item.pm:988
+msgid "Category Title and Options"
+msgstr "カテゴリのタイトルとオプション"
+
+#: lib/FAQ/OMatic/Item.pm:989
+msgid "Edit Category Permissions"
+msgstr "カテゴリのパーミッションを編集"
+
+#: lib/FAQ/OMatic/Item.pm:990
+msgid "Move Category"
+msgstr "カテゴリを移動"
+
+#: lib/FAQ/OMatic/Item.pm:991
+msgid "Trash Category"
+msgstr "カテゴリを廃棄"
+
+#: lib/FAQ/OMatic/Item.pm:995
+msgid "Answer Title and Options"
+msgstr "回答のタイトルとオプション"
+
+#: lib/FAQ/OMatic/Item.pm:996
+msgid "Edit Answer Permissions"
+msgstr "回答のパーミッションを編集"
+
+#: lib/FAQ/OMatic/Item.pm:997
+msgid "Move Answer"
+msgstr "回答を移動"
+
+#: lib/FAQ/OMatic/Item.pm:998
+msgid "Trash Answer"
+msgstr "回答を廃棄"
+
+#: lib/FAQ/OMatic/Item.pm:1004
+msgid "%0 Title and Options"
+msgstr "%0 タイトルとオプション"
+
+#: lib/FAQ/OMatic/Item.pm:1005 lib/FAQ/OMatic/Item.pm:1006
+msgid "Edit %0 Permissions"
+msgstr "%0 のパーミッションを編集"
+
+#: lib/FAQ/OMatic/Item.pm:1007
+#, c-format
+msgid "Move %0"
+msgstr "%0 を移動"
+
+#: lib/FAQ/OMatic/Item.pm:1008
+#, c-format
+msgid "Trash %0"
+msgstr "%0 を廃棄"
+
+#: lib/FAQ/OMatic/Item.pm:1046
+msgid "Duplicate Answer"
+msgstr "回答の複製"
+
+#: lib/FAQ/OMatic/Item.pm:1047
+msgid "Duplicate Category as Answer"
+msgstr "回答としてカテゴリを複製"
+
+#: lib/FAQ/OMatic/Item.pm:1090
+msgid "Convert to Answer"
+msgstr "回答に変換"
+
+#: lib/FAQ/OMatic/Item.pm:1100
+msgid "Convert to Category"
+msgstr "カテゴリに変換"
+
+#: lib/FAQ/OMatic/Item.pm:1116 lib/FAQ/OMatic/Item.pm:1196
+msgid "New Answer in \"%0\""
+msgstr "\"%0\"中の新しい回答"
+
+#: lib/FAQ/OMatic/Item.pm:1123
+msgid "New Subcategory of \"%0\""
+msgstr "\"%0\"の中の新しいサブカテゴリ"
+
+#: lib/FAQ/OMatic/Item.pm:1149 lib/FAQ/OMatic/Part.pm:346
+msgid "Insert Text Here"
+msgstr "ここにテキストを挿入"
+
+#: lib/FAQ/OMatic/Item.pm:1162 lib/FAQ/OMatic/Part.pm:357
+msgid "Insert Uploaded Text Here"
+msgstr "アップロードするテキストをここに挿入"
+
+#: lib/FAQ/OMatic/Item.pm:1212
+msgid "Append to This Answer"
+msgstr "この答に追加"
+
+#: lib/FAQ/OMatic/Item.pm:1330
+msgid "This document is:"
+msgstr "このドキュメントは:"
+
+#: lib/FAQ/OMatic/Item.pm:1332
+msgid "This document is at:"
+msgstr "このドキュメントのURLは:"
+
+#: lib/FAQ/OMatic/Item.pm:1376
+#, c-format
+msgid "Group %0"
+msgstr "グループ %0"
+
+#: lib/FAQ/OMatic/Item.pm:1380
+msgid "Users giving their names"
+msgstr "ユーザはユーザ名を与えた"
+
+#: lib/FAQ/OMatic/Item.pm:1381
+msgid "Authenticated users"
+msgstr "認証されたユーザ"
+
+#: lib/FAQ/OMatic/Item.pm:1396
+msgid "New Category"
+msgstr "新規カテゴリ"
+
+#: lib/FAQ/OMatic/Item.pm:1398
+msgid "New Answer"
+msgstr "新しい回答"
+
+#: lib/FAQ/OMatic/Item.pm:1402
+msgid "Editing Category <b>%0</b>"
+msgstr "カテゴリを編集 <b>%0</b>"
+
+#: lib/FAQ/OMatic/Item.pm:1406
+msgid "Editing Answer <b>%0</b>"
+msgstr "回答を編集 <b>%0</b>"
+
+#: lib/FAQ/OMatic/Item.pm:1411
+msgid "Editing %0 <b>%1</b>"
+msgstr "カテゴリ編集 <b>%0</b>"
+
+#: lib/FAQ/OMatic/Item.pm:1441
+msgid "Title:"
+msgstr "タイトル:"
+
+#: lib/FAQ/OMatic/Item.pm:1446
+msgid "<p>New Order for Text Parts:"
+msgstr "<p>テキストパートの新しい順番:"
+
+#: lib/FAQ/OMatic/Item.pm:1458
+msgid "Show attributions from all parts together at bottom"
+msgstr "すべてのパートからの属性を最下部に一緒に表示"
+
+#: lib/FAQ/OMatic/Item.pm:1471 lib/FAQ/OMatic/Item.pm:1667
+#: lib/FAQ/OMatic/Part.pm:560 lib/FAQ/OMatic/editBag.pm:122
+msgid "Submit Changes"
+msgstr "変更の送信"
+
+#: lib/FAQ/OMatic/Item.pm:1472 lib/FAQ/OMatic/Item.pm:1668
+#: lib/FAQ/OMatic/Part.pm:561 lib/FAQ/OMatic/editBag.pm:123
+msgid "Revert"
+msgstr "復帰"
+
+#: lib/FAQ/OMatic/Item.pm:1492
+msgid "Who can add a new text part to this item:"
+msgstr "このアイテムに新しいパートを追加できる人:"
+
+#: lib/FAQ/OMatic/Item.pm:1494
+msgid "Who can add a new answer or category to this category:"
+msgstr "このカテゴリに新しい答かカテゴリを追加できる人:"
+
+#: lib/FAQ/OMatic/Item.pm:1496
+msgid "Who can edit or remove existing text parts from this item:"
+msgstr "このアイテムから存在するテキストパートを編集又は削除できる人:"
+
+#: lib/FAQ/OMatic/Item.pm:1498
+msgid ""
+"Who can move answers or subcategories from this category; or turn this "
+"category into an answer or vice versa:"
+msgstr ""
+"このカテゴリから回答又はサブカテゴリを移動できる人;又はこのカテゴリを回答又は"
+"何かに変更する:"
+
+#: lib/FAQ/OMatic/Item.pm:1500
+msgid "Who can edit the title and options of this answer or category:"
+msgstr "この回答かカテゴリのタイトルとオプションを編集できる人:"
+
+#: lib/FAQ/OMatic/Item.pm:1502
+msgid ""
+"Who can use untranslated HTML when editing the text of this answer or "
+"category:"
+msgstr "この回答かカテゴリのテキストを編集する時に変換無しのHTMLを使える人:"
+
+#: lib/FAQ/OMatic/Item.pm:1504
+msgid "Who can change these moderator options and permissions:"
+msgstr "モデレータオプションとパーミッションを変更できる人:"
+
+#: lib/FAQ/OMatic/Item.pm:1506
+msgid "Who can create new bags:"
+msgstr "新しいbagを作れる人:"
+
+#: lib/FAQ/OMatic/Item.pm:1508
+msgid "Who can replace existing bags:"
+msgstr "存在する袋を置換できる人:"
+
+#: lib/FAQ/OMatic/Item.pm:1510
+msgid "Who can access the installation/configuration page (use caution!):"
+msgstr "インストール/構成ページにアクセスできる人(使用注意!):"
+
+#: lib/FAQ/OMatic/Item.pm:1512
+msgid "Who can use the group membership pages:"
+msgstr "グループメンバシップページを使える人:"
+
+#: lib/FAQ/OMatic/Item.pm:1529
+msgid "Moderator options for category"
+msgstr "カテゴリのためのモデレータオプション"
+
+#: lib/FAQ/OMatic/Item.pm:1533
+msgid "Moderator options for answer"
+msgstr "回答のためのモデレータオプション"
+
+#: lib/FAQ/OMatic/Item.pm:1538
+msgid "Moderator options for"
+msgstr "右記の項目のためのモデレータオプション "
+
+#: lib/FAQ/OMatic/Item.pm:1556
+msgid "Name & Description"
+msgstr "名前と説明"
+
+#: lib/FAQ/OMatic/Item.pm:1557
+msgid "Setting"
+msgstr "設定"
+
+#: lib/FAQ/OMatic/Item.pm:1558
+msgid "Setting if Inherited"
+msgstr "継承していた場合の設定"
+
+#: lib/FAQ/OMatic/Item.pm:1567 lib/FAQ/OMatic/Item.pm:1604
+msgid "(will inherit if empty)"
+msgstr "(もしも空白ならば継承される)"
+
+#: lib/FAQ/OMatic/Item.pm:1577
+msgid ""
+"Send mail to the moderator when someone other than the moderator edits this "
+"item:"
+msgstr ""
+"モデレータ以外のだれかがこのアイテムを編集した時にメールをモデレータに送る:"
+
+#: lib/FAQ/OMatic/Item.pm:1583 lib/FAQ/OMatic/Item.pm:1620
+msgid "No"
+msgstr "いいえ"
+
+#: lib/FAQ/OMatic/Item.pm:1583 lib/FAQ/OMatic/Item.pm:1620
+msgid "Yes"
+msgstr "はい"
+
+#: lib/FAQ/OMatic/Item.pm:1583 lib/FAQ/OMatic/Item.pm:1620
+#: lib/FAQ/OMatic/Item.pm:1661
+msgid "undefined"
+msgstr "未定義"
+
+#: lib/FAQ/OMatic/Item.pm:1602
+msgid "Notifier"
+msgstr "通知先"
+
+#: lib/FAQ/OMatic/Item.pm:1603
+msgid "Send mail to the Notifier when item is created or modified"
+msgstr "アイテムが作成又は変更された時にメールを通知先に送る"
+
+#: lib/FAQ/OMatic/Item.pm:1614
+msgid ""
+"Send mail to the Notifier when someone other than the moderator edits this "
+"item:"
+msgstr ""
+"モデレータ以外のだれかがこのアイテムを編集した時にメールをモデレータに送る:"
+
+#: lib/FAQ/OMatic/Item.pm:1625
+msgid "Permissions"
+msgstr "パーミッション"
+
+#: lib/FAQ/OMatic/Item.pm:1647
+msgid "Relax: New answers and subcategories will be moderated "
+msgstr "緩和: 新しい回答とサブカテゴリは、その新しいアイテムを編集"
+
+#: lib/FAQ/OMatic/Item.pm:1648
+msgid "by the creator of the item, allowing that person full "
+msgstr "するための完全な自由を人々に許可することをアイテムの作者によって"
+
+#: lib/FAQ/OMatic/Item.pm:1649
+msgid "freedom to edit that new item."
+msgstr "モデレートされる。"
+
+#: lib/FAQ/OMatic/Item.pm:1650
+msgid "Don't Relax: new items will be moderated by "
+msgstr "緩和しない: 新しいアイテムは、このアイテムの"
+
+#: lib/FAQ/OMatic/Item.pm:1651
+msgid "the moderator of this item."
+msgstr "モデレータによってモデレートされる。"
+
+#: lib/FAQ/OMatic/Item.pm:1656 lib/FAQ/OMatic/Item.pm:1660
+msgid "Relax"
+msgstr "緩和"
+
+#: lib/FAQ/OMatic/Item.pm:1656 lib/FAQ/OMatic/Item.pm:1660
+msgid "Don't Relax"
+msgstr "緩和しない"
+
+#: lib/FAQ/OMatic/Item.pm:1656
+msgid "Inherit"
+msgstr "|継承|"
+
+#: lib/FAQ/OMatic/Item.pm:1690 lib/FAQ/OMatic/Item.pm:1704
+msgid "(system default)"
+msgstr "(システム既定値)"
+
+#: lib/FAQ/OMatic/Item.pm:1696
+msgid "defined in"
+msgstr "右記で定義"
+
+#: lib/FAQ/OMatic/Item.pm:1775
+#, c-format
+msgid "File %0 seems broken."
+msgstr "ファイル %0 が壊れているように見える。"
+
+#: lib/FAQ/OMatic/Item.pm:2155
+msgid "Category"
+msgstr "カテゴリ"
+
+#: lib/FAQ/OMatic/Item.pm:2156
+msgid "Answer"
+msgstr "回答"
+
+#: lib/FAQ/OMatic/Item.pm:2226
+msgid ""
+"Either someone has changed the answer or category you were editing since you "
+"received the editing form, or you submitted the same form twice."
+msgstr ""
+"だれかが編集フォームを受け取ってから回答又はカテゴリを変更したか、フォームを"
+"二回送信した"
+
+#: lib/FAQ/OMatic/Item.pm:2228
+msgid ""
+"Please %0 and start again to make sure no changes are lost. Sorry for the "
+"inconvenience."
+msgstr "%0 と変更しない分が失われないように、再度スタート。不便を詫びる。"
+
+#: lib/FAQ/OMatic/Item.pm:2231
+msgid "(Sequence number in form: %0; in item: %1)"
+msgstr "(アイテム %1 中のフォーム: %0 のシーケンス番号)"
+
+#: lib/FAQ/OMatic/Part.pm:270
+msgid "Edit This Text"
+msgstr "このテキストを編集"
+
+#: lib/FAQ/OMatic/Part.pm:281
+msgid "Duplicate This Text"
+msgstr "このテキストを複製"
+
+#: lib/FAQ/OMatic/Part.pm:292 lib/FAQ/OMatic/Part.pm:305
+msgid "Remove This Text"
+msgstr "このテキストを削除"
+
+#: lib/FAQ/OMatic/Part.pm:317
+msgid "Replace %0 with new upload"
+msgstr "%0 を新しいアップロードしたもので置換"
+
+#: lib/FAQ/OMatic/Part.pm:324
+msgid "Select bag to replace with new upload"
+msgstr "アップロードで置換するbagを選択"
+
+#: lib/FAQ/OMatic/Part.pm:333
+msgid "Upload New Bag Here"
+msgstr "新しいbagをここにアップロード"
+
+#: lib/FAQ/OMatic/Part.pm:498
+msgid "Upload file:"
+msgstr "ファイルをアップロード:"
+
+#: lib/FAQ/OMatic/Part.pm:503
+msgid "Warning: file contents will <b>replace</b> previous text"
+msgstr "警告: ファイルの内容は以前のテキストで <b>置換</b> "
+
+#: lib/FAQ/OMatic/Part.pm:510
+msgid "Hide Attributions"
+msgstr "属性を隠す"
+
+#: lib/FAQ/OMatic/Part.pm:513
+msgid "Format text as:"
+msgstr "書式テキストは:"
+
+#: lib/FAQ/OMatic/Part.pm:523
+msgid "Directory"
+msgstr "ディレクトリ"
+
+#: lib/FAQ/OMatic/Part.pm:530
+msgid "Natural text"
+msgstr "自然なテキスト"
+
+#: lib/FAQ/OMatic/Part.pm:534
+msgid "Monospaced text (code, tables)"
+msgstr "1つのスペースのテキストText (コード,テーブル)"
+
+#: lib/FAQ/OMatic/Part.pm:549
+msgid "Untranslated HTML"
+msgstr "変換されないHTML"
+
+#: lib/FAQ/OMatic/Part.pm:699 lib/FAQ/OMatic/addItem.pm:102
+#: lib/FAQ/OMatic/install.pm:1177 lib/FAQ/OMatic/submitAnsToCat.pm:67
+msgid "Answers in this category:"
+msgstr "このカテゴリの回答"
+
+#: lib/FAQ/OMatic/SearchMod.pm:293
+msgid "zero days"
+msgstr "0日"
+
+#: lib/FAQ/OMatic/SearchMod.pm:294
+msgid "day"
+msgstr "日"
+
+#: lib/FAQ/OMatic/SearchMod.pm:295
+msgid "two days"
+msgstr "2日"
+
+#: lib/FAQ/OMatic/SearchMod.pm:296
+msgid "week"
+msgstr "週"
+
+#: lib/FAQ/OMatic/SearchMod.pm:297
+msgid "fortnight"
+msgstr "二週間"
+
+#: lib/FAQ/OMatic/SearchMod.pm:298
+msgid "month"
+msgstr "月"
+
+#: lib/FAQ/OMatic/SearchMod.pm:299
+msgid "three months"
+msgstr "3ヶ月"
+
+#: lib/FAQ/OMatic/SearchMod.pm:300
+msgid "six months"
+msgstr "6ヶ月"
+
+#: lib/FAQ/OMatic/SearchMod.pm:301
+msgid "year"
+msgstr "年"
+
+#: lib/FAQ/OMatic/SearchMod.pm:314
+msgid "days"
+msgstr "日"
+
+#: lib/FAQ/OMatic/Slow.pm:138
+#, c-format
+msgid "This page will reload every %0 seconds,"
+msgstr "このページは毎 %0 秒ごとにリロードされ、"
+
+#: lib/FAQ/OMatic/Slow.pm:141
+msgid "showing the entire process output."
+msgstr "プロセスの出力の全部を表示する。"
+
+#: lib/FAQ/OMatic/Slow.pm:142
+msgid "Show the tail of the process log"
+msgstr "プロセスログの末尾を表示"
+
+#: lib/FAQ/OMatic/Slow.pm:144
+#, c-format
+msgid "showing the last %0 lines of the process output."
+msgstr "プロセス出力の最後の %0 行を表示する。"
+
+#: lib/FAQ/OMatic/Slow.pm:145
+msgid "Show the entire process log"
+msgstr "全てのプロセスログを表示"
+
+#: lib/FAQ/OMatic/addItem.pm:48 lib/FAQ/OMatic/delPart.pm:47
+#: lib/FAQ/OMatic/editItem.pm:50 lib/FAQ/OMatic/editModOptions.pm:50
+#: lib/FAQ/OMatic/faq.pm:74 lib/FAQ/OMatic/moveItem.pm:50
+#: lib/FAQ/OMatic/selectBag.pm:60 lib/FAQ/OMatic/submitAnsToCat.pm:49
+#: lib/FAQ/OMatic/submitCatToAns.pm:48 lib/FAQ/OMatic/submitItem.pm:48
+#: lib/FAQ/OMatic/submitModOptions.pm:47 lib/FAQ/OMatic/submitPart.pm:48
+msgid "The file (%0) doesn't exist."
+msgstr "ファイル (%0) が存在しない。"
+
+#: lib/FAQ/OMatic/addItem.pm:67
+msgid "Copy of"
+msgstr "→のコピー"
+
+#: lib/FAQ/OMatic/addItem.pm:102 lib/FAQ/OMatic/install.pm:1177
+#: lib/FAQ/OMatic/submitAnsToCat.pm:67
+msgid "Subcategories:"
+msgstr "サブカテゴリ:"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:46
+msgid "Appearance Options"
+msgstr "見た目オプション"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60 lib/FAQ/OMatic/appearanceForm.pm:64
+#: lib/FAQ/OMatic/appearanceForm.pm:68 lib/FAQ/OMatic/appearanceForm.pm:84
+#: lib/FAQ/OMatic/appearanceForm.pm:92
+msgid "Show"
+msgstr "表示"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60
+msgid "Compact"
+msgstr "縮小"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:60 lib/FAQ/OMatic/appearanceForm.pm:64
+#: lib/FAQ/OMatic/appearanceForm.pm:68 lib/FAQ/OMatic/appearanceForm.pm:84
+#: lib/FAQ/OMatic/appearanceForm.pm:92
+msgid "Hide"
+msgstr "非表示"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:62 lib/FAQ/OMatic/install.pm:803
+msgid "expert editing commands"
+msgstr "上級向け編集コマンド"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:66 lib/FAQ/OMatic/install.pm:808
+msgid "name of moderator who organizes current category"
+msgstr "現在のカテゴリを管理するモデレータ名"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:70 lib/FAQ/OMatic/install.pm:813
+msgid "last modified date"
+msgstr "最後に変更した日時"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:84
+msgid "Default"
+msgstr "既定値"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:86 lib/FAQ/OMatic/install.pm:818
+msgid "attributions"
+msgstr "属性"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:88
+msgid "Simple"
+msgstr "単純"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:88
+msgid "Fancy"
+msgstr "きれい"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:94 lib/FAQ/OMatic/install.pm:823
+msgid "commands for generating text output"
+msgstr "テキスト出力作成のためのコマンド"
+
+#: lib/FAQ/OMatic/appearanceForm.pm:126
+msgid "Accept"
+msgstr "許可"
+
+#: lib/FAQ/OMatic/authenticate.pm:55
+msgid "Set a New Password"
+msgstr "新しいパスワードを設定"
+
+#: lib/FAQ/OMatic/authenticate.pm:60
+msgid "Create a New Login"
+msgstr "新しいログインを作成"
+
+#: lib/FAQ/OMatic/authenticate.pm:63
+msgid ""
+"That password is invalid. If you've forgotten your old password, you can"
+msgstr "そのパスワードは不正。もしもパスワードを忘れたら、"
+
+#: lib/FAQ/OMatic/authenticate.pm:81
+#, c-format
+msgid "New items can only be added by %0."
+msgstr "新しいアイテムは %0 のみ追加できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:83
+#, c-format
+msgid "New text parts can only be added by %0."
+msgstr "新しいテキストパートは %0 のみ追加できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:85
+#, c-format
+msgid "Text parts can only be removed by %0."
+msgstr "テキストパートは %0 のみ削除できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:89
+msgid ""
+"This part contains raw HTML. To avoid pages with invalid HTML, the moderator "
+"has specified that only %0 can edit HTML parts. If you are %0 you may "
+"authenticate yourself with this form."
+msgstr ""
+"このパートは生のHTMLを含んでいる。不正なHTMLを含むページを防止するため、モデ"
+"レータは %0 のみが編集出来るように指定している。もしも %0 ならば、このフォー"
+"ムで自分自身を認証する必要がある。"
+
+#: lib/FAQ/OMatic/authenticate.pm:91
+#, c-format
+msgid "Text parts can only be added by %0."
+msgstr "テキストパートは %0 のみ追加できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:93
+#, c-format
+msgid "Text parts can only be edited by %0."
+msgstr "テキストパートは %0 のみ編集できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:96
+#, c-format
+msgid "The title and options for this item can only be edited by %0."
+msgstr "このアイテムのタイトルとオプションは %0 のみ編集できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:98
+#, c-format
+msgid "The moderator options can only be edited by %0."
+msgstr "モデレータオプションは %0 のみ編集できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:101
+msgid ""
+"This item can only be moved by someone who can edit both the source and "
+"destination parent items."
+msgstr ""
+"このアイテムはソースとディストネーション親アイテム両方を編集できる人のみが移"
+"動できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:103
+#, c-format
+msgid "This item can only be moved by %0."
+msgstr "このアイテムは %0 のみ移動できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:110
+#, c-format
+msgid "Existing bags can only be replaced by %0."
+msgstr "存在するbagは %0 のみ更新できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:112
+#, c-format
+msgid "Bags can only be posted by %0."
+msgstr "bagは %0 のみ投稿できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:115
+#, c-format
+msgid "The FAQ-O-Matic can only be configured by %0."
+msgstr "FAQ-O-Matic は %0 のみ構成できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:117
+msgid "The operation you attempted (%0) can only be done by %1."
+msgstr "(%0) に対して試みた操作は %1 によってのみ完了できる。"
+
+#: lib/FAQ/OMatic/authenticate.pm:120
+msgid ""
+"If you have never established a password to use with FAQ-O-Matic, you can"
+msgstr ""
+"もしも、FAQ-O-Matic 用のパスワードを確立していないならば、右記でログイン"
+
+#: lib/FAQ/OMatic/authenticate.pm:121
+msgid "If you have forgotten your password, you can"
+msgstr "もしも、パスワードを忘れたら右記で新規パスワード"
+
+#: lib/FAQ/OMatic/authenticate.pm:122
+msgid ""
+"If you have already logged in earlier today, it may be that the token I use "
+"to identify you has expired. Please log in again."
+msgstr ""
+"もしも既に本日ログインしていたならば、認証用トークンの有効期限切れである。再"
+"度ログインが必要。"
+
+#: lib/FAQ/OMatic/authenticate.pm:136
+msgid "Please offer one of the following forms of identification:"
+msgstr "認識のために、以下のフォームのどれかを提出:"
+
+#: lib/FAQ/OMatic/authenticate.pm:139
+msgid "No authentication, but my email address is:"
+msgstr "認証がないが、メールアドレスは:"
+
+#: lib/FAQ/OMatic/authenticate.pm:140
+msgid "Email:"
+msgstr "メールアドレス:"
+
+#: lib/FAQ/OMatic/authenticate.pm:147
+msgid "Authenticated login:"
+msgstr "認証ログイン:"
+
+#: lib/FAQ/OMatic/authenticate.pm:149 lib/FAQ/OMatic/changePass.pm:71
+msgid "Password:"
+msgstr "パスワード:"
+
+#: lib/FAQ/OMatic/changePass.pm:48
+msgid "Please enter your username, and select a password."
+msgstr "あなたの名前を入力し、パスワードを選択"
+
+#: lib/FAQ/OMatic/changePass.pm:49
+msgid ""
+"I will send a secret number to the email address you enter to verify that it "
+"is valid."
+msgstr "認証を検査するために入力する暗証番号をメールアドレスに送った。"
+
+#: lib/FAQ/OMatic/changePass.pm:50
+msgid ""
+"If you prefer not to give your email address to this web form, please contact"
+msgstr "もしも、このWebフォームでメールアドレスを提供しなかったら右記に連絡を:"
+
+#: lib/FAQ/OMatic/changePass.pm:52
+msgid ""
+"Please <b>do not</b> use a password you use anywhere else, as it will not be "
+"transferred or stored securely!"
+msgstr ""
+"安全に保管も転送もされていないので、他の場所ではパスワードを<b>使ってはいけな"
+"い</b>。"
+
+#: lib/FAQ/OMatic/changePass.pm:73
+msgid "Set Password"
+msgstr "パスワード設定"
+
+#: lib/FAQ/OMatic/editBag.pm:75
+msgid "Replace bag"
+msgstr "bagの置換"
+
+#: lib/FAQ/OMatic/editBag.pm:81
+msgid "Upload new bag to show in the %0 part in <b>%1</b>."
+msgstr "<b>%1</>中のパート %0 中に表示するために新しいbagをアップロード"
+
+#: lib/FAQ/OMatic/editBag.pm:96
+msgid "Bag name:"
+msgstr "Bag名:"
+
+#: lib/FAQ/OMatic/editBag.pm:98
+msgid ""
+"The bag name is used as a filename, so it is restricted to only contain "
+"letters, numbers, underscores (_), hyphens (-), and periods (.). It should "
+"also carry a meaningful extension (such as .gif) so that web browsers will "
+"know what to do with the data."
+msgstr ""
+"バッグ名はファイル名として使用されるため、名前は英数字と下線(_)、ハイホン(-)"
+"とピリオド(.)に制限される。また、意味のある拡張子(例えば .gif)は伝達されるた"
+"め、Webブラウザはデータに対して何をしたらいいかが分かる。"
+
+#: lib/FAQ/OMatic/editBag.pm:99
+msgid "Hint: Leave blank and Bag Data filename will be used."
+msgstr "ヒント: 空白とBagデータファイル名を残すことは使うことが出来る"
+
+#: lib/FAQ/OMatic/editBag.pm:102
+msgid "Bag data:"
+msgstr "Bagデータ:"
+
+#: lib/FAQ/OMatic/editBag.pm:106
+msgid "Inline (Images only):"
+msgstr "インライン(イメージのみ)"
+
+#: lib/FAQ/OMatic/editBag.pm:110
+msgid ""
+"(Leave blank to keep original bag data and change only the associated "
+"information below.)"
+msgstr ""
+"(オリジナルのbagデータを保持するために空白を取り除き関連する以下の情報だけ変"
+"更。)"
+
+#: lib/FAQ/OMatic/editBag.pm:114
+msgid "If this bag is an image, fill in its dimensions."
+msgstr "もしもbagがイメージならばその次元を埋める"
+
+#: lib/FAQ/OMatic/editBag.pm:115
+msgid "Width:"
+msgstr "幅:"
+
+#: lib/FAQ/OMatic/editBag.pm:117
+msgid "Height:"
+msgstr "高さ:"
+
+#: lib/FAQ/OMatic/editPart.pm:147
+msgid "Enter the answer to <b>%0</b>"
+msgstr "<b>%0</b> の回答を入力"
+
+#: lib/FAQ/OMatic/editPart.pm:149
+msgid "Enter a description for <b>%0</b>"
+msgstr "<b>%0</b> の説明を入力"
+
+#: lib/FAQ/OMatic/editPart.pm:151
+msgid "Edit duplicated text for <b>%0</b>"
+msgstr "<b>%0</b> の複製テキストを編集"
+
+#: lib/FAQ/OMatic/editPart.pm:153
+msgid "Enter new text for <b>%0</b>"
+msgstr "<b>%0</b> の新しいテキストを入力"
+
+#: lib/FAQ/OMatic/editPart.pm:158
+msgid "Editing the %0 text part in <b>%1</b>."
+msgstr "<b>%1</b> 中の %0 テキストパートを編集。"
+
+#: lib/FAQ/OMatic/editPart.pm:172
+msgid ""
+"If you later need to edit or delete this text, use the [Appearance] page to "
+"turn on the expert editing commands."
+msgstr ""
+"もしも、このテキストを後で編集又は削除する必要がある場合、[見た目] ページで上"
+"級編集コマンドを有効にする必要がある。"
+
+#: lib/FAQ/OMatic/install.pm:94
+msgid "Faq-O-Matic Installer"
+msgstr "Faq-O-Matic インストーラ"
+
+#: lib/FAQ/OMatic/install.pm:122
+#, c-format
+msgid "%0 failed: "
+msgstr "%0 が失敗した: "
+
+#: lib/FAQ/OMatic/install.pm:128
+msgid "Unknown step: \"%0\"."
+msgstr "不明のステップ: \"%0\"."
+
+#: lib/FAQ/OMatic/install.pm:139
+msgid "Updating config to reflect new meta location <b>%0</b>."
+msgstr "新しいメタデータの位置 <b>%0</b> を反映させるために構成を更新"
+
+#: lib/FAQ/OMatic/install.pm:157
+msgid ""
+"(Can't find <b>config</b> in '%0' -- assuming this is a new installation.)"
+msgstr "('%0' 中に <b>config</b> が見付からない -- 新しいインストールと仮定。)"
+
+#: lib/FAQ/OMatic/install.pm:181
+#, c-format
+msgid "Click here</a> to create %0."
+msgstr "%0 を作成するためにここをクリック</a>。"
+
+#: lib/FAQ/OMatic/install.pm:183
+msgid ""
+"If you want to change the CGI stub to point to another directory, edit the "
+"script and then"
+msgstr ""
+"もしも、CGIスタブを別ディレクトリを示すように変更したいなら、スクリプトを編集"
+"し、"
+
+#: lib/FAQ/OMatic/install.pm:186
+msgid "click here to use the new location"
+msgstr "新しいローケーションを使うためにここをクリック"
+
+#: lib/FAQ/OMatic/install.pm:188
+msgid ""
+"FAQ-O-Matic stores files in two main directories.<p>The <b>meta/</b> "
+"directory path is encoded in your CGI stub (%0). It contains:"
+msgstr ""
+"FAQ-O-Matic はファイルを2つのディレクトリに格納する。<p><b>meta/</b>ディレク"
+"トリパスはCGIスタブ($0)中にエンコードされ、以下を含む:"
+
+#: lib/FAQ/OMatic/install.pm:189
+msgid ""
+"<ul><li>the <b>config</b> file that tells FAQ-O-Matic where everything else "
+"lives. That's why the CGI stub needs to know where meta/ is, so it can "
+"figure out the rest of its configuration. <li>the <b>idfile</b> file that "
+"lists user identities. Therefore, meta/ should not be accessible via the web "
+"server. <li>the <b>RCS/</b> subdirectory that tracks revisions to FAQ items. "
+"<li>various hint files that are used as FAQ-O-Matic runs. These can be "
+"regenerated automatically.</ul>"
+msgstr ""
+"<ul><li><b>config</b>ファイルは稼働状況以外の、どこにFAQ-O-Maticの全てがある"
+"かを記述する。それはなぜCGIスタブがどこに meta/ があるかを知る必要があると言"
+"う事であり、その構成の残りを指し示す。<li><b>idfile</b> はユーザ識別情報を保"
+"持する。そのため、meta/ はWeb サーバ経由でアクセスできてはいけない。"
+"<li><b>RCS/</b>サブディレクトリはFAQの各アイテムを追跡する。<li>種々のヒント"
+"ファイルはFAQ-O-Matic実行時に使われる。それらは自動的に再生成される。</ul>"
+
+#: lib/FAQ/OMatic/install.pm:190
+msgid ""
+"<p>The <b>serve/</b> directory contains three subdirectories <b>item/</b>, "
+"<b>cache/</b>, and <b>bags/</b>. These directories are created and populated "
+"by the FAQ-O-Matic CGI, but should be directly accessible via the web server "
+"(without invoking the CGI)."
+msgstr ""
+"<p><b>serve/</b>ディレクトリは3つのサブディレクトリ: <b>item/</b>, <b>cache/"
+"</b>と<b>bags/</b>を含む。それらのディレクトリは、FAQ-O-Matic-CGI によって作"
+"成され、一般化されるが、webサーバから(CGI起動なして)直接アクセス可能でなけれ"
+"ばならない。)."
+
+#: lib/FAQ/OMatic/install.pm:191
+msgid ""
+"<ul><li>serve/item/ contains only FAQ-O-Matic formatted source files, which "
+"encode both user-entered text and the hierarchical structure of the answers "
+"and categories in the FAQ. These files are only accessed through the web "
+"server (rather than the CGI) when another FAQ-O-Matic is mirroring this one. "
+"<li>serve/cache/ contains a cache of automatically-generated HTML versions "
+"of FAQ answers and categories. When possible, the CGI directs users to the "
+"cache to reduce load on the server. (CGI hits are far more expensive than "
+"regular file loads.) <li>serve/bags/ contains image files and other ``bags "
+"of bits.'' Bit-bags can be linked to or inlined into FAQ items (in the case "
+"of images). </ul>"
+msgstr ""
+"<ul><li>serve/item/ は FAQ-O-Matic形式のソースファイルのみ保持し、それは、"
+"ユーザが入力したテキストとFAQ中の階層構造の回答とカテゴリをエンコードする。そ"
+"れらのファイルは、他のFAQ-O-Maticがそれをミラーする時は、webサーバを経由して"
+"のみ(というよりはCGI経由)アクセスできる。<li>serve/cache/ ディレクトリは自動"
+"的に生成された、HTMLバージョンのFAQの回答とカテゴリのキャッシュを保持する。も"
+"しも可能ならば、CGIはサーバ負荷の軽減のために、キャッシュを指し示す。(CGIの"
+"ヒットは通常のファイルのロードよりははるかにコストがかかる。)<li>serve/bags/ "
+"はイメージファイルとその他の情報を含む。その他の情報のbagはFAQアイテム中にリ"
+"ンクできる(イメージの場合)。</ul>"
+
+#: lib/FAQ/OMatic/install.pm:203 lib/FAQ/OMatic/install.pm:218
+#: lib/FAQ/OMatic/install.pm:277 lib/FAQ/OMatic/install.pm:631
+msgid "I couldn't create <b>%0</b>: %1"
+msgstr "<b>%0</b>を作成できない: %1"
+
+#: lib/FAQ/OMatic/install.pm:207 lib/FAQ/OMatic/install.pm:222
+#: lib/FAQ/OMatic/install.pm:634
+msgid "Created <b>%0</b>."
+msgstr "<b>%0</b> を作成した。"
+
+#: lib/FAQ/OMatic/install.pm:210 lib/FAQ/OMatic/install.pm:225
+#: lib/FAQ/OMatic/install.pm:637
+msgid "I don't have write permission to <b>%0</b>."
+msgstr "<b>%0</b>に対する書き込み許可を持っていない。"
+
+#: lib/FAQ/OMatic/install.pm:269
+msgid "Created new config file."
+msgstr "新しい構成ファイルを作成した。"
+
+#: lib/FAQ/OMatic/install.pm:283
+msgid "The idfile exists."
+msgstr "idfile が存在している。"
+
+#: lib/FAQ/OMatic/install.pm:332
+msgid "Configuration Main Menu (install module)"
+msgstr "構成メインメニュー(モジュールインストール)"
+
+#: lib/FAQ/OMatic/install.pm:333
+msgid "Perform these tasks in order to prepare your FAQ-O-Matic version %0:"
+msgstr "あなたの FAQ-O-Matic バージョン %0を準備するためにこれらの処理を実行:"
+
+#: lib/FAQ/OMatic/install.pm:338
+msgid "Define configuration parameters"
+msgstr "構成パラメータの定義"
+
+#: lib/FAQ/OMatic/install.pm:343 lib/FAQ/OMatic/install.pm:348
+msgid "Set your password and turn on installer security"
+msgstr "パスワード設定し、インストーラのセキュリティを有効にする"
+
+#: lib/FAQ/OMatic/install.pm:349
+msgid "(Need to configure \\$mailCommand and \\$adminAuth)"
+msgstr "(\\$mailCommand と \\$adminAuth の構成が必要)"
+
+#: lib/FAQ/OMatic/install.pm:355
+msgid "(Installer security is on)"
+msgstr "(インストーラのセキュリティが有効)"
+
+#: lib/FAQ/OMatic/install.pm:360
+msgid "Create item, cache, and bags directories in serve dir"
+msgstr "サーバ中のアイテム、キャッシュとbagディレクトリの作成"
+
+#: lib/FAQ/OMatic/install.pm:368
+msgid "Copy old items</a> from <tt>%0</tt> to <tt>%1</tt>."
+msgstr "古いアイテム</a> を <tt>%0</tt> から <tt>%1</tt> に複写"
+
+#: lib/FAQ/OMatic/install.pm:375
+msgid "Install any new items that come with the system"
+msgstr "システム由来の新しいアイテムのインストール"
+
+#: lib/FAQ/OMatic/install.pm:380
+msgid "Create system default items"
+msgstr "システム既定値のアイテムの作成"
+
+#: lib/FAQ/OMatic/install.pm:388
+msgid "Rebuild the cache and dependency files"
+msgstr "キャッシュと依存するファイルの再作成"
+
+#: lib/FAQ/OMatic/install.pm:395
+msgid "Install system images and icons"
+msgstr "システム用のイメージとアイコンのインストール"
+
+#: lib/FAQ/OMatic/install.pm:403
+msgid "Update mirror from master now. (this can be slow!)"
+msgstr "ミラーのマスタからの更新(遅い場合あり!)"
+
+#: lib/FAQ/OMatic/install.pm:409
+msgid "Set up the maintenance cron job"
+msgstr "メンテナンス用cronジョブの設定"
+
+#: lib/FAQ/OMatic/install.pm:415 lib/FAQ/OMatic/install.pm:420
+msgid "Run maintenance script manually now"
+msgstr "メンテナンススクリプトの手動実行"
+
+#: lib/FAQ/OMatic/install.pm:422
+msgid "(Need to set up the maintenance cron job first)"
+msgstr "(最初にメンテナンスcronジョブの設定が必要)"
+
+#: lib/FAQ/OMatic/install.pm:430
+msgid "Maintenance last run at:"
+msgstr "最後に実行されたもののメンテナンス:"
+
+#: lib/FAQ/OMatic/install.pm:435
+#, c-format
+msgid "Mark the config file as upgraded to Version %0"
+msgstr "構成ファイルをバージョン %0 にアップグレードするようにマーク"
+
+#: lib/FAQ/OMatic/install.pm:441
+msgid "Select custom colors for your Faq-O-Matic</a> (optional)"
+msgstr "Faq-O-Matic用のカスタムカラーの選択</a> (任意)"
+
+#: lib/FAQ/OMatic/install.pm:445
+msgid "Define groups</a> (optional)"
+msgstr "グループの定義</a> (任意)"
+
+#: lib/FAQ/OMatic/install.pm:451
+msgid "Upgrade to CGI.pm version 2.49 or newer."
+msgstr "CGI.pm をバージョン 2.49 以降に更新せよ。"
+
+#: lib/FAQ/OMatic/install.pm:454
+msgid "(optional; older versions have bugs that affect bags)"
+msgstr "(任意; 古いバージョンはbagに影響するバグを持つ)"
+
+#: lib/FAQ/OMatic/install.pm:457
+#, c-format
+msgid "You are using version %0 now."
+msgstr "現在バージョン %0 を使用している。"
+
+#: lib/FAQ/OMatic/install.pm:462
+msgid "Bookmark this link to be able to return to this menu."
+msgstr "このメニューに戻れるように、リンクをブックマークに保存しなさい。"
+
+#: lib/FAQ/OMatic/install.pm:473
+msgid "(need to turn on installer security)"
+msgstr "(インストーラのセキュリティを有効にする必要がある)"
+
+#: lib/FAQ/OMatic/install.pm:476
+msgid "Other available tasks:"
+msgstr "他の有効なタスク:"
+
+#: lib/FAQ/OMatic/install.pm:480
+msgid "See access statistics"
+msgstr "アクセス統計を見る"
+
+#: lib/FAQ/OMatic/install.pm:485
+msgid "Examine all bags"
+msgstr "すべてのbagを検査"
+
+#: lib/FAQ/OMatic/install.pm:491
+msgid "Check for unreferenced bags (not linked by any FAQ item)"
+msgstr "未参照のbag(FAQアイテムにリンクされていない)をチェック"
+
+#: lib/FAQ/OMatic/install.pm:497
+msgid "Empty old trash now"
+msgstr "古いゴミ箱を今削除"
+
+#: lib/FAQ/OMatic/install.pm:503
+msgid "fsck (check and repair tree structure) now"
+msgstr "fsck(木構造の検査と修復)"
+
+#: lib/FAQ/OMatic/install.pm:509
+msgid "rebuild search database now"
+msgstr "検索データベースを今再構成"
+
+#: lib/FAQ/OMatic/install.pm:517
+msgid "Rebuild the cache and dependency files now"
+msgstr "キャッシュと依存するファイルの再作成"
+
+#: lib/FAQ/OMatic/install.pm:522
+#, c-format
+msgid "The Faq-O-Matic modules are version %0."
+msgstr "Faq-O-Maticのモジュールのバージョンは %0。"
+
+#: lib/FAQ/OMatic/install.pm:641
+msgid ""
+"I wasn't able to change the permissions on <b>%0</b> to 755 (readable/"
+"searchable by all)."
+msgstr ""
+"<b>%0</b> のパーミッションを 755 にできない(全てのユーザに 読み/検索を許可)。"
+
+#: lib/FAQ/OMatic/install.pm:656 lib/FAQ/OMatic/install.pm:657
+msgid "updated config file:"
+msgstr "構成ファイルを更新:"
+
+#: lib/FAQ/OMatic/install.pm:664
+msgid "Redefine configuration parameters to ensure that <b>%0</b> is valid."
+msgstr "<b>%0</b> の有効化を確実にするために構成ファイルパラメータを再定義。"
+
+#: lib/FAQ/OMatic/install.pm:676
+msgid "Jon made a mistake here; key=%0, property=%1."
+msgstr "Jonはここでミスをした; key=%0, property=%1."
+
+#: lib/FAQ/OMatic/install.pm:705
+msgid "<b>Mandatory:</b> System information"
+msgstr "<b>必須:</b> システム情報"
+
+#: lib/FAQ/OMatic/install.pm:708
+msgid "Identity of local FAQ-O-Matic administrator (an email address)"
+msgstr "ローカルの FAQ-O-Matic管理者の識別(メールアドレス)"
+
+#: lib/FAQ/OMatic/install.pm:710
+msgid ""
+"A command FAQ-O-Matic can use to send mail. It must either be sendmail, or "
+"it must understand the -s (Subject) switch."
+msgstr ""
+"FAQ-O-Maticがメール送信に使うコマンド。それはsendmailか -s(題名)スイッチを認"
+"識しなければならない。"
+
+#: lib/FAQ/OMatic/install.pm:712
+msgid "The command FAQ-O-Matic can use to install a cron job."
+msgstr "cronジョブをインストールするのに使うコマンド。"
+
+#: lib/FAQ/OMatic/install.pm:716
+msgid "Path to the <b>ci</b> command from the RCS package."
+msgstr "RCSパッケージの <b>ci</b> コマンドへのパス。"
+
+#: lib/FAQ/OMatic/install.pm:719
+msgid "Path to the <b>co</b> command from the RCS package."
+msgstr "RCSパッケージの <b>co</b> コマンドへのパス。"
+
+#: lib/FAQ/OMatic/install.pm:722
+msgid "<b>Mandatory:</b> Server directory configuration"
+msgstr "<b>必須:</b> サーバディレクトリ構成"
+
+#: lib/FAQ/OMatic/install.pm:724
+msgid ""
+"Protocol, host, and port parts of the URL to your site. This will be used to "
+"construct link URLs. Omit the trailing '/'; for example: <tt>http://www."
+"dartmouth.edu</tt>"
+msgstr ""
+"作成サイトのURLのプロトコル、ホストとポート番号部分。これはURLのリンクの構築"
+"に使われる。最後の '/'を省略しなさい。例:<tt>http://www.dartmouth.edu</tt>"
+
+#: lib/FAQ/OMatic/install.pm:727
+msgid ""
+"The path part of the URL used to access this CGI script, beginning with '/' "
+"and omitting any parameters after the '?'. For example: <tt>/cgi-bin/cgiwrap/"
+"jonh/faq.pl</tt>"
+msgstr ""
+"このCGIスクリプトにアクセスするためのURLのパスの部分で、'/'で始まり、'?'以降"
+"の任意のパラメータを省略。例:<tt>/cgi-bin/cgiwrap/jonh/faq.pl</tt>"
+
+#: lib/FAQ/OMatic/install.pm:730
+msgid ""
+"Filesystem directory where FAQ-O-Matic will keep item files, image and other "
+"bit-bag files, and a cache of generated HTML files. This directory must be "
+"accessible directly via the http server. It might be something like /home/"
+"faqomatic/public_html/fom-serve/"
+msgstr ""
+"FAQ-O-Maticがアイテムファイル、イメージとその他のもののbagファイルを保持し、"
+"作成したHTMLファイルをキャッシュするディレクトリ。このディレクトリはhttpサー"
+"バ経由でアクセスできねばならない。たとえば、/home/faqomatic/public_html/fom-"
+"serve/である。"
+
+#: lib/FAQ/OMatic/install.pm:732
+msgid ""
+"The path prefix of the URL needed to access files in <b>\\$serveDir</b>. It "
+"should be relative to the root of the server (omit http://hostname:port, but "
+"include a leading '/'). It should also end with a '/'."
+msgstr ""
+"<b>\\$serveDir</b>中のファイルにアクセスするのに必要なURLのプレフィックスのパ"
+"ス。これはサーバのrootからの相対パスでなければならない(http://hostname:portは"
+"省略できるが、先行する'/' は含まなければならない。)。また、'/'で終る必要があ"
+"る。"
+
+#: lib/FAQ/OMatic/install.pm:735
+msgid "<i>Optional:</i> Miscellaneous configurations"
+msgstr "<i>任意:</i> その他の構成設定"
+
+#: lib/FAQ/OMatic/install.pm:740
+msgid "Select the display language."
+msgstr "表示言語を選択"
+
+#: lib/FAQ/OMatic/install.pm:741
+msgid "'en'"
+msgstr "'ja_JP.EUC'"
+
+#: lib/FAQ/OMatic/install.pm:745
+msgid "Show dates in 24-hour time or am/pm format."
+msgstr "時間を24時間制/午前午後形式で表示。"
+
+#: lib/FAQ/OMatic/install.pm:749
+msgid ""
+"If this parameter is set, this FAQ will become a mirror of the one at the "
+"given URL. The URL should be the base name of the CGI script of the master "
+"FAQ-O-Matic."
+msgstr ""
+"もしもこのパラメータが設定されると、このFAQは与えられたURLのミラーとなる。URL"
+"はマスターFAQ-O-MaticのCGIスクリプトのベースネームでなければならない。"
+
+#: lib/FAQ/OMatic/install.pm:751
+msgid ""
+"An HTML fragment inserted at the top of each page. You might use this to "
+"place a corporate logo."
+msgstr ""
+"それぞれのページの先頭に挿入されるHTMLフラグメント。会社のロゴを配置するのに"
+"使える。"
+
+#: lib/FAQ/OMatic/install.pm:753 lib/FAQ/OMatic/install.pm:766
+msgid ""
+"If this field begins with <tt>file=</tt>, the text will come from the named "
+"file in the meta directory; otherwise, this field is included verbatim."
+msgstr ""
+"もしもフィールドが <tt>file=</tt> で始まるならば、テキストはメタディレクトリ"
+"中の名前付けられたファイルから来る。それ例外は、このフィールドはverbatimを含"
+"む。"
+
+#: lib/FAQ/OMatic/install.pm:761
+msgid ""
+"The <tt>width=</tt> tag in a table. If your <b>\\$pageHeader</b> has "
+"<tt>align=left</tt>, you will want to make this empty."
+msgstr ""
+"テーブル中の<tt>width=</tt> タグ。もしも <b>\\$pageHeader</b> が "
+"<tt>align=left</tt>ならば、これを空白にしてもよい。"
+
+#: lib/FAQ/OMatic/install.pm:764
+msgid ""
+"An HTML fragment appended to the bottom of each page. You might use this to "
+"identify the webmaster for this site."
+msgstr ""
+"各ページの末尾に追加されるHTMLフラグメント。このサイトのWeb管理者を表示するの"
+"に使える。"
+
+#: lib/FAQ/OMatic/install.pm:769
+msgid ""
+"Where FAQ-O-Matic should send email when it wants to alert the administrator "
+"(usually same as \\$adminAuth)"
+msgstr ""
+"FAQ-O-Maticが、管理者に警告を送ろうとする時に、送る先のメールアドレス(通常は"
+"\\$adminAuthと同一)"
+
+#: lib/FAQ/OMatic/install.pm:771
+msgid ""
+"If true, FAQ-O-Matic will mail the log file to the administrator whenever it "
+"is truncated."
+msgstr ""
+"もしも真ならば、FAQ-O-Maticはログファイルが縮められた時には必ずメールする。"
+
+#: lib/FAQ/OMatic/install.pm:774
+msgid "User to use for RCS ci command (default is process UID)"
+msgstr "RCS ci コマンドを使うユーザ(既定値ではプロセスのUID)"
+
+#: lib/FAQ/OMatic/install.pm:778
+msgid ""
+"Links from cache to CGI are relative to the server root, rather than "
+"absolute URLs including hostname:"
+msgstr ""
+"ホスト名を含む絶対URLというよりはサーバルートからCGIキャッシュへの相対リンク:"
+
+#: lib/FAQ/OMatic/install.pm:782
+msgid ""
+"mailto: links can be rewritten such as jonhATdartmouthDOTedu (cheesy), jonh "
+"(nameonly), or e-mail addresses suppressed entirely (hide)."
+msgstr ""
+"mailto: リンクは jonhATdartmouthDOTedu (擬似的)、jonh(名前のみ)又はメールアド"
+"レスが完全に抑圧される(隠蔽)ように書き換えることが出来る。"
+
+#: lib/FAQ/OMatic/install.pm:786
+msgid ""
+"Number of seconds that authentication cookies remain valid. These cookies "
+"are stored in URLs, and so can be retrieved from a browser history file. "
+"Hence they should usually time-out fairly quickly."
+msgstr ""
+"認証クッキーが有効な秒数。このクッキーはURLに保存され、ブラウザヒストリファイ"
+"ルから検索できる。そのため、あまり早くタイムアウトにならないように設定。"
+
+#: lib/FAQ/OMatic/install.pm:790
+msgid ""
+"Number of days that trash sits in the trash category before maintenance "
+"cleans it up. '0' lets it stay forever."
+msgstr ""
+"保守時に削除してしまう前に、ごみがゴミ箱(trash)カテゴリ中に居座っている日"
+"数。'0'を指定すると永遠に保持される。"
+
+#: lib/FAQ/OMatic/install.pm:793
+msgid "<i>Optional:</i> These options set the default [Appearance] modes."
+msgstr "<i>任意:</i> これらのオプションが[Appearance]モードの既定値に設定。"
+
+#: lib/FAQ/OMatic/install.pm:798
+msgid "Page rendering scheme. Do not choose 'text' as the default."
+msgstr "ページレンダリングスキーム。'text'を既定値として選んではならない。"
+
+#: lib/FAQ/OMatic/install.pm:826
+msgid ""
+"<i>Optional:</i> These options fine-tune the appearance of editing features."
+msgstr ""
+"<i>任意:</i> これらのオプションは編集機能向けのの見栄えに良く調整されている。"
+
+#: lib/FAQ/OMatic/install.pm:829
+msgid "The old [Show Edit Commands] button appears in the navigation bar."
+msgstr "古い[編集コマンドを表示]ボタンはナビゲータバーにある。"
+
+#: lib/FAQ/OMatic/install.pm:833
+msgid "Navigation links appear at top of page as well as at the bottom."
+msgstr "ナビゲーションリンクは末尾と同じようにページの先頭にある。"
+
+#: lib/FAQ/OMatic/install.pm:837
+msgid "Hide [Append to This Answer] and [Add New Answer in ...] buttons."
+msgstr "[この回答を追加]と[新しい回答を追加...]ボタンを隠す。"
+
+#: lib/FAQ/OMatic/install.pm:842
+msgid "Editing commands appear with neat-o icons rather than [In Brackets]."
+msgstr "[ブラケット中]というよりは編集コマンドは neat-oアイコンと一緒にある。"
+
+#: lib/FAQ/OMatic/install.pm:845
+msgid ""
+"<i>Optional:</i> Other configurations that you should probably ignore if "
+"present."
+msgstr "<i>任意:</i> もしも存在するならば、その他の構成は無視すべきである。"
+
+#: lib/FAQ/OMatic/install.pm:849
+msgid "Draw Item titles John Nolan's way."
+msgstr "アイテムタイトルをJohn Nolan流で描画。"
+
+#: lib/FAQ/OMatic/install.pm:853
+msgid "Hide sibling (Previous, Next) links"
+msgstr "(前、次)兄弟リンクを隠す"
+
+#: lib/FAQ/OMatic/install.pm:857
+msgid "Use DBM-based search databases. Faster on machines with non-broken DBM."
+msgstr ""
+"DBMベースの検索データベースを使う。壊れていないDBMのマシンのものを使うより早"
+"い。"
+
+#: lib/FAQ/OMatic/install.pm:860
+msgid ""
+"Links from search results page point into cache (do not highlight search "
+"terms)"
+msgstr ""
+"検索の結果をキャッシュ中のページを指すようにする(検索語をハイライト)しない"
+
+#: lib/FAQ/OMatic/install.pm:865
+msgid ""
+"Arguments to make ci quietly log changes and not mash RCS tags (use default "
+"with GNU RCS)"
+msgstr ""
+"表示無しにログの変更をciコマンドにさせ、RCSタグをつぶさせない引数(GNU RCSで既"
+"定値として使う"
+
+#: lib/FAQ/OMatic/install.pm:868
+msgid "Arguments to make co not mash RCS tags (use default with GNU RCS)"
+msgstr "coにRCSタグをつぶさせない引数(GNU RCSで既定値として使う)"
+
+#: lib/FAQ/OMatic/install.pm:974
+msgid "This is a command, so only letters, hyphens, and slashes are allowed."
+msgstr "これはコマンドなので、英数字、ハイホンとスラッシュのみが有効。"
+
+#: lib/FAQ/OMatic/install.pm:1033
+msgid ""
+"If this is your first time installing a FAQ-O-Matic, I recommend only "
+"filling in the sections marked <b>Mandatory</b>."
+msgstr ""
+"もしも最初のFAQ-O-Maticのインストールならば、<b>必須</b>とマークされたセク"
+"ションのみを埋める事を推奨。"
+
+#: lib/FAQ/OMatic/install.pm:1037
+msgid "Define"
+msgstr "定義"
+
+#: lib/FAQ/OMatic/install.pm:1080
+msgid "You should <a href=\"%0\">go back</a> and fix these configurations."
+msgstr "<a href=\"%0\">戻る</a> に戻り、それらの構成を修正しなければならない。"
+
+#: lib/FAQ/OMatic/install.pm:1083
+msgid "Rewrote configuration file."
+msgstr "構成ファイルを再書き込み。"
+
+#: lib/FAQ/OMatic/install.pm:1097
+msgid ""
+"%0 (%1) has an internal apostrophe, which will certainly make Perl choke on "
+"the config file."
+msgstr ""
+"%0 (%1) は内部にアポストロフィがあり、それは構成ファイル上で確実にPerlを止め"
+"る。"
+
+#: lib/FAQ/OMatic/install.pm:1101 lib/FAQ/OMatic/install.pm:1107
+msgid "%0 (%1) doesn't look like a fully-qualified email address."
+msgstr "%0 (%1) は完全に記述されている電子メールアドレスではない。"
+
+#: lib/FAQ/OMatic/install.pm:1113 lib/FAQ/OMatic/install.pm:1118
+msgid "%0 (%1) isn't executable."
+msgstr "%0 (%1) は実行できない。"
+
+#: lib/FAQ/OMatic/install.pm:1135
+msgid "%0 has funny characters."
+msgstr "%0 には不正な文字がある。"
+
+#: lib/FAQ/OMatic/install.pm:1170
+msgid ""
+"To name your FAQ-O-Matic, use the [Appearance] page to show the expert "
+"editing commands, then click [Edit Category Title and Options]."
+msgstr ""
+"FAQ-O-Maticに名前を付けるために、[見た目]ページで上級編集コマンドを見えるよう"
+"に使い、[カテゴリタイトルとオプションの編集]をクリック"
+
+#: lib/FAQ/OMatic/install.pm:1180 lib/FAQ/OMatic/install.pm:1192
+#: lib/FAQ/OMatic/install.pm:1204
+msgid "Created category \"%0\"."
+msgstr "\"%0\"カテゴリを作成した。"
+
+#: lib/FAQ/OMatic/install.pm:1182 lib/FAQ/OMatic/install.pm:1194
+#: lib/FAQ/OMatic/install.pm:1206
+msgid "<b>%0</b> already contains a file '%1'."
+msgstr "<b>%0</b> はすでにファイル '%1' を含んでいる。"
+
+#: lib/FAQ/OMatic/install.pm:1244
+msgid "Copied %0 items from <tt>%1</tt> to <tt>%2</tt>."
+msgstr "%0 アイテムを、<tt>%1</tt>から<tt>%2</tt>へコピーした。"
+
+#: lib/FAQ/OMatic/install.pm:1301
+msgid "Attempting to install cron job:"
+msgstr "cronジョブのインストールを試みる:"
+
+#: lib/FAQ/OMatic/install.pm:1349
+msgid ""
+"I replaced this old crontab line, which appears to be an older one for this "
+"same FAQ:"
+msgstr "この同じFAQの古い物に見えるような、古いcrontab行をリプレースした:"
+
+#: lib/FAQ/OMatic/install.pm:1358
+msgid "I thought I installed a new cron job, but it didn't appear to take."
+msgstr "新しいcronジョブをインストールしたが、そのように見えないと思う。"
+
+#: lib/FAQ/OMatic/install.pm:1360
+msgid ""
+"You better add %0 to some crontab yourself with <b><tt>crontab -e</tt></b>"
+msgstr ""
+"%0 をいくつかのcrontabに、<b><tt>crontab -e</tt></b> を使って御自身で追加した"
+"方が良い。"
+
+#: lib/FAQ/OMatic/install.pm:1366
+msgid "Cron job installed. The maintenance script should run hourly."
+msgstr "Cronジョブをインストールした。管理スクリプトを毎時動かすべきである。"
+
+#: lib/FAQ/OMatic/install.pm:1422
+msgid "Use the <u>%0</u> links to change the color of a feature."
+msgstr "<u>%0</u> リンクを、機能の色を変更するために使う。"
+
+#: lib/FAQ/OMatic/install.pm:1436
+msgid "An Item Title"
+msgstr "アイテムの題名"
+
+#: lib/FAQ/OMatic/install.pm:1444
+msgid ""
+"A regular part is how most of your content will appear. The text colors "
+"should be most pleasantly readable on this background."
+msgstr ""
+"通常のパートはどのようにほとんどのコンテンツを見せるかである。テキストの色は"
+"この背景上でほとんど快適に読める。"
+
+#: lib/FAQ/OMatic/install.pm:1446 lib/FAQ/OMatic/install.pm:1458
+#: lib/FAQ/OMatic/install.pm:1485
+msgid "A new link"
+msgstr "新しいリンク"
+
+#: lib/FAQ/OMatic/install.pm:1447 lib/FAQ/OMatic/install.pm:1459
+#: lib/FAQ/OMatic/install.pm:1489
+msgid "A visited link"
+msgstr "訪れたリンク"
+
+#: lib/FAQ/OMatic/install.pm:1449 lib/FAQ/OMatic/install.pm:1461
+#: lib/FAQ/OMatic/install.pm:1494
+msgid "A search hit"
+msgstr "検索にヒット"
+
+#: lib/FAQ/OMatic/install.pm:1457
+msgid "A directory part should stand out"
+msgstr "ディレクトリ部分はstand outすべき"
+
+#: lib/FAQ/OMatic/install.pm:1481
+msgid "Regular text"
+msgstr "通常のテキスト"
+
+#: lib/FAQ/OMatic/install.pm:1506
+msgid "Select a color for %0:"
+msgstr "%0 の色を選択:"
+
+#: lib/FAQ/OMatic/install.pm:1517
+msgid "Or enter an HTML color specification manually:"
+msgstr "又は、HTML色指定を手動で入力:"
+
+#: lib/FAQ/OMatic/install.pm:1520
+msgid "Select"
+msgstr "選択"
+
+#: lib/FAQ/OMatic/install.pm:1529
+msgid "Unrecognized config parameter"
+msgstr "不明な構成パラメータ"
+
+#: lib/FAQ/OMatic/install.pm:1577
+#, c-format
+msgid "Proceed to step '%0'"
+msgstr "ステップ '%0' の実行"
+
+#: lib/FAQ/OMatic/install.pm:1708
+msgid ""
+"You must enter the correct temporary password to install this FAQ-O-Matic. "
+"If you don't know it, remake the CGI stub to have a new one assigned."
+msgstr ""
+"FAO-O-Maticをインストールするために正しい一時パスワードを入力する必要がある。"
+"もしもその方法を知らないならば、CGIスタブを、新しいパスワードを割り当てるため"
+"に再作成せよ。"
+
+#: lib/FAQ/OMatic/install.pm:1711
+msgid "Temporary password: "
+msgstr "一時パスワード: "
+
+#: lib/FAQ/OMatic/moveItem.pm:114
+msgid "Make <b>%0</b> belong to which other item?"
+msgstr "<b>%0</b> をどちらのアイテムに属させるか?"
+
+#: lib/FAQ/OMatic/moveItem.pm:118
+msgid "No item that already has sub-items can become the parent of"
+msgstr "右記の親になれる、既にサブアイテムを持つアイテムがない"
+
+#: lib/FAQ/OMatic/moveItem.pm:120
+msgid "No item can become the parent of"
+msgstr "右記の親のアイテムになれる物が無い"
+
+#: lib/FAQ/OMatic/moveItem.pm:124
+msgid ""
+"Some destinations are not available (not clickable) because you do not have "
+"permission to edit them as currently authorized."
+msgstr ""
+"いくつかのディストネーションは無効で(クリックできない)あり、それは、現在の認"
+"証状態ではそれらの編集権限が無いためである。"
+
+#: lib/FAQ/OMatic/moveItem.pm:127
+msgid "Click here</a> to provide better authentication."
+msgstr "より良い認証を提供するためここをクリック</a>。"
+
+#: lib/FAQ/OMatic/moveItem.pm:133
+msgid "Hide answers, show only categories"
+msgstr "回答を隠し、カテゴリのみ表示"
+
+#: lib/FAQ/OMatic/moveItem.pm:136
+msgid "Show both categories and answers"
+msgstr "カテゴリと回答両方を表示"
+
+#: lib/FAQ/OMatic/recent.pm:62
+#, c-format
+msgid "No items were modified in the last %0."
+msgstr "最後の %0 中で何のアイテムも変更されなかった。"
+
+#: lib/FAQ/OMatic/recent.pm:65
+msgid "Items modified in the last %0:"
+msgstr "最後の %0 中で アイテムが変更された。"
+
+#: lib/FAQ/OMatic/search.pm:72
+msgid "No items matched all of these words"
+msgstr "それらの単語のすべてでアイテムに一致したものはなかった"
+
+#: lib/FAQ/OMatic/search.pm:76
+#, c-format
+msgid "No items matched at least %0 of these words"
+msgstr "少なくともそれらの %0 の語でアイテムに一致したものはなかった"
+
+#: lib/FAQ/OMatic/search.pm:85
+msgid "Search results for all of these words"
+msgstr "全ての語のための検索結果"
+
+#: lib/FAQ/OMatic/search.pm:89
+#, c-format
+msgid "Search results for at least %0 of these words"
+msgstr "少なくともそれらの語の %0 のための検索結果"
+
+#: lib/FAQ/OMatic/search.pm:106
+msgid ""
+"Results may be incomplete, because the search index has not been refreshed "
+"since the most recent change to the database."
+msgstr ""
+"検索索引がデータベースの最新の変更以来更新されていないため、結果は不完全な可"
+"能性がある。"
+
+#: lib/FAQ/OMatic/searchForm.pm:53
+msgid "search for keywords"
+msgstr "検索のためのキーワード"
+
+#: lib/FAQ/OMatic/searchForm.pm:58
+msgid "Search for"
+msgstr "検索対象:"
+
+#: lib/FAQ/OMatic/searchForm.pm:59
+msgid "matching"
+msgstr "一致"
+
+#: lib/FAQ/OMatic/searchForm.pm:61
+msgid "all"
+msgstr "すべて"
+
+#: lib/FAQ/OMatic/searchForm.pm:62
+msgid "any"
+msgstr "任意"
+
+#: lib/FAQ/OMatic/searchForm.pm:63
+msgid "two"
+msgstr "2つ"
+
+#: lib/FAQ/OMatic/searchForm.pm:64
+msgid "three"
+msgstr "3つ"
+
+#: lib/FAQ/OMatic/searchForm.pm:65
+msgid "four"
+msgstr "4つ"
+
+#: lib/FAQ/OMatic/searchForm.pm:66
+msgid "five"
+msgstr "5つ"
+
+#: lib/FAQ/OMatic/searchForm.pm:68
+msgid "words"
+msgstr "語"
+
+#: lib/FAQ/OMatic/searchForm.pm:76
+msgid "search for recent changes"
+msgstr "最近の変更を検索"
+
+#: lib/FAQ/OMatic/searchForm.pm:82
+msgid "Show documents"
+msgstr "ドキュメント表示"
+
+#: lib/FAQ/OMatic/searchForm.pm:83
+msgid "modified in the last"
+msgstr "最後で変更"
+
+#: lib/FAQ/OMatic/selectBag.pm:69
+msgid "Replace which bag?"
+msgstr "どのbagを置換?"
+
+#: lib/FAQ/OMatic/stats.pm:69
+msgid "Hits Per Day"
+msgstr "一日あたりのヒット数"
+
+#: lib/FAQ/OMatic/stats.pm:70
+msgid "Cumulative Hits"
+msgstr "累積ヒット数"
+
+#: lib/FAQ/OMatic/stats.pm:74
+msgid "New Hosts Per Day"
+msgstr "一日あたりの新規ホスト数"
+
+#: lib/FAQ/OMatic/stats.pm:75
+msgid "Total Hosts"
+msgstr "トータルホスト数"
+
+#: lib/FAQ/OMatic/stats.pm:79
+msgid "Hits Per Host"
+msgstr "ホストあたりのヒット数"
+
+#: lib/FAQ/OMatic/stats.pm:80
+msgid "Cumulative Searches"
+msgstr "累積検索数"
+
+#: lib/FAQ/OMatic/stats.pm:83
+msgid "Submissions Per Day"
+msgstr "一日あたりの投稿数"
+
+#: lib/FAQ/OMatic/stats.pm:84
+msgid "Cumulative Submissions"
+msgstr "累積投稿数"
+
+#: lib/FAQ/OMatic/stats.pm:87
+msgid ""
+"Please be patient ... the image files are generated dynamically, and can "
+"take from 20 to 50 seconds to create.\n"
+msgstr ""
+"少々お待ちを.... イメージファイルは動的に作成されるため、作成に20から50秒かか"
+"る.\n"
+
+#: lib/FAQ/OMatic/stats.pm:137
+msgid "Change View Duration"
+msgstr "表示期間"
+
+#: lib/FAQ/OMatic/stats.pm:140
+msgid "One Month"
+msgstr "一ヶ月"
+
+#: lib/FAQ/OMatic/stats.pm:142
+msgid "Two Months"
+msgstr "二ヶ月"
+
+#: lib/FAQ/OMatic/stats.pm:144
+msgid "Three Months"
+msgstr "三ヶ月"
+
+#: lib/FAQ/OMatic/stats.pm:146
+msgid "History"
+msgstr "履歴"
+
+#: lib/FAQ/OMatic/submitBag.pm:74
+msgid ""
+"Bag names may only contain letters, numbers, underscores (_), hyphens (-), "
+"and periods (.), and may not end in '.desc'. Yours was"
+msgstr ""
+"bag名は英数字、下線(_)、ハイホン(-)とピリオド(.)のみが有効で'.desc'で終っては"
+"いけない。→"
+
+#: lib/FAQ/OMatic/submitItem.pm:61
+msgid "Your browser or WWW cache has truncated your POST."
+msgstr "ブラウザかWWWキャッシュがあなたのPOSTを切り詰めた。"
+
+#: lib/FAQ/OMatic/submitItem.pm:72
+msgid "Changed the item title, was \"%0\""
+msgstr "項目タイトルが \"%0\" に変更された。"
+
+#: lib/FAQ/OMatic/submitItem.pm:88 lib/FAQ/OMatic/submitItem.pm:98
+msgid "Your part order list (%0) "
+msgstr "あなたの部分オーダリスト (%0) "
+
+#: lib/FAQ/OMatic/submitItem.pm:89
+msgid "doesn't have the same number of parts (%0) as the original item."
+msgstr "オリジナルアイテムと同じ数のパート (%0) を持つ事が出来ない。"
+
+#: lib/FAQ/OMatic/submitItem.pm:99
+#, c-format
+msgid "doesn't say what to do with part %0."
+msgstr "パート %0 について何であるかを言う事が出来ない。"
+
+#: lib/FAQ/OMatic/submitMove.pm:51
+msgid "The moving file (%0) is broken or missing."
+msgstr "移動したファイル(%0)は壊れているか存在しない。"
+
+#: lib/FAQ/OMatic/submitMove.pm:57
+msgid "The newParent file (%0) is broken or missing."
+msgstr "新しい親ファイル(%0)は壊れているか存在しない。"
+
+#: lib/FAQ/OMatic/submitMove.pm:66
+msgid "The oldParent file (%0) is broken or missing."
+msgstr "古い親ファイル(%0)は壊れているか存在しない。"
+
+#: lib/FAQ/OMatic/submitMove.pm:74
+msgid "The new parent (%0) is the same as the old parent."
+msgstr "新しい親(%0)は古い親と同じである。"
+
+#: lib/FAQ/OMatic/submitMove.pm:79
+msgid "The new parent (%0) is the same as the item you want to move."
+msgstr "新しい親(%0)は移動対象の物と同じである。"
+
+#: lib/FAQ/OMatic/submitMove.pm:86
+msgid "The new parent (%0) is a child of the item being moved (%1)."
+msgstr "新しい親(%0)は移動して来た子(%1) である。"
+
+#: lib/FAQ/OMatic/submitMove.pm:92
+msgid "You can't move the top item."
+msgstr "最上位のアイテムは移動できない。"
+
+#: lib/FAQ/OMatic/submitMove.pm:130
+#, c-format
+msgid "moved a sub-item to %0"
+msgstr "サブアイテムを %0 に移動した"
+
+#: lib/FAQ/OMatic/submitMove.pm:133
+#, c-format
+msgid "moved a sub-item from %0"
+msgstr "サブアイテムを %0 から移動した"
+
+#: lib/FAQ/OMatic/submitPass.pm:49
+msgid "An email address must look like 'name\\@some.domain'."
+msgstr "電子メールアドレスは 'name\\@some.domain' の形でなければならない。"
+
+#: lib/FAQ/OMatic/submitPass.pm:51
+msgid ""
+"If yours (%0) does and I keep rejecting it, please mail the administrator of "
+"this FAQ at %1 and tell him or her what's happening."
+msgstr ""
+"もしもあなたのFOMに(%0)があり、私がそれを排除しつづけたいなら、何が起きたかを"
+"このFAQの管理者 %1 にメールして欲しい。"
+
+#: lib/FAQ/OMatic/submitPass.pm:58
+msgid "Your password may not contain spaces or carriage returns."
+msgstr "あなたのパスワードには空白や改行を含んではならない。"
+
+#: lib/FAQ/OMatic/submitPass.pm:97
+msgid "Your Faq-O-Matic authentication secret"
+msgstr "あなたの Faq-O-Matic 認証のための情報"
+
+#: lib/FAQ/OMatic/submitPass.pm:98
+msgid ""
+"To validate your Faq-O-Matic password, you may either enter this secret into "
+"the Validation form:"
+msgstr ""
+"Faq-O-Matic用のパスワードを検証するため、検証用フォームに秘密のキーを入力して"
+"もよい。"
+
+#: lib/FAQ/OMatic/submitPass.pm:99 lib/FAQ/OMatic/submitPass.pm:136
+msgid "Secret:"
+msgstr "認証情報:"
+
+#: lib/FAQ/OMatic/submitPass.pm:100
+msgid ""
+"Or access the following URL. Be careful when you copy and paste the URL that "
+"the line-break doesn't cut the URL short."
+msgstr ""
+"または、以下のURLにアクセスする。URLのコピーと貼り付けを行なう際に、改行がURL"
+"をカットしないように気をつけなければならない。"
+
+#: lib/FAQ/OMatic/submitPass.pm:101
+msgid "Thank you for using Faq-O-Matic."
+msgstr "Faq-O-Maticに移動"
+
+#: lib/FAQ/OMatic/submitPass.pm:102
+msgid ""
+"(Note: if you did not sign up to use the Faq-O-Matic, someone else has "
+"attempted to log in using your name. Do not access the URL above; it will "
+"validate the password that user has supplied. Instead, send mail to %0 and I "
+"will look into the matter.)"
+msgstr ""
+"(注意: もしもFaq-O-Maticを使うためにサインアップしないならば、だれかがあなた"
+"の名前でログインしようと試みるだろう。上記のURLにアクセスしてはならない。それ"
+"はユーザに割り当てられたパスワードを検証するだろう。その代わりに、メールを%0"
+"に送り、それを処理するだろう。"
+
+#: lib/FAQ/OMatic/submitPass.pm:106
+msgid ""
+"I couldn't mail the authentication secret to \"%0\" and I'm not sure why."
+msgstr "認証のための情報を \"%0\" に送れなかったが理由が分からない。"
+
+#: lib/FAQ/OMatic/submitPass.pm:116
+msgid "The secret you entered is not correct."
+msgstr "入力された認証情報が不正である。"
+
+#: lib/FAQ/OMatic/submitPass.pm:118
+msgid "Did you copy and paste the secret or the URL completely?"
+msgstr "認証情報またはURLを正しくコピー＆ペーストしたか?"
+
+#: lib/FAQ/OMatic/submitPass.pm:122
+msgid "I sent email to you at \"%0\". It should arrive soon, containing a URL."
+msgstr ""
+"メールを\"%0\" に送った。その中にURLが含まれている。まもなく到着するだろう。"
+
+#: lib/FAQ/OMatic/submitPass.pm:126
+msgid ""
+"Either open the URL directly, or paste the secret into the form below and "
+"click Validate."
+msgstr ""
+"URLを直接開くか、認証情報を以下のフォームにペーストしてクリックして認証せよ。"
+
+#: lib/FAQ/OMatic/submitPass.pm:128
+msgid "Thank you for taking the time to sign up."
+msgstr "認証作業が完了。"
+
+#~ msgid "Your Faq-O-Matic would have a title "
+#~ msgstr "インストーラを走らせた時にできる"
+
+#~ msgid "installer."
+#~ msgstr "タイトルを持つだろう。"
+
+#~ msgid "deprecated; subsumed by RCSciArgs and RCScoArgs."
+#~ msgstr "不賛成; RCSciArgsとRCScoArgsによって包含されている。"
+
+#~ msgid "You must enter the correct temporary password to install "
+#~ msgstr "インストールするために正しい一時パスワードをこのFAO-O-Matic用に"
+
+#~ msgid "this FAQ-O-Matic. If you don't know it, remake the CGI stub "
+#~ msgstr "入力しなければならない。もしも、それが不明ならば、CGIスタブを"
+
+#~ msgid "to have a new one assigned."
+#~ msgstr "新しく割り当てるために再作成しなさい。"
+
+#~ msgid "Temporary password: <input type=password size=36 name=temppass>\n"
+#~ msgstr "一時パスワード: <input type=password size=36 name=temppass>\n"

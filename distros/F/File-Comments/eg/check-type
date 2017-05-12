@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+###########################################
+# check-type
+# Mike Schilli, 2005 (m@perlmeister.com)
+###########################################
+use strict;
+
+use File::Comments;
+use Log::Log4perl qw(:easy);
+use Getopt::Std;
+
+die "usage: $0 file" unless @ARGV;
+
+getopts("v", \my %opts);
+
+Log::Log4perl->easy_init(
+{level => $opts{v} ? $DEBUG : $ERROR, 
+ layout => "%F{1} %L %m%n"});
+
+my $snoop = File::Comments->new();
+
+my $type = $snoop->guess_type($ARGV[0]);
+
+if($type) {
+    print "$ARGV[0]: $type\n";
+} else {
+    print "$ARGV[0]: UNKNOWN\n";
+}

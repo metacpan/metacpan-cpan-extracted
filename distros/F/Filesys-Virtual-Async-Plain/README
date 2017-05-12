@@ -1,0 +1,97 @@
+NAME
+    Filesys::Virtual::Async::Plain - A plain non-blocking virtual filesystem
+
+SYNOPSIS
+    use Filesys::Virtual::Async::Plain;
+
+    my $fs = Filesys::Virtual::Async::Plain->new( root => '/home/foo', );
+
+    $fs->mkdir( '/bar', $mode, sub { if ( $_[0] ) { print "success\n"; }
+    else { print "failure:$!\n"; } });
+
+DESCRIPTION
+    Filesys::Virtual::Async::Plain provides non-blocking access to virtual
+    filesystem rooted in a real filesystem. It's like a chrooted filesytem
+
+WARNING
+    This module is still in flux to an extent. It will change. I released
+    this module early due to demand. If you'd like to suggest changes,
+    please drop in the irc channel #poe on irc.perl.org and speak with
+    xantus[] or Apocalypse
+
+OBJECT METHODS
+    new( root => $path );
+        root is optional, and defaults to /. root is prepended to all paths
+        after resolution
+
+    cwd()
+        Returns the current working directory (virtual)
+
+    root() or root( $path )
+        Gets or sets the root path
+
+CALLBACK METHODS
+    All of these work exactly like the IO::AIO methods of the same name. Use
+    IO::AIO as a reference for these functions. This module is mostly a
+    wrapper around IO::AIO. All paths passed to these functions are resolved
+    for you, so pass virtual paths, not the full path on disk as you would
+    pass to aio
+
+    dirlist( $path, $withstat, $callback )
+        Not an aio method, but a helper that will fetch a list of files in a
+        path, and optionally stat each file. The callback is called with an
+        array. The first element is the file name and the second param is an
+        array ref of the return value of io_stat() if requested.
+
+    open()
+    close()
+    read()
+    write()
+    sendfile()
+    readahead()
+    stat()
+    lstat()
+    utime()
+    chown()
+    truncate()
+    chmod()
+    unlink()
+    mknod()
+    link()
+    symlink()
+    readlink()
+    rename()
+    mkdir()
+    rmdir()
+    readdir()
+    load()
+    copy()
+    move()
+    scandir()
+    rmtree()
+    fsync()
+    fdatasync()
+
+SEE ALSO
+    Filesys::Virtual::Async
+
+    <http://xant.us/>
+
+BUGS
+    Probably. Report 'em:
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filesys-Virtual-Async-Plain>
+
+AUTHOR
+    David W Davis <xantus@cpan.org>
+
+RATING
+    You can rate this this module at
+    <http://cpanratings.perl.org/rate/?distribution=Filesys::Virtual::Async:
+    :Plain>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2009 by David W Davis, All rights reserved
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself
+

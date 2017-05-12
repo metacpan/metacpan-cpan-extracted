@@ -1,0 +1,13 @@
+[% maintain_msg = BLOCK %]
+
+<b>[% c.config.name %] is closed for:</b><br /><br />
+
+The borad is under maintain. Sorry for any inconvenience.
+
+<br /><br />If you are administrator, Please <a href="/login">Login</a>
+
+[% END %]
+
+[% INCLUDE 'simple/message.html' message = {
+    msg => maintain_msg,
+} %]

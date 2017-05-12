@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 b9674965c33606d4bc1535db17507d8dad3c0370 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 48763cec25ee8781f857e832fd576b158adb49c7 Changes
+SHA1 eb14af591036950d4ce520c3e675a3eae1edabd4 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 95c8b2b9f59c9b69456db8c2cf36542822ed44d2 MANIFEST
+SHA1 31f0f5583f38985e25ef425e5d10646ffa0b34f2 META.json
+SHA1 ebc7144ffd5b1aeb5ccf326d84bb4383a074f53b META.yml
+SHA1 acb352bdbdc2eab0967a5bca0e316ab2c78e95e8 Makefile.PL
+SHA1 304a29ef5d851ef7d5b4f5fff08543b5b7895cfa README
+SHA1 813cd9ebdd6b2fe6a666b0bff0274a91608a4460 TODO
+SHA1 5289db0ccf71352fa8e3e79dd8eb2f3d8dcc6e7c TODO.mm
+SHA1 65177e83328f702f1540e69e0ac72ee1f82cc696 bin/mm2txt
+SHA1 119eb51601b7d58cae2fae278718ab48ac814c13 dist.ini
+SHA1 dcd5b24fa12727545bd2328b27dae7bce72a1c7a doap.ttl
+SHA1 6afc9764977a86b335a8f2305657f608c85f8641 examples/tttodo-to-text.pl
+SHA1 d970d1094bf1a2933f84cc522519f8c147893079 examples/tttodo.mm
+SHA1 b3abe56481fba800c2782cd2bd851e07b86b2595 lib/FreeMind/ArrowLink.pm
+SHA1 7d842ef63139555f6483385b8cea51b376be3051 lib/FreeMind/Cloud.pm
+SHA1 30a38887de2cc8588fc30a1349b6b94f87aa093b lib/FreeMind/Document.pm
+SHA1 1efb83edd7a3a5a712d4318a50c3f236e0560efa lib/FreeMind/Edge.pm
+SHA1 34a129cd329690999b62e9c8f0759d68f2034d2d lib/FreeMind/Font.pm
+SHA1 f21fdddf3c4049f0a262ee58ca9983e48d6c90ce lib/FreeMind/Icon.pm
+SHA1 302eb5a73043f14b7c2e4109b8a1cce30e30feb4 lib/FreeMind/Map.pm
+SHA1 5bf7f8b321f301e9ccb12fcf48ef7d772fa8deda lib/FreeMind/Node.pm
+SHA1 7d5d0c79616235b43738a6ddf0b9aff798dd1406 lib/FreeMind/RichContent.pm
+SHA1 7e1b1c9ae48080926d5f3d47e644e2b5d327b537 lib/FreeMind/Text.pm
+SHA1 ad050912b847e9d8db03fc4717a971adf5bb4320 t/01basic.t
+SHA1 be3abbed71d9b438c0c4e777213ea219bbc10aa8 t/02totext.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ1AsACgkQzr+BKGoqfTn0QQCglCH48cDja1DP2HvID8l+wsHb
+Re0AmwSlC3b8K4eTU653/EW5WjsYxDcd
+=nGsL
+-----END PGP SIGNATURE-----

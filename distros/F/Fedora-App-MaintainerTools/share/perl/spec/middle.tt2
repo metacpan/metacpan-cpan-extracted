@@ -1,0 +1,66 @@
+%description
+[% data.description -%]
+
+%prep
+%setup -q -n [% data.dist %]-%{version}
+
+%build
+[% IF data.has_build -%]
+[% data.build.join("\n") %]
+[% ELSE -%]
+[% IF data.is_noarch -%]
+%{__perl} Makefile.PL INSTALLDIRS=vendor
+[% ELSE -%]
+%{__perl} Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+[% END -%]
+make %{?_smp_mflags}
+[% END # data.has_build -%]
+
+%install
+[% IF data.has_install -%]
+[% data.install.join("\n") %]
+[% ELSE -%]
+rm -rf %{buildroot}
+
+make pure_install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
+[% IF (!data.is_noarch) -%]
+find %{buildroot} -type f -name '*.bs' -a -size 0 -exec rm -f {} ';'
+[% END -%]
+find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
+
+%{_fixperms} %{buildroot}/*
+[% END -%]
+
+%check
+[% IF data.has_check -%]
+[% data.check.join("\n") %]
+[% ELSE -%]
+make test
+[% END -%]
+
+
+%clean
+[% IF data.has_clean -%]
+[% data.clean.join("\n") %]
+[% ELSE -%]
+rm -rf %{buildroot}
+[% END -%]
+
+%files
+[% IF data.has_files -%]
+[% data.files.join("\n") %]
+[% ELSE -%]
+%defattr(-,root,root,-)
+%doc [% data.docfiles.join(" ") %]
+[% IF (data.is_noarch) -%]
+%{perl_vendorlib}/*
+[% ELSE -%]
+%{perl_vendorarch}/*
+%exclude %dir %{perl_vendorarch}/auto
+[% END -%]
+%{_mandir}/man3/*.3*
+[% FOREACH file = data.extra_files -%]
+[% file %]
+[% END -%]
+[% END # data.has_files -%]

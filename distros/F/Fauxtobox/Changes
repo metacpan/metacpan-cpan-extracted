@@ -1,0 +1,7 @@
+Revision history for Fauxtobox
+
+0.02    2014-12-07
+        - fake methods now forward to real methods when called on an object
+
+0.01    2013-10-06
+        First version, released on an unsuspecting world.

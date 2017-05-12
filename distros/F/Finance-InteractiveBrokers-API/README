@@ -1,0 +1,66 @@
+Finance-InteractiveBrokers-API
+
+This module describes and enumerates the InteractiveBrokers API through
+successive revisions.
+
+It is not very useful on its own, and was designed to be used by
+Finance::InteractiveBrokers::SWIG POE::Component::Client::InteractiveBrokers
+to reduce maintenance, by isolating the API description for each revision
+into one single location.
+
+This module should be updated each time new versions of the IB API are
+released.  If the author gets hit by a bus, there is enough documentation
+contained herein to make the changes yourself.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Finance::InteractiveBrokers::API
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-InteractiveBrokers-API
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Finance-InteractiveBrokers-API
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Finance-InteractiveBrokers-API
+
+    Search CPAN
+        http://search.cpan.org/dist/Finance-InteractiveBrokers-API/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2013 Jason McManus
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+The authors are not associated with InteractiveBrokers, and as such, take
+no responsibility or provide no warranty for your use of this module or the
+InteractiveBrokers service.  You do so at your own responsibility.  No
+warranty for any purpose is either expressed or implied by your use of this
+module suite.
+
+The data from InteractiveBrokers are under an entirely separate license that
+varies according to exchange rules, etc.  It is your responsibility to
+follow the InteractiveBrokers and exchange license agreements with the data.
+
+# END

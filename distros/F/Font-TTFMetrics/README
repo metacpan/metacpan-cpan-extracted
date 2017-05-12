@@ -1,0 +1,25 @@
+Font::TTFMetrics version 0.01
+============================
+
+Font::TTFMetrics is a fast, easy-to-use parser for true-type font (TTF) file. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Nothing special.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Malay Kumar Basu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

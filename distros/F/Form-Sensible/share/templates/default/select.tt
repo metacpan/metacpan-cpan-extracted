@@ -1,0 +1,50 @@
+[% IF render_hints.render_as && (render_hints.render_as == 'checkboxes' ) -%]
+    [%- box_type = 'radio' -%]
+    [%- IF field.accepts_multiple %][%- box_type='checkbox' -%][% END -%]
+    [%- fields_across = 3 -%]
+    [%- IF render_hints.fields_across -%][% fields_across = render_hints.fields_across %][% END -%]
+    [%- field_count = 0 -%]
+    [%- total_field_count = 0 -%]
+    [%- FS_fieldcontainerclass = css_prefix _ 'checkbox_container' -%]
+        <div class="[% css_prefix -%]checkboxes">
+             [% FOREACH item = field.get_options -%]
+                [% IF field_count == 0 %]<div class="[% css_prefix -%]checkbox_row" >[% END %]
+                [% field_count = field_count + 1 %]
+                [% total_field_count = total_field_count + 1 %]
+                [%- selected = "" -%]
+                [%- FOREACH val = field.value -%]
+                    [%- IF item.value == val %][% selected = ' checked="checked"' %][% END -%]
+                [%- END -%]
+                <div class="[% css_prefix -%]checkbox [% css_prefix -%][% field_name %]_checkbox">
+                [% IF render_hints.checkbox_align && (render_hints.checkbox_align == 'right') %]
+                    <label class="[% css_prefix -%]name [% css_prefix _ field_type %]_name [% IF !field.editable %] noteditable[% END %]">[% item.name %] <input type="[% box_type %]" [% IF !field.editable %] class="noteditable" disabled="disabled"[% END %] name="[% field.name %]" value="[% item.value %]"[%- selected -%]></label>
+                [% ELSE %]
+                    <label class="[% css_prefix -%]name [% css_prefix _ field_type %]_name [% IF !field.editable %] noteditable[% END %]"><input type="[% box_type %]" [% IF !field.editable %] class="noteditable" disabled="disabled"[% END %] name="[% field.name %]" value="[% item.value %]" [%- selected -%]> [% item.name %]</label>    
+                [% END %]
+                </div>
+                [% IF field_count >= fields_across || (total_field_count == field.get_options.size ) %][% field_count = 0 %]</div>[% END %]
+               [% END %]
+               [%- IF !field.editable %]
+                   [%- FOREACH val = field.value -%]
+                       <input type="hidden" name="[% field_name %]" value="[% val %]" />
+                   [%- END -%]
+               [% END -%]
+        </div>
+[% ELSE %]
+    [% select_size = '' %]
+    [%- IF render_hints.select_size %][% select_size='size="' _ render_hints.select_size _'"' %][% END -%]
+    <select name="[% field_name %]" [%- IF field.accepts_multiple %]multiple[%- END %] [% select_size %] id="[% css_prefix _ form.name %]_[% field_name %]_input" class="[% css_prefix %]input [% css_prefix _ field_type %]_input [% css_prefix _ field_name %]_input  [% IF !field.editable %] noteditable" disabled="disabled[% END %]">
+        [% FOREACH item = field.get_options -%]
+        [%- selected = "" -%]
+        [%- FOREACH val = field.value -%]
+            [%- IF item.value == val %][% selected = ' selected="selected"' %][% END -%]
+        [%- END -%]
+       <option value="[% item.value %]"[%- selected -%]>[% item.name %]</option>
+       [% END %]
+    </select>
+    [%- IF !field.editable %]
+        [%- FOREACH val = field.value -%]
+            <input type="hidden" name="[% field_name %]" value="[% val %]" />
+        [%- END -%]
+    [% END -%]
+[% END %]

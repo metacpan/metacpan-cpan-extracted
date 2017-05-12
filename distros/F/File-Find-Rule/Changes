@@ -1,0 +1,138 @@
+0.34 Thursday 4th December, 2015
+        Add canonpath option to normalize file-path
+        separators.  Work by Mithun Ayachit.
+
+0.33 Monday 19th September, 2011
+        Fixes the case where name("foo(*") hits an error with mismatched
+        parentheis.  Reported by Jan Engelhardt.
+
+0.32 Saturday 28th November, 2009
+	Rework the referencing of anyonymous subroutines internally,
+	closes RT#46599 (Reported by Kevin Ryde)
+
+0.31 Friday 27th November 2009
+	Move to Makefile.PL
+	use Test::Differences in the testsuite if available.
+	Rearrange the testsuite so you don't keep tripping over yourself.
+	Dropped 5.00503 backwards compatibility, allows some 5.6isms and
+	dropping the shonky Cwd code.
+	All taint 'bugs' are now the same as the behaviour of File::Find,
+	documentation has been added to describe this.
+
+
+0.30 Wednesday 1st June, 2006
+	Made './//././././///.//././/////./blah' be treated the same 
+        as './blah' (it gets turned into 'blah')
+
+0.29 Tuesday 16th May, 2006
+	Kludged around {min,max}depth and trailing slashes in path
+	names.
+
+0.28 Tuesday 18th May, 2004
+	exposed %X_tests and @stat_tests as package variables, and make a
+	_call_find method for File::Find::Rule::Filesys::Virtual
+
+0.27 Wednesday 25th February, 2004
+	Changed to write_makefile_pl to 'traditional' from
+	'passthrough'.  Fixes INDIRECTLY REPORTED install problems
+	caused by new Module::Build being backwards incompatible.
+
+0.26 Monday 10th November, 2003
+	Typo/thinko in File::Find::Rule::Extending corrected (spotted
+	by Jim Cromie)
+
+	Optimization to the stat-based tests.  They now compile to code
+	fragments saving much subroutine dispatch.
+
+0.25 Wednesday 22nd October, 2003
+	applied a patch from Leon Brocard to make the tests ignore CVS dirs
+	as well as .svn dirs.
+
+	reworked part of t/File-Find-Rule.t to not assume that t/foobar will
+	always be 10 bytes in size. (rt.cpan.org #3838)
+
+	now we install the findrule script
+
+0.24 Monday 6th October, 2003
+	when you specify an extra of C<{ follow => 1 }> File::Find stops
+	populating $File::Find::topdir.  This leads to warnings noise so
+	instead we now track $topdir ourselves.
+
+0.23 Friday 3rd October, 2003
+	make the extras hash work and add a proper test for it. (Doh!)
+
+0.22 Friday 3rd October, 2003
+	add in ->extras hash for passing things through to File::Find::find
+
+0.21 Monday 15th September, 2003 
+	pod glitch in File::Find::Rule::Procedural spotted and fixed
+	by Tom Hukins
+
+0.20 8th September, 2003
+	- relative flag
+
+	- Fix maxdepth? - this is undertested.
+
+	- MANIFEST fixes (thanks to the cpan smokers)
+
+	- split the documentation of the procedural interface out to
+	  File::Find::Rule::Procedural, as people often seem to get
+	  confused that the method calls don't take anonymous arrays
+	  after seeing the procedural code that did
+
+	- Chunky internal restructure.  Now we compile a match sub
+	  from code fragments.  Though more complex, this is a big
+	  speed win as it eliminates a lot of the subroutine dispatch.
+
+	- During the restructure we lost the ->test method.  I hope
+	  that it's not missed, since maintining it through a
+	  deprecation cycle would be fiddly with the current _compile code.
+
+	- Split the findrule tests into their own file, and just skip
+	  the tricky ones on Win32.
+
+0.11    29th July, 2003
+        - Fix Win32 test failures (rt.cpan.org #3047)
+
+0.10	10th March 2003
+	- fixup an accidental warning in the stat-based tests.  Caught
+	  by Alex Gough (rt.cpan.org #2138)
+	- make the findrule tests more win32 safe/shell independent (picked 
+	  up by Philip Newton)
+	- autogenerate READMEs from bits and pieces
+
+0.09	21st January 2003
+	- Fix to the stat-based tests (spotted by Randal L. Schwartz)
+	- implemented our own import sub so we can bootstrap
+	  extensions more easily
+	- added some documentation about using extensions.
+
+0.08	28th October, 2002
+	- ->not_* and implicit s#^\./## (based on suggestions by Tony
+	  Bowden)
+	- Sketchy first cut of findrule (suggestion from Tatsuhiko Miyagawa)
+
+0.07	25th October, 2002
+	- Tweaks required to let extensions work
+
+0.06	22nd October, 2002
+	-> Fix the code example for the ->grep clause (again from
+	   Douglas Wilson)
+
+0.05	21st October, 2002
+	- ->grep clause - from original code from Douglas Wilson
+        - Bugfix the demo code in the synopsis - pointed out by Barbie
+
+0.04	10th September, 2002
+	- create a correctly spelled writable rule (thanks to Iain
+	  Truskett for this one)
+
+0.03	24th August, 2002
+	- backport to 5.00503 (hadn't tested before this point)
+
+0.02	14th August, 2002
+	- bugfix ->exec subrule invocation (thanks to Chris Carline
+	  for pointing this out)
+
+0.01	26th July, 2002
+	- Inital release

@@ -1,0 +1,7 @@
+Revision history for perl-file-valet
+
+1.01 Thu Apr 14 19:16:27 PDT 2016
+	- Bugfixes in unit tests (i18n issues with $!)
+
+1.00 Thu Apr 14 10:51:40 PDT 2016
+	- First version released

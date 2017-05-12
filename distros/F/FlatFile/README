@@ -1,0 +1,48 @@
+FlatFile version 0.11
+=====================
+
+Functions for simple, lightweight management of flat-file databases
+
+CHANGES FROM 0.10 -> 0.11:
+
+Bug fixes in the handling of inherited classes, particularly those
+with nonstandard field separators.
+
+CHANGES FROM 0.04 -> 0.10:
+
+Rewrote internals; the module now uses Tie::File for I/O, instead of
+doing all the I/O manually.  This changed some behavior, but it will
+be much easier to move forward.  A number of insoluble problems are
+now wither solved or solvable.  In particular, you no longer need to
+call ->flush explicitly; it is invoked automatically when the database
+object is finished.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright 2006 Mark Jason Dominus
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+

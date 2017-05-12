@@ -1,0 +1,15 @@
+Changes
+FDpasser.pm
+FDpasser.h
+FDpasser.xs
+Makefile.PL
+MANIFEST
+README
+typemap
+common.h
+bsd44.c
+bsd43.c
+svr4.c
+t/t00basic.t
+t/t07fork.t
+t/t12serv_cli.t

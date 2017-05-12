@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use File::Digest qw(digest_files);
+    
+     my $res = digest_files(
+         files => ["file1", "file2"],
+         algorithm => 'md5', # default md5, available also: crc32, sha1, sha256
+     );
+
+DESCRIPTION
+
+SEE ALSO
+
+    sum from PerlPowerTools (which only supports older algorithms like
+    CRC32).
+
+    Backend modules: Digest::CRC, Digest::MD5, Digest::SHA.
+
+    xsum from App::xsum which can also check checksums/digests from
+    checksum file e.g. MD5SUMS.
+

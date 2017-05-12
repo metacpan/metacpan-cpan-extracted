@@ -1,0 +1,19 @@
+rules :
+    - Email
+    - String
+setting :
+    strict :
+        email :
+            rule :
+                - Email#email
+        password :
+            rule :
+                - String#length :
+                    min : 4
+                    max : 12
+                - String#ascii 
+lang : ja
+labels :
+    ja :
+        email : メールアドレス
+        password : パスワード

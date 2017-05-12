@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use diagnostics;
+use Data::Dumper;
+use Cache::Memcached;
+use Storable;
+use File::Find;
+use XML::Simple;
+
+our ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) = localtime( time() );
+my $memd = new Cache::Memcached {
+'servers' => [ "127.0.0.1:11211"],
+'debug' => 0,
+'compress_threshold' => 10_000,
+} or warn($@);
+#find("master-run");
+
+
+	my $hashref = $memd->get("master-run");
+	my $xml = XML::Simple::XMLout( $hashref->{result} );
+
+
+open (XML,">master-run.xml");
+print XML $xml;
+close (XML);
+print Dumper keys %{$hashref->{result}},$xml;
+print $xml;
+#$memd->set("symbols_key",[qw(AAPL ABV ACM ACPW)]);
+#@val = $memd->get("symbols_key");
+#if ($val[0]) { print  $val[0][0]; }
+
+1;

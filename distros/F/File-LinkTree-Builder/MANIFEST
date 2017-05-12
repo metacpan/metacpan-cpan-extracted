@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/storage/christmas.data
+eg/storage/christmas.txt
+eg/storage/july-4.data
+eg/storage/july-4.txt
+lib/File/LinkTree/Builder.pm
+t/000-report-versions-tiny.t
+t/build.t
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

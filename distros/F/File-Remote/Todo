@@ -1,0 +1,14 @@
+
+Still need to create equivalents to these functions:
+
+   flock    fcntl    dbmopen    dbmclose
+   opendir  readdir  closedir   stat
+
+There should also be a way to overcome the limitation
+that currently exists whereby you can't read from remote
+files that are ever-growing. Basically, a snapshot of
+the remote file is taken when open() is called, and this
+should probably be changed.
+
+Patches that accomplish any of these are quite welcome.
+

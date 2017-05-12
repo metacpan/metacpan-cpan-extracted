@@ -1,0 +1,1 @@
+if (defined(_last_clock)) { my $ad = _clock - _last_clock; _absdiff = sprintf("%0.6f", $ad) }

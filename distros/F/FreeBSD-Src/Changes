@@ -1,0 +1,21 @@
+Revision history for FreeBSD-Src
+
+2.0.0	2011-05-05/03:50
+		-Minor bug fixes.
+		-Rework the KERNEL selection mechanism.
+		-All errors are now one or higher, making error checking easier.
+		-Clean up the obj dir stuff.
+		-New can now be called with no args.
+		-Add following methods
+			error
+			exitint
+			output
+		-The error blanking method no longer clears the last exit int.
+		-Update my name post marriage.
+
+1.1.0	2008-06-25/18:18
+		Now supports DESTDIR.
+
+1.0.0	2008-05-06/15:35
+		Initial release.
+

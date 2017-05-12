@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/File/MergeSort.pm
+README
+t/1
+t/1.gz
+t/2
+t/2.gz
+t/3
+t/4
+t/5
+t/6
+t/7
+t/1_basic.t
+t/2_compressed.t
+t/3_exception.t
+t/4_pod_coverage.t
+t/5_pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

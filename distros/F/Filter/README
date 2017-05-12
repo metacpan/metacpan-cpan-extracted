@@ -1,0 +1,104 @@
+                              Source Filters
+ 
+                               Version 1.57
+ 
+                              2014-12-09 rurban
+ 
+        Copyright (c) 1995-2011 Paul Marquess. All rights reserved.
+        Copyright (c) 2011-2014 Reini Urban. All rights reserved.
+         This program is free software; you can redistribute it and/or
+                 modify it under the same terms as Perl itself.
+ 
+ 
+ 
+DESCRIPTION
+-----------
+ 
+This distribution consists of a number of Source Filters.
+
+For more details see the pod documentation embedded in the .pm files.
+
+If you intend using the Filter::Util::Call functionality, I would strongly
+recommend that you check out Damian Conway's excellent Filter::Simple
+module. Damian's module provides a much cleaner interface than
+Filter::Util::Call. Although it doesn't allow the fine control that
+Filter::Util::Call does, it should be adequate for the majority of
+applications. It's available at
+
+   http://search.cpan.org/dist/Filter-Simple/
+
+LIMITATIONS
+-----------
+
+Source filters only work on the string level, thus are highly limited
+in its ability to change source code on the fly. It cannot detect
+comments, quoted strings, heredocs, it is no replacement for a real
+parser.
+The only stable usage for source filters are encryption, compression,
+or the byteloader, to translate binary code back to source code.
+
+See for example the limitations in Switch, which uses source filters,
+and thus is does not work inside a string eval, the presence of
+regexes with embedded newlines that are specified with raw /.../
+delimiters and don't have a modifier //x are indistinguishable from
+code chunks beginning with the division operator /. As a workaround
+you must use m/.../ or m?...? for such patterns. Also, the presence of
+regexes specified with raw ?...? delimiters may cause mysterious
+errors. The workaround is to use m?...? instead.  See
+http://search.cpan.org/perldoc?Switch#LIMITATIONS
+
+Currently internal buffer lengths are limited to 32-bit only.
+
+
+PREREQUISITES
+-------------
+ 
+Before you can build the Source Filters you need to have the following
+installed on your system:
+
+    * Perl 5.005 or better. 5.6.0 or better is recommended for Win32.
+
+If your Perl is less than version 5.004_55, the "order" test harness
+will be skipped.
+
+
+BUILDING THE MODULES
+--------------------
+ 
+Assuming you have met all the prerequisites, building the modules
+should be relatively straightforward.
+
+The modules can now be built using this sequence of commands:
+ 
+    perl Makefile.PL
+    make
+    make test
+
+Building in parallel (-j4) does not work.
+ 
+The filters have been successfully built and tested on the following
+systems (at least):
+
+	linux (gcc or clang)
+	cygwin 1.7
+	mingw strawberry 5.14
+	SunOS 4.1.3 (Sun C compiler & gcc 2.7.2.3)
+	Solaris 2.3 (Sun C Compiler)
+	irix 5.3	
+	irix 6.x	
+	Windows XP (Visual C++ 6.0)
+
+On Windows tr.exe and cpp.exe should be really the gnu/mingw tools in the path
+for the testsuite to pass successfully.
+
+INSTALLATION
+------------
+ 
+    make install
+ 
+UPDATES
+-------
+ 
+The most recent version of the Filters is always available at
+ 
+    http://www.cpan.org/modules/by-module/Filter

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Local and Remote Tail Library",
+   "author" : [
+      "DMJA, Inc <smarttail@dmja.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-SmartTail",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      }
+   },
+   "provides" : {
+      "File::SmartTail" : {
+         "file" : "lib/File/SmartTail.pm",
+         "version" : "4.66"
+      },
+      "File::SmartTail::DB" : {
+         "file" : "lib/File/SmartTail/DB.pm"
+      },
+      "File::SmartTail::Logger" : {
+         "file" : "lib/File/SmartTail/Log4perlLogger.pm"
+      },
+      "File::SmartTail::Version" : {
+         "file" : "lib/File/SmartTail/Version.pm",
+         "version" : "v1.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.2"
+}

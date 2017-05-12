@@ -1,0 +1,24 @@
+---
+abstract: unknown
+author:
+  - 'Thadeu Lima de Souza Cascardo <cascardo@cascardo.eti.br>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Bank-BR-Santander-Spreadsheet
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime::Format::Strptime: '1.5'
+  Spreadsheet::ParseExcel::Simple: '1.02'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

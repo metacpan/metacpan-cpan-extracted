@@ -1,0 +1,19 @@
+*** file.old	2012-09-07 12:58:02.000000000 +0700
+--- file.new	2012-09-07 12:58:39.000000000 +0700
+***************
+*** 1,6 ****
+  line 1
+- line 2
+  line 3
+! line 4
+! line 5
+  line 6
+--- 1,8 ----
+  line 1
+  line 3
+! 
+!   line 4 - modified
+!   modified line 5
+  line 6
++ line 7
++ line 8

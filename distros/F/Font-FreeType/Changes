@@ -1,0 +1,101 @@
+0.07 2015-09-27 dmol@cpan.org
+ - No changes since 0.07_2
+
+0.07_2 2015-09-24 dmol@cpan.org
+ - Try to support utf8_to_uvchr_buf for older perls
+
+0.07_1 2015-09-24 dmol@cpan.org
+ - Fix UTF-8 string usage on non-intel architectures (GH#17)
+
+0.06 2015-01-27 dmol@cpan.org
+ - No changes since 0.06_1
+
+0.06_1 2015-01-27 dmol@cpan.org
+ - Allow optionally fallback to missing glyph
+
+0.05  2015-01-27 dmol@cpan.org
+ - No changes since 0.05_02
+
+0.05_2 2015-01-23 dmol@cpan.org
+ - Be more tolerant in test for checking underline position
+   (CT#9d93130c-a254-11e4-9a11-67e5227a829d) (Ivan Baidakou, basiliscos).
+ - Get build options from freetype-config if it exists (RT#101654)
+   (Zakariyya Mughal).
+
+0.05_1 2015-01-21 dmol@cpan.org
+ - Avoid clang warning (RT#101653).
+ - Attempt to fix CT#939e0664-8c46-11e4-8147-dcee86cc0d3a.
+
+0.04 2014-12-24 dmol@cpan.org
+ - No changes since v0.04_03.
+
+0.04_03 2014-12-22 dmol@cpan.org
+ - Simplify rendering tests t/30render.t, as there is false-negative
+   tests results (GH#17).
+
+0.04_02 2014-12-22 dmol@cpan.org
+ - Update Changes.
+ - Add licence, min perl version and link to repository in Makefile.PL
+   (Ivan Baidakou, basiliscos).
+
+0.04_01 2014-12-21 dmol@cpan.org
+ - New BoundingBox class, which represents outline's bounding box for a
+   face (Ivan Baidakou, basiliscos).
+ - New NamedInfo class, which allows to access to information from 'names
+   table' in font file, e.g. get font copyrigh information (Ivan Baidakou,
+   basiliscos).
+ - New CharMap class, which allows to access to character map from font
+   typefaces (Ivan Baidakou, basiliscos).
+ - Improve module building, i.e. use Devel::CheckLib instead of pkg-config
+   invocation (Ivan Baidakou, basiliscos).
+ - Skip pgm-comparison tests as they are dependend on underlying FT2
+   library version (Ivan Baidakou, basiliscos).
+ - Retrieve more font face metrics: text_heigh, ascender and descender
+   (Ivan Baidakou, basiliscos).
+ - Update examples/font-info.pl which mimics more ftdump utility (Ivan
+   Baidakou, basiliscos).
+ - Apply patch to build (RT#64110) and fix compilation errors (RT#32713)
+   (Zakariyya Mughal).
+
+0.03 2004-09-11 qef@laxan.com
+ - Now compiles with older versions of FreeType, at least back to 2.0.9.
+   There are macro #if directives to conditionalize the code on the
+   version, based on the FreeType changelogs and grepping of various
+   versions of the source, so it should work with lots of different
+   versions now. The POD documents the features that aren't available in
+   older versions.
+ - Various changes to make it compile under Perl 5.6.1.
+ - When loading a bitmapped font, set the pixel size to the first fixed
+   size, which should usually be the right thing.  Seems to be necessary on
+   older versions of FreeType (at least 2.0.9) which don't do this
+   automatically.
+ - Added a few more tests for extracting bitmaps (including from a Windows
+   FNT format file added to the distribution), and made tests that use the
+   BDF font skip if the version of FreeType is too old to support BDF
+   fonts.
+ - Don't export the FT_LOAD_RENDER or FT_LOAD_MONOCHROME symbols, because
+   they aren't needed.	The bitmaps are always rendered when you ask for
+   the bitmap image, and you can pass FT_RENDER_MODE_MONO to bitmap() to
+   avoid antialiasing.
+
+0.02 2004-09-10 qef@laxan.com
+ - The methods that return bitmap images have been changed to also return
+   the left and top offsets of the bitmap from the origin of the glyph, so
+   that the images can be properly positioned within a larger picture.
+ - Added the svg_path() method and an example for generating an SVG image
+   showing a single glyph.
+ - Better checking in $ft->version().
+ - Make sure that glyph outlines can be accessed even if the first thing
+   done to a glyph is to get its bitmap.  Added tests for doing this both
+   ways round.	The solution could be better though.
+ - Added methods $face->ascender() and $face->descender().
+ - Added method $glyph->bitmap_magick() and an example program
+   demonstrating its use, as well as using ImageMagick drawing functions to
+   render outlines.
+ - Added test for POD correctness.
+ - Provided a better META.yml file.
+ - Minor change to typemap for older Perls.
+
+0.01 2004-06-09 qef@laxan.com
+ - Initial version.
+

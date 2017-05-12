@@ -1,0 +1,103 @@
+=head1 NAME
+
+Froody::DataFormats - Example Data Formats used by Froody
+
+=head1 DESCRIPTION
+
+This documentation gives examples of the same data presented multiple times in
+various formats that are used by Froody.
+
+=head2 XML Format
+
+This is the actual XML format.  Note that this needs to be wrapped in
+a C<< <rsp stat="ok">...</rsp> >> set of tags.
+
+ <people group="frameworks" />
+   <person nick="clkao" number="243">
+     <name>Chia-liang Kao</name>
+   </person>
+   <person nick="Trelane" number="234">
+     <name>Mark Fowler</name>
+   </person>
+   <person nick="Nicholas" number="238">
+     <name>Nicholas Clark</name>
+   </person>
+   <person nick="nnunley" number="243">
+     <name>Norman Nunley</name>
+   </person>
+   <person nick="skugg" number="214">
+     <name>Stig Brautaset</name>
+   </person>
+   <person nick="jerakeen" number="235">
+     <name>Tom Insam</name>
+   </person>
+   Frameworks is a department of Fotango.  We work on lots of
+   software, including writing tools like Froody.
+ </people>
+
+This format is used by Froody::Response::String and is essentially what
+everything must at some point produce.
+
+=head2 Terse
+
+This is the Terse format used by Froody::Response::Terse.  It's what's
+handed back by methods associated by Froody::Implementation to a
+Froody::Implementation local:
+
+  {
+    group => "frameworks",
+    person => [
+      { nick => "clkao",    number => "243", name => "Chia-liang Kao" },
+      { nick => "Trelane",  number => "234", name => "Mark Fowler"    },
+      { nick => "Nicholas", number => "238", name => "Nicholas Clark" },
+      { nick => "nnunley",  number => "243", name => "Norman Nunley"  },
+      { nick => "skugg",    number => "214", name => "Stig Brautaset" },
+      { nick => "jerakeen", number => "235", name => "Tom Insam"      },
+    ],
+    -text => "Frameworks is a department of Fotango.  We work on lots of\n".
+            "software, including writing tools like Froody."
+  }
+
+This format doesn't make any sense on it's own.  You need to have a response
+specification to process from this format into any of the above formats.
+
+=head2 Response Spec
+
+This strictly isn't the same data, but a way of expressing what data should
+be where.
+
+  { 
+    'people' => {
+      attr => ['group'],
+      elts => [qw/person/],
+    },
+    'people/person' => {
+      elts => [qw/name/],
+      attr => [qw/nick number/],
+      text => 0,
+      multi => 1,
+    },
+  };
+
+=head1 BUGS
+
+None known.
+
+Please report any bugs you find via the CPAN RT system.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Froody>
+
+=head1 AUTHOR
+
+Copyright Fotango 2005.  All rights reserved.
+
+Please see the main L<Froody> documentation for details of who has worked
+on this project.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Froody>, L<Froody::Response>
+
+=cut

@@ -1,0 +1,11 @@
+Changes
+Descriptions.pm
+MANIFEST
+Makefile.PL
+test.pl
+simtelnet/dirs.txt
+simtelnet/00_index.txt
+debian/Packages
+debian/files/9menu_1.4-6.deb
+freebsd/INDEX
+freebsd/archivers/arc-5.21e.tgz

@@ -1,0 +1,10 @@
+Revision history for File-Find-Rule-LibMagic
+
+0.02    April 27th, 2010
+        - add support for multiple expressions in function interface
+	- ignore .svn files manually in function interface
+	- add test for object interface
+
+0.01    April 13th, 2010
+        First version, released on an unsuspecting world.
+

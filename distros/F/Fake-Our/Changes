@@ -1,0 +1,43 @@
+Revision history for this software.
+
+0.10 2017-03-07 00:00:00
+  - define NORECURS, PM, and PL_FILES in Makefile.PL
+  - created by INABA Hitoshi
+
+0.09  2017-01-29 00:00:00
+  - rollback to version 0.05
+  - created by INABA Hitoshi
+
+0.08  2017-01-28 00:00:00
+  - remove the prerequisite module to 'PREREQ_PM' in Makefile.PL
+  - created by INABA Hitoshi
+
+0.07  2017-01-27 00:00:00
+  - add the prerequisite module to 'PREREQ_PM' in Makefile.PL
+  - write "$VERSION = $VERSION = 0.07" in one line
+  - created by INABA Hitoshi
+
+0.06  2017-01-23 00:00:00
+  - remove '.' from @INC (CVE-2016-1238: Important unsafe module load path flaw)
+  - created by INABA Hitoshi
+
+0.05 2015-06-21 00:00:00
+  - remove exit to PASS test of ActiveState Code
+  - created by INABA Hitoshi
+
+0.04 2014-08-11 00:00:00
+  - prevent from installing on newer perls
+  - rename Test/Simple.pm to Test/Simply.pm
+  - created by INABA Hitoshi
+
+0.03 2014-08-09 00:00:00
+  - fix ABSTRACT
+  - created by INABA Hitoshi
+
+0.02 2014-08-07 00:00:00
+  - fix name of META.yml
+  - created by INABA Hitoshi
+
+0.01 2014-02-09 00:00:00
+  - original version
+  - created by INABA Hitoshi

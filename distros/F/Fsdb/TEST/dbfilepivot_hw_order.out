@@ -1,0 +1,5 @@
+#fsdb name hw_1 hw_2 hw_3
+John	97	98	99
+Paul	-	80	82
+#   | dbsort -n hw
+#   | dbfilepivot -k name -p hw -v score

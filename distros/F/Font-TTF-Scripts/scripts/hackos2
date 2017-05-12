@@ -1,0 +1,224 @@
+#! /usr/bin/perl
+#   Title:          HACKOS2.BAT
+#   Author:         M. Hosken
+#   Description:
+# 1.001 MJPH    05-AUG-1997     Fix &makestr() to work properly
+# 1.002 MJPH    06-AUG-1997     Add -d & -q support
+# 1.1   MJPH    22-MAR-1998     Add -f support
+# 1.2   MJPH    11-JUN-1999     Add -t support
+# 1.3   MJPH     9-AUG-1999     Fix -d glob
+# 1.4   MJPH    17-FEB-2000     Fix typo for type 1 tables
+# 1.5   MJPH    19-SEP-2000     Add -n, -x
+# 1.6   MJPH    10-NOV-2000     Add -v
+# 1.7   RMH      2-Dec-2003     Add -w
+# 1.7.1 MJPH    27-APR-2006     Add docs for man pages, up version report
+# 1.8   MJPH     8-NOV-2007     Support v3 OS/2 tables and some handling of those beyond
+# 1.9   RMH     12-NOV-2014     Fix table padding and checksum calculations; use Pod::Usage
+
+use Getopt::Std;
+use Pod::Usage;
+
+require 'ttfmod.pl';
+
+getopts("c:d:f:hn:p:qt:u:v:x:w:");
+
+if ($opt_h)
+{
+    pod2usage( -verbose => 2, -noperldoc => 1);
+    exit;
+}
+
+
+if ((defined $opt_d && !defined $ARGV[0]) || (!defined $opt_d && !defined $ARGV[1]))
+{
+    pod2usage(1);
+    exit;
+}
+
+$old = select(STDERR); $| = 1; select($old);
+
+if ($opt_c =~ m/^none/oi)
+    {
+    undef $opt_c;
+    $revert = 1;
+    }
+else
+    { $revert = 0; }
+
+$fns{"OS/2"} = "hackos2";
+
+if (defined $opt_d)
+    {
+    foreach $a (@ARGV)
+        {
+        foreach $f (glob($a))
+            {
+            print STDERR "$f -> $opt_d/$f\n" unless (defined $opt_q);
+            &ttfmod($f, "$opt_d/$f", *fns);
+            }
+        }
+    }
+else
+    {
+    &ttfmod($ARGV[0], $ARGV[1], *fns);
+    }
+
+sub hackos2
+    {
+    local(*INFILE, *OUTFILE, $len) = @_;
+    local($csum);
+
+    read(INFILE, $dat, 78);
+    $ver = unpack("n", substr($dat, 0, 2));
+    if ($revert)
+        {
+        if ($ver == 1)
+            {
+            substr($dat, 0, 2) = pack("n", 0);
+            $len = 78;
+            }
+        }
+    else
+        {
+        if ($ver == 2)
+            {
+            read(INFILE, $dat1, 8);
+            $dat .= $dat1;
+            }
+        elsif ($ver == 1 || defined $opt_c)
+            {
+            substr($dat, 0, 2) = pack("n", 1);
+            $dat .= pack("x8", 0);
+            $len = 86;
+            }
+        else
+            {
+            read(INFILE, $dat1, 18);
+            $dat .= $dat1;
+            $len = 96;
+            if ($ver > 3)
+                {
+                print "Warning, version of OS/2 table too recent. Reverting it to v3\n";
+                substr($dat, 0, 2) = pack('n', 3);
+                }
+            }
+        }
+    if (defined $opt_c)
+        { substr($dat, 78, 8) = &makestr($opt_c, 8, 4); }
+#                pack("NN", unpack("LL", &makestr($opt_c, 8))); }
+    if (defined $opt_p)
+        { substr($dat, 32, 10) = &makestr($opt_p, 10, 1); }
+    if (defined $opt_u)
+        { substr($dat, 42, 16) = &makestr($opt_u, 16, 4); }
+#                pack("NNNN", unpack("LLLL", &makestr($opt_u, 16))); }
+    if (defined $opt_f)
+        { substr($dat, 62, 2) = &makestr($opt_f, 2, 2); }
+    if (defined $opt_t)
+        { substr($dat, 8, 2) = pack("n", $opt_t); }
+    if (defined $opt_n)
+        { substr($dat, 64, 2) = &makestr($opt_n, 2, 2); }
+    if (defined $opt_x)
+        { substr($dat, 66, 2) = &makestr($opt_x, 2, 2); }
+    if (defined $opt_v)
+        { substr($dat, 58, 4) = pack("A4", $opt_v); }
+    if (defined $opt_w)
+        { substr($dat, 2, 2) = pack("n", $opt_w); }
+    $dat .= "\0" x (4 - ($len & 3)) if ($len & 3);      # pad to long
+    $csum = unpack("%32N*", $dat);
+    print OUTFILE $dat;
+    ($len, $csum);
+    }
+
+# &makestr($string, $number_of_bytes, $granule)
+#   converts $string as a big hex number into a packed string no longer than
+#   $number_of_bytes long. The string is then swapped on the $granule byte
+#   boundary so that the least significant bundle comes first. This is unless
+#   $granule is 0 or -ve.
+#
+#   returns its string in Network order.
+
+sub makestr
+    {
+    local($str, $len, $group) = @_;
+    local($res, $have, $temp);
+
+    $have = length($str);
+    if ($have % 2)
+        {
+        $str = "0" . $str;
+        $have++;
+        }
+    $have >>= 1;
+    $have = $len if ($have > $len);
+    $res = "\000" x ($len - $have);
+    for ($i = 0; $i < $have; $i++)
+        { $res .= pack("C", hex(substr($str, $i << 1, 2))); }
+    if ($group > 0)
+        {
+        $temp = "";
+        for ($i = 0; $i < $len / $group; $i++)
+            {
+            $temp = substr($res, $i * $group, $group) . $temp;
+            }
+        $res = $temp;
+        }
+    ($res);
+    }
+
+__END__
+
+=head1 NAME
+
+hackos2 - edit the OS/2 table in a TrueType Font
+
+=head1 SYNOPSIS
+
+  HACKOS2 [-c hex] [-d directory] [-f fsSelection] [-p hex] [-q]
+          [-t num] [-u hex] [-w width] <infile> <outfile>
+
+Hacks the OS/2 table of a ttf file copying from infile to outfile.
+
+=head1 OPTIONS
+
+  -c      change codepage information (a 64 bit hex number)
+  -d      specifies output directory for processing multiple files. In which
+          case <outfile> is not used and <infile> may be a list including
+          wildcards.
+  -f      fsSelection value (16 bit hex) (e.g. 4240 for Thai fonts)
+  -n      sets usFirstCharIndex given a hex value
+  -p      change panose info
+              (10 bytes of hex in reverse order: 0A090807060504030201)
+  -q      Quiet mode (do not list names as they are processed)
+  -t      Sets fsType (embedding) information (decimal)
+  -u      change unicode info (a 128 bit hex number)
+  -v      sets vendor tag to the first 4 chars of the string
+  -w      set average char width (decimal)
+  -x      sets usLastCharIndex given a hex value
+
+For example, to convert a Win3.1 ANSI font to Win95 use the following:
+
+  hackos2 -c01 -u03 old.ttf new.ttf
+
+or for a Symbol font use:
+
+  hackos2 -c80000000 -u0 old.ttf new.ttf
+
+Or to revert:
+
+  hackos2 -cnone other.ttf new.ttf
+
+=head1 AUTHOR
+
+v1.9, 12-NOV-2014
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut

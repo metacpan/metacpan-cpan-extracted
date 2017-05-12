@@ -1,0 +1,185 @@
+
+use strict;
+use warnings;
+
+if ($^O eq 'MSWin32') {
+    Forks::Super::Config::CONFIG_module("Win32::API");
+    if ($Win32::API::VERSION && $Win32::API::VERSION < 0.71) {
+	warn qq[
+
+Win32::API v$Win32::API::VERSION found. v>=0.71 may be required
+to pass this test and use the features exercised by this test.
+
+];
+    }
+}
+
+#
+# tests (36) for exercising Forks::Super::bg_eval
+# tied class. This code should
+# not be run by itself, but should be <require>'d by
+# the test scripts (62bd-bg_eval_tie.t, 62by-bg_eval_tie.t)
+# that wish to run them.
+# 
+
+my $t0 = Time::HiRes::time();
+
+# untaint needed when Data::Dumper is the serializer
+my $untaint = ${^TAINT};
+if ($untaint) {
+    my $ipc_dir = Forks::Super::Job::Ipc::_choose_dedicated_dirname();
+    if (! eval {$ipc_dir = Cwd::abs_path($ipc_dir)}) {
+	$ipc_dir = Cwd::getcwd() . "/" . $ipc_dir;
+    }
+    ($ipc_dir) = $ipc_dir =~ /(.*)/;
+    Forks::Super::Job::Ipc::set_ipc_dir($ipc_dir);
+}
+
+### scalar context ###
+
+tie my $x, &BG_EVAL, sub { sleep 3 ; return 42 },
+    { untaint => $untaint };
+my $t = Time::HiRes::time();
+ok(defined $Forks::Super::LAST_JOB,        ### 3 ###
+   "\$Forks::Super::LAST_JOB set");
+ok(defined $Forks::Super::LAST_JOB_ID, "\$Forks::Super::LAST_JOB_ID set");
+ok(Forks::Super::isValidPid($Forks::Super::LAST_JOB_ID), 
+   "\$Forks::Super::LAST_JOB_ID set");
+ok($Forks::Super::LAST_JOB->{_is_bg} > 0, 
+   "\$Forks::Super::LAST_JOB marked bg");
+my $p = waitpid -1, 0, 10.0;
+ok($p == -1, "waitpid doesn't catch bg_eval job");
+ok($x == 42, "scalar bg_eval");
+my $t1 = Time::HiRes::time();
+($t,$t0) = ($t1-$t,$t1-$t0);
+my $y = $x;
+ok($y == 42, "scalar bg_eval");
+okl($t0 >= 2.6 && $t <= 7.95,     ### 10 ### was 3.85, obs 3.97,5.11,7.39,2.65
+   "scalar bg_eval took ${t}s ${t0}s expected ~3s");
+$x = 19;
+ok($x == 19, "result is not read only");
+
+SKIP: {
+
+    my $tied = tie $x, &BG_EVAL, sub { sleep 10; return 19 },
+    { timeout => 2, untaint => $untaint };
+    $t = Time::HiRes::time();
+    ok(!defined($tied->_fetch) || $x eq '',
+       "scalar bg_eval undef on failure");
+    $t = Time::HiRes::time() - $t;
+    okl($t <= 6.45,                    ### 13 ### was 3.25, obs 3.41,5.01,6.44
+	"scalar bg_eval respected timeout, took ${t}s expected ~2s");
+}
+
+$t0 = Time::HiRes::time();
+tie $x, &BG_EVAL, sub {
+    sleep 2;
+    opendir(X, "t");
+    my $i = 0; my %f = map { $_ => ++$i } grep { !/\.t$/ } readdir(X);
+    closedir X;
+    return \%f;
+},{
+    'untaint' => $untaint
+};
+$t = Time::HiRes::time();
+my %others = %$x;
+my $t2 = Time::HiRes::time();
+($t,$t0) = ($t2-$t,$t2-$t0);
+okl($t0 >= 1.95 && $t <= 5.04,           ### 25 ### was 5.04 obs 8.54
+    "listref bg_eval took ${t0}s ${t}s expected ~2s");
+ok(scalar(keys %others) > 0, "listref bg_eval");
+$x = [ "a", "v", "rst" ];
+ok(@$x == 3, "listref bg_eval overwrite ok");
+waitall;
+
+### test variery of %options ###
+
+$x = 20;
+my $w = 14;
+$t0 = Time::HiRes::time();
+tie $x, &BG_EVAL, sub {
+    sleep 5; return 19
+},{ name => 'bg_eval_job', delay => 3, on_busy => "queue",
+    callback => { queue => sub { $w++ }, start => sub { $w+=2 },
+		  finish => sub { $w+=5 } },
+    untaint => $untaint
+};
+$t = Time::HiRes::time();
+my $j = Forks::Super::Job::get('bg_eval_job');
+ok($j eq $Forks::Super::LAST_JOB, "\$Forks::Super::LAST_JOB updated");
+ok($j->{state} eq "DEFERRED", "bg_eval with delay");
+ok($w == 14 + 1, "bg_eval job queue callback");
+Forks::Super::pause(4);
+ok($j->{state} eq "ACTIVE", "bg_eval job left queue " . $j->toString());
+ok($w == 14 + 1 + 2, "bg_eval start callback");
+ok($x == 19, "scalar bg_eval with lots of options");
+$t1 = Time::HiRes::time();
+($t,$t0) = ($t1-$t,$t1-$t0);
+okl($t0 > 7.60 && $t < 13.5,  ### 34 ### was 9.6 obs 9.99,10.35,11.37,13.20,7.69
+   "bg_eval with delay took ${t}s ${t0}s, expected ~8s");
+ok($w == 14 + 1 + 2 + 5, "bg_eval finish callback");
+
+
+### list context ###
+
+tie my @x, &BG_EVAL, sub { sleep 3 ; return (19,42,[11..22]) },
+    { untaint => $untaint };
+$t = Time::HiRes::time();
+ok(defined $Forks::Super::LAST_JOB,
+   "\$Forks::Super::LAST_JOB set");
+ok(defined $Forks::Super::LAST_JOB_ID, "\$Forks::Super::LAST_JOB_ID set");
+ok(Forks::Super::isValidPid($Forks::Super::LAST_JOB_ID), 
+   "\$Forks::Super::LAST_JOB_ID set");
+ok($Forks::Super::LAST_JOB->{_is_bg} > 0, 
+   "\$Forks::Super::LAST_JOB marked bg");
+$p = waitpid -1, 0, 10.0;
+ok($p == -1, "waitpid doesn't catch bg_eval job");
+ok(@x == 3, "list bg_eval");
+$t1 = Time::HiRes::time();
+($t,$t0) = ($t1-$t,$t1-$t0);
+$y = $x[1];
+ok($y == 42 && $x[0]==19 && ref($x[2]) eq 'ARRAY', "list bg_eval");
+okl($t0 >= 2.85 && $t <= 7.95,     ### 10 ### was 3.85, obs 3.97,5.11,7.39
+   "scalar bg_eval took ${t}s ${t0}s expected ~3s");
+@x = (9,14,@INC);
+ok($x[0]==9 && @x>3, "result is not read only");
+
+my $tied = tie @x, &BG_EVAL, sub { sleep 10; return (19) },
+    { timeout => 2, untaint => $untaint };
+$t = Time::HiRes::time();
+ok(!defined($tied->_fetch) || @x==0,
+   "list bg_eval empty list on failure");
+$t = Time::HiRes::time() - $t;
+okl($t <= 5.25,                    ### 13 ### was 3.25, obs 3.41,4.01,5.01
+    "list bg_eval respected timeout, took ${t}s expected ~2s");
+
+
+
+$t0 = Time::HiRes::time();
+tie my %x, &BG_EVAL, sub {
+    sleep 2;
+    opendir(X, "t");
+    my $i = 0; my %f = map { $_ => ++$i } grep { !/\.t$/ } readdir(X);
+    closedir X;
+    return %f;
+},{
+    'untaint' => $untaint
+};
+$t = Time::HiRes::time();
+%others = %x;
+$t2 = Time::HiRes::time();
+($t,$t0) = ($t2-$t,$t2-$t0);
+okl($t0 >= 1.70 && $t <= 5.04,           ### 25 ### was 5.04 obs 8.54,1.72
+    "list to hash bg_eval took ${t0}s ${t}s expected ~2s");
+ok(scalar(keys %others) > 0, "listref bg_eval");
+%x = ('foo' => 'bar', 'hello' => 'world', 19 => 42);
+ok(3 == keys %x, "listref bg_eval overwrite ok");
+waitall;
+
+### list context to hash ###
+
+
+
+
+
+1;

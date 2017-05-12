@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/FSA/Rules.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/base.t
+t/graph.t
+t/leak.t
+t/pingpong.t
+t/state.t
+t/storable.t

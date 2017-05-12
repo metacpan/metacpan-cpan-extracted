@@ -1,0 +1,7 @@
+Homer Simpson;Abraham Simpson;Mona Simpson;safety.officer@springfieldnuclear.com;http://en.wikipedia.org/wiki/Homer_Simpson;;0
+Bart Simpson;Homer Simpson;Marge Simpson;;http://en.wikipedia.org/wiki/Bart_Simpson;;0
+Lisa Simpson;Homer Simpson;Marge Simpson;lisa@springfieldhigh.edu;;http://en.wikipedia.org/wiki/Lisa_Simpson;1
+Maggie Simpson;Homer Simpson;Marge Simpson;;http://en.wikipedia.org/wiki/Maggie_Simpson;;1
+Patty Bouvier;Clancy Bouvier;Jacqueline Bouvier;;http://en.wikipedia.org/wiki/Patty_and_Selma_Bouvier;;1
+Selma Bouvier;Clancy Bouvier;Jacqueline Bouvier;;http://en.wikipedia.org/wiki/Patty_and_Selma_Bouvier;;1
+Marge Simpson;Clancy Bouvier;Jacqueline Bouvier;;http://en.wikipedia.org/wiki/Marge_Simpson;;1

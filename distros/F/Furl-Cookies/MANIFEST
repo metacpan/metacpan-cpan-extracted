@@ -1,0 +1,10 @@
+Changes
+Cookies.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Furl-Cookies.t
+lib/Furl/Cookies.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

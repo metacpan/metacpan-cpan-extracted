@@ -1,0 +1,24 @@
+This file was pre-historic, so still looked correct.
+
+With modern perl and CPAN.pm you should be able to type:
+
+perl -MCPAN -e shell
+install Finance::Bank::TB
+
+Or do it by hand as follows:
+
+get the Finance-Bank-TB-x.xx.tar.gz file - use binary mode if FTP'ing.
+  where x.xx is version number
+
+Unpack it e.g.
+                                  
+gunzip -c Finance-Bank-TB-x.xx.tar.gz | tar xf - 
+  or
+tar zxf Finance-Bank-TB-x.xx.tar.gz
+
+cd to the directory distribution unpacks to.
+
+perl Makefile.PL
+make 
+make test (optional, but recomended)
+make install

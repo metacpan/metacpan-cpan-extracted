@@ -1,0 +1,7 @@
+In no particular order:
+
+- create a real test like: ./t/testing.pl - DONE
+- complete the Buy/Sell and transfer tests
+- expand each test to be more comprehensive. (at least validate the response keys)
+
+

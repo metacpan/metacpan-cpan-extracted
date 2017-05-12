@@ -1,0 +1,35 @@
+Name:           [% data.name %]
+Summary:        [% data.summary %]
+[% IF data.epoch -%]
+Epoch:          [% data.epoch %]
+[% END -%]
+Version:        [% data.version %]
+Release:        [% data.release %]%{?dist}
+[% data.license_comment -%]
+License:        [% data.license || spec.license %]
+Group:          Development/Libraries
+Source0:        [% data.source0 %] 
+URL:            [% data.url %]
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+[% IF data.is_noarch -%]
+BuildArch:      noarch
+[% END -%]
+
+[% brs = data.build_requires; FOREACH br = brs.sort -%]
+[% vers = data.build_require_version(br) -%]
+BuildRequires:  [% br %][% IF (vers != 0) %] >= [% vers %][% END %]
+[% END -%]
+
+[% brs = data.requires; FOREACH br = brs.sort -%]
+[% vers = data.build_require_version(br) -%]
+Requires:       [% br %][% IF (vers != 0) %] >= [% vers %][% END %]
+[% END -%]
+
+[% IF data.has_additional_deps -%]
+### Additional generated deps. These deps are regenerated from scratch every
+### time this spec file is updated.
+[% data.additional_deps_as_string %]
+[% END -%]
+
+[% IF data.has_macros %][% data.macros_as_string %][% END %]

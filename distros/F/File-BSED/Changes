@@ -1,0 +1,36 @@
+Revision history for Perl extension File-BSED.
+
+0.67 Tue Aug 14 16:19:34 2007
+    - Now skips author tests. Author test modules removed from dependencies.
+
+0.6  Tue Jul 17 17:23:02 2007
+    - uses new version of libgbsed (0.6)
+      this means that now the output file will preserve the executable flags
+      from the input file.
+    - fixed a broken preprocessor directive when PERL_MALLOC was active
+      in libgbsed.h
+    - removed unused function _hexstr2bin from BSED.xs
+    - tried to use goto() for some of the aliases in lib/File/BSED.pm, but
+      this obviosly didn't work very well. Reset to function calls instead.
+
+0.5  Sun Jul 15 22:38:45 2007
+    - uses new version of libgbsed.
+
+0.4  Fri Jul 13 17:33:09 2007
+    - libgbsed.c: Forgot to close files and flush buffers.
+    - libgbsed.c: Global variables removed.
+
+0.3  Tue Jul 10 18:43:22 2007
+    - bin/plbsed: We didn't import binary_file_matches
+    - Documented wildcard matching and minmatch+maxmatch.
+    - Changed Dave Dykstra's email from dwd@bell-labs.com to
+      dwdbsed@drdykstra.us.
+
+0.2  Tue Jul 10 17:33:53 2007
+    - Removed t/XSExample.t as this was a file left over from h2xs,
+      and made our tests fail.
+    - Minor documentation changes.
+
+0.1  Mon Jul 09 16:04:06 2007
+	- Initial version.
+

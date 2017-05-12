@@ -1,0 +1,15 @@
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+README
+Makefile.PL
+META.yml
+Changes
+LICENSE
+
+lib/Filesys/Virtual/Async/Dispatcher.pm
+
+examples/simpletest.pl
+
+t/1_load.t
+t/apocalypse.t

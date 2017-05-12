@@ -1,0 +1,97 @@
+{
+   "abstract" : "Simple way to handle Facebook's Graph API.",
+   "author" : [
+      "Oklahomer <hagiwara dot go at gmail dot com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.15.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Facebook-OpenGraph",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Recursive::Encode" : "0",
+            "Digest::SHA" : "0",
+            "Furl" : "0",
+            "HTTP::Message" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "2",
+            "MIME::Base64::URLSafe" : "0",
+            "Module::Build" : "0",
+            "Parse::CPAN::Meta" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Uplevel" : "0",
+            "URI" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Mock::Furl" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Facebook::OpenGraph" : {
+         "file" : "lib/Facebook/OpenGraph.pm",
+         "version" : "1.23"
+      },
+      "Facebook::OpenGraph::Response" : {
+         "file" : "lib/Facebook/OpenGraph/Response.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oklahomer/p5-Facebook-OpenGraph/issues"
+      },
+      "homepage" : "https://github.com/oklahomer/p5-Facebook-OpenGraph",
+      "repository" : {
+         "url" : "git://github.com/oklahomer/p5-Facebook-OpenGraph.git",
+         "web" : "https://github.com/oklahomer/p5-Facebook-OpenGraph"
+      }
+   },
+   "version" : "1.23",
+   "x_contributors" : [
+      "Oklahomer <go.hagiwara@facebook.com>",
+      "Oklahomer <hagiwara.go@gmail.com>"
+   ]
+}

@@ -1,0 +1,11 @@
+Revision history for Perl extension Finance::btce.
+
+0.01  Mon Apr 22 06:44:48 2013
+	- original version; created by h2xs 1.23 with options
+		-AX -n Finance::btce
+
+0.02  Tue Apr 23 03:50:00 2013
+	- added all public api tickers
+	- added new() method to store keys
+	- added getInfo method to return info about account
+

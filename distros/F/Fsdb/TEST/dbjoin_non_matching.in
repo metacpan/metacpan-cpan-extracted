@@ -1,0 +1,7 @@
+#h sid cid
+1 10
+2 11
+1 12
+2 12
+1 13
+#  | dbsort -n cid

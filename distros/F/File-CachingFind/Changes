@@ -1,0 +1,31 @@
+Revision history for Perl extension File::CachingFind.
+
+0.67  Sat Apr 05 17:52:00 2008
+	- hopefully fixed wrong symlink check in CachingFind_link.t
+
+0.66  Thu Nov 22 17:44:00 2007
+	- fixed LICENSE in README
+	- added "use warnings" (perl 5.6 needed!)
+	- added Build.PL
+
+0.65  Mon Nov 19 17:34:00 2007
+	- skip CachingFind_link.t if platform has no working symlink
+
+0.64  Wed Oct 31 18:43:00 2007
+	- reorganised to standard directory structure
+	- added POD and POD coverage tests
+
+0.63  Fri May 24 07:17:00 2002
+	- fixed faulty test behavior depending on the sequence of a hash
+
+0.62  Fri May 24 08:03:00 2002
+	- rewritten test cases to give detailed information
+
+0.61  Fri May  3 08:31:00 2002
+	- ignore non existant directories
+
+0.60  Thu May  2 12:36:00 2002
+	- changed name from File::Locate to File::CachingFind
+
+0.50  Tue Apr  9 08:48:33 2002
+	- first public version; created by Thomas Dorner

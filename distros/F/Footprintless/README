@@ -1,0 +1,353 @@
+NAME
+
+    Footprintless - A utility for managing systems with minimal installs
+
+VERSION
+
+    version 1.24
+
+SYNOPSIS
+
+        use Footprintless;
+    
+        my $footprintless = Footprintless->new();
+    
+        # Deploy initialize, start, and follow the log of the foo
+        $footprintless->overlay('dev.foo.overlay')->initialize();
+        $footprintless->service('dev.foo.service')->start();
+        $footprintless->log('dev.foo.logs.app')->follow();
+
+DESCRIPTION
+
+    Footprintless is an automation framework with an application frontend
+    for managing diverse software stacks in a consistent fashion. It
+    provides a minimally invasive approach to configuration management. At
+    its core, Config::Entities are used to define the whole system
+    <https://en.wikipedia.org/wiki/System>. Once defined, the entities are
+    used by all of the Footprintless modules to decouple the environment
+    from the action. The environment is defined by the entities used to
+    create command options. Specifically:
+
+        hostname
+        ssh
+        sudo_username
+        username
+
+    Each module will have its own entities structure, see them for more
+    details.
+
+ENTITIES
+
+    An example system my consist of multiple environments, each defined in
+    their own file:
+
+        ./fooptintless
+                      /entities
+                               /foo
+                                   /dev.pm
+                                   /qa.pm
+                                   /prod.pm
+
+    Each one of them would likely be rather similar, perhaps a variation
+    of:
+
+        return {
+            app => {
+                deployment => {
+                    'Config::Entities::inherit' => ['hostname', 'sudo_username'],
+                    clean => [
+                        '/opt/foo/tomcat/conf/Catalina/localhost/',
+                        '/opt/foo/tomcat/temp/',
+                        '/opt/foo/tomcat/webapps/',
+                        '/opt/foo/tomcat/work/'
+                    ],
+                    resources => {
+                        bar => 'com.pastdev:bar:war:1.0',
+                        baz => 'com.pastdev:baz:war:1.0'
+                    },
+                    to_dir => '/opt/foo/tomcat/webapps'
+                },
+                hostname => 'app.pastdev.com',
+                logs => {
+                    catalina => '/opt/foo/tomcat/logs/catalina.out'
+                },
+                overlay => {
+                    'Config::Entities::inherit' => ['hostname', 'sudo_username'],
+                    base_dir => '/home/me/git/foo/base',
+                    clean => [
+                        '/opt/foo/tomcat/'
+                    ],
+                    deployment_coordinate => 'foo.dev.app.deployment',
+                    key => 'T',
+                    os => 'linux',
+                    resolver_coordinate => 'foo.dev',
+                    template_dir => '/home/me/git/foo/template',
+                    to_dir => '/opt/foo/tomcat'
+                },
+                sudo_username => 'tomcat',
+                tomcat => {
+                    'Config::Entities::inherit' => ['hostname', 'sudo_username'],
+                    catalina_base => '/opt/foo/tomcat',
+                    http => {
+                        port => 20080
+                    },
+                    service => {
+                        'Config::Entities::inherit' => ['hostname', 'sudo_username'],
+                        action => {
+                            'kill' => { command_args => 'stop -force' },
+                            'status' => { use_pid => 1 }
+                        },
+                        command => '/opt/foo/tomcat/bin/catalina.sh',
+                        pid_file => '/opt/foo/tomcat/bin/.catalina.pid',
+                    },
+                    shutdown => {
+                        port => 20005,
+                        password => $properties->{'foo.dev.app.tomcat.shutdown.password'},
+                    },
+                    trust_store => {
+                        'Config::Entities::inherit' => ['hostname', 'sudo_username'],
+                        file => '/opt/foo/tomcat/certs/truststore.jks',
+                        include_java_home_cacerts => 1,
+                        password => $properties->{'foo.dev.app.tomcat.trust_store.password'},
+                    }
+                }
+            }
+            web => {
+                hostname => 'web.pastdev.com',
+                logs => {
+                    error => '/var/log/httpd/error_log',
+                    access => '/var/log/httpd/access_log'
+                }
+                sudo_username => 'apache'
+            }
+        }
+
+    Then when you decide to perform an action, the environment is just part
+    of the coordinate:
+
+        fpl log foo.dev.app.tomcat.logs.catalina follow
+    
+        fpl service foo.qa.app.tomcat.service status
+    
+        fpl deployment foo.prod.app.deployment deploy --clean
+
+    If using the framework instead, the story is the same:
+
+        my $permission_denied = Footprintless->new()
+            ->log('foo.prod.web.logs.error')
+            ->grep(options => 'Permission denied');
+
+CONSTRUCTORS
+
+ new(\%entity, %options)
+
+    Creates a new Footprintless factory. Available options are:
+
+    config_dirs
+
+      The root folder(s) for configuration entities. Defaults to the
+      $FPL_CONFIG_DIRS environment variable if set, $FPL_HOME/config if
+      not. config_dirs can be a scalar (one directory), or an array ref if
+      there is more than one directory. If set via the $FPL_CONFIG_DIRS
+      environment variable, and you need more than one directory, use a ;
+      to delimit on windows, or a : to delimit on *nix (same as the $PATH
+      variable).
+
+    config_properties
+
+      The properties file(s) used for placeholder replacement for
+      configuration entities. Defaults to the $FPL_CONFIG_PROPS environment
+      variable if set, $FPL_HOME/properties.pl if not. config_properties
+      can be a scalar (one file), or an array ref if there is more than one
+      directory. If set via the $FPL_CONFIG_PROPS environment variable, and
+      you need more than one directory, use a ; to delimit on windows, or a
+      : to delimit on *nix (same as the $PATH variable).
+
+    command_options_factory
+
+      Sets the command_options_factory for this instance. Must be an
+      instance or subclass of Footprintless::CommandOptionsFactory.
+
+    command_runner
+
+      Sets the command_runner for this instance. Must be an a subclass of
+      Footprintless::CommandRunner.
+
+    entities
+
+      If supplied, entities will serve as the configuration for this
+      instance. All other configuration sources will be ignored. Must be
+      either a hashref, or an instance of Config::Entities.
+
+    fpl_home
+
+      The root folder for footprintless configuration. Defaults to the
+      $FPL_HOME environment variable if set, ~/.footprintless if not.
+
+    localhost
+
+      Sets the localhost resolver for this instance. Must be an instance or
+      subclass of Footprintless::Localhost.
+
+METHODS
+
+ agent(%options)
+
+    Returns a new agent obtained from agent in Footprintless::Util. The
+    supported options are:
+
+    cookie_jar
+
+      A hashref for storing cookies. If not supplied, cookies will be
+      ignored.
+
+    timeout
+
+      The http request timeout.
+
+ command_options_factory()
+
+    Returns the command_options_factory used by this instance.
+
+ command_runner()
+
+    Returns the command_runner used by this instance.
+
+ deployment($coordinate, %options)
+
+    Returns a new instance of Footprintless::Deployment preconfigured to
+    operate on the deployment at $coordinate. Supported options are
+
+    command_options_factory
+
+      A command_options_factory to use instead of that which is supplied by
+      this footprintless instance.
+
+    command_runner
+
+      A command_runner to use instead of that which is supplied by this
+      footprintless instance.
+
+    localhost
+
+      A localhost to use instead of that which is supplied by this
+      footprintless instance.
+
+    resource_manager
+
+      A resource_manager to use instead of that which is supplied by this
+      footprintless instance.
+
+ entities()
+
+    Returns the Config::Entities that were resolved by this footprintless
+    instance.
+
+ localhost()
+
+    Returns the localhost resolver used by this instance.
+
+ log($coordinate, %options)
+
+    Returns a new instance of Footprintless::Log preconfigured to operate
+    on the log at $coordinate. Supported options are
+
+    command_options_factory
+
+      A command_options_factory to use instead of that which is supplied by
+      this footprintless instance.
+
+    command_runner
+
+      A command_runner to use instead of that which is supplied by this
+      footprintless instance.
+
+    localhost
+
+      A localhost to use instead of that which is supplied by this
+      footprintless instance.
+
+ overlay($coordinate, %options)
+
+    Returns a new instance of Footprintless::Overlay preconfigured to
+    operate on the overlay at $coordinate. Supported options are
+
+    command_options_factory
+
+      A command_options_factory to use instead of that which is supplied by
+      this footprintless instance.
+
+    command_runner
+
+      A command_runner to use instead of that which is supplied by this
+      footprintless instance.
+
+    localhost
+
+      A localhost to use instead of that which is supplied by this
+      footprintless instance.
+
+    resource_manager
+
+      A resource_manager to use instead of that which is supplied by this
+      footprintless instance.
+
+ plugins()
+
+    Returns the registered plugins for this instance.
+
+ resource_manager()
+
+    Returns the resource_manager used by this instance.
+
+ service($coordinate, %options)
+
+    Returns a new instance of Footprintless::Service preconfigured to
+    operate on the service at $coordinate. Supported options are
+
+    command_options_factory
+
+      A command_options_factory to use instead of that which is supplied by
+      this footprintless instance.
+
+    command_runner
+
+      A command_runner to use instead of that which is supplied by this
+      footprintless instance.
+
+    localhost
+
+      A localhost to use instead of that which is supplied by this
+      footprintless instance.
+
+ tunnel($coordinate, %options)
+
+    Returns a new instance of Footprintless::Tunnel preconfigured for
+    $coordinate.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Footprintless::Deployment
+
+      * Footprintless::Log
+
+      * Footprintless::Overlay
+
+      * Footprintless::Service
+
+      * https://github.com/lucastheisen/footprintless
+

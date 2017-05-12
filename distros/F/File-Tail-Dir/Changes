@@ -1,0 +1,22 @@
+Revision history for File-Tail-Dir
+
+0.10    2010-03-24
+        First version released to CPAN
+
+0.11    2012-08-03
+        Provided options for auto saving state (rt.cpan.org #60492)
+
+0.12    2012-08-03
+        Addressed potential issue of excessive memory usage (rt.cpan.org #70095)
+
+0.13    2012-08-06
+        Removed signal handlers from watchdog to prevent double-writing of state file
+
+0.14	2012-11-02
+	rt.cpan.org #80457 Issues on Windows 7
+
+0.15    2013-07-23
+        Fixed problem with infinite loop while reading file that has no final carriage return.
+
+0.16    2013-09-27
+        rt.cpan.org #88995 Fixed missing method _stop_watchdog

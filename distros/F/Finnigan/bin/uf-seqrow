@@ -1,0 +1,169 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+use Finnigan;
+
+my $option_help = 0;
+my $option_man = 0;
+my $option_dump = 0;
+my $option_html = 0;
+my $option_wiki = 0;
+my $option_size = 0;
+my $option_inj = 0;
+my $option_relative = 0;
+
+Getopt::Long::Configure ("bundling");
+GetOptions(
+           'help|?' => \$option_help,
+           'man' => \$option_man,
+           'size|s' => \$option_size,
+           'html|h' => \$option_html,
+           'wiki|w' => \$option_wiki,
+           'injection|i' => \$option_inj,
+           'relative|r' => \$option_relative,
+          ) or pod2usage(2);
+pod2usage(1) if $option_help;
+pod2usage(-existstatus => 0, -verbose => 2) if $option_man;
+
+@ARGV == 1 or do{ say STDERR "Expecting a single input file\n"; pod2usage(2) };
+
+my $file = shift @ARGV;
+
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $header->version);
+
+if ( $option_size ) {
+  if ( $option_inj ) {
+    say "size: " . $seq_row->injection->size;
+  }
+  else {
+    say "size: " . $seq_row->size;
+  }
+}
+
+if ( $option_html ) {
+  if ( $option_inj ) {
+    $seq_row->injection->dump(style => 'html', relative => $option_relative);
+  }
+  else {
+    $seq_row->dump(style => 'html', relative => $option_relative);
+  }
+}
+elsif ( $option_wiki ) {
+  if ( $option_inj ) {
+    $seq_row->injection->dump(style => 'wiki', relative => $option_relative);
+  }
+  else {
+      $seq_row->dump(style => 'wiki', relative => $option_relative);
+    }
+}
+else {
+  if ( $option_inj ) {
+    $seq_row->injection->dump(relative => $option_relative);
+  }
+  else {
+    $seq_row->dump(relative => $option_relative);
+  }
+}
+
+__END__
+=head1 NAME
+
+uf-seqrow -- decode the SeqRow structure in a Finnigan raw file
+
+=head1 SYNOPSIS
+
+uf-seqrow [options] <file>
+
+ Options:
+   --help            brief help message
+   --man             full documentation
+   --html            requet html formatting of the dump
+   --wiki            format as a wiki table
+   --size            tell object size
+   --injection       dump the content of InjectionData instead of the SeqRow itself
+   --relative        show relative addresses
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the manual page and exit.
+
+=item B<--dump>
+
+Prints the table listing all header fields with their seek addresses,
+sizes, acess keys and values.
+
+=item B<--html>
+
+Dump as html table.
+
+=item B<--wiki>
+
+Dump as a wiki table.
+
+=item B<--size>
+
+Show structure size in bytes.
+
+=item B<--injection>
+
+Dump the contents of InjectionData, instead of the parent object.
+
+=item B<--relative>
+
+Show relative addresses of all itmes. The default is to show the
+absolute seek address.
+
+=back
+
+=head1 DESCRIPTION
+
+B<uf-seqrow> will display the contents of the SeqRow (sequence table
+row) structure or its component, InjectionData.
+
+It will return an error message if its input is not a Finnigan raw
+file.
+
+By default, it will dump the SeqRow object in tabular format.
+
+=head1 SEE ALSO
+
+Finnigan::SeqRow
+
+=head1 EXAMPLES
+
+=over 4
+
+=item Dump the entire SeqRow structure with absolute addresses:
+
+  uf-seqrow sample.raw
+
+=item Dump the InjectionData substructure with relative addresses and print its size:
+
+  uf-seqrow -sri sample.raw
+
+=back
+
+=cut

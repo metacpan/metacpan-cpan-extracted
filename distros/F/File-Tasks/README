@@ -1,0 +1,198 @@
+NAME
+    File::Tasks - A set of file tasks to be executed in a directory
+
+SYNOPSIS
+      # Create a script
+      my $Script = File::Tasks->new;
+  
+      # Add some new files
+      $Script->add( 'Foo' );
+
+DESCRIPTION
+    File::Tasks allows you to define a set of file tasks to be done to a
+    local filesystem. There are three basic tasks, Add, Edit, and Remove.
+
+    A single File::Tasks object is used to assemble a collection of these
+    tasks, and then execute them on a new or existing directory somewhere on
+    the local filesystem.
+
+    The File::Tasks will take care of making sure that the task paths are
+    all compatible with their resulting location, and that the tasks match
+    the current state of the filesystem.
+
+    Once fully verified, it will execute the tasks and make the changes to
+    the filesystem.
+
+METHODS
+  new @params
+    Create and return a new "File::Tasks" object. Takes as argument a number
+    of parameters in "<Key =" $value>> form.
+
+    provider
+        Provide a custom Data Provider. The passed object must be a
+        sub-class of File::Tasks::Provider.
+
+    Returns a new "File::Tasks" object.
+
+  provider
+    Returns the Provider object for the File::Tasks
+
+  ignore
+    Returns the original "File::Find::Rule" for the files to be ignore
+    provided to the constructor.
+
+  paths
+    Returns as a sorted list the file paths of all of the Tasks
+
+  tasks
+    Returns all of the Tasks as a list, in the same order as for paths.
+
+  task $path
+    Access a single File::Tasks::Task object by its path
+
+  add $path, $source
+    The "add" method creates an "Add" task and adds it to the File::Tasks.
+    An Add task creates a new file where no file currently exists. Upon
+    execution of the File::Tasks, if a file already exists at the location,
+    execution will fail.
+
+    Returns the new File::Tasks::Add object as a convenience. Returns
+    "undef" if the path clashes, or the source is not valid.
+
+  edit $path, $source
+    The "edit" method creates as "Edit" task and adds it to the File::Tasks.
+    An Edit task replaces the contents of an existing file. Upon execution
+    of the File::Tasks, if no file exists the execution will fail.
+
+    Returns the File::Tasks::Edit object as a convenience. Returns "undef"
+    if the path clashes, or the source is not valid.
+
+  remove $path
+    The "remove" method creates a "Remove" task and adds it to the
+    File::Tasks. A Remove task deletes a file currently on the filesystem.
+    If no file exists, execution will fail.
+
+    Returns the File::Tasks::Remove object as a convenience. Returns "undef"
+    if the path clashes.
+
+  remove_dir $dir [, $Rule ]
+    The "remove_dir" method is specifically designed to remove an entire
+    directory. The directory passed as the first argument is scanned using
+    File::Find::Rule to find all the files in it, and then a series if
+    "Remove" tasks are created and added based on the relative location of
+    the files in the existing directory.
+
+    A pre-built Rule object can be provided as the second argument to modify
+    the behaviour of File::Find::Rule when searching for files. In one
+    example, you might want to add Remove tasks for all the files in a CVS
+    checkout, without removing the .cvs directories.
+
+      # Create the "leave .cvs dirs intact" rule
+      my $Rule = File::Find::Rule->new;
+      $Rule = $Rule->or(
+            $Rule->new->directory->name('.cvs')->prune,
+            $Rule->new->file
+            );
+  
+      # Add the Remove tasks
+      $Script->remove_dir($dir, $Rule);
+
+    Returns the number of Remove tasks added, which may validly be zero. On
+    error, such as a bad directory, bad second argument, or failed Remove
+    Task addition, returns "undef".
+
+  set $Task
+    For a File::Tasks::Task object created outside of File::Tasks, the "set"
+    method attempts to add it to the Script.
+
+    Returns the Task object as a convenience, or "undef" on error.
+
+  clashes $path
+    The "clashes" method is used to determine if a path clashes with an
+    existing Task in the File::Tasks object. Generally this is because a
+    file already exists for a directory you want to add, or vica versa.
+
+    Returns true if the path clashes, or false if not.
+
+  test $dir
+    The "test" method does a complete dry run of the execution of the
+    File::Tasks object. This includes:
+
+    - Ensuring that no paths clash
+
+    - Checking that all files that should exist do
+
+    - Checking that all files that shouldn't exist don't
+
+    - Checking we have the correct permissions
+
+    Returns true if the test run was successful, or "undef" otherwise.
+
+execute $dir
+    Executes the File::Tasks. This will create, modify or remove files as
+    described in the Tasks.
+
+    Due to the delicate and somewhat complex nature of the installation, you
+    almost certainly will want to do a test run with "<-"test($dir)>> before
+    the live call.
+
+    Returns true if completed successfully, or "undef" otherwise.
+
+  overlay $Under, $Over
+    To keep complexity down, a great way of generating File::Tasks objects
+    that will "overwrite" a previous installation is to do it in two parts.
+
+      # Create a script to remove the old installation
+      my $Old = File::Tasks->new;
+      $Old->remove_dir($dir);
+  
+      # Script for a fresh install spat out by some module
+      my $Install = My::Module->build->Script;
+  
+      # Overlay the new install over the old removal to create
+      # a combined script that will "shift" the current files as needed.
+      my $Script = $Old->overlay($Install);
+
+    Where this gets really cool is that if the new file is the same as the
+    old file, the Task will be optimised away.
+
+    This means that if the underlying data for a process changes, and you
+    rerun a generator of some sort, the only output files that are touched
+    are the ones that will actually change as a result of the underlying
+    data changing.
+
+    Given two File::Tasks objects, will create and return a new Script that
+    represents the combination of the two. Returns "undef" on error.
+
+    The + operator is also effectively overloaded to this method
+
+      # The explicit way
+      my $Script = $Old->overlay($Install);
+  
+      # Via the overload
+      my $Script = $Old + $Install;
+
+TO DO
+    - Much more detailed unit testing
+
+    - Add various caching options
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Tasks>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2005, 2006 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

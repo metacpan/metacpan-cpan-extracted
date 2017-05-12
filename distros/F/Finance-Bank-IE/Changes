@@ -1,0 +1,130 @@
+0.30 2014-01-01T00:00:00Z
+    REMOVE MBNA - MBNA Ireland no longer exists
+    Add preliminary support for AIB & AvantCard (MBNA replacement)
+    Release script ensures all files are versioned correctly.
+
+0.29 2012-12-29T00:00:00Z
+    Revert to previously-used numbering schema
+    Fix deprecated use of qw() which becomes an error in 5.17
+    Add release dates to this changelog (mostly obtained from test reports)
+
+0.28.1 2012-12-07T00:00:00Z
+    Disable save_pages tests entirely until I figure out why they're
+      such trouble
+
+0.28 2012-11-20T00:00:00Z
+    Fix reported bug with running on Windows (using ? in filenames)
+    Refactor BoI module somewhat to reuse code
+
+0.27 2012-07-10T00:00:00Z
+    Date::Parse on OpenBSD apparently doesn't parse
+      01/01/1970. Removed the str2time call completely as it was
+      overkill.
+    BoI advertising their app on the login page screws up the login.
+    Rudimentary render-as-QIF support
+    Bumped all $VERSIONs to match release
+
+0.26 2012-04-12T00:00:00Z
+    Fix MBNA account-in-credit detection (returns negative balance)
+    Fix MBNA due-date reparsing when due date is blank
+    (lots of changes in 0.25 not mentioned below!)
+    Add funds transfer to PTSB module (subsequently broken)
+    Rework PTSB to deal with changes to beneficiaries page
+    Rework BoI to deal with site makeover
+
+0.25 2011-04-26T00:00:00Z
+    Almost complete code coverage in tests for PTSB, including Mock
+
+0.24 2010-11-20T00:00:00Z
+    Update MBNA for HTML changes.
+
+0.23 2010-10-27T00:00:00Z
+    Remove Test::MockModule requirement as it's not yet used
+
+0.22 2010-10-07T00:00:00Z
+    Adding support for Permanent TSB
+
+0.21 2009-12-02T00:00:00Z
+    Now we have real tests for the BoI module. Additionally, there's
+    an activate_beneficiary function, and some perldocs (incomplete).
+
+0.20 2009-11-05T00:00:00Z
+    Previous update broke account detail due to an omitted backslash. (no
+    fault of Audun!) Serves me right for not testing properly.
+
+0.19 2009-10-13T00:00:00Z
+    Update to BoI fetching of multiple pages in account detail (courtesy of
+      Audun)
+    Handle empty BoI account detail.
+
+0.18 2009-09-26T00:00:00Z
+    MBNA made a text change on the account detail page.
+    dumping MBNA debug data won't happen without $ENV{DEBUG}
+
+0.17 2009-08-07T00:00:00Z
+    MBNA moved the password onto a separate page.
+
+0.16 2009-01-04T00:00:00Z
+    BOI: minor cleanup of stray debug text
+    MBNA: update sentinel text to pull account details from summary page
+
+0.15 2008-11-14T00:00:00Z
+    Forgot to actually bump the module versions and update this file.
+
+0.14 2008-11-14T00:00:00Z
+    Update MBNA for layout changes
+
+0.13 2008-07-15T00:00:00Z
+    Use old BoI address, as both Safari and WWW::Mechanize can't cope
+    with the new one and I don't know why not.
+
+0.12 2008-06-05T00:00:00Z
+    Missed one of the MBNA layout changes. Also, I added some sanity
+    checking to the BoI beneficiaries code; it now checks that a
+    beneficiary is active before letting you use it.
+
+0.11 2008-04-27T00:00:00Z
+    BoI layout changed again, as did some of the MBNA layout.
+
+0.10 2007-10-19T00:00:00Z
+    BoI layout changed in mid-October 2007. Code is somewhat more robust in
+    that it will now bail out when it can't parse things instead of returning
+    undef. One minor regression in functionality: the account transfer used
+    understand your own bank account nicknames both as source and
+    destination. Due to formatting changes the nickname as destination no
+    longer works. You can probably fix this by setting a nickname on the
+    account in the third-party beneficiaries list, where BoI seem to inevitably
+    list your non-third-party accounts regardless of what ever else you do.
+
+0.09 2007-10-16T00:00:00Z
+    Phishing page, take two.
+
+0.08 2006-10-15T00:00:00Z
+    Deal with BoI phishing page
+
+0.07 2006-06-28T00:00:00Z
+    Update to match new BoI layout (changed June 20th or so)
+
+0.06 2006-01-27T00:00:00Z
+    Add transfer_funds function to BoI code
+    Update example program to show transfer_funds function
+
+0.05 2005-07-23T00:00:00Z
+    Fix example program to match API!
+    Remove currency from numeric fields in MBNA.pm
+    Handle unicode as well as encoded euro sign in MBNA.pm
+
+0.04 2005-05-24T00:00:00Z
+    Fix up Makefile with prereqs
+    Parse date in BoI statement and return as unix time
+
+0.03 2005-05-03T00:00:00Z
+    Add account details to BoI
+    Clean up somewhat for release
+
+0.02 2005-05-02T00:00:00Z
+    Converted BankOfIreland.pm to use WWW::Mechanize
+    MBNA.pm now handles the occasional Update Your E-Mail Address page
+
+0.01 2005-05-01T00:00:00Z
+    Initial version

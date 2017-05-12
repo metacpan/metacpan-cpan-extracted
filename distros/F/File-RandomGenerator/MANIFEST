@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+bin/gen_rand_files.pl
+dist.ini
+lib/File/RandomGenerator.pm
+t/10-methods.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

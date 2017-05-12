@@ -1,0 +1,6 @@
+Revision history for Perl extension File::Mangle.
+
+0.01  Thu Sep  6 22:27:19 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n File::Mangle
+

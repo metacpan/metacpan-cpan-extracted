@@ -1,0 +1,14 @@
+abstract: Drop-in replacement to Filter::Simple
+author: Audrey Tang <cpan@audreyt.org>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: MIT
+name: Filter-Simple-Compile
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Module::Compile: 0
+  perl: 5.6.0
+version: 0.02

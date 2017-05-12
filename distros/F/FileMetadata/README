@@ -1,0 +1,105 @@
+INTRODUCTION
+
+Metadata is data regarding data. Such data can include the author of a
+document or the keywords describing the content in a document among
+others. FileMetadata is a framework for extracting metadata from
+various formats and storing such data. The framework is implemented in
+the Perl programming languange.
+
+
+APPLICATION
+
+The FileMetadata framework can be used to develop applications to solve several
+problems.
+
+1. Search: The framework can bes used to write search application for any
+collection of files. These may be files on a web site or in a desktop
+environment
+
+2. Content Management/Deleivery: Metadata is a key component of content
+management. The Enjine Project Website is managed and delivered using an
+application that relies heavily on FileMetadata.
+
+3. Data Analysis: Metadata can be used to better understand exisitng data
+systems. FileMetadata would be useful in such scenarios.
+
+
+COMPONENTS
+
+There are two types of components in the framework.
+
+Miners : Miners extract specific Metadata from a file. They specialize in
+specific data or specific file formats. Miners implement the
+FileMetadata::Miner interface and are packaged in the FileMetadata::Miner::*
+namespace.
+
+Stores : A store is used in an application to store Metadata from multiple
+miners. Stores implement the FileMetadata::Store interface and are packaged
+under the FileMetadata::Store::* namespace.  Installation You should download
+the FileMetadata package from CPAN and install it. The next step would be to
+read the documentation for the FileMetadata::Miner and FileMetadata::Store
+interfaces using the perldoc command.
+
+OVERVIEW
+
+A miner takes a filename and a reference to a hash as arguments to the mine()
+function. Several miners can be called in series on a certain file. The same
+hash is passed as a reference to each miner. The miner inserts key value pairs
+into the hash. The keys are string prefixed by the perl package namespace of
+the miner. The values are strings representing metadata. If a miner cannot
+access the resource or cannot extract metadata from the given format it does
+not insert anything into the hash. The mine() method will not 'die' from such
+errors. The use of package names as prefixes in the hash keys avoids the
+problem of one miner over-writing data from another miner. We will refer to
+this hash as a meta hash from now.
+
+An application should insert two keys into the meta hash at any point
+of time before the hash is given to a store. The thwo keys are 'ID'
+and 'TIMESTAMP'. 'ID' is an unique identifier for the set of
+metadata. If a store receives two meta hashes with the same 'ID' it
+will discard all data from the first meta hash and only retrieve data
+from the latter. The absolute or relative paths to a file can be used
+as identifiers. An application can choose to generate any string
+identifier. The 'TIMESTAMP' identifies the time at which the Metadata
+was generated and can be in any format convenient for the application.
+
+The store() of a store accepts a meta hash for storage. The meta
+should contain the 'ID' and 'TIMESTAMP' keys. If these keys are not
+present the store can choose to ignore the data or 'die'. A store()
+connects to a persistent storage such as a SQL database to store the
+metadata for future use. Stores also implement other methods such as
+list(), has(), remove() and clear() that make the task of the
+application easier. A store typically aliases the keys in the meta
+hash to application specific names and provides ways of selecting
+which items in the meta hash must be stored and which can be ignored.
+
+DEVELOPING APPLICATIONS
+
+The First step to solving your problem is assessing your needs. Different
+applications have different needs. The FileMetadata framework makes it simple
+to develop applications in the framework from pre-existing components used in
+conjunction with customized components.
+
+First it is important to determine what file formats you are interested in and
+what Metadata needs to be extracted from these file formats. If existing Miners
+cannot accomplish the task, it will be necessary to develop new Miners. If you
+choose to develop a new miner that might be useful to others, please consider
+contributing it.
+
+Once the data has been mined, it can be processed by the application directly
+or it can be stored using a Store for future use. The Store interface makes it
+possible to avoid processing files that have not changed since they were last
+examined. Using the Stores might be a good idea when processing large amounts
+of files. If you choose to develop a new store that might be useful to others,
+please consider contributing it.
+
+RESOURCES
+
+http://web.ics.purdue.edu/~midh/products/FileMetadata
+
+
+LICENSE
+
+This software can be used under the terms of any Open Source Initiative
+approved license. A list of these licenses are available at the OSI site -
+http://www.opensource.org/licenses/

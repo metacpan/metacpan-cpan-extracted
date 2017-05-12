@@ -1,0 +1,157 @@
+NAME
+    File::pushd - change directory temporarily for a limited scope
+
+VERSION
+    version 1.014
+
+SYNOPSIS
+     use File::pushd;
+
+     chdir $ENV{HOME};
+
+     # change directory again for a limited scope
+     {
+         my $dir = pushd( '/tmp' );
+         # working directory changed to /tmp
+     }
+     # working directory has reverted to $ENV{HOME}
+
+     # tempd() is equivalent to pushd( File::Temp::tempdir )
+     {
+         my $dir = tempd();
+     }
+
+     # object stringifies naturally as an absolute path
+     {
+        my $dir = pushd( '/tmp' );
+        my $filename = File::Spec->catfile( $dir, "somefile.txt" );
+        # gives /tmp/somefile.txt
+     }
+
+DESCRIPTION
+    File::pushd does a temporary "chdir" that is easily and automatically
+    reverted, similar to "pushd" in some Unix command shells. It works by
+    creating an object that caches the original working directory. When the
+    object is destroyed, the destructor calls "chdir" to revert to the
+    original working directory. By storing the object in a lexical variable
+    with a limited scope, this happens automatically at the end of the
+    scope.
+
+    This is very handy when working with temporary directories for tasks
+    like testing; a function is provided to streamline getting a temporary
+    directory from File::Temp.
+
+    For convenience, the object stringifies as the canonical form of the
+    absolute pathname of the directory entered.
+
+    Warning: if you create multiple "pushd" objects in the same lexical
+    scope, their destruction order is not guaranteed and you might not wind
+    up in the directory you expect.
+
+USAGE
+     use File::pushd;
+
+    Using File::pushd automatically imports the "pushd" and "tempd"
+    functions.
+
+  pushd
+     {
+         my $dir = pushd( $target_directory );
+     }
+
+    Caches the current working directory, calls "chdir" to change to the
+    target directory, and returns a File::pushd object. When the object is
+    destroyed, the working directory reverts to the original directory.
+
+    The provided target directory can be a relative or absolute path. If
+    called with no arguments, it uses the current directory as its target
+    and returns to the current directory when the object is destroyed.
+
+    If the target directory does not exist or if the directory change fails
+    for some reason, "pushd" will die with an error message.
+
+    Can be given a hashref as an optional second argument. The only
+    supported option is "untaint_pattern", which is used to untaint file
+    paths involved. It defaults to {qr{^("" in -+@\w.+)$}}, which is
+    reasonably restrictive (e.g. it does not even allow spaces in the path).
+    Change this to suit your circumstances and security needs if running
+    under taint mode. *Note*: you must include the parentheses in the
+    pattern to capture the untainted portion of the path.
+
+  tempd
+     {
+         my $dir = tempd();
+     }
+
+    This function is like "pushd" but automatically creates and calls
+    "chdir" to a temporary directory created by File::Temp. Unlike normal
+    File::Temp cleanup which happens at the end of the program, this
+    temporary directory is removed when the object is destroyed. (But also
+    see "preserve".) A warning will be issued if the directory cannot be
+    removed.
+
+    As with "pushd", "tempd" will die if "chdir" fails.
+
+    It may be given a single options hash that will be passed internally to
+    "pushd".
+
+  preserve
+     {
+         my $dir = tempd();
+         $dir->preserve;      # mark to preserve at end of scope
+         $dir->preserve(0);   # mark to delete at end of scope
+     }
+
+    Controls whether a temporary directory will be cleaned up when the
+    object is destroyed. With no arguments, "preserve" sets the directory to
+    be preserved. With an argument, the directory will be preserved if the
+    argument is true, or marked for cleanup if the argument is false. Only
+    "tempd" objects may be marked for cleanup. (Target directories to
+    "pushd" are always preserved.) "preserve" returns true if the directory
+    will be preserved, and false otherwise.
+
+DIAGNOSTICS
+    "pushd" and "tempd" warn with message "Useless use of File::pushd::*%s*
+    in void context" if called in void context and the warnings category
+    "void" is enabled.
+
+      {
+        use warnings 'void';
+
+        pushd();
+      }
+
+SEE ALSO
+    *   File::chdir
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/File-pushd/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/File-pushd>
+
+      git clone https://github.com/dagolden/File-pushd.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Diab Jerius <djerius@cfa.harvard.edu>
+
+    *   Graham Ollis <plicease@cpan.org>
+
+    *   Olivier Mengué <dolmen@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David A Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

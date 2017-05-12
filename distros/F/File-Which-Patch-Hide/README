@@ -1,0 +1,32 @@
+SYNOPSIS
+
+     % PERL5OPT=-MFile::Which::Patch::Hide=-prog,'foo;bar' app.pl
+
+    In the above example app.pl will think that foo and bar are not in PATH
+    even though they actually are.
+
+     % PERL5OPT=-MFile::Which::Patch::Hide=-prog,'/usr/bin/foo' app.pl
+
+    The above example hides just /usr/bin/foo but foo might be available in
+    another directory in PATH.
+
+DESCRIPTION
+
+    This module can be used to simulate the absence of certain programs.
+    This module works by patching (wrapping) File::Which's which() routine
+    to remove the result if the programs that want to be hidden are listed
+    in the result. So only programs that use which() will be fooled.
+
+    An example of how I use this module: Nodejs::Util has a routine
+    get_nodejs_path() which uses File::Which::which() to check for the
+    existence of node.js binary. The get_nodejs_path() routine is used in
+    some of my test scripts to optionally run tests when node.js is
+    available. So to simulate a condition where node.js is not available:
+
+     % PERL5OPT=-MFile::Which::Patch::Hide=-prog,'node;nodejs' prove ...
+
+append:SEE ALSO
+
+    To simulate tha absence of some perl modules, you can try: lib::filter,
+    lib::disallow.
+

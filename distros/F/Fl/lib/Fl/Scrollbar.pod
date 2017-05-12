@@ -1,0 +1,132 @@
+class 'Fl::Scrollbar';
+isa 'Fl::Slider';
+include 'FL/Fl_Scrollbar.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Scrollbar - Slider with Arrow Buttons at Both Ends
+
+=head1 Description
+
+The Fl::Scrollbar draws a slider with arrow buttons at the ends of the
+scrollbar.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/scrollbar.png" /></center>
+
+Clicking on the arrows move up/left and down/right by linesize(). Scrollbars
+also accept FL_SHORTCUT events: the arrows move by linesize(), and vertical
+scrollbars take Page Up/Down (they move by the page size minus linesize()) and
+Home/End (they jump to the top or bottom).
+
+Scrollbars have step(1) preset (they always return integers). If desired you
+can set the step() to non-integer values. You will then have to use casts to
+get at the floating-point versions of value() from Fl::Slider.
+
+=head1 Methods
+
+Fl::Scrollbar inherits from Fl::Slider, Fl::Valuator and Fl::Widget. On top
+of that, it exposes the following methods...
+
+=head2 new(...)
+
+    my $val_a = Fl::Scrollbar->new(0, 0, 250, 500, 'Important Stuff');
+    my $val_b = Fl::Scrollbar->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default boxtype is FL_DOWN_BOX.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Scrollbar *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 linesize(...)
+
+    $val_a->linesize( 12 );
+
+This number controls how big the steps are that the arrow keys do.
+
+In addition page up/down move by the size last sent to value() minus one
+linesize(). The default is 16.
+
+=cut
+
+xs {name        => 'linesize',
+    definitions => [
+            {required => [[qw[int i]]],
+             returns  => 'void'
+            }
+    ]
+};
+
+=pod
+
+=head2 value(...)
+
+    $val_a->value( 12 );
+    my $value = $val_b->value();
+
+Gets or sets the value of the slider in the scrollbar.
+
+    $value = $val_b->value( $pos, $windowSize, $first, $total );
+
+Sets the position (first line displayed), size (number of lines displayed),
+and range of the slider in the scrollbar (number of first and total lines).
+
+You should call this every time your window changes size, your data changes
+size, or your scroll position changes (even if in response to a callback from
+this scrollbar). All necessary calls to redraw() are done.
+
+=cut
+
+xs {name        => 'value',
+    definitions => [
+            {returns  => 'int'},
+            {required => [[qw[int i]]],
+             returns  => 'int'
+            },
+            {required => [[qw[int pos]], [qw[int windowSize]], [qw[int first]], [qw[int total]]],
+             returns  => 'void'
+            }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

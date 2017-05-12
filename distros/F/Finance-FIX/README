@@ -1,0 +1,73 @@
+NAME
+    Finance::FIX - Parse FIX protocol messages.
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+      use Finance::FIX;
+
+      # Instantiate.
+      my $fix = Finance::FIX->new;
+
+      # Parse string containing a FIX message.
+      # Returns an array of FIX nodes, broken down into array refs of tags and values.
+      my $message = $fix->parse($message);
+
+      require Data::Dumper;
+      print Data::Dumper::Dumper( $message ), "\n";
+ 
+METHODS
+  new
+    Instantiate new Finance::FIX object.
+
+  parse($message)
+    Parse $message, returning array ref of FIX message nodes, broken down
+    into array refs of tags and values.
+
+AUTHOR
+    Blair Christensen, `<blair.christensen at gmail.com>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-finance-fix at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Finance-FIX. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Finance::FIX
+
+    You can also look for information at:
+
+    * Source Repository
+        https://github.com/blairc/finance-fix.perl
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-FIX
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Finance-FIX
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Finance-FIX
+
+    * Search CPAN
+        http://search.cpan.org/dist/Finance-FIX/
+
+ACKNOWLEDGEMENTS
+SEE ALSO
+    http://en.wikipedia.org/wiki/Financial_Information_eXchange,
+    http://www.fixprotocol.org/
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Blair Christensen.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

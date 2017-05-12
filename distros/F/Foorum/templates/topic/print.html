@@ -1,0 +1,39 @@
+[% PROCESS sub/date.html %]
+[% title = topic.title _ ' : ' _ forum.name %]
+
+[% topic.url  = forum.forum_url _ '/topic/' _ topic.topic_id %]
+[% url_prefix = topic.topic_url _ '/print' %]
+
+<div style="margin: 20px;">
+
+<h2>[% topic.title %]</h2>
+
+[% FOREACH comment IN comments %]
+<a name="c[% comment.comment_id %]"></a>
+<div [% IF comment.level %]style="margin-left: [% comment.level * 30 %]px"[% END %]>
+    <div><b>[% comment.title %]</b> Posted By <a href="/u/[% comment.author.username %]">[% comment.author.nickname %]</a> on <span class='date'>[% date_format(comment.post_on) %]</span></div>
+	<span class="postclass textbody" id='comment_text' style="padding: 2em;">
+	  [% IF comment.author.status == 'banned' %]
+	    The author is banned.
+	  [% ELSE %]
+	    [% IF comment.upload %]
+	    [% PROCESS upload/upload.html upload = comment.upload %]
+	    [% END %]
+	    [% comment.text %]
+	  [% END %]
+	</span>
+    <div class='horizontal'></div>
+</div>
+[% END %]
+[% IF comments.size %]
+<div style="clear: both;">
+    <h3>What's Next?</h3>
+    <ul>
+        <li>[% INCLUDE 'sub/pager.html' pager = comments_pager %]</li>
+        <li><a href="[% topic.url %]">[% topic.title %]</a></li>
+        <li><a href="[% forum.url %]">[% forum.name %]</a></li>
+    </ul>
+</div>
+[% END %]
+
+</div>

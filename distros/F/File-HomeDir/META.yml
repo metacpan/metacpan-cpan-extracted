@@ -1,0 +1,37 @@
+---
+abstract: 'Find your home and other directories on any platform'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  POSIX: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-HomeDir
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '3'
+  File::Basename: '0'
+  File::Path: '2.01'
+  File::Spec: '3'
+  File::Temp: '0.19'
+  File::Which: '0.05'
+  Mac::SystemDirectory: '0.04'
+  perl: v5.5.3
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=File-HomeDir
+  homepage: https://metacpan.org/release/File-HomeDir
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com:rehsack/File-HomeDir.git
+version: '1.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

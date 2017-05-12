@@ -1,0 +1,21 @@
+Revision history for Perl extension File::Tail::App.
+
+0.4  Sat Feb 11 17:18:47  2012
+     - rt 28347: replace tell($fh) with sysseek($fh,0,1)
+     - fix "Use of uninitialized value $md5_chk in concatenation (.) or string at ..." warning
+     - Change to decimal versions for simplicity
+     - define simple import() to make it all a bit lighter
+     - fully qualify Carp calls, do not import them into package
+     
+0.0.1  Mon Dec 12 19:38:28 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n File::Tail::App
+0.0.2
+	- fixed version numbering in Changes and README files
+	- comment and POD cleanup
+	- added "or croak" to the File::Tail->new() call in case File::Tail's bug (pronounced enhancement request) 16866 is addressed ever
+	- added do_md5_check funtionality (Thanks for that idea Ben!) 
+	- added check of filehandle eq (Thanks for that idea Ben!)
+	
+0.0.3
+	- fixed up Makefile.PL includeing rt 23728

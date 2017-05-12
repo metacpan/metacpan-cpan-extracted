@@ -1,0 +1,16 @@
+This Module Is Written Against:
+FFMPEG Branch Release 1.0
+
+It Must Be Installed And In Your $PATH.
+
+It Also Depends On GhostScript Being
+Installed In Your System.
+
+
+This Module Uses The Same Number Of
+The Branch Release of FFMPEG That It
+Can Be Used With.
+
+The Internal $REVISION or Release
+Date Will Indicate if You Have The Latest 
+Release of FFMPEG::Effects

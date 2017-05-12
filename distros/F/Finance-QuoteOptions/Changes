@@ -1,0 +1,60 @@
+Revision history for Perl extension Finance::QuoteOptions.
+
+0.23 August 31 2010 
+  Yahoo started using <th> tags for the column headers.
+
+0.22 July 2 2010
+  Date parsing now adapts to either long or short month names.
+  Fixed February options retreival.
+
+0.21 May 11 2010
+  Fixed Yahoo date parsing.
+
+0.20 June 8 2009
+  Most of the changes are from Dan Dascalescu. However, the author
+  found a few difficulties and had to make some changes.
+
+  + added an option to ->retrieve to only fetch the next N expiration
+    dates. If you only care about the current expiration, this makes
+    retrieval a few times faster
+  + added in_the_money hash key determined from the style of the cells
+    (yellow = in the money)
+  + fixed bug #43145 regarding options with no PUTs
+  + fixed hang on stock symbols with no data at all (e.g. 'foobar')
+  + no longer die if the HTTP request to the server happens to fail
+  + ->symbol('NEW') can now set a new symbol for subsequent ->retrieves
+  + cleaned up ${${${foo...}}} constructs, using the arrow operator
+  + updated documentation
+  + refactored code to pass Perl::Critic 'gentle'
+
+  Dan attempted to switch from WWW::Mechanize to the lighter LWP::UserAgent 
+  for Yahoo! mode. However, this change caused various applications the
+  author uses to crash in addition to not working with the CBOE code.
+  Switching back to WWW::Mechanize fixed these problems.
+
+0.14 Jan 8 2008
+  - Fixed Proxy setting
+
+0.13 Jan 8 2008
+  - Added Proxy setting
+
+0.12 Jul 8 2007
+  - Query code now returns immediately if first HTTP retrieval
+    fails. Fixes occasional query hang.
+  - Documentation fixes.
+
+0.11 Jun 1 2007
+  - Looks like the CBOE *does* blacklist IPs that pull too
+    much data. Warning added to documentation.
+
+  - Added code to the CBOE section that will calculate the
+    expiration date from the month and year if the detail page
+    is unavailable. This was because I was blacklisted in two
+    steps, first the detail page on a Friday, then the main page
+    on a Monday. I was hoping that the blacklist would happen
+    only on the detail page. Alas.
+
+
+0.10  Sat Apr 21 08:49:04 2007
+  - First Release; created by h2xs 1.23 with options
+    -b 5.6.1 -AX Finance::QuoteOptions

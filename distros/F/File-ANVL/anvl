@@ -1,0 +1,324 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+
+my $VERSION = $File::ANVL::VERSION;
+
+use File::ANVL;
+use File::OM;
+
+use Pod::Usage;
+# this :config allows -h24w80 for '‐h 24 ‐w 80', -vax for --vax or --Vax
+use Getopt::Long qw(:config bundling_override);
+
+my %opt = (
+	comments	=> 0,
+	find		=> 0,
+	format		=> 0,
+	help		=> 0,
+	invert		=> 0,
+	listformats	=> 0,
+	man		=> 0,
+	predns		=> 0,
+	show		=> 0,
+	subjelpat	=> 0,
+	version		=> 0,
+	verbose		=> 0,
+);
+
+# main
+{
+	GetOptions(\%opt,
+		'comments',
+		'find=s',
+		'format|m=s',
+		'help|h|?',
+		'invert',
+		'listformats',
+		'man',
+		'predns=s',
+		'show=s',
+		'subjelpat=s',
+		'version',
+		'verbose|v',
+	)
+			or  pod2usage(-exitstatus => 2, -verbose => 1);
+
+	$opt{help}	and pod2usage(-exitstatus => 0, -verbose => 1);
+	$opt{man}	and pod2usage(-exitstatus => 0, -verbose => 2);
+	$opt{version}	and print("$VERSION\n"), exit 0;
+	$opt{listformats} and
+		print(join("\n", File::OM::listformats()), "\n"),
+		exit 0;
+
+	# Format may be a name, optionally followed by a colon and a
+	# list of element names to be output.
+	#
+	my $format = $opt{format} || 'anvl';	# given format name
+	my $r_elem_order;
+	$format =~ /^([^:]*):\s*(.*)\s*/ and
+		($format, @$r_elem_order) = (lc($1), split(/\s*\|\s*/, $2));
+
+#	# If an element ordering is defined, change any empty element
+#	# names to the element name ("_"), which grabs any unlabeled
+#	# value that might start the record.
+#	#
+#	$r_elem_order and
+#		@$r_elem_order = map($_ || '_', @$r_elem_order);
+
+	# output formats to do: anvlr, granvl, yaml, short erc/anvl, csv
+	# XXX need a default command?  anvl_summarize?
+
+	my $anvl_opt = File::ANVL::anvl_opt_defaults();	# ref to hash
+	$$anvl_opt{comments} = $opt{comments};	# whether to keep comments
+	$$anvl_opt{elem_order} = $r_elem_order;	# different element order
+	$$anvl_opt{find} = $opt{find};		# find records matching regex
+	$$anvl_opt{invert} = $opt{invert};	# comma-invert any values
+	$$anvl_opt{show} = $opt{show};		# show given elems in recs
+	$$anvl_opt{verbose} = $opt{verbose};	# more output
+
+	# While anvl_opt and om_opt share some keys, they're used differently.
+
+	my %om_opt = (
+		comments	=> $opt{comments},
+		outhandle	=> *STDOUT,
+		verbose		=> $opt{verbose},
+	);
+	$opt{predns} and			# predicate namespace
+		$om_opt{turtle_predns} = $opt{predns};
+	$opt{subjelpat} and			# subject element name pattern
+		$om_opt{turtle_subjelpat} = $opt{subjelpat};
+
+	my $om = File::OM->new($format, \%om_opt) or
+		pod2usage("$0: unknown format: $format");
+
+	my $st = File::ANVL::anvl_om($om, $anvl_opt);
+	$st ne 1		and die "anvl: $st";
+	#
+	# If 'outhandle' had been set to '', we would expect $st to contain
+	# the complete output string built up by anvl_om.
+
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+anvl - command to convert and manipulate ANVL records
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<anvl> [B<--format> I<format>] [I<other_options>] [I<file> ...]
+
+=back
+
+=head1 DESCRIPTION
+
+The B<anvl> utility converts ANVL records to a variety of formats,
+including XML, Turtle, JSON, ANVL (long form), and Plain.  An ANVL (A
+Name Value Language) record is a text-based sequence of elements ending
+in a blank line, where each element consists of a label, colon, and value
+and long values may be continued on subsequent indented lines.
+
+This utility reads one or more I<file> arguments (or the standard input
+if none) and writes on the standard output.  The current version assumes
+input to be a stream of ANVL records.  More information is given in the
+OPTIONS section.
+
+=head1 EXAMPLES
+
+The special label "erc" in front of a short form ERC (Electronic Resource
+Citation) record is recognized and the record is converted to long form
+before other processing is done.
+
+   $ echo 'erc: a | b | c | d' | anvl --format json
+   [
+     {
+       "erc": "",
+       "who": "a",
+       "what": "b",
+       "when": "c",
+       "where": "d"
+     }
+   ]
+
+Comments may be passed through to any output format; pseudo-comments are
+produced if the target format doesn't natively support comments.
+
+   $ echo '# A way to kernel knowledge.
+   > erc: Kunze, John A. | A Metadata Kernel for Electronic Permanence
+   >      | 20011106 | http://journals.tdl.org/jodi/article/view/43
+   > ' > myfile
+   $ anvl --comments -m turtle myfile
+   @prefix erc: <http://purl.org/kernel/elements/1.1/> .
+   <http://journals.tdl.org/jodi/article/view/43>
+   # A way to kernel knowledge.
+
+       erc:erc """""" ;
+       erc:who """Kunze, John A.""" ;
+       erc:what """A Metadata Kernel for Electronic Permanence""" ;
+       erc:when """20011106""" ;
+       erc:where """http://journals.tdl.org/jodi/article/view/43""" .
+
+The default conversion target is to the ANVL format, which does little
+except to expand short form ERCs and regularize some of the whitespace.
+
+   $ anvl myfile
+   erc:
+   who: Kunze, John A.
+   what: A Metadata Kernel for Electronic Permanence
+   when: 20011106
+   where: http://journals.tdl.org/jodi/article/view/43
+
+The verbose option can cause extra information to be output.
+
+   $ echo 'a: b
+   > #note to self
+   > c: d' | anvl --verbose --comments -m xml
+   <recs>
+     <rec>   <!-- from record 1, line 1 -->
+       <a>b</a>
+       <!-- #note to self -->
+       <c>d</c>
+     </rec>
+   </recs>
+
+That XML conversion output can be converted back to the ANVL record,
+
+   erc:
+   a: b
+   c: d
+
+with this style sheet
+
+   <xsl:template match="/">
+   <xsl:for-each select="recs/rec">
+   erc:
+   <xsl:for-each select="*">
+   <xsl:value-of select="local-name(.)"/>: <xsl:value-of select="."/>
+   <xsl:text>
+   </xsl:text>
+   </xsl:for-each>
+   </xsl:for-each>
+   </xsl:template>
+
+=head1 OPTIONS
+
+=over
+
+=item B<--comments>
+
+Preserve comments during B<--format> conversion, with pseudo-comments
+produced depending on the target format.
+
+=item B<--find> I<regexp>
+
+Only output records that match the regular expression, I<regexp>.
+(The match is done before any expansion of short form ERCs.)
+
+=item B<-m> I<format[:order]>, B<--format> I<format[:order]>
+
+Convert to the given I<format>, currently one of "ANVL" (default), "XML",
+"Turtle", "JSON", "CSV", "PSV" (Pipe Separated Value), or "Plain".  When
+converting comments to the JSON or Plain formats, pseudo-comments are
+output.  Some options (below) apply only to specific target formats.
+
+Optionally, I<format> may be followed by a colon and I<order>, which is a
+list of '|'-separated element names specifying particular set and
+ordering in which to output record elements.  For example,
+"CSV:name|phone|email" specifies the "CSV" format with records consisting
+of exactly name, phone, and email.  Currently, only the first instance of
+a named element in a record is output, and a missing element is output as
+if it had an empty value.
+
+=item B<--invert>
+
+Convert element values that end with one or more commas (used in ANVL to
+designate sort-friendly values that may contain inversion points) to
+natural word order.  The more terminal commas, the more inversion points
+tried.  For example, the values
+
+     Smith, Pat,
+     McCartney, Paul, Sir,,
+     Hu Jintao,
+
+convert to the following natural word orderings
+
+     Pat Smith
+     Sir Paul McCartney
+     Hu Jintao
+
+=item B<-h>, B<--help>
+
+Print extended help documentation.
+
+=item B<--listformats>
+
+Print known conversion formats.
+
+=item B<--man>
+
+Print full documentation.
+
+=item B<--predns> I<namespace>
+
+For Turtle conversion, use the given I<namespace> for assertion Predicates,
+by default, "http://purl.org/kernel/elements/1.1/".
+
+=item B<--show> I<regexp>
+
+Show only those elements matching the regular expression, I<regexp>.
+Matching, which can include labels and values, is done against a string
+(re-)constructing the element as a "I<label>: I<value>".
+
+=item B<--subjelpat> I<pattern>
+
+For Turtle conversion, use the given I<pattern> as a regular expression to
+match the first instance of an ANVL element name in each input record,
+the corresponding value of which will become the Subject of Turtle
+assertions about the containing record.  By default, the first element
+matching "^identifier$" or "^subject$" is used, unless the record appears
+to be an ERC (Electronic Resource Citation), in which case the first
+element matching "^where$" is used.  Failing all else, the first
+non-empty element will be used.
+
+=item B<-v>, B<--verbose>
+
+Show more information, such as record numbers in output comments.
+
+=item B<--version>
+
+Print the current version number and exit.
+
+=back
+
+=head1 SEE ALSO
+
+A Name Value Language (ANVL)
+	L<http://www.cdlib.org/inside/diglib/ark/anvlspec.pdf>
+
+A Metadata Kernel for Electronic Permanence (pdf)
+	L<http://journals.tdl.org/jodi/article/view/43>
+
+=head1 AUTHOR
+
+John Kunze I<jak at ucop dot edu>
+
+=head1 COPYRIGHT
+
+Copyright 2009-2011 UC Regents.  Open source BSD license.
+
+=begin CPAN
+
+=head1 README
+
+=head1 SCRIPT CATEGORIES
+
+=end CPAN

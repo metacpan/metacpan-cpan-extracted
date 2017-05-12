@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Filter-Object-Simple
+version:             0.01
+abstract:            Binding the built-in functions with Array,Hash.
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Filter::Simple:                0.7
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Cornelius <cornelius@cpan.org>

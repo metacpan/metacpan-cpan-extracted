@@ -1,0 +1,14 @@
+Bank Of Ireland, MBNA Ireland (actually MBNA Europe), and Permanent
+TSB (Ireland) online banking access, based on existing
+Finance::Banking interface.
+
+BankOfIreland.pm is the most complete in that it covers funds
+transfer. All public functions take a hashref as an optional last
+parameter to specify the credentials to be used if a login page is
+encountered. The credentials are cached in the class and will be
+retrieved from same if none are provided.
+
+See individual perldocs and sample code for more.
+
+As noted by the code on which I based this: these modules are intended
+to access your money online. Be cautious with them!

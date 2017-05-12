@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Signature.pm
+t/00_use.t
+t/01_new.t
+t/02_new_from_string.t
+t/03_error.t
+t/04_changed.t
+t/05_is_same.t
+t/06_old_and_new.t
+t/07_overload.t
+t/08_configure.t

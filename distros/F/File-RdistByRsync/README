@@ -1,0 +1,137 @@
+NAME
+    File::RdistByRsync - read rdist distfiles, emulate using rsync
+
+SYNOPSIS
+            use File::RdistByRsync
+
+            @dist_blocks = parse_rdist($distfile, %options)
+
+            ($args, $extras, @dist_blocks) = rdist(@ARGV);
+
+            rsync(@ARGV)
+
+            perl -MFile::RdistByRsync -e 'rsync(qw/rdist command flags/)'
+
+DESCRIPTION
+    File::RdistByRsync parses and understands rdist distfiles and command
+    lines.
+
+    It can share it's understanding by returning what it got
+    ("parse_rdist()" and "rdist()") or it can attempt to emulate rdist using
+    rsync.
+
+    Why?
+
+    Well, because rdist is so slow it's unusable and rsync has such a
+    limited interface that it's unusable. I'm sure a better specification
+    language than rdist's could be developed, but rdist's language already
+    exists so I used it to drive rsync.
+
+WARNING
+    As of this writing, this code is still green. Use the "-D" "-n" and "-v"
+    options and look at the output. Look carefully. If it looks good, then
+    try running it for real. If it deletes all your files, then you didn't
+    look carefully enough. Don't blame me. See the LICENSE.
+
+DATA STRUCTURE
+    The main return value from rdist is an array of distribution blocks.
+
+    They look like:
+
+            {
+                    HOSTS           => [ host1 user@host2 host3 etc...],
+                    FILES           => [ /etc/rc.* /etc/hosts /usr etc...],
+                    EXCEPT          => [
+                            # tuples of type & file
+                            EXCEPT_PAT      /etc/p.*d       # regular expression
+                            EXCEPT          /etc/rc.local   # glob
+                            RSYNC_EXCLUDE   /etc/rc.loc*    # glob-style pattern exclusions
+                            RSYNC_INCLUDE   /etc/rc.*       # glob-style pattern inclusions
+                    ]
+                    SPECIAL         => [
+                                {
+                                    FILES   => /etc/login.conf      # glob okay
+                                    COMMAND => "cap_mkdb $FILE"     # a command to run
+                                },
+                                {
+                                    FILES   => /etc/named.conf      # glob okay
+                                    COMMAND => "ndc reload"         # a command to run
+                                },
+                            ]
+                    RSYNC_OPTION    => [ --dry-run --verbose ]
+                    INSTALL         => [
+                                {
+                                    DESTINATION => /usr             # where to install
+                                    FLAGS       => {
+                                            R => 1,                 # remove extra
+                                            w => 1,                 # append whole path
+                                    }
+                                }
+                    TSFILE          => /some/file                   # touch file name
+            }
+
+DETAILS
+            @dist_blocks = parse_rdist($distfile, %options)
+
+    There is one "dist_block" for each "::" or "->" entry in the distfile.
+
+    The options supported by parse_rdist are "DEFINES => {}" which override
+    variable definitions made in the distfile and "TARGETS => []" which
+    filters the results so that entries that don't match label targets (if
+    any match) and files that don't match file targets are removed.
+
+            ($args, $extras, @dist_blocks) = rdist(@ARGV);
+
+    "$args" comes from the Getopt::Declare manpage. See the grammer inside
+    File::RdistByRsync for full details, but basically "$args-"{"-y"}> is
+    true if "@ARGV" contained "-y".
+
+    "$extras" is a hash of a few items that are sometimes useful.
+    "$extras-"{HOSTS}> is the list of hosts specified with the "-m" option.
+    "$extras-"{DEFINES}> is a hash of "-d" variable definitions.
+    "$extras-"{RSYNCOPT}> is a list of rsync options specified in "@ARGV".
+    "$extra-"{TARGETS}> is a list of distfile entries (by label) or
+    filenames given in "@ARGV" to limit the scope of the invocation.
+    "$extra-"{CFLAG}> is a dist_block created if there is a command-line
+    style distfile.
+
+            rsync(@ARGV)
+
+    The "rsync()" function does the whole job. The "@ARGV" parameter should
+    be an rdist-style command line.
+
+COMPATABILITY
+    All rdist switches except "-i" are honored. The output is quite
+    different from rdist. Multiple invocations of rsync can be required to
+    do a single rdist.
+
+    Two features of rdist are currently ignored: email notification and
+    timestamp checking with "::" productions.
+
+    There are some additional features that are useful when using "rsync()".
+
+    First, the long-form of rsync command line arguments are noticed by
+    "rdist()" and used by "rsync()".
+
+    Second, in the "->" productions, three new commands are available:
+
+            'rsync_options' <options> ';'
+            'rsync_include' <name list> ';'
+            'rsync_exclude' <name list> ';'
+
+    Rsync_options will be passed to any rsync commands called by "rsync()"
+    that operate on the block in question.
+
+    Rsync_include and rsync_exclude will be passed to rsync with "- "
+    prepended for the excludes and "+ " prepended for the includes. When
+    building rsync exclusion lists, the order of the 'rsync_include',
+    'rsync_exclude', 'except', and 'except_pat' are taken into account and
+    preserved.
+
+LICENSE
+    Copyright (C) 2002 David Muir Sharnoff. License hereby granted for
+    anyone to use, modify or redistribute this module at their own risk. Use
+    of this module consitutes an agreement to indemnify and hold harmless
+    the author(s) for whatever might happen when using this code. Please
+    feed useful changes back to muir@idiom.com.
+

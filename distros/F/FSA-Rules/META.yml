@@ -1,0 +1,38 @@
+---
+abstract: 'Build simple rules-based state machines in Perl'
+author:
+  - unknown
+build_requires:
+  Module::Build: '0.2701'
+  Test::More: '0.17'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FSA-Rules
+provides:
+  FSA::Rules:
+    file: lib/FSA/Rules.pm
+    version: '0.35'
+  FSA::State:
+    file: lib/FSA/Rules.pm
+    version: '0.35'
+recommends:
+  B::Deparse: '0.61'
+  GraphViz: '2.00'
+  Storable: '2.05'
+  Test::Pod: '1.41'
+  Text::Wrap: '0'
+requires:
+  Scalar::Util: '1.01'
+  perl: '5.006002'
+resources:
+  bugtracker: http://github.com/theory/fsa-rules/issues/
+  homepage: http://search.cpan.org/dist/FSA-Rules/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/fsa-rules/
+version: '0.35'

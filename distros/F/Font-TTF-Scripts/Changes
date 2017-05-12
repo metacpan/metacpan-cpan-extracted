@@ -1,0 +1,169 @@
+1.05 (r1069, 2015-01-26)
+
+* make_fea generates AFDKO feature files
+* make_gdl, make_volt, make_fea parameters harmonized; 
+*   added -c support to obviate make_classes
+* fret -b, to show octaboxes
+* rename Scripts.pod to Scripts.pm; use that file for version info
+* bump Font::TTF dependency to 1.05 so tests pass
+*
+* Bug fixes:
+*    ttfsubset
+*        fix graphite generation
+*    hackos2
+*        fix OS/2 table padding and checksum
+*    ttffeatparams 
+*        correctly handles multiple cvxx/ssxx features
+*        selects correct existing strings
+*    ttf2woff 
+*        catches checksum/alignment issues rather than silently build faulty font
+*    sfdmeld
+*        fix adding new glyphs from struct to design
+*    ttftable
+*        vixed various problems related to WOFF fonts
+*
+
+1.04.1 (r995, 2014-01-09)
+
+* Bug fixes:
+*    Fix ttfsubset for Perl 5.12 and earlier
+*    Update licensing info for test fonts to OFL
+*    Slight improvement in volt2ttf for cases of missing glyphs
+
+1.04  (r969, 2013-11-10)
+
+* Bug fixes and/or new capabilities:
+*    ttfbuilder 
+*        glyph rotation
+*    make_gdl
+*        -D and -ignore options
+*    ttfsubset
+*        major upgrade with better subsetting 
+*        support for Silf table, glyph ranges
+*    ttfname 
+*        can remove multiple names at once
+*    volt2ttf 
+*        chaining lookups
+*        mark filter sets
+*        handle missing APs
+*        expunge notion of 'dflt' language tag
+*        better integration with TypeTuner
+*        SKIP_BASE, ENUM and ECEPT_CONTEXT fixes
+*        support pair-position format 1
+*    dumpfont 
+*        TSIV now parsed before dumping
+*    ttfprintinfo
+*        sorts language & feature tags
+*    ttf2woff
+*    psfix 
+*        major overhaul, new options
+*    ttfeval
+*        can now read program from a file
+*    Examples/ttfcompare.pl
+*        -t option to compare checksum & length of all tables
+
+1.03  (r866, 2012-09-07)
+
+* Bug fix: two tests weren't cross-platform
+
+1.02  (r863, 2012-08-28)
+
+* Add Text::Unicode::Equivalents dependency
+
+1.01  (r861, 2012-08-28)
+
+* Add IO::String prerequisite to keep BSD and testing environments happy
+
+1.00  (r858, 2012-08-28)
+
+* New utilities:
+*    ttf2woff
+*    ttfascent
+*    ttffeatparams
+*    ttflang2tuner
+*    ttfsubset
+* Integrated SIL TypeTuner into Font-TTF-Scripts
+* Bug fixes and/or new capabilities in
+*    add_clases
+*    addfont
+*    addpath
+*    Examples/ttfprintot.pl
+*    Examples/ttfstriphints.pl
+*    fret
+*    make_gdl
+*    make_volt
+*    sfd2ap
+*    ttf2volt
+*    ttfbuilder
+*    ttfname
+*    ttfname
+*    ttfsetver
+*    ttftable
+*    volt2ap
+*    volt2ttf
+* New Examples
+*    ttfcompare.pl
+*    ttfgetname.pl
+*    ttfmetrics.pl
+*    ttfsortcover.pl
+* EOL and executable SVN properties cleaned up
+* Copyright and licensing updated to CPAN requirements
+
+0.16.1  (r693, 2010-12-14)
+
+* Release with working tests
+
+0.16  (r691, 2010-12-14)
+
+* ttfname now expects/returns utf8 strings.
+* Bug fixes and/or new capabilities in
+*    sfd2ap
+*    ttfbuilder
+*    ttfeval
+*    ttfname
+*    ttfremap
+* New Examples
+*    ttfdiff.pl
+
+0.15.1  (r672, 2009-11-27)
+
+* New utilities:
+*    sdfmerge
+* Bug fixes and/or new capabilities in
+*    sdfmeld
+
+0.15  (r665, 2009-11-16)
+
+* Support debian packaging
+* New utilities:
+*    sdfmeld
+* Bug fixes and/or new capabilities in
+*    ttfbuilder
+*    volt2ttf
+
+0.14  (r639, 2009-07-27)
+
+* New utilities:
+*    sdfaddap
+*    ttfeval
+* Bug fixes and/or new capabilities in
+*    ttfbuilder
+* New Examples
+*    apexpr.pl
+*    fixmaxcontext.pl
+*    volt2ps.pl
+
+0.13  (r586, 2009-02-12)
+
+* New utilities:
+*    ttfdeflang
+* New Examples
+*    ttfprintot.pl
+
+0.12  (r574, 2009-01-05)
+
+
+0.11  (r.518, 2008-05-25)
+
+* New utilities:
+*    dumpfont

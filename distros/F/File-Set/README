@@ -1,0 +1,29 @@
+File::Set version 1.01
+==========================
+
+A perl module to create a "set" of files from a list
+of directories
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Rob Mueller <cpan@robm.fastmail.fm>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by FastMail IP Partners
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

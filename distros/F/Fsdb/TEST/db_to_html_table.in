@@ -1,0 +1,8 @@
+#fsdb -F S account passwd uid gid fullname homedir shell
+johnh  *  2274  134  John & Ampersand  /home/johnh  /bin/bash
+greg  *  2275  134  Greg < Lessthan  /home/greg  /bin/bash
+root  *  0  0  Root ; Semi  /root  /bin/bash
+four  *  1  1  Fourth Row  /home/four  /bin/bash
+five  *  1  1  5th Row  /home/cinq  /bin/bash
+six  *  1  1  6th Row  /home/seis  /bin/bash
+seven  *  1  1  7th Row  /home/sieben  /bin/bash

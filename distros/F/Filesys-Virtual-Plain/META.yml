@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Filesys-Virtual-Plain
+version:      0.10
+version_from: Plain.pm
+installdirs:  site
+requires:
+    Filesys::Virtual:              0.05
+    IO::File:                      
+    User::grent:                   
+    User::pwent:                   
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

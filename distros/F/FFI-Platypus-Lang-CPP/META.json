@@ -1,0 +1,70 @@
+{
+   "abstract" : "Documentation and tools for using Platypus with the C++ programming language",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FFI-Platypus-Lang-CPP",
+   "no_index" : {
+      "directory" : [
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Module::Build" : "0.38",
+            "Module::Build::FFI" : "0.18"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::CppGuess" : "0",
+            "File::Which" : "0",
+            "Module::Build" : "0.38",
+            "Module::Build::FFI" : "0.18"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::ExtractSymbols" : "0",
+            "FFI::Platypus" : "0.18",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::CheckLib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "FFI::Platypus::Lang::CPP" : {
+         "file" : "lib/FFI/Platypus/Lang/CPP.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/plicease/FFI-Platypus-Lang-CPP/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/plicease/FFI-Platypus-Lang-CPP"
+      }
+   },
+   "version" : "0.04"
+}

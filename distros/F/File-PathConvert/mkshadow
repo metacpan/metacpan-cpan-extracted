@@ -1,0 +1,78 @@
+#!/usr/local/bin/perl -w
+#
+# Copyright (c) 1996 Shigio Yamaguchi. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# mkshadow: make a shadow directory with relative symbolic links.
+#
+#	Mkshadow duplicate directory tree and make symbolic links
+#	to original files. All symbolic links have relative path.
+#	If -p flag is specified, write shell script to stdout
+#	else do the job immediately.
+#
+#	This is a sample application of module File::PathConvert.
+#
+#                               8-Mar-1998 Shigio Yamaguchi
+#
+$usage = "usage: mkshadow [ -p ] source [ destination ]\n";
+#
+use Cwd;
+use File::PathConvert qw(realpath abs2rel rel2abs);
+use File::Basename;
+use File::Find;
+use Getopt::Std;
+
+getopts('p');
+if (!$ARGV[0]) {
+    print STDERR $usage;
+    exit(1);
+}
+$source = realpath($ARGV[0]);
+$destination = realpath(($ARGV[1]) ? $ARGV[1] : ".");
+if (!-d $source) {
+    die("source directory not found.");
+}
+if (!$destination) {
+    die("cannot make destination directory.");
+}
+if ($source eq $destination) {
+    die("source and destination is identical.");
+}
+unless (-d $destination) {
+    if ($opt_p) {
+        print "mkdir $destination\n";
+    } else {
+        mkdir($destination, 0755) || die("cannot make destination directory.");
+    }
+}
+#
+# Duplicate directory tree.
+#
+find(\&wanted, $source);
+sub wanted {
+    my($cwd);
+    return if $_ eq '.';
+    $cwd = cwd();
+    $target = rel2abs($_, $cwd);
+    if (-l $_ || -f _) {
+        $dir = $cwd;
+        $dir =~ s/$source/$destination/;
+        $file = abs2rel($target, $dir);
+        if ($opt_p) {
+            print "cd $dir\n";
+            print "ln -s $file .\n";
+        } else {
+            chdir($dir) || die "cannot chdir $dir\n";
+            symlink($file, basename($file, '')) || die "cannot symlink\n";
+            chdir($cwd) || die "cannot return to $cwd\n";
+        }
+    } elsif (-d _) {
+        $target =~ s/$source/$destination/;
+        if ($opt_p) {
+            print "mkdir $target\n";
+        } else {
+            mkdir($target, 0755);
+        }
+    }
+}

@@ -1,0 +1,10 @@
+Revision history for Perl module File::chdir::WalkDir.
+
+0.040  November 16, 2012
+	- Bugfix release (lsiden++)
+
+0.030  September 13, 2011
+	- More options
+
+0.010  June 21, 2012
+	- Initial release

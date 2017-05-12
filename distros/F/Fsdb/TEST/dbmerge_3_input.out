@@ -1,0 +1,8 @@
+#fsdb cid cname
+20	advanced-os
+21	forth
+11	numanal
+12	os
+10	pascal
+13	statistics
+#   | dbmerge --input TEST/dbmerge_ex.in --input TEST/dbmerge_ex_b.in --input TEST/dbmerge_ex_c.in cname

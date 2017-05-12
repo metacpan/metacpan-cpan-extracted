@@ -1,0 +1,44 @@
+	<!-- Run dialog -->
+  <div class="modal hide" id="run-dialog" tabindex="-1" role="dialog"
+  aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <h3 id="myModalLabel">Run</h3>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-horizontal">
+        <div class="control-group">
+          <label class="control-label" for=
+          "runtime">Runtime:</label>
+
+          <div class="controls">
+            <select id="runtime" size="10">
+
+              <option id="perlito-5">
+                Perlito 5
+              </option>
+
+	      <option id="perl" selected="selected">
+                Perl
+              </option>
+
+			<option id="perlbrew-exec">
+				Perlbrew exec
+				</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div id="help"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button id="ok-button" class="btn btn-primary" data-dismiss=
+      "modal" aria-hidden="true">OK</button> <button class="btn btn-warning"
+      data-dismiss="modal" aria-hidden="true">Cancel</button>
+    </div>
+  </div>
+

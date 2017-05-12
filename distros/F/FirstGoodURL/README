@@ -1,0 +1,72 @@
+NAME
+    FirstGoodURL - determines first successful URL in list
+
+SYNOPSIS
+      use FirstGoodURL;
+      use strict;
+      
+      my @URLs = (...);
+      my $match;
+      
+      if ($match = FirstGoodURL->in(@URLs)) {
+        print "good URL: $match\n";
+      }
+      else {
+        print "no URL was alive\n";
+      }
+      
+      if ($match = FirstGoodURL->with('image/png')->in(@URLs)) {
+        print "PNG found at $match\n";
+      }
+      else {
+        print "no PNG found\n";
+      }
+      
+      if ($match = FirstGoodURL->with(200,204)->in(@URLs)) {
+        print "Status: OK or No Content at $match\n";
+      }
+      else {
+        print "no 200/204 found\n";
+      }
+
+DESCRIPTION
+    This module uses the LWP suite to scan through a list of URLs.
+    It determines the first URL that returns a specified status code
+    (with defaults to `200'), and optionally, a specified Content-
+    type.
+
+Methods
+    * `FirstGoodURL->in(...)'
+        Scans a list of URLs for a specified response code, and
+        possibly a requisite Content-type (see the `with' method
+        below)
+
+    * `FirstGoodURL->with(...)'
+        Sets a Content-type and/or Status requisite value for future
+        calls to `in'. It is destructive to the previous settings
+        given, so you must send all settings at once.
+
+        This is not backward compatible.
+
+        The argument list can contain a list of Status response
+        codes, and either a list of Content-type response values or
+        a regex to match acceptable Content-type response values.
+        These can appear in any order. The regex must be a compiled
+        one (formed by using `qr//').
+
+        This method returns the class name, so that you can daisy-
+        chain calls for readability/snazziness:
+
+          my $match = FirstGoodURL->with(qr/image/)->in(@URLs);
+
+TODO
+    Here is a listing of things that might be added to future
+    versions.
+
+    * Object support (`with' attributes per object)
+AUTHOR
+      Jeff "japhy" Pinyan
+      CPAN ID: PINYAN
+      japhy@pobox.com
+      http://www.pobox.com/~japhy/
+

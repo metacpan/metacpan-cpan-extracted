@@ -1,0 +1,7 @@
+Changes
+lib/FormValidator/Simple/Plugin/DBIC/Unique.pm
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,5 @@
+0.15 Wed Jan 12 2005
+	Works with the equivalent release of Fry::Shell. All modules well cleaned. All search based
+	commands can use any of the four search commands.
+0.05 Thu Jun 17 2004
+	Initial	release

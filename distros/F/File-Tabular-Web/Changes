@@ -1,0 +1,37 @@
+Revision history for File-Tabular-Web
+
+0.22 31.05.2016
+  - fix missing dependencies in Build.PL
+
+0.21 30.05.2016
+  - ported to Plack infrastructure
+  - revised documentation
+
+0.20
+  - fix old documentation bug, detected by new Pod::Simple
+
+0.19 04.03.2011 remlawim
+  - override template toolkit's failsafe counter for while loops
+    in case of download action
+
+0.18 09.12.2007
+  - Fixes in tests in order to pass CPAN testers  
+
+0.17 06.12.2007
+  - First CPAN release
+
+0.16
+  - Indexed.pm : use bit vectors to merge fulltext with metadata
+
+0.15
+  - removed unused method "prepare_update"
+  - initialization of special fields in "app_initialize"
+
+0.14
+  - nombreux bug fixes dans Attachments/Indexed.pm
+  - include all modules in t/00_load.t
+
+0.13
+  - option EVAL_PERL => 1 for creating templates
+
+

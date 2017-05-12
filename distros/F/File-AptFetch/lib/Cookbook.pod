@@ -1,0 +1,593 @@
+=pod
+
+=for comment $Id: Cookbook.pod 499 2014-04-19 19:24:45Z whynot $
+
+=for comment $VERSION = qv v0.1.4;
+
+=for comment Copyright 2009, 2010, 2014 Eric Pozharski <whynot@pozharski.name>
+
+=for comment AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+
+=for comment CC-SA
+
+=head1 NAME
+
+File::AptFetch::Cookbook - Tips and Gotchas about APT Methods
+
+=head1 DISCLAIMER
+
+My understanding how APT methods work (and interact) is mostly experimental.
+I've thoroughly read "APT Method Interface" (not big reading though).
+And when you would read it, please note unsurprizing number on the very first
+page -- C<1998>.
+At least something.
+
+Then I've read B<strace(1)> output -- very interesting reading.
+And I made some conversations with methods themselves.
+That's all.
+
+I admit, I didn't dig the actual code.
+(Once I'd got into B<apt-get(1)> -- it's C++;
+is it possible to read C++ without debugger?)
+I promise to do it later
+(Read-The-Code seems to be Debian's mantra,
+though that's the only authoritative place).
+
+So, if in some next section I've said "I can't comment",
+than that means that I didn't tortured methods yet.
+I will.
+
+=head1 INTRODUCTION
+
+Briefly.
+APT method is an executable that has no command-line interface at all.
+All interaction is done through I<STDIN> and I<STDOUT>.
+I<STDERR> is for side-effect messages
+(pending to see any output yet).
+
+Each B<message> is a sequence of newline (C<"\n">) terminated lines;
+And is terminated by empty line
+(lone newline works for sure;
+I can't comment what would happen if "empty" line is set of spaces).
+
+Each B<message> starts with B<message header>.
+B<Message header> is a 3-digit number (B<Status Code>)
+and B<informational string>
+(for "visual debugging";
+does it mean it's ignored?
+what if it's empty?).
+B<File::AptFetch> stores the B<Status Code> in I<$status> field and
+B<informational string> in I<$Status> field.
+I<$status> is read-only.
+
+Then B<header field>s come.
+B<Header field> is kind of RFC822 header:
+colon (C<':'>) separates header name off header value.
+(I can't comment on if header value wrapping is supported.
+And what about any extra space?)
+B<File::AptFetch> splits message, and stores it in obvious hash.
+It's either I<%$capabilities> (I<$status> is C<100>) or
+in I<%$message> (in any other case).
+I<%$capabilities> is filled once and then stays unnoted
+(that can change in future).
+I<%$message> is overwritten each time new message comes (it's not refilled).
+
+The list of B<message header>s and B<header field>s is
+in "APT Method Interface" manual.
+The list B<header field>s is incomplete;
+that rises a question: is the list of B<message header>s complete?
+
+=head1 MESSAGE HEADERS
+
+Those are B<message header>s I have something to say about
+(additions pending).
+There's an asymmethry -- they are
+either from an applicaton to a method (downstream) or
+from a method to an application (upstream).
+
+=over
+
+=item 100 Capabilities
+
+I<(upstream)>
+That's the "Hello, world!" of the method.
+That shows something about the method invoked.
+It doesn't show what method is invoked
+(you're supposed to know what you're doing).
+
+=item 102 Status
+
+I<(upstream)>
+Probably -- networking only.
+Hints application on progress.
+That progress, however, is in logical steps but bytes transfered.
+
+=item 200 URI Start
+
+I<(upstream)>
+That informs application that the method started to process a request.
+That's possible for method to skip this message.
+
+=item 201 URI Done
+
+I<(upstream)>
+That marks a request completion.
+I suppose that after this message a method forgets about just completed request
+("Quotation Needed (tm)").
+I<(v0.1.2)>
+Sometimes method leaves remains (or fossils, if you like) of served request
+what should have failed but succeeded;
+KEE of F<file> method covers some details.
+
+=item 400 URI Failure
+
+I<(upstream)>
+A named request can't be fulfilled.
+Than goes for next or waits for request.
+
+=item 600 URI Acquire
+
+I<(downstream)>
+That requests file.
+One file -- one request.
+Application isn't required to wait C<201 URI Done> code before fileing next
+C<600> --
+quite otherwise.
+It's supposed that C<600>s will gone in at once.
+
+=item 601 Configuration
+
+I<(downstream)>
+That's the "Hello, pal!" of the application.
+There's a field I<$message{send_config}>
+(supposed to be in use with C<100 Capabilities>);
+although C<601> is sent each time method is started.
+
+=item 101 Log
+
+=item 401 General Failure
+
+=item 402 Authorization Required
+
+=item 403 Media Failure
+
+=item 602 Authorization Credentials
+
+=item 603 Media Changed
+
+Those are B<message header>s I didn't meet yet.
+That's the problem with test-suite.
+To fix this I need to do some work -- it's undone yet.
+
+=back
+
+As you can see, there's no message what would require status.
+It's up to the method to report any progress.
+(I<v.0.0.8>)
+Alas, they don't.
+Thus, that's up to application to count any progress.
+Me wonders if they timeout at all.
+However, there're signs that those of networking type properly detect if
+underlying TCP/IP connection has been lost.
+
+=head1 HEADER FIELDS
+
+The same comment as for L</MESSAGE HEADERS> apply.
+The subtle difference is this list mentions B<header filed>s missing in the
+manual.
+
+B<Header fields> are spelled first-capital (regular words) and
+all-capital (abbreviations).
+I can't comment what would happen otherwise.
+
+=over
+
+=item Config-Item
+
+I<(downstream)>
+That's used with C<601 Configuration> message.
+The format of value is set to
+
+    APT::Configuration::Item=value
+
+That seems there should be no space inside
+(neiter around equal sign (C<'='>) nor in I<$value>).
+I can't comment what kind of dragons hide behind this.
+OTOH, if spaces are escaped, then should equal sign be escaped too?
+The set of items consists almost of "APT configuration space";
+however there are (at least one: C<quiet>) undocumented items too.
+
+=item Filename
+
+I<(up/down-stream)>
+The 2nd of two most used fields.
+Designates the target for request.
+It's local FS path and doesn't need and bear scheme.
+Some methods seem to ignore it completely.
+B<File::AptFetch> sets it anyway.
+
+=item Last-Modified
+
+I<(upstream)>
+That's a time stamp of I<$message{uri}> mentioned file.
+I can't comment what would be returned
+if the time can't be retrieved before fetching.
+The time is in F<RFC1123> format.
+(I'm puzzled.
+F<RFC1123> really touches in section I<v5.2.14>
+("RFC-822 Date and Time Specification: RFC-822 Section 5") date-n-time spec.
+It covers Y2K and timezone issues.
+It doesn't set the actual format.
+So, I believe, that the format is in F<RFC822> format
+with F<RFC1123> comments applied.
+I don't know why it's this way.)
+Meanwhile, B<File::AptFetch> exports returned value
+(via I<$message{last_modified}>),
+while provides no means for time checks.
+(However, refering to symlink maintanance issue --
+is mtime checks duty of method or application?)
+
+=item MD5-Hash
+
+I<(upstream)>
+The obvious MD5sum of already fetched file.
+
+=item MD5Sum-Hash
+
+I<(upstream)>
+I<(undocumented)>
+Obvious.
+I can't comment why it duplicates I<MD5-Hash>.
+
+=item Message
+
+I<(upstream)>
+Some piece of diagnostic.
+Comes with error messages (C<400 URI Failure> etc).
+
+=item Send-Config
+
+I<(upstream)>
+Comes with C<100 Capabilities>.
+But the config is sent anyway.
+Probably the remains of old ages.
+Or does it mean that such field can come asynchronously?
+Wait, what B<F::AF> should do if the field comes in with C<false>?
+
+=item SHA1-Hash
+
+=item SHA256-Hash
+
+I<(upstream)>
+I<(undocumented)>
+Obvious.
+
+=item Single-Instance
+
+I<(upstream)>
+Comes with C<100 Capabilities>, requires the method to be set up once.
+I can't comment what would happen if that requirement is violated.
+It turns out, only F<file> and F<copy> methods show that config field.
+
+=item Size
+
+I<(upstream)>
+That's obvious -- the size of the source.
+I can't comment what whould be returned
+if the size can't be retrieved before fetching.
+(I<v0.1.8>) Looks like this field appears first in C<200 URI Start>
+and hasn't been seen in C<102 Status>es;
+Probably, it will be present in C<201 URI Done>.
+
+=item URI
+
+I<(up/down-stream)>
+The 1st of two most used fields.
+Designates the source for request.
+This field's value must start with B<scheme>;
+OTOH, this scheme must exactly match the method name.
+Otherwise the method denies such URI.
+In this release, B<File::AptFetch> prepends requested URI
+with scheme unconditionally.
+That will be relaxed in the next release, meanwhile please strip.
+
+=item Version
+
+I<(upstream)>
+Is the value always C<1.0>?
+
+=item Index-File
+
+That's missing in documentation.
+
+=item Drive
+
+=item Fail
+
+=item IMS-Hit
+
+=item Local
+
+=item Media
+
+=item Needs-Cleanup
+
+=item Password
+
+=item Pipeline
+
+=item Resume-Point
+
+=item Site
+
+=item User
+
+Those are fields I didn't meet yet.
+
+=back
+
+=head1 PROTOCOL
+
+The conversation between application ("APP") and method ("MTD") is like that:
+
+=over
+
+=item APP <- "100 Capabilities" <- MTD
+
+=item APP -> "601 Configuration" -> MTD
+
+Those are the very first messages.
+Both are required.
+I don't think that C<601> could be sent before C<100> is received
+(that C<100> states the method is up and running).
+So does B<File::AptFetch>.
+
+=item APP -> "600 URI Acquire" -> MTD
+
+Requests should be filed as quick as possible (in sense --- with least pause).
+I suppose, that application shouldn't wait for responces.
+So here is no cycle actually.
+File requests when you need something, and then check for completion.
+
+=item APP <- "102 Status" <- MTD
+
+Doesn't show in locals
+(can't say about C<cdrom:> though).
+Marks progress in protocol handshake.
+I<$message{message}> has more and other fields might appear as well
+(probably, dependent on uplink capabilities).
+Doesn't appear after C<200 URI Start>.
+I can't say if this one ever happens after C<201 URI Done>
+or C<400 URI Failure>.
+
+=item APP <- "200 URI Start" <- MTD
+
+That seems to be purely informational.
+(I<v0.0.8>)
+In fact that's not.
+If connection is ruined somehow (monkey-wrench on ISP?)
+then the method restarts transfer and manifests this this way.
+Once, I've seen it five times in row.
+I can't comment if method would give up ever.
+
+=item APP <- "201 URI Done" <- MTD
+
+=item APP <- "400 URI Failure" <- MTD
+
+Only one of them should be sent (that's obvious).
+Either marks completion of request -- successful or not.
+
+=back
+
+=head1 METHOD SPECIFIC NOTES
+
+# FIXME: verification needed
+
+One common behaviour should be mentioned.
+Methods are either local or remote (that's obvious).
+Local methods require I<scheme-specific-part> in I<$message{uri}> to be
+absoulte and it must start with lone slash (C<'/'>).
+Remote methods require double-slash (C<'//'>).
+Either would complain otherwise.
+
+And one more, that seems all I<$message{message}>s bear trailing space.
+I've better note, in case I would ever spot one that doesn't.
+
+And one piece of advice.
+Don't mess with methods.
+They ain't forgetting.
+And they ain't forgiving.
+
+=head2 copy:
+
+Local.
+It's marked as C<(internal)> in doucmentation.
+I can't comment if that means that you can't have C<copy:> scheme in your
+F<sources.list>.
+When succeedes than returns a set of usual informational B<message headers>
+(hashes, mtime, size).
+
+Another issue (that, BTW, clearly shows B<File::AptFetch> bad state) if is it
+possible to create symlinks with F<copy> method.
+There is an APT configuration parameter I<Acquire::Source-Symlinks>.
+I suppose it's set to C<true> by default, although it's missing in
+C<apt-config dump> output.
+I can't comment what exactly it affects
+(C<apt-get>, F<copy> method, or F<file> method).
+Maybe there's an undocumented B<message header> that would force F<copy> method
+to symlink instead of copying.
+However, if there's such header, then B<File::AptFetch> should have means
+substitute right value for I<Acquire::Source-Symlinks> parameter
+(or whatever else).
+Right now it doesn't.
+
+Known Easter Eggs are:
+
+=over
+
+=item *
+
+Inspite of Etch'es (I<v0.6.46.4-0.1>) and Lenny's (I<v0.7.20>) APT packages
+both have a F<copy> method, and they both set I<$message{version}> to C<1.0> in
+C<100 Capabilities>, Etch'es version doesn't return hashes at all.
+Beware.
+
+=item *
+
+It does B<not> reget!
+If a source and a target match, then it will silently truncate the source.
+Then happily return size and hashes of now gone file.
+(That's for pre-Squeeze's APT.)
+
+=item *
+
+(I<v0.0.9>)
+It does B<not> reget!
+However, the Squeeze's B<copy> B<unlinks> the target now.
+Thus it needs write permissions in the targt directory.
+The permissions of just created target are affected by umask.
+And, as you already guessed, I<$message{version}> is C<1.0> still.
+(OMG, THAT'S RACE!)
+
+=item *
+
+While I<$message{uri}> should be absolute, the I<$message{filename}> can be
+relative.
+
+=item *
+
+However, if I<$message{uri}> isn't absolute, then the message is
+(in contrary with F<file> method)
+
+    Failed to stat - stat (2 No such file or directory) 
+
+(Does it really stats F<->?
+Should check it.)
+
+=item *
+
+However, if I<$message{uri}> starts with double-slash,
+then the I<$message{message}> is the same "S<Failed to stat...>".
+
+=item *
+
+And I<$message{filename}> can start with double-slash.
+
+=item *
+
+(I<v0.1.6>, C<Wheezy>)
+After target's transfer is finished, the method reads it back.
+I can't comment if it's for hash-set calculation or verification.
+If target's media is slow then it's huge performance loss.
+
+=back
+
+=head2 file:
+
+Local
+(so far that's the only method what would clearly say in C<100 Capabilities>
+I<$message{local_only}> as C<true>).
+It doesn't fetch anything (kind of fake method).
+It provides usual set of properties for I<$message{uri}> --
+hash-sums, mtime, size.
+
+Known Easter Eggs are:
+
+=over
+
+=item *
+
+Etch'es version of APT method doesn't returns I<$message{md5sum_hash}> and
+I<$message{sha256_hash}>.
+Since both (Etch'es and Lenny's) versions has I<$message{version}> set to
+C<1.0> off C<100 Capabilities> message, you can find out what version of APT
+you have only
+by experimenting.
+
+=item *
+
+If I<$message{uri}> is unabsolute, then the I<$message{message}> is
+
+    Invalid URI, local URIS must not start with // 
+
+=item *
+
+If I<$message{uri}> has permissions set a way that prohibits read access,
+then the method surprisingly succeedes, but hashes are of empty file (puzled).
+
+=item *
+
+I<(v0.1.2)>
+EE that laid just here is retracted.
+At the time the TS was lazy (units reused samples).
+At present I can't verify what was going on in pre-Squeeze.
+
+=item *
+
+I<(v0.1.2)>
+(Following route sounds really weird and there isn't RL scenario when it could
+possibly happen but that's the way it is.)
+As of Wheezy:
+(1) file F<foo> isn't readable;
+(2) access it;
+(3) access all right file F<bar> with leading double-slash URI.
+Then get this I<$message{message}>:
+
+    Could not open file %s - open (13 Permission denied) 
+
+But!
+It refers F<foo>;
+while I<$message{uri}> refers F<bar>.
+F<t/file/fail.t> (around C<ftagaab5>) really does it.
+No comments.
+
+=item *
+
+If I<$message{message}> points to a directory,
+then the behaviour is the same as for the unreadable file.
+Even if I<scheme-specific-part> ends with slash.
+However, if there are leading double-slash in I<$message{message}>,
+then the method complains about invalid URI.
+
+=back
+
+=head2 ftp:
+
+Multiple times sends C<101 Status> messages.
+In C<200 URI Start> manifests file size that's coming through
+(probably, protocol feature).
+Hashes are calculated as bytes are passing in.
+I can't say how to pass in credentials.
+
+In C<100 Capabilities> appears I<$message{send_config}> as C<true>.
+I<$message{version}> is C<1.0>, who would expect that?
+
+=head2 networking methods
+
+Thorough testing of networking methods pending.
+However, I'm pretty sure that default timeout of 2min is enough for now.
+Methods itself seem to timeout itself within that frame.
+However, I can't say how many times networking methods would reconnect before
+giving up.
+
+=head1 SEE ALSO
+
+L<File::AptFetch>,
+S<"APT Method Itnerface"> in B<libapt-pkg-doc> package,
+B<apt-config(1)>
+
+=head1 AUTHOR
+
+Eric Pozharski, <whynot@cpan.org>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009, 2010, 2014 by Eric Pozharski
+
+This overview is free in sense: AS-IS, NO-WARANRTY, HOPE-TO-BE-USEFUL.
+This overview is released under CC-SA.
+
+=cut
+
+1;
+

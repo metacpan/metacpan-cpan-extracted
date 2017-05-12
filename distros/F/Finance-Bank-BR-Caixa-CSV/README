@@ -1,0 +1,6 @@
+Finance::Bank::BR::Caixa is a module that allows users to get their
+balance and statements from Brazilian bank Caixa Econômica Federal.
+
+Finance::Bank::BR::Caixa::CSV parses statement files exported by their
+Internet Banking.
+

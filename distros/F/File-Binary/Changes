@@ -1,0 +1,33 @@
+Revision history for Perl extension File::Binary.
+1.70  Tue  1 Apr 2008 18:11:09 BST
+    - Doh! Ship the test files too!
+
+1.60  Mon 31 Mar 2008 19:06:03 BST
+    - Specify minimum version of IO::File
+    - Make binmode more automatic
+    - Change tests to exercise IO::Scalar
+
+1.50  Wed 12 Mar 2008 20:08:06 GMT
+    - fix a bug to do with binmode of file handles thanks to Peter Möller
+
+1.40  Wed 30 Aug 2006 20:09:25 BST
+    - fix bug with checking file handle on open thanks to Duane Hitz 
+
+1.30  Tue  1 Aug 2006 16:42:01 BST
+    - fix seek bug thank to patch from Karl Forner
+
+1.20  Tue Mar  2 16:20:47 GMT 2004
+    - fixed a braino spotted by Thomas L. Shinnick
+
+1.10  Tue Sep 23 15:43:13 2003
+    - add in seek and tell after suggestion from Britton Kerin
+
+1.00  Fri Mar 11 09:28:45 2003
+    - finish and upload to Cpan
+
+0.90  Mon Feb 10 16:40:03 2003
+    - completely rewritten 
+
+0.02  Wed Mar  8 15:30:21 2000
+    - original version; created by h2xs 1.1.1.1.2.1
+

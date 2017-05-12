@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/File-Samba.t
+lib/File/Samba.pm
+Build.PL
+META.yml
+smb.conf

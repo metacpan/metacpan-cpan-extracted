@@ -1,0 +1,12 @@
+Oldfashioned code replace
+	- @fields[] -> $fields[];
+	- using keyword "my" for definitions;
+	- instead of: "<= $#foo"  i use: "< @foo"
+	
+CPAN packages
+	- CGI
+
+Programming technology
+	-object oriented
+	-removed code duplication
+	-illogical code useage (like %line in reading the input in ftree)

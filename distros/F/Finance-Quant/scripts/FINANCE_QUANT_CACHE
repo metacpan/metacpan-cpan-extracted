@@ -1,0 +1,605 @@
+#!/usr/bin/perl -X
+package Finance::Quant::OrderMaker;
+use Cache::Memcached;
+use Data::Dumper;
+use DBI;
+use Storable qw(lock_retrieve lock_store);
+use Text::Autoformat;
+$VERSION = '0.01';
+
+  
+
+
+    # this is the same as before...
+    sub new {
+         my $class = shift;
+         my $opts = shift;
+         
+         my $self = {
+            dbh  => undef,
+            memcache => undef,
+            DATA => {},
+        };
+
+        $self->{date}  = `date +%Y-%m-%d`;
+        $self->{memcache}  = getCache();
+        
+    
+        $self->{dbh} = DBI->connect(sprintf("DBI:mysql:%s:%s",$opts->{dbname},$opts->{dbhost}),
+                                     $opts->{dbuser},$opts->{dbpwd}) or warn(@$);
+  
+        $self->{"_CENSUS"} = \$Census;
+        bless($self, $class);
+        
+        ++ ${ $self->{"_CENSUS"} };
+        
+#        print Dumper $self;
+        
+        return $self;
+    }
+
+
+sub getCache{
+
+return  new Cache::Memcached {
+'servers' => [ "127.0.0.1:11211"],
+'debug' => 0,
+'compress_threshold' => 0,
+};
+
+
+
+
+}
+sub FETCH {
+    my $self = shift;
+    my $ref  = $self->{'memcache'};
+    $ref->get($_[0]);
+}
+sub STORE {
+    my $self = shift;
+    if (defined $_[1]){
+        my $ref = $self->{'memcache'};
+        $ref->set($_[0],$_[1]);
+    } else {
+
+#        die "Cannot SET an undefined key in OrderMaker\n";
+    }
+}
+
+sub getDateDir{
+  my $self = shift;
+  my @e = split " ",gmtime;
+  
+  if(defined($e[2]) && (length $e[2]) == 1) {
+    $e[2] = "0".$e[2];
+  }
+  
+  return "$e[4]-$e[1]-$e[2]";
+
+}
+
+
+# ( sql => $sql, pholder => [..,..] )
+sub row_arrayref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchrow_arrayref;
+}
+
+sub row_hashref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchrow_hashref( $parm{name} );
+}
+
+sub all_hashref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchall_hashref( $parm{name} );
+}
+
+sub all_arrayref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+    return $sth->fetchall_arrayref;
+}
+
+# ( sql => $sql, pholder => [ ..,..] )
+sub all_AoHref {
+    my $self = shift;
+    my %parm = @_;
+
+    my $sth = $self->{dbh}->prepare_cached( $parm{sql} );
+    $sth->execute( @{ $parm{pholder} } );
+
+    my ( %row , @rows );
+    $sth->bind_columns( \( @row{ @{$sth->{NAME_lc}} } ) );
+    while ( $sth->fetch ) {
+        push @rows, { %row };
+    }
+    return \@rows;
+}
+
+
+sub print_table_data {
+    my $self = shift;
+  
+    my $meta = shift;
+    my $data = shift;
+    my @fields =  @_;
+
+    my $tname = $meta->{tablename};
+    my $output = "";
+    foreach my $row (@$data) {
+
+    $output .= 'INSERT INTO '.$NS.$tname.$NS.' ';
+
+    $output .= '( '.join (', ', @fields) .' )';
+
+    $output .= ' VALUES (';
+
+    my $tmp;
+    $output .= join (', ',
+        map {
+    	    return 'NULL' unless defined $_;
+    	    ($tmp = $_) =~ s/'/\\'/g;
+    	    $tmp =~ /^[\d\.]+$/ ? $tmp : "'$tmp'";
+        } (ref($row) eq 'ARRAY' ? @$row : values %$row)
+    );
+
+    $output .= ');'."\n";
+    }
+    
+    return $output;
+}
+
+#__DATA__
+=head1 NAME
+  
+  Finance::Quant::OrderMaker
+  
+=head1 DESCRIPTION
+
+  Translates R order commands to mysql querys part of Finance::Quant
+
+=head1 SYNOPSIS
+
+  *
+
+=head1 SEE ALSO
+
+  part of Finance::Quant  
+  
+=head1 AUTHOR
+
+  Hagen Geissler, E<lt>santex@cpan.org<gt>
+  
+=head1 COPYRIGHT AND LICENSE
+  Copyright (C) 2012 by Hagen Geissler
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself, either Perl version 5.12.4 or,
+  at your option, any later version of Perl 5 you may have available.
+=cut
+
+
+package Finance::Quant::Cache;
+
+use strict;
+use Getopt::Long;
+use Storable qw(lock_retrieve lock_store);
+use Data::Dumper;
+use File::Spec;
+use Cache::Memcached;
+use Finance::Quant;
+use Text::Reform;
+use File::Find;
+
+my $dir = File::Spec->tmpdir();
+my $CACHE_VERSION = 1;
+my $VERSION = "0.01";
+my $backtest = {};
+my @tested;
+chdir("/tmp/");
+
+
+# return only matching modules
+sub wanted { 
+   /longtrend_backtest[_](.*).data$/ && push @tested,[$1,$File::Find::name];
+
+}
+
+my @looking = ["Finance::Quant","Finance::Optical","Finance::Google","Finance::NASDAQ"];
+# look in the @IRC dirs that exist
+find(\&wanted, grep { -r and -d } @INC);
+
+# nice printout
+foreach (@tested) {
+  $backtest->{$_->[0]}=[$_->[1]];
+#  print "$_->[0]=$_->[1]\n";
+}
+
+our $date  = trim(`date --date=1" days ago" +%Y-%m-%d`);
+
+my $opts = {
+            timeout       => 3,
+            mhost =>"localhost",
+            mport =>11211,
+            dbhost =>"localhost",
+            dbuser =>"root",
+            dbpwd =>"pass",
+            dbname =>"FinanceQuant",
+            max_cache_age => 0,
+            cache_file    => sprintf("%s/Finance-Quant/%s/getquotes_cache_%s.cache",$dir,Finance::Quant::OrderMaker::getDateDir(),Finance::Quant::OrderMaker::getDateDir()),
+            orders_file    => sprintf("%s/Finance-Quant/%s/orders_cache_%s.cache",$dir,Finance::Quant::OrderMaker::getDateDir(),Finance::Quant::OrderMaker::getDateDir()),
+            cache         => 1,
+            order         => 0,
+           };
+
+GetOptions ($opts,
+            "timeout=i",
+            "cache!",
+            "order!",
+            "mhost=s",
+            "mport=i",
+            "dbhost=s",
+            "dbuser=s",
+            "dbpwd=s",
+            "dbname=s",
+            "max_cache_age=i",
+            "cache_file=s");
+
+
+my $foo = Finance::Quant::OrderMaker->new($opts);
+my $memd = new Cache::Memcached {
+'servers' => [ "127.0.0.1:11211"],
+'debug' => 0,
+'compress_threshold' => 10_000,
+} or warn($@);
+
+my @symbols = @ARGV;
+
+  my $self = $memd->get("master-run");
+
+  @symbols = @{$self->{result}->{symbols}} unless(!defined($self->{result}));
+  
+  @symbols = map {uc} @symbols;
+
+
+my $cache = {};
+my $orders = {};
+eval {
+  $cache = lock_retrieve($opts->{cache_file});
+  $orders = lock_retrieve($opts->{orders_file});
+};
+$cache = {};
+$orders = {};
+$cache = {} unless
+  $cache->{CACHE_VERSION} and $cache->{CACHE_VERSION} !~ m/\D/
+  and $cache->{CACHE_VERSION} == $CACHE_VERSION;
+
+  refetch($cache, @symbols) unless $opts->{cache} == 1 and  check_cache($cache, @symbols);
+
+
+
+
+#   0 Symbol
+#   1 Company Name
+#   2 Last Price
+#   3 Last Trade Date
+#   4 Last Trade Time
+#   5 Change
+#   6 Percent Change
+#   7 Volume
+#   8 Average Daily Vol
+#   9 Bid
+#  10 Ask
+#  11 Previous Close
+#  12 Today's Open
+#  13 Day's Range
+#  14 52-Week Range
+#  15 Earnings per Share
+#  16 P/E Ratio
+#  17 Dividend Pay Date
+#  18 Dividend per Share
+#  19 Dividend Yield
+#  20 Market Capitalization
+#  21 Stock Exchange
+
+
+
+my $coreData = "";
+for my $symbol (@symbols) {
+  my $q = $cache->{$symbol}->{data};
+  my $core = $cache->{$symbol}->{core};
+  
+ # $coreData .= sprintf Dumper $symbol,$core;
+  
+   $coreData .=sprintf "No symbol $symbol\n" and next unless ($q);
+   $coreData .=sprintf "%-5s %6.2f %6.2f %6.2f%% - %10s %7s (%s)\n", $q->[0], $q->[2], $q->[5], $q->[6], $q->[3], $q->[4], lc $q->[1];
+  
+}
+#print $coreData;
+
+
+sub refetch {
+  my ($cache, @symbols) = @_;
+  eval {
+    local $^W = 0;  # because Finance::YahooQuote doesn't pass
+                    # warnings with 5.6.0.
+    require Finance::YahooQuote;
+    import  Finance::YahooQuote;
+    $Finance::YahooQuote::TIMEOUT = $Finance::YahooQuote::TIMEOUT = $opts->{timeout};
+    
+  };
+
+  die qq[\nYou need to install the Finance::YahooQuote module\n\nTry\n\n  perl -MCPAN -e 'install "Finance::YahooQuote"'\n\nas root\n\n]
+        if $@ =~ /locate Finance/;
+  die $@ if $@;
+
+  my @q = getquote(@symbols);
+  for my $q (@q) {
+    my $symbol = $q->[0];
+    if ($q->[1] eq $symbol) {
+      $q = undef;
+    } else {
+      $q->[6] =~ s/%$//;
+    }
+
+    
+    $cache->{$symbol}->{time} = time;
+
+    
+    $cache->{$symbol}->{data} = $q;
+    
+    
+my $quote = {};
+
+if(defined($q))  {
+$quote = {"symbol"	=>	$q->[0],
+"CompanyName"	=>	$q->[1],
+"LastPrice"	=>	$q->[2],
+"LastTradeDate"	=>	$q->[3],
+"LastTradeTime"	=>	$q->[4],
+"PercentChange"	=>	$q->[5],
+"Volume"	=>	$q->[7],
+"AverageDailyVol"	=>	$q->[8],
+"PreviousClose"	=>	$q->[11],
+"Open"	=>	$q->[12],
+"DayRange"	=>	$q->[13],
+"52-WeekRange"	=>	$q->[14],
+"MarketCapitalization"	=>	$q->[20],
+};
+
+    $quote->{result} = readFile(@{$backtest->{$q->[0]}},$orders);
+    $cache->{$symbol}->{core} = getCore($symbol,$quote);
+    $orders->{ranking}->{$quote->{result}->{NET}[2]} = $symbol;
+}
+    
+  }
+  #$cache->{CACHE_VERSION} = $CACHE_VERSION;
+  lock_store($cache, $opts->{cache_file});
+
+  lock_store($orders, $opts->{orders_file});
+}
+
+sub check_cache {
+  my ($cache, @symbols) = @_;
+  # check that all symbols are fresh enough
+  for my $symbol (@symbols) {
+    unless ($cache->{$symbol}->{time}
+            and $cache->{$symbol}->{time} > time-$opts->{max_cache_age}) {
+
+      # XXX .. cache cleaning should work
+     # for my $symbol (keys %{$cache}) {
+        #if ($cache->{$symbol}->{time} < time-($opts->{max_cache_age}*20)) {
+        #  delete $cache->{$symbol};
+       # }
+     # }
+
+      return 0;
+    }
+  }
+  return 1;
+}
+
+
+
+
+sub getCore{
+
+  my ($symbol,$data) = @_;
+  my $homex = $self->{result}->{$symbol}->{extended};
+     $homex->{quote}=$data;
+     
+  return $homex;
+
+}
+
+
+sub trim
+{
+	my $string = shift;
+
+  $string = "" unless($string);
+#	$string =~ s/\n//;
+  $string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	return $string;
+}
+
+
+sub readFile {
+  my($filename,$symbol,$orders) = @_;
+  my(@lines)=();
+
+  return unless(defined $filename);
+  return unless(-e $filename);
+
+  my @results = ();
+  
+  if(-e $filename) {
+    open(IN, $filename) or warn "Error: couldn't open file $filename : $!\n";
+
+#    @files = sort grep(!/^\./, readdir(DIR));
+    my $symbol = "";
+    @lines=<IN>;
+    foreach(@lines){
+
+      if(trim($_) =~ m/(Txn|PL|Net|$date|\[1\]\ \"20*)/){
+
+
+        if($_ =~ m/(.*) (.*) (.*) \@ (.*)/){
+          my $ods = sprintf("%s %s %s %s",$1,$2,$3,$4);
+          $symbol = $2;
+          $ods =~ s/(\[1\]\ \"|\"$)//g;
+          if($ods =~ /$symbol -/){
+
+              push @{$orders->{SELL}},[split " ",$ods];
+
+          }else{
+              push @{$orders->{BUY}},[split " ",$ods];
+          }
+
+
+        }else{
+          push @results,$_;
+        }
+      }
+
+    }
+    close(IN);
+  }
+
+  my @net = split " ",pop @results;
+
+  my @last =  map {$_=[split(" ",$_)] } @results;#grep(/$date/, @results);
+  
+  
+  #push @net,$symbol;
+
+  $orders->{LAST}=[@last];   
+  $orders->{NET}=[@net];   
+  #@results,
+  return  $orders;
+}
+
+
+sub tildeexp {
+  my $path = shift;
+  $path =~ s{^~([^/]*)} {  
+          $1 
+                ? (getpwnam($1))[7] 
+                : ( $ENV{HOME} || $ENV{LOGDIR} || (getpwuid($>))[7])
+          }ex;
+  return $path;
+}
+
+
+END{
+
+    my @fields =("changedDate","symbol","shares","avgFillPrice");
+
+    my $meta = {"tablename"=>"orders"};
+
+
+  my @keys = keys %{$orders->{ranking}};
+     pop @keys;
+  @keys = reverse sort { $a <=> $b  }  @keys;
+
+  foreach (@keys) { 
+    next if $_ =~ /Symbol=/;
+    
+    my $sym = $orders->{ranking}->{$_};
+    
+      printf("\n%s %s",$sym,$_);
+    
+    my @last = ();
+    
+
+
+#    if(defined($cache->{$sym}->{core}->{quote})){
+    
+        my $sell =$cache->{$sym}->{core}->{quote}->{result}->{SELL};
+        my $buy =$cache->{$sym}->{core}->{quote}->{result}->{BUY};
+        
+        my @orders=();
+        
+        
+        push @orders, split "\n",$foo->print_table_data($meta,$buy,@fields);
+        push @orders, split "\n",$foo->print_table_data($meta,$sell,@fields);
+        foreach(@orders){
+        
+            $foo->{dbh}->do($_) unless(!$opts->{order});
+            sleep 0.01;
+        }
+
+
+        
+        #print Dumper @last unless(!$#last);
+        
+ #   }
+    
+    
+  }
+
+
+print "\n\n".form
+"--------------------------------------------------------------------[INITIAL ACCOUNT 10000USD]-----------------------------------------------------------------",
+"---------------------------------------------------------------------------------------------------------------------------------------------------------------",
+"SYMBOL    BACKTEST-NET        PL_PCT              DATA-FILE                                PDF                               ORDER",
+"---------------------------------------------------------------------------------------------------------------------------------------------------------------",
+"[[[[[[[   [[[[[[[[       |||||||||||||   ||".("|"x30)." ||".("|"x30)." ||".("|"x45)." ||||||".("["x35);
+
+  #print Dumper keys %$cache;
+
+    
+}
+
+
+
+=head1 NAME
+  
+  FINANCE_QUANT_CACHE
+  
+=head1 DESCRIPTION
+
+  Result collection and formating
+
+=head1 SYNOPSIS
+
+  FINANCE_QUANT_CACHE
+
+=head1 SEE ALSO
+
+  Finance::Quant  
+  
+  http://html5stockbotdotcom.blogspot.com/view/sidebar
+  
+=head1 AUTHOR
+
+  Hagen Geissler santex@cpan.org
+
+=head1 TODO
+
+  part of Finance::Quant
+
+  
+=head1 COPYRIGHT AND LICENSE
+  Copyright (C) 2012 by Hagen Geissler
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself, either Perl version 5.12.4 or,
+  at your option, any later version of Perl 5 you may have available.
+=cut

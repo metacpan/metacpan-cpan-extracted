@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Filesys-SmbClient
+version:             3.2
+abstract:            Filesys::SmbClient - Interface for access Samba filesystem with libsmclient.so
+license:             ~
+author:              
+    - Alain BARBET (alian@alianwebserver.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

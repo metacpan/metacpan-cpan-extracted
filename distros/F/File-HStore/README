@@ -1,0 +1,47 @@
+File-HStore version 0.10
+========================
+
+
+File-HStore  is a very  minimalist perl  library to  store files  on a
+filesystem using a very simple hash-based storage.
+
+File-HStore  is nothing  more than  a  simple wrapper  interface to  a
+storage containing a specific directory structure where files are hold
+based on  their hashes. The  name of the  directories is based  on the
+first two  bytes of the  hexadecimal form of  the digest. The  file is
+stored and named  with its full hexadecimal form  in the corresponding
+prefixed directory.
+
+The  current version  is supporting  the  SHA-1 and  SHA-2 (256  bits)
+algorithm. The FAT (Free Archive Toolkit) format is also supported and
+it is  composed of the date  of submission plus the  SHA-2 real digest
+part.
+
+ 
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the following modules :
+
+  Digest::SHA
+  File::Copy
+  File::Path
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2008 by Alexandre Dulaunoy <adulau@foo.be>
+
+This library is  free software; you can redistribute  it and/or modify
+it under the same terms as  Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

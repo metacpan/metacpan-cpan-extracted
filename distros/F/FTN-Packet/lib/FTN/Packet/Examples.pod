@@ -1,0 +1,145 @@
+package FTN::Packet::Examples;
+
+use strict;
+use warnings;
+use Carp qw( croak );
+
+=head1 NAME
+
+FTN::Packet::Examples - Examples of the usage of FTN::Packet
+
+=head1 VERSION
+
+VERSION 0.23
+
+=cut
+
+our $VERSION = '0.23';
+
+=head1 DESCRIPTION
+
+Examples of using FTN::Packet, which is a Perl extension for reading or writing
+Fidonet Technology Networks (FTN) packets.
+
+=head2 Example of reading an FTN packet file
+
+This example reads an FTN packet file and then writes the contents of the messages
+in that packet file as text files in the directory $spool_dir/msgs.
+
+ use warnings;
+ use strict;
+ use FTN::Packet qw(&read_ftn_packet);
+ use FTN::Log qw(&logging);
+
+ my ($PKT, $pkt_file, $message, $msg_area, $msg_date, $msg_from, $msg_fromnode,
+     $msg_to, $msg_tonode, $msg_subj, $msg_body, $msg_msgid, $msg_replyid, $msg_ctrlinfo, $i);
+
+ my $spool_dir = "/var/spool/ftn"
+ my $inbound_dir = "$spool_dir/in";
+ my $log_file = "$spool_dir/packet.log";
+
+ opendir(INBOUND, $inbound_dir);
+ my @pkt_files = grep(/.*\.pkt/i,readdir(INBOUND));
+ closedir(INBOUND);
+
+ foreach $pkt_file (sort @pkt_files) {
+
+     &logging($log_file, $log_id, "Open packet file: $pkt_file");
+
+     # Call the FTN::Packet read_ftn_packet function to read packet
+     # gets an array of hashes back
+     $message = FTN::Packet::read_ftn_packet("$inbound_dir/$pkt_file");
+
+     &logging($log_file, $log_id, "Logging messages from packet file.");
+
+     for $i ( 0 .. $#{$message} ) {
+
+         &logging($log_file, $log_id, "Msg number: $i");
+
+         &logging($log_file, $log_id, "Msg Area: ${$message}[$i]{area}");
+         $msg_area = ${$message}[$i]{area};
+
+         &logging($log_file, $log_id, "Msg Date: ${$message}[$i]{ftscdate}");
+         $msg_date = ${$message}[$i]{ftscdate};
+
+         &logging($log_file, $log_id, "Msg From: ${$message}[$i]{from}");
+         $msg_from = ${$message}[$i]{from};
+         $msg_fromnode = ${$message}[$i]{fromnode};
+
+         &logging($log_file, $log_id, "Msg To:   ${$message}[$i]{to}");
+         $msg_to = ${$message}[$i]{to};
+         $msg_tonode = ${$message}[$i]{tonode};
+
+         &logging($log_file, $log_id, "Msg Subj: ${$message}[$i]{subj}");
+         $msg_subj = ${$message}[$i]{subj};
+
+         $msg_body = ${$message}[$i]{body};
+
+         $msg_msgid = ${$message}[$i]{msgid};
+         $msg_replyid = ${$message}[$i]{replyid};
+
+         $msg_ctrlinfo = ${$message}[$i]{ctrlinfo};
+
+         # Printing the message as a text file.
+         # A "page overflow" warning at the write line because this example does not take into
+         # account the length of a printed line. Using something like Template::Tiny could for
+         # better formated files, including text & html depending only the template file.
+         open(MsgFile, ">$spool_dir/msgs/msg$i.txt") or die "Cannot open message file for writing.";
+         write MsgFile;
+         close MsgFile;
+     }
+
+     # Delete the packet file that was just read
+     &logging($log_file, $log_id, "Deleting: $pkt_file"); 
+     unlink("$inbound_dir/$pkt_file");
+
+ }
+
+ logging($log_file, $log_id, 'FTN test packet file has been read.');
+
+ return();
+
+ format MsgFile =
+ Date:    @<<<<<<<<<<<<<<<<<<<<
+          $msg_date
+ From:    @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<     @<<<<<<<<<<<<<<<<<<<<<<
+          $msg_from,                               $msg_fromnode
+ To:      @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<     @<<<<<<<<<<<<<<<<<<<<<<
+          $msg_to,                                 $msg_tonode
+ Subject: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+          $msg_subj
+ Area:    @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+          $msg_area
+ --------------------------------------------------------------------------------
+ @*
+ $msg_body
+ --------------------------------------------------------------------------------
+ Msg ID:   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ $msg_msgid
+ Reply ID: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ $msg_replyid
+ @*
+ $msg_ctrlinfo
+
+ .
+
+ }
+
+
+=head1 AUTHOR
+
+Robert James Clay, jame@rocasa.us
+
+=head1 SEE ALSO
+
+ L<FTN::Packet>, L<FTN::Packet::ToDo>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012-2014 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

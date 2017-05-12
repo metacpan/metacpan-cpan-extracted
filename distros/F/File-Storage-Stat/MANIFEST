@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-load.t
+t/02-int.t
+t/03-char.t
+t/testfile
+lib/File/Storage/Stat.pm
+META.yml                                 Module meta-data (added by MakeMaker)

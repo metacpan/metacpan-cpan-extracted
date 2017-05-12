@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Makefile_PL_settings.plx
+README
+lib/File/Open.pm
+t/00-load.t
+t/corners.t
+t/layers.t
+t/null.t
+t/open-func.t
+t/open-meth.t
+t/pollute.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

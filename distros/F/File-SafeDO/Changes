@@ -1,0 +1,35 @@
+Revision history for Perl extension File::SafeDO
+
+0.14  Mon Jan 27 12:47:58 PST 2014
+        correct typo in Makefile.pm
+
+0.13  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.12  Sun Nov 16 15:37:50 PST 2008
+	Add the capability to INCLUDE additional file(s)
+	within a returned HASH object with the "INCLUDE"
+	and the doINCLUDE function.
+
+0.11  Tue Jul  5 19:05:39 PDT 2005
+	Add the capability to suppress certain warnings during
+	the DO process with an optional command switch.
+
+0.10  Mon Mar 14 20:48:03 PST 2005
+	Revision number 0.06 was and OOPS! number wise.
+	The revision level in the file was actually 0.03
+	sigh.... so I've upped it to 0.10
+
+	The "do $file" function in the previous revision
+	called the 'do' function in the scope of THIS package
+	when what we really want is the scope of the 'caller' 
+	package. This release corrects this defect with an
+	eval that executes a "do $file" in the scope of the
+	caller by inserting an anonymous subroutine into
+	the calling package.
+	
+was really 0.03
+0.06  Tue Mar  12 12:42:10 PST 2004
+	initial release
+
+	adapteded from Net::DNSBL::Utilities v0.02

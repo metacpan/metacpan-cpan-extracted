@@ -1,0 +1,5 @@
+prog='dbfilealter'
+args='-Z none'
+in='TEST/dbfilealter_compress_xz.out'
+cmp='diff -c -b '
+requires='IO::Compress::Xz'

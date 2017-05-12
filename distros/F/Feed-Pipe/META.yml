@@ -1,0 +1,27 @@
+---
+abstract: 'Pipe Atom/RSS feeds through UNIX-style high-level filters'
+author:
+  - 'Vince Veselosky <vince at control-escape.com>'
+build_requires:
+  Path::Class: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Feed-Pipe
+requires:
+  Data::UUID: '0'
+  DateTime::Format::HTTP: '0'
+  Moo: '2'
+  XML::Atom: '0.37'
+  XML::Feed: '0.43'
+resources:
+  bugtracker: https://github.com/frioux/Feed-Pipe/issues
+  homepage: https://github.com/frioux/Feed-Pipe
+  repository: https://github.com/frioux/Feed-Pipe.git
+version: '1.004'

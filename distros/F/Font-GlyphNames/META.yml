@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Font-GlyphNames
+version:      1.00000
+version_from: lib/Font/GlyphNames.pm
+installdirs:  site
+requires:
+    Encode:                        0
+    Exporter:                      0
+    File::Spec::Functions:         0
+    lib:                           0
+    strict:                        0
+    subs:                          0
+    Test::More:                    0
+    utf8:                          0
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

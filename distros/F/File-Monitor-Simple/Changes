@@ -1,0 +1,26 @@
+Revision history for Perl module File::Monitor::Simple
+
+1.00 Tue Mar  9 21:59:56 EST 2010
+    - No code changes, declaring stable. 
+
+0.99_1 Mon Jul 23 23:35:30 2007
+    - first version under this name. Much code is from
+      Catalyst::Engine::HTTP::Restarter::Watcher
+
+    - Switched to using File::Find::Rule, which is more readable
+
+    - Added tests
+
+    - Updated code to re-scan after a file is added or deleted. 
+      This wasn't necessary in the Catalyst code because the whole
+      object was killed and recreated by the web-server restart,
+      serving the same purpose.
+    
+    - Removed "delay" option. The same goal is more clearly met 
+      by updating calling code to use "while (sleep 1)" instead of "while (1)"
+      As a result, we no longer require "Time::HiRes" here.
+
+    - moved special handling of "*.pm" files to HTTP::Server::Restarter
+
+
+

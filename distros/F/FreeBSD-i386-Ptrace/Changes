@@ -1,0 +1,29 @@
+# Revision history for FreeBSD-i386-Ptrace
+#
+# $Id: Changes,v 0.5 2015/01/14 23:59:24 dankogai Exp dankogai $
+#
+# Revision history for Revision history for URI-Escape-XS
+#
+$Revision: 0.5 $ $Date: 2015/01/14 23:59:24 $
++ t/peekpoke.pl
+! lib/FreeBSD/i386/Ptrace.pm
+  * fix pt_pokestr
+
+0.04 2015/01/14 06:30:20
+! README lib/FreeBSD/i386/Ptrace.pm t/nofork.pl t/rperl.pl
+  * POD fixes.
+  * Copyright fixes.
+  * Add 'last if $name eq 'exit';' in the loop for perl 5.18 and up
+
+0.03 2009/03/20 22:42:20
+! lib/FreeBSD/i386/Ptrace.pm
+  POD fixes.
+
+0.02 2009/03/20 14:03:28
+! *
+	Lots of enhancements.
+
+0.01  2009/03/14 12:45:27
++ *
+        First release.
+

@@ -1,0 +1,146 @@
+
+=pod
+
+=head1 NAME
+
+Frost::Cookbook - How to deep-freeze a Moose
+
+=head1 ABSTRACT
+
+A little shell script named frosttest is shipped with the package.
+Moreover a series of recipes taken from the Frost test suite is explained here.
+
+=head1 DESCRIPTION
+
+The Frost cookbook is a series of recipes taken from
+the Frost test suite. Each recipe presents
+some code, which demonstrates some of the features of
+L<Frost|Frost>, and then proceeds to explain the details of
+the code.
+
+Moreover you can fine-tune the test suite or your own L<Frost|Frost>-based
+application runs by setting special environment parameters.
+
+We also provide a L<Glossar|Frost::Cookbook::Glossar> and an
+L<Inquisition|Frost::Manual::Inquisition> for common questions
+and problems people may have with Frost.
+
+You should be familiar with the cooking of a L<Moose> before trying to frost it ;-)
+See L<Moose::Cookbook>.
+
+=head1 FROSTTEST
+
+For your convenience a little shell script named B<frosttest> is shipped with the package.
+
+It expects B<prove> to be installed in C</usr/bin/prove>.
+
+=over 4
+
+=item options
+
+   Option    Action                     Default
+   -d        switch on debugging        no debugging output
+   -l        run lock test              no lock tests
+   -m        make_mutable               make_immutable
+   -p px     path expression            empty
+   -s        run speed tests            no speed tests
+   -t pt     path to test root          ../t
+   -v        be verbose                 be quiet
+   -w        do not die warnings        die on warnings
+
+By default the speed and lock tests are not run during installation.
+Moreover all test are using immutable mode by default -
+many tests will fail, if mutable is choosen, because mutable is VERBOTEN.
+
+The option C<-p> takes the same expression as B<prove>, i.e.
+
+   to run all test in t/400_recipes say         frosttest -p 400*
+   to run test t/400_recipes/003_loop.t say     frosttest -p 400*/003*
+
+With option C<-t> you can tell frosttest, where to look for tests, if
+it was not started from the shipped location.
+
+So instead of
+
+   machine:~# cd /your/build/path/of/frost/scripts
+   machine:/your/build/path/of/frost/scripts# ./frosttest
+
+you can say
+
+   machine:~# /your/build/path/of/frost/scripts/frosttest -t /your/build/path/of/frost/t
+
+=item Examples
+
+=over 4
+
+=item Speed
+
+   frosttest -s -p 500*
+
+=item Locking
+
+   frosttest -l -p 300*
+
+=item Running embedded, tree, loop and mesh in verbose mode
+
+   frosttest -v -p 400*/00*
+
+=item Running all tests including speed and lock in verbose mode
+
+   frosttest -vls
+
+=back
+
+=item Enviroment
+
+The script L<frosttest|"scripts/frosttest"> exports following environment vars:
+
+   Frost_DEBUG=1               if option -d
+   Frost_LOCK=1                if option -l
+   Frost_MAKE_MUTABLE=1        if option -m
+   Frost_SPEED=1               if option -s
+   Frost_NO_DIE_ON_WARNINGS=1  if option -w
+
+=back
+
+=head1 RECIPES
+
+B<TO DO: DOCS>
+
+For now, please have a look at the sources in t/, especially in
+t/000_moose_examples, t/000_moose_recipes and t/400_recipes.
+
+t/000_moose_examples and t/000_moose_recipes provides the same examples and recipes
+as L<Moose::Cookbook>, some already decorated with Frost's persistence voodoo, while
+t/400_recipes shows homebrewed stuff like circles, loops, trees and meshes.
+
+=head1 GETTING HELP
+
+I'm reading the Moose mailing list frequently, so please ask your
+questions there.
+
+The mailing list is L<moose@perl.org>. You must be subscribed to send
+a message. To subscribe, send an empty message to
+L<moose-subscribe@perl.org>
+
+=head1 BUGS
+
+All complex software has bugs lurking in it, and this module is no
+exception.
+
+Please report any bugs to me or the mailing list.
+
+=head1 AUTHOR
+
+Ernesto L<ernesto@dienstleistung-kultur.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Dienstleistung Kultur Ltd. & Co. KG
+
+L<http://dienstleistung-kultur.de/frost/>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

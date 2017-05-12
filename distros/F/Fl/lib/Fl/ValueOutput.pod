@@ -1,0 +1,157 @@
+class 'Fl::ValueOutput';
+isa 'Fl::Valuator';
+include 'FL/Fl_Value_Output.H';
+widget_type 'Fl_Value_Output';
+
+=pod
+
+=head1 NAME
+
+Fl::ValueOutput - Displays Floating Point Value
+
+=head1 Description
+
+The Fl::ValueOutput widget displays a floating point value.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/Fl_Value_Output.png" /></center>
+
+If C<step()> is not zero, the user can adjust the value by dragging the mouse
+left and right. The left button moves one C<step()> per pixel, the middle by
+C<10 * step()>, and the right button by C<100 * step()>.
+
+This is much lighter-weight than Fl::ValueInput because it contains no text
+editing code or character buffer.
+
+=head1 Methods
+
+Fl::ValueOutput inherits from Fl::Valuator and Fl::Widget. On top of that, it
+exposes the following methods...
+
+=head2 new(...)
+
+    my $val_a = Fl::ValueOutput->new(0, 0, 250, 500, 'Important Stuff');
+    my $val_b = Fl::ValueOutput->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default boxtype is FL_NO_BOX.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Value_Output *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 soft(...)
+
+    my $soft = $val_a->soft();
+    $val_b->soft( 0 );
+
+If "soft" is turned on, the user is allowed to drag the value outside the
+range.
+
+If they drag the value to one of the ends, let go, then grab again and
+continue to drag, they can get to any value. Default is C<1> (on).
+
+=cut
+
+xs {name        => 'soft',
+    definitions => [
+            {required => [[qw[uchar s]]],
+             returns  => 'void'
+            },
+            {returns  => 'uchar'}
+    ]
+};
+
+=pod
+
+=head2 textcolor(...)
+
+Sets or gets the color of the text in the value box.
+
+    my $color = $val_a->textcolor();
+    $val_b->textcolor(Fl::FL_RED);
+
+=cut
+
+xs {name        => 'textcolor',
+    definitions => [
+            {required => [[qw[Fl_Color color]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Color'}
+    ]
+};
+
+=pod
+
+=head2 textfont(...)
+
+Sets or gets the typeface of the text in the value box.
+
+    my $font = $val_a->textfont();
+    $val_b->textfont(Fl::FL_HELVETICA);
+
+=cut
+
+xs {name        => 'textfont',
+    definitions => [
+            {required => [[qw[Fl_Font font]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Font'}
+    ]
+};
+
+=pod
+
+=head2 textsize( )
+
+Gets the size of the text in the value box.
+
+    my $size = $val_a->textsize();
+
+=cut
+
+xs {name        => 'textsize',
+    definitions => [
+            {returns  => 'Fl_Fontsize'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

@@ -1,0 +1,65 @@
+#!/usr/bin/perl --
+
+use strict;
+use Getopt::Std ();
+use Filesys::DiskUsage::Fast;
+use Number::Bytes::Human qw(format_bytes);
+use Pod::Usage;
+
+# getopt
+Getopt::Std::getopts 'hvcs:' => my $opt = {};
+
+# help
+&usage if defined $opt->{h};
+
+my $check_mode = defined $opt->{c};
+my $dir = shift @ARGV // './';
+
+# disk
+if( $check_mode ){
+	require Filesys::DiskUsage;
+	
+	my $sector_size = ( defined $opt->{s} and $opt->{s} > 1 ) ? $opt->{s} : 1;
+	my $total = Filesys::DiskUsage::du( { dereference => 1, 'sector-size' => $sector_size }, $dir );
+	printf "Filesys::DiskUsage:       %s %u (%s)\n", $dir, $total, format_bytes( $total );
+};
+
+# disk fast
+do {
+	local $Filesys::DiskUsage::Fast::Debug = 1
+		if defined $opt->{v};
+	local $Filesys::DiskUsage::Fast::SectorSize = $opt->{s}
+		if defined $opt->{s};
+	my $total = Filesys::DiskUsage::Fast::du( $dir );
+	printf "%s%s %u (%s)\n", ( $check_mode && "Filesys::DiskUsage::Fast: " ), $dir, $total, format_bytes( $total );
+};
+
+sub usage {
+	pod2usage 0;
+}
+
+*HELP_MESSAGE = \&usage;
+
+__END__
+
+=head1 NAME
+
+diskusage - show disk usage
+
+=head1 SYNOPSIS
+
+diskusage [-hvc] [-s <sector size>]
+
+ Options:
+    -h  show usage
+    -v  debug run
+    -c  check mode (for debug, File::DiskUsage required)
+    -s  sector size in bytes (default is 0)
+
+ Examples:
+    shell> diskusage
+    shell> diskusage -s 4096
+
+=head1 DEPENDENCY
+
+Filesys::DiskUsage::Fast, Number::Bytes::Human

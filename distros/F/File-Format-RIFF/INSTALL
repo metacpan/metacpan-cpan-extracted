@@ -1,0 +1,10 @@
+To install File::Format::RIFF:
+
+Execute the following commands (use the current version instead of "x.x.x"):
+
+   $ tar xvzf File-Format-RIFF-x.x.x.tar.gz
+   $ cd File-Format-RIFF-x.x.x
+   $ perl Makefile.PL
+   $ make
+   $ make test
+   $ make install

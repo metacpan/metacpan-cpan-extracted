@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+# $Id: y-method 496 2014-02-26 17:39:18Z whynot $
+# Copyright 2009, 2010, 2014 Eric Pozharski <whynot@pozharski.name>
+# GNU GPLv3
+# AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+
+use strict;
+use warnings;
+
+package main;
+use version 0.77; our $VERSION = version->declare( v0.1.1 );
+
+use IO::Handle;
+
+STDOUT->autoflush( 1 );
+
+my $fn = <DATA>;
+chomp $fn;
+open STDERR, q|>>|, $fn                        or die qq|[open] (STDERR): $!|;
+
+while( <DATA> )      { chomp; print STDERR qq|[$_]\n|; print STDOUT qq|$_\n| }
+
+# vim: set filetype=perl

@@ -1,0 +1,457 @@
+#!/usr/bin/perl -X
+package MyMemCache;
+
+use strict;
+use warnings;
+use IO::Socket::INET;
+use  XML::Simple;
+use Carp;
+my $img = "";
+my $result = {};
+my %items;
+sub recommended {
+    my $class = shift;
+    $class->new(14);
+}
+sub new {
+    my $class = shift;
+    my $this  = bless {
+    }, $class;
+    my $dir = shift;
+    if( defined $dir ) {
+        $this->set_path( $dir );
+        $this->{result}=$result;
+    }
+    return $this;
+}
+sub start {
+    my $self = shift;
+    my $addr = shift || "127.0.0.1";
+    my $mode = shift || "stats";
+    my $return = "";
+    $addr = "127.0.0.1" unless($addr);
+    $mode = "stats" unless($mode);
+    my ($from, $to);
+    if ($mode eq "display") {
+        undef $mode if @ARGV;
+    } elsif ($mode eq "move") {
+        $from = shift;
+        $to = shift;
+        undef $mode if $from < 6 || $from > 17;
+        undef $mode if $to   < 6 || $to   > 17;
+            printf STDERR "ERROR: parameters out of range\n\n" unless $mode;
+    } elsif ($mode eq 'dump') {
+        ;
+    } elsif ($mode eq 'stats') {
+        ;
+    } else {
+        undef $mode;
+    }
+    undef $mode if @ARGV;
+    $return .= sprintf
+        "Usage: show-memory.pl <host[:port] | /path/to/socket> [mode]\n
+           show-memory.pl 10.0.0.5:11211 display    # shows slabs
+           show-memory.pl 10.0.0.5:11211            # same.  (default is display)
+           show-memory.pl 10.0.0.5:11211 stats      # shows general stats
+           show-memory.pl 10.0.0.5:11211 dump       # dumps keys and values
+    " ;
+    my $sock;
+    if ($addr =~ m:/:) {
+        $sock = IO::Socket::UNIX->new(
+            Peer => $addr,
+        );
+    }
+    else {
+        $addr .= ':11211' unless $addr =~ /:\d+$/;
+        $sock = IO::Socket::INET->new(
+            PeerAddr => $addr,
+            Proto    => 'tcp',
+        );
+    }
+    die "Couldn't connect to $addr\n" unless $sock;
+    if ($mode eq 'dump') {
+        my %items;
+        my $totalitems;
+       printf $sock "stats items\r\n";
+        while (<$sock>) {
+            last if /^END/;
+            if (/^STAT items:(\d*):number (\d*)/) {
+                $items{$1} = $2;
+                $totalitems += $2;
+            }
+        }
+            printf STDERR "Dumping memcache contents\n";
+            printf STDERR "  Number of buckets: " . scalar(keys(%items)) . "\n";
+            printf STDERR "  Number of items  : $totalitems\n";
+        foreach my $bucket (sort(keys(%items))) {
+        printf STDERR "Dumping bucket $bucket - " . $items{$bucket} . " total items\n";
+        printf $sock "stats cachedump $bucket $items{$bucket}\r\n";
+        my %keyexp;
+            while (<$sock>) {
+                last if /^END/;
+                # return format looks like this
+                # ITEM foo [6 b; 1176415152 s]
+                if (/^ITEM (\S+) \[.* (\d+) s\]/) {
+                    $keyexp{$1} = $2;
+                }
+            }
+            foreach my $k (keys(%keyexp)) {
+                printf $sock "get $k\r\n";
+                my $response = <$sock>;
+                if ($response =~ /VALUE (\S+) (\d+) (\d+)/) {
+                    my $flags = $2;
+                    my $len = $3;
+                    my $val;
+                    read $sock, $val, $len;
+                    $return .= sprintf "add $k $flags $keyexp{$k} $len\r\n$val\r\n";
+                    # get the END
+                    $_ = <$sock>;
+                    $_ = <$sock>;
+                }
+            }
+        }
+    }
+    if ($mode eq 'stats') {
+        my %items;
+        printf $sock "stats\r\n";
+        while (<$sock>) {
+            last if /^END/;
+            chomp;
+            if (/^STAT\s+(\S*)\s+(.*)/) {
+                $items{$1} = $2;
+            }
+        }
+            $return .= sprintf ("#%-17s %5s %11s\n", $addr, "Field", "Value");
+        foreach my $name (sort(keys(%items))) {
+            $return .= sprintf ("%24s %12s\n", $name, $items{$name});
+        }
+    }
+    # display mode:
+      # class -> { number, age, chunk_size, chunks_per_page,
+    #            total_pages, total_chunks, used_chunks,
+    #            free_chunks, free_chunks_end }
+    print $sock "stats items\r\n";
+    my $max = 0;
+    while (<$sock>) {
+        last if /^END/;
+        if (/^STAT items:(\d+):(\w+) (\d+)/) {
+            $items{$1}{$2} = $3;
+            $max = $1;
+        }
+    }
+    print $sock "stats slabs\r\n";
+    while (<$sock>) {
+        last if /^END/;
+        if (/^STAT (\d+):(\w+) (\d+)/) {
+            $items{$1}{$2} = $3;
+        }
+    }
+    print "  #  Item_Size  Max_age   Pages   Count   Full?  Evicted Evict_Time OOM\n" if($max);
+    foreach my $n (1..$max) {
+        my $it = $items{$n};
+        next if (0 == $it->{total_pages});
+        my $size = $it->{chunk_size} < 1024 ?
+            "$it->{chunk_size}B" :
+            sprintf("%.1fK", $it->{chunk_size} / 1024.0);
+        my $full = $it->{free_chunks_end} == 0 ? "yes" : " no";
+        printf("%3d %8s %9ds %7d %7d %7s %8d %8d %4d\n",
+               $n, $size, $it->{age}, $it->{total_pages},
+               $it->{number}, $full, $it->{evicted},
+               $it->{evicted_time}, $it->{outofmemory});
+    }
+        return $return;
+}
+1;
+package MyWebHost;
+use HTTP::Daemon;
+use HTTP::Status;
+use Data::Dumper;
+use Finance::Quant::Quotes;
+use Finance::Quant::Charter;
+use Cache::Memcached;
+my $i = 0;
+my            $d = HTTP::Daemon->new(
+                      LocalAddr => 'localhost',
+                      LocalPort => 11811,
+                  );
+my $current = "";
+my         $memd = new Cache::Memcached {
+           'servers' => [ "127.0.0.1:11211"],
+           'debug' => 0,
+           'compress_threshold' => 10_000,
+         } or warn($@);
+# Version Number
+my $VERSION = "0.2";
+my ($key,$field,$docurlbase,$numsub) = ("","","",0);
+# Details of the RDS fields
+my $field_map = {
+	'VER' => {
+		'name'	=> 'Firmware Version',
+		'type'	=> 'string',
+		'ro'	=> 'true',
+	},
+	'PI' => {
+		'name'	=> 'Program Identification',
+		'type'	=> 'string',
+		'len'	=> '4',
+	},
+	'PS' => {
+		'name'	=> 'Program Service Name',
+		'type'	=> 'string',
+		'len'	=> '8',
+	},
+	'PTY' => {
+		'name'	=>	'Program Type',
+		'type'  =>	'enum',
+		'enum'	=> {
+			1	=> 'News',
+			1	=> 'Information',
+			3	=> 'Science',
+				=> 'Finance',
+				=> 'Documentary' }
+		},
+	'MS' => {
+		'name'	=>	'Speech Switch',
+		'type'  =>	'enum',
+		'enum'	=> {
+			0	=>	'Primarily Speech',
+			1	=>	'Primarily Test' },
+		},
+};
+my $cache=MyMemCache->new();
+#$cache->add("xcontent",$xcontent);
+my $x=sprintf("<pre>%s</pre>",$cache->start);
+ #  $x.=sprintf("<pre>%s</pre>",$cache->get("xcontent"));
+ print "Please contact me at: <", $d->url, "AAPL>\n";
+ 
+	
+ 
+ while (my $c = $d->accept) {
+     while (my $r = $c->get_request) {
+         
+                 
+     #            	if (!grep($c->peerhost() eq $_, @Allow_Hosts)) {
+	#	print "Host isn't authorised: ".$c->peerhost()."\n";
+	#	$c->send_error(RC_FORBIDDEN);
+
+	print localtime().": Handling request from ".$c->peerhost()." for ".$r->url."\n";
+		if ($r->url->path eq "/") { handle_status_request( $c ); }
+			elsif ($r->url->path eq "/edit") { handle_edit_request( $c, $r->url->query ); }
+			elsif ($r->url->path eq "/status.xml") { handle_xml_request( $c ); }
+			elsif ($r->method eq 'GET' and $r->uri->path eq "/status") {
+                     # remember, this is *not* recommended practice :-)
+                       my $response = HTTP::Response->new( RC_OK );
+                       my $content = "";
+                          $content = handle_status_request($c);
+                        
+                        $response->content( $content );
+                        $response->content_type('text/html');
+                        $c->send_response( $response );
+            }        
+            elsif($r->method eq 'GET' and ($r->uri->path =~ m/favicon.ico|README|FAQ/ or $r->uri->path eq "/"  or $r->uri->path eq "")) {
+                        my $response = HTTP::Response->new( RC_OK );
+                        my $content = handle_status_request($c);
+                      
+                        $response->content( $content );
+                        $response->content_type('text/html');
+                        $c->send_response( $response );
+                   }else{
+                        my $response = HTTP::Response->new( RC_OK );
+                        
+my $stocksymbol = substr($r->uri->path,1);
+
+#my $content = create_html_header($stocksymbol);
+
+my $content = handle_status_request($c);
+
+my $startdate = "2-15-2011";   # since it's for historical date,
+my $enddate = "";     # latest data may not be available
+my $interval = "d";   # d: daily, w: weekly, m: monthly
+my $agent = "Mozilla/4.0";   # ymy id sent to Yahoo Web server, enter something
+my $q = get($stocksymbol, $startdate, $enddate, $interval, $agent);
+my ($ma, $diff) = (20, 1);   # lags for MA & differencing
+my $xcontent = html($stocksymbol, $q, $ma, $diff);   # expecting headers: Date,Open,High,Low,Close,Volume
+   $content .= $xcontent;
+   $current = $stocksymbol;
+                      
+                        $response->content( $content );
+                        $response->content_type('text/html');
+                        $c->send_response( $response );
+                    }
+             }
+             $c->close;
+             undef($c);
+}
+sub htmlheader
+{
+  return <<"EOH";
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+  <html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+      <title> Debian Popularity Contest </title>
+        <link rev="made" href="mailto:ballombe\@debian.org">
+        </head>
+        <body text="#ffffff" bgcolor="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+          <li class="twitter">
+      <a title="Post this story to Twitter" href="http://twitter.com/home?status=BBC+News+-+What+is+Germany%27s+vision+for+Europe%3F+http://www.bbc.co.uk/news/business-16030374">Twitter</a>
+    </li>
+EOH
+}
+sub popconintro
+{
+  my $current = shift;
+  my $master = $memd->get("symbols_key");
+  my @val = ();
+  my $txt = "";
+    if($master){
+       @val =  @{$master};
+      }
+  foreach(@val) {
+        my $sel = "";
+        if($current eq $_){
+            $sel = " selected ";
+        }else{
+        }
+        $txt.=sprintf('<option %s value="%s">%s</option>',$sel,$_,$_);
+  }
+  return  <<"EOH";
+  <p> <em>
+  For more information, read the <a href="${docurlbase}README">README</a> and the
+  <a href="${docurlbase}FAQ">FAQ</a>.
+  </em>
+</div>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+        <select onchange='document.location="/"+this.value'>
+        $txt
+        </select>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+  </div>
+</div>
+<div class="header">
+  <div class="headertitle">
+ </div>
+</div>
+ </small></address>
+EOH
+}
+sub htmlfooter
+{
+  my $date=gmtime();
+  return  <<EOF;
+<pre>
+inst     : number of people who installed this package;
+vote     : number of people who use this package regularly;
+old      : number of people who installed, but don't use this package regularly;
+recent   : number of people who upgraded this package recently;
+no-files : number of people whose entry didn't contain enough information (atime
+and ctime were 0).
+</pre>
+<p>
+To participate in this survey, install the <a href="http://packages.debian.org/popularity-contest">popularity-contest</a> package.
+</p>
+EOF
+}
+
+
+	
+sub create_html_header {
+	my $title = shift;
+	my $content;
+  $content .= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"';
+	$content .= ' "http://www.w3.org/TR/html4/loose.dtd">';
+	$content .= '<HTML><HEAD><TITLE>'.$title.'</TITLE></HEAD>';
+	$content .= '<body text="#ffffff" bgcolor="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">'.
+	            popconintro($title);
+	return $content;
+}
+sub create_html_footer {
+	my $content ="";
+	#$content .= '<br><I>publish.pl version '.$VERSION;
+	#$content .= ' by Hagen Geissler</I>';
+	#$content .= '</BODY></HTML>';
+	return $content;
+}
+sub handle_status_request {
+    
+	my $client = shift;
+	my $response = HTTP::Response->new( RC_OK );
+
+	my $content = create_html_header('FINANCE_QUANT_HTTP_SERVER: Status');
+	$content .= '<table border="1" cellspacing="0" cellpadding="2">';
+
+	my $c=0;
+	foreach my $key (keys %$field_map) {
+		my $field = $field_map->{$key};
+		
+		if ($c%2)	{ $content .= '<TR bgcolor="#f5f5ff">'; }
+		else		{ $content .= '<TR bgcolor="#ffffff">'; }
+		
+		$content .= "<TD><B>".$key."</B><BR>";
+		$content .= "<FONT SIZE='-1'>".$field->{'name'}."</FONT></TD>";
+		
+		$content .= '<TD>'.$field->{'value'};
+		if ($field->{'type'} eq 'enum') {
+			$content .= " (".$field->{'enum'}->{$field->{'value'}}.")";
+		}
+		$content .= '</TD><td width="50" align="center">';
+		
+		$content .= '<A HREF="/edit?'.$key.'">Edit</A>'
+		unless (defined $field->{'ro'});
+		
+		$content .= '</TD></TR>';
+		$c++;
+	}
+
+	$content .= '</TABLE></FORM><BR><BR>';
+
+	$content .= 'This information is also available as XML ';
+	$content .= '<A HREF="/status.xml">here</A>.';
+	$content .= create_html_footer();
+	
+}
+
+
+
+sub handle_xml_request {
+	my $client = shift;
+	my $response = HTTP::Response->new( RC_OK );
+	my $hashref = {};
+	
+	
+	foreach my $key (keys %$field_map) {
+		$hashref->{$key}->[0] = $field_map->{$key}->{'value'};
+	}
+	
+	my $xml = XML::Simple::XMLout( $hashref );
+	$response->content( $xml );
+	$response->content_type('text/xml');
+	$client->send_response( $response );
+	
+}
+
+
+
+sub handle_edit_request {
+	my $client = shift;
+	my $response = HTTP::Response->new( RC_OK );
+	my $hashref = {};
+	
+	
+	foreach my $key (keys %$field_map) {
+		$hashref->{$key}->[0] = $field_map->{$key}->{'value'};
+	}
+	
+	my $xml = XML::Simple::XMLout( $hashref );
+	$response->content( $xml );
+	$response->content_type('text/xml');
+	$client->send_response( $response );
+	
+}
+
+
+
+1;

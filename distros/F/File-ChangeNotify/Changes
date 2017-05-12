@@ -1,0 +1,198 @@
+0.27   2017-01-30
+
+- Inflating File::ChangeNotify::Default::Watcher into a Moose object with
+  Moose 2.2000 would cause an error or warning because of a bug in how it
+  defined an attribute. This broke Catalyst::Restarter.
+
+
+0.26   2016-05-29
+
+- Require Moo 1.006000+.
+
+
+0.25   2016-05-28
+
+- Switched from Moose to Moo and Type::Tiny.
+
+- Switched from Class::Load to Module::Runtime.
+
+- Made File::ChangeNotify::Watcher a role instead of a parent class.
+
+- Fixed a bug where the wrong watcher class could be used the second time
+  File::ChangeNotify->instantiate_watcher was called.
+
+- Allow the exclude parameter to accept subroutine references. Patch by
+  H. Merijn Brand. RT #114492.
+
+
+0.24   2013-11-28
+
+- Removed used of deprecated Class::MOP::load_class().
+
+
+0.23   2013-01-26
+
+- The new_events() watcher method blocked when using IO::Kqueue as the watcher
+  backend. Reported and patched by Jun Kuriyama.
+
+
+0.22   2012-04-13
+
+- Remove unnecessary Perl 5.10 requirement.
+
+
+0.21   2012-02-03
+
+- The implementation of the exclude feature did not work properly in several
+  cases. First, for the Inotify and KQueue watchers, when a new directory was
+  created that should have been excluded, it was not. Second, it didn't work
+  for files at all for these watchers. Reported by Jon Swartz. RT #73089.
+
+
+0.20   2011-04-19
+
+- The KQueue watcher checks that a file has a file descriptor to avoid
+  watching closed files. Patch by Adreas Voegele.
+
+
+0.19   2010-10-17
+
+- The all.t test didn't run any tests at all if neither the Inotify nor KQueue
+  watchers could be loaded. This was treated as a failure by test
+  harnesses. Now we always test the Default class.
+
+
+0.18   2010-10-15
+
+- Always make a Default watcher object if we cannot load an OS-specific class.
+
+- Add Test::Exception as a test prereq.
+
+
+0.17   2010-10-04
+
+- Loading File::ChangeNotify always loads the Default watcher class. This will
+  give a useful error message if this module's prereqs are not loaded.
+
+
+0.16   2010-07-12
+
+- Changes to avoid a warning about a useless coercion from future versions of
+  Moose.
+
+
+0.15   2010-07-09
+
+- Add a missing prereq, namespace::autoclean.
+
+
+0.14   2010-07-08
+
+- Running the tests left behind a lot of temp directories that should have
+  been cleaned up, but weren't. Reported by Peter Edwards. RT #59125.
+
+- License is now Artistic 2.0
+
+
+0.13   2010-03-28
+
+- Circular symlinks would cause instantiating a watcher to die with an error
+  from File::Find. These are now ignored. Reported by Jon Schutz. RT #55883.
+
+- Fixed misspelling of IO::KQueue in auto features. Reported by Jens
+  Rehsack. RT #54905.
+
+
+0.12   2010-01-28
+
+- Added auto_features to the Build.PL, which will give hints on what modules
+  to install for KQueue and Inotify support.
+
+- Require Linux::Inotify 1.2+, since 1.1 apparently doesn't work with this
+  module. Reported by Michael Grondin. RT #54069.
+
+
+0.11   2009-12-07
+
+- A test attempted to use Test::Without::Module but this wasn't in the prereq
+  list. I've made the test check for the module and skip its tests if the
+  module isn't present. Reported by Leon Brocard. RT #52539.
+
+
+0.10   2009-12-06
+
+- Attempting to instantiate more than one watcher failed if you were on a
+  system where one of the watcher subclasses could not be loaded (which is
+  basically every system because no system has both inotify and kqueue). Patch
+  by Mark Grimes. RT #52477.
+
+
+0.09   2009-11-09
+
+- This release fixes the excluded-dirs.t under Windows. There are no other
+  changes in this release, so there's no need to upgrade if you have 0.08
+  installed. Patch by Taro Nishino. RT #51161.
+
+
+0.08   2009-11-05
+
+- Added a new exclude feature that allows you to excludes files or directories
+  outright. Implemented by Dan Thomas. RT #51062.
+
+- Added a KQueue-based watcher written by Dan Thomas. I have no idea if this
+  works, as I don't have BSD, but we'll assume he ran the tests on his system
+  ;) RT #51062.
+
+
+0.07   2009-06-29
+
+- Fixed a typo in File::ChangeNotify::Watcher that causes a warning
+  with newer versions of Moose. Reported by David Raab. Fixes RT
+  #47431.
+
+
+0.06   2009-06-03
+
+- Created a Makefile.PL from the Build.PL.
+
+
+0.05   2009-05-17
+
+- Update the Moose::Params::Validate prereq so it requires the version
+  we really need (0.08+).
+
+- Removed Cwd and FindBin from our prereq list.
+
+
+0.04   2009-05-14
+
+- The Default watcher would blow up when a directory it was watching
+  was later removed. Reported by Tomas Doran.
+
+- The Inotify watcher would generate two events when a directory it
+  was watching was removed, one delete and one unknown, rather than
+  just a delete event.
+
+
+0.03   2009-05-11
+
+- Removed the default value for directories in the Watcher class,
+  because setting this value is really an app-specific task.
+
+
+0.02   2009-05-10
+
+- Not having Linux::Inotify2 caused attempting to make a watcher blow
+  up, when it should just use the Default watcher. Reported by Florian
+  Ragwitz.
+
+- Fixes a a bug in the Default watcher that causes it die
+  when trying to sleep in the wait_for_events method.
+
+- Fixed warnings from the Default watcher in the face of symlinks that
+  point to nonexistent files.
+
+
+0.01   2009-05-07
+
+- First version, released on an unsuspecting world.

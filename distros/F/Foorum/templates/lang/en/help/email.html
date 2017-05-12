@@ -1,0 +1,10 @@
+[% title = 'Email Obfuscate' %]
+
+[% WRAPPER help/index.html %]
+
+<p>We use <a href='http://search.cpan.org/perldoc?HTML::Email::Obfuscate'>HTML::Email::Obfuscate</a> to keep our emails safe (from spammer). </p>
+
+<p>when you see fay<span>&#x6C;</span>&#x61;nd<span><!-- @ -->&#64;</span>gmail<B>&#46;</b>com in your browser, the indeed HTML is
+<pre>fay&lt;span>&amp;#x6C;&lt;/span>&#x61;nd&lt;span>&lt;!-- @ -->&amp;#64;&lt;/span>gmail&lt;B>&amp;#46;&lt;/b>com</pre></p>
+
+[% END %]

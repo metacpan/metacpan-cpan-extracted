@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-Bank-AU-StGeorge.t
+lib/Finance/Bank/AU/StGeorge.pm
+META.yml                                 Module meta-data (added by MakeMaker)

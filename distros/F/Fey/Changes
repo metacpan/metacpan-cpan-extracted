@@ -1,0 +1,379 @@
+0.43    2015-06-15
+
+- I meant to require MooseX::Params::Validate 0.21 or greater in the 0.41
+  release but somehow only required 0.08. This also increases several other
+  prereq versions. This distro now requires Moose 2.1200+,
+  MooseX::Role::Parameterized 1.00+, and MooseX::StrictConstructor 0.13+.
+
+
+0.42    2015-06-14
+
+- Fixed the repo info in the distro metadata.
+
+
+0.41    2015-06-14
+
+- Shut up warning from tests with newer Perls.
+
+- Fix test failures when using MooseX::Params::Validate 0.21 or
+  newer. Reported by Andreas Koenig. RT #102342.
+
+
+0.40    2011-02-16
+
+- Bind params in a subselect used in the SELECT clause of a query were not
+  returned by the bind_params() method.
+
+
+0.39    2011-01-07
+
+- The value used for setting a column in an UPDATE or INSERT can now be any
+  object which does the Fey::Role::SQL::ReturnsData role, which includes
+  Fey::SQL::Select objects.
+
+
+0.38    2010-12-14
+
+- Various methods which returned lists of objects, such as Schema->tables()
+  and Table->columns() without arguments, did not return the objects in any
+  specific order. Now the objects are returned in the same order as they were
+  added originally. This also applies to lists of columns in both candidate
+  and foreign keys. RT #63811. Reported by John Dasch.
+
+
+0.37    2010-09-25
+
+- Removing a candidate key left an undef value in the internal candidate key
+  array. I'm not sure if this could actually show up in normal use. Note that
+  this fix also avoids an error that will show up in future versions of Moose
+  when a native delegation method is called incorrectly.
+
+
+0.36    2010-08-27
+
+- Avoid warnings from the latest versions of Moose (1.10).
+
+
+0.35    2010-06-15
+
+- You can now include a WHERE clause as part of an inner join, like 
+
+  FROM Part
+       JOIN MachinePart
+       ON Part.part_id = MachinePart.part_id
+       AND MachinePart.machine_id = ?
+
+  Implemented by Dieter Pearcey.
+
+- Aliasable objects now have an alias method which sets the alias and returns
+  the object itself, for chaining:
+
+  my $function = Fey::Literal::Function->new( ... )->alias('bar');
+
+  Note that this may be deprecated in a future release where we start allowing
+  aliases to be set in the constructor.
+
+  Implemented by Dieter Pearcey.
+
+- We now use MooseX::Types internally. Patch by Oliver Charles.
+
+- License is now Artistic 2.0, instead of "same as Perl itself". Artistic 2.0
+  allows you to redistribute under the GPL (any version) if you like.
+
+
+0.34    2009-10-25
+
+- Add a can_have_alias() attribute to Fey::Term::Literal. Sometimes you want
+  make sure a term is used exactly as-is, without any alias being added.
+
+- Fey::Literal is no longer the parent class for all literal classes. Instead,
+  it is simply a factory. All the literals now do the Fey::Role::IsLiteral
+  role.
+
+
+0.33    2009-10-07
+
+- Put a $VERSION in every .pm file matching Fey.pm
+
+- The $table->aliased_columns() method can now be called with just a prefix,
+  in which case it returns aliases for all the columns in the table. Requested
+  by Aristotle Pagaltzis. RT #40857.
+
+- Fixed some tests in t/SQL/Set.t that changed results when modules were
+  loaded in a different order.
+
+
+0.32    2009-09-10
+
+- Shut up some warnings from the next Moose (0.90).
+
+- Improved docs on WHERE clauses, especially on what can be compared (columns,
+  literals, etc.). See Fey::SQL for details. Requested by Martin. RT #48677.
+
+- Tightened up checking of WHERE clause components. Previously an unblessed
+  reference would've ended up getting stringified, now it will be rejected.
+
+
+0.31    2009-08-18
+
+- Added a new (empty) role, Fey::Role::SQL::ReturnsData. Use this as a
+  constraint any place you might be checking if an object
+  ->isa('Fey::SQL::Select'). This role is applied to any SQL query that
+  returns data, such as SELECTs, UNIONs, etc.
+
+- Added Fey::SQL::Select->distinct_on($column).
+
+
+0.30    2009-08-12
+
+- Allow the first argument to ->limit to be undef, so you can do
+  ->limit( undef, 20 ), which produces SQL like "OFFSET 20".
+
+
+0.29    2009-08-12
+
+- Allow subselects on the right hand side of a where clause comparison using
+  =, !=, or <>.
+
+
+0.28    2009-05-14
+
+- Fixed the tests to pass with newer Moose. No code changes.
+
+
+0.27    2009-04-18
+
+- All SQL objects now implement a clone() method.
+
+
+0.26    2009-04-04
+
+- Some uses of Fey::SQL::Fragment::SubSelect were still lingering in
+  the code, so a fresh install failed. Reported by Chad Granum.
+
+
+0.25    2009-04-01
+
+- Major internals changes to how aliasable things are created and
+  used. Added two new roles, Fey::Role::MakesAliasObjects, and
+  Fey::Role::HasAliasName. All literals can now be aliased (including
+  Terms). A subselect is now just a Fey::SQL::Select object
+  internally, which makes the internals much cleaner. This also means
+  that a Fey::SQL::Select has an ->alias_name. Implemented by Dieter
+  Pearcey.
+
+- Added support for "NULLS FIRST/LAST" in ORDER BY
+  clauses. Implemented by Erik Rijkers. RT #44656.
+
+
+0.24    2009-03-26
+
+- Support for UNION, INTERSECT, and EXCEPT queries. Implemented by
+  Dieter Pearcey.
+
+
+0.23    2009-03-23
+
+- Fey::SQL::Insert did not make sure that the order of the
+  bind_params() it returned actually matched the order of the columns
+  in the "INSERT ... INTO" clause. It accidentally worked sometimes
+  but was fundamentally broken. This only mattered if you were using
+  the auto_placeholders feature, so it did not affect
+  Fey::ORM. Reported and diagnosed by Dieter Pearcey.
+
+
+0.22    2009-02-24
+
+- A table that was passed to $sql->from($table) and also included in a
+  join could show up in the FROM clause twice. Based on a patch from
+  Dieter Pearcey.
+
+- Fey::Literal::Term now accepts a list of items which it joins
+  together. These items can be strings or Fey objects like columns or
+  tables. This makes generating arbitrary of SQL snippets
+  easier. Based on a patch from Dieter Pearcey.
+
+
+0.21    2009-02-24
+
+- If you created two Fey::Table::Alias objects with the same name
+  (from the same table) and joined each object in a query, one of the
+  aliases could go out of scope (because of weak refs and other
+  weirdness), causing a random "cannot call method ... on an undefined
+  value" error. Test by Dieter Pearcey.
+
+
+0.20    2009-02-04
+
+- No significant external changes, just lots of internal changes to
+  use Moose properly. Some of this code started life pre-Moose and
+  still showed signs of it.
+
+
+0.1901  2009-01-24
+
+- No code changes, just re-releasing because the last tarball was full
+  of Mercurial repo junk.
+
+
+0.19    2009-01-23
+
+* BACKWARDS INCOMPATIBILITY - Fey::SQL::Select->select() no longer
+  makes each element unique. Instead, it simply accepts what it's
+  given and reproduces it in the original order. Sadly, this is
+  necessary because sometimes you are stuck relying on the order of
+  the columns being returned (because SQL is broken).
+
+
+0.18    2008-12-09
+
+- Fey::SQL::Insert->into claimed it took a table as an argument, but
+  was only accepting a list of columns. Fixed by Dieter Pearcey.
+
+
+0.17    2008-11-21
+
+- Fey::SQL::Select->group_by() was not returning $self, so it could be
+  in the middle of a chain. Reported by Aristotle Pagaltzis. RT
+  #41062.
+
+- Made (almost) all the methods that generate portions of a query
+  public, for example, $select->select_clause(), ->where_clause(),
+  etc. See the various Fey::SQL::* docs for details. Requested by
+  Dieter Pearcey.
+
+
+0.16    2008-11-14
+
+- Fey::SQL::Select did not allow outer joins using table
+  aliases. Reported by Aristotle Pagaltzis. RT #40856.
+
+- Fey::SQL::Select->select will now accept another Fey::SQL::Select,
+  allowing subselects in the SELECT clause. Requested by Aristotle
+  Pagaltzis. RT #40858.
+
+- Fey::Table->alias() and Fey::Column->alias() now allow a single
+  argument, an alias name. This is a shortcut for the most common use
+  case. Requested by Aristotle Pagaltzis.
+
+- Added Fey::Table->aliased_column() and Fey::Table->aliased_columns()
+  methods. Requested by Aristotle Pagaltzis. RT #40857.
+
+
+0.15    2008-10-28
+
+- Added Fey::SQL::Select->select_clause_elements(), most for the
+  benefit of Fey::ORM.
+
+
+0.14    2008-09-19
+
+- Fey did not handle this join correctly:
+
+    $q->from( $s->table('User') );
+    $q->from( $s->table('User'), $s->table('UserGroup') );
+
+  It added a spurious comma so you got
+
+    FROM "User", JOIN ...
+
+  Reported by Aristotle Pagaltzis.
+
+- The Fey::FK docs for the constructor did not name the parameters it
+  expects correctly. Reported by Aristotle Pagaltzis.
+
+
+0.13    2008-09-19
+
+- Including a table in a from clause failed. Now the Fey::Schema
+  object will accept a table alias as a parameter for the
+  foreign_keys_between_tables() method. When given an alias, it
+  returns a Fey::FK object which contains columns from that
+  alias. This faciliates creating SQL that joins on an alias. Reported
+  by Aristotle Pagaltzis.
+
+
+0.12    2008-09-01
+
+- Changes to work with the latest versions of Moose.
+
+
+0.11    2008-08-26
+
+- 0.10 was missing a dependency - MooseX::AttributeHelpers.
+
+
+0.10    2008-08-25
+
+- Optimizations to cache frequently used (and rarely changing) method
+  return values as attributes.
+
+- As a result of the above, several methods that used to return arrays
+  now return array references. These are Fey::FK->column_pairs(),
+  Fey::Table->candidate_keys(), and Fey::Table->primary_key(), and
+  Fey::Literal::Function->args().
+
+- Overloaded objects are now handled (mostly) correctly when used as
+  parameters in SQL statements. I say mostly because overloading in
+  Perl is so broken that it's not possible to deal with them 100%
+  correctly.
+
+
+0.09    2008-07-31
+
+- If a where clause had a subgroup after a comparison (like "WHERE x =
+  1 AND ( y = 2 )", it didn't properly add the needed "AND".
+
+
+0.08    2008-07-02
+
+- The fix for "SELECT statements with multiple joins generated bogus
+  SQL (a spurious comma separating JOIN clauses)" still generated
+  bogus SQL in some cases.
+
+
+0.07    2008-06-26
+
+- SELECT statements with multiple joins generated bogus SQL (a
+  spurious comma separating JOIN clauses).
+
+
+0.06    2008-03-06
+
+- Allow a Fey::Column object to have a column with precision but no
+  length, since Postgres allows this.
+
+
+0.05    2008-02-20
+
+- Some small tweaks to take advantage of recent Moose changes.
+
+- Added Fey::FK->pretty_print().
+
+- Some internal changes for the benefit of Fey::ORM.
+
+
+0.04    2008-02-13
+
+- Some SQL methods (order_by() and limit()) did not return the object
+  on which they were called, so they broke method chaining.
+
+
+0.03    2008-02-06
+
+- Renamed the distro from Fey-Core to just Fey.
+
+- Added automatic use of placeholders to Fey::SQL. Now when you pass
+  literal values, the default is to convert them to placeholders. The
+  values can be retrieved from the new
+  bind_params(). method. Suggested by Daisuke Maki.
+
+
+0.02    2008-02-05
+
+- Moved Fey::Test to its own distro, and made it a build prereq.
+
+
+0.01    2008-02-02
+
+- First release upon an unsuspecting world.

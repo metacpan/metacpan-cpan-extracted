@@ -1,0 +1,13 @@
+Revision history for Perl module FuseBead::From::PNG
+
+0.02 May 8, 2016
+    Added Turquoise and Clear colors from Hama beads
+    Updated generate instructions to limit whitelist beads to a specific set of colors
+    Fixed passing hashref to values issue
+    Added support for mirrored plans
+    Updated README to add attribution to sourced information and products
+
+0.01 May 5, 2016
+    - First release
+
+

@@ -1,0 +1,27 @@
+---
+name: File-Mountpoint
+version: 0.01
+author:
+  - 'Joshua Hoblitt <jhoblitt@cpan.org>'
+abstract: see if a directory is a mountpoint
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Fcntl: 0
+  File::Spec: 0
+  File::stat: 0
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+recommends:
+  Test::Distribution: 1.22
+provides:
+  File::Mountpoint:
+    file: lib/File/Mountpoint.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

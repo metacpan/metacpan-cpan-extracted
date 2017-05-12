@@ -1,0 +1,16 @@
+#  1.08  2013/05/09 Move 'pm' files to the more standard locations under the
+#                   lib/ directory. Add Author & Copyright information for
+#                   Robert James Clay <jame@rocasa.us>. Match version number
+#                   of FTN::Nodelist::Node to that of main FTN::Nodelist module.
+#
+#  1.07  2007/02/28 License added
+#  1.06  2007/02/04 Quality update (Test::Pod, Test::Pod::Coverage)
+#  1.05  2005/09/29 Fixed problem with non-existing node
+#  1.04  2005/09/29 Fixed problem with missing nodelist
+#  1.03  2005/02/25 Cache problem fixed
+#
+#  1.02  2005/02/22 Perl license added
+#                   Pointlist processing added
+#                   Documentation improved
+#
+#  1.01  2005/02/16 Initial revision

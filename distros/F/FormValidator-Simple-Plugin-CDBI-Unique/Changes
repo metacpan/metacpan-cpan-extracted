@@ -1,0 +1,9 @@
+Revision history for Perl extension FormValidator::Simple::Plugin::CDBI::Unique.
+
+0.03  Thu Nov 24 00:00:50 2005
+	- fixed typo
+
+0.01  Thu Nov 10 15:30:43 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A FormValidator::Simple::Plugin::CDBI::Unique
+

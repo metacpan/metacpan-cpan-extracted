@@ -1,0 +1,26 @@
+
+=pod
+
+
+=head1 NAME
+
+Foorum::Manual::Upgrade - how to upgrade Foorum?
+
+=head1 Introduction
+
+It's for upgrade from old version to new Foorum. If u are trying to install from the beginning, try read L<Foorum::Manual::INSTALL>
+
+=head1 Details
+
+Let's explain in an example like upgrade from 0.1.5 to 0.2.0
+
+   * check bin/upgrade dir. then u will find a lot of dirs like 0.1.1 0.1.2 like. try run each scripts under those dirs from 0.1.6 (no 0.1.5 since we ran that when upgrade to 0.1.5) to 0.2.0. here we have 0.1.7, 0.1.8 and 0.2.0
+   * run them from old to new like "perl 0.1.7/up.pl" then "perl 0.1.8/upl.pl", and at last "perl 0.2.0/scraper.pl" (if u have scraper option on)
+
+=head1 CAVEATS
+
+   * Please don't run them more than once (even some scripts can run many times, but some are not)
+   * Report to L<Foorum::Manual::AUTHORS> when something went wrong
+
+
+=cut

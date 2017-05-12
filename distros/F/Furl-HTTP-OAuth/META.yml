@@ -1,0 +1,25 @@
+---
+abstract: 'Make OAuth 1.0 signed requests with Furl'
+author:
+  - 'ascra <ascra@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Furl-HTTP-OAuth
+requires:
+  Digest::HMAC_SHA1: '0'
+  Furl::HTTP: '0'
+  Scalar::Util: '0'
+  URI: '0'
+  URI::Escape: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.002'

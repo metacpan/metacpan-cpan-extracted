@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Freq
+version:      0.22
+version_from: Freq.pm
+installdirs:  site
+requires:
+    CDB_File:                      0.01
+    FileHandle:                    0.01
+    Inline:                        0.43
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.20

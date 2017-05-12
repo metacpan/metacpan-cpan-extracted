@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/File/Maintenance.pm
+t/00-load.t
+t/01-methods.t
+t/02-get_files.t
+t/03-purge.t
+t/04-archive.t
+t/05-compress.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

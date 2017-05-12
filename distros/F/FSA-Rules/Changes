@@ -1,0 +1,229 @@
+Revision history for Perl extension FSA::Rules.
+
+0.35  2015-03-16T16:04:12Z
+      - Fixed failing GraphViz tests by comparing debug output rather than
+        canonical.
+      - Fixed failing test that failed to require a sufficiently new version
+        of Storable.
+
+0.34  2015-03-14T00:45:52Z
+      - Added version to FSA::State, thus fixing CPAN indexing, which failed
+        for v0.33.
+
+0.33  2015-03-14T00:42:20Z
+      - Added test to prevent future memory leaks.
+      - Fixed another memory leak caused by circular rule references. Thanks
+        to Alceu Rodrigues de Freitas Junior for the report!
+      - Eliminated segfault in `stacktrace` on Perl 5.6 when the machine has
+        recursive rules. Done by requiring the pure Perl implementation of
+        Data::Dumper on versions of Perl less than 5.8.
+      - Removed all Pod tests from the distribution.
+
+0.32  2013-10-16T18:38:59Z
+      - Fixed a memory leak that prevented any FSA::Rules object from being
+        destroyed until program exit. Thanks to Alceu Rodrigues de Freitas
+        Junior for the report!
+
+0.31  2012-05-02T16:04:15Z
+      - Added `state_params` parameter to `new()`. The specified hash
+        reference will be passed as a list to the `state_class` constructor.
+        Patch from Chia-liang Kao.
+
+0.30  2012-03-06T05:03:37Z
+      - Fixed broken rt.cpan.org email address.
+      - Fixed failed tests in `t/graph.t` on Windows.
+
+0.29  2011-06-20T04:55:18
+      - Fixed the required Perl version number so that it can be understood
+        by older Perls (e.g., 5.5). Reported by Slaven Rezic via cpan-testers.
+      - Moved repostitory to [GitHub](https://github.com/theory/fsa-rules/).
+      - Switched to a "traditional" `Makefile.PL`.
+      - Require Test::Pod 1.41 to run the Pod tests.
+
+0.28  2008-05-22T03:05:24
+      - Added a link to the Subversion repository.
+      - Updated copyright.
+      - Removed Pod::Spelling from `Build.PL`, since the spelling test isn't
+        included in the distribution.
+
+0.27  2008-05-02T20:08:40
+      - Corrected a number of typos in the POD.
+      - Added the "configure_requires" parameter to Build.PL.
+      - Added Test::Spelling to the "recommends" parameter to Build.PL and
+        updated the test to skip if Test::Spelling is not installed.
+      - The output of `stacktrace` now has has keys sorted by
+        `$Data::Dumper::Sortkeys = 1`. Not sure how or when this was turned
+        off.
+      - Added B::Deparse 0.61 to the "recommends" parameter to Build.PL, as
+        older versions can cause Storable to croak, since they don't support
+        deparsing code references. This fixes things for Perl 5.6.2, where
+        serialization is not supported.
+      - Requiring Perl 5.6.2 or greater.
+
+0.26  2006-08-29T17:44:37
+      - The message() method now takes a list of arguments instead of a single
+        scalar. It will concatenate them all together.
+      - Fixed bug in strict mode where the machine entered the next state
+        before it evaluated all of the rules to ensure that there were not
+        multiple destination states. Thanks to Khalil Haddad for sending
+        a script that demonstrated the issue (Ticket # 21213).
+      - Removed the word "possible" from the exception thrown in strict mode
+        where multiple destinations have been found in the rules.
+
+0.25  2006-07-14T18:49:53
+      - Reverted "circular reference" change from previous release. It wasn't
+        a circular reference after all.
+      - Added a "description" attribute for rules.
+      - Updated the graph output to output the description of each rule within
+        the node, along with the node name.
+      - Fixed the "obscure bug" with the 'wrap_nodes' parameter to the graph()
+        method so that it no longer breaks graphs.
+      - Changed graph tests to use as_canon() instead of as_text(), since
+        the latter seems to vary with release of GraphViz.
+      - Add the 'with_state_name' parameter to graph() to prepend the state
+        name to the label for each node if there is a label. Otherwise the
+        label is just the state name regardless of this parameters.
+      - Changed the 'wrap_nodes' parameter to graph() to 'wrap_node_labels'.
+        The former is still supported but will be removed in a future release.
+      - Changed the 'wrap_labels' parameter to graph() to 'wrap_edge_labels'.
+        The former is still supported but will be removed in a future release.
+      - Changed the 'text_wrap' parameter to graph() to 'wrap_length'. The
+        former is still supported but will be removed in a future release.
+      - Added the 'node_params' and 'edge_params' parameters to graph() to
+        allow greater control over how graphs are output.
+      - Edges labels no longer use lines to link them to their edges. This
+        behavior can now be handled using 'edge_params => { decorate => 1 }.
+      - Removed requirement for the Clone module. This also cuts the memory
+        footprint for each rules object roughly in half, since it no longer
+        keeps a clone of the arguments to new().
+
+0.24  2006-03-03T00:06:23
+      - Added newline to the 'game_over' state in the synopsis. Reported
+        by Chris Dolan.
+      - FSA::Rules is now serializable via Storable. Suggested by Aaron
+        Dalton.
+      - Eliminated a circular reference that could lead to memory leaks.
+
+0.23  2006-02-07T05:18:26
+      - Fixed some typos.
+      - Added DESTROY() methods to prevent memory leaks.
+
+0.22  2005-08-08T17:10:00
+      - Calling reset() now resets the "done" flag to undef unless "done"
+        is set to a code reference. Reported by Xavier Caron.
+
+0.21  2004-12-31T18:30:20
+      - Calling reset() now empties the machine hashref and state hashrefs.
+        [Curtis & David]
+      - User can now turn text wrapping off and on for nodes and labels.
+        [Curtis]
+      - states() will now croak if called with any non-existent states.
+        [Curtis]
+      - Added "decorate => 1" attribute to graphs to have lines drawn from
+        the edge to its corresponding label. [Curtis]
+      - Changed "label_wrap" to "text_wrap" and had it apply to all text.
+        [Curtis].
+      - Added "Text::Wrap" as a requirement. [Curtis]
+      - Fixed documentation typo--rule actions specified via a hash reference
+        rule spec are keyed off the word "action", not "actions". [David]
+      - Actions specified via a hash reference rule specification can now
+        take a code reference as well as an array referencde of code
+        references. [David]
+
+0.20  2004-12-24T18:38:57
+      - Modified Synopsis to show off the result() method.
+      - Other minor documentation fixes spotted by Curtis Poe.
+      - Added graph support. [Curtis Poe]
+      - Added at() method. [Curtis Poe]
+      - Simplified synopsis. [Curtis Poe]
+      - Added "state_class" parameter to simplify subclassing FSA::State.
+      - A rule defined as a false scalar value, rather than a code reference,
+        now works properly.
+      - A successful attempt to switch states with the "strict" attribute
+        enabled now succeeds if no other rules evaluate to true.
+      - Each rule may now take an optional hash reference instead of a code
+        or array reference. The hash reference may optionally specify a
+        rule label, which eases the tracking of rules and allows graphs to
+        generate rule labels. [Curtis Poe]
+      - Changed the state() method to curr_state(). The old name has been
+        deprecated, will issue a warnning when called, and will be removed in
+        a future version.
+
+0.10  2004-12-17T23:29:54
+      - Moved state-specific methods to new FSA::State class. This is a
+        pretty significant change and can introduce backwards compatibility
+        issues, so the version has been bumped up to 0.10.
+      - FSA::State objects are now passed to state actions, rather than the
+        FSA::Rules object. Call their machine() method to get the FSA::Rules
+        object.
+      - Switch actions are now passed two arguments: The current FSA::State
+        object and the FSA::State object for the new state.
+      - Added notes() method for storing arbitrary notes in the FSA::Rules
+        object.
+      - Added states() method to return one or more of the state objects in
+        a machine.
+      - Moved the "message" and "result" methods to the state class. The
+        "set_" forms are gone now, since you don't need to specify a state
+        when you have a state. Added last_message() and last_result()
+        methods to FSA::Rules to get the most recent messages and results
+        from the states.
+      - Added convenience methods prev_state(), notes(), and done() to the
+        state class to reach back into the FSA::Rules object.
+      - The start() method will now throw an exception if the machine is
+        already running. Call reset() before calling start on a running
+        machine.
+      - Added "strict" attribute to prevent rules from short-circuiting
+        and cause an exception to be thrown if more than one rule returns
+        a true value during a call to try_switch(). Suggested by Curtis
+        Poe.
+      - Added optional parameter hash reference as first argument to new().
+        It can force the machine to be started before being returned, or
+        can set the "done" or "strict" attributes.
+
+0.07  2004-12-16T22:23:43
+      - Updated the synopsis to no longer document non-existent methods.
+      - Added notes about DFA vs. NFA state engines and how FSA::Rules
+        compares to the two models.
+      - Added state methods to allow easy caching and retrieval of state
+        results and messages. Also added stack trace methods for easy
+        debugging. Implementation by Curtis Poe.
+
+0.06  2004-12-16T02:05:01
+      - Added a stack() method to return an arrayref of state transformations.
+        Implementation by Curtis Poe.
+      - Added reset() which resets the state machine to a pristine state.
+        Implementation by Curtis Poe.
+
+0.05  2004-12-16T00:50:49
+      - Changed C<try_switch()> to pass any arguments to each rule checking
+        code reference. These can be used as inputs in a classic DFA-style
+        rule table. Suggested by Paul Hoffman.
+
+0.04  2004-12-16T00:19:41
+      - Changed done() to evaluate a code reference if a code reference is
+        what is passed to it. Suggested by Curtis Poe.
+
+0.03  2004-12-15T23:45:39
+      - Fixed POD for search.cpan.org.
+
+0.02  2004-12-15T22:01:58
+      - Changed name to FSA::Rules. Thanks to the module-authors list for the
+        feedback!
+      - Changed the "enter" and "leave" parameters to "on_enter" and
+        "on_exit", respectively. Suggested by Tim Bunce.
+      - Changed the check() method to switch() and modified it to return
+        the name of the state to which it switched.
+      - Added try_switch(), which returns the name of the state to which
+        it switched on success, and "undef" on failure.
+      - Changed the start() method to return the name of the start state.
+      - Added support for numbered states, including "0". Reported by
+        Curtis Poe.
+      - Changed the "goto" parameter to "rules" to better reflect their
+        role and for parity with the new module name.
+      - Added the "done" attribute and run() method. Suggested by Curtis
+        Poe.
+      - Added a check for duplicate state names in new(). Suggested by
+        Curtis Poe.
+
+0.01  2004-12-15T07:12:22
+      - Initial public release (to module-authors@perl.org only).

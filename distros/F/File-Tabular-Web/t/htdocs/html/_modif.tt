@@ -1,0 +1,33 @@
+[%- WRAPPER entities_main.tt -%]
+
+
+[% import(found.records.0); %]
+
+<h2>HTML Entity [% Name %]</h2>
+
+<form method="post" action="[% self.url %]">
+<table border>
+
+<tr><td>Number</td>
+    <td><input name="Num" value="[% Num %]" size=5 readonly></td>
+</tr>
+
+<tr><td>Name</td>
+    <td><input name="Name" value="[% Name %]"></td>
+</tr>
+
+<tr><td>Character</td>
+    <td><input name="Char" value="[% Char %]" size=1></td>
+</tr>
+
+<tr><td>Description</td>
+    <td><input name="Description" value="[% Description %]" size=60></td>
+</tr>
+
+<tr><td colspan=2><input type=submit name=U></td></tr>
+
+</table>
+</form>
+
+
+[%- END -%]

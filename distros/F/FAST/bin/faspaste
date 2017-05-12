@@ -1,0 +1,411 @@
+#!/usr/bin/perl -w
+use POSIX;
+use Getopt::Long qw(:config bundling require_order auto_version);
+use Pod::Usage;
+use FAST;
+use FAST::Bio::SeqIO;
+use File::Basename;
+use strict;
+
+use vars qw($VERSION $DESC $NAME $COMMAND $DATE);
+$VERSION = $FAST::VERSION; 
+$DESC    = "concatenate sequence records";
+$NAME    = $0;
+$NAME    =~ s/^.*\///;
+$COMMAND = join " ",$NAME,@ARGV;
+$DATE = POSIX::strftime("%c",localtime());
+
+use constant { true => 1, false => 0 };
+
+## DEFAULT OPTION VALUES
+my $def_format  = $FAST::DEF_FORMAT;  #7/1/13 "fasta";
+my $def_logname = $FAST::DEF_LOGNAME; #7/1/13 "FAST.log.txt";
+my $def_field_join         = $FAST::DEF_JOIN_STRING; # " "
+my $def_other_join         = ''; 
+
+## OPTION VARIABLES
+my $man                  = undef;  # --man
+my $help                 = undef;  # -h
+my $moltype              = undef;  # -m, in case bioperl can't tell
+my $format               = $def_format;  # --format
+my $log                  = undef;        # -l
+my $logname              = $def_logname; # -L
+my $comment              = undef;        # -C
+my $join                 = undef; # -j
+my $repeat               = undef;
+my $description          = undef;
+my $identifier           = undef;
+my $recipient            = undef;
+
+GetOptions('help|h'         		 => \$help, 
+	   'man'            		 => \$man,
+	   'moltype|m=s'                 => sub{  my (undef,$val) = @_; 
+						  die "$NAME: --moltype or -m option argument must be \"dna\", \"rna\" or \"protein\"" 
+						    unless $val =~ /dna|rna|protein/i; 
+						  $moltype = $val;
+						},
+	   'format=s'                    => \$format,
+	   'log|l'                       => \$log,
+	   'logname|L=s'                 => \$logname,
+	   'comment|C=s'                 => \$comment,
+	   'description|d'               => \$description,
+	   'identifier|i'                => \$identifier,
+	   'join|j=s'                    => \$join,
+	   'fastq|q'                     => sub {$format = 'fastq';},
+	   'repeat|r'                    => \$repeat,
+	   'recipient|R=i'               => sub{  my (undef,$val) = @_; 
+						  die "$NAME: --recipient or -R option takes an integer argument >= 1 or less than the number of arguments" 
+						    unless ($val > 0 and $val <= scalar (@ARGV)); 
+						  $recipient = $val;
+						},
+	  ) 
+  or exit(1);
+
+pod2usage(-verbose => 1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+my $fromSTDIN = ((-t STDIN) ? false : true);
+
+pod2usage("$NAME: expects at least one input filename or glob unless reading standard input. Try \"perldoc $NAME\"") if (!$fromSTDIN and !(@ARGV));
+pod2usage("$NAME: fastq format requires -d or -i option. Try \"perldoc $NAME\"") if ($format eq 'fastq' and not ($description or $identifier));
+&FAST::log($logname, $DATE, $COMMAND, $comment, $fromSTDIN) if ($log);
+
+my ($selector,$type);
+if ($description) {
+  $selector = "desc";
+  $type = "description";
+  unless ($join) {
+    $join = $def_field_join;
+  }
+}
+elsif ($identifier) {
+  $selector = "id";
+  $type = "identifier";
+  unless ($join) {
+    $join = $def_other_join;
+  }
+}
+else {
+  $selector = "seq";
+  $type = "sequence";
+  unless ($join) {
+    $join = $def_other_join;
+  }
+}
+
+$join = "\t" if ($join eq '\t');
+
+my $OUT = FAST::Bio::SeqIO->newFh(-fh => *STDOUT{IO}, '-format' => $format);
+
+my @seqios = ();
+my @indices = ();
+my $indices = 0;
+my %seen = ();
+while (@ARGV) {
+  my $file = shift (@ARGV);
+  
+  if (exists $seen{$file}) {
+    push @indices, $seen{$file};
+  }
+  else {
+    my $freeindex = $indices++;
+    push @indices, $freeindex;
+    $seen{$file} = $freeindex;
+    if ($file eq '-') {
+      unless ($fromSTDIN) {
+	warn "$NAME: Could not find any input on STDIN. Skipping.\n";
+      } 
+      elsif ($moltype) {
+	push @seqios, FAST::Bio::SeqIO->new(-fh => *STDIN{IO}, '-format' => $format, '-alphabet' => $moltype);
+      } 
+      else {
+	push @seqios, FAST::Bio::SeqIO->new(-fh => *STDIN{IO}, '-format' => $format);
+      }       
+    } 
+    elsif (!(-e $file)) {
+      warn "$NAME: Could not find file $file. Skipping.\n";
+    }
+    elsif ($moltype) {
+      push @seqios, FAST::Bio::SeqIO->new(-file => $file, '-format' => $format, '-alphabet' => $moltype);
+    }
+    else {
+      push @seqios, FAST::Bio::SeqIO->new(-file => $file, '-format' => $format);
+    }
+  }
+}
+
+die "$NAME: no valid input stream or file was found.\n" unless (@seqios);
+
+my @repseq = ();
+while (1) {
+  my @seq = ();
+  my $leftseqi = ($recipient ? ($recipient - 1)  : 0);
+  my $seqs_on_input = 0;
+  ## load sequences if available
+  ## Identify leftmost recipient sequence
+  foreach my $i (0..$#seqios) {
+    if ($seq[$i] = $seqios[$i]->next_seq()) {
+      $seqs_on_input = 1;
+      $repseq[$i] = $seq[$i] if ($repeat); 
+    }
+    elsif ($repeat) {
+      $seq[$i] = $repseq[$i];
+    }
+    else {
+      $seq[$i] = 0;
+    }
+  }
+  last unless ($seqs_on_input); 
+  my $leftseq = $seq[$leftseqi];
+  last unless $leftseq;
+
+  my $outseq;
+  #initialize output sequence from recipient sequence
+  if ($format eq 'fastq'){
+    if ($moltype) {
+      $outseq = new FAST::Bio::Seq::Quality(-seq => $leftseq->seq,-id => $leftseq->id,-desc => $leftseq->desc, -qual => $leftseq->qual, -alphabet => $moltype);
+    }
+    else {
+      $outseq = new FAST::Bio::Seq::Quality(-seq => $leftseq->seq,-id => $leftseq->id,-desc => $leftseq->desc, -qual => $leftseq->qual);
+    }
+  }
+  else {
+    if ($moltype) {
+      $outseq = new FAST::Bio::Seq(-seq => $leftseq->seq,-id => $leftseq->id,-desc => $leftseq->desc, -alphabet => $moltype);
+    }
+    else {
+      $outseq = new FAST::Bio::Seq(-seq => $leftseq->seq,-id => $leftseq->id,-desc => $leftseq->desc);
+    }
+  }
+
+  my @newdata = ();
+  my @newquals = ();
+  my $pastequals = ( $selector eq "seq" and $format eq 'fastq');
+
+  foreach my $i (0..$#indices) {
+    if ($seq[$indices[$i]]) {
+      my $data = $seq[$indices[$i]]->$selector();
+      push @newdata, $data;
+      push @newquals, $seq[$indices[$i]]->qual() if ($pastequals);
+    }
+  }
+
+  my $newdata = join $join,@newdata;
+  $outseq->$selector($newdata);
+  
+  if ($pastequals) {
+    $outseq->qual(join '',@newquals);
+  }
+  print $OUT $outseq;
+}
+
+
+__END__
+
+=head1 NAME
+
+B<faspaste> - concatenate sequence record data
+
+=head1 SYNOPSIS
+
+B<faspaste> [OPTION]... [MULTIFASTA-FILE]...
+
+=head1 DESCRIPTION
+
+B<faspaste> processes sequence record data from one or more input
+sources in parallel, concatenating data one-at-a-time across
+correspoding records from each source. B<faspaste> concatenates only
+one record component at a time; by default, sequences. Optionally
+descriptions or identifiers may be concatenated instead.
+
+The order of input sources to B<faspaste> is determined by the
+argument list to B<faspaste>, which may be file pathnames or "-"
+indicating the standard input stream. If a file pathname or "-" is
+repeated in the argument list, sequence records from that input source
+will be concatenated repeatedly in the output sequence
+record. 
+
+The default output of B<faspaste> are the records from the first input
+source with components replaced by the concatenated data. Optionally,
+any of the input streams may be designated as the "recipient" of
+concatenated data.
+
+When sequence records are exhausted for any input source, that source
+will be treated as an endless source of empty records. When the
+"recipient" input source is exhausted of data, the program
+terminates. With the B<-r> or B<--repeat> option, the last record from
+an empty source is used repeatedly as needed. By default, records from
+the first input source are "recipient" sequence records as templates
+to receive the concatenated data for output. By default, if the first
+(leftmost) named input source is exhausted of records, the
+second-left-most input source is used as a template to receive output
+data, and so on. Alternatively, with the B<-R> or B<--recipient>
+option, the nth named input stream may be optionally designated to
+always receive data (one-based indexing is used, so the first argument
+designates the first input stream. Output ceases when this stream of
+records becomes exhausted.
+
+By default, sequences and identifiers are concatenated with the empty
+string, and descriptions are concatenated with a single space
+character.Other delimiters for joining data may be specified with the
+B<-j> option.
+
+
+Options specific to B<faspaste>:
+  B<-i>, B<--identifier>                  paste identifiers
+  B<-d>, B<--description>                 paste descriptions
+  B<-r>, B<--repeat>                      repeat data from last record for empty sources
+  B<-R>, B<--recipient>=<int>             use records from input stream <int> (one-based) as output template
+  B<-j>, B<--join>=<string>               concatenate data using <string>
+
+Options general to FAST:
+  B<-h>, B<--help>                  	 print a brief help message
+  B<--man>             	           print full documentation
+  B<--version>                         print version
+  B<-l>, B<--log>                         create/append to logfile	
+  B<-L>, B<--logname>=<string>            use logfile name <string>
+  B<-C>, B<--comment>=<string>            save comment <string> to log
+  B<--format>=<format>                 use alternative format for input  
+  B<--moltype>=<[dna|rna|protein]>     specify input sequence type
+  B<-q>, B<--fastq>                       use fastq format as input and output
+
+=head1 INPUT AND OUTPUT
+
+B<faspaste> is part of FAST, the FAST Analysis of Sequences Toolbox,
+based on Bioperl. Most core FAST utilities expect input and return
+output in multifasta format. Input can occur in one or more files and
+or on standard input. Output occurs to STDOUT. The FAST utility
+B<fasconvert> can reformat other formats to and from multifasta.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-i>,
+      B<--identifier>
+
+Concatenate identifiers. The default join-string is the empty string. 
+
+=item B<-d>,
+      B<--description>
+
+Concatenate descriptions. The default join-string is a single space characer. 
+
+
+=item B<-j string>,
+      B<--join=string>
+
+Use <string> to concatenate data. Use "\t" to indicate a tab-character.
+
+=item B<-r>,
+      B<--repeat>
+
+Once records are exhausted from any source, repeat the last entry from
+that source in subsequent operations.
+
+=item B<-R int>,
+      B<--recipient=int>
+
+Use input source #<int> as template to receive concatenated
+data. One-based indexing is used, with input source 1 as default.
+
+=item B<-h>,
+      B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the manual page and exit.
+
+=item B<--version>
+
+Print version information and exit.
+
+=item B<-l>,
+      B<--log>
+
+Creates, or appends to, a generic FAST logfile in the current working
+directory. The logfile records date/time of execution, full command
+with options and arguments, and an optional comment.
+
+=item B<-L [string]>,
+      B<--logname=[string]>
+
+Use [string] as the name of the logfile. Default is "FAST.log.txt".
+
+=item B<-C [string]>,
+      B<--comment=[string]>
+
+Include comment [string] in logfile. No comment is saved by default.
+
+=item B<--format=[format]> 		  
+
+Use alternative format for input. See man page for "fasconvert" for
+allowed formats. This is for convenience; the FAST tools are designed
+to exchange data in Fasta format, and "fasta" is the default format
+for this tool.
+
+=item B<-q>
+      B<--fastq>
+
+Use fastq format as input and output.
+
+=back
+
+=head1 EXAMPLES
+
+Join sequences from two files together:
+
+=over 8
+
+B<faspaste> data.fas data2.fas
+
+=back
+
+Join both descriptions and sequences
+    
+=over 8
+
+B<faspaste> data.fas data2.fas | B<faspaste> -d - data2.fas
+
+=back
+
+Paste the first sequence repeatedly to every other sequence in a file
+
+=over 8
+
+B<fashead> -n 1 t/data/fasxl_test4.fas | B<faspaste> -r - t/data/fasxl_test4.fas
+
+=back
+
+Paste the first sequence of one file repeatedly to every other
+sequence in another file, with output identifiers and descriptions
+taken from the second file.
+
+=over 8
+
+B<fashead> -n 1 t/data/fasxl_test3.fas | B<faspaste> -r -R 2 - t/data/fasxl_test4.fas
+
+=back
+
+=head1 SEE ALSO
+
+=over 8
+
+=item C<man FAST>
+
+=item C<perldoc FAST>
+
+Introduction and cookbook for FAST
+
+=item L<The FAST Home Page|http://compbio.ucmerced.edu/ardell/FAST>"
+
+=back 
+
+=head1 CITING
+
+If you use FAST, please cite I<Lawrence et al. (2015). FAST: FAST Analysis of
+Sequences Toolbox.> and Bioperl I<Stajich et al.>. 
+
+=cut

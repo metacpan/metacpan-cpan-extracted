@@ -1,0 +1,20 @@
+abstract: FreeMind .mm File Convert to wiki Format
+author: 'Takeo Suzuki <motionbros@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: FreeMind-Convert
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Win32::Clipboard: 0
+requires:
+  Class::Accessor: 0
+  HTML::Entities: 0
+  Jcode: 0
+  XML::Simple: 0
+version: 0.03

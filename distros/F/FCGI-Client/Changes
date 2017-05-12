@@ -1,0 +1,47 @@
+Revision history for Perl extension FCGI::Client
+
+0.08
+
+    - fixed default timeout was 10secs.
+      previsously it was documented as 10secs, but it is implemented as 1sec.
+      https://rt.cpan.org/Ticket/Display.html?id=71100
+
+0.07
+
+    - make FCGI::Client::Connection->timeout as writable(Jonas)
+
+0.06
+
+    - fixed large packet issue
+      (trunaev++)
+
+0.05
+
+    - remove unused dependency to autodie, Try::Tiny.
+    - fixed bad error handler in FCGI/Client/Connection.pm.
+      https://rt.cpan.org/Ticket/Display.html?id=57374
+      (reported by mmcleric)
+
+0.04
+
+    - fixed bug: support long input
+
+0.03
+
+    - fixed bug: long key/value pairs in headers now conform to spec
+      (peterkeen)
+
+0.02
+
+    - better error handler
+    - fixed alarm handler, and localize it
+
+0.01_02
+
+    - fixed alarm bug
+    - fixed deps
+
+0.01_01
+
+    - shipped first dev release
+

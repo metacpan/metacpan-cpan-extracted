@@ -1,0 +1,129 @@
+NAME
+    Finance::Bank::JP::Mizuho
+
+SYNOPSIS
+        my $mizuho = Finance::Bank::JP::Mizuho-new(
+            consumer_id => '123455678',
+            password => 'p45sW0rD',
+            questions => {
+                '母親の誕生日はいつですか（例：５月１４日）' => '１０月１日', # have to use 2byte digits, sucks
+                '最も年齢の近い兄弟姉妹の誕生日はいつですか（例：２月１０日）' => '１２月２日',
+                '応援しているスポーツチームの名前は何ですか' => '阪神タイガース',
+            },
+        );
+    
+        my $accounts = $mizuho->accounts;
+    
+        my $ofx = $mizuho->get_ofx(
+            $mizuho->accounts->[0],
+            $mizuho->CONTINUATION_FROM_LAST,
+        );
+
+DESCRIPTION
+    Perl interface to access your Mizuho Direct
+    <http://www.mizuhobank.co.jp/direct/start.html> account.
+
+CONSTANT
+  CONTINUATION_FROM_LAST
+    Value for "get_ofx"
+
+  SAME_AS_LAST
+    Value for "get_ofx"
+
+  LAST_TWO_MONTHS
+    Value for "get_ofx"
+
+FUNCTIONS
+  new ( %config )
+    Creates a new instance.
+
+    %config keys:
+
+     consumer_id
+       Consumer id of Mizuho Direct ( お客さま番号 )
+
+     password
+       Password for your consumer_id
+
+     questions
+       Hash reference paired with: Key as Question, Value as Answer
+
+  consumer_id
+  accounts
+    returns array of Finance::Bank::JP::Mizuho::Account
+
+  account_by_number ( $number )
+    returns an instance of Finance::Bank::JP::Mizuho::Account
+
+  get_ofx ( $account_or_number , $term )
+    $account_or_number: an instance of Finance::Bank::JP::Mizuho::Account OR
+    bank account number
+
+    $term :
+
+    "CONTINUATION_FROM_LAST"
+    "SAME_AS_LAST"
+    "LAST_TWO_MONTHS"
+
+    returns list of hash references, parsed by Finance::OFX::Parse::Simple
+
+  get_raw_ofx ( $account_or_number , $term )
+    arguments are same as "get_ofx".
+
+    returns OFX content as scalar
+
+  host
+    returns random host, provided by Mizuho Direct web service.
+
+  logged_in
+    returns this instance has logged in
+
+  login
+    returns logged in successfully.
+
+    calling this method is not neccesary.
+
+  logout
+    if you leave the process without calling this method, the account will
+    be locked for about 10 minutes, and you will not able to access the web
+    service.
+
+  password
+  questions
+  ua
+TESTING
+    To test this module with real bank data,
+
+    Type on the shell:
+
+        $ ppit set web.ib.mizuhobank.co.jp
+
+    $EDITOR launches, then set your account information using Config::Pit
+    like the bellow.
+
+        ----
+        consumer_id: '123455678'
+        password: 'p45sW0rD'
+        questions:
+            '母親の誕生日はいつですか（例：５月１４日）' : '１０月１日'
+            '最も年齢の近い兄弟姉妹の誕生日はいつですか（例：２月１０日）' : '１２月２日'
+            '応援しているスポーツチームの名前は何ですか' : '阪神タイガース'
+
+    set environment variable "MIZUHO_TEST_CONFIG", instead of
+    *web.ib.mizuhobank.co.jp*.
+
+        $ export MIZUHO_TEST_CONFIG=just_testing_mizuho
+        $ ppit set just_testing_mizuho
+
+SEE ALSO
+    Finance::OFX::Parse::Simple
+
+AUTHOR
+    Atsushi Nagase <ngs@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 Atsushi Nagase <ngs@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

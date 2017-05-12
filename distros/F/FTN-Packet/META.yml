@@ -1,0 +1,19 @@
+---
+abstract: 'Reading or writing Fidonet Technology Networks (FTN) packets.'
+author:
+  - 'Robert James Clay <jame@rocasa.us>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FTN-Packet
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: http://sourceforge.net/p/ftnpl/ftn-packet/code
+version: 0.23

@@ -1,0 +1,27 @@
+Revision history for FASTAid
+
+v0.0.4 07-05-06
+
+ Added some new tests to make sure FASTAid would throw exceptions where it should.
+ First version uploaded to CPAN.
+
+v0.0.3 04-03-06
+
+ The new index recreation feature I added in the last version was broken,
+ causing the FASTA file to be reindexed every time retrieve_entry() was called.
+ This bug still exists, but the reindexing feature has been temporarily turned
+ off.
+
+ FASTAid now uses a pre-existing index if create_index is called instead of
+ building a new one. Thanks to Todd Wylie for suggesting this behavior.
+
+v0.0.2 03-02-06
+
+ When retrieve_entry() is called, the index will be created if it doesn't exist.
+ Also, the index will be recreated if it is older than the FASTA file it
+ purports to index.
+
+v0.0.1 07-31-05
+
+ First Perl package version of FASTAid.
+

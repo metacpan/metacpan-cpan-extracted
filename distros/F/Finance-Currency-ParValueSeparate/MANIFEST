@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+ParValueSeparate.pm
+ParValueSeparate/RMB.pm
+test.pl

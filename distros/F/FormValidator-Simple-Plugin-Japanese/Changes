@@ -1,0 +1,24 @@
+Revision history for Perl extension FormValidator::Simple::Plugin::Japanese.
+
+0.05  Wed Dec  6 10:00:00 2006
+    - bumped up Mail::AddressMobileJp dependency, and
+      added support for the new career, softbank.
+      Thanks to Junichiro Tobe.
+
+0.04  Mon Oct  3 19:00:00 2005
+    - fixed some validation's name
+        JZIP          -> ZIP_JP
+        EMAIL_JMOBILE -> EMAIL_MOBILE_JP
+
+    - Now this loads FormValidator::Simple::Plugin::Number::Phone::JP
+
+0.03  Sun Oct  2 03:00:00 2005
+    - little bit fixed documentation
+
+0.02  Mon Sep 26 23:00:00 2005
+    - CPAN release version
+
+0.01  Wed Jul  6 15:54:29 2005
+    - original version; created by h2xs 1.23 with options
+        -A -X FormValidator::Simple::Plugin::Japanese
+

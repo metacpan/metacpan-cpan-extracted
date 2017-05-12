@@ -1,0 +1,135 @@
+Forward::Routes provides the ability to automatically detect a URLs format and route depending on this format.
+
+By default, format detection is turned off, so using a placeholder, you get full file names back:
+
+    my $routes = Forward::Routes->new;
+    $routes->add_route('hello/:file_name');
+
+    # pass method and path to match method
+    $routes->match(get => '/my_first_file.html');
+    # $m->[0]->params is {file_name => my_first_file.html}
+
+    $routes->match(get => '/my_first_file.jpeg');
+    # $m->[0]->params is {file_name => my_first_file.jpeg}
+
+Turning on format detection has two effects:
+- only paths with the required format match
+- the format is then saved in the match object
+
+    my $routes = Forward::Routes->new;
+    $routes->add_route('hello/:last_name')->format('html');
+
+    $routes->match(get => '/hello/smith.html');
+    # $m->[0]->params is {last_name => 'smith', format => 'html'}
+
+    $routes->match(get => '/hello/foo.jpeg');
+    # $m is undef (no match)
+
+Format detection allows to route to different actions in different controllers based on the format.
+
+    my $routes = Forward::Routes->new;
+    $routes->add_route('hello/:file_name')->format('html')->to('Foo#bar');
+    $routes->add_route('hello/:file_name')->format('xml')->to('My#xml');
+
+    $routes->match(get => '/hello/my_first_file.html');
+    # $m->[0]->params is {file_name => my_first_file, format => 'html', controller => 'Foo', action => 'bar'}
+
+    $routes->match(get => '/hello/my_first_file.xml');
+    # $m->[0]->params is {file_name => my_first_file, format => 'xml', controller => 'My', action => 'xml'}
+
+You can also make use of nested routes. All child routes inherit the format constraint of their parent.
+
+    my $routes = Forward::Routes->new;
+    my $html_route = $routes->add_route->format('html');
+
+    $html_route->add_route('/foo');
+    $html_route->add_route('/baz');
+
+    $m = $root->match(get => 'foo.html');
+    # $m->[0]->params is {format => 'html'};
+
+    $m = $root->match(get => 'baz.html');
+    # $m->[0]->params is {format => 'html'};
+
+    $m = $root->match(get => '/foo');
+    # $m is undef
+
+Or you can define a pattern first and restrict formats later (via nested routes):
+
+    my $routes = Forward::Routes->new;
+    my $child = $routes->add_route('/hello');
+
+    $child->add_route->format('html')->to('HTMLController#html_action');
+    $child->add_route->format('xml')->to('XMLController#xml_action');
+
+    $m = $root->match(get => '/hello.html');
+    # $m->[0]->params is {format => 'html', controller => 'HTMLController', action => 'html_action'};
+
+    $m = $root->match(get => 'hello.xml');
+    # $m->[0]->params is {format => 'xml', controller => 'XMLController', action => 'xml_action'};
+
+Or just define a base format and override formats for deeper routes:
+
+    my $routes = Forward::Routes->new;
+    my $html_route = $routes->add_route('hello')->format('html');
+
+    $html_route->add_route('/foo');
+    $html_route->add_route('/baz')->format('xml');
+    my $bar_route = $html_route->add_route('/bar');
+        my $bar_jpeg_route = $bar_route->add_route->format('jpeg');
+            $bar_jpeg_route->add_route('first');
+            $bar_jpeg_route->add_route('second')->format('gif');
+
+    
+    $m = $root->match(get => '/hello/foo.html');
+    # $m->[0]->params is {format => 'html'};
+
+    $m = $root->match(get => '/hello/baz.html');
+    # $m is undef
+
+    $m = $root->match(get => '/hello/baz.xml');
+    # $m->[0]->params is {format => 'xml'};
+
+    $m = $root->match(get => '/hello/bar.html');
+    # $m is undef
+
+    $m = $root->match(get => '/hello/bar/first.jpeg');
+    # $m->[0]->params is {format => 'jpeg'};
+
+    $m = $root->match(get => '/hello/bar/second.gif');
+    # $m->[0]->params is {format => 'gif'};
+
+
+
+You can also pass empty if you do not want a format beeing accepted:
+
+    my $routes = Forward::Routes->new;
+    $routes->add_route('/hello/foo')->format('');
+    $routes->add_route('/hello/:file_name')->format('');
+
+    $m = $r->match(get => 'hello/there.html');
+    # $m->[0] is undef
+
+    $m = $r->match(get => 'hello/there');
+    # $m->[0]->params is {file_name => 'there', format => ''}
+
+    $m = $r->match(get => 'hello/foo.html');
+    # $m->[0] is undef
+
+    $m = $r->match(get => 'hello/foo');
+    # $m->[0]->params is {format => ''}
+
+
+Finally, you can also pass more than one format constraint:
+
+    my $routes = Forward::Routes->new;
+    $routes->add_route('foo/:bar')->format('html', 'xml');
+
+    $m = $r->match(get => 'foo/there.html');
+    # $m->[0]->params is {bar => 'there', format => 'html'}
+
+    $m = $r->match(get => 'foo/there.xml');
+    # $m->[0]->params is {bar => 'there', format => 'xml'}
+
+    $m = $r->match(get => 'foo/there.jpeg');
+    # $m is undef

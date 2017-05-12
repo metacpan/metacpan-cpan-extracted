@@ -1,0 +1,4 @@
+#fsdb test foo
+a	FOO
+b	FOO
+#   | dbcolcreate -e FOO foo

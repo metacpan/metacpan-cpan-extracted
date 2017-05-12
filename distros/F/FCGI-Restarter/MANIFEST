@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/FCGI-Restarter.t
+lib/FCGI/Restarter.pm
+META.yml                                 Module meta-data (added by MakeMaker)

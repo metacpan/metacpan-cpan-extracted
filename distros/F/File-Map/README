@@ -1,0 +1,79 @@
+File::Map
+
+File::Map is a module that maps files or anonymous memory into perl variables.
+
+Advantages of memory mapping
+  *   Unlike normal perl variables, mapped memory is shared between
+      threads or forked processes.
+
+  *   It is an efficient way to slurp an entire file. Unlike for example
+      File::Slurp, this module returns almost immediately, loading the
+      pages lazily on access. This means you only 'pay' for the parts of
+      the file you actually use.
+
+  *   Perl normally never returns memory to the system while running,
+      mapped memory can be returned.
+
+Advantages of this module over other similar modules
+ Safety and Speed
+  This module is safe yet fast. Alternatives are either fast but can cause
+  segfaults or loose the mapping when not used correctly, or are safe but
+  rather slow. File::Map is as fast as a normal string yet safe.
+
+ Simplicity
+  It offers a more simple interface targeted at common usage patterns
+
+  *   Files are mapped into a variable that can be read just like any
+      other variable, and it can be written to using standard Perl
+      techniques such as regexps and "substr".
+
+  *   Files can be mapped using a set of simple functions. No weird
+      constants or 6 argument functions.
+
+  *   It will automatically unmap the file when the scalar gets destroyed.
+      This works correctly even in multithreaded programs.
+
+ Portability
+  File::Map supports both Unix and Windows.
+
+ Thread synchronization
+  It has built-in support for thread synchronization.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Map
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Map
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-Map
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-Map
+
+    Search CPAN
+        http://search.cpan.org/dist/File-Map
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Leon Timmermans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

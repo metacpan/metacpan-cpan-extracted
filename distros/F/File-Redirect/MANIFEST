@@ -1,0 +1,17 @@
+Changes
+lib/File/Redirect/Base.pm
+lib/File/Redirect/Simple.pm
+lib/File/Redirect/lib.pm
+lib/File/Redirect/Zip.pm
+lib/File/Redirect.pm
+Makefile.PL
+MANIFEST
+Redirect.xs
+t/01_load.t
+t/02_simple.t
+t/03_require.t
+t/04_zip.t
+t/98_pod.t
+t/Foo-Bar-0.01.zip
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

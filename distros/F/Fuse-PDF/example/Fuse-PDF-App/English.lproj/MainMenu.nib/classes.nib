@@ -1,0 +1,26 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {mountPDF = id; showController = id; unmountPDF = id; }; 
+            CLASS = AppDelegate; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {clickLink = id; mountPDF = id; unmountPDF = id; }; 
+            CLASS = MainWindow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                dropWell = NSBox; 
+                fuseLink = NSTextField; 
+                fuseStatus = NSTextField; 
+                mountButton = NSButton; 
+                pdfList = NSTableView; 
+                unmountButton = NSButton; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

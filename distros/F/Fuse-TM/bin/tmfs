@@ -1,0 +1,176 @@
+#!/usr/bin/perl
+# $Id: tmfs,v 1.4 2009-12-09 07:10:45 az Exp $ 
+use strict;
+use Fuse::TM;
+use TM 1.43;
+use Getopt::Std;
+use File::Basename;
+
+=pod
+
+=head1 NAME
+
+tmfs - Mount Topic Map as Filesystem
+
+=head1 SYNOPSIS 
+
+ tmfs [options] <mapfile> </path/to/mountpoint>
+
+=head1 DESCRIPTION
+
+tmfs is a frontend for L<Fuse::TM> for mounting a Topic Map
+at a particular mountpoint. Any map format known to 
+L<TM> is supported (e.g. AsTMa, LTM, CTM, XTM and MLDBM).
+
+When run without options, tmfs mounts the given mapfile read-only
+at the ountpoint and blocks until an unmount is triggered 
+(see L<fusermount>).
+
+See L<Fuse::TM> for description of the filesystem layout.
+
+=head1 OPTIONS
+
+=over 
+
+=item -d N
+
+Debugging. Set N=1 for internal debugging, N=2 for Fuse debugging as well.
+
+=item -b
+
+Fork and Background before mounting.
+
+=item -h 
+
+Hide infrastructure topics.
+
+=item -w
+
+Read-write mode.
+
+=item -W
+
+Read-write mode with topic autogeneration for implied topics.
+
+=item -o URI
+
+Sets the output URI for write mode. See L<Fuse::TM> and L<TM::Serializable> for details.
+
+=item -i DRIVERNAME
+
+Overrides the file extension-based guessing of the input driver backend.
+Must be the name of a TM class that supports sync_in.
+
+=item -l
+
+Shows the default list of file extensions and associated input drivers, then
+exits.
+
+=item -e DRIVERNAME
+
+Overrides the output driver backend. If not given the input driver will
+be used. 
+
+Note that if you override this, you B<must> use
+TM::Synchronizable::XX (for MLDBM) and TM::Serializable::XX (for text-based formats) 
+drivers instead of TM::Materialized::XX. This makes little sense, but that's the
+way the TM module universe is structured (see L<TM::FAQ>).
+
+=back
+
+=cut
+
+my $usage="usage: ".basename($0)." [-d N] [-bhl] [-w|-W] [-o uri] [-i driver] [-e driver] <mapfile> <mountpoint>
+-b: background before mounting
+-d: 1 internal debug info, 2+ fuse also
+-h: hide infrastructure topics
+-w: read-write mode
+-W: ditto with topic autocreation
+-o: sets output uri for saving in r/w mode (e.g. io:stdout, file:./x.atm).
+    see man TM::Resourceable for url format.
+-i: argument overrules import TM driver defaults 
+-l: show file extensions / TM driver defaults
+-o: argument overrules output TM driver (defaults to input driver. 
+    You must use TM::Serializable::XX for text-based formats 
+    and TM::Synchronizable::MLDBM for db, TM::Materialized::XX will NOT WORK.)
+\n";
+
+my %opts;
+die $usage if (!getopts("bd:hwWo:i:e:l",\%opts)) ;
+
+my %defdrivers=("atm"=>"TM::Materialized::AsTMa",
+		"db"=>"TM::Materialized::MLDBM",
+		"ctm"=>"TM::Materialized::CTM",
+		"xtm"=>"TM::Materialized::XTM",
+		"ltm"=>"TM::Materialized::LTM",
+);
+
+if ($opts{l})
+{
+    print "\nDefault TM drivers:\nExt\tDriver\n==============\n";
+    print map { ".$_\t$defdrivers{$_}\n" } sort keys(%defdrivers);
+    print "\n";
+    exit 0;
+}
+
+my ($mapfile,$mountpt)=@ARGV;
+die $usage if (!-e $mapfile || !-d $mountpt);
+
+
+my $indriver=$opts{i};
+if (!$indriver)
+{
+    for my $k (keys %defdrivers)
+    {
+	if ($mapfile=~/\.$k$/)
+	{
+	    $indriver=$defdrivers{$k};
+	    last;
+	}
+    }
+}
+ 
+die "can't find input driver!\n" if (!$indriver);
+
+eval "require $indriver";
+die "can't load input driver module \"$indriver\": $@" if ($@);
+
+my $tm=$indriver->new(file=>$mapfile)
+    || die "can't create map object!\n";
+
+my $tmfs=Fuse::TM->new(tm=>$tm,
+		       debug=>$opts{d},
+		       rw=>($opts{w}||$opts{W}),
+		       autocreate=>$opts{W},
+		       hide=>$opts{h},
+		       output=>$opts{o},
+		       outputdriver=>$opts{e},
+		       );
+
+if ($opts{b})
+{
+    exit 0 if (fork);
+}
+
+$tmfs->mount($mountpt);
+exit 0;
+
+
+=pod 
+
+=head1 SEE ALSO
+
+L<Fuse::TM(3)>, L<TM(3)>
+
+=head1 AUTHOR
+
+Alexander Zangerl, <alphazulu@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 Alexander Zangerl
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+=cut

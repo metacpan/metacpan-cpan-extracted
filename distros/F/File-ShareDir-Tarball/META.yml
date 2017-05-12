@@ -1,0 +1,40 @@
+---
+abstract: 'Deal transparently with shared files distributed as tarballs'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  File::Find: 0
+  Module::Build: 0.3601
+  Test::File::ShareDir: v0.3.0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-ShareDir-Tarball
+provides:
+  File::ShareDir::Tarball:
+    file: lib/File/ShareDir/Tarball.pm
+    version: v0.2.2
+requires:
+  Archive::Tar: 0
+  Carp: 0
+  Exporter: 0
+  File::ShareDir: 0
+  File::Temp: 0
+  File::chdir: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=File-ShareDir-Tarball
+  homepage: http://search.cpan.org/dist/File-ShareDir-Tarball/
+  repository: https://github.com/yanick/File-ShareDir-Tarball.git
+version: 0.2.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

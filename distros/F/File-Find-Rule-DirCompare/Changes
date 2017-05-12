@@ -1,0 +1,9 @@
+Revision history for File-Find-Rule-DirCompare
+
+0.020	2013-10-02
+    - Changes reformatted as per CPAN::Changes::Spec
+    - move author tests to (not distributed) xt
+    - make author tests mandatory
+
+0.01    2010-04-14
+    - First version, released on an unsuspecting world.

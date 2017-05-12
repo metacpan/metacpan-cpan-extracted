@@ -1,0 +1,38 @@
+File/FnMatch version 0.01
+=========================
+
+File::FnMatch exposes your system's fnmatch(3) capabilities to Perl.
+While considerably less powerful than regular expressions, shell-style
+patterns are yet useful and familiar to a large audience of end-users.
+
+----------------------------------------------------------------------
+N.B.:  Some platforms, notably Win32, do not supply an fnmatch
+       implementation.  This module will not build on those platforms.
+----------------------------------------------------------------------
+
+Briefly:
+
+   use File::FnMatch qw(:fnmatch);
+
+   opendir(D, '.');
+   while (my $fn = readdir(D)) {
+     next unless fnmatch('*.exe', $fn, FNM_PERIOD|FNM_PATHNAME);
+     ...
+   }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Michael J. Pomraning
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

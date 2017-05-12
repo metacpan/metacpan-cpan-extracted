@@ -1,0 +1,38 @@
+Changes
+=======
+
+Changes by Daisuke Maki unless otherwise noted.
+
+0.07000 - 18 Nov 2007
+  - Migrate to Module::Install
+  - Add Class::Data::Inheritable to dependencies. rt #30810
+
+0.06 - 01 Nov 2005
+  - Tweak Build.PL. Reported by Jose Castro.
+
+0.05 - 28 Oct 2005
+  - Add File::Extract::Excel (experimental)
+
+0.04 - 27 Oct 2005
+  - Hmm, shouldn't be creating distros at 3:00 am. MANIFEST didn't get
+    updated properly, so a lot of files were missing.
+  - Add File::Extract::PDF (experimental)
+
+0.03 - 27 Oct 2005 
+  - Added filters! Thanks to Tatsuhiko Miyagawa for the inspiration and advice
+  - Fix F::E::Plain's return value (should have been F::E::Result)
+  - Make sure recode() is called before creating F::E::Result
+  - Add register_filter()
+
+  *** Backward Incompatible Changes ***
+  - rename register() to register_processor().
+  - Change F::E::Result API. Now results have a metadata field, which can
+    contain anything other than the text field. Also, now F::E::Result has
+    mandatory fields 'filename', 'mime_type', 'text'.
+
+0.02 - 26 Oct 2005
+  - output_encoding 
+
+0.01 - 26 Oct 2005
+  - Initial CPAN Release.
+  - TODO tests.

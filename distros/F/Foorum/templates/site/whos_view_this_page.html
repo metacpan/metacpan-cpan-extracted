@@ -1,0 +1,34 @@
+[% USE date %]
+[% PROCESS sub/date.html %]
+
+<br />
+<div class='one'>
+<table align='center'>
+<tr class='title'><td colspan='2'> -=> <a href='/site/online'>[% c.loc("Who is viewing this Page?") %]</a> [ <span class='date date_no_ago'>[% date_format(date.now) %]</span> ]</td></tr>
+    <tr>
+    <td class='forum1' valign='middle' align='center' width='28'><img src='[% c.config.dir.images %]/board/online.gif' alt='On' width='16' height='16' /></td>
+    <td class='forum2' width='100%'>
+    [% FOREACH whos IN whos_view_this_page %]
+    
+    [% IF whos == 'SELF';
+          whos = {
+            user_id => c.user_exists ? c.user_id : 0,
+            user    => c.user_exists ? c.user : undef,
+            sessionid => c.sessionid,
+            path    => c.req.path,
+            title   => title || 'unknown',
+            start_time => date.now,
+            last_time  => date.now
+          };
+       END; %]
+    
+    [% IF whos.user %]
+    <a href='/u/[% whos.user.username %]' alt="Visit time: [% date_format(whos.start_time) %]\nActive time: [% date_format(whos.last_time) %]">[% whos.user.nickname %]</a>[% UNLESS loop.last %], [% END %]
+    [% ELSE %]
+    <span alt="Visit time: [% date_format(whos.start_time) %]\nActive time: [% date_format(whos.last_time) %]">Guest</span>
+    [% END %]
+    [% END %]
+    </td>
+    </tr>
+</table>
+</div>

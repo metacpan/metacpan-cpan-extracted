@@ -1,0 +1,157 @@
+--- 
+meta: 
+  Producers: 
+    $0: /usr/local/perl/bin/rrr-aggregate
+    File::Rsync::Mirror::Recentfile: 0.0.1
+    time: 1223270942.18846
+  aggregator: 
+    - 6h
+    - 1d
+    - 1W
+    - 1M
+    - 1Q
+    - 1Y
+    - Z
+  canonize: naive_path_normalize
+  comment: These 'RECENT' files are part of a test of a new CPAN mirroring concept. Please ignore them for now.
+  filenameroot: RECENT
+  interval: Z
+  protocol: 1
+  serializer_suffix: .yaml
+recent: 
+  - 
+    epoch: 1223270911.76639
+    path: id/M/MS/MSIMERSON/Mail-Toaster-5.12_01.tar.gz
+    type: new
+  - 
+    epoch: 1223270911.76193
+    path: id/M/MS/MSIMERSON/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270811.41559
+    path: id/Z/ZA/ZAG/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270810.95688
+    path: id/V/VV/VVELOX/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270810.89322
+    path: id/V/VP/VPIT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270810.75097
+    path: id/V/VA/VAYDE/Lazy/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270810.73467
+    path: id/V/VA/VASILUS/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270808.09977
+    path: id/S/SC/SCHROEER/Wortschatz/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270807.69462
+    path: id/R/RS/RSRCHBOY/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270807.53375
+    path: id/R/RR/RRA/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270807.01402
+    path: id/R/RJ/RJBS/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270800.42829
+    path: id/M/MT/MTHURN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270797.76178
+    path: id/K/KN/KNORR/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270797.35933
+    path: id/K/KA/KANE/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270796.38567
+    path: id/J/JR/JRM/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270796.36758
+    path: id/J/JR/JRED/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270795.8004
+    path: id/J/JM/JMATES/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270795.45088
+    path: id/J/JE/JETTERO/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270795.11028
+    path: id/J/JB/JBURNETT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270793.54239
+    path: id/G/GP/GPHAT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270792.74174
+    path: id/F/FL/FLOWERYSO/SmugMug/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270792.53034
+    path: id/F/FA/FAYLAND/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270791.856
+    path: id/D/DW/DWHEELER/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270791.13817
+    path: id/D/DL/DLAND/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270790.41091
+    path: id/D/DA/DANNY/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270789.69511
+    path: id/C/CL/CLEONTY/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270789.64418
+    path: id/C/CL/CLAESJAC/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270789.28434
+    path: id/C/CD/CDOLAN/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270788.87453
+    path: id/C/CA/CASIANO/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270788.06877
+    path: id/B/BE/BEHANW/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270787.55463
+    path: id/A/AU/AUDREYT/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223270786.78341
+    path: id/A/AS/ASHLEY/CHECKSUMS
+    type: new
+  - 
+    epoch: 1223269613.67094
+    path: id/V/VV/VVELOX/zcls-0.0.1.pl
+    type: new
+  - 
+    epoch: 1223269222.00701
+    path: id/V/VV/VVELOX/zcls-0.0.0.pl
+    type: new

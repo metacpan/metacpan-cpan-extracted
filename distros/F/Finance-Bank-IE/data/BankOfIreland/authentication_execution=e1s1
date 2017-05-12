@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" >
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:c="http://java.sun.com/jsp/jstl/core" xml:lang="en" lang="en">
+        
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+
+            <meta http-equiv="Cache-Control" content="no-cache" />
+            <meta http-equiv="Cache-Control" content="no-store" />
+            <meta http-equiv="Cache-Control" content="must-revalidate" />
+            <meta http-equiv="Expires" content="0" />
+            <meta http-equiv="refresh" content="615; URL=/online365/spring/logout" />
+
+            <link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/basic_classes.xcss/DATB/eAELXT5DOhSIAQ!sA18_" rel="stylesheet" type="text/css" /><link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/extended_classes.xcss/DATB/eAELXT5DOhSIAQ!sA18_" media="rich-extended-skinning" rel="stylesheet" type="text/css" /><script src="/online365/spring/resource/org.ajax4jsf.javascript.AjaxScript" type="text/javascript"></script><script src="/online365/spring/resource/org/ajax4jsf/javascript/scripts/form.js" type="text/javascript"></script><script src="/online365/spring/resource/org.ajax4jsf.javascript.PrototypeScript" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/available.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/jquery/jquery.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/script/controlUtils.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/utils.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/browser_info.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/modalPanel.js" type="text/javascript"></script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/modalPanelBorders.js" type="text/javascript"></script><link class="component" href="/online365/spring/resource/org/richfaces/renderkit/html/css/modalPanel.xcss/DATB/eAELXT5DOhSIAQ!sA18_" rel="stylesheet" type="text/css" /><script type="text/javascript">window.RICH_FACES_EXTENDED_SKINNING_ON=true;</script><script src="/online365/spring/resource/org/richfaces/renderkit/html/scripts/skinning.js" type="text/javascript"></script><script src="/online365/js/defaultFocus.js" type="text/javascript"></script><script src="/online365/js/browserDetection.js" type="text/javascript"></script><link rel="icon" href="/online365/favicon.ico" type="image/x-icon" />
+            <link rel="SHORTCUT ICON" href="/online365/favicon.ico" />
+            <link rel="apple-touch-icon" href="/online365/images/extras/smartPhoneIcon.png" />
+            <link rel="stylesheet" type="text/css" href="/online365/css/boi_online.css" />
+            
+            <!--[if IE 7]>
+                <link rel="stylesheet" type="text/css" href="/online365/css/styles_ie7.css" />
+            <![endif]-->
+            <!--[if IE 8]>
+                <link rel="stylesheet" type="text/css" href="/online365/css/styles_ie8.css" />
+            <![endif]-->
+        <meta name="keywords" content="Bank of Ireland, 365 Online , login Step 1 of 2, " />
+        <meta name="description" content="Bank of Ireland 365 Online, login Step 1 of 2" />
+        
+		<title>Bank of Ireland 365 Online | Login - Step 1 of 2</title>
+        
+        <link rel="stylesheet" type="text/css" href="/online365/css/bg.css" />
+
+            <script type="text/javascript" src="/online365/js/defaultFocus.js"></script>
+            <script type="text/javascript" src="/online365/js/autoTab.js"></script>
+            <script type="text/javascript" src="/online365/js/loadMonitor.js"></script>
+            
+            <script type="text/javascript"> <!-- REMOVE DIV ONCLICK FUNCTION -->
+                function hide_element(element_name) {
+                    element = document.getElementById(element_name);  
+                    element.style.display = 'none';
+                }
+            </script>
+        </head>
+ 
+        <body onload="pageIsLoaded();defaultFocus();" onbeforeunload="pageUnloaded()"><form id="form" name="form" method="post" action="/online365/spring/authentication?execution=e1s1"><input id="form:ajaxRequestStatus" type="hidden" name="form:ajaxRequestStatus" value="AJAX REQUEST PROCESSOR INACTIVE" />
+	            <ul id="hide">
+	                <li><a href="#content">skip navigation</a></li>
+	                <li><a href="/online365/spring/accessibility">Accessibility</a></li>
+	            </ul>
+   
+        <div id="container">
+	        <div id="masthead"><img src="/online365/images/header/bankofireland_online.gif" alt="Bank of Ireland 365 Online" />
+	            <p>For more information 
+	            	<img src="/online365/images/extras/icon_popup.gif" alt="Contact Us opens up in a new window" /><a id="form:j_id8:contactLink" name="form:j_id8:contactLink" href="#" class="strong"> Contact Us<script type="text/javascript">Richfaces.componentControl.attachAvailable('#form\\:j_id8\\:contactLink','onclick','#form\\:j_id67\\:j_id82\\:contactPanel','show')</script></a>
+	            </p>
+			</div>
+        </div>
+
+    <div class="bg">  
+	    <div class="container">
+			<div id="shade"> 
+			    <h1 class="h1_login">
+			        Welcome to 365 online
+			    </h1> 
+			    <div class="login"> 
+			        
+					<a name="content"></a><span class="mandatory"><span class="abbrstyle"><abbr title="Mandatory">*</abbr></span> = mandatory</span>
+					
+					<h2>Secure Login</h2>
+			
+					<fieldset> 
+					
+					<noscript>
+					    <br class="clear" />
+						<div id="noscript">
+							<h2> Please enable javascript on your browser.</h2>
+							<p>
+							You do not currently have javascript enabled please
+							enable it.
+							</p>
+							<p> 
+							To use this application correctly you must have
+							javascript enabled.
+							</p>
+						</div>
+					</noscript>
+						<div class="error">
+					    	<p>    
+					    		365 online no longer supports your browser, please upgrade. For more information see our <a href="/online365/spring/faqs" target="_blank">FAQs</a>.
+					    	</p>
+					    </div>
+			        
+					<legend class="hidden">Secure Login - Step 1 of 2</legend> <ol>
+						<li> 
+                               <label for="form:userId">
+                                   Please enter your <strong> User ID</strong>
+                               </label><span class="abbrstyle"><abbr title="Mandatory">*</abbr></span><input id="form:userId" type="text" name="form:userId" autocomplete="off" class="inputbox accountID" maxlength="8" onkeyup="autoTab(event,this,document.getElementById('form:dateOfBirth_date'),document.getElementById('form:phoneNumber'))" size="18" tabindex="1" title="Please enter your User ID" /> 
+                           </li>
+			
+			                <li>
+			                    <fieldset class="nestedlegend">
+			                        <legend>Date of birth</legend>
+			                        <div>Please enter your <strong>Date of Birth</strong></div>
+			
+			                        <label for="form:dateOfBirth_date" class="hidden">DD</label>
+			                        <label for="form:dateOfBirth_month" class="hidden">MM</label>
+			                        <label for="form:dateOfBirth_year" class="hidden">YYYY</label>
+			                        <span class="abbrstyle"><abbr title="Mandatory">*</abbr></span><input id="form:dateOfBirth_date" class="day_month inputbox" autocomplete="off" maxlength="2" name="form:dateOfBirth_date" size="2" type="text" title="Please enter the day of your birth" onkeyup="autoTabMaxLength(event,this, 'form:dateOfBirth_month')" value="DD" />Â / <input id="form:dateOfBirth_month" class="day_month inputbox" autocomplete="off" maxlength="2" name="form:dateOfBirth_month" size="2" title="Please enter the month of your birth" type="text" onkeyup="autoTabMaxLength(event,this, 'form:dateOfBirth_year')" value="MM" />Â / <input id="form:dateOfBirth_year" class="year inputbox" autocomplete="off" maxlength="4" name="form:dateOfBirth_year" title="Please enter the year of your birth" size="4" type="text" onkeyup="autoTabMaxLength(event,this, 'form:continue')" value="YYYY" />
+			                    </fieldset>
+			                </li> </ol> 
+					</fieldset>
+			
+					<p class="forgot"><img src="/online365/images/extras/icon_popup.gif" alt="I've forgotten my login details opens up in a new window" /> <a href="/online365/spring/forgotton" target="_blank">I've forgotten my login details</a></p>
+					<p class="forgot">
+						<img src="/online365/images/extras/icon_popup.gif" alt="Not registered, sign up for 365 online" /> 
+						<a href="http://personalbanking.bankofireland.com/online-banking/registration" target="_blank">
+							Not registered, sign up for 365 online
+						</a>
+					</p>
+<script type="text/javascript" src="/online365/spring/com_sun_faces_sunjsf.js"></script>
+<a id="form:continue" href="#" onblur="(isIE6() || isIE7()) ? this.style.border='none' :this.style.outline='none';" onfocus="(isIE6() || isIE7()) ? this.style.border='#000000 dashed 1px' : this.style.outline='#000000 dotted thin';" tabindex="5" onclick="if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form'),{'form:continue':'form:continue'},'');}return false" class="btn_continue">Continue</a>
+						
+					<br class="clear" />						
+		 
+				</div> 
+				<span class="curve"></span>
+
+
+
+      <div class="secure">
+          <h3><img src="/online365/images/extras/icon_popup.gif" alt="Stay safe and secure opens up in a new window" /><a href="/online365/spring/security" target="_blank">Stay safe and secure</a></h3>
+          <p><a href="/online365/spring/security" target="_blank">ATMs in Ireland have recently been targeted in attacks of Cloning or Skimming (the process of capturing card and PIN information via illegal attachments at ATMs). Counterfeit cards are then produced and monies stolen from bank accounts.</a></p>
+      </div>
+			</div>	
+	    </div>
+    </div>
+	<!-- here checking if external page is not null then it opens new window -->
+	      <div class="container">
+	       <div class="bg_white">
+        
+    <div class="ad_left">
+    	<img src="../images/supp_images/HOUSE1.jpg" alt="Picture of home" title="Picture of home" />
+		<h2><a href="http://personalbanking.bankofireland.com/insurance/home-insurance/">Home Insurance</a></h2>
+	    <p><a href="http://personalbanking.bankofireland.com/insurance/home-insurance/">Want to lighten your home insurance costs? We offer one of the most comprehensive home insurance policies on the market.</a></p>
+	    <a href="http://personalbanking.bankofireland.com/insurance/home-insurance/" class="btn_go_login">Get a quote today</a>
+    </div>
+     
+    <div class="ad_right">
+    	<img src="../images/supp_images/wedding.jpg" alt="Picture of a Bride" title="Picture of a Bride" />
+		<h2><a href="http://personalbanking.bankofireland.com/savings/regular-saver/save-to-borrow/">Save to Borrow</a></h2>
+        <p><a href="http://personalbanking.bankofireland.com/savings/regular-saver/save-to-borrow/">Designed to help you build up a savings habit and also support a future borrowing requirement, if needed in the future.
+        </a></p>
+        <a href="http://personalbanking.bankofireland.com/savings/regular-saver/save-to-borrow/" class="btn_go_login">Find out more</a>
+	</div> 
+	       </div>
+
+    <div class="hr_half"></div>
+
+    <div class="news">
+        <h3><a href="https://personalbanking.bankofireland.com/online-banking-demo/">365 online demo</a></h3>
+        <h4><a href="https://personalbanking.bankofireland.com/online-banking-demo/">Need help with internet banking?</a></h4>
+        <p>View our interactive demo for a step-by-step guide to 365 online.</p>
+        <a href="https://personalbanking.bankofireland.com/online-banking-demo/">Find out more</a>
+    </div>
+
+	<br class="clear" />
+
+	<div class="container">
+	<div class="hr_blue"></div>
+
+	<div id="footer">
+	<span class="server">J1
+	</span>
+	<ul>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="About Us opens up in a new window" /> <a href="/online365/spring/about" target="_blank">About
+		Us</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Security opens up in a new window" /> <a href="/online365/spring/security" target="_blank">Security</a>
+		|</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Privacy Policy opens up in a new window" /> <a href="/online365/spring/privacy" target="_blank">Cookie and Privacy Policy</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Terms and Conditions opens up in a new window" /> <a href="/online365/spring/termsAndConditions" target="_blank">Terms and Conditions</a> |</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="FAQs opens up in a new window" /> <a href="/online365/spring/faqs" target="_blank">FAQs</a>
+		|</li>
+		<li><img src="/online365/images/extras/icon_popup.gif" alt="Accessibility opens up in a new window" /> <a href="/online365/spring/accessibility" target="_blank">Accessibility</a></li>
+
+	</ul>
+	
+	</div>
+	</div><div id="form:j_id67:j_id82:contactPanel" style="display: none;"><input autocomplete="off" id="form:j_id67:j_id82:contactPanelOpenedState" name="form:j_id67:j_id82:contactPanelOpenedState" type="hidden" /><div class="rich-modalpanel sortable" id="form:j_id67:j_id82:contactPanelContainer" style="position: absolute; display: none; z-index: 100; background-color: inherit;"><div class="rich-mpnl-mask-div-opaque rich-mpnl-mask-div" id="form:j_id67:j_id82:contactPanelDiv" style="z-index: -1;"><button class="rich-mpnl-button" id="form:j_id67:j_id82:contactPanelFirstHref"></button></div><div class="rich-mpnl-panel"><div class="rich-mp-container" id="form:j_id67:j_id82:contactPanelCDiv" style="position: absolute; left: 0px; top: 0px; z-index: 9;"><div class="rich-mpnl-shadow" id="form:j_id67:j_id82:contactPanelShadowDiv"></div><div class="rich-mpnl-ovf-hd rich-mpnl-trim rich-mpnl-content" id="form:j_id67:j_id82:contactPanelContentDiv"><div class="rich-mpnl-text rich-mpnl-controls ">
+				<a href="#" id="hideContactUs" class="calc_close">Close</a><script type="text/javascript">Richfaces.componentControl.attachAvailable('#hideContactUs','onclick','#form\\:j_id67\\:j_id82\\:contactPanel','hide')</script></div><table border="0" cellpadding="0" cellspacing="0" class="rich-mp-content-table" id="form:j_id67:j_id82:contactPanelContentTable" style="height: 100%; width: 100%;"><tr style="height: 1%;"><td class="rich-mpnl-header-cell"><div class="rich-mpnl-text rich-mpnl-header " id="form:j_id67:j_id82:contactPanelHeader" style="white-space: nowrap;">
+				<h2>Contact Us</h2></div></td></tr><tr style="height: 99%"><td class="rich-mpnl-body" valign="top">
+		
+		<div class="container">
+   			<div class="content">
+       			<div class="height">
+           			<a name="content"></a>
+         			<br class="clear" />
+					<h2 class="contact_details">From Republic of Ireland:   <span>0818 365 365</span></h2>
+					<h2 class="contact_details">From Northern Ireland:          <span> 0845 7 365 555</span></h2>
+					<h2 class="contact_details">From Great Britain:            <span>0845 7 365 333</span></h2>
+					<h2 class="contact_details">Outside these locations:      <span>+ 353 1 404 4000</span></h2>
+					<p>
+						<strong>Opening Hours:</strong> 8am to Midnight, Monday to Friday or 10am to 2pm on Saturdays
+							(excluding Bank / Public Holidays).
+					</p>
+					<br class="clear" />
+				</div>
+			</div>    
+		</div></td></tr></table></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerN" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerE" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerS" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerW" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerNWU" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerNEU" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerNEL" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerSEU" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerSEL" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerSWL" style="height: 40px; width: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerSWU" style="width: 40px; height: 4px;"></div><div class="rich-mpnl-resizer" id="form:j_id67:j_id82:contactPanelResizerNWL" style="height: 40px; width: 4px;"></div></div></div><div class="rich-mpnl-mask-div rich-mpnl-mask-div-transparent" id="form:j_id67:j_id82:contactPanelCursorDiv" style="z-index: -200;"><button class="rich-mpnl-button" id="form:j_id67:j_id82:contactPanelLastHref"></button></div><script type="text/javascript">new ModalPanel('form:j_id67:j_id82:contactPanel',
+				{
+					width: 700,
+					height: 300,
+
+					minWidth: -1,
+					minHeight: -1,
+
+					resizeable: true,
+					moveable: true,
+
+					left: "auto",
+					top: "auto",
+
+					zindex: 100,onresize: '',onmove: '',onshow: '',onhide: '',onbeforeshow: '',onbeforehide: '',
+					domElementAttachment: "",				
+					keepVisualState: false,
+					showWhenRendered: false,
+					selectBehavior: "disable",
+
+					autosized: false,
+					overlapEmbedObjects: false});</script></div><script type="text/javascript"></script></div>
+	     </div>
+	            
+				<div class="container">
+					<p>Bank of Ireland is regulated by the Central Bank of Ireland in Ireland. Bank of Ireland (UK) plc is authorised and regulated by the Financial Services Authority.</p>
+					<p> Advertising on this page relates to ROI products &amp; services. For details of NI/GB products &amp; services, please click here <a href="http://www.bankofireland.co.uk/">www.bankofireland.co.uk</a> </p>
+				</div><input type="hidden" autocomplete="off" name="form" value="form" /><input type="hidden" autocomplete="off" name="autoScroll" value="" /><input type="hidden" autocomplete="off" name="form:j_idcl" value="" /><input type="hidden" autocomplete="off" name="form:_link_hidden_" value="" /><script type="text/javascript">function clear_form() {
+_clearJSFFormParameters('form','',['form:j_idcl','form:_link_hidden_']);
+}
+function clearFormHiddenParams_form(){clear_form();}
+function clearFormHiddenParams_form(){clear_form();}
+clear_form();</script><input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="e1s1" autocomplete="off" /></form>
+        </body>
+</html>

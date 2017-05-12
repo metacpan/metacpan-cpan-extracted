@@ -1,0 +1,21 @@
+[%- IF status_messages.size -%]
+<tr id="[% css_prefix _ form.name %]_messageblock_tr" class="[% css_prefix -%]messageblock_tr">
+<td colspan="2" id="[% css_prefix _ form.name %]_messageblock_td" class="[% css_prefix -%]messageblock_td">
+    [%- FOREACH message IN status_messages -%]
+    <span class="[% css_prefix -%]message [% css_prefix _ form.name %]_message">[% message %]</span><br/>
+    [%- END -%]
+</td>
+</tr>
+[%- END -%]
+[%- IF error_messages.size -%]
+<tr id="[% css_prefix _ form.name %]_errorblock_tr" class="[% css_prefix -%]errorblock_tr">
+<td colspan="2" id="[% css_prefix _ form.name %]_errorblock_td" class="[% css_prefix -%]errorblock_td">
+    [%- FOREACH field IN form.field_order -%]
+    [%- errors = error_messages.$field %]
+    [%- FOREACH message IN errors -%]
+    <span class="[% css_prefix -%]error [% css_prefix _ form.name %]_error">[% message %]</span><br/>
+    [%- END -%]
+    [%- END -%]
+</td>
+</tr>
+[%- END -%]

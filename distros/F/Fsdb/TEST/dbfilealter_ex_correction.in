@@ -1,0 +1,4 @@
+#fsdb -F S name id test1
+a student  1  80
+b nice  2  70
+c all  3  65

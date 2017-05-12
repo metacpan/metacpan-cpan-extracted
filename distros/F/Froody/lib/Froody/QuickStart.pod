@@ -1,0 +1,428 @@
+=head1 NAME
+
+Froody::QuickStart - the froody Quick Start tutorial
+
+=head1 DESCRIPTION
+
+At the core of Froody is the concept of Froody Methods, methods that you
+can call remotely over the web.
+
+For example, we have a hypothetical method called "examples.myapi.greet" that
+can return us greetings.  We need to pass it one parameter, called "who", that
+is the name of the person we're greeting. These two things are passed as CGI
+parameters to a froody endpoint (a cgi script, a mod_perl server, whatever)
+sitting at "http://myserver.com/fe"
+
+  bash$ lwp-request 'http://myserver.com/fe?method=examples.myapi.greet&who=Mark'
+  <?xml version="1.0" encoding="utf-8"?>
+  <rsp stat="ok">
+    <greeting>Hello Mark!</greeting>
+  </rsp>
+
+We get a chunk of XML back that is the result of calling the function.
+
+=head1 Hello World Server Example
+
+The easiest way to show you how Froody works is to expand the above example and
+demonstrate how we might implement that on the server.
+
+=head2 Writing The API
+
+Firstly we have to define a class that builds an API - a way of describing what
+methods can be called on our endpoint, along with what they expect to be passed
+and what they're going to return.  This is normally done by subclassing
+Froody::API::XML and implementing C<xml> to return a block of XML that describes 
+the method(s):
+
+  package MyAPI;
+  use base qw(Froody::API::XML);
+  1;
+  
+  sub xml {
+  return <<"XML";
+  <spec>
+   <methods>
+     <!-- each method that we can call via the API needs one of these -->
+     <method name="examples.myapi.greet">
+       
+       <!-- the parameters we pass to the method -->
+       <arguments>
+         <argument name="who" type="text" optional="0" />
+       </arguments>
+       
+       <!-- an example response, what the returned XML will look like -->
+       <response>
+         <greeting>Hello World!</greeting>
+       </response>
+       
+     </method>
+   </methods>
+  </spec>
+  XML
+  }
+
+Note that I've omitted the optional documentation sections that should normally
+be included (the C<< <errors> >> and C<< <description> >> sections.)
+
+Though this seems like a lot of stuff to have to write upfront, it saves us a
+lot of work in the Perl code we're going to write later since it allows Froody
+to verify parameters for you and convert your return values to XML
+automatically.
+
+Information on exactly what should be put in an XML spec can be found
+by reading up on L<Froody::API::XML>.
+
+=head2 Writing The Implementation
+
+Having declared our API we now need to write a class that implements it - i.e.
+write the code that actually does the work of calculating the greeting.
+
+This is done like so:
+
+  package SayHello;
+  use base qw(Froody::Implementation);
+  
+  # say what we implement.
+  sub implements { MyAPI => "examples.myapi.*" }
+  
+  sub greet
+  {
+    my $self = shift;
+    my $args = shift;
+    return "Hello $args->{who}!";
+  }
+
+Note that we don't have to do any checks to see if we've got the required
+parameter C<< $args->{who} >> and returning an error instead, or wrapping our
+arguments in the right sort of XML, or even worrying about encoding the output
+or escaping anything that is going to cause our XML.  This is all done for us
+by Froody.
+
+More infomation on how we marry the implementations to the APIs can be
+found by reading the docs for L<Froody::Implementation>.  The way the
+data structure your methods returns is converted to XML is documented in
+L<Froody::Invoker::Implementation>
+
+=head2 Testing the Code From The Command Line
+
+When you install the Froody distribution, you get the froody client command
+line tool installed .  This can be used to test the method call
+
+  bash$ froody -MSayHello examples.api.greet who "Mark"
+  <?xml version="1.0" encoding="utf-8"?>
+  <rsp stat="ok">
+    <greeting>Hello Mark!</greeting>
+  </rsp>
+
+The C<-M> option tells C<froody> to load a module.  If a Froody::Implementation
+has been loaded into memory then the client will automatically use that to make
+local froody calls against.
+
+=head2 Setting up the Webserver
+
+Local implementations are all very well and good, but the point is to make
+Froody methods avalible across the web.  To do this we need to set up our
+endpoint so that it knows about the Froody Methods it's supposed to serve.
+
+For performance reasons this should really be run from a mod_perl handler,
+which can be configured with a section in your httpd.conf like so:
+
+  PerlModule SayHello;
+  PerlModule Froody::Server;
+  
+  <Location /fe>
+    SetHandler perl
+    PerlHandler Froody::Server->handler
+  </Location>
+
+This is all documented in L<Froody::Server>.  If you need a little more control
+over your server setup (i.e. you need multiple Froody endpoints for any one
+Apache) then you should read L<Froody::Server>.
+
+For testing or an infrequently called script, we could run our endpoint as
+a CGI script:
+
+  #!/usr/bin/perl
+  use warnings;
+  use strict;
+  use Froody::Server;
+  Froody::Server->dispatch();
+
+Either way, we can now make calls to our server:
+
+  bash$ lwp-request 'http://myserver.com/fe?method=example.myapi.greet&who=Mark'
+  <?xml version="1.0" encoding="utf-8"?>
+  <rsp stat="ok">
+    <greeting>Hello Mark!</greeting>
+  </rsp>
+
+=head2 Using Froody as a Client
+
+Froody is useful as a client as well as a server:
+
+  # create a client and then tell it where to get its methods from
+  my $client = Froody::Dispatch->new();
+  $client->add_endpoint("http://myserver.com/fe");
+  
+  # call the method on the remote server
+  my $response = $client->dispatch( 
+    method => "example.myapi.greet", 
+    params => { who => "Mark" },
+  );
+
+  # print out the same XML as above
+  print $response->render;
+  
+There are several different response objects, and the C<as_*> methods
+can be used to turn them into one another.  For example:
+
+  use Froody::Response::PerlDS;
+  my $perl_ds = $response->as_perlds;
+
+  use Data::Dumper;
+  print Dumper $perl_ds->content;
+
+Prints:
+
+  $VAR1 = {
+    name  => "greeting"
+    value => "Hello Mark!"
+  };
+
+Mostly you want to use the Froody::Response::Terse response that returns the
+data in the same format as you passed out of the original Perl method back
+on the server:
+
+  use Froody::Response::Terse;
+  my $terse = $response->as_terse;
+
+  use Data::Dumper;
+  print $terse->content;  # prints "Hello Mark!"
+
+We've added a shortcut for this, so all you need to do is:
+
+  my $response = $client->call('example.myapi.greet', who => 'Mark');
+
+which is equivalient to:
+
+  my $rsp = $client->dispatch( 
+    method => "example.myapi.greet", 
+    params => { who => "Mark" },
+  );
+  my $response = $rsp->as_terse->content;
+
+
+The terse response makes use of Reflection. The 'add_endpoint()' method calls
+the server to ask it what methods it provides and what the responses look like.
+It then uses these specifications (like the one we declared at the top of this
+document) to do the conversion back to the expected response.
+
+=head1 A More Complicated Example
+
+Of course, there would be little point returning XML if all we were going to do was
+return simple strings.  We can return much more complicated data structures:
+
+  package Corelist::API;
+  use base qw(Froody::API::XML);
+  1;
+  
+  sub xml {
+    return <<'XML';
+    <spec>
+     <methods>
+      <method name="froody.demo.core">
+      <description>When modules were distributed with core Perl</description>
+      <arguments>
+        <argument name="modules" type="csv" optional="0" />
+      </arguments>
+      <response>
+        <core_list module_core_list_version="1.23">
+           <module name="Foo::Bar" first_in="5.7">
+             <distribution perl_version="5.7" module_version="1.2"/>
+             <distribution perl_version="5.8" module_version="1.2"/>         
+           </module>
+           <module name="Foo::Baz" first_in="5.7">
+             <distribution perl_version="5.7" module_version="1.2"/>
+             <distribution perl_version="5.8" module_version="1.2"/>         
+           </module>
+           <serveradmin>
+             <name>Mark Fowler</name>
+             <email>mark@twoshortplanks.com</email>
+           </serveradmin>
+        </core_list>
+      </response>
+      </method>
+     </methods>
+    </spec>
+  XML
+  }
+
+We now have elements that are contained within elements, attributes, and things
+that appear multiple times.  I'll explain why we had to do that later.
+
+First note that we've defined the argument type as C<csv>.  This means that it
+expects the data passed to it via the CGI parameter to be a comma seperated
+list. So if we call this method like so
+
+  http://server.com/fe?method=examples.perl.core&modules=Foo::Bar,Foo::Baz
+
+The arguments (the second parameter) that's passed to the method we define will
+be:
+
+   {
+     modules => [ "Foo::Bar", "Foo::Baz" ]
+   }
+
+If there's only one value in our URL:
+
+  http://server.com/fe?method=exaples.perl.core&modules=Foo::Bar
+
+We'll still get a one item array:
+
+   {
+     modules => [ "Foo::Bar" ]
+   }
+
+The data structure we want to return is not nearly as complicated as the
+XML we've defined above.
+
+  { 
+    module_core_list_version => "1.31",
+    module => [
+      {
+        name => "Foo::Bar",
+        first_in => "5.7",
+        distrbution => [
+          { perl_version => "5.7", module_version => "1.2" },
+          { perl_version => "5.8", module_version => "1.2" },          
+        ],
+      },
+      {
+        name => "Foo::Baz",
+        first_in => "5.7",
+        distrbution => [
+          { perl_version => "5.7", module_version => "1.2" },
+          { perl_version => "5.8", module_version => "1.2" },
+        ],
+      },
+    ],
+    server_admin => { 
+       name => "Mark Fowler",
+       email => 'mark@twoshortplanks.com'
+    }
+  }
+
+Note how we haven't specified which hash keys above are attributes and which
+contain data to be put in elements - in fact you can't tell what's going to
+turn into an attribute and what's going to turn into a child element by looking
+at the data structure alone.  Froody works out what the right thing to do is by
+comparing the hash keys with the attributes and element names defined in the
+example response.
+
+Froody also works out if something can occur multiple times by examining the
+example response. If you want to return a list of similar items, for example,
+you have to specify it multiple (at least 2) times.
+
+Here's the implementation that can actually create these data structures for us
+(you can find a fully working demo of this example in the C<examples> directory
+in the Froody distribution).
+
+  package Corelist::Implementation;
+  use base qw(Froody::Implementation);
+  use strict;
+  use warnings;
+  1;
+  
+  sub implements { 'Corelist::API' => "froody.demo.core" }
+  
+  use Module::CoreList;
+  sub core
+  {
+     my $self = shift;  # not used
+     my $args = shift;
+  
+     # insert the static server stuff
+     my $ds = { 
+       server_admin => { 
+         name => "Mark Fowler",
+         email => 'mark@twoshortplanks.com',
+       },
+       module_core_list_version => Module::CoreList->VERSION,
+       module => [],
+     };
+         
+     # for each of the modules
+     foreach my $module (@{ $args->{modules} })
+     {
+       my $module_hash = { name => $module, distribution => [] };
+          
+       # what was the first one?
+       if (my $first_in = Module::CoreList->first_release($module))
+         { $module_hash->{first_in} = $first_in }
+     
+       # build the distributions list
+       foreach my $dist (sort { $a <=> $b } keys %Module::CoreList::version)
+       {
+         if (exists $Module::CoreList::version{ $dist }{ $module }) {
+           my $version = $Module::CoreList::version{ $dist }{ $module };
+           $version = "undef" unless defined $version;
+           push @{ $module_hash->{distribution} }, {
+             perl_version => $dist,
+             module_version => $version,
+           };
+         }
+       }
+  
+       push @{ $ds->{module} }, $module_hash;
+     }
+  
+     return $ds;
+  }
+
+
+And now we can test the code with the Froody client:
+
+  bash$ froody -MGetCore examples.perl.core modules Tie::File
+  <?xml version="1.0" encoding="utf-8"?>
+  <rsp stat="ok">
+    <core_list module_core_list_version="2.02">
+      <module first_in="5.007003" name="Tie::File">
+        <distribution perl_version="5.007003" module_version="0.17"/>
+        <distribution perl_version="5.008" module_version="0.93"/>
+        <distribution perl_version="5.008001" module_version="0.97"/>
+        <distribution perl_version="5.008002" module_version="0.97"/>
+        <distribution perl_version="5.008003" module_version="0.97"/>
+        <distribution perl_version="5.008004" module_version="0.97"/>
+        <distribution perl_version="5.008005" module_version="0.97"/>
+        <distribution perl_version="5.008006" module_version="0.97"/>
+        <distribution perl_version="5.008007" module_version="0.97"/>
+        <distribution perl_version="5.009" module_version="0.97"/>
+        <distribution perl_version="5.009001" module_version="0.97"/>
+        <distribution perl_version="5.009002" module_version="0.97"/>
+      </module>
+    </core_list>
+  </rsp>
+
+=head1 BUGS
+
+None known.
+
+Please report any bugs you find via the CPAN RT system.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Froody>
+
+=head1 AUTHOR
+
+Copyright Fotango 2005.  All rights reserved.
+
+Please see the main L<Froody> documentation for details of who has worked
+on this project.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Froody>
+
+=cut
+

@@ -1,0 +1,12 @@
+0.61 Mon, 01 February 2010
+
+Renamed project to File::Find::Declare
+
+0.60 Sat, 30 January 2010
+
+Added new sub routine 'recurse' for setting
+the recursion property after object creation.
+
+0.52 Sat, 30 January 2010
+
+Added this changes file.

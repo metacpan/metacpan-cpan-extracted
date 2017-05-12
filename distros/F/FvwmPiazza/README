@@ -1,0 +1,276 @@
+NAME
+    FvwmPiazza - Fvwm module for tiling windows
+
+VERSION
+    version 0.3001
+
+SYNOPSIS
+    FvwmPiazza
+
+DESCRIPTION
+    This Fvwm module tiles windows in different ways; each "way" is called a
+    layout. Layouts are applied on a per-desktop basis.
+
+  Layouts
+    Layouts can be set in two ways: as a default layout, or on the fly.
+
+    A default layout is set in the config with a "LayoutN" directive.
+
+        *FvwmPiazza: Layout0 Full
+
+    The above means that the default layout for desktop 0 is "Full".
+
+    To set a layout on the fly, you must send a message to the module; this
+    is most easily done by setting a hotkey command for it.
+
+        Key f               A       CM      SendToModule FvwmPiazza Full
+
+    This will set the layout for the current desktop to "Full" when
+    Alt-Ctrl-f is hit.
+
+   Layout Types
+    All layouts have a "max_win" argument, which is the maximum number of
+    windows visible in that layout. For different types of layouts, this set
+    of windows is arranged differently.
+
+    Columns
+            Columns --max_win I<cols>
+
+        Windows are arranged in *cols* columns.
+
+            Columns --max_win I<cols> --ratios I<ratios>
+
+        If a *ratios* argument is given, this defines the ratios of the
+        columns. For example, "Columns --cols 2 --ratios 60:40" will give
+        the first column 60% of the space, and the second column 40% of the
+        space.
+
+    Full
+        All windows are fullscreen.
+
+    Grid
+            Grid --max_win I<grids> --cols I<cols>
+
+        Windows are arranged in a grid of *grids* squares, with *cols*
+        columns. Thus to get a 2x2 grid, the command is "Grid --max_win 4
+        --cols 2".
+
+    Rows
+            Rows --max_win I<rows>
+
+        Windows are arranged in *rows* rows.
+
+            Rows --max_win I<rows> --ratios I<ratios>
+
+        If a *ratios* argument is given, this defines the ratios of the
+        rows. For example, "Rows --max_win 2 --ratios 60:40" will give the
+        first row 60% of the space, and the second row 40% of the space.
+
+    Tall
+            Tall --max_win I<groups>
+
+        Windows are arranged such that the first window is in one column,
+        and the rest of the windows are in (*groups* - 1) rows in the second
+        column.
+
+            Tall --max_win I<groups> --variation Right
+
+        If the argument "--variation Right" is given ("Tall --max_win 3
+        --variation Right" for example) then the arrangement is a
+        mirror-image, with the single-window column being on the right
+        instead of the left.
+
+    Wide
+            Wide --max_win I<groups>
+
+        Windows are arranged such that the first window is in one row, and
+        the rest of the windows are in (*groups* - 1) columns in the second
+        row.
+
+            Wide --max_win I<groups> --variation Bottom
+
+        If the argument "--variation Bottom" is given ("Wide --max_win 3
+        --variation Bottom" for example) then the arrangement is a
+        mirror-image, with the single-window row being on the bottom instead
+        of the top.
+
+    Matrix
+            Matrix --max_win I<groups> --cols I<cols> --rows I<rows> --rows I<rows>
+
+        The *groups* number of windows are arranged in *cols* number of
+        columns, with each column having the corresponding *rows* number of
+        rows. For example "Matrix --max_win 4 --cols 3 --rows 1 --rows 2
+        --rows 1" would have three columns, with one window in the first
+        column, two windows in the second column, and one window in the
+        third column.
+
+  Moving Windows
+    Windows can be moved to the next or previous "group" (e.g. in the Column
+    layout, that would be the next or previous column) with a keystroke.
+
+        Key Left    A       3S      Current (!CirculateHit) SendToModule FvwmPiazza PrevGroup
+        Key Right   A       3S      Current (!CirculateHit) SendToModule FvwmPiazza NextGroup
+
+    The above bindings move a window to the previous group when
+    Mod3-Shift-Left is hit, and to the next group when Mod3-Shift-Right is
+    hit.
+
+    Note that if you move a window directly with the mouse, FvwmPiazza will
+    not notice, and will behave as if the window was still in the same
+    group.
+
+  Changing the number of Groups
+    The number of "groups" in a layout can be increased or decreased on the
+    fly.
+
+        Key less    A       3S      SendToModule FvwmPiazza Decrement 1
+        Key greater A       3S      SendToModule FvwmPiazza Increment 1
+
+    The above bindings decrease the number of groups if Mod3-Shift-less is
+    hit, and increase the number of groups if Mod3-Shift-greater is hit.
+
+  Other Config Settings
+   Exclude
+    This tells FvwmPiazza to ignore windows that match the given regex.
+
+        *FvwmPiazza: Exclude (Gweled|gnome-mastermind|PipeWalker|feh|pho)
+
+EXAMPLES
+  Example Config
+        # =================================================================
+        # FvwmPiazza
+        # =================================================================
+        All (FvwmPiazza) Close
+        DestroyModuleConfig FvwmPiazza: *
+
+        *FvwmPiazza: Exclude (Gweled|gnome-mastermind|PipeWalker|feh|pho|Lurk)
+        *FvwmPiazza: Layout0 Full
+        *FvwmPiazza: Layout1 Tall 3
+        *FvwmPiazza: Layout2 Tall 3
+        *FvwmPiazza: Layout3 Full
+        *FvwmPiazza: Layout4 Tall 3
+        *FvwmPiazza: Layout5 Tall 3
+        *FvwmPiazza: Layout6 Tall 3
+        *FvwmPiazza: Layout7 Tall 3
+        *FvwmPiazza: Layout8 Full
+
+        Module FvwmPiazza
+
+        # Hotkeys
+        Key n               A       3       SendToModule FvwmPiazza "None"
+        Key f               A       3       SendToModule FvwmPiazza Full
+        Key t               A       3       SendToModule FvwmPiazza Tall --max_win 3
+        Key t               A       3S      SendToModule FvwmPiazza Tall --max_win 3 --variation Right
+        Key c               A       3       SendToModule FvwmPiazza Columns --max_win 2
+        Key c               A       3S      SendToModule FvwmPiazza Columns --max_win 3 --ratios 18:64:18
+        Key r               A       3       SendToModule FvwmPiazza Rows --max_win 2
+        Key r               A       3S      SendToModule FvwmPiazza Rows --max_win 2 --ratios 66
+        Key w               A       3       SendToModule FvwmPiazza Wide --max_win 3
+        Key w               A       3S      SendToModule FvwmPiazza Wide --max_win 3 --variation Bottom
+        Key g               A       3       SendToModule FvwmPiazza Grid --max_win 4 --cols 2
+        Key g               A       3S      SendToModule FvwmPiazza Grid --max_win 4 --cols 2 --width_ratio 60 --height_ratio 50
+
+        Key less    A       3S      SendToModule FvwmPiazza Decrement 1
+        Key greater A       3S      SendToModule FvwmPiazza Increment 1
+
+        Key Left    A       3S      Current (!CirculateHit) SendToModule FvwmPiazza PrevGroup
+        Key Right   A       3S      Current (!CirculateHit) SendToModule FvwmPiazza NextGroup
+
+  More Complex Example Config
+        # =================================================================
+        # FvwmPiazza
+        # =================================================================
+        All (FvwmPiazza) Close
+        DestroyModuleConfig FvwmPiazza: *
+
+        *FvwmPiazza: Struts 0 112 24 0
+        *FvwmPiazza: Exclude (Gweled|gnome-mastermind|PipeWalker|feh|pho|Lurk)
+        *FvwmPiazza: Layout0 Full
+        *FvwmPiazza: Layout1 Columns 3
+        *FvwmPiazza: Layout2 Grid 6,3
+        *FvwmPiazza: Layout3 Columns 2
+        *FvwmPiazza: Layout4 Columns 3
+        *FvwmPiazza: Layout5 Columns 3
+        *FvwmPiazza: Layout6 Full
+        *FvwmPiazza: Layout7 None
+
+        Module FvwmPiazza
+
+        # Hotkeys
+        Key n               A       3       SendToModule FvwmPiazza "None"
+        Key f               A       3       SendToModule FvwmPiazza Full
+
+        Key c               A       3       Popup FPMultiColumnMenu
+        Key r               A       3       Popup FPMultiRowMenu
+        Key g               A       3       Popup FPMultiGridMenu
+
+        Key Up              A       3       SendToModule FvwmPiazza Increment 1
+        Key Down            A       3       SendToModule FvwmPiazza Decrement 1
+
+        Key Left            A       3S      Current (!CirculateHit) SendToModule FvwmPiazza PrevGroup
+        Key Right           A       3S      Current (!CirculateHit) SendToModule FvwmPiazza NextGroup
+
+        #------------------------------------------------------------------
+        # Functions
+
+        # Fake multi-keys by defining menus
+        DestroyMenu FPMultiColumnMenu
+        AddToMenu FPMultiColumnMenu
+        + "&2 Columns" SendToModule FvwmPiazza Columns --max_win 2
+        + "&3 Columns" SendToModule FvwmPiazza Columns --max_win 3
+        + "&4 Columns" SendToModule FvwmPiazza Columns --max_win 4
+        + "&Two-Thirds Columns" SendToModule FvwmPiazza Columns --max_win 2 --ratios 66
+
+        DestroyMenu FPMultiRowMenu
+        AddToMenu FPMultiRowMenu
+        + "&2 Rows" SendToModule FvwmPiazza Rows --max_win 2
+        + "&3 Rows" SendToModule FvwmPiazza Rows --max_win 3
+        + "&4 Rows" SendToModule FvwmPiazza Rows --max_win 4
+        + "&Two-Thirds Rows" SendToModule FvwmPiazza Rows --max_win 2 66
+        + "&Wide" SendToModule FvwmPiazza Wide --max_win 3
+        + "&Bottom Wide" SendToModule FvwmPiazza Wide --max_win 3 Bottom
+        + "&a) Two-Thirds Wide" SendToModule FvwmPiazza Wide --max_win 3 --height_ratio 2:1
+
+        DestroyMenu FPMultiGridMenu
+        AddToMenu FPMultiGridMenu
+        + "&4 Grid" SendToModule FvwmPiazza Grid --max_win 4 --cols 2
+        + "&6 Grid" SendToModule FvwmPiazza Grid --max_win 6 --cols 3
+        + "Tall &Left (1-2)" SendToModule FvwmPiazza Tall --max_win 3
+        + "Tall &Right (2-1)" SendToModule FvwmPiazza Tall --max_win 3 Right
+        + "&a) Tall Left (1-3)" SendToModule FvwmPiazza Tall --max_win 4
+        + "&b) Tall Right (3-1)" SendToModule FvwmPiazza Tall --max_win 4 Right
+        + "&c) Matrix (1-2-1)" SendToModule FvwmPiazza Matrix --max_win 4 --rows 1 --rows 2 --rows 1 --cols 3
+
+REQUIRES
+        FVWM::Module
+        Class::Base
+
+INSTALLATION
+  Global
+        perl Build.PL
+        ./Build
+        ./Build test
+        sudo ./Build install
+
+  Personal
+    Since this module is only used by Fvwm, it makes equal sense to install
+    it in your own .fvwm directory.
+
+        mkdir $HOME/.fvwm/modules
+        cp scripts/FvwmPiazza $HOME/.fvwm/modules
+        mkdir $HOME/.fvwm/perllib
+        cp -a lib/FvwmPiazza $HOME/.fvwm/perllib
+
+BUGS
+    Please report any bugs or feature requests to the author.
+
+AUTHOR
+        Kathryn Andersen (RUBYKAT)
+        perlkat AT katspace dot org
+
+COPYRIGHT AND LICENCE
+    Copyright (c) 2009-2011 by Kathryn Andersen
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

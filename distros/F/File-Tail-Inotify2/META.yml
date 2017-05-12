@@ -1,0 +1,41 @@
+---
+abstract: 'Simple interface to tail a file using inotify.'
+author:
+  - 'Yoshihiro Sasaki, <ysasaki at cpan.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Tail-Inotify2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  File::Tail::Inotify2:
+    file: lib/File/Tail/Inotify2.pm
+    version: 1.00
+requires:
+  Linux::Inotify2: 1.22
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/ysasaki/p5-file-tail-inotify2/issues
+  homepage: https://github.com/ysasaki/p5-file-tail-inotify2
+  repository: git://github.com/ysasaki/p5-file-tail-inotify2.git
+version: 1.00
+x_contributors:
+  - 'ysasaki <ysasaki@idac.co.jp>'
+  - 'ysasaki <aloelight@gmail.com>'

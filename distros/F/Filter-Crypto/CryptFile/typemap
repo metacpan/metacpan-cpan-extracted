@@ -1,0 +1,41 @@
+#===============================================================================
+#
+# CryptFile/typemap
+#
+# DESCRIPTION
+#   XS typemap file.
+#
+# COPYRIGHT
+#   Copyright (C) 2004 Steve Hay.  All rights reserved.
+#
+# LICENCE
+#   You may distribute under the terms of either the GNU General Public License
+#   or the Artistic License, as specified in the LICENCE file.
+#
+#===============================================================================
+
+#===============================================================================
+# TYPEMAP SECTION
+# How to map a given C type to a Perl value.
+#===============================================================================
+
+TYPEMAP
+
+FILTER_CRYPTO_MODE_EX   T_IV
+
+#===============================================================================
+# INPUT SECTION
+# How to translate Perl values ($arg) into variables ($var) of a given C type
+# ($type).
+#===============================================================================
+
+INPUT
+
+#===============================================================================
+# OUTPUT SECTION
+# How to translate variables ($var) of a given C type to Perl values ($arg).
+#===============================================================================
+
+OUTPUT
+
+#===============================================================================

@@ -1,0 +1,383 @@
+#!/usr/local/bin/perl
+
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+    if 0;    # not running under some shell
+
+package main;
+
+use vars qw($VERSION);
+
+BEGIN {
+    $VERSION              = '0.16.7';
+    $FCGI::Spawn::Default = 'FCGI::Spawn';
+}
+
+=pod
+
+=head1 NAME
+
+fcgi_spawn - FastCGI server for CGI-like Perl applications effective multiprocessing, the executable daemon of FCGI::Spawn
+
+=head1 DESCRIPTION
+
+Daemon enables you to launch Perl applications originally written for CGI environment. To accomplish POST input you should need to patch your CGI.pm with the patch supplied in the FCGI::Spawn distribution, or the application, in some rare cases (like the Bugzilla), the both.
+Daemon is intended to be launched  as a root ( C<uid = 0> ) user, although you may run it as a target user itself.
+You need the FastCGI-capable web server capable to work with other ('external') daemons by a FastCGI protocol: the 'FastCGI requester'.
+Many features supported like the fine-tune on the number of processes, maximum number of requests served by the each process in its lifetime, more on this on L<FCGI::Spawn>, also L<tested environments|FCGI::Spawn/"Tested Environments"> and comparison to the well-known L<Perl runtime environments|FCGI::Spawn/"Why not mod_perl/mod_perl2/mod_fcgid?">.
+Main focus of the daemon is the system administration convinience and adaptation to the OS distribution(s), as it is seen from:
+
+=head1 SYNOPSIS
+
+The necessary configuration for fcgi_spawn is to be located in the dedicated directory, specified by -c command line parameter (by default the /usr/local/etc for FreeBSD/Slackware packages; /etc for FHS-compatible Linux/Cygwin packages ( RedHat, Debian, etc. ) . This includes the configuration file C<fcgi_spawn.conf>, and optional preload scripts aimed similarly as the C<startup.pl> of the mod_perl: to preload the modules before the process to fork, and perform necessary initialization steps like environment variables setup.
+
+=head2 Command line options
+
+Consider all of them to be mandatory:
+
+  -c <config_path> Full path to the directory of configuration file, the
+fcgi_spawn.conf ( See 'Configuration File' below );
+  -p <pid_file>    Full path and name of the process ID file name;
+  -l <log_file>    Full path and name  of the log file name;
+  -u <user>        Name of the system user to run the FastCGI applications;
+  -g <group>       Name of the system group to run the FastCGI applications;
+  -s <socket>      Name of the local UNIX socket to be created by the daemon to
+listen for incoming connections. You should try :number or address:number or
+host:number as a value of this option in teh case the TCP connectivity is
+wanted;
+
+Those are optional:
+
+  -e               Redefine the exit() Perl builtin function to prevent the
+spawned persistent processes from exiting and starting again when your
+application(s) exit;
+  -pl              Evaluate the:
+
+=head2 Preload Scripts from the configuration directory
+
+You can use preload scripts for modules preload and initialization, similarly to the what is the apache's C<startup.pl> is attended for in the mod_perl's world , although C<fcgi_spawn> doesn't execute them from the root ( C<uid = 0> ) user. ( while apache does ).
+Typically, good results are achieved when you try to execute the dummy index page of the web aplication in them, because it loads the most necessary modules of the application. If you have no errors when execute that perl script ( obviously C<index.pl> or C<index.cgi> depending on your application ) as a C<fcgi_spawn>'s target user and group ( specified with C<-u> and C<-g> options ), you should give it a try. Thing to beware at this point is: environment variables cause C<fcgi_spawn> clears the all of the environment for security purposes.
+
+Preload scripts are to be located in the configuraion directory with the names C<preload_nonprepared_XX.pl> and C<preload_prepared_XX.pl>, respectively. The C<XX> here means a number of the execution sequence, as you may wish to C<use SomeModule> on the followed of scripts and have its functionality on the scripts following after those. The difference between non- and prepared scripts is: the multi-processing occurs to happen in between of them ( L<FCGI::Spawn/prepare> ). That means that the 'nonprepared' scripts are the best place to pre-load your applications' modules, but the I<handles> like the data files, sockets, database handles, etc. can exist only per single process and therefore should be established in the 'prepared' scripts.
+
+Predefined symbols for preload scripts are:
+
+=over
+
+=item $spawn
+
+the L<FCGI::Spawn|FCGI::Spawn> object.
+
+It is useful to do the trick like this for your CGI app:
+
+        $FCGI::Spawn::fcgi = new CGI;
+        $spawn->callout( '/path/to/your/CGI/app.pl', $FCGI::Spawn::fcgi );
+        undef $FCGI::Spawn::fcgi;
+
+( C<CGI.pm.patch> supplied in the source package is required for this to work best. )
+This loads the most of your application's code into memory in the 'nonprepared' script before the daemon to fork() which is the main to know about what the L<FCGI::Spawn's prepare|FCGI::Spawn/prepare> is.
+
+=item CALLED_OUT
+
+the label to go to with the exit() Perl builtin redefined ( '-e' command line parameter ).
+
+Should be contained in the code reference supplied as a L<callout|FCGI::Spawn/new({hash parameters})> property of the $spawn, the C<FCGI::Spawn object>. This is to keep the exit()'ed CGI application from exiting the FastCGI connection C<accept()> loop before C<max_requests> processed. The code use this label like this:
+ 
+        $spawn->{ callout } =  sub{ do shift;
+        CALLED_OUT: eval ' $Bugzilla::_request_cache = { }; '
+          if defined( $Bugzilla::_request_cache ) and scalar keys %{ $Bugzilla::_request_cache };
+        };
+
+=back
+
+=item $OURS
+
+Hash reference to keep scalar variables in between preload eval()s. Those are to be restored in preload scripts like this:
+
+				map{ ${ $main::{ $_ } }
+				  		= $OURS->{  $_ } ;
+				} qw/webguiRoot bugzillaRoot skybillRoot/;
+
+=back
+
+All of the preload scripts, if any exist, are eval()'ed after the C<$spawn> is initialized with the values from:
+
+=head2 Configuration File
+
+C<fcgi_spawn.conf>, to be read from the configuration directory specified with C<-c> command line parameter, should contain the values of the L<FCGI::Spawn|FCGI::Spawn> object constructor, method "L<new|FCGI::Spawn/new>", if those need to differ from the defaults. The exception is the C<callout> parameter which is not a constant but the CODE reference and should be set up in the C<preload_noprepared> scripts.
+
+Syntax is: spaces and tabs at the begin of the line are ignored, the C<#> symbol before the rest means this line is ignored as a comment too, key and value are separated with the space(s) or tab(s) all on the same line, and if the value is multiple ( same way separated ) values, it is treated as an array reference ( wanted for C<sock_chown> parameter ).
+
+Sample configuration file, C<fcgi_spawn.conf.sample>, is provided in the source distribution.
+
+=head1 Typical CGI Applications with C<fcgi_spawn>
+
+C<FCGI::Spawn>, and therefore C<fcgi_spawn>, are able to work in Unix and Cygwin environments, with 'properly' written CGI applications, which the most of the well-known CGI applications are. This means: no much assign of the global variables, incapsulation of the code in the C<Namespace::sub()>s at least, and so on.
+
+Care should be taken about file and database handles closing and networking sockets disconnection because the C<END{}> block of your Perl application is unlikely to be executed automatically, like it does in true CGI application. You should refer to Mod_Perl code guides in Chapter 6 of Practical mod_perl book: L<http://modperlbook.org/pdf/ch06.pdf> Commonly, if your CGI application runs well with the typical C<PerlRun> and C<Registry> environments of the Mod_Perl, it should with the C<fcgi_spawn> ( and C<CGI.pm.patch> supplied ), too. At least as the examples below do:
+
+=head2 WebGUI.org
+
+Till version 6.9 supported CGI mode, requires the 'date' system command to be present in the PATH. Fix this in preload script. You should C<preload_nonprepared> your C<index.pl> with the C<$spawn>'s ->L<callout|FCGI::Spawn/callout>, too. Demo is: L<http://alpha.vereshagin.org>.
+
+=head2 Skybill
+
+Traffic accounting system was rewritten a bit, as you can see from L<http://skybill.sf.net>. It was ( and in many aspects is ) my old dummy code but it's to show that even that is able to be C<fcgi_spawn>-friendly. You may want to use the L</FCGI::Spawn/xinc> feature not only to cache the XSLT object between request but to share it among fork()ed processes, it is accomplished with callout of the index.pl on your C<preload_nonprepared> script automatically. Demo is: L<http://skybill.vereshagin.org>.
+
+=head2 Bugzilla
+
+Got to know satisfaction: this was probably a worst evil code ever seen. Despite it has no problems with mod_perl, that required many tricks to perform and here is the scoop:
+
+=over
+
+=item Many exit()s on the blocks
+
+Requires the exit() to be redefined with C<-e> command line switch for C<fcgi_spawn>, and the C<CALLED_OUT> label to be crafted like it is already described here.
+
+=item CGI.pm ancesting
+
+Requires the both patches to be applied, on C<CGI.pm> amd C<Bugzilla/CGI.pm> .
+
+=item Request caching
+
+Bugzilla's own request cache cleans only if the mod_perl is used specifically. Same about the C<CALLED_OUT> here.
+
+=item Environment cleaning
+
+As an evil of L<Date::Manip|Date::Manip> ( I myself hate it too, since the C<DateTime.pm> infrastructure is much better ), and thus the WebGUI.org too, the Bugzilla can make your system commands unavailable from your applications on your PATH environment variable. This is why you should also enable the C<save_env> feature on C<fcgi_spawn.conf>, if it is not enabled in L<FCGI::Spawn|FCGI::Spawn> by default.
+
+Also, in some cases the Bugzilla's CGI programs use to take $0 instead of $ENV{ SCRIPT_NAME } which makes the URLs generated pointless.
+
+=back
+
+Demo is located at:
+
+=head1 BUGS And TODOs
+
+L<http://bugs.vereshagin.org/product/FCGI%3A%3ASpawn>
+
+Adequate reports are accepted.
+
+=head1 Runtime Control
+
+Daemon is supplied with POSIX signal handling: C<USR1> makes it to reopen the log file, and every other signal is passed as is to the actual L<FCGI::ProcManager|FCGI::ProcManager> process.
+
+=head1 LICENSE
+
+LGPL, as of the MANIFEST file in L<FCGI::Spawn|FCGI::Spawn>'s CPAN distribution. More info on fcgi_spawn at: L<http://fcgi-spawn.sf.net>.
+
+=cut
+
+use strict;
+use warnings;
+
+our $OURS = {};
+my ( $config_path, $pid_file, $log_file, $user, $group, $redefine_exit, );
+my $preload = 0;
+
+unless ( scalar @ARGV ) {
+    print "Usage help: $0 -h\n";
+    CORE::exit;
+}
+while ( my $arg0 = shift @ARGV ) {
+    if ( $arg0 eq '-c' ) {
+        $config_path = shift @ARGV;
+    }
+    elsif ( $arg0 eq '-p' ) {
+        $pid_file = shift @ARGV;
+    }
+    elsif ( $arg0 eq '-l' ) {
+        $log_file = shift @ARGV;
+    }
+    elsif ( $arg0 eq '-u' ) {
+        $user = shift @ARGV;
+    }
+    elsif ( $arg0 eq '-g' ) {
+        $group = shift @ARGV;
+    }
+    elsif ( $arg0 eq '-s' ) {
+        $ENV{FCGI_SOCKET_PATH} = shift @ARGV;
+    }
+    elsif ( $arg0 eq '-e' ) {
+        $redefine_exit = 1;
+    }
+    elsif ( $arg0 eq '-pl' ) {
+        $preload = 1;
+    }
+    elsif ( grep { $arg0 eq $_ } ( '-h', '-?', ) ) {
+        print
+            "Usage:\n\t-h, -?\t\tdisplay this help\n\t-c <config path>\tpath to the config file(s)\n\t-l\t\tlog file\n\t-p\t\tpid file\n"
+            . "\t-u\t\tsystem user name\n\t-g\t\tsystem group name\n\t-s\t\tsocket name with full path\n"
+            . "\t-e\t\tredefine exit builtin perl function\n\t-pl\t\tevaluate the preload scripts\n";
+        CORE::exit;
+    }
+}
+
+BEGIN {
+    $ENV{FCGI_SOCKET_PATH} = "/tmp/spawner.sock"
+        unless defined $ENV{FCGI_SOCKET_PATH};
+    if ( grep { '-e' eq $_ } @ARGV ) {
+        my $cref = sub {
+            if ( 'FCGI::ProcManager' eq scalar caller ) {
+                CORE::exit @_;
+            }
+            else {
+                no warnings;
+                last CALLED_OUT;
+            }
+        };
+        *CORE::GLOBAL::exit = $cref;
+        *CORE::GLOBAL::exit;
+    }
+}
+
+use POSIX qw/setuid setgid setsid/;
+
+if ($redefine_exit) {
+    use subs qw/exit/;
+}
+
+defined( my $pid = fork ) or die "Forking logger: $!";
+if ($pid) {
+    if ( defined $pid_file ) {
+        open( PIDF, ">$pid_file" ) or die "Writing $pid_file: $!";
+        print PIDF "$pid\n";
+        close PIDF;
+    }
+    CORE::exit;
+}
+
+sub re_open_log {
+    my $log_file = shift;
+    close FCGI_SPAWN_LOG if defined fileno FCGI_SPAWN_LOG;
+    open( FCGI_SPAWN_LOG, ">>$log_file" ) or die "Opening log $log_file: $!";
+    *STDOUT = *FCGI_SPAWN_LOG;
+    *STDERR = *FCGI_SPAWN_LOG;
+    open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
+}
+
+my $saved_stderr = *STDERR;
+re_open_log $log_file;
+$SIG{USR1} = sub { re_open_log($log_file); };
+
+defined( my $spawn_pid = fork ) or die "Forking spawn: $!";
+if ($spawn_pid) {
+    map {
+        my $signal = $_;
+        $SIG{$signal} = sub {
+            kill $signal, $spawn_pid;
+
+            #	if( $signal eq 'TERM' ){
+            #		CORE::exit ;
+            #	}
+        };
+    } qw/HUP TERM/;
+    $0 = 'fcgi_spawn';
+    waitpid $spawn_pid, 0;
+    unlink $pid_file;
+    CORE::exit;
+}
+
+my $gid = getgrnam($group);
+die "Get group $group: $!" if $gid == 0;
+setgid($gid);
+$) = "$gid $gid";
+$( = $gid;
+die "Set group $group($gid): $!" if ( $( != $gid ) or ( $) != $gid );
+my $uid = getpwnam($user);
+die "Get user $user: $!" if $uid == 0;
+setuid($uid);
+$> = $uid;
+$< = $uid;
+die "Set user $user($uid): $!" if ( $< != $uid ) or ( $> != $uid );
+
+setsid or die "Setting session: $!";
+%ENV = ();
+
+my $config_file = "$config_path/fcgi_spawn.conf";
+my $conf        = {};
+open( FCGI_CONFIG, "<$config_file" ) or die "Opening $config_file: $!";
+while (<FCGI_CONFIG>) {
+    next if /^\s*(#|$)/;
+    chomp;
+    s/^\s+//g;
+    if ( my ( $key, @val ) = split /\s+/, $_ ) {
+        if ( 1 < scalar @val ) {
+            $conf->{$key} = \@val;
+        }
+        else {
+            $conf->{$key} = shift @val;
+        }
+    }
+}
+close FCGI_CONFIG;
+
+eval "use FCGI::Spawn;";
+die $@ if $@;
+
+$conf->{sock_chmod} = oct( $conf->{sock_chmod} )
+    or die "Not a chmod for socket: " . $conf->{sock_chmod};
+
+my $spawn = FCGI::Spawn->new( $conf, );
+
+my $preloaders = { nonprepared => [], prepared => [], };
+if ($preload) {
+    opendir( my $preloaders_dh, $config_path )
+        or die "Opening path $config_path: $!";
+    while ( my $fn = readdir $preloaders_dh ) {
+        next if grep { $_ eq $fn } qw/. ../;
+        my $full_fn = join '/', $config_path, $fn;
+        next unless -f $full_fn;
+        push( @{ $preloaders->{nonprepared} }, $full_fn )
+            if $fn =~ /^preload_nonprepared_\d+\.pl$/;
+        push( @{ $preloaders->{prepared} }, $full_fn )
+            if $fn =~ /^preload_prepared_\d+\.pl$/;
+    }
+    closedir $preloaders_dh;
+
+    map {
+        $preloaders->{$_} = [
+            map {
+                my $str = '';
+                open( PRELOADER, "<$_" ) or die "Open $_: $!";
+                while (<PRELOADER>) {
+                    $str .= $_;
+                }
+                close PRELOADER;
+                $str;
+                } sort {
+                my ( $anum, $bnum ) = map {
+                    my $c = $_;
+                    $c =~ s/[^\d]//g;
+                    $c;
+                } ( $a, $b );
+                $anum <=> $bnum;
+                } @{ $preloaders->{$_} }
+        ];
+    } keys %$preloaders;
+
+    map {
+        eval $_;
+        die $@ if $@;
+    } @{ $preloaders->{nonprepared} };
+
+}
+
+$spawn->prepare;
+
+if ($preload) {
+    map {
+        eval $_;
+        if ($@) {
+            warn "$@\nterminating PM pid $spawn_pid";
+            kill 'TERM', $spawn_pid;
+            waitpid $spawn_pid, 0;
+            die $@;    # should not happen;
+        }
+    } @{ $preloaders->{prepared} };
+}
+
+*STDERR = $saved_stderr;
+
+$spawn->spawn;
+
+1;

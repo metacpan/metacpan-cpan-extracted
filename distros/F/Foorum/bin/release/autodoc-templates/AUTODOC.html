@@ -1,0 +1,29 @@
+[% INCLUDE html_header.tt2 %]
+
+<ul>
+[% FOR source IN sources %]
+<li><a href="#[% source.moniker %]">[% source.moniker %]</a></li>
+[% END %]
+</ul>
+<hr />
+
+[% FOR source IN sources %]
+    <h2>
+        <a name="[% source.moniker %]">[% source.moniker %]</a>
+        (table [% source.table %])
+    </h2>
+
+    [% INCLUDE columns_table.tt2 %]
+    [% IF source.unique_constraints.size %]
+        [% INCLUDE unique_constraints_table.tt2 %]
+    [% END %]
+    [% IF source.relationships.size %]
+        <br />
+        [% INCLUDE relationship_table.tt2 %]
+    [% END %]
+
+    <hr />
+[% END %]
+
+[% INCLUDE html_footer.tt2 %]
+[%# $Id: AUTODOC.html 22 2007-11-21 15:17:51Z jason $ #%]

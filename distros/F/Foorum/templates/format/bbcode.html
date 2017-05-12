@@ -1,0 +1,50 @@
+[% PROCESS 'config/format.html' %]
+[% c.load_once("jquery/localisation.js") %]
+<script type="text/javascript">
+$(document).ready(function() {
+    $.localise('[% c.config.dir.js %]/site/formatter/ubbhelp', {loadBase: false, language: '[% lang %]'});
+} );
+</script>
+[% c.load_once("site/formatter/ubb.js") %]
+<div class='none'>
+<table align='center'>
+    <tr><td>
+        <select onchange='showfont(this.options[this.selectedIndex].value)' name='font'>
+        [% FOREACH font IN config.all_fonts %]
+        <option style="font-family: [% font %]" value="[% font %]">[% font %]</option>
+        [% END %]
+        </select>
+        <select onchange='showsize(this.options[this.selectedIndex].value)' name='size'>
+        [% FOREACH font_size IN [8 .. 16] %]
+        <option style='font-size: [% font_size %]pt' value='[% font_size %]'>[% font_size %]</font>
+        [% END %]
+        </select>
+        <select onchange='showcolor(this.options[this.selectedIndex].value)' name='color'>
+        [% FOREACH color IN config.all_colors %]
+        <option style="background-color:[% color %];color:[% color %]" value="[% color %]">[% color %]</option>
+        [% END %]
+        </select>
+    <br />
+        <img onclick='bold()' height='22' alt='Bold' src='[% c.config.dir.images %]/bbcode/bold.gif' width='23'>
+        <img onclick='italicize()' height='22' alt='Italicize' src='[% c.config.dir.images %]/bbcode/italicize.gif' width='23'>
+        <img onclick='underline()' height='22' alt='Underline' src='[% c.config.dir.images %]/bbcode/underline.gif' width='23'>
+        <img onclick='center()' height='22' alt='Center' src='[% c.config.dir.images %]/bbcode/center.gif' width='23'>
+        <img onclick='hyperlink()' height='22' alt='Hyperlink' src='[% c.config.dir.images %]/bbcode/url.gif' width='23'>
+        <img onclick='image()' height='22' alt='Image' src='[% c.config.dir.images %]/bbcode/image.gif' width='23'> 
+        <img onclick='quote()' height='22' alt='Quote' src='[% c.config.dir.images %]/bbcode/quote.gif' width='23'>
+        <img onclick='flash()' height='22' alt='Flash' src='[% c.config.dir.images %]/bbcode/swf.gif' width='23'>
+        <img onclick='music()' height='22' alt='Realplayer' src='[% c.config.dir.images %]/bbcode/rm.gif' width='23'>
+        <img onclick='music()' height='22' alt='Media Player' src='[% c.config.dir.images %]/bbcode/wm.gif' width='23'>
+    </td></tr>
+</table>
+</div>
+
+[% content %]
+
+<div class='none'>
+<table align='center'>
+    <tr><td>
+        Mode:<input type="radio" name="mode" value="help" onClick="thelp(1)"> Help <input type="radio" name="mode" value="prompt" checked='yes' onClick="thelp(2)"> Full <input type="radio" name="mode" value="basic"  onClick="thelp(0)"> Basic
+    </td></tr>
+</table>
+</div>

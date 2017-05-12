@@ -1,0 +1,42 @@
+File-Samba version 0.02
+=======================
+
+Version 0.01 -- 5/11/2004
+	-- Initial version of File::Samba
+
+Version 0.02 -- 9/15/2004
+	-- Fixed Data:Dump requirement in Build.PL
+
+
+This module allows for easy editing of smb.conf in an OO way.
+The need arised from openfiler http://www.openfiler.org which at this current
+time setups a smb conf for you, however any changes you made by hand are lost
+when you make change due to the fact it doesnt havea way to edit an existing
+smb.conf but simply creates a new one. This modules allows for any program to
+be ables to extract the current config, make changes nd save the file. Comments
+are lost however on save.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2004 by Salvatore E. ScottoDiLuzio
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

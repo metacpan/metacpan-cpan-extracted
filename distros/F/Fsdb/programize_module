@@ -1,0 +1,55 @@
+#!/usr/bin/perl -w
+
+#
+# modularize_program
+# Copyright (C) 2007 by John Heidemann <johnh@isi.edu>
+# $Id: dbcol 551 2007-11-14 07:07:22Z johnh $
+#
+# This program is distributed under terms of the GNU general
+# public license, version 2.  See the file COPYING
+# in $dblibdir for details.
+#
+
+=head1 NAME
+
+modularize_program - convert a fsdb library to a standalone program
+
+=head1 SYNOPSIS
+
+modularize_program dbcol < lib/Fsdb/Filter/dbcol > bin/dbcol
+
+=head1 DESCRIPTION
+
+Using intimate knowledge of how filter code is layed out,
+we copy it to a stand-alone program that just invokes the filter.
+Thus the filter is the master copy of everything.
+
+=cut
+
+my ($STATE_HEAD, $STATE_POST_CLASS_FUNCTIONS, $STATE_POST_AUTHOR) = (1..20);
+my $state = $STATE_HEAD; 
+my $copying = 1;
+
+my($progname) = @ARGV;
+
+while (<STDIN>) {
+    if ($state == $STATE_HEAD && /^package Fsdb::Filter/) {
+	next;   # silently eat the line
+    } elsif ($state == $STATE_HEAD && /^=head1 CLASS FUNCTIONS/) {
+	print "=cut\n\n";
+
+	print "\n# WARNING: This code is derived from $progname.pm; that is the master copy.\n\n";
+	print 'use Fsdb::Filter::' . $progname . ";\n" .
+	    'my $f = new Fsdb::Filter::' . $progname . '(@ARGV);' . "\n" .
+	    '$f->setup_run_finish;' . "  # or could just --autorun\n" .
+	    "exit 0;\n\n";
+
+	$state = $STATE_POST_CLASS_FUNCTIONS;
+	$copying = 0;
+    } elsif ($state == $STATE_POST_CLASS_FUNCTIONS && /^=head1 AUTHOR/) {
+	print "\n";
+	$state = $STATE_POST_AUTHOR;
+	$copying = 1;
+    };
+    print $_ if ($copying);
+};

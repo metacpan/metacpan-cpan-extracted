@@ -1,0 +1,9 @@
+# This file configures Perl::Critic, which is called by the Dist::Zilla
+# plugin "Test::Perl::Critic" to test code quality.
+
+severity = 3
+
+# Dist::Zilla::Plugin::PkgVersion v4.300034 writes version numbers
+# above "use strict" and "use warnings" lines.  Until this is fixed,
+# exclude the relevant policies distribution-wide.
+exclude = RequireUseStrict RequireUseWarnings

@@ -1,0 +1,52 @@
+
+=pod
+
+=head1 NAME
+
+Foorum::Manual::Configure - configure Foorum
+
+Generally, run bin/setup.pl
+
+=head1 Cache Configure
+
+we have built-in FileCache in foorum.yml
+
+  cache:
+    backends:
+      default:
+        class: 'Cache::FileCache'
+        namespace: 'Foorum'
+        default_expires_in: 600
+
+
+optional: cache_root: '/home/faylandfoorum/cache'
+
+and we can configure Cache::Memcached as backend cache
+
+  cache:
+    backends:
+      default:
+        class: 'Cache::Memcached'
+        servers:
+          - '127.0.0.1:11211'
+        compress_threshold: '10_000'
+        debug: 0
+
+
+See Also L<Catalyst::Plugin::Cache>
+
+=head1 Mail Configure
+
+we have several conf under directory conf/examples/mail for mail.
+
+  * sendmail.yml - under Linux/Unix we recommended this one. cp conf/examples/mail/sendmail.yml conf/mail.yml
+  * SMTP.yml - if u have a SMTP server. cp it as conf/mail.yml and change SMTP server and user/pass
+  * Gmail.yml - if u have no choice, try this.
+
+=head2 See Also
+
+L<Email::Send>
+
+L<Foorum::Manual::INSTALL>, L<Foorum::Manual::TroubleShooting>
+
+=cut

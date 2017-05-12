@@ -1,0 +1,213 @@
+NEXT
+
+    * Retooling Dist::Zilla config for modern times.
+    * (HT: srezic) Fixing missing prereqs in an attempt to fix broken tests
+    * Adding a .travis.yml config to setup CI testing for myself
+
+0.021   February 15, 2015
+
+    * (HT: zoffixznet) Corrected the use of enum to fix deprecation warnings.
+    * (HT: zoffixznet) Fix the use of load_class to fix deprecation warnings.
+    * Replace apply_metaclass_roles with apply_metaroles.
+    * Fix some problems with the way the code is released.
+    * Convert to Test::Class::Moose because Test::Able has not been maintained
+      and because OVID is awesome.
+    * Fix test failures related to _build_label being run too soon on labeled
+      controls. (Fixed by making labels build lazily.)
+
+0.020   September 7, 2010
+
+    * Correcting some POD problems
+    * Removing the sub around legal_options_for_inheritance in
+      Form::Factory::Action::Meta::Attribute::Control as this has been removed
+      in Moose 1.09, in favor of illegal_options_for_inheritance.
+    * Moose 1.09 is required.
+
+0.019   May 21, 2010
+
+    * Correct tests that started failing with Moose 1.02 because Form::Factory
+      mistakenly used "Regexp" as a type, when "RegexpRef" was meant.
+
+0.018   March 23, 2010
+
+    * Added Form::Factory::Process::Role and related changes to make it possible
+      to build form actions by composing roles
+
+0.017   February 23, 2010
+
+    * Added the slot option to fill_on_assignment
+
+0.016   February 18, 2010
+
+    * Added the InitializeControl control feature role
+    * Converting fill_on_assignment to an InitializeControl so that it will work
+      properly with value conversion features
+    * Correcting a bug that broke control value converter features
+    * Correcting some of the documentation
+    * Adding a new test for value conversions
+
+0.015   February 17, 2010
+
+    * COMPATIBIILTTY: Controls no longer have a stashable_keys attribute. It was
+      essentially the same for all controls and should be a metaclass attribute
+      if it needs to be added again in the future.
+    * COMPATIBILITY: Removed the Value role for controls and added a value and
+      default_value attribute directly to Control. All controls have these and
+      current_value() and friends have been updated accordingly.
+    * Added the convert_control_to_value() and convert_value_to_control()
+      methods, which use the control_to_value and value_to_control attributes as
+      well as any features implementing the ControlValueConverter role.
+    * Controls now keep a weak reference to the action to which they belong
+    * Adding a setup_and_render() method as a shortcut for the common rendering
+      tasks
+    * Make fill_on_assignment work with default_value, which is better.
+    * Now using Test::Able::Runner for tests
+
+0.014   January 16, 2010
+
+    * Added the set_attribute_from_control() helper method to
+      Form::Factory::Action
+    * Removed the Str type requirements from controls and related classes. This
+      causes a lot of complications that Form::Factory just doesn't need to
+      worry about. Typing should be handled by the action classes, not the
+      controls. The controls should just cope with whatever they are given (at
+      least that's the theory I'm operating with for the moment).
+    * Updated metadata to include a link to the github repository. (Thanks CPAN
+      Service <cpanservice@chorny.com>)
+    * Correcting some documentation
+
+0.013   January 4, 2010
+
+    * COMPATIBIILTY: The "no_warn" option to the fill_on_assignment feature is
+      now named "no_warning".    
+    * Fixed a problem where feature removal was not working correctly when
+      using the new has_control +name syntax.
+
+0.012   January 2, 2010
+
+    * Adding support for the has_control '+name' syntax to allow sub-classes to
+      override inherited attributes. This allows features to be modified, turned
+      on, and turned off in child classes.
+    * Prefer carp and croak rather than warn and die
+    * Corrected some of the documentation
+
+0.011   January 1, 2010
+
+    * COMPATIBILITY: Break compatability with previous versions in that all
+      checks must explicitly set is_valid on the result to affect validation.
+      Previously, setting an error automatically flagged something as invalid,
+      but this is no longer the case.
+    * Updated the built in features to be more consistent with the control value
+      refactoring that took place in 0.009
+    * Corrected the isa check to a does check on the action attribute of
+      features.
+    * Added the has_current_value() method to controls with values to determine
+      if the control actually contains a value after consumption.
+    * The required control feature depends on has_current_value() now
+      Gathered results will die if you try to gather itself, does not 
+      prevent grandchildren from causing a recursive loop, though
+    * Added more tests and test classes are now run in a random order
+    * Added the clear_state() method to result classes for clearing success,
+      validity, and content attributes
+    * Added the use_feature statement to Form::Factory::Processor for adding
+      form features to forms
+    * Added the require_none_or_all form feature to allow controls to be grouped
+      such that one field being filled requires all related fields to be filled
+      (such as might be useful on a password change form)
+
+0.010   December 29, 2009
+
+    * COMPATIBILITY: Breaks compatibility with 0.009 in the way the BuildControl
+      features work.
+    * Changed the API for BuildControl to be more useful
+    * Changed fill_on_assignment to update the control on construction
+    * Added documentation to BuildControl to explain how it works
+    * Added documentation to feature roles to explain how it works
+
+0.009   December 29, 2009
+
+    * Refactored ScalarValue, ListValue, and BooleanValue and added a shared
+      Value role. This unifies the values are represented. Some attributes have
+      been eliminated and replaced with synonyms so the API has not drastically
+      changed. (Though, it is probably not 100% compatible with 0.008.)
+    * Updated documentation to better show register_implementation in use
+    * Features may not modify attribute construction via the BuildAttribute role
+    * Features may now modify control construction via the BuildControl role
+    * A new fill_on_assignment control feature has been added
+    * Make sure we warn about read-only attributes when is => bare as well as
+      when is => ro.
+
+0.008   December 12, 2009
+
+    * It is now possible to extend interfaces, controls, features, and control
+      features using your application interface. To do so you need to create a
+      Form::Factory::<type>::Custom::<your-name> class which has a
+      register_implementation class returning the name of the actual class.
+
+0.007   December 11, 2009
+
+    * Correcting Changes. I must have been half-asleep when I wrote up the
+      change log for 0.006
+    * Fixing the broken action inheritance test because some objects were sorted
+      improperly
+    * Adds a test to find a bug related to running the clean() or
+      check() or process() method on an action. If the "controls" parameter was
+      not passed, it did not work correctly. It worked as if the changes to
+      feature roles made in 0.006 had not been done. This has been corrected.
+
+0.006   December 8, 2009
+
+    * The feature role has been split into 5 roles:
+        * Form::Factory::Feature is now mostly a marker class for features
+          (still adds common attributes, such as result)
+        * Form::Factory::Feature::Role::Clean requires the clean method
+        * Form::Factory::Feature::Role::Check requires the check method
+        * Form::Factory::Feature::Role::PreProcess requires the pre_process
+          method
+        * Form::Factory::Feature::Role::PostProcess requires the post_process
+          method
+    * Moved custom message handling for features into separate roles:
+      Form::Factory::Feature::Role::CustomMessage and
+      Form::Factory::Feature::Role::CustomControlMessage
+    * Added a new type of feature, the build_attribute feature allows a control
+      feature to modify attributes when the meta-class is being setup
+    * Features should now set is_valid() explicitly for success and failure
+    * Added more unit tests
+
+0.005   December 6, 2009
+
+    * Make sure get_all_features() in the meta class does not clobber feature
+      config when a parent class uses the same feature with a different
+      configuration. This might need some more tweaking since we do want to
+      avoid running an identical feature multiple times.
+
+0.004   December 3, 2009
+
+    * The render_control() and consume_control() methods now return the control
+      object rendered or consumed.
+    * The Button control is now a boolean value rather than a preset value to
+      make it much more useful
+    * The CLI interface does not consume arguments from boolean values anymore,
+      it just flips them on or off based on the fact they are present or not
+    * Added unit tests for render_control() and consume_control()
+
+0.003   December 3, 2009
+
+    * Adding a consume_control() method to the Action role
+    * Correcting a problem with how Form::Factory::Result returns messages when
+      in scalar context (it was not stringifying properly before)
+    * Adding more unit tests
+
+0.002   November 30, 2009
+
+    * Renamed Form::Factory::Factory to Form::Factory::Interface
+    * Adding a CLI interface for developing command-line interfaces
+    * Adding several helpful control roles: BooleanValue, HiddenValue,
+      MultiLine, and PresetValue
+    * Made the ScalarValue and ListValue control roles mutually exclusive
+    * Control objects copy the original attribute's documentation attribute
+
+0.001   November 29, 2009
+
+    * Initial release includes the experimental API, basic controls, and a
+      factory for rendering and consuming HTML forms

@@ -1,0 +1,457 @@
+#!/bin/bash
+
+
+#FINANCE_QUANT_HTTP_SERVER  
+#FINANCE_QUANT_R_CMD        
+#FINANCE_QUANT_RECOMMENDED 
+#FINANCE_QUANT_SORT_MARKETS 
+#FINANCE_QUANT_TEST_INSTALL 
+#FINANCE_QUANT_VGREP 
+#FINANCE_QUANT_VGREP
+
+# Define variables
+progname=$(basename $0)
+
+if [ "$USER" = "" ]
+then
+    USER=$(whoami)
+fi
+
+DATABASE='FinanceQuant'
+VERSION='0.1'
+#DBSYSTEM='PostgreSQL'
+DBSYSTEM='MySQL'
+SCHEMA_ONLY=0
+DAYOFWEEK=$(date +"%u")
+LSB=""
+
+
+if [ "$DAYOFWEEK" -gt 5 ] || [ "$DAYOFWEEK" -eq 1 ]
+then
+    LASTBIZDAY="last friday"
+else
+    LASTBIZDAY="yesterday"
+fi
+
+
+
+
+
+function format(){
+
+    local message="$@"
+    [ -z $message ] && message=" "
+    read -p "$message" readEnterKey
+    
+
+
+}
+
+
+function nl(){
+
+    local message="$@"
+    [ -z $message ] && message=" "
+    read -p "$message" readEnterKey
+    format
+
+
+}
+
+
+# Purpose: Display pause prompt
+# $1-> Message (optional)
+
+function pause(){
+    
+    local message="$@"
+    [ -z $message ] && message="Press [Enter] key to continue..."
+    read -p "$message" readEnterKey
+  
+}
+
+
+
+# Purpose  - Display a menu on screen
+function run_test(){
+
+
+    write_header " Testing "
+
+    FINANCE_QUANT_RECOMMENDED &
+
+    pause
+
+}
+
+
+
+# Purpose  - Display a menu on screen
+function run_xtest(){
+
+
+sqldate=$(perl <<'EOF'
+
+sub sqlDate {
+
+  my $in     = shift;
+  my @dateBits = ();
+  my $out      = "";
+
+  if(defined $in and $in =~/-/) {
+      @dateBits = split("-",$in);
+      $out = sprintf("%s/%s/%s",$dateBits[1],$dateBits[2],$dateBits[0]);
+  }elsif(defined $in and $in =~ /\//){
+      @dateBits = split("/",$in);
+      $out = sprintf("%s%s-%s-%s",$dateBits[2] gt 1000 ? "":"20",$dateBits[2],$dateBits[1],$dateBits[0]);
+  }
+  return $out;
+}
+print sqlDate($ENV{"sequencerMaxDate"});
+
+
+EOF
+
+)
+
+
+
+}
+
+
+
+# Purpose  - Display a menu on screen
+function evaluate_data(){
+    date
+    write_header " Evaluate "
+
+    pause
+
+}
+
+
+# Purpose - Network inferface and routing info
+function market_overview(){
+
+    write_header " Market overview"
+
+    FINANCE_QUANT_SORT_MARKETS 
+    
+    nl
+    
+    pause
+
+}
+
+
+# Purpose - Network inferface and routing info
+function start_tray(){
+
+    write_header " Starting Tray"
+
+    FINANCE_QUANT_TRAY &
+    
+    nl
+    
+    pause
+
+}
+
+
+function start_report_server(){
+
+    write_header " Starting.. FINANCE_QUANT_HTTP_SERVER "
+    
+    FINANCE_QUANT_HTTP_SERVER &
+
+    nl
+
+    pause 
+}
+
+
+function start_r_cmd(){
+
+    write_header " Starting.. FINANCE_QUANT_R_CMD "
+    
+    FINANCE_QUANT_R_CMD &
+    
+    nl 
+    
+    pause 
+}
+
+
+
+
+# Purpose - Network inferface and routing info
+function start_gtk_search(){
+
+    write_header " Starting.. "
+
+    FINANCE_QUANT_VGREP &
+
+    nl 
+
+    pause 
+}
+
+
+# Purpose  - Display a menu on screen
+function show_menu(){
+    date
+    echo "---------------------------"
+    echo "   Main Menu"
+    echo "---------------------------"
+    echo "0. exit"
+    echo "1. Operating system info"
+    echo "2. Hostname and dns info"
+    echo "3. Network info"
+    echo "4. Who is online"
+    echo "5. Last logged in users"
+    echo "6. Free and used memory info"
+    echo "7. Create Db"
+    echo "8. Scann IBES for strong buy"
+    echo "9. Start report server"
+    echo "10. Start gtk search interface"
+    echo "11. Market Overview"
+    echo "12. Start R back-test"
+    echo "13. Start Tray"
+    echo "14. Restore previous run from master-run Storable"
+    echo "15. XML EXPORT"
+    echo "16. View Data Cache"
+    echo "17. View Trades"
+    echo "18. Manage Contracts"
+    echo "19. Custom Module"
+
+
+}
+
+# Purpose - Display header message
+# $1 - message
+function write_header(){
+    local h="$@"
+    echo "---------------------------------------------------------------"
+    echo "     ${h}"
+    echo "---------------------------------------------------------------"
+}
+
+# Purpose - Get info about your operating system
+function os_info(){
+    write_header " System information "
+    echo "Operating system : $(uname)"
+    [ -x $LSB ] && $LSB -a || echo "$LSB command is not insalled (set \$LSB variable)"
+    #pause "Press [Enter] key to continue..."
+    pause
+}
+
+# Purpose - Get info about host such as dns, IP, and hostname
+function host_info(){
+    local dnsips=$(sed -e '/^$/d' /etc/resolv.conf | awk '{if (tolower($1)=="nameserver") print $2}')
+    write_header " Hostname and DNS information "
+    echo "Hostname : $(hostname -s)"
+    echo "DNS domain : $(hostname -d)"
+    echo "Fully qualified domain name : $(hostname -f)"
+    echo "Network address (IP) :  $(hostname -i)"
+    echo "DNS name servers (DNS IP) : ${dnsips}"
+    pause
+}
+
+# Purpose - Network inferface and routing info
+function net_info(){
+    devices=$(netstat -i | cut -d" " -f1 | egrep -v "^Kernel|Iface|lo")
+    write_header " Network information "
+    echo "Total network interfaces found : $(wc -w <<<${devices})"
+
+    echo "*** IP Addresses Information ***"
+    ip -4 address show
+
+    echo "***********************"
+    echo "*** Network routing ***"
+    echo "***********************"
+    netstat -nr
+
+    echo "**************************************"
+    echo "*** Interface traffic information ***"
+    echo "**************************************"
+    netstat -i
+
+    pause 
+}
+
+# Purpose - Display a list of users currently logged on 
+#           display a list of receltly loggged in users   
+function user_info(){
+    local cmd="$1"
+    case "$cmd" in 
+    who) write_header " Who is online "; who -H; pause ;;
+    last) write_header " List of last logged in users "; last ; pause ;;
+    esac 
+}
+
+# Purpose - Display used and free memory info
+function mem_info(){
+    write_header " Free and used memory "
+    free -m
+
+    echo "*********************************"
+    echo "*** Virtual memory statistics ***"
+    echo "*********************************"
+    vmstat
+    echo "***********************************"
+    echo "*** Top 5 memory eating process ***"
+    echo "***********************************"	
+    ps auxf | sort -nr -k 4 | head -5	
+    pause
+}
+# Purpose - Get input via the keyboard and make a decision using case..esac 
+function read_input(){
+    local c
+    read -p "Enter your choice [ 0 - 19 ] " c
+    case $c in
+    0)	echo "Bye!"; exit 0 ;;
+    1)	os_info ;;
+    2)	host_info ;;
+    3)	net_info ;;
+    4)	user_info "who" ;;
+    5)	user_info "last" ;;
+    6)	mem_info ;;
+    7)	create_db ;;
+    8)	run_test ;;
+    9)	start_report_server ;;
+    10)	start_gtk_search ;;
+    11)	market_overview ;;
+    12) start_r_cmd ;;
+    13)	start_tray ;;
+    14)	FINANCE_QUANT_RESTORE ;;
+    15)	FINANCE_QUANT_XML_RESULTS ;;
+    16)	FINANCE_QUANT_CACHE       ;;
+    17)	echo 1 ;;
+    18)	echo 1 ;;
+    19)	format ;;
+    *)	
+    echo "Please select between 0 to 19 choice only."
+    pause
+    esac
+}
+
+
+
+# 
+function create_db(){
+devices=$(netstat -i | cut -d" " -f1 | egrep -v "^Kernel|Iface|lo")
+write_header " Create Base Database "
+
+    FINANCE_QUANT_CREATE_DB
+    
+    pause 
+}
+
+
+# ignore CTRL+C, CTRL+Z and quit singles using the trap
+trap '' SIGINT SIGQUIT SIGTSTP
+
+# main logic
+while true
+do
+    clear
+    show_menu	# display memu
+    read_input  # wait for user input
+
+done
+
+
+
+echo "Done."
+exit 0
+
+
+=head1 NAME
+
+  financequant - 
+
+=head1 SYNOPSIS
+
+  financequant 
+
+=head1 DESCRIPTION
+
+
+=head1 OPTIONS
+
+    echo "0. exit"
+    echo "1. Operating system info"
+    echo "2. Hostname and dns info"
+    echo "3. Network info"
+    echo "4. Who is online"
+    echo "5. Last logged in users"
+    echo "6. Free and used memory info"
+    echo "7. Create Db"
+    echo "8. Scann IBES for strong buy"
+    echo "9. Start report server"
+    echo "10. Start gtk search interface"
+    echo "11. Market Overview"
+    echo "12. Start R back-test"
+    echo "13. Start Tray"
+
+
+=head1 SEE ALSO
+
+  YOU NEED
+  ~~~~~~~~
+  
+  PERL
+  ----
+  Finance::Quant;
+  Finance::Google::Sector::Mean;
+  Finance::NASDAQ::Markets;
+  Finance::Quant::Symbols;
+  GD                   
+  Test::More        
+  Carp
+  Text::Reform    
+  Data::Dumper			
+  File::Spec::Functions		
+  File::Path			
+  Time::Local			
+  File::Fetch			
+  File::Copy			
+  File::Find			
+  Finance::Optical::StrongBuy	
+  Finance::Google::Sector::Mean	
+  Finance::NASDAQ::Markets	
+  HTML::TreeBuilder		
+  Text::Buffer			
+  WWW::Mechanize
+  GraphViz
+  List::Util
+  MIME::Base64
+  GD::Graph::lines
+  Statistics::Basic
+  Thread::Queue
+  Cache::Memcached
+  LWP::UserAgent
+
+  
+  
+
+  UNIX
+  ----
+  >GD
+  >mysql
+  >memcached  
+   
+  R
+  - 
+  >require(quantmod)
+  >require(TTR)
+  >require(blotter)
+  >require(quantmod)
+  >require(quantstrat)
+  >require(PerformanceAnalytics)
+
+=head1 AUTHOR
+
+
+=cut
+

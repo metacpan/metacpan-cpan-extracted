@@ -1,0 +1,10 @@
+TODO list for Perl module Fuse::Simple
+
+- a more intelligent accessor() that understands $off etc?
+
+- implement some more functionality like (optional) ability to rename,
+  chmod, chown, touch, edit non-coderef files?
+
+- check it's taint-safe
+
+- check it's thread-safe

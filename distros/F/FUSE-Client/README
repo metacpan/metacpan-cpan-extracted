@@ -1,0 +1,21 @@
+Readme file for FUSE::Client
+
+The documentation for FUSE::Client is included in the module in POD format.
+
+To install the module, download from CPAN, unpackage and then:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Or from within the CPAN shell:
+
+install FUSE::Client
+
+For more information about FUSE check the home page (http://www.sulake.com/fuselight/) and the mailing list (http://www.egroups.com/group/fuselight).
+
+For more information about Perl-FUSE, check the homepage (http://www.iamcal.com/software/puse/).
+
+--Cal Henderson
+

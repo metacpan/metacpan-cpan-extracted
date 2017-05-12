@@ -1,0 +1,29 @@
+---
+abstract: 'Framework Sites version 2'
+author:
+  - 'Nate Lewis <nlewis@gnetworks.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FWS-V2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: 0
+  Crypt::Blowfish: 0
+  DBI: 0
+  Digest::SHA1: 0
+  GD: 0
+  Storable: 0
+  Test::More: 0
+  Time::Local: 0
+version: 1.13091122

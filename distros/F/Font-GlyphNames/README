@@ -1,0 +1,54 @@
+Font::GlyphNames, version 1.00000
+
+This module converts between glyph names and characters, following the
+Adobe Glyph Naming convention.
+
+
+CHANGES IN THIS RELEASE
+
+New version number. That is all.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the cpan script or
+the CPAN module:
+
+    [sudo] cpan Font::GlyphNames
+    [sudo] perl -MCPAN -e "install Font::GlyphNames"
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires Perl 5.8.0 or later.
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Font::GlyphNames
+
+Or try using man (it’s faster in my experience):
+
+    man Font::GlyphNames
+
+
+COPYRIGHT AND LICENCE
+
+This copyright notice does not apply to the files glyphlist.txt and
+zapfdingbats.txt included in this package.  Those two files contain
+their own copyright notices.
+
+Copyright (C) 2006-9 Father Chrysostomos
+
+This program is free software; you may redistribute it, modify it,
+or both under the same terms as perl.

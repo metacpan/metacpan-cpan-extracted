@@ -1,0 +1,93 @@
+Finance-BankVal-International-GetSWIFT version 0.02
+===================================================
+
+This module handles all of the restful web service calls to Unified Software's
+BankValInternational SWIFT BIC service. It also handles fail over to the back up services
+transparently to the calling script. It can be called in a procedural or OO fashion
+(see synopsis)
+
+The exportable method &getSWIFT(); takes a number of parameters including;
+
+1: Format 	- the response format (either xml, json or csv)
+
+2: SWIFT BIC	- the BIC code to be validated
+
+3: UserID	- available from www.unifiedsoftware.co.uk
+
+4: PIN		- available from www.unifiedsoftware.co.uk
+
+(UserID and PIN are available from http://www.unifiedsoftware.co.uk/freetrial/free-trial-home.html)
+
+The order of the parameters MUST be as above. The UserID and PIN can be stored in the InternationalLoginConfig.txt
+file bundled with this module, the use of this file saves passing the PIN and user ID data with each call to getSWIFT.
+For example, a call to validate a SWIFT BIC passing the user ID and PIN as parameters
+and printing the reply to console should follow this form:
+
+=====================================================================
+
+ #!/usr/bin/perl
+
+ use Finance::BankVal::International::GetSWIFT qw(&getSWIFT);
+
+ my $ans = getSWIFT('XML','ABICCODE','xmpl123','12345');
+
+ print $ans;
+
+=============================OR for OO===============================
+
+ use Finance::BankVal::International::GetSWIFT;
+
+ $swiftObj = Finance::BankVal::International::GetSWIFT->new();
+ my $ans = $swiftObj->getSWIFT('XML','ABICCODE','xmpl123','12345');
+
+ print $ans;
+
+=====================================================================
+
+valid parameter lists are:-
+
+getSWIFT('$format','$swiftbic','$userID','$PIN');
+
+getSWIFT('$format','$swiftbic');
+
+n.b. the last parameter list requires that the user ID and PIN are stored
+in the InternationalLoginConfig.txt file bundled with this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or just copy the .pm file to your PERL lib and ensure you have all the dependencies listed below installed.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+use LWP::UserAgent;
+use XML::Simple;
+use JSON;
+
+
+Crypt::SSLeay is also required as it is a dependency of LWP::UserAgent.
+
+Crypt::SSLeay is typically bundled with windows Perl ports, however on *nix you may need to install it by:
+
+sudo aptitude install libssl-dev (might not be neccessary and can be removed after install)
+sudo cpan -i Crypt::SSLeay
+
+
+COPYRIGHT AND LICENCE
+
+A. Evans - Unified Software, support@unifiedsoftware.co.ukE
+
+Copyright (C) 2010 by Unified Software Limited
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.08.0 or,
+at your option, any later version of Perl 5 you may have available.
+

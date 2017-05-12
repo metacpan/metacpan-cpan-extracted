@@ -1,0 +1,43 @@
+File-Locate-Harder version 0.06
+===============================
+
+File::Locate::Harder provides a generalized "locate" method to access
+the file system indexes used by the "locate" command-line utility.
+It is intended to be a relatively portable way for perl code to
+quickly ascertain what files are present on the current system.
+
+This code is essentially a wrapper around multiple different methods
+of accessing a locate database: it makes an effort to use the fastest
+method that works.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Class::Base
+
+Test::Trap  (used by tests)
+
+File::Locate will be used if it's available, but does not
+depend on it.  If File::Locate is not working, it falls back on
+command-line locate (standard on many systems, sometimes found
+in a package such as "findutils").
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007, 2010 by Joseph Brenner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

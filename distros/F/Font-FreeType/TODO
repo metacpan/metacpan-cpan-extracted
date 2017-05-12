@@ -1,0 +1,89 @@
+ * A few constants aren't available with older versions of Freetype.  They
+   should do something better than simply not exist, probably croaking if
+   they are used.
+
+ * Some characters don't have an outline or bitmap, but can be put together
+   from other glyphs.  E.g., magick.pl doesn't work with kochi-minco.ttf
+   because it doesn't have a glyph for Acircumflex, but fontforge says it
+   does provide that character, just that it doesn't have an outline or
+   bitmap.  It says it's composed of U+0041 and U+0302.
+   The current situation is that bitmap() will return a 0x0 bitmap, which
+   breaks bitmap_magick(), and the outline doesn't cause any problems
+   apart from not being there.
+
+ * Tests:
+    * decomposing outlines.  Also test the postscript() and svg_path() methods.
+    * bitmap_magick() -- skip tests if Image::Magick not installed
+
+ * Maybe provide some defaults for $face->set_char_size(), so that you don't
+   have to pass in all four values.
+
+ * $face->glyph_from_char() should work with Unicode characters properly.
+
+ * There should be a way of getting glyphs by index.
+
+ * The underline methods ($face->underline_position() and
+   $face->underline_thickness()) should scale their values to the same
+   scale as the font.
+
+ * Provide an interface for doing transformations.  This also implies
+   supporting the 'advance' vector in glyph slots.  It could be accessed
+   with an 'advance()' method, returning just the prevalent component in
+   scalar context.  Means 'horizontal_advance()' would be rarely needed.
+
+ * Make $face->kerning() accept glyph objects as well as indices,
+   and maybe also allow strings.  In the documentation highlight the
+   fact that it accepts glyph indices, not Unicode codepoints, and
+   explain why.
+
+ * Handle vertical layout, by accepting a flag to $library->face().
+   Various places will have to support this:
+    * $face->kerning() should return the y kerning when called in scalar
+      context and when in vertical layout.
+    * Make sure the metrics information returned is sensible.
+    * Make it easy somehow to position characters centered around
+      the (vertical) baseline.  (FreeType might do this automatically.)
+
+ * What about top-side bearing, does it mean anything in horizontal layout?
+   If so, bind it.
+
+ * Perhaps an interface for selecting charmaps.
+
+ * Check that the things passed to $glyph->outline_decompose() are actually
+   code refs.
+
+ * Provide a simple way to generate characters in a Type3 font (or whatever)
+   to output Postscript less stupidly.
+
+ * Provide convenience method for generating PDF fragments from outline.
+
+ * Binding of FT_HAS_MULTIPLE_MASTERS, if I can work out what it's for.
+
+ * Some support for doing ligatures would be nice.
+
+ * Maybe the library version would be better as a v1.2.3 type value?
+   Might make comparison easier.
+
+ * Attaching files: some support in the $face->attach_file() method,
+   but it's completely untested.
+
+ * Need to test scalable fonts that also provide bitmaps.  If we're to
+   use the bitmaps then $glyph->bitmap() will have to be more clever
+   about deciding when to render.  kochi-mincho provides many fixed sizes.
+
+ * Make $glyph->postscript() (and any similar methods I add) work with
+   bitmap glyphs, by getting the bitmap and outputting appropriate PS code
+   to draw it.
+
+ * If FT_LOAD_NO_SCALE is used, perhaps $glyph->outline_decompose() should
+   return integers, rather than trying to treat the values wrongly as 26.6.
+
+ * Provide some way of iterating over glyphs rather than characters.
+   For example, listing 'cursor.bdf' finds no characters, because they all
+   have "ENCODING -1 0".
+
+ * Provide a README, if I can think of anything useful to put in it.
+
+ * Figure out how to make the outline available even after the bitmap was
+   first loaded, without the kludge of always loading the outline (which
+   is probably inefficient).  See the comments in qefft2_glyph_bitmap().

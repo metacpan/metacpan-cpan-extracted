@@ -1,0 +1,9 @@
+Revision history for Filter-ExtractSource
+
+0.02    12 April 2004
+        Fixed bug which prevented code extraction if only
+        a single 'use' statement was used.
+
+0.01    09 April 2004
+        First version, released on an unsuspecting world.
+

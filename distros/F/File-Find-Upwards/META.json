@@ -1,0 +1,61 @@
+{
+   "abstract" : "Look for a file in the current directory and upwards",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101831, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Find-Upwards",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Memoize" : 0,
+            "Exporter" : 0,
+            "Path::Class" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "FindBin" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "File::Find::Upwards" : {
+         "file" : "lib/File/Find/Upwards.pm",
+         "version" : "1.102030"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-file-find-upwards at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Upwards"
+      },
+      "homepage" : "http://search.cpan.org/dist/File-Find-Upwards/",
+      "repository" : {
+         "url" : "http://github.com/hanekomu/File-Find-Upwards"
+      }
+   },
+   "version" : "1.102030"
+}
+

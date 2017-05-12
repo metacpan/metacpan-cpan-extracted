@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Finance-Optical-StrongBuy,
+version 0.09:
+
+  analyses a image [strong-sell,sell,hold,buy,strong-buy] for given stock, released by Institutional Brokers Estimate System
+
+This software is copyright (c) 2013 by hagen geissler santex@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,654 @@
+#!/usr/bin/perl
+
+# Created on: 2009-08-07 18:33:36
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Carp qw/carp croak confess cluck/;
+use Getopt::Long;
+use Pod::Usage;
+use List::Util qw/sum/;
+use List::MoreUtils qw/uniq/;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Term::ANSIColor qw/:constants/;
+use Path::Tiny;
+use File::Copy;
+use File::CodeSearch;
+use File::CodeSearch::Replacer;
+use File::TypeCategories;
+use IO::Prompt qw/prompt/;
+
+our $VERSION = version->new('0.7.4');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+my $REVERSE  = REVERSE;
+my $RESET    = RESET;
+my $BLUE     = BLUE;
+my $BOLD     = BOLD;
+my $ON_RED   = ON_RED;
+my $ON_GREEN = ON_GREEN;
+
+my %option = (
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'sre_all|all|a',
+        'sre_words|words|W',
+        'sre_ignore_case|ignore|i',
+        'sre_whole|whole|w',
+        'sre_sub_matches|contains|c=s@',
+        'sre_sub_not_matches|not-contains|notcontains|S=s@',
+        'sre_last|last|L=s@',
+        'sre_smart|smart|m',
+        'replace|r=s',
+        'path|p=s@',
+        'file_symlinks|links|l',
+        'file_recurse|R!',
+        'file_contains=s',
+        'file_not_contains=s',
+        'file_include|include|n=s@',
+        'file_include_type|include_type|int|N=s@',
+        'file_exclude|exclude|x=s@',
+        'file_exclude_type|exclude_type|ext|X=s@',
+        'file_ignore=s',
+        'file_ignore_add|d=s',
+        'file_ignore_remove|I=s',
+        'out_suround|suround|context|C=n',
+        'out_suround_before|before|B=n',
+        'out_suround_after|after|A=n',
+        'out_totals|totals|t',
+        'out_files_only|files-only|f',
+        'out_quiet|quiet|q!',
+        'out_unique|unique|u!',
+        'out_limit|limit=i',
+        'project|P=s',
+        'yes|y',
+        'no',
+        'execute|execute-files|E=s',
+        'config|c=s',
+        'bw|g',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+    elsif ( !@ARGV ) {
+        warn "No search term specified\n";
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+
+    $option{path} = [ map {glob $_} map {split /:/, $_} $option{path} ? @{$option{path}} : ('.') ];
+
+    if ($option{out_suround}) {
+        $option{out_suround_before} ||= $option{out_suround};
+        $option{out_suround_after}  ||= $option{out_suround};
+        delete $option{out_suround};
+    }
+
+    parse_config(\%option);
+
+    my $lines = 80;
+    if ($option{sre_smart}) {
+        ($lines) = split /\s+/, `stty size` || 40;
+        if (( !$option{file_include_type} || !@{ $option{file_include_type} }) && grep {$_ eq $ARGV[0]} qw/n b ss/) {
+            $option{file_include_type}[0] = 'programing';
+        }
+        if ( !exists $option{ignore} ) {
+            my $re = join ' ', @ARGV;
+            if ( $re =~ /[A-Z]/ && $re =~ /[a-z]/ ) {
+                $option{ignore} = 0;
+            }
+            else {
+                $option{ignore} = 1;
+            }
+        }
+    }
+
+    warn Dumper { params('file', %option) } if $option{verbose};
+    my $files = File::TypeCategories->new(params('file', %option));
+
+    warn Dumper { params('sre', %option), re => \@ARGV } if $option{verbose};
+    my $hl =
+        $option{replace} ? File::CodeSearch::Replacer->new( params('sre', %option), re => \@ARGV, replace => $option{replace} )
+        :                  File::CodeSearch::Highlighter->new( params('sre', %option), re => \@ARGV );
+
+    if ($option{bw}) {
+        $REVERSE = '';
+        $RESET   = '';
+        $BLUE    = '';
+        $BOLD    = '';
+        $ON_RED  = '';
+        $hl->before_match('');
+        $hl->after_match('');
+        $hl->before_nomatch('');
+        $hl->after_nomatch('');
+    }
+    warn Dumper {params('out',%option)}, \%option if $option{verbose};
+    my $cs = File::CodeSearch->new( regex => $hl, files => $files, params('out',%option) );
+
+    my $fh = \*STDOUT;
+    my %match;
+    my %found;
+    my $out = '';
+    if ( !$option{sre_smart} || $option{replace} ) {
+        $option{bw} = 1;
+    }
+    $cs->search(
+        searcher(\%found, \$out, \%match, $hl, $lines, $fh),
+        @{ $option{path} }
+    );
+    if ($out) {
+        if ($option{sre_smart}) {
+            print $out;
+        }
+        else {
+            print {$fh} $out;
+        }
+    }
+
+    if ($option{out_unique}) {
+        print join "\n", sort keys %match;
+        print "\n";
+    }
+    if ($option{execute}) {
+        system $option{execute} . ' ' . join ' ', sort keys %found;
+    }
+    if ($option{out_totals}) {
+        print "\nTotal matches " . (sum values %found) . "\n";
+    }
+
+    return;
+}
+
+sub searcher {
+    my ($found, $out, $match, $hl, $lines, $fh) = @_;
+    my $last_file = undef;
+    my $answer = { all => $option{yes}, save_all => $option{yes} };
+    my $content = '';
+
+    return sub {
+        my ($line, $file, $line_no, %stuff ) = @_;
+        confess "No line number provided!\n" if !defined $line_no;
+        my $saved = 0;
+        my $post  = 0;
+
+        if ( !$found->{$file} && !$option{out_unique} && !($option{out_files_only} && $option{out_totals}) ) {
+            $$out .= "${file}\n";
+        }
+        $found->{$file}++;
+        if (!defined $last_file || $file ne $last_file) {
+            if ( defined $last_file ) {
+                if ( $option{out_files_only} && $option{out_totals} ) {
+                    $$out .= "$last_file ($found->{$last_file})\n";
+                }
+            }
+            $last_file = $file;
+        }
+        return if $option{out_files_only};
+
+        # check if there were lines after the last match and display them
+        if ( $stuff{after} && @{ $stuff{after} } ) {
+            my @after = @{ $stuff{after} };
+            my $count = $stuff{last_line_no} + 1;
+            for my $after_line ( @after ) {
+                last if $line && $line eq $after_line;
+                $$out .= sprintf $REVERSE . '%4i: ' . $RESET . '%s', $count++, $after_line;
+            }
+        }
+        # check if there were lines before this match and display them
+        if ( $stuff{before} && @{ $stuff{before} } ) {
+            my @before = @{ $stuff{before} };
+            my $count = @before;
+            for my $before_line ( @before ) {
+                confess Dumper(\%stuff) . "Bad line" if !defined $before_line || !defined $count;
+                $$out .= sprintf $REVERSE . '%4i: ' . $RESET . $before_line, $line_no - $count--;
+            }
+        }
+
+        if ($option{out_unique}) {
+            $match->{$hl->match($line)}++ if ($line);
+        }
+        elsif ($line) {
+            my $last = $hl->get_last_found();
+            if ($last) {
+                $$out .= $BLUE . $last . $RESET;
+            }
+
+            my ( $found, $before, $after, $to ) = $hl->highlight($line);
+            if ($found) {
+                $$out .= sprintf $REVERSE . $BOLD . $ON_RED . '%4i: ' . $RESET . '%s', $line_no, $found;
+            }
+            elsif ($before) {
+                my $ans = '';
+                if ( $answer->{all} ) {
+                    $$out .= sprintf $REVERSE . $BOLD . $ON_GREEN . '%4i: ' . $RESET . '%s', $line_no, $after;
+                    $post = 1;
+                }
+                else {
+                    $$out .= sprintf $REVERSE . $BOLD . $ON_RED . 'From: ' . $RESET . '%s', $before;
+                    $$out .= sprintf $REVERSE . $BOLD . $ON_RED . 'To    ' . $RESET . '%s', $after;
+                    print {$fh} $$out;
+                    $$out = '';
+
+                    warn Dumper $answer;
+                    $ans = lc prompt(-prompt => $RESET . "Change? [yNa] ", -default => 'n', '-1t');
+                    print "\n";
+                }
+
+                if ( $ans eq 'a') {
+                    $answer->{all} = 1;
+                    $post = 1;
+                }
+                if ( $ans eq 'y' || $answer->{all} ) {
+                    $stuff{lines}[-1] = $to;
+                    $answer->{yes} = 1;
+                    #warn $changed;
+                    $post = 1;
+                }
+            }
+        }
+
+        if ( $stuff{lines} && @{ $stuff{lines} } ) {
+            $content .= join '', @{ $stuff{lines} };
+            @{ $stuff{lines} } = ();
+        }
+
+        if ( !$line && $out ) {
+            save_replace( $last_file, $content, $answer );
+            $content = '';
+        }
+
+        if ($option{bw}) {
+            print {$fh} $$out;
+            $$out = '';
+        }
+        if ( $$out && ( !$option{sre_smart} || (my @tmp = split /\n/, $$out) >= $lines) ) {
+            if ($option{sre_smart}) {
+                my $tmp;
+                $fh = $tmp if open $tmp, '|-', $ENV{CS_PAGER_COLOR} || 'less -Rx4SFX';
+            }
+            print {$fh} $$out;
+            $$out = '';
+            $option{sre_smart} = 0;
+        }
+
+        return $post;
+    };
+}
+
+sub save_replace {
+    my ( $file, $content, $answer ) = @_;
+
+    # check that we have something to do
+    return if !$answer->{yes};
+
+    delete $answer->{yes};
+
+    my $ans = $answer->{save_all} ? 'y' : 'n';
+    if ( !$answer->{save_all} ) {
+        $ans = prompt "Save changes to $file? [yNa] ", -default => 'n', '-1t';
+    }
+
+    if ( $ans eq 'a' ) {
+        $answer->{save_all} = 1;
+    }
+    if ( $ans eq 'y' || $answer->{save_all} ) {
+        $file = path($file);
+
+        # Create a backup of the file if we don't appear to be in a revision control system environment
+        # TODO make this smarter to check that the files are currently part of the rcs system
+        if ( !grep { -d $_ } qw/ .git .bzr .svn CSV RCS / ) {
+            my $backup = $file->parent->child($file->basename . '~');
+            my $i = 1;
+            while (-f $backup) {
+                $backup = $file->parent->child($file->basename . '~' . $i++);
+            }
+            move $file, $backup;
+        }
+
+        my $fh = $file->openw;
+        print {$fh} $content;
+        close $fh;
+        $content = '';
+        print "Saved $file\n";
+    }
+
+    return;
+}
+
+sub params {
+    my ($name, %var) = @_;
+    my %params;
+
+    VAR:
+    for my $key (keys %var) {
+        next VAR if $key !~ /^ $name _ /xms;
+        my $new_key = $key;
+        $new_key =~ s/^ $name _ //xms;
+        $params{$new_key} = $var{$key};
+    }
+
+    return %params;
+}
+
+sub parse_config {
+    my ($opt) = @_;
+
+    $ENV{HOME} ||= $ENV{USERPROFILE};
+    my $conf_file = $opt->{config} || "$ENV{HOME}/.csrc";
+
+    return if !-r $conf_file;
+
+    require Config::General;
+    my $conf = Config::General->new($conf_file);
+    my %conf = $conf->getall();
+
+    $conf{default} ||= {};
+    $conf{project} ||= {};
+
+    my $default = $conf{default};
+
+    my $project =
+        $opt->{project} ? $opt->{project}
+        : $name ne 'cs' ? $name
+        :                 undef;
+    if ( $project && $conf{project} && keys %{$conf{project}} && $conf{project}{$project} ) {
+        $default = merge($conf{project}{$project} || {}, $default);
+    }
+
+    %$opt = %{ merge($default, $opt) };
+
+    return;
+}
+
+sub merge {
+    my ($hash1, $hash2, @rest) = @_;
+    my $merge = {};
+
+    for my $key (uniq sort keys %{$hash1}, keys %{$hash2}) {
+        $merge->{$key} =
+            exists $hash1->{$key} ? $hash1->{$key}
+        :                           $hash2->{$key};
+    }
+
+    return merge($merge, @rest) if @rest;
+
+    return $merge;
+}
+
+__DATA__
+
+=head1 NAME
+
+cs - Search and/or replace text (with some intelligence)
+
+=head1 VERSION
+
+This documentation refers to cs version 0.7.4.
+
+=head1 SYNOPSIS
+
+   cs [option] search
+   cs [option] search -r replace
+   cr [option] search replace
+
+ OPTIONS:
+  search         A perl regular expression. if it is written in multiple parts
+                 eg search this on the command line (ie no joinded together
+                 with quotes) the parts will be joined together with \s or
+                 if --all is used a regular expression will be written
+                 containing each part in every order, if --words the parts are
+                 seperated by .*'s.
+  replace        The value to substitute for the values found by search
+
+  Search:
+   -a --all      Find all parts on regardless of order on the line
+   -W --words    Similar to --all but with out the reordering
+   -i --ignore-case
+                 Turn off case sensitive searching
+   -w --whole    Makes the match only whole words (ie wraps with (?<\W) & (?=\W))
+   -c --contains[=]re
+                 Only show matches if the file also matches this sub regex.
+                 This may be declared more that once and the results are ORed.
+   -S --not-contains[=]re
+                 Ignore any files whoes contents match this regex.
+   -m --smart    Converts multi part regexes baised on what is imput
+                 eg cs ss Class is converted to cs class Class
+                    cs n func                   cs function func
+                    cs b subroutine             cs sub subroutine
+  Replace:
+   -r --replace[=]string
+                 String to replace found text with
+  Files:
+   -p --path[=]string
+                 A colon seperated list of directories to search in, which may
+                 include globing but you must quote so the shell doesn't do
+                 the globbing itself.
+                 (Default is current directory)
+   -l --follow-symlinks
+                 Follow symlinks to directories
+      --no-follow-symlinks
+                 Don't follow symlinks to directories
+      --recurse  Recurse into subdirectories (Default)
+      --no-recurse
+                 Turns off recursing into subdirectories
+   -n --file-include[=]string
+                 Only include files mathcing the regex (Multiple)
+   -N --int[=]string
+      --include-type[=]string
+                 Only include files the specified type (Mulitple)
+                 see perldoc File::TypeCategories available types
+   -x --file-exclude[=]string
+                 Don't include files mathcing the regex (Multiple)
+   -X --ext[=]string
+      --exclude-type[=]string
+                 Don't include files the specified type (Mulitple)
+                 see perldoc File::TypeCategories available types
+      --file-ignore[=]string
+                 Replace the default ignore regex
+   -d --file-ignore-add[=]string
+                 Add this regex to the list of ignored files
+   -r --file-ignore-remove[=]string
+                 Remove this regex to the list of ignored files
+  Output:
+   -C --context[=]int
+                 Show int lines of context before and after a match
+   -B --before[=]int
+                 Show int lines before a match
+   -A --after[=]int
+                 Show int lines after a match
+   -t --totals
+                 Show the total number of lines & files matched
+   -f --files-only
+                 Show only the file names containg matches
+   -L --last[=][function|class|sub]
+                 Show the last function, class or sub name found before the
+                 matched line.
+   -q --quiet    Turn off warnings about unreadable files & directories.
+   -u --unique   Show only unique matches (just the match not the whole line)
+      --limit[=]int
+                 Only show this number of found search results
+  Other:
+   -E --execute[=]cmd
+                 Run this command with the found files as arguments
+   -P --project[=]string
+                 Use the specified projects default settings
+   -c --config[=]file
+                 Use the specified file as the config file instead of the
+                 deafult ~/.cs
+
+   -v --verbose  Show more detailed option
+      --version  Prints the version information
+      --help     Prints this help information
+      --man      Prints the full documentation for cs with example usage
+
+=head1 DESCRIPTION
+
+The C<cs> command is aimed at searching large quantities of text files with
+the ability to easily select searching files by type (or excluding files of a
+certain type). Also by default C<cs> excludes version control directories eg
+.svn or .git.
+
+=head2 Examples
+
+ cs --path lib:t query
+
+This would search both the directories lib/ and t/ for files containing the
+work query.
+
+ cs --include-type=perl --smart b do_stuff
+
+This would search only perl files (.pl, .pm and files with the first line
+containing perl eg #!/usr/bin/perl or #!/usr/bin/env perl) for any declaration
+of a subroutine who's name starts with do_stuff eg sub do_stuff_again.
+
+ cs --exclude-type=html input
+
+Would search all non-html files (.html, .htm, .xhtml etc) for the word input
+
+ cs --after 5 text
+
+This would show up to 5 lines of text following any links that match text
+
+ cs --files-oly text
+
+This would show only the names of files that contain text. This can speed
+the search considerably as files are stopped being searched after a single
+match is found
+
+ cs --unique 'CONST_[A-Z0-9]'
+
+This will search for all upper case words starting with CONST_ and show a
+unique list of matched words, no files or matched lines are shown.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+A configuration file placed in ~/.csrc (or specified through --conf) allows
+allows the setting of default values. See L<Config::General> for full details
+of the file format.
+
+Eg
+
+  <default>
+      smart = 1
+  </default>
+
+  <file_types>
+      <perl>
+          definite    = [.]pl$  # Definite match regexps can be specified mulitple
+          definite    = [.]pm$  # times to form a list of definit matches
+          definite    = [.]pod$ # Note this replaces the predefined list
+          definite    = [.]PL$
+
+          possible    = [.]t$   # As can possiple matches
+          possible    = [.]cgi$
+
+          none        = 1       # set files with out a suffix to match as perl files
+          bang        = perl    # Causes the reading of the first line of a file
+                                # to check if it contains /perl/ (and there fore matches)
+      </perl>
+      <python>
+          +definite   = [.]pthony$ # Adds this regexp to the default list of
+                                   # regexps that definitly phyton files
+      </python>
+  <file_types>
+
+  <project proj>
+    exclude = /path/to/excluded/dir
+  </project>
+
+  <project other_work>
+    file-exclude = large[.]file$
+  </project>
+
+In the C<default> section, default values for command line options can be specified.
+
+In the C<file_types> section, you can add new file types or override or change
+existing file types.
+
+In the project section, you can add defaults specific to a project which can
+be specified on the command line as --project=proj
+
+=head2 Pager
+
+By default cs uses the command C<less -Rx4SFX> if it can run other wise it
+falls back just writing to C<STDOUT>. You can change this environment variable
+C<CS_PAGER_COLOR>
+
+=head1 DEPENDENCIES
+
+Some of the --smart capabilities (ie paging output) require the C<less> command
+to be installed other wise the paging wont available.
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 ALSO SEE
+
+C<grep -r> - Recursive C<grep>, can be much faster but will search into version
+control directories and has to be used with C<find> to limit the searched files.
+
+L<ack> - This a very similar in syntax to C<grep> but can't do replacements which
+C<cs> can.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

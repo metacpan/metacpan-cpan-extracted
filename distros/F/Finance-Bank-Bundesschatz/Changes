@@ -1,0 +1,9 @@
+Revision history for Perl extension Finance::Bank::Bundesschatz.
+
+1.01  Sun Oct 12 13:57:31 CEST 2003
+        - Fixed documentation concerning the format of the
+          external configuration file.
+        - Put the correct licence into the documention.
+1.00  Fri Sep 19 19:43:54 CEST 2003
+        - original version; created by h2xs 1.2 with options
+                -X -n Finance::Bank::Bundesschatz

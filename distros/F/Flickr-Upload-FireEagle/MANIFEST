@@ -1,0 +1,10 @@
+# $Id: MANIFEST,v 1.1 2008/04/20 20:25:36 asc Exp $
+Build.PL
+Changes
+lib/Flickr/Upload/FireEagle.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t

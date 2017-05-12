@@ -1,0 +1,7 @@
+conf
+bin/xktl
+bin/ktzda
+go.bash
+tst.bash
+sqlite.cmd
+.*~

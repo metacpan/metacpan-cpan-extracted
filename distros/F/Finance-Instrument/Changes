@@ -1,0 +1,7 @@
+Revision history for Perl extension Finance::Instrument
+
+0.02 Tue Jan  1 15:26:29 CST 2013
+        - 2013 contracts for XTAF.TX
+
+0.01  Fri Jan 27 01:26:40 2012
+        - original version

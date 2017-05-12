@@ -1,0 +1,114 @@
+---
+abstract: 'check Bankwest accounts from Perl'
+author:
+  - 'Alex Peters <lxp@cpan.org>'
+build_requires:
+  HTTP::Response: '0'
+  Module::Loaded: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Routine: '0'
+  URI::file: '4.21'
+  parent: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Bank-Bankwest
+no_index:
+  directory:
+    - t
+provides:
+  Finance::Bank::Bankwest:
+    file: lib/Finance/Bank/Bankwest.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Account:
+    file: lib/Finance/Bank/Bankwest/Account.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error:
+    file: lib/Finance/Bank/Bankwest/Error.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::BadResponse:
+    file: lib/Finance/Bank/Bankwest/Error/BadResponse.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::ExportFailed:
+    file: lib/Finance/Bank/Bankwest/Error/ExportFailed.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::ExportFailed::UnknownReason:
+    file: lib/Finance/Bank/Bankwest/Error/ExportFailed/UnknownReason.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::NotLoggedIn:
+    file: lib/Finance/Bank/Bankwest/Error/NotLoggedIn.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::NotLoggedIn::BadCredentials:
+    file: lib/Finance/Bank/Bankwest/Error/NotLoggedIn/BadCredentials.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::NotLoggedIn::SubsequentLogin:
+    file: lib/Finance/Bank/Bankwest/Error/NotLoggedIn/SubsequentLogin.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::NotLoggedIn::Timeout:
+    file: lib/Finance/Bank/Bankwest/Error/NotLoggedIn/Timeout.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::NotLoggedIn::UnknownReason:
+    file: lib/Finance/Bank/Bankwest/Error/NotLoggedIn/UnknownReason.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::ServiceMessage:
+    file: lib/Finance/Bank/Bankwest/Error/ServiceMessage.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Error::WithResponse:
+    file: lib/Finance/Bank/Bankwest/Error/WithResponse.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Parser::Accounts:
+    file: lib/Finance/Bank/Bankwest/Parser/Accounts.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Parser::Login:
+    file: lib/Finance/Bank/Bankwest/Parser/Login.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Parser::Logout:
+    file: lib/Finance/Bank/Bankwest/Parser/Logout.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Parser::ServiceMessage:
+    file: lib/Finance/Bank/Bankwest/Parser/ServiceMessage.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Parser::TransactionExport:
+    file: lib/Finance/Bank/Bankwest/Parser/TransactionExport.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Parser::TransactionSearch:
+    file: lib/Finance/Bank/Bankwest/Parser/TransactionSearch.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Parsers:
+    file: lib/Finance/Bank/Bankwest/Parsers.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Session:
+    file: lib/Finance/Bank/Bankwest/Session.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::SessionFromLogin:
+    file: lib/Finance/Bank/Bankwest/SessionFromLogin.pm
+    version: v1.2.8
+  Finance::Bank::Bankwest::Transaction:
+    file: lib/Finance/Bank/Bankwest/Transaction.pm
+    version: v1.2.8
+requires:
+  HTTP::Response::Switch: '1.001000'
+  IO::String: '0'
+  MooseX::Declare: '0'
+  MooseX::OneArgNew: '0'
+  MooseX::StrictConstructor: '0'
+  MooseX::Types: '0'
+  Text::CSV_XS: '0.66'
+  Throwable::Error: '0.101110'
+  TryCatch: '0'
+  WWW::Mechanize: '0'
+  Web::Scraper: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Bank-Bankwest
+  homepage: https://metacpan.org/release/Finance-Bank-Bankwest
+  repository: git://github.com/lx/perl5-Finance-Bank-Bankwest
+version: 1.2.8

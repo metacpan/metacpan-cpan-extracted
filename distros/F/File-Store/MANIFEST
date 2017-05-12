@@ -1,0 +1,8 @@
+README
+lib/File/Store.pm
+Makefile.PL
+MANIFEST
+t/class.t
+t/standalone.t
+t/missing.t
+META.yml                                 Module meta-data (added by MakeMaker)

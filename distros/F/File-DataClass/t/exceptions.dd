@@ -1,0 +1,7 @@
+do { my $x = {
+       'davidlou-d20' => '7d05f746-6cb1-1014-afba-1d3088877a71',
+       'microcenter' => '9ee01d3a-55a5-11e6-9fc5-14bfbd15da07',
+       'virtua.com.br' => '95b807aa-2fde-11e6-bda7-b7692eab5396'
+     };
+  $x;
+ }

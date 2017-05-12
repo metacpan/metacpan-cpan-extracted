@@ -1,0 +1,11 @@
+CVS/
+^tgz/
+\.~$
+\.#
+\w#$
+\.bak$
+Makefile$
+Makefile\.old$
+blib
+\.gz$
+.cvsignore

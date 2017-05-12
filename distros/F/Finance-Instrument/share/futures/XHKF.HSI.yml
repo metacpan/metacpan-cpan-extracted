@@ -1,0 +1,141 @@
+--- 
+type: Futures
+name: HSI
+code: HSI
+exchange: XHKF
+time_zone: Asia/Hong_Kong
+month_cycle: FGHJKMNQUVXZ
+currency: HKD
+tick_size: 1
+multiplier: 50
+session:
+  -
+    - 555
+    - 720
+  -
+    - 810
+    - 975
+last_trading_day_close: 960
+override_since:
+  1970-01-01:
+    session:
+      -
+        - 585
+        - 750
+      -
+        - 870
+        - 975
+  2011-03-07:
+    session:
+      -
+        - 555
+        - 720
+      -
+        - 810
+        - 975
+  2012-03-05:
+    session:
+      -
+        - 555
+        - 720
+      -
+        - 780
+        - 975
+contract_calendar: 
+  200901: 
+    last_trading_day: 2009-01-30
+  200902: 
+    last_trading_day: 2009-02-28
+  200903: 
+    last_trading_day: 2009-03-30
+  200904: 
+    last_trading_day: 2009-04-29
+  200905: 
+    last_trading_day: 2009-05-27
+  200906: 
+    last_trading_day: 2009-06-29
+  200907: 
+    last_trading_day: 2009-07-30
+  200908: 
+    last_trading_day: 2009-08-28
+  200909: 
+    last_trading_day: 2009-09-29
+  200910:
+    last_trading_day: 2009-10-29
+  200911: 
+    last_trading_day: 2009-11-27
+  200912: 
+    last_trading_day: 2009-12-30
+  201001: 
+    last_trading_day: 2010-01-28
+  201002: 
+    last_trading_day: 2010-02-25
+  201003: 
+    last_trading_day: 2010-03-31
+  201004: 
+    last_trading_day: 2010-04-29
+  201005: 
+    last_trading_day: 2010-05-28
+  201006: 
+    last_trading_day: 2010-06-29
+  201007: 
+    last_trading_day: 2010-07-29
+  201008: 
+    last_trading_day: 2010-08-30
+  201009: 
+    last_trading_day: 2010-09-29
+  201010: 
+    last_trading_day: 2010-10-28
+  201011: 
+    last_trading_day: 2010-11-29
+  201012: 
+    last_trading_day: 2010-12-30
+  201101: 
+    last_trading_day: 2011-01-28
+  201102: 
+    last_trading_day: 2011-02-25
+  201103: 
+    last_trading_day: 2011-03-30
+  201104: 
+    last_trading_day: 2011-04-28
+  201105: 
+    last_trading_day: 2011-05-30
+  201106: 
+    last_trading_day: 2011-06-29
+  201107: 
+    last_trading_day: 2011-07-28
+  201108: 
+    last_trading_day: 2011-08-30
+  201109: 
+    last_trading_day: 2011-09-29
+  201110: 
+    last_trading_day: 2011-10-28
+  201111: 
+    last_trading_day: 2011-11-29
+  201112: 
+    last_trading_day: 2011-12-29
+  201201: 
+    last_trading_day: 2012-01-30
+  201202: 
+    last_trading_day: 2012-02-28
+  201203: 
+    last_trading_day: 2012-03-29
+  201204: 
+    last_trading_day: 2012-04-27
+  201205: 
+    last_trading_day: 2012-05-30
+  201206: 
+    last_trading_day: 2012-06-28
+  201207: 
+    last_trading_day: 2012-07-30
+  201208: 
+    last_trading_day: 2012-08-30
+  201209: 
+    last_trading_day: 2012-09-27
+  201210: 
+    last_trading_day: 2012-10-30
+  201211: 
+    last_trading_day: 2012-11-29
+  201212: 
+    last_trading_day: 2012-12-28
+

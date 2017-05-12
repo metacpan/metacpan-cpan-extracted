@@ -1,0 +1,21 @@
+#fsdb -R C size mean stddev pct_rsd
+size: 1024
+mean:  1496200
+stddev:   284970
+pct_rsd: 19.047
+
+size: 10240
+mean:  5028600
+stddev:   601030
+pct_rsd: 11.952
+
+size: 102400
+mean:  4921600
+stddev:   309390
+pct_rsd: 6.2863
+
+#  | dbsetheader size bw
+#  | /home/johnh/BIN/DB/dbmultistats size bw
+#  | /home/johnh/BIN/DB/dbcol size mean stddev pct_rsd
+#   | dbfilealter -R C
+#  | dbroweval  '{ _mean = sprintf("%8.0f", _mean); _stddev = sprintf("%8.0f", _stddev);  }'

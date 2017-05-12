@@ -1,0 +1,61 @@
+#
+# $Id: greek.atm,v 1.1 2009-12-07 05:12:56 az Exp $
+
+uranus
+bn: Uranus
+bn @ greek: Uranos
+in: represents heaven
+in: feared his children -- kept them within Gaia -- was castrated by Chronos
+oc(dud): http://some.dud.link/
+
+gaia
+bn: Gaia
+in: represents earth
+sin: http://pikiwedia.org/gaiagaiagaia/
+
+(is-parent-of)
+parent: uranus gaia
+child: chronos
+
+(is-parent-of)
+parent: uranus gaia
+child: rhea
+
+(is-married-to)
+husband: chronos
+wife: rhea
+
+chronos (titan god)
+bn: Chronos
+bn @ latin : Chronus
+in: personification of time
+in: liked to eat all of his children
+
+rhea (titan god)
+bn: Rhea 
+in: a Titaness
+in: known as The Mother of Gods
+oc(wp): http://en.wikipedia.org/wiki/Rhea_%28mythology%29
+
+
+god
+bn: God
+
+(is-parent-of)
+parent: chronos
+child: zeus
+
+
+sillystatement
+in: this is a silly assoc reification example
+
+(something-silly) is-reified-by sillystatement
+silly: zeus
+sillier: uranus
+
+
+godsite reifies site-about-gods
+bn: the god site
+
+othersite reifies http://pikiwedia.org/
+bn: some other place

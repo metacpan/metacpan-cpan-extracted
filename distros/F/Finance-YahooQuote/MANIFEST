@@ -1,0 +1,18 @@
+CHANGES
+CHANGES.old
+GNU-LICENSE
+MANIFEST
+Makefile.PL
+README
+YahooQuote.pm
+yahooquote
+t/01base.t
+t/02simple.t
+t/03extended.t
+t/04custom.t
+t/05test.t
+examples/examine_server.sh
+examples/symbol_alias.sh
+examples/fixyahoo.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

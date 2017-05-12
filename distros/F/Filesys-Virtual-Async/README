@@ -1,0 +1,104 @@
+NAME
+    Filesys::Virtual::Async - Base class for non blocking virtual
+    filesystems
+
+SYNOPSIS
+    use base 'Filesys::Virtual::Async';
+
+    sub new { my $class = shift; $class->SUPER::new(@_); }
+
+    # then override the various methods
+
+DESCRIPTION
+    The goal of Filesys::Virtual::Async is to provide an interface like
+    IO::AIO for a non blocking virtual filesystem
+
+    This is a base class, see the "SEE ALSO" section below
+
+    This module is still in flux to an extent. If you'd like to suggest
+    changes, please drop in the irc channel #poe on irc.perl.org and speak
+    with xantus[] or Apocalypse
+
+WARNING
+    This is interface isn't solidified yet. It will change. I released this
+    module early due to demand. You have been warned.
+
+OBJECT METHODS
+    new( root => $path );
+        root is optional, and defaults to /. root is prepended to all paths
+        after resolution
+
+    cwd()
+        Returns the current working directory (virtual)
+
+    root() or root( $path )
+        Gets or sets the root path. This path is prepended to the path
+        returned from _path_from_root
+
+    _path_from_root( $path )
+        Resolves a path, with the root path prepended.
+
+        This is a private method, do not document it in your subclass.
+
+    _resolve_path( $path )
+        Resolves a path to a normalized direct path based on the cwd,
+        allowing .. traversal, and the ~ home directory shortcut (if
+        home_path is defined)
+
+        For example, if the cwd is /foo/bar/baz, and $path is
+        /../../../../foo/../foo/./bar/../foo then /foo will be returned
+
+        This is a private method, do not document it in your subclass.
+
+CALLBACK METHODS
+    All of these work exactly like the IO::AIO methods of the same name. Use
+    IO::AIO as a reference for these functions, but note that this in no way
+    requires you to use IO::AIO.
+
+    open()
+    close()
+    read()
+    write()
+    sendfile()
+    readahead()
+    stat()
+    lstat()
+    utime()
+    chown()
+    truncate()
+    chmod()
+    unlink()
+    mknod()
+    link()
+    symlink()
+    readlink()
+    rename()
+    mkdir()
+    rmdir()
+    readdir()
+    load()
+    copy()
+    move()
+    scandir()
+    rmtree()
+    fsync()
+    fdatasync()
+
+SEE ALSO
+    Filesys::Virtual::Async::Plain
+
+    <http://xant.us/>
+
+AUTHOR
+    David W Davis <xantus@cpan.org>
+
+RATING
+    You can rate this this module at
+    <http://cpanratings.perl.org/rate/?distribution=Filesys::Virtual::Async>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2009 by David W Davis, All rights reserved
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself
+

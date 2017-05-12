@@ -1,0 +1,31 @@
+1.01 Apr 24 2017
+
+     Allow tests to be executed in parallel.
+
+1.00 Apr 11 2017
+
+     Fix test failures with perl 5.26+.
+
+0.07 Apr 11 2017
+
+     Migrate from CVS to Git.
+
+0.06 Bugfix.
+     The pattern execution delivered unexpected results when the
+     pattern contained ^uc|lc|ucfirst$.
+     This should have been ^(uc|lc|ucfirst)$.
+
+0.05 Some typos.
+     Add possibility to produce locale independent warnings.
+
+0.04 Rename to perl-File-PerlMove.
+     Fix symlink test.
+
+0.03 Fix symlink test.
+
+0.02 Skip uc/lc tests if the file system is case insensitive (Windows,
+     Mac).
+     Skip symlink tests if the platform doesn't have one (Windows).
+     Document this.
+
+0.01 initial release.

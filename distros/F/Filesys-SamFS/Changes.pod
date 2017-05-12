@@ -1,0 +1,120 @@
+=head1 Revision history for Perl extension Filesys::SamFS.
+
+=over
+
+=item * 0.101 2008-04-14 10:34
+
+Changed the licensing to the Artistic License 2.0.
+Added Artistic-2.0, const-c.inc, and const-xs.inc to MANIFEST.
+
+=item * 0.1 2008-03-30 14:19
+
+Changed Makefile.PL so that it can run non-interactively.
+
+=for html
+<P></P>
+
+=item * 0.1_01 2008-01-14 13:21
+
+Regenerated code for constants with recent h2xs to make it
+more efficient. All new constants in supports include files added.
+Added new macros as well.
+sam_stat now returns the number of blocks and a constant blocksize
+of 512.
+
+New versions of stat and lstat: stat_sclars and lstat_scalars. They
+return an array ref pointing to the copy arrays rather than the arrays
+themselves, plus the new members of the structure.
+Code wrapping sam_vsn_stat, sam_segment_vsn_stat, sam_segment_stat,
+sam_segment_lstat, sam_restore_file, sam_restore_copy
+Much of the new code can be switched off by defining OLD_SAMFS.
+
+NOTE: The behaviour of sam_vsn_stat has been changed. Unless compiled
+with OLD_SAMFS, it returns a reference to one array that contains
+the attributes of the requested copy rather than a list of arrays,
+where the first array contains the attributes. I.e. the other arrays
+have been dropped.
+
+=for html
+<P></P>
+
+=item * 0.035  Wed May 29 11:11:34 2002
+
+Moved website to www.lupe-christoph.de (Yay!)
+
+=for html
+<P></P>
+
+=item * 0.034  Mon Jun 25 14:26:08 2001
+
+Added missing functions to export lists:
+  sam_archive sam_cancelstage sam_release sam_ssum sam_stage sam_setfa sam_advise
+
+=for html
+<P></P>
+
+=item * 0.033  Mon Apr 23 19:32:06 2001
+
+Removed license statement ("same as Perl") from Copyright
+section in README.pod.
+Added License section to README.pod.
+Added file Artistic to the distribution.
+
+=for html
+<P></P>
+
+=item * 0.032  Wed Apr 11 11:19:51 2001
+
+Corrected minor mistake in examples/sls.
+Corrected documentation for vsn_stat - it requires two arguments.
+
+=for html
+<P></P>
+
+=item * 0.031  Tue Mar  7 09:56:58 2000
+
+Changed name of the SamFS version sub from VERSION (clashes with the
+module VERSION) to SAM_VERSION.
+Added opencat, closecat, and getcatalog to the documentation,
+which was also a little beautified.
+
+=for html
+<P></P>
+
+=item * 0.03  Thu Feb 24 20:34:35 2000
+
+Support for SamFS release 3.3.1.
+Added
+SS_ARCHIVE_C,
+SS_DIRECTIO,
+SS_PARTIAL,
+SS_ISARCHIVE_C,
+SS_ISDIRECTIO,
+SS_ISPARTIAL
+(only defined when Filesys::SamFS is installed with a SamFS version
+that has them).
+Changed implementation of sam_vsn_stat().
+
+=for html
+<P></P>
+
+=item * 0.021  Wed Feb 23 10:46:00 2000
+
+Converted README and Changes to POD format.
+Changed Makefile.PL to generate text and HTML versions from them.
+
+=for html
+<P></P>
+
+=item * 0.02  Tue Feb 22 14:40:30 2000
+
+Reworked tests, Makefile.PL, added examples/sls
+
+=for html
+<P></P>
+
+=item * 0.01  Fri Feb 11 16:20:49 2000
+
+original version; created by h2xs 1.19
+
+=back

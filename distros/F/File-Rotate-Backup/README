@@ -1,0 +1,165 @@
+NAME
+    File::Rotate::Backup - Make backups of multiple directories and rotate
+    them on unix.
+
+SYNOPSIS
+        my $params = { archive_copies => 2,
+                       dir_copies => 1,
+                       backup_dir => '/backups',
+                       file_prefix => 'backup_'
+                       secondary_backup_dir => '/backups2',
+                       secondary_archive_copies => 2,
+                       verbose => 1,
+                       use_flock => 1,
+                     };
+
+        my $backup = File::Rotate::Backup->new($params);
+
+        $backup->backup([ [ '/etc/httpd/conf' => 'httpd_conf' ],
+                          [ '/var/named' => 'named' ],
+                        ]);
+
+        $backup->rotate;
+
+DESCRIPTION
+    This module will make backups and rotate them according to your
+    specification. It creates a backup directory based on the file_prefix
+    you specify and the current time. It then copies the directories you
+    specified in the call to new() to that backup directory. Then a tar'd
+    and compressed file is created from that directory. By default, bzip2 is
+    used for compression.
+
+    This module has only been tested on Linux and Solaris.
+
+    The only external programs used are tar and a compression program.
+    Copies and deletes are implemented internally.
+
+METHODS
+  new(\%params)
+        my $params = { archive_copies => 2,
+                       dir_copies => 1,
+                       backup_dir => '/backups',
+                       file_prefix => 'backup_'
+                       secondary_backup_dir => '/backups2',
+                       secondary_archive_copies => 2,
+                       verbose => 1,
+                       use_flock => 1,
+                       dir_regex => '\d+-\d+-\d+_\d+_\d+_\d+',
+                       file_regex => '\d+-\d+-\d+_\d+_\d+_\d+',
+                     };
+
+        my $backup = File::Rotate::Backup->new($params);
+
+    Creates a backup object.
+
+    archive_copies
+        The number of old archive files to keep.
+
+    no_archive
+        If set to true, then no compressed archive(s) will be created even
+        if archive_copies is set.
+
+    dir_copies
+        The number of old backup directories to keep.
+
+    backup_dir
+        Where backups are placed.
+
+    file_prefix
+        The prefix to use for the backup directories and archive files. When
+        the directories and archive files are created, the name for each is
+        created by appending a timestamp to the end of the file prefix you
+        specify.
+
+    secondary_backup_dir
+        Overflow directory to copy files to before deleting them from the
+        backup directory when rotating.
+
+    secondary_archive_copies
+        The number of archive files to keep in the secondary backup
+        directory.
+
+    verbose
+        If set to a true value, status messages will be printed as the files
+        are being processed.
+
+    use_flock
+        If set to a true value, an attempt will be made to acquire a write
+        lock on any file to be removed during rotation. If a lock cannot be
+        acquired, the file will not be removed. This is useful for
+        concurrency control, e.g., when your backup script gets run at the
+        same time as another script that is writing the backups to tape.
+
+    use_rm
+        If set to a true value, the external program /bin/rm will be used to
+        remove a file in the case where unlink() fails. This may occur on
+        systems where the file being removed is larger than 2GB and such
+        files are not fully supported.
+
+    dir_regex
+        Regular expression used to search for directories to rotate. The
+        file_prefix is prepended to this to create the final regular
+        expression. This is useful for rotating directories that were not
+        created by this module.
+
+    file_regex
+        Regular expression used to search for archive files to rotate. The
+        file_prefix is prepended to this to create the final regular
+        expression. This is useful for rotating files that were not created
+        by this module.
+
+  backup(\@conf)
+    Makes the backup -- creates the backed up directory and archive file.
+    @conf is an array where each element is either a string or an array. If
+    it is a string, it is expected to be the path to a directory that is to
+    be backed up. If the element is an array, the first element is expected
+    to be a directory that is to be backed up, and the second should be the
+    name the directory is called once it has been copied to the backup
+    directory. The return value is the name of the archive file created;
+    unless 'no_archive' is set, then it will return an empty string.
+
+  rotate()
+    Rotates the backup directories and archive files. The number of archive
+    files to keep and the number of directories to keep are specified in the
+    new() constructor.
+
+  my $archives = getArchiveDeleteList()
+    Returns a list of archive files that will get deleted if the rotate()
+    method is called.
+
+  my $dirs = getDirDeleteList()
+    Returns a list of directories that will get deleted if the rotate()
+    method is called.
+
+  setCompressProgramPath($path)
+    Set the path to the compression program you want to use when creating
+    the archive files in the call to backup(). The given compression program
+    must provide the same API as gzip and bzip2, at least to the extent that
+    it will except input from stdin and will write output to stdout when no
+    file names are provided. This defaults to 'bzip2' (no explicit path).
+
+  setCompressExtension($ext)
+    This sets the extension given to the archive name after the .tar. This
+    defaults to .bz2 if bzip2 is used for compression, and .gz if gzip is
+    used.
+
+  setTarPath($path)
+    Set the path to the tar program. This defaults to 'tar' (no explicit
+    path).
+
+AUTHOR
+        Don Owens <don@regexguy.com>
+
+CONTRIBUTORS
+        Augie Schwer
+
+COPYRIGHT
+        Copyright (c) 2003-2007 Don Owens
+
+        All rights reserved. This program is free software; you can
+        redistribute it and/or modify it under the same terms as Perl
+        itself.
+
+VERSION
+        0.13
+

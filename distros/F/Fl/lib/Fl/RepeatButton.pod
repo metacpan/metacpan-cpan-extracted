@@ -1,0 +1,75 @@
+class 'Fl::RepeatButton';
+isa 'Fl::Button';
+include 'FL/Fl_Repeat_Button.H';
+widget_type 'Fl_Repeat_Button';
+
+=pod
+
+=head1 NAME
+
+Fl::RepeatButton - Button that Reapeats Callback when Held
+
+=head1 Synopsis
+
+    use Fl;
+    my $button = Fl::RepeatButton->new(0, 0, 100, 200, 'Hello, World!');
+    $button->callback(sub {print q[It's dat boi]} );
+
+=head1 Description
+
+The Fl::RepeatButton class represents a button that triggers its callback
+repeatedly as long as it is pressed.
+
+The speed of the repeat is fixed and depends on the implementation.
+
+=head1 Methods
+
+Fl::RepeatButton inherits from Fl::Button which in turns inherits from
+Fl::Widget. On top of that, it exposes the following methods...
+
+=head2 new(...)
+
+    my $button_a = Fl::RepeatButton->new(0, 0, 250, 500, 'Important Stuff');
+    my $button_b = Fl::RepeatButton->new(0, 0, 250, 500);
+
+The constructor creates a new button using the given position, size, and
+label.
+
+The destructor removes the button.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Repeat_Button *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

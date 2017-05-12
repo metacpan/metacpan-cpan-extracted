@@ -1,0 +1,37 @@
+#!/usr/local/bin/perl -w
+our $VERSION = '0.37';
+use lib 'lib';
+use FreePAN -Base;
+use FreePAN::Config;
+my $base = FreePAN::Config->new->base;
+my @configs = ("$base/config.yaml",-plugins => "$base/plugins");
+FreePAN->new->load_hub(@configs)->command->process(@ARGV);
+
+__END__
+
+=head1 NAME
+
+freepan - The FreePAN Command Line Tool
+
+=head1 USAGE
+
+=head1 DESCRIPTION
+
+=head1 NOTE
+
+=head1 AUTHOR
+
+Brian Ingerson <ingy@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005. Brian Ingerson. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut
+
+# vim: set ft=perl:

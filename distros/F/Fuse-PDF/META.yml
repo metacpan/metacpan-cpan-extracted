@@ -1,0 +1,47 @@
+---
+name: Fuse-PDF
+version: 0.09
+author:
+  - 'Chris Dolan <cdolan@cpan.org>'
+abstract: Filesystem embedded in a PDF document
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CAM::PDF: 1.11
+  Carp: 0
+  Fcntl: 0
+  Fuse: 0.08
+  MIME::Base64: 3
+  POSIX: 0
+  Readonly: 1.00
+  perl: 5.8.0
+build_requires:
+  Test::Class: 0
+  Test::More: 0.62
+  Test::Virtual::Filesystem: 0.08
+recommends:
+  Getopt::Long: 2.0
+  Pod::Usage: 1.0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Fuse::PDF:
+    file: lib/Fuse/PDF.pm
+    version: 0.09
+  Fuse::PDF::ContentFS:
+    file: lib/Fuse/PDF/ContentFS.pm
+    version: 0.09
+  Fuse::PDF::FS:
+    file: lib/Fuse/PDF/FS.pm
+    version: 0.09
+  Fuse::PDF::ImageTemplate:
+    file: lib/Fuse/PDF/ImageTemplate.pm
+    version: 0.09
+  Fuse::PDF::MountPDF:
+    file: lib/Fuse/PDF/MountPDF.pm
+    version: 0.09
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

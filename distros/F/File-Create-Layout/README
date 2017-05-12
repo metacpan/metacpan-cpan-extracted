@@ -1,0 +1,105 @@
+SYNOPSIS
+
+     use File::Create::Layout qw(
+         create_files_using_layout
+         check_layout
+         parse_layout
+     );
+    
+     my $res = create_files_using_layout(layout => <<'EOL');
+     file1.txt
+     file2(0600)
+     file3.txt(0644) "content":"hello, world\n"
+     dir1/
+       file1
+       file2
+       file3
+    
+     dir2/(root,bin,0600)
+       # some comment
+       file1
+       dir3/
+         anotherfile.txt "content":"secret"
+       file2
+     EOL
+
+DESCRIPTION
+
+    EARLY DEVELOPMENT. MORE OPTIONS WILL BE AVAILABLE (E.G. DRY-RUN,
+    CHECKING A LAYOUT AGAINST FILESYSTEM, VARIOUS ERROR HANDLING OPTIONS).
+
+LAYOUT SPECIFICATION
+
+    Layout is a text document containing zero or more lines. Each line is
+    either a file/directory specification line, a blank line, or a comment
+    line.
+
+    Comment line starts with zero or more whitespaces, a # (hash)
+    character, and zero or more non-newline characters as the comment's
+    content.
+
+    The simplest specification line contains just the name of a file or
+    directory. To specify a directory, you need to add / (slash)
+    immediately after the name:
+
+     # a file
+     foo.txt
+    
+     # a directory
+     bar/
+    
+     # another directory
+     baz.txt/
+
+    To specify filename containing special characters, like #, you can
+    quote the file using double quotes:
+
+     "#tmpname#"
+     "filename containing \"quotes\""
+
+    The string will be parsed as a JSON string.
+
+    Permission and ownership. Immediately after the filename or directory
+    name, you can specify permission mode, as well as ownership (owner
+    user/group):
+
+     # specify permission mode, both are identical
+     file.txt(0600)
+     file2.txt(600)
+    
+     # specify owner as well as user+group
+     dir1/(ujang,admin,0700)
+
+    Symlink. To create a symlink, add -> (arrow) followed by the symlink
+    target. Like filename, symlink target can be an unquoted sequence of
+    non-whitespace characters, or a quoted JSON string if you want to have
+    whitespace or other special characters:
+
+     symlink1 -> ../target
+     symlink2 -> "/home/ujang/My Documents"
+
+    File content. An unquoted JSON hash (object) can be added in the end,
+    prefixed by at least one whitespace to specify extra stuffs, including
+    file content. By unquoted, it means that the enclosing curly braces {
+    .. } is not written:
+
+     file.txt "content":"This is line 1\nThis is line 2\n"
+     file2.txt(0660)      "content":"secret","foo":"bar","mtime":1441853999
+
+    Putting files/directories in a subdirectory. Indentation (only spaces,
+    tabs are not allowed) is used for this:
+
+     dir1/
+       file1-inside-dir1
+       file2-inside-dir1
+       dir2/
+         file3-inside-dir2
+         file4-inside-dir2
+       another-file-inside-dir1
+     file5-in-top-level
+     file6
+
+SEE ALSO
+
+    Setup::File::Layout, transactional/undoable version of this module
+

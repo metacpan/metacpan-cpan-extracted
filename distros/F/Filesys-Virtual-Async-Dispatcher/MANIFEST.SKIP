@@ -1,0 +1,29 @@
+# skip Eclipse IDE stuff
+\.includepath$
+\.project$
+\.settings/
+
+# Avoid version control files.
+\B\.svn\b
+\B\.git\b
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+^MYMETA.yml$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+
+# our tarballs
+\.tar\.gz$

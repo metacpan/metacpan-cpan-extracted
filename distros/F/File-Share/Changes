@@ -1,0 +1,63 @@
+0.25 Thu Aug 21 11:59:42 PDT 2014
+ - Doc fix via PR/10. @wollmers++
+
+0.24 Sat Aug 16 16:00:30 PDT 2014
+ - Fix strict/warnings
+
+0.23 Sat Aug 16 15:47:38 PDT 2014
+ - Remove versions from module use
+
+0.22 Sat Aug 16 14:43:35 PDT 2014
+ - Change Meta email
+
+0.21 Sat Aug 16 11:10:03 PDT 2014
+ - Meta 0.0.2
+
+0.20 Sat Aug 16 00:59:45 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.19 Fri Aug 15 21:19:50 PDT 2014
+ - Remove t/use_ok.t
+
+0.18 Fri Aug 15 15:51:03 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.17 Wed Jul 30 15:43:35 PDT 2014
+ - Switch IRC to
+
+0.16 Sat Jul 26 19:56:26 PDT 2014
+ - Fix issue/6 (@tsibley++)
+
+0.15 Wed Jul 16 23:05:27 PDT 2014
+ - Fix Meta and add Contributing file
+
+0.14 Sat Jun 28 12:34:23 PDT 2014
+ - Fix for FreeBSD @luc2++
+
+0.13 Tue Jun 17 10:55:13 PDT 2014
+ - Remove ABSTRACT
+ - Manual VERSION
+
+0.12 Sat Jun 14 12:13:53 PDT 2014
+ - New badge syntax in doc
+
+0.11 Sat Jun 14 09:48:46 PDT 2014
+ - Pod fix
+ - Add travis badges
+
+0.10 Fri May 23 18:37:50 PDT 2014
+ - Look for lib instead of Makefile.PL etc
+ - Change to Zilla::Dist
+
+0.03 Sat Sep 14 14:37:47 PDT 2013
+ - Add Dist::Zilla support
+ - Add Module::Build support
+
+0.02 Wed Sep 14 14:42:15 CEST 2011
+ - Fix a documentation mistake
+ - Released from Liz++ and Wendy++' master bedroom
+
+0.01 Thu Jun 16 08:13:01 EST 2011
+ - First Release
+

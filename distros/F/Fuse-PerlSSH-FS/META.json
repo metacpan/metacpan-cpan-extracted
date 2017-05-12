@@ -1,0 +1,54 @@
+{
+   "abstract" : "Mount a remote filesystem via FUSE + PerlSSH",
+   "author" : [
+      "Clipland (clipland@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Fuse-PerlSSH-FS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Virtual::Filesystem" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Daemon::Daemonize" : 0,
+            "Data::Dumper" : 0,
+            "Fcntl" : 0,
+            "File::ExtAttr" : "1.09",
+            "Fuse" : "0.14",
+            "Getopt::Long" : 0,
+            "IPC::PerlSSH" : "0.16",
+            "POSIX" : 0,
+            "Pod::Usage" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/clipland/fuse-perlssh-fs"
+      }
+   },
+   "version" : "0.13"
+}

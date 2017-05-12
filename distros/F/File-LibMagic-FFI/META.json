@@ -1,0 +1,58 @@
+{
+   "abstract" : "Determine MIME types of data or files using libmagic",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-LibMagic-FFI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "FFI::CheckLib" : "0.06",
+            "Module::Build" : "0.28",
+            "perl" : "5.008001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::CheckLib" : "0.06",
+            "FFI::Platypus" : "0.08",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "base" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/File-LibMagic-FFI/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/File-LibMagic-FFI",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/File-LibMagic-FFI.git",
+         "web" : "https://github.com/plicease/File-LibMagic-FFI"
+      }
+   },
+   "version" : "0.04"
+}
+

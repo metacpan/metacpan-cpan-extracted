@@ -1,0 +1,23 @@
+---
+abstract: 'File::Find, declaratively'
+author:
+  - 'Ryan P. Kelly <rpkelly@cpan.org>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Find-Declare
+requires:
+  ExtUtils::MakeMaker: 0
+  File::Util: 0
+  Moose: 0
+  Moose::Meta::TypeConstraint: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::StrictConstructor: 0
+  Number::Compare: 0
+  Number::Compare::Date: 0
+  Test::Exception: 0
+  Test::More: 0
+  Text::Glob: 0
+version: 0.62

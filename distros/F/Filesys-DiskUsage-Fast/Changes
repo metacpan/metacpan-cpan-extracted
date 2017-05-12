@@ -1,0 +1,17 @@
+Revision history for Filesys-DiskUsage-Fast
+
+0.04    Mon Jun 24 16:06:14 UTC 2013
+    * updated pod & metadata for wrong repos address.
+
+0.03    Mon Jun 24 11:43:42 UTC 2013
+    * added SectorSize global variable.
+    * renamed & revised eg/diskusage.
+    * switched to Minilla.
+
+0.02    Thu Nov 29 17:43:40 UTC 2012
+    * added memory leak test using Test::LeakTrace.
+    * updated Build.PL for cpan/cpantesters.
+    * fixed a compatibility issue on OpenSolaris.
+
+0.01    Sun Sep 30 12:04:47 UTC 2012
+    * first release.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::BitStamp::API.
+
+0.01  Thu June 8 13:19:53 2014
+	- original version; created by h2xs 1.23 with options
+		-AX Finance::BitStamp::API
+

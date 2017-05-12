@@ -1,0 +1,8 @@
+Revision history for File-Dir-Hash
+
+0.02    Added proper tests, changed to File::Spec instead of '/',
+        declared proper dependencies
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+# Please don't encrypt me!
+# This space is left blank intentionally  
+use Filter::CBC "GOST","my secret key";
+RandomIV”¼Ã~ÒÌÔ|o&šş…ù%cŸ,ôŒK5ŸõÿŠbXä›XŸ`ZQ˜iSğV%æUM†ƒgß^›¦e#‘/:¯ö§êÚÃFQ“Å$haöÔIŠf#MĞkê®ÇLTIÚå¾ò‰‹xS¼³×[Òt½ÿƒcòÔ£y¾
+9xíR–í

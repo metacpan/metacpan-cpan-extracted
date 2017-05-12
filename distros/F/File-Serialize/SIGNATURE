@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 355902010d557d6f7ecd3ff513074c5717a44b36 AUTHOR_PLEDGE
+SHA1 9f39bed3574d54bbdefe187b453f360e6d8b72d3 CONTRIBUTORS
+SHA1 a65728d84b48c18e869080446d96d0dc7f635330 Changes
+SHA1 5f0a62949de55b6c1500348df769e5abab866e85 INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 03432241425fab1a34e99273bb07339f23e5bbd3 MANIFEST
+SHA1 d63395ed68e8c4c35e890279740f37f98506f7df META.json
+SHA1 0e9ba2cc9e85ce632bd9e2d2d6b0583940248d33 META.yml
+SHA1 e48b1b7fc5bc7325070a3d2261cb10411c6f3aef Makefile.PL
+SHA1 d0f56384c46d8cd2d40aa81a0a7bc7e0a175dc6a bin/transerialize
+SHA1 ae9ff2c0d1c820f6f630f06b267c0aeaa3c77b06 cpanfile
+SHA1 0c4842f6d653bbb7ea845d4cc028c07ead7b2fa2 doap.xml
+SHA1 2de4c4452c83a038bf9feebf2c0b2146a7b477a9 lib/File/Serialize.pm
+SHA1 0e2541be8e36c0b9d1c97dbb4366a3a290bd8b3f lib/File/Serialize/Serializer.pm
+SHA1 d79bd1ee0dd2ce6cad5c8480a88b7ab4dc3c68f0 lib/File/Serialize/Serializer/JSON/MaybeXS.pm
+SHA1 4aa9c7d29c519faac0e205b765e06fb60bc2dec2 lib/File/Serialize/Serializer/JSONY.pm
+SHA1 c91b3959055fd3e7689f500fe5e64217e40ee000 lib/File/Serialize/Serializer/TOML.pm
+SHA1 c4332ec0e7cd68a244ddffbefa794697b321aafc lib/File/Serialize/Serializer/XML/Simple.pm
+SHA1 f1ea8df044938ba41c30af2e56d06281e3890587 lib/File/Serialize/Serializer/YAML/Tiny.pm
+SHA1 541858673f62f902f41e6b393cb5b35e5b473776 lib/File/Serialize/Serializer/YAML/XS.pm
+SHA1 8e82f490a7f0d9e798b383e4c940dbc9af384971 t/00-compile.t
+SHA1 f19b6e0e9b8a8a23740a223862aaa66fdeb886ce t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 a6971022da7835c59e664443d12373e51c124aeb t/add_extension.t
+SHA1 0605fd91275bb68e8b44840e8075b4d2be4db13f t/basic.t
+SHA1 61ba339cfa991828f0599dfcbb4bbfbfc1daf5ab t/corpus/foo.json
+SHA1 e8986665b9ddc2cd1f6c63b21eb9163084e25915 t/corpus/foo.jsony
+SHA1 f8d9510f77aefe45cfc1fa640985b431d1aa5b88 t/corpus/foo.toml
+SHA1 e36e3dd914bbf13a2412176fb5d7002dfa09e207 t/corpus/foo.xml
+SHA1 7e109797e472ae8cbd20d7a4d7e231a96324377c t/corpus/foo.yml
+SHA1 42c95e79cdcd6f9db072ebf620a36c09e8e1d34e t/corpus/mystery
+SHA1 b89eb6cd8aed92f879d9a8648c6500a71147e0f1 t/corpus/non-ref.json
+SHA1 e8495961a3e7874ef5ab14ae6c0f896a31d950dd t/defaults.t
+SHA1 50de7b47e5a5918b51ebeadcfbfa60302b164a81 t/json-allow-non-ref.t
+SHA1 d3687e5baaf37b73f1037e77a5523fde0ddfdfcb t/precedence.t
+SHA1 b2a4748f9523bf1ea8fac101a61cc302d8e7e863 t/serializer.t
+SHA1 7bf96c8298e5f230f8f6ffebc4aa765b12d05d5b t/transerialize.t
+SHA1 814eb6a8282c7cea6592f6041334311a8e68509d t/utf8.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAldyiLsACgkQ34Hwf+GwC4wZLgCg0xpC/H5/4wa2+FbWv8Tcaoqh
+LeYAn1pk+ZB5LEzNzWdBIhMrYQ5FfeE1
+=kXjS
+-----END PGP SIGNATURE-----

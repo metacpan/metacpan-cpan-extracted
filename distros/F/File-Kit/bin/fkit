@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Kit;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+sub usage;
+sub fatal;
+
+@ARGV = 'help' if !@ARGV;
+
+my $cmd = shift @ARGV;
+my $handler = __PACKAGE__->can("cmd_$cmd") or usage;
+$handler->();
+
+# --- Command handlers
+
+sub cmd_help {
+    goto &usage;
+}
+
+sub cmd_new {
+    my ($verbose);
+    GetOptions(
+        'v' => \$verbose,
+    ) or usage;
+    my $dir = shift @ARGV;
+    die "fkit: kit already exists: $dir" if -e $dir;
+    my $kit = File::Kit->new($dir, argvmeta());
+    $kit->edit;
+    while (@ARGV) {
+        my $file = shift @ARGV;
+        $kit->add($file, argvmeta());
+        print STDERR "added: $file\n" if $verbose;
+    }
+    $kit->save;
+}
+
+sub cmd_close {
+    my $dir = shift @ARGV;
+    my ($status) = glob('@*');
+    if ($status) {
+        rename $status, '@closed' or die;
+    }
+    else {
+        mkdir '@closed' or die;
+    }
+}
+
+sub cmd_add {
+    my ($verbose);
+    GetOptions(
+        'v' => \$verbose,
+    ) or usage;
+    @ARGV > 1 or usage;
+    my $dir = shift @ARGV;
+    die "fkit: kit does not exist: $dir" if ! -d $dir;
+    my $kit = File::Kit->new($dir);
+    while (@ARGV) {
+        my $file = shift @ARGV;
+        $kit->add($file, argvmeta());
+        print STDERR "added: $file\n" if $verbose;
+    }
+}
+
+# --- Helper functions
+
+sub argvmeta {
+    my %meta;
+    while (@ARGV) {
+        if ($ARGV[0] eq '--') {
+            shift @ARGV;
+            last;
+        }
+        elsif ($ARGV[0] =~ /^([^=\s]+)=(.*)$/) {
+            shift @ARGV;
+            $meta{$1} = $2;
+        }
+        elsif ($ARGV[0] =~ /^\@(.+)/) {
+            shift @ARGV;
+            %meta = ( %meta, File::Kit->rdkvfile($1) );
+        }
+        else {
+            last;
+        }
+    }
+    return %meta;
+}
+
+# fkit new DIR [KEY=VALUE]...
+# fkit add DIR [ FILE [ "[" [KEY=VALUE]... "]" ] ]...
+
+# fkit new foo.kit source=ftp://ftp.example.com/pub/
+# fkit add foo.kit /path/to/bar title='Bar nun' author='N. O. Boddie' -- baz ...
+# fkit add foo.kit bar @bar.meta baz @baz.meta
+

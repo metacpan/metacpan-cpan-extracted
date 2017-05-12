@@ -1,0 +1,32 @@
+params:
+  mail:
+    name: 'メールアドレス'
+    validators:
+      - DBIC#unique:
+          resultset: __resultset(Test)__
+  mail2:
+    name: 'メールアドレス2'
+    validators:
+      - DBIC#unique:
+          resultset: __resultset(Test)__
+          criteria:
+            id:
+              '!=': `1+1`
+            mail: __value__
+  mail3:
+    name: 'メールアドレス3'
+    validators:
+      - DBIC#unique:
+          resultset: __resultset(Test)__
+          criteria:
+            id:
+              '!=': `1+4`
+            mail: __value__
+  mail_exist:
+    name: 'メールアドレス_exist'
+    validators:
+      - DBIC#exist:
+          resultset: __resultset(Test)__
+          criteria:
+            mail: __value__
+

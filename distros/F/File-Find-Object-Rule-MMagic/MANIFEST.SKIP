@@ -1,0 +1,5 @@
+\.cvsignore
+\.svn
+^Makefile$
+~$
+^MYMETA.yml$

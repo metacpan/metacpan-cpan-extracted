@@ -1,0 +1,30 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+LICENSE
+Makefile.PL
+README
+lib/File/Same.pm
+t/00-load.t
+t/01base.t
+t/02files.t
+t/03dir.t
+t/04dirs.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+testfiles/a
+testfiles/b
+testfiles/dir1/a
+testfiles/dir1/c
+testfiles/dir1/f
+testfiles/dir2/c
+testfiles/dir2/d
+testfiles/dir2/g
+testfiles/dir3/b
+testfiles/dir3/e
+testfiles/dir3/f
+testfiles/dir3/g
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

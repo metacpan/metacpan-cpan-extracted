@@ -1,0 +1,69 @@
+NOTE: This list was created on Sun Jun 21 18:27:14 EDT 1998
+Some files may have been added or deleted since that date.  See
+file /simtelnet/msdos/00_info/upload.txt for uploading information.
+
+NOTE: Type B is Binary; Type A is ASCII
+
+Directory simtelnet/msdos/4dos/
+ Filename   Type Length   Date   Description
+==============================================
+1cat.zip      B   27440  950213  4DOS & NDOS command line disk catalog program
+4archiv3.zip  B  107213  960511  Menu tools for PKZIP and ARJ, for 4DOS
+4btmutil.zip  B    5608  940610  BTM's save/restore 4DOS env. w/Windows & more
+4d24h20b.zip  B   22806  930501  TSR critical error handler (INT 24) for 4DOS
+4datef.zip    B    2063  921019  .BTM functions: Day-of-Week, Number-of-Week
+4dc_v091.zip  B   49635  961206  Configuration program for 4DOS.INI
+4dcat10.zip   B   45846  961229  Floppy cataloger with freeform database
+4ddbu500.zip  B   24971  910731  4DOS and DOS batch utilities v5.00
+4decomp.zip   B    7733  931212  Batcomp decompressor for 4DOS 5.0 BTMs
+4derr220.zip  B    5624  960511  4DERR v2.20: Error handling script for 4DOS
+4dhs10.zip    B   10109  931220  Hindsite v1.0 command completion for 4DOS v5.0
+4diz18.zip    B   29119  960404  Make descript.ion for archives by FILE_ID.DIZ
+4dizzy96.zip  B   57017  961031  Copies archive info into 4dos descriptions
+4dman10b.zip  B    2655  921019  Unix-like MAN, searches docs for cmds, .BTM
+4dos552.zip   B  531614  960423  4DOS command processor v5.52 4-17-96 rel. A
+4dpatch.zip   B   46927  920607  4DOS & 4OS2 patch pgm for making minor updates
+4dpath.zip    B    1264  921019  Add/remove path(s) to/from %PATH (.BTM)
+4dpsetdj.zip  B    5458  930122  Printer setup for HP Deskjet series. 4DOS req.
+4dtip2.zip    B    8631  920704  How to pack several 4DOS BTM's into one
+4dtnt.zip     B   27107  911102  4DOS 4.0 Tips 'N Tricks -- sample batch files
+4edit21.zip   B  135863  960408  4DOS full screen directory description editor
+4error.zip    B    2170  921019  Show description for given DOS error, .BTM
+4fc12.zip     B   23995  920830  4Comment: Extracts file descriptions from 4DOS
+4file330.zip  B  113996  960404  Multi-purpose file manager for 4DOS & NDOS
+4laser.zip    B    4594  920415  4DOS BTM file for HP-LJII configuration
+4log05.zip    B   64144  910520  Activity tracking/performance monitor for 4DOS
+4map.zip      B   41594  901114  Customize 4DOS command line editor keybindings
+4menu10b.zip  B    4836  921019  Desktop MENU interface for 4dos (.BMT)
+4menu11w.zip  B   41870  910307  Makes batch file menus using 4DOS functions
+4mica26.zip   B   11713  920623  4DOS-based archive utility for ARJ/LHA/ZIP
+4random.zip   B    2292  921019  Pseudo-random generator for 4dos (.BTM)
+4sght13.zip   B    6906  930302  tcsh-like & windowed 4DOS filename completion
+4trash10.zip  B    3379  960703  Trash: .BTM to emulate a trashcan under 4DOS
+4utils86.zip  B  155822  960417  Free utilities for 4DOS/NDOS, with PAS source
+4whts10b.zip  B    1756  921019  WHATIS, 'what-this-cmd-stands-for'-cmd, .BTM
+4zip201.zip   B  155004  911221  Includes 4DOS file descriptions in ZIP files
+ace4d02.zip   B   45199  940202  4DOS comment editor w/Borland-style interface
+arconv01.zip  B   11855  930629  Smart archive handling & converting with 4DOS
+bkup12.zip    B   34495  950520  4DOS BTM pgm for updating PC with new files
+btmut101.zip  B   16501  960719  Collection of 4DOS BTM utilities
+cdp.zip       B   20146  980223  CDP: CD player shell for 4DOS
+confiset.zip  B    8404  920210  Export DR-DOS config environ to 4DOS (w/src)
+copyall1.zip  B    2314  940829  4DOS BTM that copies directories. Like xcopy
+delall10.zip  B    2099  940829  4DOS BTM to remove directories. Like deltree
+dfc131.zip    B    7607  921113  Dave's Floppy Cataloger, with menu & Findall
+ez-btm11.zip  B   66663  941026  4DOS BTM files: loaders/regular/libraries/help
+fabtm11.zip   B   15766  970323  File Associations BTM: File managers/cmd line
+gl-keys.zip   B    9408  940210  Keystroke stacking prg. w/ASM src, 4DOS compat
+hakaut10.zip  B   27086  950130  Set of 4DOS batch interfaces for DOS programs
+jambtm02.zip  B   57538  921113  4DOS batch file collection & related material
+jp4ref.zip    B  254848  960227  Manual for 4DOS 5.5/4OS2 2.5/4DOS/NT
+mav120.zip    B    3558  921027  4DOS BTM file: Mally's Archive Viewer
+mov_numb.zip  B    1959  930601  4DOS batch file, moves and remumbers files
+pkbtm111.zip  B   10255  920225  4DOS batch file serves as archiver shell
+rmd200.zip    B   61071  940201  Safe directory tree remover BTM for 4DOS
+sb4_4dos.zip  B  724026  940310  Soundblaster support for 4DOS v5.x unknown_cmd
+sdflush.zip   B    2857  931216  Flush SHARTDRV buffer on return to 4DOS prompt
+svalias.zip   B    4433  891223  Saves 4DOS aliases in a file for later use
+tfc22c.zip    B   42950  940111  Floppy cataloguer for 4DOS/NDOS users (+TPsrc)
+ucpbtm10.zip  B   12966  931223  4DOS compressed .BTM batch file decompressor

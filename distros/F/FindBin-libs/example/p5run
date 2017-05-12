@@ -1,0 +1,11 @@
+#!/bin/env perl
+########################################################################
+# preload PERL5LIB then execute the "real" code with an 
+# updated environment.
+########################################################################
+
+use FindBin::libs qw( p5lib );
+
+$0 = shift;
+
+exec $0;

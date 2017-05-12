@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+# -*- mode: cperl; -*-
+
+{ local($!) = 1; print "Content-Type: text/html\n\n"; }
+
+print <<END;
+<HTML>
+<HEAD>
+<TITLE>Frame1</TITLE>
+<META NAME="keywords" CONTENT="Free,xxx,Movies,Pics,Pic,Bilder,pics,pic,Tumbs">
+<META NAME="description" CONTENT="Free Pics,Movies">
+<META NAME="robots" CONTENT="INDEX, FOLLOW">
+<META NAME="revisit-after" CONTENT="10 days">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<script language="JavaScript">
+if(top.frames.length > 0)
+top.location.href=self.location;
+</script>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<a href="http://localhost:80/cgi-bin/lwp/frame2"> 1 Frame </a>
+</BODY>
+</HTML>'
+END
+

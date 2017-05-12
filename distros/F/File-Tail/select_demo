@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+BEGIN { unshift @INC,"./blib/lib/";}
+use File::Tail 0.91;
+
+#$name="/var/log/syslog" unless $name=shift @ARGV;
+$debug=shift @ARGV || 0;
+$version=shift @ARGV || 0;
+if ($#ARGV<0) {
+    @ARGV=qw( /var/log/syslog /var/adm/messages /var/adm/lpr.log );
+}
+foreach (@ARGV) {
+    push(@files,File::Tail->new(name=>"$_",debug=>$debug));
+}
+my $rin='';
+if ($version==0) {
+    while (1) {
+	$nfound=File::Tail::select(undef,undef,undef,60,@files);
+	unless ($nfound) {
+	    my @ints;
+	    foreach(@files) {
+		push(@ints,$_->interval);
+	    }
+	    print "Nothing new! - ".localtime(time)."(".join(",",@ints).")\n";
+	}
+	foreach (@files) {
+	    print $_->{"input"}." (".localtime(time).") ".$_->read unless $_->predict;
+	}
+    }
+} else {
+    while (1) {
+	($nfound,$timeleft,@pending)=
+	    File::Tail::select(undef,undef,undef,60,@files);
+	unless ($nfound) {
+	    my @ints;
+	    foreach(@files) {
+		push(@ints,$_->interval);
+	    }
+	    print "Nothing new! - ".localtime(time)."(".join(",",@ints).")\n";
+	}
+	foreach (@pending) {
+	    print $_->{"input"}." (".localtime(time).") ".$_->read;
+	}
+    }
+}

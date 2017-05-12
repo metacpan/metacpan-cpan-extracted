@@ -1,0 +1,31 @@
+---
+abstract: 'Install (into) configuration directories'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-ConfigDir-Install
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Path: '2.00'
+  File::Spec: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=File-ConfigDir-Install
+  homepage: https://metacpan.org/release/File-ConfigDir-Install
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-utils/File-ConfigDir-Install
+version: '0.001'

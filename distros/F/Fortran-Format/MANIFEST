@@ -1,0 +1,18 @@
+Changes
+Format.pm
+MANIFEST			This list of files
+Makefile.PL
+README
+format.f
+read.f
+read_arr.f
+read_arr_tests.txt
+read_arr_tests_out.txt
+read_tests.txt
+read_tests_out.txt
+t/array.t
+t/pod.t
+t/read.t
+t/write.t
+write_tests.txt
+META.yml                                 Module meta-data (added by MakeMaker)

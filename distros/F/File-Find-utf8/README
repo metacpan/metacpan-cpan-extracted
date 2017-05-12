@@ -1,0 +1,113 @@
+NAME
+
+    File::Find::utf8 - Fully UTF-8 aware File::Find
+
+VERSION
+
+    version 0.012
+
+SYNOPSIS
+
+        # Use the utf-8 versions of find and finddepth
+        use File::Find::utf8;
+        find(\&wanted, @directories_to_search);
+    
+        # Revert back to non-utf-8 versions
+        no File::Find::utf8;
+        finddepth(\&wanted, @directories_to_search);
+    
+        # Export only the find function
+        use File::Find::utf8 qw(find);
+        find(\&wanted, @directories_to_search);
+    
+        # Export no functions
+        use File::Find::utf8 qw(:none); # NOT "use File::Find::utf8 qw();"!
+        File::Find::find(\&wanted, @directories_to_search);
+
+DESCRIPTION
+
+    While the original File::Find functions are capable of handling UTF-8
+    quite well, they expect and return all data as bytes, not as
+    characters.
+
+    This module replaces the File::Find functions with fully UTF-8 aware
+    versions, both expecting and returning characters.
+
+    Note: Replacement of functions is not done on DOS, Windows, and OS/2 as
+    these systems do not have full UTF-8 file system support.
+
+ Behaviour
+
+    The module behaves as a pragma so you can use both use File::Find::utf8
+    and no File::Find::utf8 to turn utf-8 support on or off.
+
+    By default, both find() and finddepth() are exported (as with the
+    original File::Find), if you want to prevent this, use use
+    File::Find::utf8 qw(:none). (As all the magic happens in the module's
+    import function, you can not simply use use File::Find::utf8 qw())
+
+    File::Find warning levels are properly propagated. Note though that for
+    propagation of fatal File::Find warnings, Perl 5.12 or higher is
+    required (or the appropriate version of warnings).
+
+ATTRIBUTES
+
+ $File::Find::utf8::SPECIALVARS
+
+    By default File::Find::utf8 only decodes the normal File::Find
+    variables $_, $File::Find::name, $File::Find::dir, and (when follow or
+    follow_fast is in effect) $File::Find::fullname for use in the
+    preprocess, wanted, and postporcess functions.
+
+    If for any reason (e.g., compatibility with find.pl or find2perl) you
+    also need the special variables $File::Find::topdir,
+    $File::Find::topdev, $File::Find::topino, $File::Find::topmode, and
+    $File::Find::topnlink to be decoded, specify local
+    $File::Find::utf8::COMPATILBILITY = 1; in your code. The extra decoding
+    that needs to happen will impact performance though, so use only when
+    absolutely necessary.
+
+ $File::Find::utf8::UTF8_CHECK
+
+    By default File::Find::utf8 marks decoding errors as fatal (default
+    value for this setting is Encode::FB_CROAK). If you want, you can
+    change this by setting File::Find::utf8::UTF8_CHECK. The value
+    Encode::FB_WARN reports the encoding errors as warnings, and
+    Encode::FB_DEFAULT will completely ignore them. Please see Encode for
+    details. Note: Encode::LEAVE_SRC is always enforced.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/HayoBaan/File-Find-utf8/issues>.
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+COMPATIBILITY
+
+    The filesystems of Dos, Windows, and OS/2 do not (fully) support UTF-8.
+    The File::Find function will therefore not be replaced on these
+    systems.
+
+SEE ALSO
+
+      * File::Find -- The original module.
+
+      * Cwd::utf8 -- Fully utf-8 aware version of the Cwd functions.
+
+      * utf8::all -- Turn on utf-8, all of it. This was also the module I
+      first added the utf-8 aware versions of Cwd and File::Find to before
+      moving them to their own package.
+
+AUTHOR
+
+    Hayo Baan <info@hayobaan.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Hayo Baan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/File/chdir/WalkDir.pm
+t/test.t
+test_files/a/a1
+test_files/a/a2
+test_files/b/b1
+test_files/c1

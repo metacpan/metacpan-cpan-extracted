@@ -1,0 +1,3 @@
+# Run the fwctl fetch program every 10 minutes
+# m h dom mon dow user  command
+*/10 *  *   *   *  root  test -x /usr/sbin/fwctl && /usr/sbin/fwctl dump-acct

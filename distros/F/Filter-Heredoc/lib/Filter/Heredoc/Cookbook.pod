@@ -1,0 +1,298 @@
+
+=head1 NAME
+
+Filter::Heredoc::Cookbook - The Filter::Heredoc Cookbook
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+=head1 DESCRIPTION
+
+This is the L<Filter::Heredoc::Cookbook>.
+
+This is intended to provide examples and food for thoughts
+on the topic 'interesting here document concepts'.
+
+=head1 POD AS HERE DOCUMENTS EMBEDDED IN SHELL SCRIPTS
+
+Embedding documentation in source files as programmers reference
+is an excellent strategy to keep them up to date. Embedding POD in
+shell scripts as here documents achieves that goal.
+
+Once documentation is in POD, tools like I<pod2pdf> and I<pod2html>
+converts files with embedded documentation to pdf or html formats:
+
+    pod2pdf diskusage > diskusage.pdf
+    pod2html --infile=diskusage > diskusage.html
+
+Converting documentation to man pages can be done with:
+
+    su -c 'pod2man diskusage > /usr/local/share/man/man1/diskusage.1p'
+
+A problem is to spell check both the verbatim output and the embedded
+POD text but it has a solution.
+
+=head2 Perls simple to use markup documentation language - i.e. POD
+
+First, let's show how to embed POD in shell scripts.
+We need a I<smart> here document delimiter and we need the POSIX
+colon (:) command which does nothing else than expanding arguments
+and performing redirections.
+
+  : [arguments]
+
+A very short example shows how to embed POD in shell scripts:
+
+  #!/bin/bash
+  # diskusage
+  echo Demonstrate how to embed POD.
+  echo This is a shell script line.
+  
+  : <<  =cut
+  
+  =head1 NAME
+
+  diskusage - Send mail to top consumers of disk space
+
+  =head1 SYNOPSIS
+
+  diskusage 10000
+  
+  =cut
+
+Note the use of '=cut' as the delimiter for the here document.
+Running this prints only the first two I<echo> lines.
+Converting this short script file to pdf produces the documentation:
+
+    pod2pdf diskusage > diskusage.pdf
+  
+=head2 Long example: spell checking a script with multilingual text
+
+The 'diskusage' script will mail all users who exceeded a specified
+amount of disk space. However, and in this example only it does not
+provide a useful user message when the required argument is missing.
+The embedded POD text has included more information though.
+
+
+  #!/bin/bash
+  if [ "$#" -ne 1 ]; then
+    exit 1
+  fi
+  startdir=$(pwd)
+  cd /home
+  files=$(ls -D)
+  for user in $files ; do
+   if [ -d "$user" ]; then
+     amount=$(du -sm /home/$user 2>/dev/null | awk '{print $1}')
+      if [ "$amount" -gt "$1" ]; then
+        mail -s "Disk usage warning ( > $1 Mbytes)" $user <<- END_MAIL
+	Hej. Skivminnet tar snart slut i ert tilldelade hemutrymme!
+	Dina filer upptar $amount Mbytes.
+	Tag snarast bort ej aktuella filer.
+
+	Tack.
+	Er sysadmin.
+	END_MAIL
+      fi
+   fi
+  done
+  cd $startdir
+  exit 0
+  # end of shell script and start of POD part
+  : << =cut
+  
+  =head1 NAME
+
+  diskusage - Send mail to top consumers of disk space
+
+  =head1 SYNOPSIS
+
+  diskusage 10000
+
+  =head1 DESCRIPTION
+
+  I<diskusage> use the I<du> command to collect each users disk
+  consumption below the home directory. This script will use I<mail>
+  and send a warning if the found space is greater than the specified
+  (Mbytes) maximum allowed amount.
+
+  =head1 REQUIRED ARGUMENTS
+  
+  Amount of disk space when a mail warning will be sent to each end user.
+  
+  =head1 DIAGNOSTICS
+  
+  Exit codes:
+    0: Normal exit
+    1: User error
+  
+  =head1 LICENSE AND COPYRIGHT
+
+  Copyright 2011-12, Bertil Kronlund
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of either: the GNU General Public License as published
+  by the Free Software Foundation; or the Artistic License.
+
+  See http://dev.perl.org/licenses/ for more information.
+  
+  =head1 SEE ALSO
+  
+  L<du(1)>, L<mail(1)>
+  
+  =cut
+
+The challenge here is to extract the right part and spell check the 
+multilingual text. I<filter-heredoc> extracts the here document and
+I<podspell> extracts and removes the POD markup before spell checking
+the text itself.
+
+Find the existing delimiters in the (diskusage) example script with:
+
+    filter-heredoc --list diskusage
+
+which produces this output:
+    
+    (diskusage:19)END_MAIL 
+    (diskusage:63)=cut 
+
+Match and spell check only the first multilingual here document part:
+
+    filter-heredoc -qm END_MAIL diskusage | hunspell -d sv_SE -l
+    
+The POD text can be filtered directly with podspell: 
+    
+    podspell diskusage | aspell list -l en
+    podspell diskusage | ispell -a | grep \&
+
+=head2 Automated spell checking of shell scripts 
+
+I have not found any automated spell check solution for this kind of
+scripts but set up a t-test using I<Test::Spelling> for POD:
+
+    #!/usr/bin/perl
+    # xt/spelling.t
+    use Test::More;
+    use Test::Spelling 0.11;
+
+    my $spellchecker = q{aspell list -l en};
+    set_spell_cmd($spellchecker);
+    add_stopwords( <DATA> );
+    all_pod_files_spelling_ok();
+
+    __DATA__
+    onestopword
+    anotherstopword
+
+=head1 CHANGES FILE IN HEREDOC FORMAT
+
+The I<Changes> or I<ChangeLog> describes the code history of revisions.
+The GNU project defined a policy in their GNU Coding Standards.
+
+See http://www.gnu.org/prep/standards/standards.html#Change-Logs
+
+=head2 Changes file in here document format
+
+I<Changes> files can enhance it's readability by adding section headings 
+and grouping related changes together. An example from I<Dancer>:
+
+  SECURITY, API CHANGES, BUG FIXES, ENHANCEMENTS, DOCUMENTATION
+
+Individual changes are detailed under each section. This is for humans
+to read. Rewriting this in here document format improves searching and
+possible also this simplifies writing a t-test on policies.
+
+An shorted example from I<Dancer> when I use sections as delimiters:
+
+    : <<END_VERSION;<<END_API_CHANGES;<<END_BUG_FIXES;<<END_ENHANCEMENTS
+
+    1.3079_05 (02.10.2011)
+    END_VERSION
+    * Deprecation of 'before', 'before_template' and 'after' in favor of hook
+      (Alberto Simões)
+    END_API_CHANGES
+    * Minor corrections (jamhed, felixdo)
+    * Log if a view and or a layout is not found
+    (Alberto Simões, reported
+      by David Previous)
+    END_BUG_FIXES
+    * Add support for the HTTP 'PATCH' verb
+    (David Precious)
+    END_ENHANCEMENTS
+
+Note the important usage of the END-prefix and that each section text
+is now described I<above> this line.
+Suppose our interest is focused only in I<all> section of API CHANGES.
+Use I<filter-heredoc> to find these with:
+
+    filter-heredoc --quiet --match=END_VERSION,END_API_CHANGES Changes
+
+The results shows I<all> API CHANGES for this Changes file:
+
+    1.3079_05 (02.10.2011)
+    * Deprecation of 'before', 'before_template' and 'after' in favor
+      of hook (Alberto Simões)
+
+    1.3079_04 (02.10.2011)
+
+    1.3079_03 (10.09.2011)
+
+    1.3029_01 (01.04.2011)
+
+=head2 Hints on writing Changes files as here documents
+
+There is no need to include a I<#!/bin/bash> or make this file executable.
+There shall be at least one space character between the colon (:) operator and the
+redirector (<<). No trailing spaces are allowed after the delimiter word.
+Test the new Changes file for errors with I<bash> :
+
+    bash Changes
+
+=head1 TODO
+
+Write a spell check t-test when all text is in here documents.
+
+Write a policy t-test to enforce a changes policy and when Changes is
+formatted as a here document.
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Filter-Heredoc>
+or at C<< <bug-filter-heredoc at rt.cpan.org> >>.
+
+=head1 AUTHOR
+
+Bertil Kronlund, C<< <bkron at cpan.org> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to M. Ivkovic and his blog post at:
+
+http://bahut.alma.ch/2007/08/embedding-documentation-in-shell-script_16.html
+
+who pointed me in the direction to use embedded POD in shell scripts.
+This inspired me to create the L<Filter::Heredoc> module.
+
+=head1 SEE ALSO
+
+L<Filter::Heredoc>, L<filter-heredoc>
+
+L<pod2man(1)>, L<pod2html(1)>, L<pod2pdf(1)>, L<podspell(1)>,
+L<aspell(1)>, L<hunspell(1)>, L<ispell(1)>, L<Test::Spelling(3)>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011-12, Bertil Kronlund
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+

@@ -1,0 +1,1 @@
+Ensures git tracks 't/lib' as tests use that directory.

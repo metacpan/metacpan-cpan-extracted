@@ -1,0 +1,485 @@
+<HTML>
+<style type="text/css">
+<!--
+.small{FONT-FAMILY: Arial, Helvetica, sans-serif;
+       FONT-SIZE: 3pt;
+       FONT-STYLE: normal
+}
+.aktif{COLOR: blue;
+       FONT-SIZE: 9pt;
+       FONT-FAMILY: Arial, Helvetica, sans-serif;
+       FONT-STYLE: normal
+}
+A:active{ COLOR: yellow; }
+A:hover{ COLOR: yellow; }
+A:link {TEXT-DECORATION: none}
+A:visited {text-decoration: none; }
+-->
+</style>
+<script>
+var timerID = null;
+var timerRunning = false;
+var months=new Array(13);
+months[1]="Jan";
+months[2]="Feb";
+months[3]="Mar";
+months[4]="Apr";
+months[5]="May";
+months[6]="Jun";
+months[7]="Jul";
+months[8]="Aug";
+months[9]="Sep";
+months[10]="Oct";
+months[11]="Nov";
+months[12]="Dec";
+function stopclock(){
+  if(timerRunning)
+    clearTimeout(timerID);
+    timerRunning=false;
+}
+function startclock() {
+   xnow = new Date('Oct 14, 2009 10:19:00');
+   stopclock();
+   showtime();
+}
+function showtime() {
+   xnow.setSeconds(xnow.getSeconds()+1);
+   var lmonth=(((xnow.getMonth()+1) < 10) ? "0" : "") + (xnow.getMonth()+1);
+   var date=((xnow.getDate() < 10) ? "0" : "") + xnow.getDate();
+   var year=xnow.getYear();
+   if (year<2000) year=year+1900
+   var hour=((xnow.getHours() < 10) ? "0" : "") + xnow.getHours();
+   var min=((xnow.getMinutes() < 10) ? "0" : "") + xnow.getMinutes();
+   var sec=((xnow.getSeconds() < 10) ? "0" : "") + xnow.getSeconds();
+   document.DateTime.document.write("<font face=verdana size=1 color=#000000>Tanggal : " + "&nbsp;" + months[xnow.getMonth()+1] + "&nbsp;" + year + "           Jam : " + hour + ":" + min + ":" + sec + "</font>");
+   timerID = setTimeout("showtime()",900);
+   timerRunning = true;
+}
+var ms = 0;
+function fncSetTimer() {
+	ms = 0;
+	then = new Date();
+	then.setTime(then.getTime() - ms);
+}
+function fncTimer() {
+	  setTimeout("fncTimer();", 10000);
+	  ynow = new Date();
+	  ms = ynow.getTime() - then.getTime();
+	  if (ms>=480000) {
+	     fncSetTimer();
+	     fncLogoff();
+	  }
+	window.status=parseInt(ms/1000) + " seconds idle";
+}
+function fncLogoff() {
+	document.iBankForm.action = "sessionexpired.htm";
+	document.iBankForm.submit();
+}
+</script>
+<body alink="white" link="white" vlink="white" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" bgcolor="#ffffff" onload="startclock();fncSetTimer();fncTimer();" >
+<layer id="DateTime" left="25" top="12"></layer>
+<table border="0" cellpadding="0" cellspacing="0" width="590">
+   <tr height="20" bgcolor="#e7d300">
+      <td bgcolor="#e7d300" width="393" >
+         <font face="Verdana" size="2" color="#0000bb">&nbsp;
+         </font>
+      </td>
+      <td width="25" bgcolor="#4a55b5"><img src="/images/latar1b.jpg"></td>
+      <td width="100" bgcolor="#4a55b5" align="center" class="aktif"></td>
+   </tr>
+   <tr bgcolor="#4A55B5" height="2"><td colspan="3"></td></tr>
+</table>
+
+<table border="0" cellpadding="1" cellspacing="0" width="590">
+   <tr height="20">
+      <td colspan ="3" bgcolor="#8486de">
+         <font size="2" face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular" color="white">&nbsp;INFORMASI REKENING - MUTASI REKENING</font>
+      </td>
+   </tr>
+   <tr>
+      <td bgcolor="#FFFFFF" colspan=3></td></tr><tr><td bgcolor="#FFFFFF" colspan=3></td>
+   </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="590">
+<tr>  <td colspan="2" align="center">    <table border="0" width="90%" cellpadding="0" cellspacing="0" bordercolor="#f0f0f0">          <tr><td colspan="3"><hr></td></tr>          <tr bgcolor="#e0e0e0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Nomor Rekening</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td><font face="Verdana" size="1" color="#0000bb">1234567890</font></td></tr>          <tr bgcolor="#f0f0f0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Nama</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td><font face="Verdana" size="1" color="#0000bb">STEVEN HARYANTO</font></td></tr>          <tr bgcolor="#e0e0e0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Periode</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td><font face="Verdana" size="1" color="#0000bb">14/09/2009 - 14/10/2009</font></td></tr>          <tr bgcolor="#f0f0f0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Mata Uang</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td><font face="Verdana" size="1" color="#0000bb">IDR</font></td></tr>          <tr><td colspan="3"><hr></td></tr>    </table>  </td></tr><tr>  <td colspan="2">    <table border="1" width="100%" cellpadding="0" cellspacing="0" bordercolor="#ffffff">
+<tr>
+<td width="30" bgcolor="e0e0e0"><div align="left">
+<font face="Verdana" size="1"  color="#0000bb">
+<b>Tgl.</b></font></div></td>
+<td width="130" bgcolor="e0e0e0"><div align="left">
+<font face="Verdana" size="1"  color="#0000bb">
+<b>Keterangan</b></font></div></td>
+<td width="30" bgcolor="e0e0e0"><div align="center">
+<font face="Verdana" size="1"  color="#0000bb">
+<b>Cab.</b></font></div></td>
+<td width="" bgcolor="e0e0e0" colspan="2"><div align="right">
+<font face="Verdana" size="1"  color="#0000bb">
+<b>Mutasi</b></font></div></td>
+<td width="" bgcolor="e0e0e0"><div align="right">
+<font face="Verdana" size="1"  color="#0000bb">
+<b>Saldo</b></font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+15/09</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TRSF E-BANKING DB<br>1509/FTSCY/WS95011<br>        1000000.00<br>AAAAAAAAA AAAAAAAA<br>AAAAAA AAAAAAAA</font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+1,000,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+12,023,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+15/09</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TRSF E-BANKING DB<br>1509/FTSCY/WS95011<br>        4000000.00<br>AAAAAAAAA AAAAA   <br>AAAAAA AAAAAAAA</font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+4,000,000.00</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+8,023,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+15/09</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TRSF E-BANKING DB<br>1509/FTSCY/WS95011<br>         700000.00<br>AAAAAAAAA AAAAAAA <br>AA AAAAAA SEP 09  <br>AAAAAA AAA AAAAAAA<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+700,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+7,323,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+18/09</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+BIAYA ADM<br></font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+10,000.00</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+7,313,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+18/09</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+BIAYA ADM<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+25,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+7,288,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+29/09</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+SETORAN TUNAI<br></font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+6340</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+500,000.00</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+CR</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+7,788,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+30/09</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+SETORAN TUNAI<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+7340</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+2,967,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+CR</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+10,755,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+30/09</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+KOR SETORAN TUNAI<br>SALAH NOMINAL</font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+7340</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+2,967,000.00</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+7,788,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+30/09</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+SETORAN TUNAI<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+7340</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+2,962,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+CR</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+10,750,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+30/09</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TRSF E-BANKING CR<br>3009/FTSCY/WS95011<br>        1000000.00<br>AAAAAAAAAA AAAAA  <br>AAAAA AAAAAAA</font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+1,000,000.00</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+CR</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+11,750,039.77</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+30/09</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+BUNGA<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+13,990.86</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+CR</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+11,764,030.63</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+30/09</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+PAJAK BUNGA<br></font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+2,798.17</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+11,761,232.46</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+01/10</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TARIKAN ATM 01/10<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+500,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+11,261,232.46</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+05/10</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TARIKAN ATM 03/10<br></font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+1,250,000.00</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+10,011,232.46</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+05/10</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TARIKAN ATM 03/10<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+1,250,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+8,761,232.46</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+05/10</font></div></td>
+<td width="130" bgcolor="#f0f0f0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TARIKAN ATM 03/10<br></font></div></td>
+<td width="30" bgcolor="#f0f0f0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+1,250,000.00</font></div></td>
+<td width="10" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#f0f0f0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+7,511,232.46</font></div></td>
+</tr>
+<tr>
+<td width="30" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+05/10</font></div></td>
+<td width="130" bgcolor="#e0e0e0"><div align="left">
+<font face="verdana" size="1" color="#0000bb">
+TARIKAN ATM 03/10<br></font></div></td>
+<td width="30" bgcolor="#e0e0e0"><div align="center">
+<font face="verdana" size="1" color="#0000bb">
+0000</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+1,250,000.00</font></div></td>
+<td width="10" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+DB</font></div></td>
+<td width="" bgcolor="#e0e0e0"><div align="right">
+<font face="verdana" size="1" color="#0000bb">
+6,261,232.46</font></div></td>
+</tr>
+</table>  </td></tr><tr>  <td colspan="2">    <table border="0" width="70%" cellpadding="0" cellspacing="0" bordercolor="#ffffff"> 	 <tr><td colspan="3"><hr></td></tr>	 <tr bgcolor="#e0e0e0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Saldo Awal</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td align="right"><font face="Verdana" size="1" color="#0000bb">13,023,039.77</font></td></tr>	 <tr bgcolor="#f0f0f0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Mutasi Kredit</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td align="right"><font face="Verdana" size="1" color="#0000bb">7,442,990.86</font></td></tr>	 <tr bgcolor="#e0e0e0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Mutasi Debet</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td align="right"><font face="Verdana" size="1" color="#0000bb">14,204,798.17</font></td></tr>	 <tr bgcolor="#f0f0f0"><td width="35%"><font face="Verdana" size="1" color="#0000bb">Saldo Akhir</font></td><td width="10"><font face="Verdana" size="1" color="#0000bb"> : </font></td><td align="right"><font face="Verdana" size="1" color="#0000bb">6,261,232.46</font></td></tr>	 <tr><td colspan="3"><hr></td></tr>    </table>  </td></tr></td>
+ <form name="iBankForm" method="POST" action="/accountstmt.do">
+</form>
+
+    </table>
+<table border="0" cellpadding="0" cellspacing="0" width="590" bordercolor="#ffffff">
+<tr height="25">
+  <td valign="top">
+    <span align="left">
+      <font size="1" face="Verdana" color="#f00000"><b> </b> </font>
+    </span>
+  </td>
+</tr>
+<tr><td colspan="3" ><hr color="#8486ce"></td></tr>
+</table>
+<script language ="javascript">
+function fncDoubleOut(){
+    alert('Transaksi Anda sedang di proses. Terima kasih');
+    return false;
+}
+</script>
+</body>
+</html>

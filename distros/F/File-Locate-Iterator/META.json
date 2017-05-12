@@ -1,0 +1,96 @@
+{
+   "abstract" : "Read \"locate\" database file with an iterator.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Locate-Iterator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel"
+      ]
+   },
+   "optional_features" : {
+      "maximum_examples" : {
+         "description" : "Be able to run all the examples programs.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Iterator" : "0",
+                  "Iterator::Simple" : "0",
+                  "MooseX::Iterator" : "0"
+               }
+            }
+         }
+      },
+      "maximum_interoperation" : {
+         "description" : "Have maximum inter-operation with other modules (optional supported other stuff).",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "File::Map" : "0.38",
+                  "Iterator" : "0",
+                  "Iterator::Simple" : "0",
+                  "MooseX::Iterator" : "0",
+                  "PerlIO::Layers" : "0"
+               }
+            }
+         }
+      },
+      "maximum_tests" : {
+         "description" : "Have \"make test\" do as much as possible.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Taint::Util" : "0",
+                  "Test::Weaken" : "3.002"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "File::Map" : "0.38",
+            "Iterator::Simple" : "0.06",
+            "PerlIO::Layers" : "0"
+         },
+         "requires" : {
+            "File::FnMatch" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "constant::defer" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/file-locate-iterator/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "23"
+}

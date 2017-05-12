@@ -1,0 +1,77 @@
+Revision history for Perl extension Finance::Bank::TB.
+
+0.28  Thu Jun 19 00:49:31 CEST 2008
+	- mea culpa, maxima culpa
+	- only typos
+
+0.26  Thu Jun 19 00:35:57 CEST 2008
+	- fixed typos
+	- add information about AREDIR and LANG
+
+0.25  Wed Jun 18 23:10:55 CEST 2008
+	- new versions of technical specifications in doc/*
+	- added currency (CURR) mandatory parameter
+	- added support for AREDIR
+	- added support for LANG
+	- small compatibility changes in Makefile.PL	
+
+0.24  Fri May 18 11:54:07 MET DST 2001
+	- major changes in protocol and URLs
+	- added technical specifications in doc/*
+	- joined TatraPay, EliotPay and CardPay into one form and link
+	- !!! BACKWARD COMPATIBILITY IS NOT GUARANTEED !!!
+
+0.23  Sat Jan 27 20:52:05 CET 2001
+	- added support for CardPay
+	- code cleanup
+	- minor changes in documentation
+	- added INSTALL file
+	- jokes is back ( sorry )
+
+0.22  Wed Jan 17 15:25:06 MET 2001
+	- change name to Finance::Bank::TB
+
+0.21  Wed Jan 17 12:42:06 MET 2001
+	- seriously package wihtout jokes
+	- code cleanup ( thanks to brenner@tatrabanka.sk )
+	- tested (and working) on WinNT platform
+
+0.20  Wed Nov 15 13:53:48 MET 2000
+	- added generic_pay_form ( HTML FORM with submit button )
+	- synchronization of versions
+
+0.19  Tue Oct  3 22:28:22 CEST 2000
+	- added some examples and documentation
+	- manual page is complet ( may be :-{)) ) 
+	- added method pay_link
+	
+0.18  Fri Sep 22 16:34:05 MET DST 2000
+	- Crypt::DES 2.01 is avialable ( no Endians problem )
+
+0.17  Tue Sep  5 11:39:29 GMT 2000
+	- rewrite code for using Crypt::PPDES ( pure perl implementation of
+	  DES )
+
+0.16  Sun Sep  3 19:45:47 CEST 2000
+	- rewrite code for using Digest::SHA1	
+
+0.15  Fri Jun 16 12:47:43 CEST 2000
+	- fixed error in Makefile.PL
+	- add simple example
+
+0.14  Thu Jun 15 14:48:34 CEST 2000
+	- pay_form parameter added
+	- correct initial values for TB & Eliot
+
+0.13  Mon Jun 12 19:26:56 CEST 2000
+	- some changes in signatures generation routines
+	- adding pay_form method
+
+0.12  Wed May 17 00:28:30 CEST 2000
+	- first OO version
+
+0.11  Thu May 11 20:20:20 CEST 2000
+	- first version with TB support
+
+0.01  Thu May 11 17:58:32 2000
+	- original version; created by h2xs 1.19

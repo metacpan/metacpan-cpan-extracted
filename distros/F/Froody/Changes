@@ -1,0 +1,67 @@
+42.011
+  * Amend arguments to allow argument type aliases
+  * Fix the documentation for the Walker class.
+  * Strip whitespace in attribute _NAMES_, not attribute values.
+  * Can set timeout for SimpleClient when creating the client
+  * Fixing the way that the XML API is loaded. We should not be holding on to
+    the DOM tree for each example response.
+  * Improved XML api code that constructs examples as it creates the specification.
+  * fix froody error shapes -- they now pass across the wire for reflection
+  * remove XML dom node storage inside of froody
+  * avoid cloning data when not necessary
+
+42.010
+  * delete undef arguments early instead of trying to encode them
+  * handle the case where tempfile is undef during an upload
+  * unbreak get_methods() (fixes froodydoc etc.)
+
+42.009
+  * fix UTF8 handling for the standalone server and simpleclient
+  * remove dependency on JSON
+  * (froodydoc binary is currently broken, but the UTF8 fix is important
+    enough to release anyway)
+
+42.008
+  * added simple (fast) JSON-based client
+  * made passing TODO tests not be TODO tests anymore
+
+42.007
+  * fixed MANIFEST.
+
+42.006
+  * validate terse data structures properly whether they are 
+    actually passed over http as XML or simply returned directly
+  * add support for returning JSON instead of XML
+  * implement a pluggable architecture, useful for sessions management etc
+  * added froody.reflection.getSpecification
+  * lazy loading of method specs
+  * added pluggable (and chainable) argument validators
+  * added tests for weird edge cases
+  * fixed a few spelling errors in errors
+
+NOTE: Froody is still in a bit of flux, as development is driving
+refactorings and new features.
+
+
+42.005:
+  * Allow underscores in method names
+  * Allow method names with no dots
+
+42.004:
+  * regenerate dist with latest Module::Build::Kwalitee to allow
+    building with MakeMaker 
+
+42.003:
+  * Fix corelist example so it returns serveradmin stuff
+  * added a 'remaining' argument type that holds all non-declared arguments
+    passed to the method
+  * added examples to MANIFEST (oops)
+
+42.002:
+  * Fix broken meta-test (t/t.t)
+
+42.001:
+  * Fix to Build.PL
+
+42:
+  * Initial release

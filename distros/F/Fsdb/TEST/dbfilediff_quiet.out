@@ -1,0 +1,3 @@
+#fsdb event clock absdiff pctdiff diff
+_null_getpage+128	815812813.357169	0.003339	4.0929e-10	~
+#   | dbfilediff -E --input TEST/dbfilediff_ex.in-2 --quiet

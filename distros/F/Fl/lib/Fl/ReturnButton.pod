@@ -1,0 +1,76 @@
+class 'Fl::ReturnButton';
+isa 'Fl::Button';
+include 'FL/Fl_Return_Button.H';
+widget_type 'Fl_Return_Button';
+
+=pod
+
+=head1 NAME
+
+Fl::ReturnButton - Button with a Check Box
+
+=head1 Synopsis
+
+    use Fl;
+    my $button = Fl::ReturnButton->new(0, 0, 100, 200, 'Hello, World!');
+    $button->callback(sub {print q[It's dat boi]} );
+
+=head1 Description
+
+The Fl::ReturnButton class represents a button that triggers a callback when
+pressed as well as whenever the user presses the Enter key. The
+carriage-return symbol is drawn to the right of the button label.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/Fl_Return_Button.png" /></center>
+
+=head1 Methods
+
+Fl::ReturnButton inherits from Fl::Button which in turns inherits from
+Fl::Widget. On top of that, it exposes the following methods...
+
+=head2 new(...)
+
+    my $button_a = Fl::ReturnButton->new(0, 0, 250, 500, 'Important Stuff');
+    my $button_b = Fl::ReturnButton->new(0, 0, 250, 500);
+
+The constructor creates a new button using the given position, size, and
+label.
+
+The destructor removes the button.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Return_Button *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

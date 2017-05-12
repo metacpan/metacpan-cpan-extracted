@@ -1,0 +1,26 @@
+Revision history for File-Create-Layout
+
+0.04    2016-03-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.03    2015-09-11 (PERLANCAR)
+
+	- [doc] Mention Setup::File::Layout.
+
+	- Add function: parse_layout().
+
+
+0.02    2015-09-10 (PERLANCAR)
+
+        - Implement ownership setting.
+
+        -[doc] Typo/wording fixes.
+
+
+0.01    2015-09-09 (PERLANCAR)
+
+        - First release.

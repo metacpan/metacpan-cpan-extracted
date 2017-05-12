@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                File-ANVL
+version:             1.05
+abstract:            commands and routines for ANVL, ERC, and OM
+license:             BSD
+author:              
+    - John A. Kunze <jak@ucop.edu>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    File::Value:                   1.01
+    Text::Wrap:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

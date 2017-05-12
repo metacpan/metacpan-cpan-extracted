@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/example.pl
+lib/FormValidator/Lite/Constraint/Moose.pm
+t/00_compile.t
+t/01_basic.t
+t/02_custom_type.t
+t/03_coerce.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+META.yml
+MANIFEST

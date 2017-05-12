@@ -1,0 +1,132 @@
+Revision history for Perl module File::pushd
+
+1.014     2016-10-09 23:26:19-04:00 America/New_York
+
+    - No changes from 1.013-TRIAL.
+
+1.013     2016-10-05 12:57:44-04:00 America/New_York (TRIAL RELEASE)
+
+    [TESTING]
+
+    - Fixed test failures on some 5.8 perls.
+
+1.011     2016-10-05 12:35:27-04:00 America/New_York (TRIAL RELEASE)
+
+    [CHANGED]
+
+    - pushd/tempd warn if called in void context (GitHub #9 Olivier Mengué)
+
+1.009     2014-07-03 13:17:48-04:00 America/New_York
+
+    [FIXED]
+
+    - s/0.95/0.96/ in t/File_pushd.t
+
+1.008     2014-07-03 13:03:30-04:00 America/New_York
+
+    [FIXED]
+
+    - Require a newer version of Test::More
+
+1.007     2014-05-30 23:59:02-04:00 America/New_York
+
+    [FIXED]
+
+    - Fixed a testing edge case on Windows
+
+1.006     2014-03-27 15:29:36-04:00 America/New_York
+
+    [DOCUMENTED]
+
+    - Noted that multiple pushd objects in a lexical scope are not
+      destroyed in a predictable order
+
+    [CHANGED]
+
+    - Modernized Dist::Zilla configuration and repo support files
+
+1.005     2013-03-22 09:58:20 America/New_York
+
+    [BUG FIXES]
+
+    - Fix failing test for changing to non-existent directory on some
+      older Perls for some platforms
+
+1.004     2013-03-05 17:59:08 America/New_York
+
+    [BUG FIXES]
+
+    - Object destruction won't clobber $@
+
+    [SUPPORT]
+
+    - Changed issue tracker to Github
+
+    - Dropped support for Perl 5.005
+
+1.003     2012-11-27 17:49:03 America/New_York
+
+    [BUG FIXES]
+
+    - Fix test failures on Win32 when using perl.exe that must link to gcc
+      DLL [rt.cpan.org #81476]
+
+1.002     2011-12-07 11:40:26 EST5EDT
+
+    [BUG FIXES]
+
+    - Fix failures on cygwin [rt.cpan.org #73072 Reini Urban]
+
+1.001     2011-09-14 22:49:56 America/New_York
+
+    - updated docs to clarify that pushd() and tempd() croak on errors
+    - if tempd() croaks, error appears at tempd()'s caller, not from within
+      tempd() itself
+    - warnings enabled if perl version >= 5.006
+    - adds 'untaint_pattern' option with a passable default
+    
+1.00 Tue Sep 25 08:19:30 EDT 2007
+    - changed to the Apache License, version 2.0; (it's clearer, relicensable,
+      and is explicit about contributions)
+    - moved pod/coverage tests to xt/ 
+    - preserve() will preserve a temporary directory beyond the program end
+      (by design rather than due to bug RT#21953 in File::Temp); added 
+      tests to confirm this behavior after File::Temp is fixed
+
+0.99 Sat Oct 21 08:56:07 EDT 2006
+    - bumped version for pre-release before 1.00
+    - updated Pod and converted to wikidoc style
+    - added example directory
+
+0.32 Sat Feb  4 23:41:33 EST 2006
+    - eliminated syntax that prevented backwards compatibility to 5.004
+    - adjusted Build.PL to lesser dependencies
+    - added optional pod/pod-coverage test (skipped by default)
+    - switching to development-odd/release-even version numbering
+    
+0.30 Sat Dec  3 10:24:16 EST 2005
+    - eliminated subclassing of Path::Class to eliminate this non-core
+      dependency and improve cross platform compatibility
+    - improved portability of tests
+
+0.24 Tue Nov  8 09:40:02 EST 2005
+    - added Exporter to @ISA for backwards compatibility [Anton Berezin]
+    
+0.23 Mon Nov  7 22:14:51 EST 2005
+    - derived directories revert to Path::Class::Dir objects instead of
+      File::pushd objects
+
+0.22 Mon Nov  7 18:26:50 EST 2005
+    - fixed bug in Win32 tests for changing to root directory
+      (work around a Path::Class/File::Spec bug)
+      
+0.21 Mon Nov  7 15:08:17 EST 2005
+    - objects created are now subclasses of Path::Class::Dir
+    - added ability to preserve temporary directories after creation
+    - fixed overloading bug (added fallback)
+
+0.20 Fri Sep  2 06:47:07 EDT 2005
+    - added tempd function
+
+0.10 Thu Sep  1 23:53:46 EDT 2005
+	- Initial release

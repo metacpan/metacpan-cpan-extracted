@@ -1,0 +1,14 @@
+******************************************
+* Things to do
+* Jan. 9, 2007
+******************************************
+
+Allow file handles to be filtered like so:
+
+  filters (
+  	*INFH,
+	sub { uc $_ },
+	*OUTFH,
+  );
+
+

@@ -1,0 +1,105 @@
+Document Name: dok
+Plate Type: Absolute Quantification
+User: 7300Anwender
+
+Document Information
+
+Operator: 7300Anwender
+Run Date: Monday, January 08, 2007 20:21:13
+Last Modified: Monday, January 08, 2007 23:43:38
+Instrument Type: Applied Biosystems 7300 Real-Time PCR System
+
+Comments:
+SDS v1.2
+
+Well,Sample Name,Detector,Task,Ct,StdDev Ct,Qty,Mean Qty,StdDev Qty,Filtered,Tm
+A1,hGENE1,js,Unknown,35.22,2.784,,,,,83.50
+A2,hGENE1,js,Unknown,34.17,2.784,,,,,83.50
+A3,hGENE1 (outlier),js,Unknown,30.31,,,,,,83.80
+A4,hGENE3,js,Unknown,28.83,1.157,,,,,76.90
+A5,hGENE3,js,Unknown,28.72,1.157,,,,,76.90
+A6,hGENE3 (outlier),js,Unknown,28.17,4.068,,,,,76.90
+A7,hGAPDH (outlier),js,Unknown,17.81,0.693,,,,,80.00
+A8,hGAPDH,js,Unknown,16.87,0.775,,,,,79.60
+A9,hGAPDH,js,Unknown,17.34,0.775,,,,,79.60
+A10,hGENE1,js,Standard,27.22,0.104,,,,,83.50
+A11,hGENE1,js,Standard,27.23,0.104,,,,,83.50
+A12,hGENE1,js,Standard,27.41,0.104,,,,,83.10
+B1,hGENE1,js,Unknown,30.92,2.784,,,,,83.80
+B2,hGENE1,js,Unknown,31.38,2.784,,,,,83.80
+B3,hGENE1,js,Unknown,30.59,2.784,,,,,83.80
+B4,hGENE3,js,Unknown,27.30,1.157,,,,,76.90
+B5,hGENE3,js,Unknown,27.76,1.157,,,,,77.20
+B6,hGENE3 (is B7; was mistake),js,Unknown,17.71,,,,,,80.00
+B7,hGAPDH (is B6),js,Unknown,29.00,,,,,,76.90
+B8,hGAPDH,js,Unknown,18.15,0.775,,,,,79.60
+B9,hGAPDH,js,Unknown,18.31,0.775,,,,,79.60
+B10,hGENE3,js,Standard,27.57,0.883,,,,,76.90
+B11,hGENE3,js,Standard,26.89,0.883,,,,,76.50
+B12,hGENE3,js,Standard,28.64,0.883,,,,,76.50
+C1,hGENE1,js,Unknown,29.82,2.784,,,,,83.80
+C2,hGENE1,js,Unknown,29.49,2.784,,,,,84.20
+C3,hGENE1,js,Unknown,29.66,2.784,,,,,84.20
+C4,hGENE3,js,Unknown,27.04,1.157,,,,,77.20
+C5,hGENE3,js,Unknown,27.20,1.157,,,,,77.20
+C6,hGENE3,js,Unknown,27.10,1.157,,,,,77.20
+C7,hGAPDH,js,Unknown,17.25,0.775,,,,,80.30
+C8,hGAPDH,js,Unknown,17.07,0.775,,,,,80.00
+C9,hGAPDH,js,Unknown,16.74,0.775,,,,,80.00
+C10,hGAPDH (outlier),js,Standard,18.08,,,,,,79.60
+C11,hGAPDH,js,Standard,Undetermined,,,,,Noisy BL,71.20
+C12,hGAPDH,js,Standard,18.01,,,,,,79.30
+D1,hGENE1,js,Unknown,26.11,2.784,,,,,84.20
+D2,hGENE1,js,Unknown,26.00,2.784,,,,,84.20
+D3,hGENE1,js,Unknown,25.64,2.784,,,,,84.20
+D4,hGENE3,js,Unknown,26.11,1.157,,,,,77.20
+D5,hGENE3,js,Unknown,25.86,1.157,,,,,77.20
+D6,hGENE3,js,Unknown,26.00,1.157,,,,,77.20
+D7,hGAPDH,js,Unknown,18.58,0.775,,,,,80.00
+D8,hGAPDH,js,Unknown,18.26,0.775,,,,,80.00
+D9,hGAPDH,js,Unknown,18.37,0.775,,,,,79.60
+D10,hGENE1,js,NTC,Undetermined,,,,,,76.90
+D11,hGENE1,js,NTC,Undetermined,,,,,,71.50
+D12,hGENE1,js,NTC,Undetermined,,,,,,84.60
+E1,hGENE1,js,Unknown,29.55,2.784,,,,,84.20
+E2,hGENE1,js,Unknown,29.46,2.784,,,,,84.20
+E3,hGENE1 (outlier),js,Unknown,Undetermined,,,,,Noisy BL,70.50
+E4,hGENE3,js,Unknown,27.83,1.157,,,,,77.20
+E5,hGENE3,js,Unknown,26.50,1.157,,,,,77.20
+E6,hGENE3,js,Unknown,26.88,1.157,,,,,77.20
+E7,hGAPDH,js,Unknown,18.17,0.775,,,,,80.00
+E8,hGAPDH,js,Unknown,17.33,0.775,,,,,80.30
+E9,hGAPDH (outlier),js,Unknown,16.83,0.693,,,,,80.00
+E10,hGENE3,js,NTC,Undetermined,,,,,,76.20
+E11,hGENE3,js,NTC,Undetermined,,,,,,79.30
+E12,hGENE3,js,NTC,Undetermined,,,,,,72.80
+F1,hGENE1,js,Unknown,32.65,2.784,,,,,83.80
+F2,hGENE1,js,Unknown,32.66,2.784,,,,,83.80
+F3,hGENE1,js,Unknown,31.95,2.784,,,,,83.80
+F4,hGENE3,js,Unknown,26.44,1.157,,,,,76.90
+F5,hGENE3,js,Unknown,27.97,1.157,,,,,76.90
+F6,hGENE3 (outlier),js,Unknown,22.42,4.068,,,,,79.60
+F7,hGAPDH (outlier),js,Unknown,Undetermined,,,,,,76.20
+F8,hGAPDH,js,Unknown,18.70,0.775,,,,,80.00
+F9,hGAPDH,js,Unknown,19.22,0.775,,,,,80.00
+F10,hGAPDH,js,NTC,Undetermined,,,,,,70.50
+F11,hGAPDH,js,NTC,Undetermined,,,,,,80.00
+F12,hGAPDH,js,NTC,Undetermined,,,,,,71.50
+G1,hGENE1,js,Unknown,32.11,2.784,,,,,83.80
+G2,hGENE1,js,Unknown,33.54,2.784,,,,,83.80
+G3,hGENE1,js,Unknown,32.65,2.784,,,,,83.80
+G4,hGENE3,js,Unknown,28.52,1.157,,,,,76.90
+G5,hGENE3,js,Unknown,29.56,1.157,,,,,76.50
+G6,hGENE3,js,Unknown,28.72,1.157,,,,,76.90
+G7,hGAPDH,js,Unknown,19.17,0.775,,,,,79.60
+G8,hGAPDH,js,Unknown,19.14,0.775,,,,,79.60
+G9,hGAPDH,js,Unknown,19.00,0.775,,,,,79.60
+H1,hGENE1,js,Unknown,34.22,2.784,,,,,83.50
+H2,hGENE1,js,Unknown,34.01,2.784,,,,,83.50
+H3,hGENE1,js,Unknown,34.42,2.784,,,,,83.50
+H4,hGENE3 (outlier),js,Unknown,Undetermined,,,,,,74.50
+H5,hGENE3,js,Unknown,29.01,1.157,,,,,76.50
+H6,hGENE3,js,Unknown,29.29,1.157,,,,,76.50
+H7,hGAPDH,js,Unknown,18.20,0.775,,,,,79.60
+H8,hGAPDH,js,Unknown,18.23,0.775,,,,,79.60
+H9,hGAPDH,js,Unknown,17.95,0.775,,,,,79.30

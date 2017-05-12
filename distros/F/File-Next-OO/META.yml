@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                File-Next-OO
+version:             0.04
+abstract:            File-finding iterator Wrapper for C<File::Next::files> function
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    File::Next:                    0.38
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Boris Zentner <bzm@2bz.de>

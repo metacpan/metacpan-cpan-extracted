@@ -1,0 +1,26 @@
+---
+abstract: 'Perl implementation of the which utility as an API'
+author:
+  - 'Per Einar Ellefsen <pereinar@cpan.org>'
+  - 'Adam Kennedy <adamk@cpan.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.47'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Which
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/File-Which/issues
+  homepage: http://perl.wdlabs.com/File-Which
+  repository: git://github.com/plicease/File-Which.git
+version: '1.21'

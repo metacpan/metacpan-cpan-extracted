@@ -1,0 +1,87 @@
+To Do
+======
+
+- Add test scripts for testing the module itself.
+
+- Add FTN::SRIF::Tutorial
+
+- Move doc/TODO to lib/FTN/SRIF/ToDo.pod
+
+- Add example doc/binkd.srf to FTN::SRIF::Tutorial.
+
+- Move TEST::* modules to BUILD_REQUIRES in Makefile.PL
+
+- Move contents of bin/sriftst.sh to FTN::SRIF::Tutorial as an example.
+
+- Add a reference to the ftsc.org site for the SRIF documentation.
+
+- Whitespace/tags cleanup in both the module and the script.
+
+- Subroutines need to end with a return(); add that line to the subroutines as
+  they are being moved from the script to the module, and add in place to any
+  subroutines not being moved.
+
+- Add a note to the README regarding the need for Config::Tiny.
+
+
+lib/FTN/SRIF.pm
+----------------
+- Add documentation of the 'Perl for FTN Systems' project at SourceForge.
+
+- Does reading the Sysop field require needing to allow more than one space?
+
+- Move subroutines from ftn-srif script to FTN::SRIF module? (send_response,
+send_default_file, send_packet_response?)
+
+- Need tp be able to allow for blank or empty lines at the end of an SRIF file
+that is being parsed; currently it comes up with an error message about an the
+'$keyword' variable being undefined at line 222 of the file reading loop.
+
+
+bin/ftn-srif
+-------------
+
+- Add an explicit exit() to the main body of the code.
+
+- Log the lines that are being requested.
+
+- Create a results message as a text file.
+
+- Use "freqerr.txt" as a paragraph to be included in the results message,
+to indicate files that could not be found, instead of it being an entire
+msg?   Or as part of a response sentance for each file requested?
+
+- Read through a magic file list (magic.txt) for matches, & send any files
+found. If not found there, search through an okfiles.txt file for the
+file being requested.
+
+- Add a configurable option to return an FTN packet file instead of just
+the default of sending the results message back as a text file. Make it
+a call using FTN::Packet or FTN::Pkt for creating the packet.
+
+- Add a configurable option to set the logging ID ($log_id)?
+
+- Add a configurable option to save a copy of the SRIF if debug is set?
+
+- Add a configurable option to log the command line if debug is set?
+
+- Set debug option in configuration file instead of in script.  Default to set?
+
+- Getting an extra newline (at least on a Linux system) when logging the name
+of the request file, when logging that the request file is being read, and when
+logging the name of the response file.
+
+- The removal of the request file is apparantly not working but there is no
+error being generated either.
+
+- Rename to reflect that it is an SRIF processor explicitly for file requests?
+
+
+Testing
+-------
+
+- Add extra lines to the requests file t/FTN/00000001.REQ and add code to
+t/03-RequestList.t test for those lines.
+
+- Add a check of an environmental variable like RELEASE_DEBUGGING to enable
+  things like the use of Data::Dumper in the test scripts.

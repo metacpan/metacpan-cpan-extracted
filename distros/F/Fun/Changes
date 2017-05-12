@@ -1,0 +1,20 @@
+Revision history for Fun
+
+0.05  2012-09-20
+      - make function parameters read-write again
+      - fix error when closing over a variable from a named function
+
+0.04  2012-09-08
+      - fix test for Carp <1.26
+      - make function parameters readonly
+
+0.03  2012-08-20
+      - fix accidental build-requires on 5.16
+      - remove runtime call to fun() for named methods (their behavior is
+        already done at compile time, so this call does nothing)
+
+0.02  2012-08-20
+      - fix configure requires
+
+0.01  2012-08-19
+      - Initial release

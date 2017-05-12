@@ -1,0 +1,52 @@
+[% SET did_header = 0 %]
+[% FOR accessor_type IN [ 'belongs_to', 'might_have', 'has_one', 'has_many', 'many_to_many' ] %]
+    [% SET relationships = [] %]
+    [% FOR rel IN source.relationships %]
+        [% IF rel.type == accessor_type %]
+            [% relationships.push( rel ) %]
+        [% END %]
+    [% END %]
+    [% NEXT UNLESS relationships.size %]
+    [% UNLESS did_header %]
+        <h3 name="[% source.moniker %]-relationships">Relationships</h3>
+        [% SET did_header = 1 %]
+    [% END %]
+
+    <table cellspacing="0" cellpadding="3" name="[% source.moniker %]-relationships-[% accessor_type %]" style="float: left">
+    <caption>[% accessor_type %]</caption>
+    <tr>
+    <th>Name</th>
+    [% IF accessor_type == 'many_to_many' %]
+        <th>Link Rel</th>
+        <th>Foreign Rel</th>
+    [% ELSE %]
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    [% END %]
+    </tr>
+    [% FOREACH relationships.sort( 'name' ) %]
+        [% SET class = loop.count % 2 ? 'odd' : 'even' %]
+        [% FILTER collapse %]
+            <tr class="[% class %]">
+            <td>[% name %]</td>
+            [% IF accessor_type == 'many_to_many' %]
+                <td>[% link_rel_name %]</td>
+                <td>[% foreign_rel_name %]</td>
+            [% ELSE %]
+                [% SET fm = foreign_moniker %]
+                <td><a href="#[% fm %]">[% fm %]</a></td>
+                <td>
+                    [% FOR key IN cond.keys %]
+                        [% key %] =&gt; [% cond.$key %]
+                        [% UNLESS loop.last %], [% END %]
+                    [% END %]
+                </td>
+            [% END %]
+            </tr>
+            [% INCLUDE table_comment.tt2 colspan = 3 %]
+        [% END %]
+    [% END %]
+    </table>
+[% END %]
+<br clear="both" />
+[%# $Id$ #%]

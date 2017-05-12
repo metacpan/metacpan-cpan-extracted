@@ -1,0 +1,4 @@
+[% PROCESS sub/date.html %]
+<td align='left'>[ [% object.object_type | ucfirst %] ] <a href='[% object.url %]'>[% object.title %]</a></td>
+<td><a href='/u/[% object.author.username %]'>[% object.author.nickname %]</a></td>
+<td><span class='date'>[% date_format(object.last_update) %]</span></td>

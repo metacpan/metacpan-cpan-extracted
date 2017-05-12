@@ -1,0 +1,27 @@
+---
+abstract: 'Analyze past transactions in a personal stock account.'
+author:
+  - 'John Everett Refior <jrefior@gmail.com>'
+build_requires:
+  File::ShareDir: 0
+  File::Spec: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-StockAccount
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Time::Moment: 0.07
+  perl: 5.006
+version: 0.01

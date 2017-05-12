@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/FFMPEG/Effects.pm
+FFMPEG-Effects.fadein.pl
+FFMPEG-Effects.fadeout.pl
+FFMPEG-Effects.help.pl
+FFMPEG-Effects.titlesplash.pl
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+INSTALL
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

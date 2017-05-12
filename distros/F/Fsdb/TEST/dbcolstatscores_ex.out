@@ -1,0 +1,9 @@
+#fsdb name id test1 zscore tscore
+c	3	65	-1.1531	38.469
+b	2	70	-0.69188	43.081
+e	5	70	-0.69188	43.081
+a	1	80	0.23063	52.306
+d	4	90	1.1531	61.531
+f	6	90	1.1531	61.531
+#  | dbsort -n test1
+#   | dbcolstatscores --tmean 50 --tstddev 10 test1

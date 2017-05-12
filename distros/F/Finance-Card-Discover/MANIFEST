@@ -1,0 +1,21 @@
+Changes
+ex/check-accounts.pl
+lib/Finance/Card/Discover.pm
+lib/Finance/Card/Discover/Account.pm
+lib/Finance/Card/Discover/Account/Profile.pm
+lib/Finance/Card/Discover/Account/SOAN.pm
+lib/Finance/Card/Discover/Account/SOAN/Transaction.pm
+lib/Finance/Card/Discover/Account/Transaction.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_new.t
+xt/kwalitee.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/portability_filenames.t
+xt/vars.t
+META.yml                                 Module meta-data (added by MakeMaker)

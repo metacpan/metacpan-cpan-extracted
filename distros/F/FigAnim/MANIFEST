@@ -1,0 +1,17 @@
+Changes
+FigAnim.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+FigAnim/Arc.pm
+FigAnim/Color.pm
+FigAnim/Compound.pm
+FigAnim/ConvertSMIL.pm
+FigAnim/ConvertSVG.pm
+FigAnim/Ellipse.pm
+FigAnim/Point.pm
+FigAnim/Polyline.pm
+FigAnim/Spline.pm
+FigAnim/Text.pm
+FigAnim/Utils.pm

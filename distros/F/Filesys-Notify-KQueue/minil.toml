@@ -1,0 +1,4 @@
+name = "Filesys-Notify-KQueue"
+badges = ["travis"]
+authority="cpan:KARUPA"
+module_maker="ModuleBuildTiny"

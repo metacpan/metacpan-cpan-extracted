@@ -1,0 +1,43 @@
+Finance-Quote-Sberbank version 0.04
+===================================
+
+Obtain quotes from Sberbank (Savings Bank of the Russian Federation)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Finance::Quote
+  Spreadsheet::ParseExcel
+
+DESCRIPTION
+ 
+This module fetches metal quotes information from the Sberbank (Savings
+ Bank of the Russian Federation) http://sbrf.ru. It fetches quotes for 
+ next metals: Gold (SBRF.AU), Silver (SBRF.AG), Platinum (SBRF.PT),
+ Palladium (SBRF.PD).
+
+It's not loaded as default Finance::Quote module, so you need create it
+ by Finance::Quote->new("Sberbank"). If you want it to load by default,
+ make changes to Finance::Quote default module loader, or use 
+ FQ_LOAD_QUOTELET environment variable. Gnucash example:
+	FQ_LOAD_QUOTELET="-defaults Sberbank" gnucash
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Alexander Korolyoff. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

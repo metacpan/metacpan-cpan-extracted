@@ -1,0 +1,96 @@
+NAME
+    File::PackageIndexer - Indexing of packages and subs
+
+SYNOPSIS
+      use File::PackageIndexer;
+      my $indexer = File::PackageIndexer->new();
+      my $pkgs = $indexer->parse( $ppi_document_or_code_string );
+  
+      use Data::Dumper;
+      print Dumper $pkgs;
+      # prints something like:
+      # {
+      #   Some::Package => {
+      #     name => 'Some::Package',
+      #     subs => {
+      #       new => 1,
+      #       foo => 1,
+      #     },
+      #     isa => [ 'SuperClass1', 'SuperClass2' ],
+      #   },
+      #   ... other pkgs ...
+      # }
+
+DESCRIPTION
+    Parses a piece of Perl code using PPI and tries to find all subs and
+    their packages as well as the inheritance of the packages.
+
+    Currently, the following constructs are recognized:
+
+    "package" statements
+    plain subroutine declarations
+    "Class::Accessor"-like accessor generation
+    "Class::XSAccessor" and "Class::XSAccessor::Array"
+    "use base ..." inheritance declaration
+    "use parent ..." inheritance declaration
+    "our @ISA = ..." and "@ISA = ..." inheritance declaration
+    "push @ISA, ..." and "unshift @ISA, ..." inheritance modification
+
+    The inheritance detection (hopefully) correctly recognizes the effect of
+    special blocks such as "BEGIN {...}". "END" blocks are ignored.
+
+METHODS
+  new
+    Creates a new indexer object. Optional parameters:
+
+    default_package
+      The default package to assume a subroutine is in if no package
+      statement was found beforehand. Defaults to "main".
+
+  default_package
+    Get/set default package.
+
+  parse
+    Parses a given piece of code. Alternatively, you may pass in a
+    "PPI::Node" or "PPI::Document" object.
+
+    Returns a simple hash-ref based structure containing the packages and
+    subs found in the code. General structure:
+
+      {
+        'Package::Name' => {
+          subs => {
+            subname1 => 1,
+            subname2 => 1,
+            ... more subs ...
+          },
+        },
+        ... more packages ...
+      }
+
+SEE ALSO
+    Implemented using PPI.
+
+TODO
+    Maybe other constructs that affect inheritance?
+
+    Exporting! (yuck)
+
+    Other accessor generators.
+
+    Moose. This is going to be tough, but mandatory.
+
+    "Class-"import(...)> is currently not handled akin to "use Class ...".
+
+    General dependency resolution.
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8 or, at your
+    option, any later version of Perl 5 you may have available.
+

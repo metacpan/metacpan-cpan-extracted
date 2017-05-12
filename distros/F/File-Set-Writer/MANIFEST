@@ -1,0 +1,21 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/File/Set/Writer.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00_load.t
+t/00_load.t.rej
+t/01_default.t
+t/02_dies_ok.t
+t/03_print.t
+t/04_limit_files.t
+t/04_limit_handles.t
+t/04_limit_lines.t

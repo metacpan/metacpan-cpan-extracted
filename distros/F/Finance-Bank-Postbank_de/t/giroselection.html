@@ -1,0 +1,584 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html>
+
+<head>
+
+<title id="fst">Postbank Online-Banking</title>
+
+<!--
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+-->
+
+<meta http-equiv="content-language" content="de" />
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+
+<!--
+<link rel="shortcut icon" type="image/icon" href="favicon.ico" />
+<link rel="icon" type="image/icon" href="favicon.ico" />
+-->
+
+<link rel="SHORTCUT ICON" href="/app/static/images/favicon.ico" />
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/app/static/css/main.css" />
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/app/static/css/formular.css" />
+<!--[if gte IE 5]>
+<link rel="stylesheet" type="text/css" media="screen,projection" href="/app/static/css/ie.css" />
+<![endif]-->
+
+<!--[if lt IE 6]>
+<link rel="stylesheet" type="text/css" media="screen,projection" href="/app/static/css/ie5.css" />
+<![endif]-->
+
+
+
+
+<script type="text/javascript">
+// Globale Konstanten Definitionen in JavaScript
+var EXTERN_URL_GIRO_ABSCHLIESSEN = 'https://produktabschluss.postbank.de/giroplus/ekantrag/einzelkonto1.jsp';
+var EXTERN_URL_POSTBANK_BANKING_FREISCHALTEN = 'https://produktabschluss.postbank.de/giroplus/online/online1a.jsp';
+
+
+var EXTERN_URL_KONTAKT_IPVK = 'https://produktabschluss.postbank.de/ipvk/kontakte/welcome.jsp?ipvk_aufruf=iob&amp;url=https://banking.postbank.de/app/private/servlet.callback;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1';
+var EXTERN_URL_PREISINFORMATION_AZV = 'http://www.postbank.de/iob_azv_preise';
+
+
+</script>
+
+
+
+
+
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/script.js"></script>
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/util.js"></script>
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/browserCheck.js"></script>
+
+<script type="text/javascript" language="JavaScript1.2" src="/app/static/js/iob.js"></script>
+
+</head>
+
+
+
+
+
+<body onload="init()">
+
+
+
+
+<h1 class="notvisible">Postbank Internet <span lang="en">Online-Banking</span></h1>
+
+<p class="notvisible"><a href="#level2">Direkt zum Inhalt</a></p>
+
+
+
+<div id="logo" class="logo">
+
+
+
+
+
+	<img src="/app/static/images/pblogo2.gif" width="140" height="90" alt="Postbank" />
+
+
+
+</div>
+
+
+
+<div class="lftBar" id="lftBar">
+
+
+<h2 class="notvisible">Hauptnavigation</h2>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+      
+	  
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="navigation nowrap">
+<ul class="links">
+
+  
+  
+  <li><div><a href="/app/finanzstatus.reduziert.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="f" tabindex="102" class="auswahl" title="Tastenkombination: Alt + f"><span class="underline">F</span>inanzstatus</a></div></li>
+  
+  
+  
+
+  
+
+
+  
+  
+  <li class="liUnderEmpty"><div><a href="/app/kontoumsatz.umsatz.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="u" tabindex="103" class="inaktiv" title="Tastenkombination: Alt + u">Konto<span class="underline">u</span>ms&auml;tze</a></div></li>
+  
+  
+
+  
+  
+  
+  <li><div><a href="/app/ueberweisung.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="ü" tabindex="104" class="inaktiv" title="Tastenkombination: Alt + ü"><span class="underline">&Uuml;</span>berweisung</a></div></li>
+
+  
+  
+
+  
+  
+  
+
+  
+  
+  
+  <li><div><a href="/app/dauerauftrag.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="d" tabindex="105" class="inaktiv" title="Tastenkombination: Alt + d"><span class="underline">D</span>auerauftrag</a></div></li>
+  
+  
+
+  
+  
+  
+  <li><div><a href="/app/auslandsauftrag.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="a" tabindex="106" class="inaktiv" title="Tastenkombination: Alt + a"><span class="underline">A</span>uslandsauftrag</a></div></li>
+  
+  
+
+  
+  
+  
+  <li><div class="nowrap"><a href="/app/komfortsparen.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="k" tabindex="107" class="inaktiv" title="Tastenkombination: Alt + k"><span class="underline">K</span>omfort-Sparen</a></div></li>
+  
+  
+
+  
+  
+  
+
+  
+  
+  
+
+  
+  
+  
+  <li class="liUnderEmpty"><div><a href="/app/verwaltung.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="e" tabindex="109" class="inaktiv" title="Tastenkombination: Alt + e"><span class="underline">E</span>instellungen</a></div></li>
+  
+  
+
+  
+  <li class="liUnderEmpty"><div class="nowrap"><a href="/app/logout.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="b" tabindex="110" class="iob-nav-close" title="Tastenkombination: Alt + b"><span class="underline">B</span>anking beenden</a></div></li>
+
+  
+</ul>
+
+<div class="NavTeaser">
+<a class="aTeaser" tabindex="111" title="Deutsche Post World Net - &Ouml;ffnet ein neues Fenster"
+   href="http://www.dpwn.de/" target="_blank"><img
+   src="/app/static/images/dpwn.gif" alt="Deutsche Post World Net" width="140" height="52" /></a>
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<hr class="notvisible" />
+<h2 class="notvisible">Definition und Links der Tastenkombinationen</h2>
+<p class="notvisible"><a href="#level1">Links f&uuml;r Tastenkombinationen &uuml;berspringen</a></p>
+
+
+
+
+
+
+
+  
+    
+
+
+
+
+<p class="keylinks">
+
+
+<a href="#logo" accesskey="1" tabindex="500" title="[Alt+1] Seitenanfang"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+<a href="#level2" accesskey="8" title="[Alt+8] Direkt zum Inhalt"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+
+
+
+<a href="/app/finanzstatus.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="0" tabindex="500" title="[Alt+0] Startseite"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+<a href="/app/sitemap.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" accesskey="7" tabindex="500" title="[Alt+7] Seiten&uuml;bersicht"><img src="/app/static/images/empty.gif" width="1" height="1" alt="" /></a>
+
+
+</p>
+
+
+
+
+
+</div> 
+
+
+
+
+<div class="level1">
+<a name="level1"></a>
+
+
+
+<hr class="notvisible" />
+<h2 class="notvisible">Kopfbereich mit weiteren Informationen</h2>
+
+
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+
+
+
+
+<div class="topNav"></div>
+
+
+
+<div class="topBar">
+
+<div class="visual"><img class="imgVisual" 
+  src="/app/static/images/head_visual.jpg" 
+  alt="Postbank Online-Banking" width="430" height="65" /></div>
+
+  
+
+<div class="headName">
+  <h4 class="h4HeadName">MAISCHEIN, MAX
+  
+  </h4>
+  <p class="pHeadName">
+
+    <br />Girokonto: <span class="digit">999999999</span>
+    <br /><span class="abbr" title="Bankleitzahl"><abbr title="Bankleitzahl">BLZ:</abbr></span> 
+	  <span class="digit">50010060</span>
+  </p>
+
+
+
+</div>
+
+
+
+<br />
+
+
+
+
+</div>
+
+
+
+<div class="advBar clearBoth"></div>
+
+
+
+
+
+
+<div class="level2">
+<a name="level2"></a>
+
+
+
+<hr class="notvisible" />
+<h2 class="notvisible">Hauptinhalt</h2>
+
+
+
+  
+  
+
+<div class="main">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="content">
+
+<div class="headline">
+  <p class="pHeadlineLeft">Finanzstatus</p>
+  <p class="pHeadlineRight">13.04.2005 19:57</p>
+  <br />
+</div>
+
+<div class="contentTabelle">
+
+<div class="innerContentTabelle">
+<div class="emptyline">&nbsp;</div>
+
+<table class="tableFinanzstatus" summary="Diese Tabelle beschreibt den aktuellen Finanzstatus Ihrer Konten.
+  Hier erhalten Sie Informationen &uuml;ber Art, Saldo und Ums&auml;tze bzw. Transaktionen Ihrer jeweiligen Konten.">
+
+<tr>
+  <th class="thLeft" id="Spalte1">Konto, Nummer</th>
+  <th class="thLeft" id="Spalte2">Art*</th>
+  <th class="thCenter" id="Spalte3">Saldo (&euro;)</th>
+  
+  <th class="thCenter" id="Spalte4">Aktion</th>
+  
+</tr>
+
+<tr class="dark">
+  
+  
+  
+  
+  
+  
+  <td class="tdNormalNowrap" headers="Spalte1">
+    <a href="/app/kontoumsatz.umsatz.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1?konto=999999999" tabindex="10" title="Kontoums&auml;tze Girokonto">Postbank Giro plus, 999999999</a>
+  </td>
+  
+  
+  
+  
+  
+   
+  
+  
+  <td class="tdNormal" headers="Spalte2"><abbr title="Einzelkonto"><span class="abbr" title="Einzelkonto">EK</span></abbr></td>
+  
+  <td class="posSaldo" headers="Spalte3">17.756,30</td>
+  <td class="endTD nowrap" headers="Spalte4">
+
+    <div class="center">
+    
+      <a href="/app/ueberweisung.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="10" title="&Uuml;berweisung vornehmen"><img class="icon"
+        src="/app/static/images/ueberweisung.gif" width="13" height="13" alt="&Uuml;berweisung vornehmen" border="0" /></a>&nbsp;&nbsp;
+      <a href="/app/dauerauftrag.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="10" title="Dauerauftrag erstellen"><img class="icon"
+        src="/app/static/images/dauerauftrag.gif" width="13" height="13" alt="Dauerauftrag erstellen" border="0" /></a>&nbsp;&nbsp;
+      <a href="/app/auslandsauftrag.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="10" title="Auslandsauftrag vornehmen"><img class="icon"
+        src="/app/static/images/auslandsauftrag.gif" width="13" height="13" alt="Auslandsauftrag vornehmen" border="0" /></a>&nbsp;&nbsp;
+    
+    </div>
+  </td>
+  
+</tr>
+
+</table>
+
+</div> 
+
+</div> 
+
+
+
+<div class="Linkleiste">
+  <div class="LinkLinks"></div>
+    <div class="LinkRechts">
+      <a accesskey="2" title="[Alt+2] Weiter" id="enterSubmit" href="/app/finanzstatus.erweitert.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="20" class="aLinkleiste">Alle Konten anzeigen</a><a href="/app/finanzstatus.erweitert.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="20" class="aLinkleiste" title="Alle Konten anzeigen"><img 
+        width="13" height="13" class="linkleisteRightIcon" 
+        src="/app/static/images/ic_linkpfeil.gif" 
+        alt="Icon: Alle Konten anzeigen" /></a>
+    </div><br />
+</div>
+
+
+
+
+<div class="Legende">
+  <p class="pLegende"><img class="legendeIcon" src="/app/static/images/ueberweisung.gif" width="13" height="13" alt="Icon &Uuml;berweisung" />&nbsp;=&nbsp;&Uuml;berweisung vornehmen</p>
+  <p class="pLegende"><img class="legendeIcon" src="/app/static/images/dauerauftrag.gif" width="13" height="13" alt="Icon Dauerauftrag" />&nbsp;=&nbsp;Dauerauftrag erstellen</p>
+  <p class="pLegende"><img class="legendeIcon" src="/app/static/images/auslandsauftrag.gif" width="13" height="13" alt="Icon Auslandsauftrag" />&nbsp;=&nbsp;Auslandsauftrag vornehmen</p>
+  
+  <p class="pLegende">* EK=Einzelkonto; GK=Gemeinschaftskonto</p>
+</div>
+
+<div class="footerTabelle">
+  <p class="pFootertabelleRight">
+    <a href="/app/finanzstatus.reduziert.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1?action=print&cache=true" tabindex="20">Finanzstatus drucken</a><a href="/app/finanzstatus.reduziert.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1?action=print&cache=true" tabindex="20" title="Finanzstatus drucken"><img 
+      class="rightIcon" src="/app/static/images/ic_drucken.gif" 
+      width="13" height="13" alt="Icon: Finanzstatus drucken" /></a>
+
+  </p>
+</div>
+
+
+</div> 
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="rgtBar">
+  <div class="satellit">
+    <h2 class="h2Satellit">Hinweis</h2>
+    <p class="satellitText">Hier finden Sie Ihre Konten und Geldanlagen auf einen Blick.</p>
+
+    <p class="satellitText">&Uuml;ber die Aktions-Icons k&ouml;nnen Sie &Uuml;berweisungen, 
+      Dauerauftr&auml;ge oder Auslandsauftr&auml;ge f&uuml;r das 
+      <span lang="en">Login</span>-Konto vornehmen.</p>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+</div> 
+
+
+<p class="notvisible"><a href="#lftBar">Zurück zur Hauptnavigation</a></p>
+
+
+<hr class="notvisible" />
+
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+
+
+
+<div class="fusszeile">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script language="JavaScript" type="text/javascript">
+  <!--
+  var s = '<p class="pFusszeile"><a href="/app/sitemap.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="250" class="aFusszeile"><span lang="en">Sitemap</span></a> | '
+        + '<a href="/app/bedienungshilfe.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="251" class="aFusszeile">Bedienungshilfen</a> | '
+        + '<a href="javascript:;" onclick="openNewProcess(EXTERN_URL_KONTAKT_IPVK)" title="&Ouml;ffnet ein neues Fenster" tabindex="252" class="aFusszeile">Kontakt</a>'
+        + ''
+        + '</p>';
+  // alert('s=[' + s + ']');
+  document.write(s);
+  //-->
+  </script>
+  <noscript>
+  <p class="pFusszeile">
+  <a href="/app/sitemap.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="250" class="aFusszeile"><span lang="en">Sitemap</span></a> |&nbsp;
+  <a href="/app/bedienungshilfe.init.do;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" tabindex="251" class="aFusszeile">Bedienungshilfen</a> |&nbsp;
+
+  <a href="https://produktabschluss.postbank.de/ipvk/kontakte/welcome.jsp?ipvk_aufruf=iob&amp;amp;url=https://banking.postbank.de/app/private/servlet.callback;jsessionid=8F71A4CD4F2DC70F74FBC422F74BCE2F.F1_1" target="_blank" title="&Ouml;ffnet ein neues Fenster"
+    tabindex="252" class="aFusszeile">Kontakt</a>
+  
+</p></noscript>
+
+
+
+
+
+</div>
+<br />
+
+
+
+
+
+
+</div> 
+
+
+
+
+
+</body>
+
+</html>

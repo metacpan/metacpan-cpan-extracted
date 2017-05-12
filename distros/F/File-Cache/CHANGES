@@ -1,0 +1,207 @@
+Revision history for File::Cache
+
+0.16 2001-04-18-11-52
+  - prepared version 0.16 for release
+  - replaced the explicit system( ) call to invoke the subprocess get test
+    with a fork( ) instead
+  - changed email address to dewitt@unto.net
+  - started version 0.16
+
+0.15 2001-04-17-15-07
+  - prepared version 0.15 for release
+  - added a note about the release of Cache::Cache
+  - Updated documentation to indicate that $File::Cache::sNO_MAX_SIZE is the
+    default cache size. (David Coppit <david@coppit.org>)
+  - added a patch by Michael Blakely to allow for $sEXPIRES_NEVER to 
+    be used as the $expires_in parameter on a set
+  - started version 0.15
+
+0.14 2000-11-27-09-45
+  - prepared version 0.14 for release
+  - documented the optional usage of Storable in the README
+  - added requirement for File::Spec 0.82
+  - removed "use Data::Dumper"
+  - the .description file now uses a global friendly umask
+  - started version 0.14
+  
+0.13 2000-10-07-19-22
+  - binmode is now used to avoid problems with setting/getting binary data
+    from the cache (This change probably means that the segfault
+    above is no longer a problem. However, it's still a good idea to use a
+    canonical format in case processes on different platforms are accessing
+    the same cache over NFS.)
+  - Removed unreferenced subroutine _purge_all
+  - Minor formatting changes
+  - Internal subroutines get_user_path() and get_namespace_path(), are
+    now prefixed by an underscore
+  - Names of non-method subroutines are now all consistently uppercase
+  - File::Cache::REDUCE_SIZE was coded as a method, but documented as
+    an object-independent function. Fixed it, and made
+    _choose_victim_file an object-independent function
+  - Added POD documentation for get_namespace(), set_namespace(),
+    get_max_size(), set_max_size(), get_cache_depth(), and
+    set_cache_depth()
+  - "cache entry" changed to "cache object" for consistency in
+    terminology
+  - Cache size reduction is now done, if necessary, when
+    set_max_size() called 
+  - Minor portability improvements
+  - Improved error checking for REDUCE_SIZE
+  - Added parameter checking to subroutines
+  - Removed $sGET_STALE_ONLY and $sGET_FRESH_ONLY from @EXPORT_OK list
+    (these are internal constants)
+  - Internal subroutines get_username_path() and get_namespace_path()
+    now build the path directly from the cache key, username, and
+    namespace parameters. Internal subroutines set_username_path() and
+    set_namespace_path() removed.
+  - Improved directory verification so that it only happens when the
+    cache key, user, or namespace change.
+  - Modified some functions to return references instead of operating
+    on reference parameters
+  - Added cache metadata support (useful for checking that an existing
+    cache is compatible with the current version of File::Cache)
+  - Added $CACHE_OBJECT_VERSION, which describes the version of cache
+    objects that the current version of File::Cache can work with.
+  - Added support for choosing the persistence mechanism to be either
+    Storable (the traditional and default mechanism) or Data::Dumper.
+    (Data::Dumper is slower, but (1) is a standard Perl module, (2) is
+    written entirely in Perl (no compilation difficulties), and (3)
+    generates human-readable cache entries.)
+  - minor formatting change to better fit 80 columns
+  - changed _UNTAINT_STRING to take a untainted regex
+  - added _UNTAINT_FILE_PATH to call _UNTAINT_STRING with the file path regex
+  - Changed default cache key from $TMPDIR/File::Cache to $TMPDIR/FileCache on
+    DOS/Windows platforms, since the former is illegal.
+  - retroactively split version 0.13 from 0.12
+  - Corrupted cache objects stored using Data::Dumper are automatically
+    detected and removed from the cache
+  - Cache_Description.pl was changed to .description 
+  - .description files now use a proprietary format instead of Data::Dumper
+  - changed test.pl to always quote the call to the subprocess
+  - changed test/test_get.pl to strip quotes if needed
+  - wrote _RECURSIVELY_REMOVE_DIRECTORY to avoid taint failures in File::Path
+  - switched to finddepth() instead of find() in File::Find because finddepth()
+    doesn't use Cwd, which in turn is not taint safe.
+  - removed the unused _UNTAINT_CACHE_DESCRIPTION_CODE() and
+    $sUNTAINTED_CACHE_DESCRIPTION_CODE_REGEX
+  - updated the README to mention the cache upgrade issues
+  - updated the CREDITS file
+  - changed _WRITE_FILE to write to a temp file then rename to
+    avoid corruption race (thanks Randal!)
+  - better documentation for get, get_stale, and set (thanks Randal!)
+  - added two tests for getting and setting blessed objects
+  
+
+0.12 2000-08-25-09-58 (not public)
+  - fixed a typo in CHANGES
+  - added a more generic taint check called _untaint_string, this
+    is called everywhere tainting could occur
+  - use File::Spec::Functions::tmpdir to remove OS dependency for temp
+    directory (Bug ID 104869)
+  - removed last TODO item
+  - cache directories are now only created when needed (David Coppit
+    <david@coppit.org>)
+  - fixed the second test "21" in test.pl
+  - switched to nfreeze() instead of freeze to avoid segfault (thanks
+    David!)
+
+0.11 2000-06-22-09-23
+  - updated the CREDITS file
+  - updated Cache.pm for version 0.11
+
+0.10 2000-06-22-09-07
+  - updated Cache.pm for version 0.10
+  - added the remove($identifier) method to allow keys to be selectively
+    removed
+  - added a test for remove
+  - changed email address in the docs to <dewitt@avacet.com>
+  - reformatted for 80 column displays
+  - updated the _write_file routine to make it pass taint checking
+    (jhoward@fastmail.fm)
+  - updated the purge() routine to make it pass taint checking
+    (jhoward@fastmail.fm)
+
+0.09 2000-04-28-12-43
+  - perldoc updates for get and get_stale (Bug ID 104432)
+  - added public constants to EXPORT_OK (Bug ID 104433)
+  - modified test scripts to make use of EXPORT_OK'd vars
+  - updated the TODO list
+
+0.08 2000-04-12-10-31
+  - added get_creation_time() (David Coppit <david@coppit.org>)
+  - added get_expiration_time() (David Coppit <david@coppit.org>)
+  - updated the perldoc (David Coppit <david@coppit.org>)
+  - updated the test.pl script to include tests for get_creation_time() and
+    get_expiration_time() (David Coppit <david@coppit.org>)
+
+
+0.07 2000-04-10-09-45
+  - added support for the "cache_depth" option that enables
+    subdirectories in the cache to increase performance when caching
+    large numbers of objects
+  - rewrote the _recursive_find_nearest_expiration and
+    _recursive_find_latest_accessed routines to actually work recursively
+    (needed to support cache_depth)
+  - added a routine that avoids a race when removing files from the
+    cache (thanks to Jessica Mintz)
+
+ 
+0.06 2000-03-06-11-12
+  - bug fixed where purge() didn't actually delete the cache file
+    (David Coppit <david@coppit.org>)
+  - auto_purge, username, max_size, and filemode options added (David
+    Coppit <david@coppit.org>)
+  - cache_path was renamed user_path
+  - set/get methods added for auto_purge, username, max_size,
+    expires_in and filemode, namespace_path, cache_key, cache_path,
+    and user_path (David Coppit <david@coppit.org>)
+  - automatic cache size reduction added to set() method, and
+    reduce_size() method created (David Coppit <david@coppit.org>)
+  - fixed the CHANGES file to reflect the version 0.05 changes
+  - updated the perldoc (David Coppit <david@coppit.org>)
+  - now using File::Spec for the path generation (thanks for David for
+    the idea)
+  - updated the test.pl and test/test_get.pl scripts to include tests
+    for setting the username, filemode, and max_size
+
+
+0.05 2000-02-22-16-23
+  - updated the requirements in the README
+  - provided a default username if getpwuid is not available (MacOS)
+  - fixed a problem where _purge failed on FreeBSD (thanks to
+    Doug Steinwand)
+
+
+0.04 2000-02-16-14-48
+  - create a per-user namespace to better deal with file 
+    permission problems when more than one user wants
+    to use File::Cache
+  - only create a globally read/write directory for 
+    the default root of the cache (i.e., /tmp/File::Cache/)
+  - implemented size and SIZE
+  - added the _verify_directory routine for better 
+    encapsulation of that functionality
+  - updated documentation
+  - first submitted to CPAN
+  - modified test.pl to use "/tmp/TMPC" as a namespace
+  - updated the requirements in Makefile.PL
+
+
+0.03 2000-02-16-02-10
+  - set the default file and directory creation umask
+    to 0000 as a *really* temporary fix
+
+
+0.02 2000-02-14-16-52
+  - set the default file and directory creation umask
+    to 0000 as a temporary fix to the file permission
+    problem
+
+
+0.01 2000-02-10-09-22
+  - original version, created by dclinton@eziba.com
+
+
+
+
+

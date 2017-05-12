@@ -1,0 +1,40 @@
+NAME
+    File::Copy::Reliable - file copying and moving with extra checking
+
+SYNOPSIS
+      use File::Copy::Reliable;
+      copy_reliable( $source, $destination );
+      move_reliable( $source, $destination );
+
+DESCRIPTION
+    File::Copy is an excellent module which handles copying and moving
+    files. File::Copy::Reliable provides an extra level of checking after
+    the copy or move. This might be useful if you are copying or moving to
+    unreliable network fileservers.
+
+    At the moment this checks that the file size of the copied or moved file
+    is the same as the source.
+
+    The exported functions throw exceptions if there was an error.
+
+EXPORTED FUNCTIONS
+  copy_reliable
+    Copies a file:
+
+      copy_reliable( $source, $destination );
+
+  move_reliable
+    Moves a file:
+
+      move_reliable( $source, $destination );
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2006 Foxtons Ltd.
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

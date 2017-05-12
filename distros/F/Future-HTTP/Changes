@@ -1,0 +1,23 @@
+0.05 20160524
+    . Old versions of HTTP::Tiny don't have some features, defang the tests
+      appropriately.
+
+0.04 20160523
+    . Attempt to be more compatible with older versions of HTTP::Tiny
+      Those older versions are distributed with Perl 5.12.x etc, so
+      compatibility with them allows us not to require an upgrade of the
+      core module.
+
+0.03 20160523
+    . Tighten prerequisites
+      We need Future 0.33 now
+      Actually, likely anything above 0.26 will work, but I'm too lazy to
+      find out which versions work.
+    . Support Mojolicious as backend
+
+0.02 20160520
+    . Fix test suite
+
+0.01 20160516
+    . Released on an unsuspecting world
+

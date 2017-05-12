@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Fork/Promise.pm
+minil.toml
+t/00_compile.t
+t/01_run.t
+t/02_two_processes.t
+t/03_fork.t
+t/04_exitcode.t
+t/05_many_forks.t
+t/06_many_forks_in_time.t
+META.yml
+MANIFEST

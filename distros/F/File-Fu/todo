@@ -1,0 +1,22 @@
+o coverage:
+  o relative($tobase);
+  o parts/slice
+  o dir->map(..., $n/[$m,$n])
+  o File::Fu->program_name
+  o File::Fu->program_dir
+? directory mod within filename
+  - wav/thing/foo.wav => flac/thing/foo.flac
+    $file->dirname->map(sub {s/wav/flac/}, 0);
+    $file->dirname->map([wav => 'flac'], 0);
+    $file->dirname->map([qw(wav flac)], 0);
+    ($file &= λ{s/wav/flac/})->dirname &= λ{s/wav/flac/};
+    $file->map(λ{s/\.wav$/flac/})->dirname->map(λ{s/wav/flac/}, 0);
+x $dir + 'foo/bar' problem
+o freedesktop
+  o home
+  o mimeinfo
+  o basedir
+o resolve() symlink chase-down
+
+o URI support?
+  - is that just a subclass with a volume-like thing?

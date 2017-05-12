@@ -1,0 +1,6 @@
+t/cpanplus.t
+lib/Fry/Lib/CPANPLUS.pm
+README
+MANIFEST
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

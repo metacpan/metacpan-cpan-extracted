@@ -1,0 +1,151 @@
+Finance::Nadex
+
+Installation is straightforward as outlined
+in the INSTALLATION section of this document.
+
+Use this module to login to the North American Derivatives Exchange, send
+orders to the exchange, check the account balance, get price quotes,
+get information about currently available contracts, and check on open positions.
+
+It isn't clear whether the use of this module to access your Nadex account
+runs afoul of any Nadex Member Rules.  I don't believe it does.  However,
+the exchange itself is the ultimate arbiter of the meaning of
+member rules.  So, use at your own risk.
+
+This module does not (yet) support streaming quotes.  It can be used to
+continuously fetch quotes from the exchange, however, using it in that
+way will likely raise eyebrows at the exchange and possibly get your account
+deactivated.  So, don't do that.  You have been warned.  A future version
+of the module may support streaming quotes.
+
+Be aware that this module represents a very sharp knife which can be
+used improperly.  Since there is real money at stake when automating
+trades, test your client code thoroughly.  One way to do that is
+to create orders at price levels that will never get filled.  For
+example, if you create an order to buy a binary contract at $1, the
+chances of that order being filled is essentially zero.  Similarly,
+if you sell a binary at $99, the chances of the order being filled
+is once again essentially zero.  By creating such orders that
+will never be filled, you can test the key part of your code which
+is the logic of when to send orders to the exchange based on your
+algorithm without having to spend any actual money.
+
+
+Here's a sample of code that could be used to submit an order to buy
+5 GBP/USD > 1.5020 (3PM) contracts at a price of $34.50:
+
+    use Finance::Nadex;
+
+    # connects to the LIVE (real-money) platform by default;
+    # as an alternative, to connect to the DEMO (virtual money) platform,
+    # specify it in the call to new like this:
+    # my $client = Finance::Nadex->new(platform => 'demo');
+    my $client = Finance::Nadex->new;
+
+    # must login before using any other methods provided by the module
+    $client->login(username => 'yourusername', password => 'yourpassword');
+
+    # get the unique identifier for the contract to be bought 
+    my $epic = $client->get_epic(
+           instrument => 'GBP/USD',
+           type       => 'binary',
+           period     => 'Daily',
+           time       => '3pm',
+           strike     => '1.5020'
+    );
+    
+    # send the order to the exchange
+    my $order_id = $client->create_order(
+           epic      => $epic,
+           size      => 5,
+           direction => 'buy',
+           price     => 34.50 
+    );
+
+    # get information about the newly created order; note that this
+    # call may fail if the order is no longer an order; in other words,
+    # the order could get filled immediately, in which case, there is no
+    # longer an order but rather an open position
+    my $order = $client->retrieve_order( order_id => $order_id );
+
+    # display some key facts about the pending order (if it is still pending)
+    print join(" ", $order->order_id, $order->direction, $order->size, $order->contract, $order->price), "\n";
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Finance::Nadex
+
+It will also be useful to review the documentation for the following modules
+using perldoc.
+
+    perldoc Nadex::Order
+    perldoc Nadex::Position
+    perldoc Nadex::Contract
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-Nadex
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Finance-Nadex
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Finance::Nadex
+
+    Search CPAN
+        http://search.cpan.org/dist/Finance-Nadex
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 mhandisi
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

@@ -1,0 +1,128 @@
+#!perl
+use strict;
+use warnings;
+use Pod::Usage;
+use DateTime;
+use DateTime::Format::Strptime;
+use Finance::TW::TAIFEX;
+BEGIN {
+eval 'require Finance::FITF; Finance::FITF->import; 1'
+    or die 'Finance::FITF required';
+eval 'require Log::Log4perl; 1'
+    or die 'Log::Log4perl required';
+}
+if (-e 'log.conf') {
+    Log::Log4perl::init('log.conf');
+}
+else {
+    use Log::Log4perl::Level;
+    Log::Log4perl->easy_init($ERROR);
+
+}
+my $logger = Log::Log4perl->get_logger('taifex');
+
+my $rpt_dir = shift or die 'rpt dir required';
+my $fitf_db = shift or die 'fitf dir required';
+my $contract = shift or die 'contract required';
+my $code = shift;
+
+$fitf_db =~ s/\%c/$code/g;
+
+my $taifex = Finance::TW::TAIFEX->new(shift);
+
+$taifex->is_trading_day
+    or exit(0);
+
+my $date_dt = $taifex->context_date;
+my $date = $date_dt->ymd('-');
+my $month = $taifex->product($contract)->near_term($date_dt);
+
+my $rpt_f = "$rpt_dir/$date.rpt";
+my $fitf_file = DateTime::Format::Strptime->new( pattern => $fitf_db, time_zone => 'Asia/Taipei' )->format_datetime($date_dt);
+
+open my $fitf_fh, '>', "$fitf_file"
+    or $logger->error_die("unable to open $fitf_file for writing: $!");
+
+my $layer = '';
+if (-e "$rpt_f.bz2") {
+    $rpt_f .= '.bz2';
+    require PerlIO::via::Bzip2;
+    $layer .= ':via(Bzip2)';
+}
+
+open my $rpt_fh, '<'.$layer , $rpt_f
+    or $logger->error_die("unable to open $rpt_f for read: $!");
+$date =~ s/-//g;
+my $writer = Finance::FITF->new_writer(
+    fh => $fitf_fh,
+    header => {
+        name => 'XTAF.TX',
+        date => $date,
+        time_zone => 'Asia/Taipei',
+        bar_seconds => 10,
+        divisor => 1,
+        format => FITF_TICK_USHORT | FITF_BAR_USHORT
+    },
+);
+
+$writer->add_session( 525 * 60, 825 * 60 );
+
+$logger->info("reading $contract $month");
+
+<$rpt_fh>;
+my $cumvol = 0;
+
+my $prev_time;
+my $prev_ts;
+my $start = $writer->header->{start}[0];
+sub gen_ts {
+    my $data = shift;
+    my $time = $data->{time};
+    if ($prev_time && $time eq $prev_time) {
+        $data->{timestamp} = $prev_ts;
+        return $data;
+    }
+    my ($h, $m, $s) = $time =~ m/(\d\d?)(\d\d)(\d\d)/;
+    $prev_ts = $data->{timestamp} = $start - 525 * 60 + ($h*60 + $m)*60 + $s;
+    $prev_time = $time;
+    return $data;
+}
+
+my $last_price;
+
+my $contract_map = {
+    TXF => 'TX',
+};
+
+while (<$rpt_fh>) {
+    s/\s//g;
+    my ($date, $c, $m,$time, $price, $vol, $derive_price) = split(',');
+    next unless $c && $c eq $contract;
+    $time = substr($time, 0, 6) if length $time == 8 && substr($time, 6, 2) eq '00';
+    if ($contract eq 'TX' && $time >= 134500) {
+        $time = 134459; # workaround for bizzare last entry in rpt
+    }
+
+    my $data;
+    if ($m eq $month) {
+        $data = { price  => $price,
+                  date   => $date,
+                  time   => $time,
+                  volume => $vol/2,
+                  cumvol => $cumvol += $vol/2 };
+        $last_price = $price;
+    }
+    elsif ($m =~ m/^$month\//) { # spread
+        $data = { price  => $last_price, #$derive_price,
+                  date   => $date,
+                  time   => $time,
+                  volume => $vol/4,
+                  cumvol => $cumvol += $vol/4 };
+    }
+
+    next unless $data;
+    $data = gen_ts($data) if $data;
+    $writer->push_price($data->{timestamp}, $data->{price}, $data->{volume});
+
+}
+$writer->end;

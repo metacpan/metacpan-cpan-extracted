@@ -1,0 +1,70 @@
+# test4a.hash                             -*-cperl-*-
+#
+# Hashref tree for the namelist in test4a.nml
+#
+
+$namesref = [
+             'init_pars',
+             'hydro_init_pars',
+             'density_init_pars',
+             'grav_init_pars',
+             'entropy_init_pars',
+             'magnetic_init_pars',
+            ];
+
+$hashref =
+  { 'init_pars' =>
+    { 'cvsid'      => { value => ['@Id: start.in,v 1.5 2004/05/29 14:06:15 mee Exp @'],
+			stype => 'single-quote string',   type => 1 },
+      'ip'         => { value => [ '14' ],
+			stype => 'integer',               type => 4 },
+      'xyz0'       => { value => [ '-1.5', '-1.5', '-1.5' ],
+			stype => 'unspecified float',     type => 5 },
+      'lxyz'       => { value => [ '3.' , '3.' , '3.' ],
+			stype => 'unspecified float',     type => 5 },
+      'lperi'      => { value => [ 'F' , 'F' , 'F' ],
+			stype => 'logical',               type => 3 },
+      'random_gen' => { value => [ 'nr_f90' ],
+			stype => 'single-quote string',   type => 1 },
+      'r_ext'      => { value => [ '1.' ],
+			stype => 'unspecified float',     type => 5 },
+    },
+
+    'hydro_init_pars' =>
+    { 'inituu'     => { value => [ 'gaussian-noise-rprof' ],
+			stype => 'single-quote string',   type => 1 },
+      ampluu       => { value => [ '3e-2' ],
+		        stype => 'single precision float', type => 6 },
+    },
+
+
+    'density_init_pars' =>
+    { 'initlnrho'  => { value => [ 'isentropic-star' ],
+			stype => 'single-quote string',   type => 1 },
+      'cs0'        => { value => [ '1.5' ],
+			stype => 'unspecified float',     type => 5 },
+      'rho0'       => { value => [ '1.' ],
+			stype => 'unspecified float',     type => 5 },
+    },
+
+    'grav_init_pars' =>
+    { 'ipotential' => { value => [ 'M5-dwarf' ],
+			stype => 'single-quote string',   type => 1 },
+    },
+
+    'entropy_init_pars' =>
+    { 'initss'     => { value => [ 'isentropic-star' ],
+			stype => 'single-quote string',   type => 1 },
+    },
+
+    'magnetic_init_pars' =>
+    { 'initaa' => { value => [ 'gaussian-noise-rprof' ],
+		    stype => 'single-quote string',       type => 1 },
+      amplaa => { value => [ '1.e-6' ],
+		  stype => 'single precision float',      type => 6 },
+    }
+
+  };
+
+$nlists = (keys %$hashref) + 0.;
+

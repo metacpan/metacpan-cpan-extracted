@@ -1,0 +1,27 @@
+---
+abstract: 'Lightweight currency conversion using WebserviceX.NET'
+author:
+  - 'Christopher H. Laco'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.88'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Currency-Convert-WebserviceX
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::Response: 0
+  LWP: 0
+  Memoize: 0
+  perl: 5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07001

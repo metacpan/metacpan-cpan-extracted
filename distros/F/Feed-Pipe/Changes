@@ -1,0 +1,30 @@
+Revision history for Feed-Pipe
+
+1.004     2016-02-15 02:03:45-08:00 America/Los_Angeles
+ - Convert to Moo
+
+1.003   2009-12-29
+ - Entries now get a source element injected when they are added
+   to the pipe. This is only marginally useful for non-atom feeds,
+   but should allow tracing an entry back to its original source.
+ - The source feature requires upgrading to XML::Atom 0.37 to fix
+   an Atom bug.
+
+1.002   2009-12-04
+ - RT 52449: Errant Build.PL script was not up to date. Removed.
+   Only Module::Install is supported in this version.
+ - Corrected README install instructions.
+ - Fixed spurious test failures due to undeclared prerequisites
+   in the test scripts.
+
+1.001   2009-11-29
+ - No code changes. Cleaned POD considerably and removed warning about
+   API instability. API is in fact stable as of 1.0.
+
+1.000   2009-11-28
+ - First release to CPAN, useful as a general tool kit now. Implements
+   cat, grep, head, map, reverse, sort, tail.
+
+0.001   2009-11-24
+ - First version, unreleased except on github. Not really useful yet.
+   Only cat has been implemented.

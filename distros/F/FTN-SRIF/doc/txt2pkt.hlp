@@ -1,0 +1,7 @@
+
+Usage:
+txt2pkt -xf "<pkt from address>" -xt "<pkt to address>"  \
+ -af "<from address>" -at "<to address>" \
+ -nf "<from name>" -nt "<to name>" \
+ -e "echo name" -p "password" -t "tearline" -o "origin" \
+ -s "subject" -d "<directory>" <text file>

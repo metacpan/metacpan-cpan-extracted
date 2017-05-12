@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::Quant.
+
+0.08  Tue Jan 17 00:07:28 2012
+	- original version; created by h2xs 1.23 with options
+		-XA Finance::Quant
+

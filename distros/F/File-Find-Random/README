@@ -1,0 +1,12 @@
+
+This module handily returns to you a random file from a large file system. It uses File::Find and should support multiple platforms.
+
+Here are the basic install instructions.
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

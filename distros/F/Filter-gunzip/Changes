@@ -1,0 +1,38 @@
+Copyright 2010, 2011, 2013, 2014 Kevin Ryde
+
+This file is part of Filter-gunzip.
+
+Filter-gunzip is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Filter-gunzip is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Filter-gunzip.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 6, August 2014
+    - workaround for incompatible change in Compress::Raw::Zlib::Inflate
+      -LimitOutput returning Z_BUF_ERROR
+
+Version 5, January 2013
+    - debian dir maintainer part 0.1
+
+Version 4, February 2011
+    - fix Makefile.PL for perl 5.6 and earlier
+      (though PerlIO::gzip is 5.8, so probably at least that needed anyway)
+
+Version 3, September 2010
+    - test manifest only as an author test
+
+Version 2, August 2010
+    - allow for PL_rsfp_filters==NULL in perl 5.8.9
+
+Version 1, April 2010
+    - the first version

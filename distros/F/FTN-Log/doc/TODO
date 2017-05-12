@@ -1,0 +1,22 @@
+To do:  FTN::Log
+
+- Add selectable log formats?
+
+- Add To Do information, or a summary of it, as a POD section in the module?
+  Could rename the BUGS section to 'BUGS AND LIMITATIONS', then add a To Do
+  subsection to that. Or simply have (apparently non-standard) TODO section.
+
+- Add functionality for multiple logging formats by using separate sub-modules
+  like FTN::LOG::LogType, wherein they can use the standard Perl Log modules.
+
+- After have updated the name of the FTN::Log project page, update the project
+  link in the module to point directly to that instead of main project page.
+
+- Clean up and reformat the Changes file.
+
+- After the initial logging test, log several more messages then check that
+  number of lines in the log matches?
+
+- Check fields in the logged lines for correctness?
+
+

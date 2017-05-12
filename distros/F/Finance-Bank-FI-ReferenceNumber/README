@@ -1,0 +1,32 @@
+NAME
+    Finance::Bank::FI::ReferenceNumber - Calculate Finnish bank payment
+    reference number (viitenumero)
+
+DESCRIPTION
+    Calculate Finnish bank payment reference number. Laskee suomalaisen
+    maksun viitenumeron.
+
+SYNOPSIS
+        #The number given in the argument must have a length of 3..19.
+        my $ref = Finance::Bank::FI::ReferenceNumber->new('123');
+
+        print "The reference number is " . $ref->get();
+
+METHODS
+  get
+        Returns the reference number consisting of the number given for new()
+        concatenated with the calculated checksum number.
+
+BUGS
+    Accepts numbers shorter than 3 digits in new(). Accepts numbers longer
+    than 19 digits in new().
+
+AUTHOR
+    Panu Ervamaa Oskari Ojala <okko@cpan.org>
+
+COPYRIGHT & LICENSE
+    Copyright 2011-2012 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

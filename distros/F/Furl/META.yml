@@ -1,0 +1,89 @@
+---
+abstract: 'Lightning-fast URL fetcher'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+  Test::TCP: '2.11'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Furl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Furl:
+    file: lib/Furl.pm
+    version: '3.10'
+  Furl::ConnectionCache:
+    file: lib/Furl/ConnectionCache.pm
+  Furl::HTTP:
+    file: lib/Furl/HTTP.pm
+    version: '3.10'
+  Furl::Headers:
+    file: lib/Furl/Headers.pm
+  Furl::Request:
+    file: lib/Furl/Request.pm
+  Furl::Response:
+    file: lib/Furl/Response.pm
+  Furl::ZlibStream:
+    file: lib/Furl/ZlibStream.pm
+recommends:
+  Compress::Raw::Zlib: '0'
+  HTTP::CookieJar: '0'
+  IO::Socket::SSL: '0'
+  Net::IDN::Encode: '0'
+requires:
+  Class::Accessor::Lite: '0'
+  Encode: '0'
+  HTTP::Parser::XS: '0.11'
+  MIME::Base64: '0'
+  Mozilla::CA: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Time::HiRes: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Furl/issues
+  homepage: https://github.com/tokuhirom/Furl
+  repository: git://github.com/tokuhirom/Furl.git
+version: '3.10'
+x_contributors:
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'Audrey Tang <audreyt@audreyt.org>'
+  - 'Fuji Goro <fuji.goro@dena.jp>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 's-aska <s.aska.org@gmail.com>'
+  - 'ikasam_a <masaki.nakagawa@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Toshio Ito <debug.ito@gmail.com>'
+  - 'bayashi <bayashi@cpan.org>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+  - 'Jari Salmela <bissei@users.noreply.github.com>'
+  - 'tarao <tarao.gnn@gmail.com>'
+  - 'kimoto <peerler@gmail.com>'
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+  - 'Yasuhiro Matsumoto <mattn.jp@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,14 @@
+Revision history for Perl module File::Copy::Reliable:
+
+0.32 Thu Oct 16 21:08:24 BST 2008
+  - fix the tests
+  - add human-readable license to the documentation
+  - move back to Makefile.PL
+
+0.31 Tue May 29 19:55:14 BST 2007
+  - fix copy_reliable( FILE => DIR ) and move_reliable( FILE => DIR )
+    (thanks to Richard Clamp)
+  
+0.30 Mon Oct  9 15:04:12 BST 2006
+  - initial release
+  

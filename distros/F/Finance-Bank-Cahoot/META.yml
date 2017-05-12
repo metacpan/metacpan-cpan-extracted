@@ -1,0 +1,39 @@
+--- #YAML:1.0
+name:               Finance-Bank-Cahoot
+version:            1.07
+abstract:           ~
+author:
+    - Jon Connell <cpan@figsandfudge.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Class::Accessor:      0
+    Crypt::CBC:           0
+    Crypt::DES_PP:        0
+    Date::Parse:          0
+    Digest::MD5:          0
+    English:              0
+    ExtUtils::MakeMaker:  0
+    File::Slurp:          0
+    File::Spec:           0
+    HTML::Form:           0
+    HTML::TableExtract:   0
+    IO::File:             0
+    Term::ReadLine:       0
+    Test::Deep:           0
+    Test::Exception:      0
+    Test::MockObject:     0
+    Test::More:           0
+    URI:                  0
+    WWW::Mechanize:       0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

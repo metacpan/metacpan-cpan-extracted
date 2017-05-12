@@ -1,0 +1,19 @@
+---
+access_token:
+app_id: 240872146043538
+# Permissions required to be associated with Facebook access token
+permissions:
+# "User Data Permissions"
+- email
+- publish_actions
+- user_groups
+# "Friends Data Permissions"
+- friends_location
+# "Extended Permissions"
+- create_event
+- manage_pages
+- offline_access
+- publish_stream
+- rsvp_event
+postback: http://localhost:8123/
+secret: f6fb04e91625764f4bd9f4a89d8b3af6

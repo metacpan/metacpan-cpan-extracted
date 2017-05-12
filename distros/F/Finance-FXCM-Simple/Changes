@@ -1,0 +1,41 @@
+Revision history for Perl extension ForexConnect.
+
+0.014 2016-03-28 22:42:24 UTC
+    - Minor doc changes
+    - getTrades returns an empty list instead of undef if no trades exist
+0.013 2016-03-21 22:31:11 UTC
+    - Add method getTradesForSymbol
+0.012 2016-02-18 04:34:04 UTC
+    - Use YAML::XS instead of YAML::Syck
+    - Better document compile time dependency
+0.011 2015-11-27 21:35:26 UTC
+    - Improved documentation
+    - Improved travis-ci integration
+0.010 2013-03-24 17:23:30 UTC
+    - Handle exceptions in constructor
+0.009 2012-12-09 19:23:23 UTC
+    - Convert dist to Dist::Zilla
+    - Optionally use FXCONNECT_HOME when building
+    - Deal with test reliability issues in CI environment
+    - Pod encoding fix, plus link to github/travis-ci
+0.008  Mon Nov 12 23:53:43
+    - Add missing header to include usleep definition
+    - Don't check for dependencies on Makefile.PL
+0.007  Wed Aug 1 13:16:14
+    - Cleanup distribution package (META.{yml,json}, define build/runtime prerequisites)
+0.006  Tue Jun 31 21:45:34
+    - API cleanup
+    - More unit tests
+    - Perldoc
+0.005  Mon Jun 11 19:38:16
+    - Remove getNav() method which is not returning current Net Asset Value as it should.  Instead add getBalance() method which returns current account balance ( before p/l of open positions)
+0.004  Mon Jun 11 19:10:01
+    - Fix saveHistoricalDataToFile method which is returning open prices in high, low and close fields.
+0.003  Sun Jun 10 16:42:25
+    - Use std::string instead of char *
+    - release point to IO2GAccountRow object on destructor
+    - Don't ship binary versions of ForexConnect in this package
+0.002  Fri Jun  8 20:56:16
+    - Convert C++ exceptions to perl croaks
+0.001  Tue Jun  5 18:23:20 2012
+    - original version

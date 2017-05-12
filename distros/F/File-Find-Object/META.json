@@ -1,0 +1,127 @@
+{
+   "abstract" : "An object oriented File::Find replacement",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "alternative-to-core",
+      "directories",
+      "directory",
+      "directory-traversal",
+      "directory-tree",
+      "directory-trees",
+      "file",
+      "file-find",
+      "find",
+      "instance",
+      "instantiated",
+      "instantiation",
+      "iterative",
+      "object",
+      "object-oriented",
+      "oop",
+      "prune",
+      "traversal",
+      "traverse",
+      "tree"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Find-Object",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::XSAccessor" : "0",
+            "Fcntl" : "0",
+            "File::Spec" : "0",
+            "List::Util" : "0",
+            "integer" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "lib" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Find::Object" : {
+         "file" : "lib/File/Find/Object.pm",
+         "version" : "v0.3.2"
+      },
+      "File::Find::Object::Base" : {
+         "file" : "lib/File/Find/Object/Base.pm",
+         "version" : "v0.3.2"
+      },
+      "File::Find::Object::DeepPath" : {
+         "file" : "lib/File/Find/Object.pm",
+         "version" : "v0.3.2"
+      },
+      "File::Find::Object::PathComp" : {
+         "file" : "lib/File/Find/Object/PathComp.pm",
+         "version" : "v0.3.2"
+      },
+      "File::Find::Object::Result" : {
+         "file" : "lib/File/Find/Object/Result.pm",
+         "version" : "v0.3.2"
+      },
+      "File::Find::Object::TopPath" : {
+         "file" : "lib/File/Find/Object.pm",
+         "version" : "v0.3.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-file-find-object@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Find-Object"
+      },
+      "repository" : {
+         "type" : "hg",
+         "url" : "ssh://hg@bitbucket.org/shlomif/perl-file-find-object",
+         "web" : "http://bitbucket.org/shlomif/perl-file-find-object"
+      }
+   },
+   "version" : "v0.3.2"
+}
+

@@ -1,0 +1,15 @@
+#fsdb -F S event
+_null_getpage+128
+_null_getpage+128
+_null_getpage+128
+_null_getpage+128
+_null_getpage+128
+_null_getpage+128
+_null_getpage+4
+_null_getpage+4
+_null_getpage+4
+_null_getpage+4
+_null_getpage+4
+_null_getpage+4
+#  | /home/johnh/BIN/DB/dbcol event
+#  | /home/johnh/BIN/DB/dbsort event

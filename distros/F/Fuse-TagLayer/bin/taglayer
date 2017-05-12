@@ -1,0 +1,177 @@
+#!/usr/bin/perl -w
+
+
+use lib 'lib';
+use Fuse;
+use Fuse::TagLayer;
+use Getopt::Long;
+use Pod::Usage;
+
+my %options = (
+	'realdir'		=> '',
+	'mountpoint'		=> '',
+	'no_tags_from_path'	=> 0,
+	'no_tags_from_xattr'	=> 0,
+	'ignore_numbers_only'	=> 0,
+	'debug'			=> 0,
+	'backend'		=> 'SQLite',
+	'help'			=> 0,
+);
+
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+	'realdir|r:s'		=> \$options{'realdir'},
+	'mountpoint|m:s'	=> \$options{'mountpoint'},
+	'no-tags-from-path'	=> \$options{'no_tags_from_path'},
+	'no-tags-from-xattr'	=> \$options{'no_tags_from_xattr'},
+	'more-tags'		=> \$options{'more_tags'},
+	'ignore-numbers-only'	=> \$options{'ignore_numbers_only'},
+	'debug|D+'		=> \$options{'debug'},
+	'backend|b:s'		=> \$options{'backend'},
+	'help'			=> \$options{'help'},
+) or pod2usage(2);
+
+$options{'realdir'} ||= shift @ARGV;
+$options{'mountpoint'} ||= shift @ARGV;
+
+pod2usage(1) unless !$options{'help'} && $options{'realdir'};
+
+die "TagLayer: realdir $options{'realdir'} does not exist!\n" if !-d $options{'realdir'};
+
+if(!$options{'mountpoint'}){
+	print "TagLayer: No mountpoint specified. Using default $options{'realdir'} . /+tags\n";
+	$options{'mountpoint'} = $options{'realdir'} .'/+tags';
+}
+
+my $mountpoint_created;
+if(!-d $options{'mountpoint'}){
+	print "TagLayer: Creating mountpoint directory $options{'mountpoint'}\n";
+	mkdir($options{'mountpoint'}) or die "Error creating mountpoint dir: $!\n";
+	$mountpoint_created=1;
+}
+
+
+## init TagLayer
+my $ftl = Fuse::TagLayer->new(
+	realdir			=> $options{'realdir'},
+	mountpoint		=> $options{'mountpoint'},
+	'no_tags_from_path'	=> $options{'no_tags_from_path'},
+	'no_tags_from_xattr'	=> $options{'no_tags_from_xattr'},
+	'more_tags'		=> $options{'more_tags'},
+	'ignore_numbers_only'	=> $options{'ignore_numbers_only'},
+	backend			=> $options{'backend'},
+	debug			=> $options{'debug'} > 0 ? $options{'debug'} : 0,
+);
+
+
+print "TagLayer: Mounting tags found in $options{'realdir'} as $options{'mountpoint'}\n\n";
+$ftl->mount(); # blocks
+
+
+$ftl->umount();
+
+if($mountpoint_created){
+	print "TagLayer: Removing previously created mountpoint directory $options{'mountpoint'}\n";
+	rmdir($options{'mountpoint'}) or die "Error removing previously created mountpoint dir: $!\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+taglayer - mounting script for Fuse::TagLayer
+
+=head1 SYNOPSIS
+
+  taglayer [options] <realdir> [<mountpoint>]
+
+=head1 EXAMPLES
+
+  taglayer /some/real/directory/with/tagged/files
+  taglayer --no-tags-from-path --debug --debug /real/dir /real/dir/+tags
+
+=head1 OPTIONS
+
+=over
+
+=item B<--realdir, -r>
+
+Real directory hierarchy with all the files you want to mount, then layered
+with the virtual tag dirs. Required.
+
+You can choose if you want to supply this as an option switch or as the first
+argument.
+
+=item B<--mountpoint, -m>
+
+Location where to mount the TagLayer tag file-system. Defaults to <realdir>/+tags.
+
+You can choose if you want to supply this as an option switch or as the second
+argument.
+
+=item B<--no-tags-from-path>
+
+Ignore tags that could be parsed out from the real directory path of files.
+
+Note that if you restrict TagLayer to parse out tags B<only> from path (by
+adding --no-tags-from-xattr and not having --more-tags), files residing in
+the root will be left out as they are regarded as being "not tagged (by a
+dir)".
+
+=item B<--no-tags-from-xattr>
+
+Ignore tags coming from the "user.tags" extended attribute.
+
+=item B<--more-tags>
+
+Take filenames (basenames) into account to gather more tags. Does so by splitting
+on spaces, underscores (nonalpha-numeric), and in addition, offers files' suffixes
+(commonly called "file-extensions") as the special tag "zsuffix<extension>". But might
+clutter your tag-space with many tags that are effectively unsplittable filenames.
+
+=item B<--ignore-numbers-only>
+
+Ignore tags/parsed-out-values that are all numbers (matching regex /^\d+$/).
+
+=item B<--backend, -b>
+
+TagLayer allows to switch the underlying storage backend. The default is a SQLite
+database in memory. If you want to use a pure Perl version instead, pass the string
+'PurePerl' via this option.
+
+=item B<--debug, -D>
+
+Switch on debugging output. Incremental. You can repeat this option up to three
+times. 1x means debug output from Fuse::TagLayer, 2x means more verbose output
+from TagLayer and backends. 3x is even more verbose and adds the debug messages
+from Fuse.
+
+=item B<--help, -h>
+
+Output this help text.
+
+=back
+
+Please note that this script currently blocks (will remain in the foreground) until
+the mount is unmounted with I<sudo umount <mountpoint>>.
+
+=head1 KNOWN ISSUES
+
+Please refer to the library module L<Fuse::TagLayer> for known issues.
+
+=head1 SEE ALSO
+
+More information about what this mounting script does can be found in the
+documentation of the backend module L<Fuse::TagLayer>.
+
+=head1 AUTHOR
+
+Clipland GmbH L<http://www.clipland.com/>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012-2013 Clipland GmbH. All rights reserved.
+
+This library is free software, dual-licensed under L<GPLv3|http://www.gnu.org/licenses/gpl>/L<AL2|http://opensource.org/licenses/Artistic-2.0>.
+You can redistribute it and/or modify it under the same terms as Perl itself.

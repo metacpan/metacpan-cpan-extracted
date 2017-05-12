@@ -1,0 +1,60 @@
+Copyright 2008, 2009, 2010, 2015 Kevin Ryde
+
+This file is part of Finance-Quote-Grab.
+
+Finance-Quote-Grab is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Finance-Quote-Grab is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Finance-Quote-Grab extends Finance::Quote to fetch quotes from
+
+    * Reserve Bank of Australia
+    * MGEX
+    * MLC Funds
+    * Ghana Stock Exchange
+
+Quotes can be viewed in your favourite Finance::Quote program.
+
+The prerequisites are
+
+    * Finance::Quote
+    * HTML::TableExtract (which Finance::Quote needs anyway)
+    * LWP version 5.814 or higher
+
+The Finance-Quote-Grab home page is
+
+    http://user42.tuxfamily.org/finance-quote-grab/index.html
+
+The Finance::Quote home page is
+
+    http://finance-quote.sourceforge.net
+
+
+
+To make add-on F-Q modules available you generally have to add them to
+the module loads in your Finance::Quote->new call.  For example to get
+the defaults plus MLC,
+
+    my $quoter = Finance::Quote->new ('-defaults', 'MLC');
+
+You can also set the environment variable FQ_LOAD_QUOTELET like
+
+    FQ_LOAD_QUOTELET="-defaults MLC"
+    export FQ_LOAD_QUOTELET
+
+FQ_LOAD_QUOTELET is used by new() calls with no arguments.  Setting it
+may be the easiest way to get new modules into an F-Q program.  For
+example with the Examples/chkshares.pl script provided by F-Q,
+
+    FQ_LOAD_QUOTELET="RBA" ./chkshares.pl rba AUDUSD

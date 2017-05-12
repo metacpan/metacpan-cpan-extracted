@@ -1,0 +1,9 @@
+Revision history for Perl extension Furl::Cookies.
+
+0.01  Sat Sep 29 08:42:17 2012
+	- original version; created by h2xs 1.23 with options
+		-A -n Furl::Cookies
+
+0.03  Fri Jun 07 09:49:00 2013
+      Fixed several bugs.
+

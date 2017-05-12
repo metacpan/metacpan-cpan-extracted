@@ -1,0 +1,10 @@
+Changes
+lib/Formatter/HTML/Preformatted.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE
+t/01use.t
+t/02insert.t

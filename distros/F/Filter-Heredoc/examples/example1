@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use Filter::Heredoc qw( hd_getstate hd_labels );
+
+my %label = hd_labels();  # get the default labels
+my %state;
+
+die "Specify a plain text file as argument\n" if ( $#ARGV == -1) ;
+
+while (defined( my $line = <ARGV> )) {
+    %state = hd_getstate( $line );
+    print $line if ( $state{statemarker} eq $label{heredoc} );
+}

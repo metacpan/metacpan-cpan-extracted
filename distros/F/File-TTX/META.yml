@@ -1,0 +1,19 @@
+---
+abstract: Utilities for dealing with TRADOS TTX files
+author:
+  - 'Michael Roberts <michael@vivtek.com>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-TTX
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/Vivtek/File-TTX.git
+version: 0.04

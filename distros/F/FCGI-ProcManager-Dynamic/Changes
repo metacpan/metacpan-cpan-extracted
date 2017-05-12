@@ -1,0 +1,29 @@
+Revision history for Perl extension FCGI::ProcManager::Dynamic.
+
+0.8  Tue Mar 16 21:25:00
+	- Fix: Syntax
+
+0.7  Tue Mar  9 12:17:00 MSK 2017
+	- Patches from Dmitry Shalashov <skaurus@gmail.com> and Igor Golubev <gibbon4ik@gmail.com>
+
+0.6  Fri Jun 29 10:58:56 MSK 2012
+	- Fix: Stupid syntax error. Sorry.
+
+0.5  Thu Jun 28 18:32:25 MSK 2012
+	- Fix: A more correct work with shared memory queue
+	- Fix: small fix for english notifications
+
+0.4
+	- Add: Time output for FastCGI notifications (usable for log analize)
+	- Fix: Addition check if workers count less than min_nproc
+	- Fix: Do not reduce the number of work processes when the number of processes employed during delta_time was great 
+
+0.3  Tue Mar  6 14:51:37 MSK 2012
+	- Fix: documentation
+	- Fix: depending
+
+0.2  Mon Mar  5 12:40:32 MSK 2012
+	- Fix: documentation
+
+0.1  Sun Mar  4 15:56:03 2012
+	- First version

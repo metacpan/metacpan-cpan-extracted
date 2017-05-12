@@ -1,0 +1,523 @@
+#!/usr/bin/perl -w
+use File::Find;
+use Gtk2 -init;
+use Glib qw(FALSE TRUE);
+use Gtk2::Pango;
+use File::Spec::Functions;
+use File::Path;
+$|++;
+my $VERSION='1.01';
+my $help;
+while(<DATA>){$help .= $_}
+my $seeking = 0; #global flag to indicate searching is in progress
+my $cancel = 0;  #global flag to cancel a long running search
+my %files;       #global to store results
+my $current = File::Spec->tmpdir();
+#> my ($recurse, $name, $case,$linenums,$quick_start) =(0,0,0,0,0);
+my ($recurse, $name, $case,$linenums,$quick_start, $use_regex) =(0,0,0,0,0); ##< patch
+## ACTIVATE FLAGS AND ERASE THEM FROM @ARGV...
+if( grep{/\bn\b/} @ARGV ){@ARGV = grep { $_ ne 'n' } @ARGV; $name = 1 };
+if( grep{/\br\b/} @ARGV ){@ARGV = grep { $_ ne 'r' } @ARGV; $recurse = 1 };
+if( grep{/\bR\b/} @ARGV ){@ARGV = grep { $_ ne 'R' } @ARGV; $use_regex = 1 }; ##<patch
+if( grep{/\bc\b/} @ARGV ){@ARGV = grep { $_ ne 'c' } @ARGV; $case = 1 };
+$linenums = 1; #opened file line numbering is on by default
+my $search_str = $ARGV[0] or $quick_start = 1;
+$search_str ||= undef;
+my $startdir= $current;#$ARGV[1];   ## OPTIONAL DIR FOR SEARCH...
+chdir($startdir) if (defined($startdir) and -d $startdir);
+#only accept 1 search string, so quote phrases on commandline
+#print "$name $recurse $case @ARGV\n";
+my $font     = Gtk2::Pango::FontDescription->from_string("Sans Bold 12");
+my $fontMono = Gtk2::Pango::FontDescription->from_string("Andale Mono Bold 8");##< my fault
+my $hand_cursor = Gtk2::Gdk::Cursor->new ('hand2');
+my $regular_cursor = Gtk2::Gdk::Cursor->new ('xterm');
+my $hovering_over_link = FALSE;
+my $blue  = Gtk2::Gdk::Color->new (0,0,0xFFFF);
+my $navy  = Gtk2::Gdk::Color->new (0,0,0x8888);             ##< my fault
+my $red   = Gtk2::Gdk::Color->new (0x8888,0,0);             ##< my fault
+my $yell  = Gtk2::Gdk::Color->new (0xFFFF,0xFFFF,0x8888);   ##< my fault
+my $white = Gtk2::Gdk::Color->new (0xFFFF,0xFFFF,0xFFFF);
+my $window = Gtk2::Window->new;
+$window->signal_connect( destroy => sub { Gtk2->main_quit; } );
+$window->set_default_size( 700, 600 );
+$window->set_title("[$0] $startdir") if ($startdir);
+$window->signal_connect (key_press_event => \&key_handler);
+$window->activate_focus;
+#main box for display
+my $vbox = Gtk2::VBox->new();
+$vbox->set( "border_width" => 10 );
+$window->add($vbox);
+#top main box for search entry and options
+my $vboxt = Gtk2::VBox->new();
+$vboxt->set( "border_width" => 1 );
+$vbox->pack_start( $vboxt, 0, 0, 1 ); # expand?, fill?, padding
+#top layer
+my $hboxt = Gtk2::HBox->new();
+$hboxt->set( "border_width" => 1 );
+$vboxt->pack_start( $hboxt, 0, 0, 1 ); # expand?, fill?, padding
+#bottom layer
+my $vboxC3 = Gtk2::VBox->new();        ##<patch
+my $hboxb = Gtk2::HBox->new();
+$hboxb->set( "border_width" => 1 );
+$vboxt->pack_start( $hboxb, 0, 0, 1 ); # expand?, fill?, padding
+################################################################
+my $vboxC1 = Gtk2::VBox->new();
+my $vboxC2 = Gtk2::VBox->new();
+my $checkbutton1 = Gtk2::CheckButton->new('Recurse SubDirs');
+$checkbutton1->signal_connect( clicked =>
+               sub{check_button_callback($checkbutton1, \$recurse, 'recurse') } );
+$vboxC1->pack_start( $checkbutton1, 0, 0, 0 );
+if($recurse){$checkbutton1->set_active(1);}
+my $checkbutton2 = Gtk2::CheckButton->new('Name Search Only');
+$checkbutton2->signal_connect( clicked =>
+              sub{check_button_callback($checkbutton2, \$name , 'name')});
+$vboxC1->pack_start( $checkbutton2, 0, 0, 0 );
+if($name){$checkbutton2->set_active(1);}                                  ## patch
+my $checkbutton5 = Gtk2::CheckButton->new('Use RegEx');##<--------------+
+$checkbutton5->signal_connect( clicked =>                                 #
+                               sub{check_button_callback($checkbutton5,   #
+                                                         \$use_regex ,    # patch
+                                                         'use_regex')});  #
+$vboxC2->pack_start( $checkbutton5, 0, 0, 0 );                            #
+                                                                          #
+if($case){$checkbutton5->set_active(1);}               ##<--------------+
+my $checkbutton3 = Gtk2::CheckButton->new('Case Sensitive');
+$checkbutton3->signal_connect( clicked =>
+             sub{check_button_callback($checkbutton3, \$case , 'case')});
+$vboxC3->pack_start( $checkbutton3, 0, 0, 0 );                            ##< patch
+if($case){$checkbutton3->set_active(1);}
+my $checkbutton4 = Gtk2::CheckButton->new('File Line Numbered');
+$checkbutton4->signal_connect( clicked =>
+             sub{check_button_callback($checkbutton4, \$linenums , 'linenums')});
+$hboxt->pack_start( $vboxC3, 0, 0, 0 );                                   ##< patch
+$vboxC2->pack_start( $checkbutton4, 0, 0, 0 );
+if($linenums){$checkbutton4->set_active(1);}
+$hboxt->pack_start( $vboxC1, 0, 0, 0 );
+$hboxt->pack_start( $vboxC2, 0, 0, 0 );
+#################################################################
+# the search button
+my $sbutton = Gtk2::Button->new_from_stock('gtk-find');
+$sbutton->signal_connect( clicked => sub{ if(! $seeking){ do_dir_search()} });
+$hboxt->pack_start( $sbutton, 0, 0, 5 );
+##############################################################
+# exit button
+my $ebutton = Gtk2::Button->new_from_stock('gtk-quit');
+$ebutton->signal_connect( clicked => sub { Gtk2->main_quit; } );
+$hboxt->pack_end( $ebutton, 0, 0, 5 );
+#################################################################
+# the help button
+my $hbutton = Gtk2::Button->new_from_stock('gtk-help');
+$hbutton->signal_connect( clicked => \&print_usage );
+$hboxt->pack_end( $hbutton, 0, 0, 5 );
+##################################################################
+#bottom fields
+my $label = Gtk2::Label->new('Search Text:');
+$label->modify_font($font);
+$hboxb->pack_start( $label, 0, 0, 5 ); # expand?, fill?, padding
+my $entry = Gtk2::Entry->new();
+$entry->modify_font($font);
+if(defined $search_str){ $entry->set_text($search_str) }
+$hboxb->pack_start( $entry, 1, 1, 1 ); # expand?, fill?, padding
+#setup default focaus chain
+$vboxt->set_focus_child ($hboxb);
+$hboxb->set_focus_child ($entry);
+#$entry->has_focus(TRUE);
+$entry->signal_connect (key_press_event => \&key_handler);
+#################################################################
+#box for list
+my $hbox1 = Gtk2::HBox->new();
+$hbox1->set( "border_width" => 1 );
+#box for textview
+my $hbox2 = Gtk2::HBox->new();
+$hbox2->set( "border_width" => 1 );
+#$hbox2->set_size_request(200,500);
+my $f1_label = Gtk2::Label->new('Search Results');
+$f1_label->modify_fg('normal',$red);
+$f1_label->modify_font($font);
+my $frame1 = Gtk2::Frame->new();
+$frame1->set_label_widget($f1_label);
+$vbox->pack_start( $frame1, 1, 1, 1 ); # expand?, fill?, padding
+$frame1->set_border_width(1);
+$frame1->add($hbox1);
+$frame1->modify_bg('normal', $red);
+my $f2_label = Gtk2::Label->new('File');
+$f2_label->modify_fg('normal',$blue);
+$f2_label->modify_font($font);
+my $frame2 = Gtk2::Frame->new();
+$frame2->set_label_widget($f2_label);
+$vbox->pack_start( $frame2, 1, 1, 1 ); # expand?, fill?, padding
+$frame2->set_border_width(1);
+$frame2->add($hbox2);
+$frame2->modify_bg('normal', $blue);
+# Create a textbuffer to contain the resultant files
+my $textbuffer0 = Gtk2::TextBuffer->new();
+create_tags($textbuffer0);
+$textbuffer0->set_text('');
+$textbuffer0->apply_tag_by_name ('bold',$textbuffer0->get_start_iter,$textbuffer0->get_end_iter);
+# Create a textview using that textbuffer
+my $textview0 = Gtk2::TextView->new_with_buffer($textbuffer0);
+$textview0->set_left_margin (5);
+$textview0->signal_connect (event_after => \&event_after);
+$textview0->signal_connect (motion_notify_event => \&motion_notify_event);
+my $swl = Gtk2::ScrolledWindow -> new();
+$swl -> add_with_viewport($textview0);
+$hbox1->add($swl);
+######################################################
+# Create a textbuffer to contain the opened files
+my $textbuffer = Gtk2::TextBuffer->new();
+create_tags($textbuffer);
+$textbuffer->set_text('');
+$textbuffer->apply_tag_by_name ('bold',$textbuffer->get_start_iter,$textbuffer->get_end_iter);
+# Create a textview using that textbuffer
+my $textview = Gtk2::TextView->new_with_buffer($textbuffer);
+$textview->set_left_margin (5);
+$textview->modify_font ($fontMono);     ##< my fault
+$textview->modify_base('normal',$yell); ##< my fault
+$textview->modify_text('normal',$navy); ##< my fault
+# Add the textview to a scrolledwindow
+my $scrolledwindow = Gtk2::ScrolledWindow->new( undef, undef );
+$scrolledwindow->add($textview);
+# add that scrolledwindow to the vbox
+$hbox2->add($scrolledwindow);
+$window->show_all;
+#setup a control-c exit----------
+my @accels = (
+	{ key => 'C', mod => 'control-mask', func => sub{ Gtk2->main_quit } },
+	);
+my $accel_group = Gtk2::AccelGroup->new;
+use Gtk2::Gdk::Keysyms;
+      foreach my $a (@accels)
+      {
+	$accel_group->connect ($Gtk2::Gdk::Keysyms{$a->{key}},
+                               $a->{mod},
+                               'visible',
+                               $a->{func});
+       }
+$window->add_accel_group ($accel_group);
+##############-------------------
+if( $quick_start == 0)
+{
+ Glib::Timeout->add (10, sub { do_dir_search(); 0 });
+}
+Gtk2->main;
+#############################################################################
+sub do_file_search
+{
+  my $file = shift;
+  if( ! defined $file ){return}
+  my @lines = ();
+    foreach my $aref( @{$files{$file}} )
+    {
+           push @lines, $$aref[0];
+    }
+  $textbuffer->set_text('');
+  open (FH,"< $file");
+  while(<FH>){
+     my $line = $.;
+     if($linenums)
+     {
+       my $lineI = sprintf "%03d", $line;
+       $textbuffer->insert_with_tags_by_name ($textbuffer->get_end_iter, $lineI, 'rmap');
+       $textbuffer->insert ($textbuffer->get_end_iter, ' ');
+     }
+    if( grep {/^$line$/} @lines )
+    {
+           $textbuffer->insert_with_tags_by_name ($textbuffer->get_end_iter, $_, 'rmapZ');
+    }
+    else
+    {
+          $textbuffer->insert_with_tags_by_name ($textbuffer->get_end_iter, $_, 'bold');
+    }
+  }
+ close FH;
+#set up where to scroll to when opening file
+ my $first;
+ if ( $lines[0] > 0 ){ $first = $lines[0] }else{$first = 1}
+ my $start_iter = $textbuffer->get_iter_at_line($first);
+my $start_mark = $textbuffer->create_mark('start', $start_iter, 1);
+$textview->scroll_to_mark($start_mark ,0.0, 0, 0, 0.0);
+#set frame label to file name
+$f2_label->set_text($file);
+$current = $file;
+}
+################################################################
+sub do_dir_search
+{
+#prevent accidental double enter's or double find button presses
+$seeking = 1;
+$cancel = 0;
+#clear old screens
+$textbuffer->delete($textbuffer->get_start_iter,$textbuffer->get_end_iter,);
+$textbuffer0->delete($textbuffer0->get_start_iter,$textbuffer0->get_end_iter,);
+#clear old results
+%files = ();
+$f1_label->set_text('Search Results');
+$f2_label->set_text('File');
+# defaults are case-insensitive, no recurse, open and search files (not filename)
+my $path = '.';
+$search_str = $entry->get_text();
+if( ! length $search_str){$seeking = 0; $cancel = 0; return}
+my $regex;  #defaults to case insensitive
+#if ($case){$regex =  qr/\Q$search_str\E/}
+#      else{$regex =  qr/\Q$search_str\E/i} ##< before
+if ($case)                                       ##<-------+
+{                                                           #
+   if ($use_regex)                                          #
+   {                                                        #
+     $regex =  qr/$search_str/;                             #
+   }                                                        #
+   else                                                     #
+   {                                                        #
+       $regex =  qr/\Q$search_str\E/                        #
+   }                                                        # patch
+}                                                           # (regex)
+else                                                        #
+{                                                           #
+   if ($use_regex)                                          #
+   {                                                        #
+     $regex =  qr/$search_str/i;                            #
+   }                                                        #
+   else                                                     #
+   {                                                        #
+       $regex =  qr/\Q$search_str\E/i;                      #
+   }                                                        #
+}                                                ##<-------+
+# use s modifier for multiline match
+my $count = 0;
+my $count1 = 0;
+find (sub {
+      if( $cancel ){ return $File::Find::prune = 1}
+      $count1++;
+      if( ! $recurse ){
+      my $n = ($File::Find::name) =~ tr!/!!; #count slashes in file
+      return $File::Find::prune = 1 if ($n > 1);
+      }
+     return if -d;
+     return unless (-f and -T );
+    if($name){
+          if ($_ =~ /$regex/){
+	     push @{$files{$File::Find::name}}, [-1,'']; #push into HoA
+	  }
+     }
+    else
+    {
+         open (FH,"< $_");
+            while(<FH>)
+            {
+               if ($_ =~ /$regex/)
+               {
+	           chomp $_;
+                   push @{$files{$File::Find::name}}, [$., $_]; #push into HoA
+     	       }
+	     }
+	 close FH;
+     }
+#------
+        my $key = $File::Find::name;
+        if( defined  $files{$key} )
+        {
+           $count++;
+    	   my $aref = $files{$key};
+	   my @larray = @$aref;
+           insert_link ($textbuffer0, $key );
+         foreach my $aref(@larray)
+         {
+	    if( $$aref[0] > 0 )
+            {  #don't do for name searches, which are -1
+	       #add line number with color
+                  my $lineI = sprintf"%03d", $$aref[0];
+                  $textbuffer0->insert_with_tags_by_name(
+	          $textbuffer0->get_end_iter,"\n$lineI",'rmap');
+               #add matching line
+                  $textbuffer0->insert_with_tags_by_name(
+	          $textbuffer0->get_end_iter,"$$aref[1]",'bold');
+	     }
+	  }
+       $textbuffer0->insert($textbuffer0->get_end_iter,"\n");
+       }
+       $f1_label->set_text("$count1 checked -- $count matches .. SpaceBar cancels");
+       Gtk2->main_iteration while Gtk2->events_pending;
+ #-----
+    }, $path);
+     $f1_label->set_text("$count matches DONE");
+     $seeking = 0;
+     $cancel = 0;
+     Gtk2->main_iteration while Gtk2->events_pending;
+}
+##############################################################################
+sub insert_link
+{
+  my ($buffer, $file ) = @_;
+  #create tag here independently, so we can piggyback unique data
+  my $tag = $buffer->create_tag (undef,
+				 foreground => "blue",
+				 underline => 'single',
+				 size   => 20 * PANGO_SCALE
+				 );
+# piggyback data onto each tag
+  $tag->{file} = $file;
+  $buffer->insert_with_tags ($textbuffer0->get_end_iter, $file, $tag);
+}
+###########################################################################
+# Looks at all tags covering the position of iter in the text view,
+# and if one of them is a link, follow it by showing the page identified
+# by the data attached to it.
+#
+sub follow_if_link
+{
+  my ($text_view, $iter) = @_;
+      my $tag = $iter->get_tags;
+      my $file = $tag->{file};
+     if($file)
+     {
+      do_file_search($file);
+      }
+}
+#######################################################################3
+# Links can also be activated by clicking.
+#
+sub event_after
+{
+  my ($text_view, $event) = @_;
+  return FALSE unless $event->type eq 'button-release';
+  return FALSE unless $event->button == 1;
+  my $buffer = $text_view->get_buffer;
+  # we shouldn't follow a link if the user has selected something
+  my ($start, $end) = $buffer->get_selection_bounds;
+  return FALSE if defined $end
+                  and $start->get_offset != $end->get_offset;
+  my ($x, $y) = $text_view->window_to_buffer_coords ('widget', #GTK_TEXT_WINDOW_WIDGET,
+                                                     $event->x, $event->y);
+  my $iter = $text_view->get_iter_at_location ($x, $y);
+  follow_if_link ($text_view, $iter);
+  return FALSE;
+}
+#####################################################################
+# Looks at all tags covering the position (x, y) in the text view,
+# and if one of them is a link, change the cursor to the "hands" cursor
+# typically used by web browsers.
+#
+sub set_cursor_if_appropriate
+{
+  my ($text_view, $x, $y) = @_;
+  my $hovering = FALSE;
+  my $buffer = $text_view->get_buffer;
+  my $iter = $text_view->get_iter_at_location ($x, $y);
+  foreach my $tag ($iter->get_tags)
+  {
+      if ($tag->{file})
+      {
+          $hovering = TRUE;
+          last;
+      }
+  }
+  if ($hovering != $hovering_over_link)
+    {
+      $hovering_over_link = $hovering;
+      $text_view->get_window ('text')->set_cursor
+      		($hovering_over_link ? $hand_cursor : $regular_cursor);
+    }
+}
+#######################################################################
+# Update the cursor image if the pointer moved.
+#
+sub motion_notify_event
+{
+  my ($text_view, $event) = @_;
+  my ($x, $y) = $text_view->window_to_buffer_coords (
+                                         'widget', #GTK_TEXT_WINDOW_WIDGET,
+                                         $event->x, $event->y);
+  set_cursor_if_appropriate ($text_view, $x, $y);
+  $text_view->window->get_pointer;
+  return FALSE;
+}
+#########################################################################
+sub check_button_callback
+{
+  my ($button,$ident,$name) = @_;
+     if ($button->get_active)
+     {
+        # if control reaches here, the check button is down
+         $$ident = 1;
+     }
+     else
+     {
+        # if control reaches here, the check button is up
+         $$ident = 0;
+     }
+  #reload current file with(or without) linenums
+  #useful when copying for pasting to other apps
+  if( $name eq 'linenums' ){ do_file_search($current) }
+}
+##################################################################################
+sub create_tags
+{
+  my $buffer = shift;
+   $buffer->create_tag( "italic", style  => 'italic' );
+   $buffer->create_tag( "bold",   weight => PANGO_WEIGHT_BOLD );
+   $buffer->create_tag( "big",    size   => 20 * PANGO_SCALE );
+   # points times the PANGO_SCALE factor
+   $buffer->create_tag( "x-large", scale  => PANGO_SCALE_X_LARGE );
+   my $gray25_bits = pack 'CC', 0x02, 0x01, 0x01;
+   my $stipple = Gtk2::Gdk::Bitmap->create_from_data( undef, $gray25_bits, 3, 3);
+   $buffer->create_tag( "background_stipple", background_stipple => $stipple );
+   $buffer->create_tag('rmap',
+          background => 'red',
+          background_stipple => $stipple ,
+	  weight => PANGO_WEIGHT_BOLD,
+	 );
+   $buffer->create_tag('rmapX',
+          background => 'red',
+          background_stipple => $stipple ,
+	  scale => PANGO_SCALE_X_LARGE,
+	 );
+   $buffer->create_tag('rmapZ',
+           foreground => 'red',
+           weight => PANGO_WEIGHT_BOLD,
+	   size   => 15 * PANGO_SCALE
+	 );
+   $buffer->create_tag('blue',
+           background => 'blue',
+           );
+}
+######################################################################
+sub key_handler
+{
+my ($widget, $event) = @_;
+    # match the keyval --- in general you don't want to use magic
+    # numbers here, use values from %Gtk2::Gdk::Keysyms instead.
+    if (($seeking) && ($event->keyval == 32))
+    {  #detect spacebar hit to cancel search
+       $cancel = 1;
+       $seeking = 0;
+       return TRUE;  # tell the system we handled this
+     }
+    if ($event->keyval == 65293)
+    {  #detect Enter press
+       do_dir_search() unless $seeking;
+       return TRUE;  # tell the system we handled this
+     }
+return FALSE;  # tell the system we did not handle this
+}
+######################################################################
+sub print_usage
+{
+  $textbuffer->delete($textbuffer->get_start_iter,$textbuffer->get_end_iter,);
+  $textbuffer->set_text($help);
+}
+1;
+######################################################################
+__DATA__
+  ___________
+ | U S A G E | perl $0 (options) 'AAPL' dir/
+ |___________|==================================================
+ /                                                               \
+|                                                                 |
+|                                                                 |
+|                                                                 |
+| -- n ->                                                         |
+| -- r ->                                                         |
+| -- R ->                                                         |
+| -- c ->                                                         |
+|                                                                 |
+\_________________________________________________________________/

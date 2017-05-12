@@ -1,0 +1,223 @@
+class 'Fl::ValueInput';
+isa 'Fl::Valuator';
+include 'FL/Fl_Value_Input.H';
+
+=pod
+
+=head1 NAME
+
+Fl::ValueInput - Displays a Numeric Value
+
+=head1 Description
+
+The Fl::ValueInput widget displays a floating point value.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/Fl_Value_Input.png" /></center>
+
+The user can click in the text field and edit it - there is in fact a hidden
+Fl::Input widget with C<type(FL_FLOAT_INPUT)> or C<type(FL_INT_INPUT)> in
+there - and when they hit return or tab the value updates to what they typed
+and the callback is done.
+
+If C<step()> is non-zero and integral, then the range of numbers is limited to
+integers instead of floating point numbers. As well as displaying the value as
+an integer, typed input is also limited to integer values, even if the hidden
+Fl::Input widget is of C<type(FL_FLOAT_INPUT)>.
+
+If C<step()> is non-zero, the user can also drag the mouse across the object
+and thus slide the value. The left button moves one C<step()> per pixel, the
+middle by C<10 * step()>, and the right button by C<100 * step()>. It is
+therefore impossible to select text by dragging across it, although clicking
+can still move the insertion cursor.
+
+If C<step()> is non-zero and integral, then the range of numbers are limited
+to integers instead of floating point values.
+
+=head1 Methods
+
+Fl::ValueInput inherits from Fl::Valuator and Fl::Widget. On top of that, it
+exposes the following methods...
+
+=head2 new(...)
+
+    my $val_a = Fl::ValueInput->new(0, 0, 250, 500, 'Important Stuff');
+    my $val_b = Fl::ValueInput->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The default boxtype is FL_DOWN_BOX.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Value_Input *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 cursor_color(...)
+
+    my $color = $val_a->cursor_color();
+    $val_b->cursor_color(Fl::FL_RED);
+
+Gets or sets the color of the text cursor.
+
+The text cursor is black by default.
+
+=cut
+
+xs {name        => 'cursor_color',
+    definitions => [
+            {required => [[qw[Fl_Color color]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Color'}
+    ]
+};
+
+=pod
+
+=head2 shortcut(...)
+
+    my $scut = $val_a->shortcut();
+    $val_b->soft( Fl::FL_ALT | 'a' );
+
+Sets or gets the current shortcut key.
+
+Setting this overrides the use of '&' in the C<label()>. The value is a
+bitwise OR of a key and a set of shift flags, for example C<FL_ALT | 'a'> ,
+C<FL_ALT | (FL_F + 10)>, or just C<'a'>. A value of 0 disables the shortcut.
+
+The key can be any value returned by C<Fl::event_key()>, but will usually be
+an ASCII letter. Use a lower-case letter unless you require the shift key to
+be held down.
+
+The shift flags can be any set of values accepted by C<Fl::event_state()>. If
+the bit is on that shift key must be pushed. Meta, Alt, Ctrl, and Shift must
+be off if they are not in the shift flags (zero for the other bits indicates
+a "don't care" setting).
+
+=cut
+
+xs {name        => 'shortcut',
+    definitions => [
+            {required => [[qw[int s]]],
+             returns  => 'void'
+            },
+            {returns  => 'int'}
+    ]
+};
+
+=pod
+
+=head2 soft(...)
+
+    my $soft = $val_a->soft();
+    $val_b->soft( 0 );
+
+If "soft" is turned on, the user is allowed to drag the value outside the
+range.
+
+If they drag the value to one of the ends, let go, then grab again and
+continue to drag, they can get to any value. Default is C<1> (on).
+
+=cut
+
+xs {name        => 'soft',
+    definitions => [
+            {required => [[qw[uchar s]]],
+             returns  => 'void'
+            },
+            {returns  => 'uchar'}
+    ]
+};
+
+=pod
+
+=head2 textcolor(...)
+
+Sets or gets the color of the text in the value box.
+
+    my $color = $val_a->textcolor();
+    $val_b->textcolor(Fl::FL_RED);
+
+=cut
+
+xs {name        => 'textcolor',
+    definitions => [
+            {required => [[qw[Fl_Color color]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Color'}
+    ]
+};
+
+=pod
+
+=head2 textfont(...)
+
+Sets or gets the typeface of the text in the value box.
+
+    my $font = $val_a->textfont();
+    $val_b->textfont(Fl::FL_HELVETICA);
+
+=cut
+
+xs {name        => 'textfont',
+    definitions => [
+            {required => [[qw[Fl_Font font]]],
+             returns  => 'void'
+            },
+            {returns  => 'Fl_Font'}
+    ]
+};
+
+=pod
+
+=head2 textsize( )
+
+Gets the size of the text in the value box.
+
+    my $size = $val_a->textsize();
+
+=cut
+
+xs {name        => 'textsize',
+    definitions => [
+            {returns  => 'Fl_Fontsize'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

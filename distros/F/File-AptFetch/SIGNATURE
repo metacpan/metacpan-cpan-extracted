@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7db65ad70b6474a053f8d8016552447db282312d Build.PL
+SHA1 6fee7b77e707185103154acab66553f6727b567a Changes
+SHA1 bf28784e7a47ee2ca7c26ca4ec75a17a56c98347 MANIFEST
+SHA1 7bfdf569e6fb412a34058975dcaf9b9271c58e89 META.json
+SHA1 82427c05323c895f5ba9dfe0418e26698ba66a2b META.yml
+SHA1 119362f8b90e89f7d27c5c20cf5718ef456576d7 README
+SHA1 5cfe22942e5022c0aebbbc67acc65642cfa58fda lib/AptFetch.pm
+SHA1 81605ba8b38038a67b84088ac323ee532c6874cb lib/Cookbook.pod
+SHA1 67d64b64c0ca9aec1f1e926d5e2de86668ce6491 lib/Simple.pm
+SHA1 fa875215ee1e8cf4ebbff6490487c6e9125f21ae t/0.t
+SHA1 81904f77cde01aafac630f5e36f2eefbd5089bfe t/0/9raCtd.t
+SHA1 b3a7ef2053253ca7a9abb76899f5f20391974b55 t/0/EmMn8o.t
+SHA1 aee2e6e023c0157a6751ce114e4444597b78704b t/ReadCallback.pm
+SHA1 5062ae4c3aedb7feb7049ab39a8bf54e23cc7839 t/TestSuite.pm
+SHA1 d3ffb1c6971972057b6b63a3e60437c782b56484 t/copy/0.t
+SHA1 8cc204af75aed9e7390535b9f17adb2198caadcd t/copy/fail.t
+SHA1 9468273fc63d8379e673a2bafa2ec28cc9693a07 t/copy/one.t
+SHA1 7419a8aec3ef7e45b79fe75457f7bf6d3239ab3e t/copy/perm.t
+SHA1 ba7660e7d69587af784ba9dbb8c8ec54430ef7c2 t/copy/slow.t
+SHA1 a0dec6bd54ce2a8120cb6704e27bab1fd6742256 t/copy/two.t
+SHA1 071c266d10826ecb7e42f3e33e66dd646880843f t/file/0.t
+SHA1 2f39675ecde5590c8085d35808fff5f5fecd2e63 t/file/fail.t
+SHA1 b22dd67f5cd8b2671d0e90d60599c7724a7ccaac t/file/one.t
+SHA1 b06709f8f77304c954e734fd1a4b7d2c285761d2 t/file/two.t
+SHA1 b29eb349c72e4555d2e827c8b795d80194d61fe8 t/ftp/0.t
+SHA1 2406f47f07f2afcc166e1cd609a8dc6ce6d83e7c t/ftp/slow.t
+SHA1 e9a07a0197ea161538006e73c0d480b30afe4256 t/gain-callback/simple.t
+SHA1 5037c40fbe14cf440b6f9a7d6063b21dea6f1e95 t/read-callback/default.t
+SHA1 e1ed9d53f33b15ebcb5faba9288e0a01d67c3865 t/read-callback/simple.t
+SHA1 ff580d9836deb351263cf229988e110fe0d65052 t/select-callback/simple.t
+SHA1 4a11a491a4351b58740475adfe5ecb2cb9e20dab t/simple/0.t
+SHA1 85d87cd3ee3ee9d6fb45632c2a95a5e0dae4e9da t/simple/copy.t
+SHA1 4e74386b866b2844634de687c430b405853eccf2 t/simple/fail.t
+SHA1 79d648572491971f90784a401ba64ced16be5126 t/simple/file.t
+SHA1 90b4cd7b6571d62cfb1fd0b2e072047e322667e9 t/simple/wink.t
+SHA1 3c650f83cc97934f34b8fd77078913b9b78354c8 t/v-method
+SHA1 4c4300ea579916f3810d5860176a765ae8d08762 t/visual/TestSuite.pm
+SHA1 1d97d8fe3c5c5cb8a41be9017294951de36b2940 t/visual/copy.pl
+SHA1 96686e04dae112718c969a42e1539ada5190ec3c t/visual/ftp.pl
+SHA1 4bfd79e76d2245e0cb770625e9d20d225a64f765 t/void/aptconfig.t
+SHA1 f0cff11a566f6edf45de69880f9e6a7bff20d6e4 t/void/configure.t
+SHA1 25594f748740e001b3ed79530c87d9ac4615281c t/void/destroy.t
+SHA1 233123d2309002984e0dcec9effdb073630f2d18 t/void/fail.t
+SHA1 377cf0c6cc7b97aaa26d1f0e3cccd2d251b8e308 t/void/handshake.t
+SHA1 a2d6450c70afb6d39155db6370365bac036a37c2 t/void/set_callback.t
+SHA1 973a3037fe33728e8ea5e33ddcc835dd8ef81521 t/w-method
+SHA1 254759a020524ce1f7e25e2183d9d2dbf7d20021 t/x-method
+SHA1 f0b89f37c8db7e2d3d64d49da0ab6b945bde5f75 t/y-method
+SHA1 eda8b80de713fb8b126ad8bd1f0b7d31444cc409 t/z-method
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFY8X6P1qsM9O+FbKQRAk7TAKCBcE1lNgnW5Yh16DpTukfYBhzn6gCdGJl+
+wakQIVBcyRkRLFvuRk6Tk3M=
+=hS5O
+-----END PGP SIGNATURE-----

@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict ;
+use warnings ;
+
+my ($file, $output, $status) ;
+
+use Compress::Zlib ;
+
+die "Create a decompressor for a pl.gz\nUsage: filtdef file > filtfile\n"
+    unless @ARGV == 1;
+
+foreach $file (@ARGV) 
+{
+    open (F, "<", $file) or die "Cannot open $file: $!\n" ;
+    my $x = deflateInit()
+       or die "Cannot create a deflation stream\n" ;
+
+    print "use Filter::Decompress;\n" ;
+    while (<F>)
+    {
+        ($output, $status) = $x->deflate($_) ;
+    
+        $status == Z_OK
+            or die "deflation failed\n" ;
+    
+        print $output ;
+    }
+    
+    ($output, $status) = $x->flush() ;
+    
+    $status == Z_OK
+        or die "deflation failed\n" ;
+    
+    print $output ;
+    close F ;
+}

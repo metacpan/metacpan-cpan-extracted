@@ -1,0 +1,14 @@
+COPYING
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/fcgi_spawn
+fcgi_spawn.conf.sample
+lib/FCGI/Spawn.pm
+lib/FCGI/Spawn/BinUtils.pm
+t/00-usemods.t
+t/10-binutils-private.t
+t/15-binutils-public.t
+xt/release/cpan-changes.t
+META.yml                                 Module meta-data (added by MakeMaker)

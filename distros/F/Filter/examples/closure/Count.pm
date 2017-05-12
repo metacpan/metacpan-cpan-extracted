@@ -1,0 +1,33 @@
+package
+  Count ;
+ 
+use Filter::Util::Call ;
+
+use strict ;
+use warnings ;
+ 
+sub import
+{
+    my ($self) = @_ ;
+    my ($count) = 0 ;
+    filter_add(
+	sub 
+	{
+    	    my ($status) ;
+	 
+    	    if (($status = filter_read()) > 0 ) {
+        	    s/Joe/Jim/g ;
+        	    ++ $count ;
+    	    }
+    	    elsif ($count >= 0) { # EOF
+        	$_ = "print q[Made $count substitutions\n] ;" ;
+        	$status = 1 ;
+		$count = -1 ;
+    		}
+ 
+    	    $status ;
+	}) 
+}
+ 
+1 ;
+

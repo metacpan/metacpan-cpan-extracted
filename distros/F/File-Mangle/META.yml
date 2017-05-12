@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                File-Mangle
+version:             0.02
+abstract:            Perl module for file manipulation
+license:             perl
+author:              
+    - Martyn Smith <msmith@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    File::Slurp:                   1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

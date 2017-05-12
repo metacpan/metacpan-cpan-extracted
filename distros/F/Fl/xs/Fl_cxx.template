@@ -1,0 +1,613 @@
+/* Uncomment the following FLTK_ABI_VERSION line to enable ABI breaking fixes
+ * in the current patch release of FLTK. ** Use for static builds only! **
+ * For more info on this macro, see: http://fltk.org/cmp.php#FLTK_ABI_VERSION
+ */
+#define FLTK_ABI_VERSION 10303
+
+#include "include/Fl_pm.h"
+
+{%for include in includes sorted:key %}
+#include <{{include.key}}>{%endfor%}
+
+HV * Fl_stash,  // For inserting stuff directly into Fl's namespace
+   * Fl_export, // For inserting stuff directly into Fl's exports//
+   * Fl_cache;  // For caching weak refs to widgets and other objects
+
+void _cache(void * ptr, const char * cls) {
+    _cache( (const char *) &ptr, cls );
+}
+
+void _cache(const char * ptr, const char * cls) {
+    dTHX;
+#if FLTK_DEBUG
+    warn("Caching %s as %s...", ptr, cls);
+#endif
+    if (Fl_cache == NULL)
+        Fl_cache =
+#if FLTK_DEBUG
+                gv_stashpv( "Fl::Cache::ref", GV_ADD | GV_ADDMULTI );
+#else
+                newHV();
+#endif
+
+    int  _len = strlen(cls);
+    SV * _cls = newSVpv(cls, _len);
+    int  len_ = strlen(ptr);
+
+    SV ** tag = hv_store( Fl_cache, ptr, len_, _cls, 0 );
+#if FLTK_DEBUG
+    if (SvOK(* tag) )
+        warn("okay");
+    else
+        warn("failed");
+#endif
+}
+
+const char * _cache(void * ptr) {
+    return _cache( (const char *) &ptr );
+}
+
+const char * _cache(const char * ptr) {
+    dTHX;
+    if (! hv_exists( Fl_cache, ptr, strlen(ptr))) {
+#if FLTK_DEBUG
+        warn ("Cache miss on %s", ptr);
+#endif
+        return NULL;
+    }
+#if FLTK_DEBUG
+    warn("Getting cache of %s...", ptr);
+#endif
+    int  _len = strlen(ptr);
+    SV ** tag = hv_fetch( Fl_cache, ptr, _len, FALSE );
+    if (tag && SvOK(* tag))
+        return (const char *)SvPV_nolen(*tag);
+#if FLTK_DEBUG
+    warn("...failed.", ptr);
+#endif
+    return NULL;
+}
+
+void _delete_cache(void * ptr) {
+    _delete_cache( (const char *) &ptr );
+}
+
+void _delete_cache(const char * ptr) {
+    dTHX;
+    if (! hv_exists( Fl_cache, ptr, strlen(ptr))) {
+#if FLTK_DEBUG
+        warn ("Cache miss on %s", ptr);
+#endif
+        return;
+    }
+#if FLTK_DEBUG
+    warn("Deleting cache of %s...", ptr);
+#endif
+    int  _len = strlen(ptr);
+    hv_delete( Fl_cache, ptr, _len, FALSE | G_DISCARD);
+    return;
+}
+
+/*
+SV * cache(const char * ptr, SV * obj) {
+    dTHX;
+ //warn("Exporting %s to %s", what, _tag);
+    SV ** tag = hv_fetch( Fl_cache, ptr, strlen(ptr), TRUE );
+    if (tag && SvOK(* tag) && SvROK(* tag ) && (SvTYPE(SvRV(*tag))) == SVt_PVAV)
+        av_push((AV*)SvRV(*tag), newSVpv(what, 0));
+    else {
+        SV * av;
+        av = (SV*) newAV( );
+        av_push((AV*)av, newSVpv(what, 0));
+        tag = hv_store( Fl_export, _tag, strlen(_tag), newRV_noinc(av), 0 );
+    }
+}
+*/
+void register_constant( const char * name, SV * value ) {
+    dTHX;
+    newCONSTSUB( Fl_stash, (char *) name, value );
+}
+
+void register_constant( const char * package, const char * name, SV * value ) {
+    dTHX;
+    HV * _stash  = gv_stashpv( package, TRUE );
+    newCONSTSUB( _stash, (char *) name, value );
+}
+
+void export_function (const char * what, const char * _tag ) {
+    dTHX;
+    //warn("Exporting %s to %s", what, _tag);
+    SV ** tag = hv_fetch( Fl_export, _tag, strlen(_tag), TRUE );
+    if (tag && SvOK(* tag) && SvROK(* tag ) && (SvTYPE(SvRV(*tag))) == SVt_PVAV)
+        av_push((AV*)SvRV(*tag), newSVpv(what, 0));
+    else {
+        SV * av;
+        av = (SV*) newAV( );
+        av_push((AV*)av, newSVpv(what, 0));
+        tag = hv_store( Fl_export, _tag, strlen(_tag), newRV_noinc(av), 0 );
+    }
+}
+
+void export_constant( const char * name, const char * _tag, double val ) {
+    dTHX;
+    SV * value;
+    value = newSVnv(val);
+    register_constant(name, value);
+    export_function(name, _tag);
+}
+
+void set_isa(const char * klass, const char * parent) {
+    dTHX;
+    HV * parent_stash = gv_stashpv( parent, GV_ADD | GV_ADDMULTI );
+    av_push( get_av( form( "%s::ISA", klass ), TRUE ),
+             newSVpv( parent, 0 ) );
+    // TODO: make this spider up the list and make deeper connections?
+}
+
+void _cb_w ( Fl_Widget * widget, void * CODE ) {
+    ((Callback * ) CODE)->trigger(widget);
+    return;
+}
+
+#ifndef PERL_UNUSED_VAR
+#  define PERL_UNUSED_VAR(var) if (0) var = var
+#endif
+
+#ifndef dVAR
+#  define dVAR		dNOOP
+#endif
+
+/* This stuff is not part of the API! You have been warned. */
+#ifndef PERL_VERSION_DECIMAL
+#  define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#endif
+#ifndef PERL_DECIMAL_VERSION
+#  define PERL_DECIMAL_VERSION \
+	  PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#endif
+#ifndef PERL_VERSION_GE
+#  define PERL_VERSION_GE(r,v,s) \
+	  (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#endif
+#ifndef PERL_VERSION_LE
+#  define PERL_VERSION_LE(r,v,s) \
+	  (PERL_DECIMAL_VERSION <= PERL_VERSION_DECIMAL(r,v,s))
+#endif
+
+/* XS_INTERNAL is the explicit static-linkage variant of the default
+ * XS macro.
+ *
+ * XS_EXTERNAL is the same as XS_INTERNAL except it does not include
+ * "STATIC", ie. it exports XSUB symbols. You probably don't want that
+ * for anything but the BOOT XSUB.
+ *
+ * See XSUB.h in core!
+ */
+
+
+/* TODO: This might be compatible further back than 5.10.0. */
+#if PERL_VERSION_GE(5, 10, 0) && PERL_VERSION_LE(5, 15, 1)
+#  undef XS_EXTERNAL
+#  undef XS_INTERNAL
+#  if defined(__CYGWIN__) && defined(USE_DYNAMIC_LOADING)
+#    define XS_EXTERNAL(name) __declspec(dllexport) XSPROTO(name)
+#    define XS_INTERNAL(name) STATIC XSPROTO(name)
+#  endif
+#  if defined(__SYMBIAN32__)
+#    define XS_EXTERNAL(name) EXPORT_C XSPROTO(name)
+#    define XS_INTERNAL(name) EXPORT_C STATIC XSPROTO(name)
+#  endif
+#  ifndef XS_EXTERNAL
+#    if defined(HASATTRIBUTE_UNUSED) && !defined(__cplusplus)
+#      define XS_EXTERNAL(name) void name(pTHX_ CV* cv __attribute__unused__)
+#      define XS_INTERNAL(name) STATIC void name(pTHX_ CV* cv __attribute__unused__)
+#    else
+#      ifdef __cplusplus
+#        define XS_EXTERNAL(name) extern "C" XSPROTO(name)
+#        define XS_INTERNAL(name) static XSPROTO(name)
+#      else
+#        define XS_EXTERNAL(name) XSPROTO(name)
+#        define XS_INTERNAL(name) STATIC XSPROTO(name)
+#      endif
+#    endif
+#  endif
+#endif
+
+/* perl >= 5.10.0 && perl <= 5.15.1 */
+
+
+/* The XS_EXTERNAL macro is used for functions that must not be static
+ * like the boot XSUB of a module. If perl didn't have an XS_EXTERNAL
+ * macro defined, the best we can do is assume XS is the same.
+ * Dito for XS_INTERNAL.
+ */
+#ifndef XS_EXTERNAL
+#  define XS_EXTERNAL(name) XS(name)
+#endif
+#ifndef XS_INTERNAL
+#  define XS_INTERNAL(name) XS(name)
+#endif
+
+/* Now, finally, after all this mess, we want an ExtUtils::ParseXS
+ * internal macro that we're free to redefine for varying linkage due
+ * to the EXPORT_XSUB_SYMBOLS XS keyword. This is internal, use
+ * XS_EXTERNAL(name) or XS_INTERNAL(name) in your code if you need to!
+ */
+
+#undef XS_EUPXS
+#if defined(PERL_EUPXS_ALWAYS_EXPORT)
+#  define XS_EUPXS(name) XS_EXTERNAL(name)
+#else
+   /* default to internal */
+#  define XS_EUPXS(name) XS_INTERNAL(name)
+#endif
+
+#ifndef PERL_ARGS_ASSERT_CROAK_XS_USAGE
+#define PERL_ARGS_ASSERT_CROAK_XS_USAGE assert(cv); assert(params)
+
+STATIC void
+croak(const char *const params);
+STATIC void
+croak(const char *const params) {
+    PERL_ARGS_ASSERT_CROAK_XS_USAGE;
+    Perl_croak_nocontext("%s", params);
+}
+#undef  PERL_ARGS_ASSERT_CROAK_XS_USAGE
+
+#endif
+
+/* NOTE: the prototype of newXSproto() is different in versions of perls,
+ * so we define a portable version of newXSproto()
+ */
+#ifdef newXS_flags
+#define newXSproto_portable(name, c_impl, file, proto) newXS_flags(name, c_impl, file, proto, 0)
+#else
+#define newXSproto_portable(name, c_impl, file, proto) (PL_Sv=(SV*)newXS(name, c_impl, file), sv_setpv(PL_Sv, proto), (CV*)PL_Sv)
+#endif /* !defined(newXS_flags) */
+
+#if PERL_VERSION_LE(5, 21, 5)
+#  define newXS_deffile(a,b) Perl_newXS(aTHX_ a,b,file)
+#else
+#  define newXS_deffile(a,b) Perl_newXS_deffile(aTHX_ a,b)
+#endif
+
+{%for class in xsubs%}
+/* package {{class.package}}; */
+// #include <FL/{%if class.widget_type%}{{class.widget_type}}{%else%}{{class.package | replace:'::','_'}}{%endif%}.H>
+{%for method in class.methods %}
+    {%assign function = method.name%}
+{%capture cpp.function.name%}{%
+    if class.package contains '::'%}XS_{{ class.package|replace:':','_' }}_{{ method.name }}{%
+        else%}XS_{{ method.name | replace:':','_' }}{%
+    endif%}{%endcapture%}
+XS_EUPXS({{cpp.function.name}});
+XS_EUPXS({{cpp.function.name}}) {
+    dVAR; dXSARGS;{%for definition in method.definitions %}
+{%
+    assign size.req  = definition.required | size %}{%
+    assign size.opt  = definition.optional | size %}{%
+    unless class.package == 'Fl' %}{%
+        assign is_method = 1 %}{% else %}{%
+        assign is_method = 0 %}{%
+    endunless%}
+    {%if is_method%}{%assign size.req = size.req | plus:1 %}{%endif%}
+ // is_method   = {{is_method}}
+ // size.req    = {{size.req}}
+ // st.position = {{st.position}}
+
+    {%unless forloop.first%}else {%endunless%}if (items {%if size.opt%}>{%else%}={%endif%}= {{ size.req }}{% if size.opt %} && items < {{ size.req | plus: size.opt | plus: is_method }}{% endif %}{%if definition.andif %} && {{definition.andif}}{% endif %}) {
+        {%if definition.required %}
+        // Required
+        {% for arg in definition.required %}
+        {%if is_method%}{%assign st.position = forloop.index%}{%else%}{%assign st.position = forloop.index0%}{%endif%}
+        // st.position = {{st.position}}
+        // .index       = {{forloop.index}}
+        // .index0      = {{forloop.index0}}
+        // {{arg | join:' '}}
+        {%case arg.0%}
+        {%when 'uchar'                          %}{{arg | join: ' '}} = (unsigned char)SvUV(ST({{st.position}}));
+        {%when 'const char *'                   %}{{arg | join: ' '}} = ({{arg.0}})SvPV_nolen(ST({{st.position}}));
+        {%when 'SV *'                           %}{{arg | join: ' '}} = (SV *)ST({{st.position}});
+        {%when 'CV *'                           %}{{arg | join: ' '}}; 	STMT_START {
+                HV *st; GV *gvp;
+                SV * const xsub_tmp_sv = ST({{st.position}});
+                SvGETMAGIC(xsub_tmp_sv);
+                {{arg.1}} = sv_2cv(xsub_tmp_sv, &st, &gvp, 0);
+                if (!{{arg.1}})
+                    croak("We were expecting {{arg.1}} to be a CODE reference!");
+        } STMT_END;
+        {%when 'AV *'                           %}{{arg | join: ' '}}; STMT_START {
+            SV* const xsub_tmp_sv = ST({{st.position}});
+            SvGETMAGIC(xsub_tmp_sv);
+            if (SvROK(xsub_tmp_sv) && SvTYPE(SvRV(xsub_tmp_sv)) == SVt_PVAV)
+                {{arg.0}} = (AV*)SvRV(xsub_tmp_sv);
+            else
+                croak("{{arg.0}} is not an ARRAY reference");
+            }
+        } STMT_END;
+        {%when 'HV *'               %}{{arg | join: ' '}}; STMT_START {
+            SV* const xsub_tmp_sv = ST({{st.position}});
+            SvGETMAGIC(xsub_tmp_sv);
+            if (SvROK(xsub_tmp_sv) && SvTYPE(SvRV(xsub_tmp_sv)) == SVt_PVHV)
+                {{arg.0}} = (HV*)SvRV(xsub_tmp_sv);
+            else
+                croak("{{arg.0}} is not an HASH reference");
+            }
+        } STMT_END;
+        {%when 'Fl_Widget *' %}CTX * /*{{arg.0 | split: ' ' | first | replace: '_', '__'}}*/ {{arg.1}};
+        if ( sv_isobject( ST({{st.position}}) ) || ( SvTYPE( SvRV( ST({{st.position}}) ) ) == SVt_PVMG ) ) {
+            IV tmp = SvIV((SV*)SvRV(ST({{st.position}})));
+            {{arg.1}} = INT2PTR(CTX * /*{{ arg.0 | split:' ' | first | replace:'_', '__'}}*/, tmp);
+        }
+        else
+            croak("Expected object. Got a non-object?!");
+        {%when 'Fl_Menu_Item *' %}CTX * /*{{arg.0 | replace: '_', | replace_first: 'Fl', 'Fl__' | replace: '\*',}}*/ {{arg.1}};
+        if ( sv_isobject( ST({{st.position}}) ) || ( SvTYPE( SvRV( ST({{st.position}}) ) ) == SVt_PVMG ) ) {
+            IV tmp = SvIV((SV*)SvRV(ST({{st.position}})));
+            {{arg.1}} = INT2PTR(CTX */*{{ arg.0 | split:' ' | first | replace: '_', | replace_first: 'Fl', 'Fl__'}}*/, tmp);
+        }
+        else
+            croak("Expected object. Got a non-object?!");
+        {%when 'int'         %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'short'       %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'float'       %}{{arg | join: ' '}} = ({{arg.0}})SvNV(ST({{st.position}}));
+        {%when 'double'      %}{{arg | join: ' '}} = ({{arg.0}})SvNV(ST({{st.position}}));
+        {%when 'FILE'        %}{{arg | join: ' '}} = PerlIO_findFILE(IoIFP(sv_2io(ST({{st.position}}))));
+        {%when 'PerlIO *'    %}{{arg | join: ' '}} = IoIFP(sv_2io(ST({{st.position}})));
+        {%when 'Fl_Fontsize' %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'Fl_Font'     %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'Fl_Color'    %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'Fl_Align'    %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'Fl_Char'     %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'Fl_When'     %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'Fl_Labeltype'  %}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%when 'Fl_Boxtype'%}{{arg | join: ' '}} = ({{arg.0}})SvIV(ST({{st.position}}));
+        {%endcase%}{% endfor %}{% endif %}
+    {%if size.opt %}
+        // Optional{% for arg in definition.optional %}
+        {%assign position = forloop.index0 %}
+        // position  = {{position}}            | {{position}} + {{size.req}} = {{ position | plus: size.req}} {{ 99 | plus : 30000000 }}
+        // .index       = {{forloop.index}}
+        // .index0      = {{forloop.index0}}
+        // size.req     = {{size.req }}
+        // {{size.req | plus: position | minus:1}}
+        // {{arg}}
+
+        {{arg.0}} {{arg.1}}; // {{size.req}} | {{position}}
+        if (items > {{size.req | plus: position}}) // OY! {{ size.req | plus: position | minus: 1 }}
+            {{arg.1}} = {%case arg.0%}
+            {%when 'bool'           %}({{arg.0}}) SvTRUE(ST({{    size.req | plus: position }}));
+            {%when 'uchar'          %}(unsigned char) SvUV(ST({{  size.req | plus: position }}));
+            {%when 'unsigned int'   %}(unsigned int) SvUV(ST({{   size.req | plus: position }}));
+            {%when 'const char *'   %}({{arg.0}}) SvPV_nolen(ST({{size.req | plus: position }}));
+            {%when 'int'            %}({{arg.0}}) SvIV(ST({{      size.req | plus: position }}));
+            {%when 'short'          %}({{arg.0}}) SvIV(ST({{      size.req | plus: position }}));
+            {%when 'double'         %}({{arg.0}}) SvNV(ST({{      size.req | plus: position }}));
+            {%when 'float'          %}({{arg.0}}) SvNV(ST({{      size.req | plus: position }}));
+            {%when 'FILE'           %} PerlIO_findFILE(IoIFP(sv_2io(ST({{size.req | plus: position }}))));
+            {%when 'Fl_Color'       %}({{arg.0}}) SvIV(ST({{      size.req | plus: position }}));
+            {%when 'Fl_Char'        %}({{arg.0}}) SvIV(ST({{      size.req | plus: position }}));
+            {%when 'Fl_Labeltype'   %}({{arg.0}}) SvIV(ST({{      size.req | plus: position }}));
+            {%else                  %}({{arg.0}}) (ST({{          size.req | plus: position }}));
+            {%endcase%}
+        {%if arg.2%}else
+            {{arg.1}} = {{arg.2}};{%endif%}{%
+    endfor %}{%endif%}
+{%comment%}/standard init{%endcomment%}
+        {% case function %}
+            {% when 'new' %}
+            {%assign class.widget_type = definition.returns | split:' ' | first %}
+        CTX * ctx;
+        Newx(ctx, 1, CTX);
+
+        const char * package = (const char *) SvPV_nolen(ST(0));
+        {{assignments}}
+
+        int algo = 0;
+        {%capture required_arglist %}{%for arg in definition.required%}{{arg.1}}{%unless forloop.last%}, {%endunless%}{%endfor%}{%endcapture%}
+        {%capture optional_arglist %}{%for arg in definition.optional%}{{arg.1}}{%unless forloop.last%}, {%endunless%}{%endfor%}{%endcapture%}
+        ctx->cp_ctx    = new WidgetSubclass<{{ definition.returns | split:' ' | first }}>( package, {{required_arglist}}{%if required_arglist and optional_arglist%}, {%endif%}{{optional_arglist}} );
+        ctx->algorithm = algo;
+        {
+            SV * RETVALSV;
+            RETVALSV = sv_newmortal();
+            sv_setref_pv(RETVALSV, package /*object2package(ctx)*/, (void*)ctx);
+            ST(0) = RETVALSV;
+            _cache((const char *) &ctx->cp_ctx, package);
+        }
+        {%assign xs.return = 'XSRETURN(1);' %}
+            {% else %}
+            {% if is_method %}
+        CTX * /*{{ class.package|replace:':','_' }}*/ self;
+
+        if ( sv_isobject( ST(0) ) || ( SvTYPE( SvRV( ST(0) ) ) == SVt_PVMG ) ) {
+            IV tmp = SvIV((SV*)SvRV(ST(0)));
+            self = INT2PTR(CTX * /*{{ class.package|replace:':','_' }}*/,tmp);
+        }
+        else
+            croak("Attempt to call {{class.package}}->{{function}}( ... ) on a non-object!");
+        {%endif%}
+        {{assignments}}
+        {% if definition.returns and definition.returns != 'void' %}{{definition.returns}} RETVAL;{%endif%}
+
+        {%capture args%}{%
+            if definition.c_args %}{{definition.c_args}}{%
+            else%}{%
+                for arg in definition.required%}{{arg.1}}{%unless forloop.last%}, {%endunless%}{%
+                endfor%}{%
+                if definition.required and definition.optional%},{%
+                endif%}{%
+                for arg in definition.optional%} {{arg.1}}{%unless forloop.last%},{%endunless%}{%endfor%}{%endif
+            %}{%endcapture%}
+        dXSTARG;
+        {% case function %}
+                {% when 'DESTROY' %}
+                    {% assign xs.return = 'XSRETURN_EMPTY;'%}
+        if (self->cp_ctx != NULL)
+            Fl::delete_widget( self->cp_ctx );
+        Safefree(self);
+                {% when 'draw' %}
+                    {% assign xs.return = 'XSRETURN_EMPTY;'%}
+        if (self->cp_ctx != NULL)
+            ((WidgetSubclass<{%if class.widget_type%}{{class.widget_type}}{%else%}{{class.package | replace:'::','_'}}{%endif%}> *)self->cp_ctx)->draw( TRUE );
+                {% when 'handle' %}
+                    {%assign xs.return = 'XSRETURN(1);' %}
+        if (self->cp_ctx != NULL)
+            RETVAL = ((WidgetSubclass<{%if class.widget_type%}{{class.widget_type}}{%else%}{{class.package | replace:'::','_'}}{%endif%}> *)self->cp_ctx)->handle( TRUE, {{args}} );
+                {%else%}
+                    {%unless definition.returns %}
+                         {%assign xs.return = 'XSRETURN_EMPTY' %}
+                    {%else%}
+                        {%assign xs.return = 'XSRETURN(1);' %}
+                    {%endunless%}
+            {% if definition.code %}
+                { {{definition.code}} }
+            {% else %}
+                {% if definition.returns and definition.returns != 'void' %}RETVAL = {%endif%} // {{ class.package }} | {{ class.widget_type }}
+                {%if is_method%}((WidgetSubclass<{%if class.widget_type%}{{class.widget_type}}{%else%}{{class.package | replace:'::','_'}}{%endif%}> *)self->cp_ctx)->{{ function }}{%
+                else        %}{{ function }}{%
+                endif%}( {{args}} );
+            {%endif%}
+            {% endcase %}
+                {% if definition.returns %}
+                {%case definition.returns %}
+                    {%when 'void'              %}{% assign xs.return = 'XSRETURN_EMPTY;' %}
+                    {%when 'double'            %}XSprePUSH; PUSHn((double)RETVAL);
+                    {%when 'char *'            %}PUSHp(RETVAL, STRLEN);
+                    {%when 'const char *'      %}sv_setpv(TARG, RETVAL); XSprePUSH; PUSHTARG;
+                    {%when 'unsigned int'      %}XSprePUSH; PUSHu((UV)RETVAL);
+                    {%when 'bool'              %}boolSV(RETVAL);
+                    {%when 'int'               %}XSprePUSH; PUSHi((IV)RETVAL);
+                    {%when 'short'             %}XSprePUSH; PUSHi((IV)RETVAL);
+                    {%when 'Fl_Widget *' %}
+                        CTX * ctx;
+                        Newx(ctx, 1, CTX);
+                        ctx->cp_ctx    = (Fl_Widget *) RETVAL;
+                        {
+                            SV * RETVALSV;
+                            RETVALSV = sv_newmortal();
+                            sv_setref_pv(RETVALSV, object2package(ctx), (void*)ctx);
+                            ST(0) = RETVALSV;
+                        }
+                    {%when 'Fl_Group *' %}
+                        CTX * ctx;
+                        Newx(ctx, 1, CTX);
+                        ctx->cp_ctx    = (Fl_Widget *) RETVAL;
+                        {
+                            SV * RETVALSV;
+                            RETVALSV = sv_newmortal();
+                            sv_setref_pv(RETVALSV, object2package(ctx), (void*)ctx);
+                            ST(0) = RETVALSV;
+                        }
+                    {%when 'Fl_Window *' %}
+                        CTX * ctx;
+                        Newx(ctx, 1, CTX);
+                        ctx->cp_ctx    = (Fl_Widget *) RETVAL;
+                        {
+                            SV * RETVALSV;
+                            RETVALSV = sv_newmortal();
+                            sv_setref_pv(RETVALSV, object2package(ctx), (void*)ctx);
+                            ST(0) = RETVALSV;
+                        }
+                    {%when 'Fl_Menu_Button *' %}
+                        CTX * ctx;
+                        Newx(ctx, 1, CTX);
+                        ctx->cp_ctx    = (Fl_Widget *) RETVAL;
+                        {
+                            SV * RETVALSV;
+                            RETVALSV = sv_newmortal();
+                            sv_setref_pv(RETVALSV, object2package(ctx), (void*)ctx);
+                            ST(0) = RETVALSV;
+                        }
+                    {%when 'const Fl_Menu_Item *' %}
+                        CTX * ctx;
+                        Newx(ctx, 1, CTX);
+                        ctx->cp_ctx    = (Fl_Widget *) RETVAL;
+
+                        {
+                            SV * RETVALSV;
+                            RETVALSV = sv_newmortal();
+                            sv_setref_pv(RETVALSV, object2package(ctx), (void*)ctx);
+                            ST(0) = RETVALSV;
+                        }
+                    {%when 'CV *'     %}SV * RETVALSV; RETVALSV = newRV((SV*)RETVAL); RETVALSV = sv_2mortal(RETVALSV); ST(0) = RETVALSV;
+                    {%when 'AV *'     %}SV * RETVALSV; RETVALSV = newRV((SV*)RETVAL); RETVALSV = sv_2mortal(RETVALSV); ST(0) = RETVALSV;
+                    {%when 'HV *'     %}SV * RETVALSV; RETVALSV = newRV((SV*)RETVAL); RETVALSV = sv_2mortal(RETVALSV); ST(0) = RETVALSV;
+                    {%else %}XSprePUSH; PUSHi((IV)RETVAL); // {{definition.returns}}
+                {%endcase%}
+                {%endif%}
+        {% endcase %}
+        {{definition.cleanup}}
+        {{ xs.return }};
+    }{%endfor%}
+    else
+        croak("TODO: Improve usage info! {%if is_method%}{%if function == 'new'%}{{ class.package }}{%else%}${{class.package | split:'::' | last | downcase }}{%endif%}->{%endif%}{{ function }}( ... );");
+}
+{% endfor %}
+/* /package {{class.package}};  */
+{%endfor%}
+
+#ifdef __cplusplus
+extern "C"
+#endif
+XS_EXTERNAL(boot_Fl); /* prototype to pass -Wmissing-prototypes */
+XS_EXTERNAL(boot_Fl)
+{
+#if PERL_VERSION_LE(5, 21, 5)
+    dVAR; dXSARGS;
+#else
+    dVAR; dXSBOOTARGSXSAPIVERCHK;
+#endif
+#if (PERL_REVISION == 5 && PERL_VERSION < 9)
+    char* file = (char *) __FILE__;
+#else
+    const char* file = __FILE__;
+#endif
+
+    PERL_UNUSED_VAR(file);
+
+    PERL_UNUSED_VAR(cv); /* -W */
+    PERL_UNUSED_VAR(items); /* -W */
+#if PERL_VERSION_LE(5, 21, 5)
+    XS_VERSION_BOOTCHECK;
+#  ifdef XS_APIVERSION_BOOTCHECK
+    XS_APIVERSION_BOOTCHECK;
+#  endif
+#endif
+
+    /* Initialisation Section */
+
+    /* Setup! */
+    Fl_stash  = gv_stashpv( "Fl", TRUE );
+    Fl_export = get_hv( "Fl::EXPORT_TAGS", TRUE );
+
+    {
+{%for class in xsubs%}
+    {%for method in class.methods %}newXS_deffile( "{%if method.export%}Fl::{{method.name | split:'::' | last}}{%else%}{{class.package}}::{{method.name}}{%endif%}", {%
+    if class.package contains '::'%}XS_{{ class.package| replace:':','_' }}_{{ method.name }}{%
+    else                          %}XS_{{ method.name  | replace:':','_' }}{%endif%} );{%
+    if method.export%}{%for tag in method.export%}
+    export_function( "{{method.name | split:'::' | last}}", "{{tag}}" );{%endfor%}{%
+    endif%}
+    {%endfor%}
+{%endfor%}
+    }
+
+    /* Inheritance! */{%for class in xsubs%}{%if class.isa %}
+    set_isa( "{{class.package}}", "{{class.isa}}");{%endif%}{%endfor%}
+
+{%for export in exports sorted:value %}
+    export_constant( "{{export.key}}", "{{export.value}}", {{export.key}});{%endfor%}
+
+    /* End of Initialisation Section */
+
+#if PERL_VERSION_LE(5, 21, 5)
+#  if PERL_VERSION_GE(5, 9, 0)
+    if (PL_unitcheckav)
+        call_list(PL_scopestack_ix, PL_unitcheckav);
+#  endif
+    XSRETURN_YES;
+#else
+    Perl_xs_boot_epilog(aTHX_ ax);
+#endif
+}

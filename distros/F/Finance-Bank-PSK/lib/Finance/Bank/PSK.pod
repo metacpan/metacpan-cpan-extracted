@@ -1,0 +1,227 @@
+=head1 NAME
+
+Finance::Bank::PSK - check your P.S.K. accounts from Perl
+
+=head1 SYNOPSIS
+
+  # look for this script in the examples directory of the
+  # tar ball.
+  use Finance::Bank::PSK;
+  
+  use strict;
+  use warnings;
+  
+  my $agent = Finance::Bank::PSK->new(
+	  account       => 'xxx',
+          user          => 'xxx',
+          pass          => 'xxx',
+          return_floats => 1,
+	  newline       => '; ',
+  );
+  
+  my $result  = $agent->check_balance;
+  my @entries = $agent->get_entries;
+  
+  foreach my $account (@{$result->{accounts}}) {
+          printf("%11s: %25s\n", $_->[0], $account->{$_->[1]})
+                  for(( [ qw/ Kontonummer account / ],
+                        [ qw/ Bezeichnung name / ],
+                        [ qw/ Waehrung currency / ]
+                  ));
+          printf("%11s: %25.2f\n", $_->[0], $account->{$_->[1]})
+                  for(( [ qw/ Saldo balance / ],
+                        [ qw/ Dispo final / ]
+                  ));
+          print "\n";
+  }
+  
+  foreach my $fund (@{$result->{funds}}) {
+          printf("%11s: %25s\n", $_->[0], $fund->{$_->[1]})
+                  for(( [ qw/ Depotnummer fund / ],
+                        [ qw/ Bezeichnung name / ],
+                        [ qw/ Waehrung currency / ]
+                  ));
+          printf("%11s: %25.2f\n", 'Saldo', $fund->{balance});
+          print "\n";
+  }
+
+  if(scalar @entries) {
+          printf("Buchungszeilen:\n\n");
+          foreach my $row (@entries) {
+                  $row->{text} =~ s/(.{50}).*/$1.../;
+
+                  printf("%7s %5s %53s %9.2f\n",
+                          @{$row}{qw/nr value text ammount/}
+                  );
+          }
+  }
+
+
+=head1 DESCRIPTION
+
+This module provides a basic interface to the online banking system of
+the P.S.K. at C<https://wwwtb.psk.at>.
+
+Please note, that you will need either C<Crypt::SSLeay> or C<IO::Socket::SSL>
+installed for working HTTPS support of C<LWP>.
+
+=head1 METHODS
+
+=over
+
+=item check_balance
+
+Queries the via user and pass defined accounts and mutual funds and
+returns a reference to a list of hashes containing all fetched
+information:
+
+  $VAR1 = {
+            'accounts' => [
+                            {
+                              'name'     => name of the account
+                              'account'  => account number
+                              'currency' => currency
+                              'balance'  => account balance
+                              'final'    => final account balance
+                            }
+                          ],
+            'funds' => [
+                          {
+                            'name'     => name of the mutual fund
+                            'fund'     => mutual fund number
+                            'currency' => currency
+                            'balance'  => mutual fund balance
+                          }
+                        ],
+          };
+
+=item get_entries
+
+Queries and parses the Umsatzarchiv page for the defined account.
+
+Returns an array of hashes containing all fetched information:
+
+  $VAR = [
+           {
+             'nr'     => nr of the bank statement
+             'text'   => posting text
+             'value'  => value date (format: DD.MM)
+             'amount' => transfer amount
+           },
+  ];
+
+=back
+
+=head1 ATTRIBUTES
+
+All attributes are implemented by C<Class::MethodMaker>, so please take a
+look at its man page for further information about the created accessor
+methods.
+
+=over
+
+=item account
+
+Account to connect with (Teilnehmernummer).
+
+=item user
+
+User to connect with (Verfueger).
+
+=item pass
+
+Password to connect with (PIN).
+
+=item return_floats
+
+Boolean value defining wether the module returns the balance as signed
+float or just as it gets it from the online banking system (default:
+false).
+
+=item newline
+
+Scalar which should be used instead of the HTML breaklines (default '; ').
+
+=back
+
+=head1 EXAMPLES
+
+In the C<examples> directory of the distribution are two example scripts
+which show the usage of this module. Both scripts can be used out of
+the box and should represent a good starting point for a solution which
+fits your particular needs (I use a copy of C<balance-gpg.pl> on a daily
+basis).
+
+=over
+
+=item balance.pl
+
+The very same script as seen in the C<SYNOPSIS>. Shows the basic usage,
+defines all authentication settings directly in the script.
+
+The main problem with this approach is of course the fact, that the
+sensible authentication data is stored in clear text in the script
+itself. Not a good thing at all if you're using it in an multiuser
+environment or on a mobile computer.
+
+But do not fear - help in form of GPG is on the way (see C<balance-gpg.pl>).
+
+=item balance-gpg.pl
+
+This script does the same thing as C<balance.pl> but gets all the
+configuration settings from an C<GPG> encrypted file which is decrypted
+on the fly at startup, C<GPG> will interactive ask for your passphrase.
+
+To use this example script you need to set up C<GPG> and install
+C<GnuPG::Interface>, C<IO::File>, C<IO::Handle> and C<YAML> on your
+machine.
+
+The encrypted file should have the following structure (in case of C<YAML>):
+
+  account:       XXX
+  user:          XXX
+  pass:          XXX
+  return_floats: 1
+  newline:       '; '
+
+The layout may differ, depending on the module you are using for
+serialization.
+
+=back
+
+=head1 WARNING
+
+This is code for B<online banking>, and that means B<your money>, and that
+means B<BE CAREFUL>. You are encouraged, nay, expected, to audit the source 
+of this module yourself to reassure yourself that I am not doing anything 
+untoward with your banking data. This software is useful to me, but is 
+provided under B<NO GUARANTEE>, explicit or implied.
+
+=head1 THANKS
+
+Simon Cozens <simon@cpan.org> for C<Finance::Bank::LloydsTSB> from which I've
+borrowed the warning message.
+
+Chris Ball <chris@cpan.org> for his article about screen-scraping with
+C<WWW::Mechanize> at C<http://www.perl.com/pub/a/2003/01/22/mechanize.html>.
+
+=head1 AUTHOR
+
+Florian Helmberger <fh@laudatio.com>
+
+=head1 VERSION
+
+$Id: PSK.pod,v 1.5 2004/05/02 11:59:58 florian Exp $
+
+=head1 COPYRIGHT AND LICENCE
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+Copyright (C) 2003, 2004 Florian Helmberger
+
+=head1 SEE ALSO
+
+L<WWW::Mechanize>, L<HTML::TokeParser>, L<Class::MethodMaker>.
+
+=cut

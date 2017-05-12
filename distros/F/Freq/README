@@ -1,0 +1,80 @@
+NAME
+    Freq - An inverted text index.
+
+ABSTRACT
+    THIS IS ALPHA SOFTWARE
+
+    Freq is a text indexer and search utility written in Perl and C. It has
+    several special features not to be found in most available similar
+    programs, namely arbitrarily complex sequence and alternation queries,
+    and proximity searches with both exact counts and limits. There is no
+    result ranking (yet).
+
+    The index format draws some ideas from the Lucene search engine, with
+    some simplifications and enhancements. The index segments are stored in
+    a CDB disk hash (from dj bernstein).
+
+SYNOPSIS
+    Index documents:
+
+      # cat textcorpus.txt | tokenize | indexstream index_dir
+      # cat textcorpus.txt | tokenize | stopstop | indexstream index_dir
+      # optimize index_dir
+
+    Search:
+
+      # freqsearch index_dir
+      # (type search terms)
+
+PROGRAMMING API
+      use Freq;
+
+      # open for indexing
+      $index = Freq->open_write( "indexname" );
+      $index->index_document( "docname", $string );
+      $index->close_index();
+
+      # open for searching
+      $index = Freq->open_read( "indexname" );
+
+      # Find all docs containing a phrase
+      $result = $index->search( "this phrase and no other phrase" );
+
+      # result is hashref:
+      # { doc1 => [ match1, match2 ... matchN ],
+      #   doc2 => [ match1, ... ]
+      # }
+      # ... where 'match' is the token location of each match within that doc.
+
+SEARCH SYNTAX
+    Sequences of words are enclosed in angle brackets '<' and '>'.
+    Alternations are enclosed in square brackets '[' and ']'. These may be
+    nested within each other as long as it makes logical sense. "<the quick
+    [brown grey] fox>" is a simple valid phrase. Nested square brackets
+    don't make sense, logically, so they aren't allowed. Also not allowed
+    are adjacent angle bracket sequences. However, alternations may be
+    adjacent, as in "<I [go went] [to from] the store>". As long as these
+    rules are followed, search terms may be arbitrarily complex. For
+    example:
+
+    "<At [a the] council [of for] the [gods <deities we [love <believe in>]
+    with all our [hearts strength]>] on olympus [hercules apollo athena
+    <some guys>] [was were] [praised <condemned to eternal suffering in the
+    underworld>]>"
+
+    Two operators are available to do proximity searches. '#wN' represents
+    *at least* N intervening skips between words (the number of between
+    words plus 1). Thus "<The #w8 dog>" would match the text "The quick
+    brown fox jumped over the lazy dog". If #w7 or lesser had been used it
+    would not match, but if #w9 or greater had been used it would still
+    match. Also there is the '#tN' operator, which represents *exactly* N
+    intervening skips. Thus for the above example "<The #t8 dog>", and no
+    other value, would match. These operators can be used after words or
+    alternations, but no other place.
+
+AUTHOR
+    Ira Joseph Woodhead, ira at sweetpota dot to
+
+SEE ALSO
+    "Lucene" "Plucene" "CDB_File" "Inline"
+

@@ -1,0 +1,13 @@
+README
+Changes
+MANIFEST
+COPYING			the LGPL
+Makefile.PL
+Rdiff.pm
+Rdiff.xs
+typemap
+t/00_load.t
+rdiff1			rdiff using file-based utility functions
+rdiff2			rdiff using non-blocking api
+librsync.ps.gz		librsync 0.9.5 documentation
+META.yml                                 Module meta-data (added by MakeMaker)

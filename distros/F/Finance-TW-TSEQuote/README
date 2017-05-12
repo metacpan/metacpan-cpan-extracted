@@ -1,0 +1,65 @@
+NAME
+    Finance::TW::TSEQuote - Check stock quotes from Taiwan Security Exchange
+
+SYNOPSIS
+        use Finance::TW::TSEQuote;
+
+        my $quote = Finance::TW::TSEQuote->new('2002');
+
+        while (1) { print $quote->get->{MatchPrice}.$/; sleep 30 }
+
+DESCRIPTION
+    This module provides interface to stock information available from
+    Taiwan Security Exchange. You could resolve company name to stock
+    symbol, as well as getting the real time quote.
+
+CLASS METHODS
+    new
+            Create a stock quote object. Resolve the name to symbol
+            if the argument is not a symbol.
+
+    resolve
+            Resolve the company name to stock symbol.
+
+    fetchMarketFile
+            Fetch the Een-Of-Day stock information for specific company
+                by year and month.
+
+    get
+            Get the real time stock information.
+            Return a hash containing stock information. The keys are:
+
+        Bid
+                a hash of array of best 5 matching Sell and Buy bids
+
+        DQty
+                current volume
+
+        MatchQty
+                daily volume
+
+        MatchPrice
+                current price
+
+        OpenPrice
+                opening price
+
+        HighPrice
+                daily high
+
+        LowPrice
+                daily low
+
+AUTHORS
+    Chia-liang Kao <clkao@clkao.org>
+
+    Cheng-Lung Sung
+
+COPYRIGHT
+    Copyright 2003-2012 by Chia-liang Kao <clkao@clkao.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

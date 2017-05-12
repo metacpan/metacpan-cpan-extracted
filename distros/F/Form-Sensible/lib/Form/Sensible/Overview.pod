@@ -1,0 +1,391 @@
+
+=head1 NAME
+
+Form::Sensible::Overview - Getting started with Form::Sensible
+
+=head1 INTRODUCTION
+
+Form::Sensible is a different way of handling form based user input.
+Many people have heard of MVC.  The separation of programming concerns
+into that of the data model, the view, and the controller is by
+now familiar territory.  Many implementations are available and some
+of them are really good.  Unfortunately, more often than not the user
+input portion of the View is neglected.  Handling user interaction
+is pushed into the controller where direct access to the methods
+of input occur.
+
+Form::Sensible is an attempt to abstract user input in a way that is similar
+to the abstraction provided for the presentation portion of the view. As such,
+Form::Sensible takes a different approach to representing a form. Instead of
+defining a form in terms of what your user will see (checkboxes, dropdowns,
+text fields, etc.) you define your form in terms of the information you want
+to collect from the user.
+
+If you want to have a user select an item from a set of options, you
+create a Select field.  If you want a number between 1975 and 2010,
+then you create a Number field.  Ultimately, your code just wants
+the correct information.  It doesn't matter whether the number is
+from a text entry field, or from a dropdown select box.  Likewise
+when selecting a preferred item from a number of options, your code
+doesn't care whether the selection is presented as a dropdown box
+or a set of checkboxes.  (How many times have you been asked to
+change a select dropdown to a set of checkboxes or vice-versa?)
+
+Form::Sensible provides a conduit for information to and from the
+user.  It is a mechanism for prompting the user with questions, for
+collecting the information you need, for ensuring that
+the value collected fits your constraints, and for indicating errors
+and other important information to the user.
+
+With Form::Sensible, however, the method by which the user is queried
+for the information is abstracted from the code that uses the
+information.  This allows you to change the details of what
+the interface looks like without adjusting your code.  It also allows
+you to completely change your interface mechanism without rewriting your
+code.  You can, for example, swap out your in-browser HTML based forms with a
+desktop-GUI by simply replacing the L<Renderer|Form::Sensible::Renderer>*
+(or, more accurately, you will be able to in the not-too-distant future.)
+
+=head1 OVERVIEW
+
+As we mentioned, Form::Sensible abstracts the method of querying the user
+from the code that's actually using the data.  Many people will use
+L<Form::Sensible> primarily for HTML based forms only and those who do use
+it for other things are likely familiar with HTML based form handling so
+we will use them as our unfortunate victim, er... example.
+
+When comparing Form::Sensible to HTML forms, there are a few big differences
+from what you are probably used to. First off, you are probably used to
+defining fields in terms of how they will eventually be shown. You create text
+fields, password fields, radio buttons, etc. in a template of some kind. Then
+you collect the information in its raw form and boil it down to something
+that you can use in your code. Then you write code to perform validation of
+your data and then set up a mechanism for reporting any errors to the user. A
+number of modules and libraries have been created to make portions of this
+easier to deal with HTML generators, Form Validators, etc. But when it comes
+down to it, the process is the same just slightly more succinct.
+
+In Form::Sensible you approach it from a different perspective. Fields are
+defined in terms of the data they represent. For each field in a form, you
+define the constraints and other parameters important to the type of data it
+represents. Once this is done, you simply pass the form to a Form renderer and
+it takes care of turning it into something presentable for the user.
+
+It is important to note that unlike HTML forms which bind to a particular
+action for form processing, forms in Form::Sensible simply provide a way
+to bundle a set of fields together.  They are simply a handle for working
+with more than one field at once.
+
+Once the user's response to the form is collected, you can easily ensure that
+it is valid by triggering form validation.  The easiest method for doing so
+is to simply call C<< $form->validate() >>.  This will validate the values
+provided by the user against the constraints defined for each field (and the
+collection of fields together) and will set up messaging for any errors that
+are found.  Then you can choose to represent the form to the user or if
+validation succeeded, you can proceed to do whatever is appropriate for
+your data.
+
+It is important to note also that Form::Sensible forms are intended to
+be queried for their data.  Meaning if you want the value of your
+C<year_of_birth> field, you call C<< $form->field('year_of_birth')->value() >>.
+This allows your code to be separate from the mechanism of retrieving the
+value in the first place.  This makes things significantly easier when
+it comes time to port your application to a new user interface method.
+
+=head1 USING IT
+
+Until now we've spoken in very general terms about how you do things
+with Form::Sensible.  Now we will actually demonstrate it, starting
+with creating a form.
+
+=head2 CREATING AND RENDERING A FORM
+
+You can create Form::Sensible forms using an object-oriented process of
+creating a form object, creating field objects, and then adding each field
+object to the form object. While useful in certain circumstances, most people
+tend to create a form in a static manner. As such, an easier and significantly
+more brief option is available. That option is the C<< Form::Sensible->create_form() >>
+method. Let's jump right in:
+
+    use Form::Sensible;
+    
+    my $form = Form::Sensible->create_form(
+        {
+            name => 'login_form',
+            fields => [
+                         {
+                            field_class => 'Text',
+                            name => 'username',
+                            validation => {
+                                    regex => '^[0-9a-z]*',
+                                    required => 1,
+                                }
+                         },
+                         {
+                             field_class => 'Text',
+                             name => 'password',
+                             validation => {
+                                    required => 1,
+                                },
+                             render_hints => {
+                                    'HTML' => {
+                                                render_as => 'password'
+                                              }
+                                    },
+                         },
+                         {
+                             field_class => 'Trigger',
+                             name => 'submit'
+                         }
+                      ],
+        } );
+
+The above code snippet creates the all-too-familiar login form we are used to.
+Each field has a C< field_class >, which corresponds with a
+C<< Form::Sensible::Field >> classname, and a C<name> which is used to
+get a hold of this particular field.  The C<name> element for any given
+field should be unique within the form.
+
+Something to notice here is that all validation information required for
+validating this form is present in this definition. Another thing to notice is
+that we use a standard C<Text> field to store our password data.  Remember that
+C<Form::Sensible> field definitions are centered around the data you want
+to collect, not how they are presented.  In this case, we simply ask the HTML
+renderer to render it as a C<password> by providing C<render_hints>. We'll
+come back to C<render_hints> later.
+
+Now that we have a form, though, what do we do with it?  Well, in most cases
+we want to render it.  That is astoundingly simple.  First we ask for the renderer
+we want, then we use the renderer to render the form:
+
+    my $renderer = Form::Sensible->get_renderer('HTML');
+    my $renderedform = $renderer->render($form);
+
+At this point, we have a C<$renderedform>. This is not, however, a string. The
+output of a Form::Sensible renderer is a 'rendered form handle.' What that
+means is specific to the type of Renderer being used. What they have in
+common, though, is that they are an object that can be used to actually
+initiate user interaction. They are also connected directly to the C<$form>
+object which was used to create them. This means that changes to the C<$form>
+object will be reflected in the User Interface and that values will be set in
+the C<$form> in response to user action on the renderedform.
+
+For HTML, this connection is limited by the transactional nature of HTTP, but
+it is still there and any changes you make to C<$form> prior to actually
+presenting the rendered form will be reflected in the HTML generated.
+
+Ok... so we have a C<$renderedform>. Now what do we do? We display it,
+obviously. For an HTML form, that looks like this:
+
+    print $renderedform->complete('/login', 'post');
+
+This would print out the form rendered as HTML. The first argument to
+C<complete()> is the action to submit this HTML form to. This is passed
+directly through to the generated C<< <form> >> element's C< action >
+attribute. The second argument is the method, either 'get' or 'post', and is
+likewise passed directly through to the C< method > attribute on the form
+element.
+
+In terms of rendering, we are done.  The HTML representation of the form will be
+generated and printed out.
+
+=head2 SETTING VALUES AND VALIDATION
+
+Once the form is submitted, we have to get the values into our form somehow.
+This requires a bit of glue in your application and will be somewhat specific to
+the rendering model you are using, but the most straightforward option is simply to
+call C<< $form->set_values() >> with a hashref of name-value pairs.
+
+    $form->set_values($c->req->params);
+
+The form is smart enough to recognize the fields it cares about and to load the
+values as appropriate.  Note, however, that validation is not done at this point.
+It is entirely possible to put bad data into the values for the various fields.  To
+make sure that what we got is valid, we call C<< $form->validate() >>:
+
+    my $result = $form->validate();
+
+Calling C<< $form->validate() >> runs through all field and form validation according
+to the form definition and produces a L<Form::Sensible::Validator::Result|Form::Sensible::Validator::Result>
+object.  The result object can then be used to indicate what exactly went wrong, if anything:
+
+    if ($result->is_valid()) {
+        # do valid-form stuff here.
+        authenticate_user($form->field('username')->value, $form->field('password')->value);
+    } else {
+        my $renderer = Form::Sensible->get_renderer('HTML');
+        my $renderedform = $renderer->render($form);
+        $renderedform->add_errors_from_validator_result($result);
+        print $renderedform->complete('/login','post');
+    }
+
+If C<< $result->is_valid() >> is true, we can proceed to doing what we need to
+do with the form data. An interesting thing to note here is that if the form
+is invalid, we simply redisplay the form.
+
+You've now gone through the entire lifecycle of a C<Form::Sensible> form. We
+have used the HTML renderer because it is most familiar (and it is the only
+publicly released renderer at this point.) That said, however, for the most
+part only the C<print> line and C<set_values> line are likely to change to
+present using a different renderer.
+
+=head1 DETAILS
+
+In the previous section we showed briefly how to create a form, render it, and
+validate the user's input.  The validation and rendering mechanisms in C<Form::Sensible>
+are complex and flexible and some detail is needed to use them effectively.
+
+=head2 VALIDATION
+
+=head3 Field validation
+
+Form and Field validation in Form::Sensible is fairly straightforward. Each
+field has a C<validation> hashref which defines three elements for field
+validation: C<required>, C<regex>, and C<code>. The C<required> element is
+simply a true/false flag indicating whether it is an error if the field is
+empty. The C<regex> element is exactly what it sounds like. The value for the
+field is checked against the regex provided; if it does not match, the field
+is marked invalid. The last element, C<code>, is the most interesting. Its
+value is a coderef for a subroutine that checks the field's value. The
+subroutine provided is called with two arguments, first the field's value,
+then the field object itself. The subroutine is expected to return either a zero (0)
+value - indicating the field is OK, or a message indicating why the field is
+invalid. This is somewhat non-intuitive as you return 0, or a false value, to
+indicate the field is ok if you are not familiar with exit codes on UNIX-like
+platforms. If that is the case, it may help to think about the C<code> coderef as a
+question, 'Is this value invalid?'  An example of a C<code> validator is:
+
+    validation => {
+                ## remember this is answering the question 'is_this_invalid()'
+        code => sub {
+                        my ($value, $field) = @_;
+                        if ($value ne $field->name) {
+                            return "_FIELDNAME_ is a bizarre field that can only contain its own name.  Field is invalid.";
+                        } else {
+                            ## I contain my own name, that means this validation should pass.  return 0.
+                            return 0;
+                        }
+                    }
+    }
+
+Note in the example above the string '_FIELDNAME_' is used in place of the
+actual field name.  This works this way to allow for easy localization of strings.
+This will be translated to the field's name later.
+
+Validation is not an either-or: you can have both a regex and a coderef for
+validation and if you do, both must be successful for the value to be considered
+valid.  When you provide both, the regex is tested first and if the value passes
+the regex check, then the coderef is run.  Note that if the regex failed, the coderef
+subroutine will not be called.
+
+Note that some field types have their own validation. For example,
+L<Select|Form::Sensible::Field::Select> fields will not accept any value that is not
+part of their option list.  Numbers, likewise, perform their own validation to check
+against their upper and lower bounds and other related items.  If a field type has
+a builtin validator routine, it will be run after the regex and coderef are run.  Unlike
+the coderef, however, the field's builtin validation routine is run regardless of the
+results of regex or coderef validators.
+
+Another thing to note about Field validation is that if the field is empty no validation
+will be run and the form itself will be marked 'invalid.' The field itself will be marked
+as 'invalid' if it is not required and 'missing' if it is required. See L</"Error Messaging">.
+
+=head3 Complete Form validation
+
+If field validation is completed successfully, the final step in form validation is run.
+That step is 'complete form validation.'  You can provide a C<validation> hashref on
+the form itself which will be run after all other fields have been validated (if and only
+if all the fields individually are valid.)  The subroutine for a form is slightly different
+than the coderef for a field.  The arguments are the form object and the validator result object
+that was created for this validation.  Rather than returning any particular value, a form validation
+coderef should manipulate the validator result object directly. For example:
+
+    # ... rest of form definition
+    validation => {
+        code => sub {
+                        my ($form, $result) = @_;
+                        if ($form->field('password')->value() ne $form->field('password2')->value()) {
+                            ## add an error on the 'password' field.
+                            $result->add_error('password', "Your passwords do not match, please try again.");
+                        }
+                    }
+    }
+
+=head3 Error Messaging
+
+Finally we need to cover error messaging.  With code-based validation of either Fields or the entire form,
+you provide the error message to use.  For other types of validation (including regex and field-specific
+validation) you may want to provide custom error messages.  If you want to provide a custom
+error message for a field you can provide two additional elements to the C<validation> hashref:
+C<invalid_message> and C<missing_message>.  Both of these are strings that will be used in place
+of the generic 'FieldX is invalid' type messaging.  As you might suspect, C<invalid_message> is used when
+a field is found to be invalid.  The C<missing_message> is used if the field is required but is not
+set.  An example of custom messaging:
+
+    # ... rest of field definition
+    validation => {
+                    regex => '^\d\d\d-\d\d\d-\d\d\d\d$',
+                    invalid_message => "Phone must be formatted as ###-###-####",
+                    missing_message => "Please provide a Phone number."
+    }
+
+
+=head2 RENDERING
+
+=head3 render_hints
+
+Render hints are a way to help the renderer decide how to present the field or
+form you are working with. Render hints can be placed into the form definition
+itself or can be inserted at various points along the rendering path.
+Generally speaking, the hints that are closest to final rendering take
+precedence over those at a higher distance.
+
+That is to say that if you have C<render_hints> provided for the field in the
+C<render_field()> call, they will override any hints set in the C<complete()> call
+which in turn would override any hints set in the field's original definition.
+Note that the all of the C<render_hints> are merged before processing occurs
+with those closer to the actual rendering taking precedence on conflict.
+
+Render hints are most often applied to fields, though they can be applied to
+Forms as well. How render hints are applied are specific to the renderer being
+used. An example of render hints might be:
+
+    {
+        field_class => 'Number',
+        lower_bound => 1910,
+        upper_bound => 2010,
+        step => 1,
+        render_hints => {
+            HTML => {
+                field_type => 'Select',
+                render_as => 'checkboxes'
+            }
+        }
+    }
+The C<render_hints> here tells the HTML render that this should be rendered
+the way a Select field is rendered instead of the way a Number is normally
+rendered (a text field). It also tells the renderer that when it is rendering
+the Select C<field_type> it should render the select as a series of checkboxes
+instead of a dropdown (the default for Select type).
+
+The 'HTML' in the above example addresses that section to the HTML renderer,
+other renderers would not be affected by the render hints provided.  This
+allows you to provide C<render_hints> for the field that are specific for.
+
+... More to come.
+
+
+# JK - pick up here.
+
+
+=head1 AUTHORS
+
+Jay Kuri, C<jayk@cpan.org>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2010 the aforementioned authors. All rights
+reserved. This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut

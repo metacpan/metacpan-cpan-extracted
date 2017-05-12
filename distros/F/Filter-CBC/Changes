@@ -1,0 +1,40 @@
+Revision history for Perl extension Filter::CBC.
+
+0.0.1  Sat Nov  3 02:25:31 2001
+	- original version
+
+0.0.2  Sun Nov  4 02:00:00 2001
+	- Added internal text converting
+        - Added some POD
+
+0.03  Sun Nov  4 21:00:00 2001
+	- Cleaned up Package to improve CPANability
+        - Added some CBC Cipher examples
+	- Cleaned up and updated POD
+
+0.04  Thu Nov  8 17:00:00 2001
+	- Added autoencryption feature (BIG CHANGE)
+        - Added cbc2code script
+
+0.05  Fri Nov  9 23:00:00 2001
+	- Added default keyphrases & default encryption routines
+	- Cleaned up Package to improve CPANability
+
+0.06  Tue Nov  27 17:00:00 2001
+	- Improved autoencryption feature
+	- Dropped text handlers
+
+0.07  Fri Nov  30 15:00:00 2001
+        - Added example code (Serpent, RC6)
+	- Fixed POD
+	- Moved autofiltering to import block
+	
+0.08  Fri Dec  14 20:40:00 2001
+	- Removed horrible bug that screwed up on newlines
+
+0.09  Thu Feb  14 21:00:00 2002
+	- Fixed \x bug again
+	- Fixed NULL example 
+
+0.10  Tue Sep 18 17:30:00 2007
+         - Fixed Salt bug for newer versions of Crypt::CBC

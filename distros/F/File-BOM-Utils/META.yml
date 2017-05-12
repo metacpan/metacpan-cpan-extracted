@@ -1,0 +1,36 @@
+---
+abstract: 'Check, Add and Remove BOMs'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-BOM-Utils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Slurper: '0.008'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Moo: '1.007'
+  Pod::Usage: '0'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Types::Standard: '1.000005'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/File-BOM-Utils.git
+version: '1.02'
+

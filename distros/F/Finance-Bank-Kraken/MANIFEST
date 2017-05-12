@@ -1,0 +1,6 @@
+lib/Finance/Bank/Kraken.pm
+README
+MANIFEST
+COPYING
+Makefile.PL
+kraken.spec

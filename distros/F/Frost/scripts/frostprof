@@ -1,0 +1,81 @@
+#!/bin/sh
+
+echo "#"
+echo "# frostprof..."
+echo "#"
+
+PERL=`which 'perl'`
+NYTP=`which 'nytprofhtml'`
+
+if [ ! -e "$PERL" ]
+then
+	echo "perl not found"
+	echo "------------ ERROR ---------------------------------------------------"
+	exit 1
+fi
+
+if [ ! -e "$NYTP" ]
+then
+	echo "nytprofhtml not found"
+	echo "------------ ERROR ---------------------------------------------------"
+	exit 1
+fi
+
+echo "# using"
+echo "# $PERL"
+echo "# $NYTP"
+echo "#"
+
+DEBUG=
+LOCK_TEST=
+MAKE_MUTABLE=
+NO_DIE_WARN=
+PATH='500_speed/201_burial_profile.t'
+SPEED_TEST=1
+TEST_PATH='../t'
+VERBOSE=
+
+while getopts 't:' OPTION
+do
+	case "$OPTION" in
+
+	t)		TEST_PATH="$OPTARG";;
+
+	esac
+done
+
+echo "------------ PARAM ---------------------------------------------------"
+echo "VERBOSE      = $VERBOSE"
+echo "DEBUG        = $DEBUG"
+echo "MAKE_MUTABLE = $MAKE_MUTABLE"
+echo "LOCK_TEST    = $LOCK_TEST"
+echo "SPEED_TEST   = $SPEED_TEST"
+echo "NO_DIE_WARN  = $NO_DIE_WARN"
+echo "TEST_PATH    = $TEST_PATH"
+echo "PATH         = $PATH"
+echo "------------ TEST ----------------------------------------------------"
+
+if [ ! -e "$TEST_PATH/$PATH" ]
+then
+	echo "Profile test $PATH not found in $TEST_PATH"
+	echo "------------ ERROR ---------------------------------------------------"
+	exit 1
+fi
+
+export Frost_NO_DIE_ON_WARNINGS=$NO_DIE_WARN
+export Frost_DEBUG=$DEBUG
+export Frost_MAKE_MUTABLE=$MAKE_MUTABLE
+export Frost_LOCK=$LOCK_TEST
+export Frost_SPEED=$SPEED_TEST
+
+cd $TEST_PATH
+
+$PERL -d:NYTProf -I../lib $PATH
+
+echo "----------------------------------------------------------------------"
+echo "Creating HTML pages..."
+
+$NYTP
+
+
+echo "------------ DONE ----------------------------------------------------"

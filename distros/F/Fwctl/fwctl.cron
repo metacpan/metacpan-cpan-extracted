@@ -1,0 +1,10 @@
+# At each 15 minutes dumps the accounting stats
+*/15 * * * * root /usr/sbin/fwctl dump-acct
+
+# ... and preprocess the kernel logs
+0 * * * * root /usr/sbin/fwctllog --start "`date --date '1 hour ago' +\%Y-\%m-\%d' '\%H:00`" --period '1h' /var/log/messages >> /var/log/fwctl_log
+
+# Generates daily reports
+15 0 * * * root /usr/sbin/fwctlreport --start "`date --date '1 day ago' +\%Y-\%m-\%d' '00:00`" --period 1d /var/log/fwctl_log -r service_sum -r src_host | mail -s "Fwctl Daily Activity Report for `hostname`" root
+
+15 0 * * * root /usr/sbin/fwctlacctreport --start "`date --date '1 day ago' +\%Y-\%m-\%d' '00:00`" --period 1d /var/log/fwctl_acct -r summary -r packets -r bytes -sample hour | mail -s "Fwctl Daily IP Accounting Report for `hostname`" root

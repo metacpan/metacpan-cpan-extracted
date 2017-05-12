@@ -1,0 +1,46 @@
+Revision history for Finance-InteractiveBrokers-TWS
+
+0.1.0  2008/08/03
+
+    - Kinda ripped it apart and rebuilt using a way to dynamically 
+      learn about the EWrapper and create corresponding code.
+    - Made it more logically to request objects directly from IB's Java
+      rather than having code in this module
+
+0.0.8  2006/09/25
+
+    - Added method tickOptionComputation
+    - Updated the docs to include how to fix missing method errors
+
+0.0.7  2006/04/01
+
+    - Added methods dump_event and dump_java_object, and created config file
+    - Fixed some more doc
+    - Added suggestions by Marius
+    - Fixed the single parm calling
+
+0.0.6  2006/03/12
+
+    - Changed the calling syntax from ->new(%hash) to ->new($callback)
+      because with current updates, there is only need for a single attr
+    - Added eConnect, eDisconnect that do the right thing when connecting
+      to TWS 
+    - added all the EClientSocket methods to tws, so you don't have to 
+      know how to get at those methods
+    - Fixed where Inline::Java builds its parts - so they aren't scattered
+      arount the user's filesystem
+
+0.0.5  2006/03/02
+
+    - Altered doc to include updated example
+    - Changed the calls to create the IB objects
+    - Added parameters to all callbacks
+
+0.0.2  2006/01/17
+
+    - Updated README, changed email address, updated some POD
+
+0.0.1  Thu Jan 12 23:25:40 2006
+
+    - Initial release.
+

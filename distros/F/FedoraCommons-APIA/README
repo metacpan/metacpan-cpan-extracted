@@ -1,0 +1,281 @@
+NAME
+    FedoraCommons::APIA - Interface for interaction with Fedora's Access API
+
+VERSION
+SYNOPSIS
+      use FedoraCommons::APIA;
+
+      my $apia=new Fedora::APIA(
+                  host    => "my.fedora.host",
+                  port    => "8080",
+                  usr     => "fedoraAdmin",
+                  pwd     => "foobarbaz",
+                  timeout => 100); 
+
+      $status = $apia->findObjects( 
+                  resultFields => @resFlds,
+                  maxResults => $maxRes,
+                  fldsrchValue => $fldsrchVal,
+                  fldsrchProperty => $fldsrchProp,
+                  fldsrchOperator => $fldsrchOp,
+                  searchRes_ref => \$searchRes);
+
+      $status = $apia->resumeFindObjects(
+                  sessionToken => $sessionToken,
+                  searchRes_ref => \$searchRes);
+
+      $status = $apia->getDatastreamDissemination(
+                  pid => $pid,
+                  dsID => $dsID,
+                  stream_ref => \$stream);
+
+      $status = $apia->listDatastreams(
+                  pid=>$pid, 
+                  datastream_ref =>\$datastreams);
+
+      Return Status:
+
+       0 = success
+       1 = Error
+       2 = Error on remote server
+
+DESCRIPTION
+    FedoraCommons::APIA provides an interface to the SOAP-based access API
+    (API-A) of the Fedora repository architecture
+    (<http://www.fedora.info/>).
+
+    It exposes a subset of the API-A operations and handles errors and
+    elapsed-time profiling.
+
+OPTIONS
+    FedoraCommons::APIA may be invoked with an option
+
+    version
+         FedoraCommons::APIA supports multiple versions of the Fedora API-A.
+         Specifying the version of the Fedora API-A is done at invocation
+         time by
+
+           use Fedora::APIA version=>3.2;
+
+         Supported versions of the Fedora API-A: 3.2.
+
+METHODS
+    Parameters for each method is passed as an anonymous hash. Below is a
+    description of required and optional hash keys for each method. Methods
+    will croak if mandatory keys are missing. Most keys corresponds to
+    paramter names to the equivalent API-A operation described at
+    <http://www.fedora-commons.org/confluence/display/FCR30/API-A>.
+
+  Constructor
+    new()
+       Constructor. Called as
+
+           my $apia = new FedoraCommons::APIA (
+             host    => "hostname",      # Required. Host name of 
+                                         #   fedora installation
+             port    => "8080",          # Required. Port number of 
+                                         #   fedora installation
+             usr     => "fedoraAdmin",   # Required. Fedora admin user
+             pwd     => "fedoraAdmin",   # Required. Fedora admin password
+             timeout => 100              # Optional. Timeout for
+                                         #   SOAP connection
+           );
+
+  Methods representing API-A operations
+    Each method returns 0 upon success and 1 upon failure. Method error()
+    may be used to get back a textual description of the error of the most
+    recent method call.
+
+    findObjects()
+       Gets requested object fields @resFlds for all objects in the
+       repository matching the given criteria
+
+           $apia->findObjects (
+             resultFields => @resFlds,         # Required. Fields returned
+             maxResults=> $maxres,             # Required. Max number of 
+                                               #   results returned.
+             fldsrchProperty => $fldsrchProp,  # Required. Field being searched
+             fldsrchOperator => $fldsrchOp,    # Required. Operator for 
+                                               #   comparing a property to 
+                                               #   a value
+             fldsrchValue => $fldsrchval,      # Required. Value of the property
+                                               #   being searched.
+             searchres_ref => \$searchres      # Required. Reference to scalar 
+                                               #   into which search results 
+                                               #   is put
+           );
+
+    resumeFindObjects()
+       Gets the next list of results from a truncated findObjects response
+
+           $apia->resumeFindObjects (
+             sessionToken => $sessionToken,   # Required. token of the session
+                                              #   in which the next few 
+                                              #   results can be found
+             searchres_ref => \$searchres     # Required. Reference to scalar 
+                                              #   into which search results 
+                                              #   is put 
+           );
+
+    getDatastreamDissemination()
+       Gets a datastream in the digital Fedora object and returns the
+       datastream. Called as
+
+           my $mystream;
+           $apia->getDatastreamDissemination(
+             pid => $pid,                       # Required. Scalar holding
+                                                #   PID of object 
+             dsID => $dsID,                     # Required. 
+             asOfDateTime => $asOfDateTime,     # Optional. 
+             stream_ref => \$stream             # Required. Reference to scalar 
+                                                #   into which resulting stream 
+                                                #   is put
+           );
+
+       Note: Empty (or null'ed) dsID are currently not supported.
+
+    listDatastreams()
+       Lists all of the datastreams in the digital Fedora object and returns
+       the list of datastreams. Called as
+
+           my $datastreams;
+           $apia->listDatastreams(
+             pid => $pid,                       # Required. Scalar holding
+                                                #   PID of object 
+             datastream_ref => \$datastreams    # Required. Reference to scalar 
+                                                #   into which resulting 
+                                                #   datastreams is put
+           );
+
+  Methods Currently Not Implemented
+    The following API-A methods are currently not supported in this module.
+    The decision to implement methods was based on the specific needs of our
+    project.
+
+    describeRepository()
+       Provides information that describes the repository.
+
+    getObjectHistory()
+       Gets a list of timestamps that correspond to modification dates of
+       components. This currently includes changes to Datastreams and
+       disseminators.
+
+    getObjectProfile()
+       Profile of an object, which includes key metadata fields and URLs for
+       the object Dissemination Index and the object Item Index. Can be
+       thought of as a default view of the object.
+
+    getDissemination()
+       Disseminates the content produced by executing the method specified
+       in the service definition associated the specified digital object.
+
+    listMethods()
+       Lists all the methods that the object supports.
+
+  Other methods
+    error()
+       Return error of most recent API-A method.
+
+    get_time()
+       Return the elapsed time of the most recent SOAP::Lite call to the
+       fedora API-A.
+
+    get_stat()
+       Return reference to hash describing total elapsed time and number of
+       calls - since instantiation or since most recent call to start_stat()
+       - of all SOAP::Lite calls to the fedora API-A.
+
+    start_stat()
+       Start over the collection of elapsed times and number of calls
+       statistics.
+
+DEPENDENCIES
+    SOAP::Lite, Time::HiRes, Carp
+
+KNOWN BUGS, LIMITATIONS AND ISSUES
+    In its current implementation, Fedora::APIA represents a wrapping of the
+    SOAP based interface in which most of the parameters for the SOAP
+    operations are required parameters to the corresponding wrapping method,
+    even though parameters may be optional in the SOAP interface.
+
+    In future versions, parameters should become optional in the methods if
+    they are optional in the corresponding SOAP operation; or suitable
+    defaults may be used with SOAP for some of the parameters, should they
+    be missing as parameters to the wrapping method.
+
+SEE ALSO
+    Fedora documentation:
+    <http://fedora-commons.org/confluence/display/FCR30/Fedora+Repository+3.
+    2.1+Documentation>.
+
+    Fedora API-A documentation:
+    <http://www.fedora.info/definitions/1/0/api/Fedora-API-A.html>.
+
+    APIA Method summary descriptions are taken directly from the APIA
+    documentation.
+
+AUTHOR
+    The Fedora::APIA module is based on a module written by Christian
+    Tønsberg, <ct@dtv.dk> in 2006. Christian no longer supports or
+    distributes the module he developed.
+
+    Maryam Kutchemeshgi (Penn State University) put together the initial
+    version of Fedora::APIA. This module was originally developed (circa
+    2007) in a collaboration between Cornell University and Penn State
+    University as part of a project to develop an interface to support the
+    use of the Fedora Repository as the underlying repository for DPubS
+    [Digital Publishing System] <http://dpubs.org>. Maryam Kutchemeshgi
+    <mxk128@psu.edu> is no longer involved with maintaining this module.
+
+    David L. Fielding (<dlf2@cornell.edu<gt>) is responsible for recent
+    enhancements along with packaging up the module and placing it on CPAN.
+    To avoid confusion between Fedora (the Linux operating system) and
+    Fedora (the repository) I changed the name of the module package from
+    Fedora to FedoraCommons (the qualified name of the Fedora repository). I
+    have modified the modules to work with the Fedora Commons 3.2 APIs.
+
+    This module implements a subset of the requests supported by the API-A
+    specification. Additional requests may be implemented upon request.
+    Please direct comments, suggestions, and bug reports (with fixes) to me.
+    The amount of additional development will depend directly on how many
+    individuals are using the module.
+
+    Please refer to module comments for information on who implemented
+    various methods.
+
+INSTALLATION
+    This module uses the standard method for installing Perl modules. This
+    module functions as an API for a Fedora server and therefore requires a
+    functioning Fedora server to run the tests ('make test'). Settings for
+    the Fedora server are read from the following environment variables:
+    FEDORA_HOST, FEDORA_PORT, FEDORA_USER, FEDORA_PWD. The tests will not
+    run if these environment variable are not set properly.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008, 2009 by Cornell University,
+    <http://www.cornell.edu/> Copyright (C) 2007 by PSU,
+    <http://www.psu.edu/> Copyright (C) 2006 by DTV, <http://www.dtv.dk/>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this library; if not, visit http://www.gnu.org/licenses/gpl.txt or
+    write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+    Floor, Boston, MA 02110-1301 USA
+

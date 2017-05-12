@@ -1,0 +1,10 @@
+#fsdb first last first-last
+John	Heidemann	John-Heidemann
+Greg	Johnson	Greg-Johnson
+Root	-	Root-
+# this is a simple database
+#  | /home/johnh/BIN/DB/dbcol fullname
+#  | dbcolrename fullname first_last
+#  | /home/johnh/BIN/DB/dbcolsplit -C _ first_last
+#  | /home/johnh/BIN/DB/dbcol first last
+#   | dbcolmerge -C - first last

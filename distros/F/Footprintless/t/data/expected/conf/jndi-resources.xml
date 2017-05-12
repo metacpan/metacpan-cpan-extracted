@@ -1,0 +1,8 @@
+<Environment name="foo/principalName" 
+  type="java.lang.String" 
+  override="false"
+  value="foo" />
+<Environment name="foo/allowedFrom" 
+  type="java.lang.String" 
+  override="false"
+  value="localhost,trusted.pastdev.com,trusted.pastdev.local" />

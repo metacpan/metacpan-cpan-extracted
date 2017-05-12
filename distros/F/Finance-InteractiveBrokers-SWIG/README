@@ -1,0 +1,139 @@
+Finance-InteractiveBrokers-SWIG
+
+This module provides Perl connectivity to the InteractiveBrokers market data
+and program trading service, using the IB-provided C++ code.  It is primarily
+intended to be used with L<POE::Component::Client::InteractiveBrokers>, which
+provides a better API, but may be used standalone if desired, by referring
+to the IB documentation itself (under L</"SEE ALSO">).
+
+It is a very complex module with an involved build process, and thus you
+should read the documentation thoroughly.
+
+
+PREREQUISITES
+
+You must have the following to build and use this module:
+
+* Finance::InteractiveBrokers::API
+
+    Provides a programmatic means of looking up methods and events in the
+    IB API.
+
+* A working build environment
+
+    Capable of compiling C and C++ files, and running 'make'.
+
+* SWIG >= 1.3.28
+
+    The "Simplified Wrapper and Interface Generator", capable of building SWIG
+    interfaces.  This module has been tested with versions from 1.3.28-2.0.1.
+
+Optional, but highly recommended:
+
+* Alien::InteractiveBrokers
+
+    Installs (downloading if necessary) the InteractiveBrokers API files,
+    and provides Perly mechanisms for locating them.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+HOW IT WORKS
+
+The IB API is available as either a set of C++ or Java source code files.
+This module builds a library from this, and then runs SWIG (the Simplified
+Interface Wrapper and Generator) against it to provide Perl connectivity.
+
+The API consists of several methods, callable from this module, as well
+as several events, containing the asynchronous responses from IB to
+methods you have called.
+
+In order to catch the events, you must subclass
+L<Finance::InteractiveBrokers::SWIG::EventHandler>, and override all of
+the events therein with your own code to handle their responses (e.g.
+save them to a database, or do whatever).
+
+You then pass your $handler into ->new(), and you have complete access
+to the IB API, delegated through the C++ library.
+
+
+NOTES ON BUILDING ON OS-X
+
+When building on OS-X, you may see warnings similar to the following, when
+linking the final dynamic library:
+
+ld: warning: directory not found for option '-L/usr/local/lib'
+ld: warning: directory not found for option '-L/usr/local/lib'
+ld: warning: directory not found for option '-L/usr/local/lib'
+ld: warning: directory not found for option '-L/usr/local/lib'
+
+This is avoidable, but it would reduce the flexibility and require a much
+more convoluted build process.
+
+An explanation of why this happens: When distributing modules, especially
+binary modules as complex as Finance::InteractiveBrokers::SWIG for myriad
+end-user platforms, the only way to get an idea of the local system's
+configuration is to query Perl itself, via various methods.  The build
+process expects that, since perl is built and (hopefully!) working, that
+its configuration will work.  This is not the case if the people who
+packaged your copy of 'perl' do not use a common system configuration such as
+would be found on an OS-X end-user's machine.  In particular, it looks like
+the packagers had some libraries installed in '/usr/local/lib', which is
+not necessarily a normal directory on OS-X.  Blame them, not me.
+
+The solution is to ignore these warnings; the final build works fine, if
+everything else has completed successfully, and a 'make test' reports a
+PASS.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Finance::InteractiveBrokers::SWIG
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-InteractiveBrokers-SWIG
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Finance-InteractiveBrokers-SWIG
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Finance-InteractiveBrokers-SWIG
+
+    Search CPAN
+        http://search.cpan.org/dist/Finance-InteractiveBrokers-SWIG/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2014 Jason McManus
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+The authors are not associated with InteractiveBrokers, and as such, take
+no responsibility or provide no warranty for your use of this module or the
+InteractiveBrokers service.  You do so at your own responsibility.  No
+warranty for any purpose is either expressed or implied by your use of this
+module suite.
+
+The data from InteractiveBrokers are under an entirely separate license that
+varies according to exchange rules, etc.  It is your responsibility to
+follow the InteractiveBrokers and exchange license agreements with the data.
+
+# END

@@ -1,0 +1,11 @@
+Revision history for Perl extension File::GetLineMaxLength.
+
+1.01  Mon Aug 20 16:11 2007
+	- avoid infinite loop on lines with no EOL
+    (http://rt.cpan.org/Ticket/Display.html?id=27849)
+    thanks mhasch-cpanbugs@cozap.com
+
+1.00  Tue Nov  2 19:26:24 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n File::GetLineMaxLength
+

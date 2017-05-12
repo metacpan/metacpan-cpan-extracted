@@ -1,0 +1,217 @@
+Revision history for Perl extension Finance::Bank::Postbank_de.
+
+0.45 20170417
+  . Fix test suite that broke due to . (dot) not being in
+    @INC anymore, thanks to Ryan Voots
+
+0.44 20161122
+  . Remove the EURO sign from the canned account statement
+    This should address RT #117204, again; reported by
+    Slaven Rezic, thanks!
+
+0.43 20161015
+  ! We only enable fingerprint verification for OpenSSL versions
+    below 1.0.2. For 1.0.2 and higher, we rely on OpenSSL to do
+    The Right Thing.
+    Note that Debian Jessie will stay on 1.0.1
+  + Make past_days work better (provided by Harald Becker)
+  + Reorder module loading so that Finance::Bank::Postbank_de doesn't
+    get loaded twice.
+
+0.42 20160903
+  ! Mozilla::CA 20160104 does not support the G3 certificate from Symantec, but postbank.de
+    relies on that certificate. We now check the fingerprint of the postbank.de
+    certificate instead of verifying the certificate chain.
+    An alternative fix is to fall back to the 2013 version of Mozilla::CA.
+
+0.41 20160902
+  + Allow to specify the days to request the statement for
+  + Better resiliency against where the EURO sign appears
+
+0.40 20160619
+  + Allow more numerical entities in certificate. Yay ASN
+
+0.39 20160612
+  . Add license (Artistic license)
+  . Adapt to new number/currency format in the statement output
+
+0.38 20151115
+  + Adapt to the website changes (new form field names)
+
+0.37 20150731
+  + New certificate text
+  + Use ->decoded_content when downloading an account statement, in case
+    it gets gzipped
+  . Allow OIDs and names in certificate
+    Some SSL libraries know about the names for the OIDs, but older
+    versions of OpenSSL don't.
+
+    The real fix would be to teach OpenSSL the new(er) OIDs
+    L<http://fm4dd.com/openssl/add_oids_to_openssl.htm>
+
+0.36 201507xx
+  + New certificate text
+
+0.35 20140922
+  + Adapt to the website changes
+    Session function URLs now change with each page
+
+0.34 20140706
+  + Adapt to the website changes
+  . (Forgot to include this in the release)
+
+0.33 20140201
+  + Use Mozilla::CA to get a maintained certificate chain
+    Contributed by Sven Nierlein
+  . No other code changes, no need to upgrade
+  . Test updates to IBANs now being returned in some places instead of account numbers
+
+0.32 20130829
+  + Adjust parser for the new website.
+    The parser now uses the link titles. This means tht if the website
+    ever uses a different language than German, this module will not
+    work with that setting.
+  + Add method to fetch the count of unread messages.
+
+0.31 20130810
+  + Added link to repository, thanks to D. Steinbrunner
+
+0.30 20130729
+  + Adjusted to the new postbank.de certificate/subject
+
+0.29 20130514
+  + Adjusted to the new postbank.de certificate/subject
+  + Test fixes for slight changes in the website
+  ! We now explicitly require LWP::Protocol::https as a prerequisite to ensure HTTPS support
+  . Test fixes
+
+0.28 2012xxxx
+  ! Perl 5.6 is now the minimum version, needed for syntax
+  ! Perl 5.8 is needed for the Encode handling
+  ! Major changes to new interface of Postbank.de
+  ! We now decode all strings to UTF-8
+  ! running_total is now formatted as a Perl number, not as a string anymore
+  ! We need WWW::Mechanize v1.52 minimum, because it has the ->form_id method
+  . Files still get stored as CP-1252, Postbank claims these are encoded as UTF-8 :)
+  . Do not upgrade without a working fallback strategy!
+
+0.27 20110728
+  - Adjusted to the new Postbank.de certificate/SSL-Cert-Subject
+    /1.3.6.1.4.1.311.60.2.1.3=DE/1.3.6.1.4.1.311.60.2.1.1=Bonn/2.5.4.15=Private Organization/serialNumber=HRB6793/C=DE/postalCode=53113/ST=NRW/L=Bonn/streetAddress=Friedrich Ebert Allee 114 126/O=Deutsche Postbank AG/OU=Systems AG/CN=banking.postbank.de
+   Reported and code fix by Pablo Schlaepfer
+
+  - Bumped WWW::Mechanize prerequisite to 1.30
+
+  - Changed one call from ->follow() to ->follow_link().
+
+0.26 20070821
+  - The Postbank certificate changed, reported by Reto Heygel
+  - The Postbank site is buggy and caches statements based on only the referencing URL,
+    not the referencing URL and the query parameters. The stupid workaround currently
+    is to only query one account per session. The test suite does just that.
+
+        $account->agent(undef);
+
+    is the magic incantation. This will force a fresh login on the next request.
+  - HTML updates
+
+0.25 20061125
+  - Postbank changed the format of the account statement
+    thankfully reported again by Reto Heygel
+  - adapted tests to match the new format
+
+0.24
+  - Another small HTML change, thankfully reported by
+    Reto Heygel
+
+0.23 20060327
+  - Moved to Test::Inline 2.x
+  - Cleaned up MANIFEST
+
+0.22 20050928
+  - Postbank changed their layout again and added yet another
+    advisory page that must be skipped.
+
+0.21 20050413
+  - Markus Preis informed me of two changes to the Postbank
+    layout even before I noticed them! Thanks Markus!
+
+0.20 20041113
+  - Moved to the new web interface and hopefully didn't break anything
+  ! The account accessor C<name> is now different from C<number> !!!
+    They used both to contain the account number but now the name
+    contains the name of the account owner(s).
+  ! White space in the comment fields may have changed positions!
+  ! White space at the end of fields is stripped! This is different
+    from the files you download directly from the web interface!
+  ! The type names have changed:
+      'GUTSCHRIFT' 	=>  'Gutschrift'
+      'ÜBERWEISUNG'  =>   "\xfcberweisung"
+      'SCHECK'		=>   "Scheckeinreichung"
+      'LASTSCHRIFT'	=>   "Lastschrift"
+      'INH. SCHECK'	=>   "Inh. Scheck"
+    The names are passed through directly so you will need to adapt
+    your program(s).
+  ! The postbank now fills in more fields (sender/receiver) all the time.
+  ! The credit card accounts are not returned!!
+  ! The two embedded tests fail, but I don't know why :-(
+
+0.11 20041108
+  - Fixed erroneous skip count in t/02-maintenance.t.
+    This bogus failure was only triggered when no SSL capability
+    is available.
+  - The Postbank changed the look of their website. I cheated and
+    use the old, 'classic' HTML interface.
+
+0.10 20040904
+  - The Postbank changed their certificate, which rightfully tripped
+    up the If-SSL-Cert-Subject header.
+
+0.09 20031108
+  - Added List::Sliding::Changes as a hard prerequisite. It's only
+    needed for the examples, but I grew tired of the bug reports.
+  - Added certificate checking through LWP If-SSL-Cert-Subject header
+  - now needs WWW::Mechanize v0.64 due to autocheck => 1
+
+0.08 20031107
+  - The error number for wrong PIN changed from 10011 to 9501
+  - The maintenance screen now got an error number: 5010
+  - The tests now dump html files if they don't match expectations
+  - added test to check for maintenance mode detection
+  - the $agent now moves to the previous page after downloading stuff
+
+0.07 20030520
+  - Thanks to Markus Preis for reporting the bugs fixed in this release
+  - Fixed Finance::Postbank_de::Account synopsis
+  - Added test and fix for negative account balance ...
+  - Added tests to actually test the Synopsis of both modules
+
+0.06 20030207
+  - Restructured ::Postbank_de::Account::transactions()
+  - Introduced some aliases for field names
+  - talked to Briac Pilpre about moving to common Account / Transaction classes
+  - One synopsis example is possibly still failing under Perl 5.8, but I can't
+    confirm / reproduce it
+  - hopefully fixed the inline tests so that they work under Perl 5.8
+
+0.05 20030206
+  - Fixed inline POD tests/examples (how I hate broken synopsis code)
+  - Added access_denied() to Finance::Bank::Postbank_de
+  - Added error_page() to Finance::Bank::Postbank_de for generic error recognition
+
+0.04 20030204
+  - Revamped tests to include the examples
+  - Examples use List::Sliding::Changes
+
+0.03 20030126
+  - Updated dependencies of the test files in Makefile.PL
+  - Different handling of EOL for better compatibility with Unix
+
+0.02 20030123
+  - Added checking for https capability of LWP to all tests
+  - Name change from Finance::Bank::Postbank to Finance::Bank::Postbank_de due to
+    conflicting different bank in the netherlands with the same name
+
+0.01  Sat Jan 11 12:28:10 2003
+  - original version; created by h2xs 1.21 with options
+    -X Finance::Bank::Postbank

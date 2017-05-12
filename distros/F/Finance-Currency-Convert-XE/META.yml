@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name:                   Finance-Currency-Convert-XE
+version:                0.25
+abstract:               An online currency conversion module.
+author:
+  - Barbie <barbie@cpan.org>
+  - Robert McKay <robert@mckay.com>
+
+license:                perl
+distribution_type:      module
+installdirs:            site
+
+requires:
+  HTML::TokeParser:       0
+  Test::More:             0.47
+  WWW::Mechanize:         0
+recommends:
+  Test::More:             0.47
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    1.08
+  Test::CPAN::Meta:       0.08
+  Test::CPAN::Meta::JSON: 0.08
+build_requires:
+  Test::More:             0.47
+
+provides:
+  Finance::Currency::Convert::XE:
+    file:     lib/Finance/Currency/Convert/XE.pm
+    version:  0.25
+no_index:
+  directory:
+    - t
+    - examples
+
+meta-spec:
+   version:   1.3
+   url:       http://module-build.sourceforge.net/META-spec-v1.3.html
+generated_by: Hand 1.0

@@ -1,0 +1,122 @@
+Fwctl
+=====
+
+Version: 0.28
+
+Requirements
+------------
+kernel 2.2
+ipchains 1.3.8
+IPChains.pm 0.5
+Net::IPv4Addr.pm 0.10 or later
+ipmasqadm for port forwarding
+
+Description
+-----------
+
+Fwctl is a module to configure the Linux kernel packet filtering firewall
+using higher level abstraction than rules on input, output and forward
+chains. It supports masquerading and accounting as well.
+
+With it, you can configure your firewall using 
+
+accept traffic_control
+accept ping -src INTERNAL_NET -dst INTERNET -masq
+accept http -src INTERNAL_NET -dst PROXY
+accept http -src PROXY -dst INTERNET
+accept name_service -src INT_DNS_SRV -dst DNS_SERVER -query-port 5353
+accept name_service -src DNS_SERVER  -dst INTERNET   -query-port 5353
+accept name_service -src INTERNET -dst DNS_SERVER -server
+accept telnet -src INTERNAL_NET -dst INTERNET -masq
+deny netbios -nolog #Reduce log file clutter
+
+Rather than the approximate 100 rules to have the equivalent in a tight
+configuration. (When the default policy is to deny everything on all chains,
+and when you are using interface name in all rules.)
+
+From the same configuration files and using the same principles, it
+is possible to configure accounting and port forwarding.
+
+Fwctl also has powerful report generation tools.
+
+Installing
+----------
+
+If you are on RedHat 6.0, I strongly suggest you use the RPM file or
+the spec file to generate one.
+
+If you are not on a RedHat 6.0 compatible system, you can use 
+the usual:
+
+    perl Makefile.PL
+    make
+    make install
+
+This will install *only* the Fwctl module.  You will need to install
+the following files manually, according to your distribution layout :
+
+    fwctl : Script to start/restart/reconfigure the firewall
+
+    fwctl.init : SysV style shell script to start the firewall at boot.
+
+    fwctl.cron : Shell script that dumps the accounting information once
+		 in a while. Should be run periodically.
+
+The default path to the configuration files are
+
+	/etc/fwctl/aliases
+	/etc/fwctl/interfaces
+	/etc/fwctl/rules
+
+Testing
+-------
+
+If you want to run the regression test, you must do so as root
+and I suggest you shutdown your network interfaces when doing so.
+
+Documentation
+-------------
+
+Documentation is included in POD format.
+
+Support & Mailing List
+----------------------
+
+There are two mailing lists related to Fwctl. 
+
+One is low traffic and moderated for announcements related material. You
+can subscribe by sending an empty message to fwctl-announce-subscribe@insu.com.
+
+The other mailing list is for discussion around the use of Fwctl. You
+can subscribe by sending an empty message to fwctl-users-subscribe@insu.com.
+
+
+Bugs
+----
+
+Send bug reports and suggestions to bugs@iNsu.COM.
+
+Author
+------
+
+Francis J. Lacoste <francis.lacoste@iNsu.COM>
+
+Copyright
+---------
+
+Copyright (c) 1999,2000 iNsu Innovations. Inc.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, you can get one at
+http://www.gnu.org/copyleft/gpl.html
+

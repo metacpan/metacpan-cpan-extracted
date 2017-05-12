@@ -1,0 +1,17 @@
+
+FakeHash - Simulate the behavior of a Perl hash variable
+FakeHash::DrawHash - Draw a 'pic' diagram of the internal structure of a hash
+
+By subclassing FakeHash::DrawHash, you should be able to get it to
+draw the diagram in Your Favorite Drawing System without very much trouble.
+
+A program to convert 'pic' code to GIFs is included.  It requires the
+GhostScript and the PBM package.  The Makefile.pic will do this.  To
+invoke it, try
+
+        make -f Makefile.pic test.gif
+
+2000/12/19
+Mark Dominus
+mjd-perl-fakehash+@plover.com
+

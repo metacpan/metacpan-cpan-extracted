@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         FormValidator-Simple-Plugin-Japanese
+version:      0.05
+version_from: lib/FormValidator/Simple/Plugin/Japanese.pm
+installdirs:  site
+requires:
+    FormValidator::Simple:         0.03
+    FormValidator::Simple::Plugin::Number::Phone::JP: 0.01
+    Jcode:                         0
+    Mail::Address::MobileJp:       0.07
+    Unicode::RecursiveDowngrade:   0.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

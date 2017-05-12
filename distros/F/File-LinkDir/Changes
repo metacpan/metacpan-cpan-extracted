@@ -1,0 +1,41 @@
+1.02 Thu May 17 11:44:41 CDT 2012
+    - Changed version to 1.02.
+1.02_01
+    - Actually install the link-files script
+    - Correct how --add-ignore works and the corresponding test case.
+1.01
+    - Made changes to get a UTF-8 META.yml instead of ISO-8859-1.
+        - Fixed encoding of META.yml.
+        - Fixed =encoding line of POD in lib/File/LinkDir.pm.
+        - Corrected Hinrik's name in two places in the POD.
+1.00
+    - Changed version to 1.00.
+1.00_07
+    - Will not create a Makefile unless links and symlinks are supported.
+    - Corrected t/boilerplate.t.
+    - Added bin/link-files to MANIFEST.
+1.00_06
+    - Don't ignore .gitconfig, but ignore .gitmodules, .gitignore, etc
+    - Change the name to File::LinkDir
+1.00_05 Sun Oct 31 10:28:21 CDT 2010
+    - Added link-files.
+    - Added dryrun option to File::LinkDir::OO.
+    - Corrected a few mistakes in the POD.
+    - Updated AUTHOR and COPYRIGHT sections of the POD.
+1.00_04 Wed Oct 27 22:55:33 CDT 2010
+    - Makefile.PL changes.
+    - Corrected POD markup and encoding.
+    - Fixed usage of catpath.
+1.00_03 Fri Oct 22 16:24:50 CDT 2010
+    - Revised tests.
+    - Added additional documentation to README and the pod of 
+	File::LinkDir::OO.
+1.00_02 Tue Sep 28 16:03:56 CDT 2010
+    - Improved the option handling in init().
+    - Corrected the behavior of run() so that it changes back to the original 
+        directory when it is finished.
+    - Corrected -d test in t/04_hardlinks.t to use the directory in the 
+        filename.
+1.00_01 Fri Apr 23 16:04:24 CDT 2010
+    - First release.
+    - Based on File::LinkDir version 0.05.

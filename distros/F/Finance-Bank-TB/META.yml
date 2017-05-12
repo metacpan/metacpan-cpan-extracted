@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Finance-Bank-TB
+version:      0.28
+version_from: TB.pm
+installdirs:  site
+requires:
+    Crypt::DES:                    2.03
+    Digest::SHA1:                  1.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

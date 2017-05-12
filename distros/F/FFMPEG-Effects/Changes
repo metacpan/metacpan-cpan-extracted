@@ -1,0 +1,12 @@
+Revision history for FFMPEG-Effects
+
+0.01	First version -- Working Through Development
+
+0.02	Continued Development
+
+0.03	First Release on CPAN
+
+0.04	Changed to Object Oriented
+		Last Version to Use the Included ffmpeg-HEAD-665132e
+		Which Was Merged With Google SOC vsrc_movie Filter
+		Checked Out From svn://svn.ffmpeg.org/soc/libavfilter/vsrc_movie.c 

@@ -1,0 +1,21 @@
+Build.PL
+Changes
+lib/File/Flock.pm
+lib/File/Flock/Forking.pm
+lib/File/Flock/Subprocess.pm
+MANIFEST
+README
+t/auto.t
+t/auto2.t
+t/flock.t
+t/flock.tt
+t/flock2.t
+t/flock2.tt
+t/forking.t
+t/forking2.t
+t/subprocess.t
+t/subprocess2.t
+t/wrap.tm
+META.yml
+Makefile.PL
+META.json                                Module JSON meta-data (added by MakeMaker)

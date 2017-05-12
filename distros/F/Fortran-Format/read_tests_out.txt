@@ -1,0 +1,150 @@
+IFORMAT(I4)                                    
+   1                                    
+IFORMAT(I10)                                   
+         1
+
+IFORMAT(2I4)                                   
+   1   2                                
+IFORMAT(I10)                                   
+         1
+
+IFORMAT(I4)                                    
+   1   2                                
+IFORMAT(I10)                                   
+         1
+
+IFORMAT(2I4)                                   
+   1                                    
+IFORMAT(I10)                                   
+         1
+
+IFORMAT(I4)                                    
+                                        
+IFORMAT(I10)                                   
+         0
+
+IFORMAT(I4)                                    
+  1                                     
+IFORMAT(I10)                                   
+         1
+
+IFORMAT(BZI4)                                  
+  1                                     
+IFORMAT(I10)                                   
+        10
+
+IFORMAT(BZI4)                                  
+                                        
+IFORMAT(I10)                                   
+         0
+
+IFORMAT(BNI4)                                  
+  1                                     
+IFORMAT(I10)                                   
+         1
+
+IFORMAT(BZI4)                                  
+ 1 1                                    
+IFORMAT(I10)                                   
+       101
+
+IFORMAT(BNI4)                                  
+ 1 1                                    
+IFORMAT(I10)                                   
+        11
+
+DFORMAT(F8.3)                                  
+    1.234                               
+DFORMAT(E16.3)                                 
+       0.123E+01
+
+DFORMAT(F8.3)                                  
+1.234                                   
+DFORMAT(E16.3)                                 
+       0.123E+01
+
+DFORMAT(F8.3)                                  
+                                        
+DFORMAT(E16.3)                                 
+       0.000E+00
+
+DFORMAT(F8.3)                                  
+    1234                                
+DFORMAT(E16.3)                                 
+       0.123E+01
+
+DFORMAT(F8.3)                                  
+   1234                                 
+DFORMAT(E16.3)                                 
+       0.123E+01
+
+DFORMAT(F8.3)                                  
+   123                                  
+DFORMAT(E16.3)                                 
+       0.123E+00
+
+DFORMAT(2PF8.3)                                
+    1.234                               
+DFORMAT(E16.3)                                 
+       0.123E-01
+
+DFORMAT(-2PF8.3)                               
+    1.234                               
+DFORMAT(E16.3)                                 
+       0.123E+03
+
+LFORMAT(L8)                                    
+       T                                
+LFORMAT(L1)                                    
+T
+
+LFORMAT(L8)                                    
+       F                                
+LFORMAT(L1)                                    
+F
+
+LFORMAT(L8)                                    
+ True                                   
+LFORMAT(L1)                                    
+T
+
+LFORMAT(L8)                                    
+ true                                   
+LFORMAT(L1)                                    
+T
+
+LFORMAT(L8)                                    
+.TRUE.                                  
+LFORMAT(L1)                                    
+T
+
+LFORMAT(L8)                                    
+      .T                                
+LFORMAT(L1)                                    
+T
+
+LFORMAT(L8)                                    
+tomato                                  
+LFORMAT(L1)                                    
+T
+
+LFORMAT(L8)                                    
+ falcon                                 
+LFORMAT(L1)                                    
+F
+
+CFORMAT(A26)                                   
+abcdefghijklmnopqrstuvwxyz              
+CFORMAT(A40)                                   
+abcdefghijklmnopqrstuvwxyz              
+
+CFORMAT(A26)                                   
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+CFORMAT(A40)                                   
+abcdefghijklmnopqrstuvwxyz              
+
+CFORMAT(A26)                                   
+   xyz                                  
+CFORMAT(A40)                                   
+   xyz                                  
+

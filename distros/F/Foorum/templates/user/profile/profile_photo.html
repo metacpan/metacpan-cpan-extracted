@@ -1,0 +1,50 @@
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='/profile/edit'><span>[% c.loc('Edit Profile') %]</span></a></li>
+        <li><a href='/profile/change_username'><span>Change Username</span></a></li>
+        <li><a href='/profile/change_password'><span>Change Password</span></a></li>
+        <li><a href='/profile/change_email'><span>Change Email</span></a></li>
+        <li selected="selected"><a href='javascript:void(0);'><span>Profile Photo</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<form method='post' enctype="multipart/form-data">
+<table align='center'>
+	<tbody>
+	<tr class='misc2'><td align='right'>Profile Photo:</td><td>
+	
+  [% upload = c.user.profile_photo.upload %]
+  [% IF upload %]
+  [% USE Math %]
+
+  [% upload_id = upload.upload_id;
+     filetype  = upload.filetype;
+     dir1 = upload_id / 3200 / 3200;
+     dir1 = Math.int(dir1);
+     dir2 = upload_id / 3200;
+     dir2 = Math.int(dir2);
+  %]
+  <input type='radio' name='attachment_action' value='stay' checked='yes' /> Stay as before [ <a href="[% c.config.dir.upload %]/[% dir1 _ '/' _ dir2 _ '/' _ upload.filename %]">[% upload.filename %]</a> ]<br />
+  <input type='radio' name='attachment_action' value='delete' /> Delete it<br />
+  <input type='radio' name='attachment_action' value='replace' /> Replace it<br />
+  [% END %]
+  [% INCLUDE upload/input.html %]
+	
+	</td></tr>
+	<tr class='misc1'><td></td><td><input type='submit' /></td></tr>
+	</tbody>
+</table>
+</form>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

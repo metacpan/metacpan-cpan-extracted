@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+eval q{ use Test::Spelling };
+plan skip_all => "Test::Spelling is not installed." if $@;
+
+set_spell_cmd('aspell -a -d en');
+add_stopwords( map { split /[\s\:\-]/ } <DATA> );
+$ENV{LANG} = 'C';
+all_pod_files_spelling_ok('lib');
+
+__DATA__
+Roszatycki
+overridable
+fatalize
+fatalized
+benchmarked
+Str

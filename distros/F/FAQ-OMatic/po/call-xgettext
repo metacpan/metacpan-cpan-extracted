@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+#   Call xgettext and filter out some warnings (which is produced by
+#   normal Perl source because Perl is not C ;-)
+#
+#   Copyright (c) 2001 Andrew W. Nosenko <awn@bcs.zp.ua>
+#
+
+LC_MESSAGES=C       # allow grep over xgettext messages
+export LC_MESSAGES;
+
+nomalize_dir() {
+    cd "$1"
+    d=`pwd`
+    cd -
+    echo "$d"
+}
+
+PACKAGE=faqomatic
+top_srcdir=`dirname $0`/..
+top_srcdir=`nomalize_dir "${top_srcdir}"`
+
+po_dir="${top_srcdir}/po"
+po_file="${po_dir}/${PACKAGE}.po"
+pot_file="${po_dir}/${PACKAGE}.pot"
+tmp_file="${po_dir}/${PACKAGE}.tmp.$$"
+
+cd ${top_srcdir}
+
+# --sort-output
+xgettext  \
+    --files-from="${po_dir}/POTFILES" \
+    --default-domain="${PACKAGE}" \
+    --keyword=gettexta \
+    --output-dir="${po_dir}" \
+    2>"${tmp_file}"
+if [ $? -ne 0 ]
+then
+    cat "${tmp_file}" >&2
+    rm -f "${tmp_file}"
+    exit 1;
+fi
+
+cat "${tmp_file}" \
+    | grep -v 'warning: file .* extension .* is unknown;' \
+    | grep -v 'warning: unterminated character constant' \
+    | grep -v 'warning: unterminated string literal'
+rm -f "${tmp_file}"
+
+if [ ! -f "${po_file}" ]
+then
+    echo "Seems like some xgettext error" >&2
+    exit 1
+fi
+
+mv ${po_file} ${pot_file}   || exit 1;

@@ -1,0 +1,140 @@
+---
+name: 'Foorum'
+dsn: dbi:mysql:foorum
+dsn_user: root
+dsn_pwd: 'secret'
+theschwartz_dsn: dbi:mysql:theschwartz
+
+View::TT:
+  POST_CHOMP: 1
+  PRE_CHOMP:  1
+  EVAL_PERL: 1
+  CONTEXT: ''
+  DELIMITER: ';'
+
+View::JSON:
+  expose_stash: json_data
+
+cache:
+  backends:
+    default:
+      class: 'Cache::FileCache'
+      namespace: 'Foorum'
+      default_expires_in: 600
+
+Plugin::PageCache:
+  expires: 300
+  set_http_headers: 1
+  disable_index: 1
+  debug: 1
+  auto_check_user: 1
+  auto_cache:
+    - '/rss(/|$)'
+
+authentication:
+  default_realm: 'members'
+  password_hash_type: "SHA-1"
+  realms:
+    members:
+      credential:
+        class: 'Password'
+        password_field: 'password'
+        password_type: "hashed"
+        password_hash_type: "SHA-1"
+      store:
+        class: 'FromSub'
+        user_type: 'Hash'
+        model_class: "UserAuth"
+        field_id: 'user_id'
+    
+session:
+  dbic_class: "DBIC::Session"
+  expires: 604800
+  cookie_expires: 0
+  verify_address: 0
+  param: sid
+
+static:
+  dirs:
+   - js
+   - css
+   - upload
+   - images
+  ignore_extensions:
+   - cgi
+   - pl
+  debug: 0
+
+captcha:
+  session_name: captcha_string
+  new:
+    width: 50
+    height: 20
+    lines: 1
+    gd_font: giant
+    rndmax: 4
+  create:
+    - normal
+    - rect
+  particle:
+    - 100
+  out:
+    force: jpeg
+
+upload:
+  max_size: 300
+  valid_types:
+    - jpg
+    - jpeg
+    - gif
+    - doc
+    - rar
+    - txt
+    - png
+    - zip
+    - swf
+    - htm
+    - html
+    - gz
+    - tar
+    - tar.gz
+
+logger:
+  path: 1
+  path_load_time_more_than: 2
+
+function_on:
+  maintain: 0
+  register: 1
+  create_forum: 1
+  scraper: 0
+  page_cache: 1
+  topic_pdf: 0
+  poll: 1
+
+site:
+  domain: 'http://www.foorumbbs.com/'
+
+per_day:
+  most_deletion_topic: 5
+
+default_lang: en
+
+per_page:
+  forum: 20
+  topic: 10
+  message: 8
+
+dir:
+  js: /static/js
+  images: /static/images
+  static: /static
+  upload: /upload
+
+# For Foorum pm using
+mail:
+  from_email: 'foorumbbs.com@gmail.com'
+  daily_report_email: 'foorumbbs.com@gmail.com'
+
+extra:
+  urchin_account: UA-65008-5

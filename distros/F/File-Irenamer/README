@@ -1,0 +1,46 @@
+Irenamer
+========
+
+Interactive file renamer module allows filename changes from within
+your favorite editor.  
+
+It is most useful when complicated or one-time repetitive changes to a
+directory or directory tree must be made but programmatic solutions are
+probably not worth the time to implement.  Defaults to 'do not recurse'.
+
+It exports a single function called InteractiveRename()
+
+It assumes a Unix-like environment that exports $EDITOR.
+If you're on Win32, Cygwin works well.  Otherwise you can try to set 
+$ENV{EDITOR} in the code that calls InteractiveRename().
+
+Verbose mode is highly recommended, at least initially, since there is no
+prompting nor undo available.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Robert S. Heckel Jr.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+

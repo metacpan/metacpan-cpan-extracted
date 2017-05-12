@@ -1,0 +1,17 @@
+---
+- time: '*/5 * * * *'
+  worker: Hit
+- time: '*/15 * * * *'
+  worker: Every15Min
+- time: 10 3 * * *
+  worker: RemoveOldDataFromDB
+- time: 0 0 * * *
+  worker: DailyReport
+- time: 0 0 * * *
+  worker: DailyChart
+- time: 0 0 * * *
+  worker: ValidateForumData
+- time: '*/13 * * * *'
+  worker: SendScheduledEmail
+- time: 0 1 * * *
+  worker: ResendActivation

@@ -1,0 +1,37 @@
+	<!-- Open file(s) dialog -->
+  <div class="modal hide" id="open-files-dialog" tabindex="-1" role=
+  "dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <h3 id="myModalLabel">Open File(s)</h3>
+    </div>
+
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <div class="control-group">
+          <label class="control-label" for="file">File:</label>
+         <div class="controls">
+            <input type="text" id="file" placeholder="File">
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="matched-files">Matched Files:</label>
+          <div class="controls">
+            <select id="matched-files" size="10" multiple="multiple">
+              </select>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="path">Path:</label>
+		<div class="controls">
+			<div id="path"></div>
+		</div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button id="ok-button" class="btn btn-primary" data-dismiss=
+      "modal" aria-hidden="true">OK</button> <button id=
+      "cancel-button" class="btn btn-warning" data-dismiss="modal" aria-hidden=
+      "true">Cancel</button>
+    </div>
+  </div>

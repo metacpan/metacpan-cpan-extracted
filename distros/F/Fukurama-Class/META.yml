@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Fukurama-Class
+version:             0.032
+abstract:            Pragma to extend the Perl-OO (in native Perl)
+license:             ~
+author:              
+    - Tobias Tacke <cpan@tobias-tacke.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Data::Dumper:                  0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

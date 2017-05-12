@@ -1,0 +1,6 @@
+2009-01-26 Sergey Sinkovskiy <glorybox@cpan.org>
+
+	* ChangeLog: new file
+	* lib/File/Lockfile.pm: added strict and warnings pragma
+	* Updated documentation
+	* added tests

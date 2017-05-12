@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+rrr-init - set up RECENT files for a directory tree
+
+=head1 SYNOPSIS
+
+  rrr-init [options] directory
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--aggregator=s>
+
+Comma separated list of aggregator specifications, e.g.
+
+  --aggregator=1h,6h,1d,1W,1M,1Q,1Y,Z
+
+Defaults to C<1h,1d,1M,1Y,Z>
+
+=item B<--force|f>
+
+Forces an overwrite of an already existing recentfile in the target
+directory.
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--serializer_suffix=s>
+
+Defaults to C<.yaml>. Supported values are listed in
+L<File::Rsync::Mirror::Recentfile> under the heading SERIALIZERS.
+
+=item B<--verbose|v+>
+
+More feedback. Requires Time::Progress installed.
+
+=back
+
+=head1 DESCRIPTION
+
+Walk through a tree and fill all files into initial recentfiles.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use File::Find::Rule;
+use File::Rsync::Mirror::Recent;
+use File::Rsync::Mirror::Recentfile;
+use File::Spec;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+use Time::HiRes qw(time);
+
+our %Opt;
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(1);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (@ARGV != 1) {
+    pod2usage(1);
+}
+
+if ($Opt{verbose}) {
+    # speed up fail on missing module:
+    require Time::Progress;
+}
+
+my($rootdir) = @ARGV;
+my $aggregator_string = $Opt{aggregator} || "1h,1d,1M,1Y,Z";
+my @aggregator = split /\s*,\s*/, $aggregator_string;
+my $localroot = File::Spec->rel2abs($rootdir);
+my $rfconstructor = sub {
+    return File::Rsync::Mirror::Recentfile->new
+          (
+           aggregator => \@aggregator,
+           interval => $aggregator[0],
+           localroot => $localroot,
+           verbose => $Opt{verbose},
+           serializer_suffix => $Opt{serializer_suffix},
+          );
+};
+my $rf = $rfconstructor->();
+my $rfilename = File::Spec->catfile
+    (
+     $rootdir,
+     $rf->rfilename,
+    );
+
+if (-e $rfilename) {
+    if ($Opt{force}) {
+        unlink $rfilename or die sprintf "Could not unlink '%s': %s", $rfilename, $!;
+        $rf = $rfconstructor->();
+    } else {
+        die sprintf "Alert: Found an already existing file '%s'. Won't overwrite. Either use --force or remove the file before calling me again", $rfilename;
+    }
+}
+my @t = time;
+my @batch;
+foreach my $file ( File::Find::Rule->new->file->in($rootdir) ) {
+    my $path = File::Spec->rel2abs($file);
+    my $epoch = (lstat $path)[9];
+    push @batch, {path=>$path,type=>"new",epoch=>$epoch};
+}
+if ($Opt{verbose}) {
+    $t[1] = time;
+    warn sprintf "Found %d files to register in %.6f s. Writing to %s\n", scalar @batch, $t[1]-$t[0], $rfilename;
+}
+$rf->batch_update(\@batch);
+if ($Opt{verbose}) {
+    $t[2] = time;
+    warn sprintf "Registered %d files in %.6f s\n", scalar @batch, $t[2]-$t[1];
+}
+
+__END__
+
+
+# Local Variables:
+# mode: cperl
+# coding: utf-8
+# cperl-indent-level: 4
+# End:

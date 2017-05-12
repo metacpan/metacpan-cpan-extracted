@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+# Please don't encrypt me!
+# This space is left blank intentionally  
+use Filter::CBC "Twofish","my secret key";
+RandomIVgëaâ#3ƒtË%_fU„÷	Ï-£+⁄Ú∑ï>tﬁc<ó0PMœÈo–Ÿƒ1—µöd£	.Ñºˆ1AŒ;ózDøä¨Ë`õ-¢îÓœ	˜Î˘YÖÌ∞c˜a¬ø˚_√é#4á∏π!ú‡ÃCl™˚ä¯N<ÕUxè]$∑%§∞ıgY/NA∆ÚÇ[hÌAn`ÅRÓ“

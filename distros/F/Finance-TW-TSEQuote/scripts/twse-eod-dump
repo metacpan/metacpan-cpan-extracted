@@ -1,0 +1,21 @@
+#!perl
+use strict;
+use warnings;
+use Finance::TW::TSEQuote;
+
+my $product = shift || '0050';
+my $dir = shift || 'daily';
+
+my $quote = Finance::TW::TSEQuote->new($product);
+for my $y (1998..2012) {
+    for my $m (1..12) {
+		my $file = sprintf('%s/%s-%d-%02d.txt', $dir, $product, $y, $m);
+        next unless -e $file;
+
+        open my $fh, '<', $file or die "$file: $!";
+
+        while (<$fh>) {
+			print;
+        }
+    }
+}

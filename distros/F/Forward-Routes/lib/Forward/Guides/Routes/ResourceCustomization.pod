@@ -1,0 +1,155 @@
+=head1 Name
+
+Forward::Guides::Routes::ResourceCustomization - Customizing resourceful routes
+
+=head1 namespace
+
+The C<-namespace> option works like the C<namespace> command. It might be
+needed to determine the full controller class name ($match->class).
+It also effects the names automatically generated for your routes, so make sure
+to use C<app_namespace> instead of C<namespace> for your application base
+namespace to keep route names as short as possible (use namespace for sub
+namespaces only).
+
+    my $r = Forward::Routes->new;
+    $r->add_resources('users' => -namespace => 'Admin');
+
+    # which is equivalent to
+    my $r = Forward::Routes->new->namespace('Admin');
+    $r->add_resources('users');
+    
+
+    $m = $r->match(get => 'users');
+    # controller param is still 'Users'...
+    # $m->[0]->params is {controller => 'Users', action => 'index'};
+    # ... but:
+    # $m->[0]->class is "Admin::Users"
+    # $m->[0]->action is "index"
+    # $m->[0]->name is "admin_users_index"
+
+    my $path = $r->build_path('admin_users_index');
+    # $path->{path} is 'users'
+    # $path->{method} is 'get'
+
+The C<-namespace> option has no effect on the URL pattern,
+
+    # in order to match /admin/users instead of /users,
+    $r->add_route('admin')->add_resources('users' => -namespace => 'Admin');
+
+This offers a lot more flexibility:
+
+    $r->bridge('admin')->to('Authorization#admin')
+      ->add_resources('users' => -namespace => 'Admin');
+    # allows to check whether the current user is really the admin (using
+    # bridges) and break the dispatching cycle if authorization fails
+
+Changes of a resources namespace also effects nested resources (inheritance)!
+
+=head1 as
+The C<-as> option changes automatic route and controller naming.
+
+    my $r = Forward::Routes->new;
+    $r->add_resources(
+        'photos',
+        'customers' => -as => 'users',
+        'prices'
+    );
+
+    $m = $r->match(get => 'customers');
+    # $m->[0]->params is {controller => 'Users', action => 'index'};
+
+    $m = $r->match(get => 'users');
+    # $m is undef
+
+    my $path = $r->build_path('users_index');
+    # $path->{path} is 'customers'
+    # $path->{method} is 'get'
+
+=head1 constraints
+
+The resource id placeholder can be assigned a custom constraint using the
+C<-constraint> option:
+
+    my $r = Forward::Routes->new;
+    $r->add_resources(
+        'users',
+        'photos' => -constraints => {id => qr/\d{6}/},
+        'tags'
+    );
+    
+    my $m = $r->match(get => 'photos/123456');
+    # $m->[0]->params is {controller => 'Photos', action => 'show', id => 123456};
+    
+    $m = $r->match(get => 'photos/abc');
+    # $m is undef;
+
+
+=head1 format
+
+The format constraint can be changed with the help of the C<-format> option:
+
+    my $r = Forward::Routes->new;
+    $r->add_resources(
+        'users',
+        'photos' => -format => 'html',
+        'tags'
+    );
+    
+    my $m = $r->match(get => 'photos/123456.html');
+    # $m->[0]->params is {format => 'html', controller => 'Photos', action => 'show',
+    #   id => 123456};
+    
+    $m = $r->match(get => 'photos/123456');
+    # $m is undef;
+
+
+Resources inherit the file extension of their parent. As a result, the format
+constraint can also be changed through format inheritance:
+
+    # in order to match get => /cities/paris/edit.html
+
+    # Routes root object
+    my $root = Forward::Routes->new;
+
+    # Create a parent route with format "html"
+    $route_with_html_extension = $root->add_route->format('html');
+
+    # add a resource on top of parent
+    $route_with_html_extension->add_resources('cities');
+    
+    $m = $root->match(get => '/cities/paris/edit.html');
+    # $m->[0]->params is
+    #   {controller => 'Cities', action => 'cities_update_form',
+    #    format => 'html'};
+
+The inherited format behaviour can be overwritten with the C<-format> option
+for individual resources.
+
+
+=head1 only
+
+Instead of creating all default resourceful routes for a resource (i.e. index,
+create, show, update, delete, create_form, update_form, delete_form), only
+selected routes can be generated using the C<-only> option.
+
+    # only generate the "create" and "show" routes for the "users" resource
+    my $root = Forward::Routes->new;
+    $root->add_resources(
+        'photos',
+        'users' => -only => ['create', 'show'],
+        'prices'
+    );
+    
+    my $m = $root->match(get => 'users');
+    # $m is undef, as "index" not included via "only"
+    
+    $m = $root->match(post => 'users');
+    # create:
+    # $m->[0]->params is {controller => 'Users', action => 'create'};
+    
+    $m = $root->match(get => 'users/1');
+    # show
+    # $m->[0]->params is {controller => 'Users', action => 'show', id => 1};
+
+
+=cut

@@ -1,0 +1,59 @@
+
+Description
+-----------
+
+This is the README file for File::BSDGlob, a Perl module that provides
+globbing with the option of full csh(1) compatibility.
+
+This is version 0.94.  See the "Changes" file for bug fixes and new
+features in this release.
+
+Perl Version 5.004_04 is required to use this module.
+
+Anyone who needs to use Perl's csh(1) compatible globbing in a secure
+fashion (through perl's -T option) or where csh(1) is not available
+will find this module most useful.
+
+See the POD in BSDGlob.pm for more details.
+
+Prerequisites
+-------------
+
+To use File::BSDGlob, you need the following Perl Version 5.004_04 or
+greater on a platform supported by MakeMaker (most Unix platforms and a
+few others).
+
+HELP SAVE THE WORLD!!!  I would like this module to work on as many
+platforms as possible.  There are still some issues with the Win32
+family that need resolving.  I have not received much input at all
+from the others.
+
+Installation
+------------
+
+Install File::BSDGlob by running the following commands
+
+    gzip -dc File-BSDGlob-0.94.tar.gz | tar xvf -
+    cd File-BSDGlob-0.94
+    perl Makefile.PL
+    make test
+    make install
+
+Bugs, Problems, Suggestions
+---------------------------
+
+Please send any suggestions, bug reports, complaints, et cetera to
+Greg Bacon <gbacon@cs.uah.edu>.
+
+Credits
+-------
+
+Nathan Torkington <gnat@frii.com> wrote the original Glob::BSD module
+which is based on Guido van Rossum's FreeBSD glob library.  Further
+modifications have been made by Greg Bacon <gbacon@cs.uah.edu>.
+
+Obnoxious BSD License Requirement
+---------------------------------
+
+This product includes software developed by the University of California,
+Berkeley and its contributors.

@@ -1,0 +1,16 @@
+FAQ
+
+ Why use the patch program? Why not use a Perl module like Text::Patch?
+
+    The patch program has many nice features that Text::Patch lacks, e.g.
+    applying reverse patch (needed to check fixed state and to undo),
+    autodetection of patch type, ignoring whitespace and fuzz factor, etc.
+
+KNOWN ISSUES
+
+SEE ALSO
+
+    Rinci::Transaction
+
+    Text::Patch, PatchReader, Text::Patch::Rred
+

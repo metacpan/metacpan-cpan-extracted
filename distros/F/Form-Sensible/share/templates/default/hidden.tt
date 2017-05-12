@@ -1,0 +1,1 @@
+[% FS_wrapper = '' %]<input type="hidden" id="[% css_prefix _ form.name %]_[% field_name %]_hidden_input" class="[% css_prefix %]hidden_input [% css_prefix _ field_name %]_input" name="[% field_name %]" value="[% field.value %]" />

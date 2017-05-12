@@ -1,0 +1,53 @@
+{
+   "abstract" : "Inter-machine advisory file locking on NFS volumes",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-SharedNFSLock",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "Sys::Hostname" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=File-SharedNFSLock"
+      },
+      "homepage" : "http://search.cpan.org/search?query=File%3A%3ASharedNFSLock&mode=dist",
+      "repository" : {
+         "url" : "git://github.com/fangly/file-sharednfslock.git"
+      }
+   },
+   "version" : "0.04"
+}

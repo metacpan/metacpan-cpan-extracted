@@ -1,0 +1,65 @@
+{
+   "abstract" : "Run chmod recursively against directories",
+   "author" : [
+      "Mithun Ayachit <mithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "chmod",
+      "stat",
+      "permissions",
+      "mode",
+      "file",
+      "recursive"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-chmod-Recursive",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Find" : "0",
+            "File::chmod" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "File::chmod::Recursive" : {
+         "file" : "lib/File/chmod/Recursive.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mithun/perl-file-chmod-recursive/issues"
+      },
+      "homepage" : "https://github.com/mithun/perl-file-chmod-recursive",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mithun/perl-file-chmod-recursive.git"
+      }
+   },
+   "version" : "v1.0.3",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

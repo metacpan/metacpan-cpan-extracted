@@ -1,0 +1,24 @@
+Revision history for Finance-NASDAQ-Quote
+
+0.07    2013-01-25 13:26:00 EDT
+        Handle 'unch' net change correctly
+        (Thanks JonathanD)
+
+0.06    2010-09-21 15:54:00 EDT
+        Allow user-specified UA
+
+0.05    2009-05-18 18:00:00 EDT
+        NASDAQ changed the form of their page title.
+
+0.04    2009-03-24 10:29:00 EDT
+        Include company name in getquote return.
+
+0.03    2009-03-16 22:08:00 EDT
+        Added URI.pm to PREREQ_PM
+
+0.02    2009-01-10 05:10:00 EST
+        undef 'sgn' if the image can't be found
+        delete the HTML::TreeBuilder tree (d'oh)
+
+0.01    2008-12-31 18:55:00 EST
+        First version, released to a mostly-partying world.

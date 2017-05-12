@@ -1,0 +1,20 @@
+Changes
+lib/Finance/Bank/Natwest.pm
+lib/Finance/Bank/Natwest/Connection.pm
+lib/Finance/Bank/Natwest/CredentialsProvider/Callback.pm
+lib/Finance/Bank/Natwest/CredentialsProvider/Constant.pm
+lib/Finance/Bank/RBoS.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/callback.t
+t/connection.t
+t/constant.t
+t/fbn_creation.t
+t/fbr_creation.t
+t/lib/Mock/NatwestWebServer.pm
+t/lib/Mock/NatwestWebServer/Tests.pm
+t/natwestwebserver.t
+t/rboswebserver.t
+META.yml                                 Module meta-data

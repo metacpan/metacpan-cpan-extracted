@@ -1,0 +1,13 @@
+Changes
+lib/File/Find/Rule/Perl.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+t/01_compile.t
+t/02_main.t
+t/03_no_index.t
+t/dist/lib/Foo.pm
+t/dist/META.yml
+t/dist/t/01_compile.t

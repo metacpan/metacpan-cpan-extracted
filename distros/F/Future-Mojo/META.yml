@@ -1,0 +1,43 @@
+---
+abstract: 'use Future with Mojo::IOLoop'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  Test::Identity: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Future-Mojo
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Future::Mojo:
+    file: lib/Future/Mojo.pm
+    version: '0.003'
+requires:
+  Carp: '0'
+  Future: '0.33'
+  Mojolicious: '5.0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Grinnz/Future-Mojo/issues
+  homepage: https://github.com/Grinnz/Future-Mojo
+  repository: https://github.com/Grinnz/Future-Mojo.git
+version: '0.003'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'

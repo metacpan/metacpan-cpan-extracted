@@ -1,0 +1,70 @@
+Revision history for Future-Q
+
+0.110    2015-08-02
+         [DOCUMENTATION UPDATE]
+         - Fix a little typo.
+         - Mention Future's catch() method, which is introduced in Future-0.33.
+
+0.100    2014-12-07
+         [BUG FIX]
+         - It did not call SUPER::DESTROY when it's DESTROYed.
+           This was not a big deal unless you used the debug mode of Future.
+         - is_rejected() method now returns a boolified value.
+         - Test t/10-construction.t emitted warning messages with Future 0.30.
+           The offending tests are removed.
+         [ENHANCEMENT]
+         - Slight performance enhancements of want_all() etc. (5 - 15% boost)
+         [PACKAGING]
+         - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.090    2014-03-30
+         [API CHANGE]
+         - Add finally() method.
+         [DEPENDECY UPDATE]
+         - Add dependency on parent pragma.
+         [DOCUMENTATION UPDATE]
+         - Mention AnyEvent::Promise.
+
+0.080    2014-03-24
+         [DEPENDENCY UPDATE]
+         - Now it requires Future 0.22 to pass the tests.
+
+0.070    2014-03-24
+         [API CHANGE]
+         - Add $OnError package variable.
+
+0.060    2014-03-23
+         [API CHANGE]
+         - Add resolve() method.
+         [DOCUMENTATION UPDATE]
+         - Promises module no longer emulates jQuery.Deferred. Now it's more like Q.
+
+0.050    2013-11-17
+         - No changes to the code.
+         - Documentation update. Some interesting modules are added to "SEE ALSO" section.
+         - Switch to Module::Build::Pluggable with cpanfile.
+
+0.040    2013-07-15
+         - [BUG FIX] Now Carp::croak() called in callback functions for try(), fcall(),
+           then() and catch() methods report the error from the user's perspective.
+           Note that you have to include 'Future::Q' in @CARP_NOT of the package
+           that calls try(), fcall(), then() or catch().
+         - Perhaps error reporting might need a little more brush-up...
+
+0.030    2013-07-03
+         - No changes to the code.
+         - Update POD in response to Future 0.14 and q.js v0.9.5
+         - Confirmed it passes the tests with Future 0.15 installed.
+
+0.020    2013-05-12
+         - Support Future 0.13
+           POD is updated now that Future has its own then() method.
+         - [BUG FIX] It crashed when a Future object (not a Future::Q object) was returned
+           from then() callbacks. This bug is fixed.
+         - Drop support for Future::Utils::repeat() in the test suite. repeat() may not
+           go well with Future::Q's feature of reporting unhandled failures.
+         - Now Module::Build is used for packaging.
+
+0.012    2013-04-14
+         Initial release.
+

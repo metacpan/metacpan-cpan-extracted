@@ -1,0 +1,10 @@
+Revision history for Finance-Currency-Convert-DnB
+
+0.1    Sat Dec  2 08:59:26 CET 2006
+	Fixed so it converts to NOK currency.
+	Properly dies when grabbing XML.
+	URL to my bank's XML file had changed.
+
+0.1    Thu Nov 30 22:04:17 CET 2006
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,33 @@
+---
+abstract: 'Some useful pointer utilities when writing FFI modules (Deprecated)'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Module::Build: '0.4005'
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::CChecker: '0'
+  Module::Build: '0.28'
+  Module::Build::FFI: '0.19'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI-Util
+requires:
+  Exporter::Tidy: '0'
+  FFI::Platypus: '0.19'
+  Math::Int64: '0'
+  Module::Build: '0.4005'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/FFI-Util/issues
+  homepage: http://perl.wdlabs.com/FFI-Util
+  repository: git://github.com/plicease/FFI-Util.git
+version: '0.16'
+x_deprecated: 1

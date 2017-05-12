@@ -1,0 +1,6 @@
+Only in t02/old: aaa
+Only in t02/new: bbb
+Files t02/old/ddd and t02/new/ddd differ
+File t02/old/eee is a directory while file t02/new/eee is a regular file
+File t02/old/fff is a regular file while file t02/new/fff is a directory
+Only in t02/new: ggg

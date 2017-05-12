@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_number_phone_jp.t
+lib/FormValidator/Simple/Plugin/Number/Phone/JP.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

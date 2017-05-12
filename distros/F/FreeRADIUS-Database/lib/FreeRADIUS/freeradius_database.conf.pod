@@ -1,0 +1,241 @@
+=head1 NAME
+
+freeradius_database.conf - Configuration file for FreeRADIUS::Database.
+
+=head1 DESCRIPTION
+
+freeradius_database.conf is the primary configuration file for the FreeRADIUS::Database
+module.
+
+By default, it is installed into /usr/local/etc as freeradius_database.conf-dist.
+
+You will (at this time) need to manually rename this file to freeradius_database.conf,
+and set the configuration variables for your site.
+
+=head1 HEADINGS
+
+The configuration file categories are used to ease human classification,
+and by the system internally.
+
+=head2 [ Version ]
+
+Contains the system version number. Do not change it.
+
+
+=head2 [ Global ]
+
+Configuration settings that are used globally by the system.
+
+=head3 timezone
+
+This setting MUST comply with an entry that is supplied by a call to
+DateTime::TimeZone->all_names().
+
+Default: America/New_York
+
+=head3 ras_classification
+
+You can aggregate NAS devices into classes based on their IP address
+or name by enabling this setting. Enabling this will rename all of your
+NASIPAddress column entries so long as the IP of the NAS is listed
+after a NAS name classification in the config file.
+
+See the [ RAS ] section on classification/aggregating details.
+
+Valid values: 0, 1.
+
+Default: off.
+
+=head3 delete_after_archive
+
+Toggle whether you want to delete the data from the `radacct` table after
+having it archived.
+
+Valid values: 0, 1.
+
+Default: off.
+
+=head3 months_after_archive
+
+How many months you want to go back before performing the month
+archive. delete_after_archive is affected by this setting.
+
+Example: if this setting is set to 3, then the system will archive the
+month prior to three months ago. If delete_after_archive is true,
+the archived month will be deleted from the main `radacct` table.
+
+A setting of 0 indicates that you want to archive last months data.
+
+Valid values: 0, 1-36
+
+Default: 3.
+
+=head3 config_dir
+
+Set by the installer. This can be changed after the configuration
+file is moved to the new file system location.
+
+Default: set by installer. If installer defaults were accepted,
+/usr/local/etc
+
+=head3 script_dir
+
+Set by the installer. This can be changed after the scripts are moved
+to the new file system location, and after any automation (ie. cron)
+changes are made.
+
+Default: set by installer. If installer defaults were accepted,
+/usr/local/sbin
+
+=head3 in_test_mode
+
+Used exclusively for `make test`. This sets the system to use a test-only
+configuration file, and forces the system to use a test-only database which
+contains a pre-defined dataset.
+
+THIS IS ON BY DEFAULT. You will need to disable it.
+
+Valid values: 0, 1.
+
+Default: ON 
+
+
+
+=head2 [ RAS ]
+
+This section is where you define your classes for your NAS/RAS equipment. 
+
+RAS classification is used within the accounting aggregation functions.
+By 'classifying' your RAS equipment, you can group numerous RAS gear that
+perform similar functions into a searchable item by name.
+
+For instance, if you have 10 ADSL RASs, all on different IP addresses,
+using this classification system, you can aggregate your user sessions
+into one 'class'.
+
+If aggregating daily totals for user 'steveb', who logged in numerous times
+across four RASs within the day because of modem resets, his daily
+totals from all four RASs would be summed together and collectively
+aggregated into a single entry under the 'ADSL' `class`.
+
+If the [ Global ] configuration varable ras_classification is set to false,
+this section will be ignored.
+
+A class is defined by assigning a name, followed by a comma-separated list
+of IP addresses/prefixes without their trailing prefix length, or a comma
+separated list of NAS names.
+
+Currently, the classification is done via a regex-like check, and needs
+significant improvement to be able to use proper x.x.x.x/xx style prefixes.
+
+For example:
+
+
+	# class any IP that begins with 10.0.0, or 172.16 as adsl:
+
+	adsl = 10.0.0, 172.16
+
+	# class any IP that matches 10.1.1.111 exactly, or begins with 
+	# 10.1.5 as dialup
+
+	dialup = 10.1.1.111, 10.1.5
+
+	# class any IP that is within 10.55.55.5x range as hotspot
+
+	hotspot = 10.55.55.5
+
+	# class an IPv6 box as 'special' ;)
+
+	special = 2001:0db8:dead:beef, 2001:0db8:1:1::b5
+
+	# you can also class based on name, if your server logs its
+	# NAS name instead of IP
+
+	named_class = ras1.example.com, ras2.example.com, ras3.example.com
+
+You can use any names you wish. The defaults are there for illustrative
+purposes only.
+
+=head2 [ Database ]
+
+=head3 enable_replication
+
+Informs the system that you have a MySQL cluster setup, and allows writing
+to the master server, while load-balancing reads across the slaves.
+
+For this directive to have any effect, you must have at least one slave_servers,
+and a slave must be configured.
+
+Do not enable this unless you have a proper MySQL replication cluster configured.
+The system will cease to function if these settings are incorrect.
+
+Note that 'slave_1_source' etc are displayed in the default configuration file
+for example purposes. Additional slaves are configured the same way, but with
+the integer incremented.
+
+Valid values: 0, 1.
+
+Default: off.
+
+=head3 master_locked
+
+Informs the system that the master database server in the cluster is offline for
+maintenance. During this time, all writes will be blocked. 
+
+Valid values: 0, 1.
+
+Default: off.
+
+=head3 slave_servers
+
+The number of read-only slave servers you have in your cluster.
+
+Valid values: any integer.
+
+Default: 0.
+
+=head3 maintenance_source
+
+The DBI connect string of the database that will be used to accept writes
+while the master cluster server is offline for maintenance.
+
+Valid value: any DBI connect source string.
+
+THIS FEATURE IS NOT YET FUNCTIONAL.
+
+=head3 master_source
+
+MySQL DBI source string.
+
+=head3 master_user
+
+Username of the user who has proper privileges on the master_source.
+
+=head3 master_pass
+
+Password of 'master_user'.
+
+=head3 slave_1_source
+
+See master_source.
+
+=head3 slave_1_user
+
+User for slave_1_source.
+
+=head3 slave_1_pass
+
+...
+
+=head3 test_mode_source
+
+Same as master_source, but used exclusively when a developer is running
+tests after a code update.
+
+=head3 test_mode_user
+
+User for the test database.
+
+=head3 test_mode_user
+
+Password for the test database user.

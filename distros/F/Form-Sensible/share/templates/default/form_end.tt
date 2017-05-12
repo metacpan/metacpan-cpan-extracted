@@ -1,0 +1,3 @@
+[% IF render_hints.legend %]</fieldset>[% END %]
+</form>
+</div>

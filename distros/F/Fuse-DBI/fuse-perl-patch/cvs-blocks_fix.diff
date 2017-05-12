@@ -1,0 +1,23 @@
+Index: Fuse.xs
+===================================================================
+RCS file: /cvsroot/fuse/perl/Fuse.xs,v
+retrieving revision 1.2
+diff -u -w -r1.2 Fuse.xs
+--- Fuse.xs	18 Nov 2004 13:09:10 -0000	1.2
++++ Fuse.xs	26 Nov 2004 21:32:30 -0000
+@@ -32,14 +32,11 @@
+ 		else
+ 			rv = -ENOENT;
+ 	} else {
++		result->st_blocks = POPi;
+ 		result->st_blksize = POPi;
+ 		result->st_ctime = POPi;
+ 		result->st_mtime = POPi;
+ 		result->st_atime = POPi;
+-		/* What the HELL?  Perl says the blockcount is the last argument.
+-		 * Everything else says the blockcount is the last argument.  So why
+-		 * was it folded into the middle of the list? */
+-		result->st_blocks = POPi;
+ 		result->st_size = POPi;
+ 		result->st_rdev = POPi;
+ 		result->st_gid = POPi;

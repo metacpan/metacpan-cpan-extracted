@@ -1,0 +1,38 @@
+File::Store VERSION 1.0 - cache file contents in memory.
+
+DESCRIPTION
+File::Store - read and cache file contents in memory.
+
+COPYRIGHT
+Copyright (c) 1998-2008 Anthony Fletcher. All rights reserved.
+These modules are free software; you can redistribute them and/or modify
+them under the same terms as Perl itself.
+
+This code is supplied as-is - use at your own risk.
+
+PREREQUISITES
+Perl5
+Exporter
+
+HOW TO BUILD AND INSTALL
+perl Makefile.PL
+make
+make test
+make install
+
+TODO
+Nothing planned.
+
+SUGGESTIONS
+Send suggestions, bugs, etc. to arif+perl@bifb.org.
+
+EXAMPLE 
+
+               use File::Store;
+
+	       my $contents1 = File::Store::get('/etc/passwd');
+	       my $contents2 = File::Store::get('/etc/passwd');
+
+The second call retrieves the file contents for the file store instead
+of reading it from disc, unless the file has been modified.
+

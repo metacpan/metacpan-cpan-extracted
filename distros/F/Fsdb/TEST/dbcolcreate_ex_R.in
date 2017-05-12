@@ -1,0 +1,6 @@
+#fsdb -R C test
+test: a
+
+test: b
+
+#   | dbfilealter -R C

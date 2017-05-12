@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Finance::IIF;
+
+while ( my $file = shift @ARGV ) {
+    print("File: $file\n");
+    my $iif = $package->new( file => $file );
+
+    while ( my $record = $iif->next ) {
+        print( "Header: ", $record->{header}, "\n" );
+        foreach my $key ( sort keys %{$record} ) {
+            next if ( $key eq "header" );
+            print( "    ", $key, ": ", $record->{$key}, "\n" );
+        }
+    }
+}

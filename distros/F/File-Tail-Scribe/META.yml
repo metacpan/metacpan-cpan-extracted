@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:                File-Tail-Scribe
+version:             0.13
+abstract:            Monitor and send the tail of files to a Scribe logging system.
+license:             perl
+author:              
+    - Jon Schutz <jon at jschutz.net>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    File::Basename:                0
+    File::Spec::Functions:         0
+    File::Tail::Dir:               0
+    File::Temp:                    0
+    FindBin:                       0
+    Getopt::Long:                  0
+    Log::Dispatch::Scribe:         0
+    Moose:                         0
+    Pod::Usage:                    0
+    POSIX:                         0
+    Sys::Hostname:                 0
+    Test::MockObject:              0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

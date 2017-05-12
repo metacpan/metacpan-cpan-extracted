@@ -1,0 +1,145 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+use File::Lock::ParentLock;
+
+#my $verbose=0;
+my $help=0;
+
+my ($lockfile,$pid);
+my ($lock,$unlock,$status);
+my $verbose=1;
+
+my $result = GetOptions (
+    'q|quiet'=> sub {$verbose=0},
+    "v|verbose+"  => \$verbose,
+    "help"  => \$help,
+    "pid=s"  => \$pid,
+    "f|file|lockfile=s"  => \$lockfile,
+    "l|lock"  => \$lock,
+    "unlock"  => \$unlock,
+    "status"  => \$status,
+);
+
+if ($help) {
+    pod2usage();
+}
+
+$lockfile=shift @ARGV if @ARGV and not $lockfile;
+$pid=shift @ARGV if @ARGV and not $pid;
+if (@ARGV) {
+    warn "ERROR: too many command line arguments! ".join(' ',@ARGV)."\n";
+    pod2usage();
+} elsif ($lock and $unlock) {
+    warn "ERROR: both --lock and --unlock options are present!\n";
+    pod2usage();
+} elsif (not $lock and not $unlock and not $status) {
+    warn "ERROR: one of --lock, --unlock, --status options should be present!\n";
+    pod2usage();
+}
+
+my $locker= File::Lock::ParentLock->new(
+	-lockfile=>$lockfile,
+	-pid=>$pid,
+    );
+
+my $exit_code=0;
+if ($lock) {
+    $exit_code=1 if !$locker->lock();
+} elsif ($unlock) {
+    $exit_code=1 if !$locker->unlock();
+}
+if ($status or $verbose and $exit_code) {
+    print "ParentLock status: ", $locker->status_string(),"\n";
+}
+exit $exit_code;
+
+
+__END__
+
+
+
+=head1	NAME
+
+parentlock - share parent's lock with child processes.
+
+=head1	SYNOPSIS
+
+B<parentlock>
+[B<-v>]
+[B<--lock> | B<--unlock>]
+[B<--status>]
+[B<--lockfile>] I<lockfile>
+[B<-p|--pid>] I<PID>
+
+=head1	DESCRIPTION
+
+B<parentlock> is useful for shell scripting where there are lots of 
+nested script calls and we want to share a lock from the main wrapper
+script for its subprocesses through the parent - child relationship.
+
+Note that unlocking is optional because the lock becomes invalid
+when the process that lock contains its pid dies.
+
+=head1	EXAMPLES
+
+In each chell script add at the beginning
+
+ #!/bin/sh
+ LOCKFILE=/workdir/.lock
+ parentlock --lock --lockfile $LOCKFILE $$ || exit 1
+ ...
+
+=head1	OPTIONS
+
+=over
+
+=item	B<-l,--lock>
+
+Lock
+
+=item	B<-u,--unlock>
+
+Unlock
+
+=item	B<-p,--pid>
+
+PID to lock with.
+
+=item	B<-f,--file,--lockfile> I<path>
+
+Lockfile name to be created. A relative path will be converted
+to the absolute path at the moment script called.
+
+=item	B<-v,--verbose>
+
+Increase verbosity level.
+
+=item	B<-q,--quiet>
+
+Silent mode.
+
+=back
+
+=head1	AUTHOR
+
+Written by Igor Vlasenko <viy@altlinux.org>.
+
+=head1	ACKNOWLEGEMENTS
+
+To Alexey Torbin <at@altlinux.org>, whose qa-robot package
+had a strong influence on repocop. 
+
+=head1	COPYING
+
+Copyright (c) 2008 Igor Vlasenko, ALT Linux Team.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation;
+either version 2 of the License, or (at your option) any later version.
+
+=cut

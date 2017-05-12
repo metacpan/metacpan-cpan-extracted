@@ -1,0 +1,15 @@
+#!/usr/local/bin/perl
+
+use strict;
+use Finance::Bank::SCSB::TW;
+
+my ($u,$p,$a) = @ARGV[0..2];
+
+( $u && $p && $a ) || die ("Usage: $0 <username> <password> <account number>");
+
+my $scsb = Finance::Bank::SCSB::TW::check_balance($u,$p,$a);
+
+foreach (keys %$scsb) {
+	print "$_ : " . $scsb->{$_}. "\n";
+}
+

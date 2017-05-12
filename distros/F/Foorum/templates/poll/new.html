@@ -1,0 +1,64 @@
+
+<script>
+  function AddAnotherRow() {
+      var option_number = $('#option_number').val();
+      var new_option_no = Math.round(option_number) + 1;
+      $('#option_number').val(new_option_no);
+      var option_html = "Option " + new_option_no + ": <input type='text' name='option" + new_option_no + "' id='option" + new_option_no + "' /><br />";
+      $('#extra_options').append(option_html);
+  }
+</script>
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='[% forum.forum_url %]'><span>Topics</span></a></li>
+        <li><a href='[% forum.forum_url %]/polls'><span>Polls</span></a></li>
+        [% UNLESS forum.settings.can_post_threads AND forum.settings.can_post_threads == 'N' %]
+        <li><a href='[% forum.forum_url %]/topic/new'><span>[% c.loc("New Topic") %]</span></a></li>
+        [% END %]
+        <li selected="selected"><a href='[% forum.forum_url %]/poll/new'><span>[% c.loc("New Poll") %]</span></a></li>
+        <li><a href='[% forum.forum_url %]/action_log'><span>View Action Logs</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<form method="post">
+<table align='center' border='1' cellpadding='6'>
+  <tr class='title'><td colspan='2'>Create a new POLL</td></tr>
+  <tr class='forum1'><td align='right'>[% c.loc('Title') %]</td><td><input type='text' size='60' maxlength='80' name='title' />
+  [% IF c.form.error('title') %]title should be 1-80 chars.[% END %]
+</td></tr>
+  <tr class='forum2'><td>Options:</td><td>
+    <input type='hidden' name='option_number' id='option_number' value='2' />
+    <div id='options'>
+    Option 1: <input type='text' name='option1' id='option1' /><br />
+    Option 2: <input type='text' name='option2' id='option2' /><br />
+    <div id='extra_options'></div>
+    <input type='button' onclick='javascript:AddAnotherRow()' value='Add Another Option' /><br />
+    </div>
+  </td></tr>
+  <tr class='forum1'><td>Setting:</td><td>
+    Duration: <select name='duration_day'>
+        <option value='1'>1 Day</option>
+        <option value='2'>2 Days</option>
+        <option value='3'>3 Days</option>
+        <option value='7'>1 Week</option>
+        <option value='30'>30 Days</option>
+    </select><br />
+    <input type='checkbox' name='multi' value='1' /> Multi-Vote<br />
+  </td></tr>
+  <tr class='forum2'><td colspan='2'><input type='submit' /></td></tr>
+</table>
+</form>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

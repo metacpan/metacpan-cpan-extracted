@@ -1,0 +1,62 @@
+[% WRAPPER 'admin/bar.html' %]
+
+<div class='one'>
+<form method='POST' action='/admin/topic/batch'>
+<input type='hidden' name='do' id='do' value='0' />
+
+<p>
+    [% IF c.req.params.banned %]
+    <input type='submit' name='btn' value='Batch Unban' onclick='$("#do").val("unban")' />
+    [% ELSE %]
+    <input type='submit' name='btn' value='Batch Ban' onclick='$("#do").val("ban")' />
+    [% END %]
+    <input type='submit' name='btn' value='Batch Delete' onclick='$("#do").val("delete")' />
+</p>
+<p>
+    <select name='to_fid'>
+        [% FOREACH f IN forums %]
+        <option value='[% f.forum_id %]'>[% f.name %]</option>
+        [% END %]
+    </select>
+    <input type='submit' name='btn' value='Batch Move' onclick='$("#do").val("move")' />
+</p>
+<p><input type='button' name='selectall' value='Select All' onclick='javascript:SelectAll()' />
+   <input type='button' name='selectnone' value='Select None' onclick='javascript:SelectNone()' />
+</p>
+
+<table align='center'>
+<tr class='title'><td colspan='3'>Topic List</td></tr>
+<tr class='misc2'><td>ID</td><td>Title</td><td>ACTION</td></tr>
+[% FOREACH t IN topics %]
+<tr class='misc[% IF loop.count mod 2;'2';ELSE;'1';END; %]'>
+    <td><input type='checkbox' name='topic_id' value='[% t.topic_id %]' /> [% t.topic_id %]</td><td><a href='/forum/[% t.forum_id %]/[% t.topic_id %]'>[% t.title %]</a></td>
+    <td>
+        [% IF c.req.params.banned %]
+        <a href='/forum/[% t.forum_id %]/topic/[% t.topic_id %]/unban'>Unban</a>
+        [% ELSE %]
+        <a href='/forum/[% t.forum_id %]/topic/[% t.topic_id %]/ban'>Ban</a>
+        [% END %]
+    </td>
+</tr>
+[% END %]
+<tr class='misc1'><td colspan='3'>[% INCLUDE 'sub/pager.html' %]</td></tr>
+</table>
+</div>
+</form>
+
+[% END %]
+
+<script type="text/javascript">
+
+function SelectAll() {
+    $("input[name=topic_id]").each(function() {
+        this.checked = true;
+    } );
+}
+function SelectNone() {
+    $("input[name=topic_id]").each(function() {
+        this.checked = false;
+    } );
+}
+
+</script>

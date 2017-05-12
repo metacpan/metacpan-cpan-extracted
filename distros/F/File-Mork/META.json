@@ -1,0 +1,46 @@
+{
+   "abstract" : "a module to read Mozilla URL history files",
+   "author" : [
+      "Module-ised by Simon Wistow <simon@thegestalt.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Mork",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Mork" : {
+         "file" : "lib/File/Mork.pm",
+         "version" : "0.4"
+      },
+      "File::Mork::Entry" : {
+         "file" : "lib/File/Mork.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.4",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

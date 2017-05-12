@@ -1,0 +1,5 @@
+#
+#--- Example of /etc/fstab lines for main web site and staging PDS
+/sample/www  /srv/example.com/www  fuse.funifs  user,ro,_netdev,dirs=/srv/sites/example.com/www    0 0
+/sample/u/w  /srv/example.com/u/w  fuse.funifs  user,ro,_netdev,dirs=/srv/sites/example.com/u/w:/srv/sites/example.com/www    0 0
+#

@@ -1,0 +1,15 @@
+File::Headerinfo
+
+DESCRIPTION
+
+All this module does is to gather together a set of existing file-reader modules 
+and put them all behind a simple friendly interface. it has a factory architecture
+that should make it easy to extend, and using it is as simple as:
+
+  my $info = File::Headerinfo->read('/path/to/file.ext');
+
+The only installation problem is likely to be Video::Info, which currently
+depends on openquicktime. With some small tinkering you can remove that 
+dependency: let me know if you want details.
+
+For that or any other problems: contact will on wross@cpan.org.

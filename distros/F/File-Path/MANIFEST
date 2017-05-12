@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+lib/File/Path.pm
+t/FilePathTest.pm
+t/Path-Class.t
+t/Path.t
+t/Path_root.t
+t/Path_win32.t
+t/taint.t
+xt/extra.t
+xt/setup_tests.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

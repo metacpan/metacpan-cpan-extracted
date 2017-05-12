@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/FASTAid.pm
+t/FASTAid.t
+t/FASTAid_test1.fa
+t/FASTAid_test2.fa
+t/FASTAid_test4.fa
+t/FASTAid_test7.fa
+t/FASTAid_test8.fa
+META.yml    #                             Module meta-data (added by MakeMaker)

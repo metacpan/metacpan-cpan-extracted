@@ -1,0 +1,223 @@
+=head1 NAME
+
+File::HTTP - open, read and seek into remote files and directories transparently
+
+=head1 SYNOPSIS
+    
+    use File::HTTP qw(:open);
+    
+    # open and read a remote file (server must allow range queries)
+    open(my $fh, '<', 'http://example.com/robots.txt') or die $!;
+    
+    while (<$fh>) {
+        chomp;
+        ...
+    }
+    
+    # remote file is seekable in all directions
+    seek($fh, 500, 0);
+    read($fh, my $buf, 40);
+    
+    seek($fh, -40, 1);
+    read($fh, my $buf2, 40);   
+
+    # $/ behaves as with regular files
+    local $/ = \52;
+    $buf = <$fh>;
+    
+    # also works with https addresses if IO::Socket::SSL is available
+    open(my $fh, '<', 'https://example.com/robots.txt') or die $!;
+    
+    # open() still works as expected with local files
+    open(my $fh, '<', "local_file") or die $!;
+    
+    # directory (when servers allow directory listing)
+    
+    use File::HTTP qw(:opendir);
+    
+    opendir(my $dirh, 'http://example.com/files/') or die $!;
+    
+    while (my $file = readdir($dirh)) {
+        next if $file =~ /^\.\.?$/;
+        open(my $fh, '<', "http://example.com/files/$file") or die $!;
+        ...
+    }
+    
+    # open remote file, but not seekable
+    # works with all web servers, and faster (real filehandler)
+    
+    use File::HTTP qw(open_stream);
+    
+    my $fh = open_stream('http://example.com/file') or die $!;
+    while (<$fh>) {
+        chomp;
+	...
+    }
+
+    # make your module HTTP compatible when File::HTTP is installed.
+    # on top of module:
+    eval {use File::HTTP qw(:open)};
+    
+=head1 DESCRIPTION
+
+C<File::HTTP> open, read and seek into remote files and directories transparently
+
+=over 4
+
+=item open [MODE] FILE
+
+=item stat FH or FILE
+
+Imported with the :open or :all tags.
+
+Act exaclty as CORE::open and CORE::stat, but also work with remote HTTP files.
+
+Falls back to CORE::open and CORE::stat when the path looks like a local file.
+
+Returns a Tied filehanlder when opening a remote file.
+
+Only works with Web servers that allow range queries (see CAVEATS).
+
+You should use C<open_stream> when servers do not allow range queries.
+
+=back
+
+=item opendir DIR
+
+=item readdir / rewinddir / telldir / seekdir / closedir DIRH
+
+Imported with the :opendir or :all tags.
+
+Act exaclty as CORE::opendir and associated CORE functions, but also work with
+remote HTTP directories.
+
+Falls back to CORE::opendir when the path looks like a local directory.
+
+Returns a Tied filehanlder when opening a remote directory.
+
+Only works with Web servers that allow directory listing.
+
+=back
+
+=item open_stream URL
+
+open a readable but not seekable filehandle to the specified URL
+
+=back
+
+=item slurp_stream URL
+
+context dependent slurping of an url
+
+    my $content = slurp_stream($url);
+    my @lines = slurp_stream($url);
+
+=back
+
+=item get URL [follow redirections]
+
+slurps an url into a string, also also returning request and response
+headers strings in list context.
+Contrary to slrup_stream, default behavior is to ignore redirections
+
+    my $body = get($url);
+    my $body = get($url, 1); # follow redirections
+    my ($request_headers, $response_headers, $body) = get($url);
+
+If set to follow redirections, $request_headers and $response_headers
+will correspond to the last emitted request.
+
+=back
+
+=item open_at URL
+
+=back
+
+=head1 EXPORTS
+
+Nothing by default.
+Functions can be imported explicitely
+
+    use File::HTTP qw(open open_stream opendir readdir);
+
+:open and :opendir tags are much prefered as they will ensure all needed
+functions are exported
+
+   use File::HTTP qw(:open);
+   # same as:
+   use File::HTTP qw(open stat);
+   
+   use File::HTTP qw(:opendir);
+   # same as:
+   use File::HTTP qw(opendir readdir rewinddir telldir seekdir closedir);
+
+You can use the :all tag to import all functions
+
+    use File::HTTP qw(:all);
+    
+You can also use the -everywhere tag to export emulation function into all namespaces
+(dangerous!)
+
+    use File::HTTP qw(-everywhere);
+    
+    # now all modules shall magicaly work with remote files (or not)
+
+=back
+
+=head1 CAVEATS
+
+=over 4
+
+C<open> only works with remote web server and ressources that allow range queries.
+
+Dynamic ressources such as PHP or CGI typically do not work with range queries.
+
+C<open_stream> does not have such limitations, but does not allow seeks.
+
+C<opendir> only works with remote web servers and ressources that allow directory
+listing, and list files as a simple <a href> links.
+
+=back
+
+=head1 OPTIONAL MODULES
+
+=over 4
+
+=item * L<IO::Socket::SSL> is required for HTTPS URLs
+
+=item * Either L<Time::y2038> or L<Time::Local> will be used to set the modification
+date in state
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item * better $! error mapping
+
+=item * auto adaptation of seek vs read based on time
+
+=item * buffering
+
+=item * tests...
+
+=back
+
+=head1 SEE ALSO
+
+L<Tie::Handle::HTTP>
+
+=head1 AUTHOR
+
+Thomas Drugeon, E<lt>tdrugeon@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Thomas Drugeon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

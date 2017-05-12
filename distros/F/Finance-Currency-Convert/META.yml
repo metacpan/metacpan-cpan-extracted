@@ -1,0 +1,12 @@
+name:               Finance::Currency::Convert
+version:            1.08
+abstract:           Convert currencies
+author:
+    - Jan Willamowius <jan@willamowius.de>
+license:            perl
+distribution_type:  module
+recommends:
+    Finance::Quote:  0
+resources:
+  license: http://dev.perl.org/licenses/
+

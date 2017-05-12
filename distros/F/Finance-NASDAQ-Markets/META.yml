@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension to download realtime quotes for all major markets indices sectors'
+author:
+  - 'santex <santex@cpan.org>'
+build_requires:
+  Test::More: 0
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-NASDAQ-Markets
+requires:
+  Data::Dumper: 0
+  Exporter: 0
+  HTML::TableContentParser: 0
+  HTML::TableExtract: 0
+  LWP::Simple: 0
+  perl: 5.012004
+  strict: 0
+  warnings: 0
+version: 0.006

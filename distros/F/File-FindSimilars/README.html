@@ -1,0 +1,653 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.2.7" />
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revision {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble,
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-right: 10%;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock {
+  margin-right: 0%;
+}
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock {
+  padding-left: 2.0em;
+}
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock {
+  padding-left: 2.0em;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 2px solid silver;
+}
+
+div.exampleblock > div.content {
+  border-left: 2px solid silver;
+  padding: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+div.imageblock img { border: 1px solid silver; }
+span.image img { border-style: none; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+div.olist > ol {
+  list-style-type: decimal;
+}
+div.olist2 > ol {
+  list-style-type: lower-alpha;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+
+div.hlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hlist td {
+  padding-bottom: 15px;
+}
+td.hlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+}
+td.hlist2 {
+  vertical-align: top;
+}
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+
+div.exampleblock-content {
+  border-left: 2px solid silver;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+
+/* Because IE6 child selector is broken. */
+div.olist2 ol {
+  list-style-type: lower-alpha;
+}
+div.olist2 div.olist ol {
+  list-style-type: decimal;
+}
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+window.onload = function(){generateToc(2)}
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, October 2006. License: GPL */
+
+function getText(el) {
+  var text = "";
+  for (var i = el.firstChild; i != null; i = i.nextSibling) {
+    if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+      text += i.data;
+    else if (i.firstChild != null)
+      text += getText(i);
+  }
+  return text;
+}
+
+function TocEntry(el, text, toclevel) {
+  this.element = el;
+  this.text = text;
+  this.toclevel = toclevel;
+}
+
+function tocEntries(el, toclevels) {
+  var result = new Array;
+  var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+  // Function that scans the DOM tree for header elements (the DOM2
+  // nodeIterator API would be a better technique but not supported by all
+  // browsers).
+  var iterate = function (el) {
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+        var mo = re.exec(i.tagName)
+        if (mo)
+          result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+        iterate(i);
+      }
+    }
+  }
+  iterate(el);
+  return result;
+}
+
+// This function does the work. toclevels = 1..4.
+function generateToc(toclevels) {
+  var toc = document.getElementById("toc");
+  var entries = tocEntries(document.getElementsByTagName("body")[0], toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "toc" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    document.getElementById("header").removeChild(toc);
+}
+/*]]>*/
+</script>
+<title>Fast Similar Files Finder</title>
+</head>
+<body>
+<div id="header">
+<h1>Fast Similar Files Finder</h1>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<h2 id="_basics">Basics</h2>
+<div class="sectionbody">
+<h3 id="_info">Info</h3><div style="clear:left"></div>
+<div class="para"><p>findsimilars walks along the given dirs to find all similar files.</p></div>
+<h3 id="_description">Description</h3><div style="clear:left"></div>
+<div class="para"><p>findsimilars will find all similar files, not only identical ones:
+different version (.txt, .html, or .pdf) and different compression methods
+(.zip, .gz, .tar.gz, .bip2), MP3 files with slightly different names or even
+different sample rates, etc. It uses advanced soundex vector algorithm to
+determine the file similarities.</p></div>
+<div class="para"><p>The file similarity checking is extremely fast. It uses advanced soundex
+vector algorithm to determine the similarity between files. Generally it
+means that if there are n files, each having approximately m words in the
+file name, the degree of calculation is merely</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>O(n^2 * m)</tt></pre>
+</div></div>
+<div class="para"><p>regardless of file size. This is over hundreds times faster than any
+existing file fingerprinting technology.</p></div>
+<h3 id="_files">Files</h3><div style="clear:left"></div>
+<div class="para"><p><a href="release-log.txt">Release notes</a>.</p></div>
+<div class="para"><p><a href="Changes">Changes logs</a>.</p></div>
+</div>
+<h2 id="_help">Help</h2>
+<div class="sectionbody">
+<div class="para"><p>The self-test output will help you understand what the module do and what
+would you expect from the outcome.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>$ make test
+PERL_DL_NONLAZY=1 /usr/bin/perl "-Iblib/lib" "-Iblib/arch" test.pl
+1..5 todo 2;
+# Running under perl version 5.010000 for linux
+# Current time local: Mon Nov  3 08:57:42 2008
+# Current time GMT:   Mon Nov  3 13:57:42 2008
+# Using Test.pm version 1.25
+# Testing File::FindSimilars version 2.03</tt></pre>
+</div></div>
+<div class="olist"><ol>
+<li>
+<p>
+. .
+</p>
+</li>
+</ol></div>
+<h4 id="_testing_2_files_under_test_subdir">Testing 2, files under test/ subdir:</h4>
+<div class="literalblock">
+<div class="content">
+<pre><tt>  9 test/(eBook) GNU - Python Standard Library 2001.pdf
+  3 test/Audio Book - The Grey Coloured Bunnie.mp3
+  5 test/ColoredGrayBunny.ogg
+  5 test/GNU - 2001 - Python Standard Library.pdf
+  4 test/GNU - Python Standard Library (2001).rar
+  9 test/LayoutTest.java
+  3 test/PopupTest.java
+  2 test/Python Standard Library.zip
+ok 2 # (test.pl at line 83 TODO?!)</tt></pre>
+</div></div>
+<div class="para"><p>Note:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+The findsimilars script will pick out similar files from them in next test.
+</p>
+</li>
+<li>
+<p>
+Let's assume that the number represent the file size in KB.
+</p>
+</li>
+</ul></div>
+<h4 id="_testing_3_result_should_be">Testing 3 result should be:</h4>
+<div class="literalblock">
+<div class="content">
+<pre><tt>## =========
+           3 'Audio Book - The Grey Coloured Bunnie.mp3' 'test/'
+           5 'ColoredGrayBunny.ogg'                      'test/'</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>## =========
+           4 'GNU - Python Standard Library (2001).rar' 'test/'
+           5 'GNU - 2001 - Python Standard Library.pdf' 'test/'
+ok 3</tt></pre>
+</div></div>
+<div class="para"><p>Note:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+There are 2 groups of similar files picked out by the script.
+</p>
+</li>
+<li>
+<p>
+The similar files are picked because their file names look similar.
+    Note that the first group looks different and spells differently too,
+    which means that the script is versatile enough to handle file names that
+    don't have space in it, and robust enough to deal with spelling mistakes.
+</p>
+</li>
+<li>
+<p>
+Apart from the file name, the file size plays an important role as well.
+</p>
+</li>
+<li>
+<p>
+There are 2 files in the second similar files group, the book files group.
+</p>
+</li>
+<li>
+<p>
+The file <em>Python Standard Library.zip</em> is not considered to be similar to
+    the group because its size is not similar to the group.
+</p>
+</li>
+</ul></div>
+<h4 id="_testing_4_if_python_zip_is_bigger_result_should_be">Testing 4, if Python.zip is bigger, result should be:</h4>
+<div class="literalblock">
+<div class="content">
+<pre><tt>## =========
+           4 'Python Standard Library.zip' 'test/'
+           4 'GNU - Python Standard Library (2001).rar' 'test/'
+           5 'GNU - 2001 - Python Standard Library.pdf' 'test/'</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>## =========
+           3 'Audio Book - The Grey Coloured Bunnie.mp3' 'test/'
+           5 'ColoredGrayBunny.ogg'                      'test/'
+ok 4</tt></pre>
+</div></div>
+<div class="para"><p>Note:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+The previous second similar files group is now the first. I.e.,
+    the order of similar files groups is not important.
+</p>
+</li>
+<li>
+<p>
+There are now 3 files in the book files group.
+</p>
+</li>
+<li>
+<p>
+The file <em>Python Standard Library.zip</em> is included in the
+    group because its size is now similar to the group.
+</p>
+</li>
+</ul></div>
+<h4 id="_testing_5_if_python_zip_is_even_bigger_result_should_be">Testing 5, if Python.zip is even bigger, result should be:</h4>
+<div class="literalblock">
+<div class="content">
+<pre><tt>## =========
+           4 'GNU - Python Standard Library (2001).rar' 'test/'
+           5 'GNU - 2001 - Python Standard Library.pdf' 'test/'
+           6 'Python Standard Library.zip' 'test/'
+           9 '(eBook) GNU - Python Standard Library 2001.pdf' 'test/'</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>## =========
+           3 'Audio Book - The Grey Coloured Bunnie.mp3' 'test/'
+           5 'ColoredGrayBunny.ogg'                      'test/'
+ok 5</tt></pre>
+</div></div>
+<div class="para"><p>Note:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+There are 4 files in the book files group now.
+</p>
+</li>
+<li>
+<p>
+The file <em>Python Standard Library.zip</em> is still in the group.
+</p>
+</li>
+<li>
+<p>
+But this time, because it is also considered to be similar to the .pdf
+    file (since their size are now similar, 6 vs 9), a 4th file the .pdf one
+    is now included in the book group.
+</p>
+</li>
+<li>
+<p>
+If the size of file <em>Python Standard Library.zip</em> is 12(KB), then the
+    book files group will be split into two. Do you know why and
+    which files each group will contain?
+</p>
+</li>
+</ul></div>
+</div>
+<h2 id="_installation_amp_configuration">Installation &amp; Configuration</h2>
+<div class="sectionbody">
+<h3 id="_installation">Installation</h3><div style="clear:left"></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>perl Makefile.PL
+make
+make test
+make install</tt></pre>
+</div></div>
+<div class="para"><p>There includes in the package a client program called <em>findsimilars</em>.
+It should have been copied to a directory which is in the PATH
+by <em>make install</em>.</p></div>
+<h3 id="_get_help">Get Help</h3><div style="clear:left"></div>
+<div class="para"><p>Issue <em>findsimilars</em> to get help on how to use it. And also,</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>perldoc File::FindSimilars</tt></pre>
+</div></div>
+</div>
+<h2 id="_misc">Misc</h2>
+<div class="sectionbody">
+<div class="para"><p><a href="Similars.why.htm">Why writting such tool; why it might be necessary</a>.</p></div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2009-01-02 16:25:10 EDT
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+---
+abstract: 'a Future (or Promise or Deferred) like Q module for JavaScript'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  Carp: '0'
+  FindBin: '0'
+  Scalar::Util: '0'
+  Test::Identity: '0'
+  Test::Memory::Cycle: '0'
+  Test::MockModule: '0.05'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Future-Q
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+  file:
+    - README.pod
+requires:
+  Carp: '0'
+  Devel::GlobalDestruction: '0'
+  Future: '0.29'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/debug-ito/Future-Q/issues
+  repository: git://github.com/debug-ito/Future-Q.git
+version: '0.110'

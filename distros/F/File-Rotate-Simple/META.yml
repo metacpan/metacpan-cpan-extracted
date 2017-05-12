@@ -1,0 +1,23 @@
+---
+abstract: 'no-frills file rotation'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Rotate-Simple
+requires:
+  Moo: '1.001000'
+  Path::Tiny: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: v5.8.8
+  version: '0'
+resources:
+  bugtracker: https://github.com/robrwo/File-Rotate-Simple/issues
+  repository: git://github.com/robrwo/File-Rotate-Simple.git
+version: v0.1.5

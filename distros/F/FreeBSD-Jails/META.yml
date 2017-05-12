@@ -1,0 +1,27 @@
+---
+abstract: 'jail list for FreeBSD systems'
+author:
+  - 'Athanasios Douitsis <aduitsis@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Module::Build: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FreeBSD-Jails
+provides:
+  FreeBSD::Jails:
+    file: lib/FreeBSD/Jails.pm
+    version: v0.2.0
+requires:
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/aduitsis/FreeBSD-Jails
+version: v0.2

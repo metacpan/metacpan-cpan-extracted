@@ -1,0 +1,4 @@
+See the git repository.
+
+ * 1.18 - Changes from stdweird: octal mode support, :group support for
+   _set_ownership, backup suffix, mtime modifiction.

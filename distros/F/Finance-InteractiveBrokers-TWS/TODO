@@ -1,0 +1,2 @@
+I'd like to figure out a way to get the parameters of the events into a hash that
+describes the values, instead of them just being positional

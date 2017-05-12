@@ -1,0 +1,9 @@
+[% FS_showlabel = 0 %][% IF render_hints.render_as == 'link' %]
+    <a href="[% IF field.editable %][% render_hints.link %][% ELSE %]#[% END %]" class="[% css_prefix %]input [% css_prefix _ field_type %]_input [% css_prefix _ field_type %]_link [% css_prefix _ field_name %]_input [% IF !field.editable %] noteditable[% END %]">[% field_display_name %]</a>
+[% ELSIF render_hints.render_as == 'reset' %]
+    <input type="reset" id="[% css_prefix _ form.name %]_[% field_name %]_input" class="[% css_prefix %]input [% css_prefix _ field_type %]_input [% css_prefix _ field_name %]_input  [% IF !field.editable %] noteditable" disabled="disabled[% END %]" name="[% field_name %]" value="[% field.value ? field.value : field_display_name %]" />
+[% ELSIF render_hints.render_as == 'button' %]
+    <input type="button" id="[% css_prefix _ form.name %]_[% field_name %]_input" class="[% css_prefix %]input [% css_prefix _ field_type %]_input [% css_prefix _ field_name %]_input  [% IF !field.editable %] noteditable" disabled="disabled[% END %]" name="[% field_name %]" value="[% field.value ? field.value : field_display_name %]" />
+[% ELSE %]
+    <input type="submit" id="[% css_prefix _ form.name %]_[% field_name %]_input" class="[% css_prefix %]input [% css_prefix _ field_type %]_input [% css_prefix _ field_name %]_input  [% IF !field.editable %] noteditable" disabled="disabled[% END %]" name="[% field_name %]" value="[% field.value ? field.value : field_display_name %]" />    
+[% END %]

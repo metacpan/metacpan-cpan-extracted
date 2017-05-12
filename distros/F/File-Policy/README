@@ -1,0 +1,40 @@
+File::Policy v1.005
+
+(c) BBC 2004. This program is free software; you can redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt 
+
+QUICK START:
+
+Install File::Policy by unpacking the tarball and running the following
+commands in the source directory:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	Then delete the source directory tree since it's no longer needed.
+
+	By using File::Policy (or File::Slurp::WithinPolicy) in your code you get File::Policy::Default by, erm, default.  
+	This imposes no restrictions on filepaths, but does provide reasonable default temp and log dirs for you.  
+	See the POD for File::Policy::Default to see how these paths are determined.
+
+	To implement your own custom policy
+	  cp File/Policy/Default.pm File/Policy/YourPolicy.pm
+	and modify YourPolicy accordingly.
+	
+	Then, create a file File/Policy/Config.pm with:
+	
+	  use constant IMPLEMENTATION => 'YourPolicy';
+
+	run 'perldoc File::Policy' to read the full documentation.
+
+SAMPLE:
+
+See samples/lib/File/Policy/Simple.pm for an example of a custom policy.
+
+DEPENDENCIES:
+
+Pod::Test and Pod::Test::Coverage are used by two of the unit tests if present 
+- otherwise these 2 tests should skip gracefully.  Tests require Test::Assertions and Log::Trace
+which is why these are listed in the PREREQ_PM in Makefile.PL.

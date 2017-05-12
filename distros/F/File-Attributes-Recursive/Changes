@@ -1,0 +1,9 @@
+Revision history for File-Attributes-Recursive
+
+0.02	11 October 2006
+	- fixed #22041
+        - moved to path::class (#22042)
+
+0.01    2 July 2006
+        First version, released on an unsuspecting world.
+

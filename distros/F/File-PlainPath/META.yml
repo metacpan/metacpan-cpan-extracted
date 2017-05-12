@@ -1,0 +1,49 @@
+---
+abstract: 'Construct portable filesystem paths in a simple way'
+author:
+  - 'Michal Wojciechowski <odyniec@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-PlainPath
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  File::PlainPath:
+    file: lib/File/PlainPath.pm
+    version: 0.030
+requires:
+  Exporter: 0
+  File::Spec: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/odyniec/File-PlainPath/issues
+  homepage: https://github.com/odyniec/File-PlainPath
+  repository: https://github.com/odyniec/File-PlainPath.git
+version: 0.030
+x_contributors:
+  - 'Michal Wojciechowski <odyniec@odyniec.net>'
+  - 'Michał Wojciechowski <odyniec@odyniec.eu.org>'
+  - 'Toby Inkster <tobyink@cpan.org>'

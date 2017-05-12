@@ -1,0 +1,17 @@
+[%# $Id: html_tabs.tt2 16 2007-11-20 19:16:29Z jason $ #%]
+[% FILTER collapse %]
+[% PROCESS tabs.tt2 %]
+<ul id="tabs">
+    [% FOR tab IN tabs %]
+        [% IF template.name == tab.template %]
+            <li class="here">
+        [% ELSE %]
+            <li>
+        [% END %]
+        <a href="[% output_filename( tab.template ) %]">[% tab.label %]</a>
+        </li>
+    [% END %]
+</ul>
+<div style="clear:both"></div>
+[% template.name %]
+[% END %]

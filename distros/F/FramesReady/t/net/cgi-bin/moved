@@ -1,0 +1,9 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+my $SERVER_NAME = $ENV{'SERVER_NAME'};
+my $SERVER_PORT = $ENV{'SERVER_PORT'};
+
+print "Location: http://$SERVER_NAME:$SERVER_PORT/\n\n";
+

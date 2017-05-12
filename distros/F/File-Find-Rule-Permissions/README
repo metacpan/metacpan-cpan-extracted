@@ -1,0 +1,11 @@
+This module extends File::Find::Rule to let you check whether an arbitrary
+user can read, write or execute files.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.

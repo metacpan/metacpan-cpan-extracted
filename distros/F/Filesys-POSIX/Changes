@@ -1,0 +1,190 @@
+Version 0.9.19
+
+    * When reading a directory, do not process detached inodes
+
+Version 0.9.18
+
+    * Fix spurious tar file header emitted for unreadable files.
+    * Add 'ignore_inaccessible' option to tar() method.
+    * Add ReducedPrivileges filesystem.
+    * Add 'recursion_mode' option to find() method.
+    * Fix handling of 'detached' inodes in Real directories.
+    * Fix handling of inodes named '0'
+    * Make alias() copy symlinks instead of the symlink targets.
+
+Version 0.9.17
+
+    * Revert _write_file() refactor until further investigation is complete
+
+Version 0.9.16
+
+    * Finally get around to adding this lovely Changes file
+
+    * Refactor tar _write_file() method
+    
+      Refactor Filesys::POSIX::Userland::Tar->_write_file() method to ensure
+      the amount of data written for a file is indeed the amount committed to
+      in the archive member's header; if a file is shorter than indicated, then
+      sufficient padding is provided to compensate; and if a file grows longer
+      than promised, then the file output is truncated, and a warning is
+      emitted indicating as such.
+
+Version 0.9.15
+
+    * Rename t/lib-Filesys-POSIX-Userland-Tar_race2.t to t/tar-race.t
+
+    * Update MANIFEST to add t/tar-race.t
+
+    * Update MANIFEST to add missing t/mount.t
+
+    * Remove useless shebang from t/false-filename.t
+
+    * Don't use Exporter in lib/Filesys/POSIX.pm
+
+    * Replace mkdtemp() with File::Temp::tempdir()
+    
+      Fix OpenBSD CPANTS errors by replacing mkdtemp() with
+      File::Temp::tempdir()
+
+    * Replace qw// with qw()
+
+    * Fix CPANTS test failures
+    
+        Modify Filesys::POSIX::Userland::Tar's $fs->tar() method option
+        'ignore_missing' to test $! for ENOENT rather than checking $@,
+        which can get localized to something other than what we used to
+        expect
+    
+        Modify Filesys::POSIX::Userland::Tar's $fs->tar() to use a blocking
+        factor of 20 * 512 bytes; pad end of stream to prevent failure
+        untarring on BSD tar
+    
+        Modify t/rename.t to be slightly less anal about expected output
+        from tar, to accommodate for slight differences in formatted
+        output between GNU tar and BSD tar
+    
+        Modify t/tar-missing.t to use Test::Filesys::POSIX::Error function
+        throws_errno_ok()
+    
+        Modify Test::Filesys::POSIX::Error to use Try::Tiny, rather than
+        plain block eval(), which causes issues with Perl <=5.12
+    
+        Modify Test::Filesys::POSIX::Error to build a default number=>name
+        cache populated with number=>number, in case of an incompatible
+        Errno module
+
+    * Implement pax header support for tar implementation
+    
+      Teach the tar implementation how to deal with long filenames and
+      symlinks by using pax extended headers.  Add unit tests to ensure the
+      header length computation is correct.
+
+    * Remove $fs->import_module() mechanism
+    
+      Modules previously declared as mixins in the Filesys::POSIX namespace
+      can declare themselves in their own namespace, but can selectively
+      export their methods into Filesys::POSIX; this has the side effect of
+      making POD for mixin modules render correctly on Meta::CPAN
+    
+      Extension modules can be loaded by simply using 'use Some::Module';
+      their benefits can be used by any Filesys::POSIX object immediately
+      thereafter
+
+    * Refactor to use Errno for error reporting
+    
+      Implement Filesys::POSIX::Error with throw() function to simplify
+      throwing of errors by number; sets $! to a specified value, and
+      throws a stringified $! with Carp::confess()
+    
+      Implement Test::Filesys::POSIX::Error with throws_errno_ok() to
+      simplify refactor of unit tests to enforce new interface contract
+    
+      Change a few errors thrown to an errno.h value which better matches
+      the behavior of a real Unix environment
+    
+      Update POD to reflect exceptions thrown by their errno.h macro name
+    
+      Update copyright on all files to 2014
+
+    * Update Makefile.PL
+    
+      Add GitHub info to Makefile.PL
+    
+      Update authorship to reflect PAUSE account email address
+    
+      Update copyright in Makefile.PL
+    
+      Add .perltidyrc to repository, MANIFEST
+
+    * Replace README with README.md
+    
+    * Update synopsis of Filesys::POSIX::Real
+    
+      Update synopsis, usage and exceptions indicated in the POD for the module
+      Filesys::POSIX::Real to accurately reflect current usage
+
+    * Replace failing t/tar-race.t with t/tar-missing.t
+    
+      Rather than fork()ing a subprocess to perform the archiving, archive
+      to a file handle opened for /dev/null
+    
+      Use map() to bring a file in from the real filesystem into a fake one,
+      and remove the referred file from $fs immediately prior to tar() to
+      ensure desired condition is triggered deterministically
+
+Version 0.9.14
+    
+    * Avoid archiving nonregular files and sockets
+    
+      Implement $inode->sock() convenience function to quickly ascertain
+      whether an inode references a socket
+    
+      Make Filesys::POSIX::Userland::Tar->tar() avoid attempting to
+      archive sockets at all
+    
+      Avoid opening files for archival if they are non-regular files, or
+      are regular files of zero byte size
+    
+      Localize usage of $@
+
+    * Mass perltidy
+
+    * Corrected error handling for later versions of Carp
+    
+      Carp changes resulted in the $! variable being lost, so it
+      error details would not be reported; this caused test failures on some
+      systems. Fixed by copying the $! variable before passing it to confess
+      using stringification, i.e. "$!".
+
+Version 0.9.13
+
+    * Add correct handling of real filesystem renames
+    
+      The rename method in Filesys::POSIX was a generic manipulation of the
+      data structure without considering any additional change that might need
+      to be made on the backend storage (in particular,
+      Filesys::POSIX::Real::Directory).
+    
+      This caused the object to be aware that new member had been
+      added, but to also remain conscious of the old member, which
+      still had a presence on disk and therefore was visible through
+      Filesys::POSIX::Real::Directory.
+    
+      This change moves some of the generic rename handling logic from
+      Filesys::POSIX::rename into Filesys::POSIX::Directory::rename_member
+      and adds a Real-specific rename_member method to the
+      Filesys::POSIX::Real::Directory class, allowing it to handle its
+      own special case (use the actual rename function).
+    
+    * Further conversion to Filesys::POSIX::Bits::System
+    
+      Replaced an existing (and incomplete) bit conversion function with the
+      one provided by Filesys::POSIX::Bits::System to reduce code duplication.
+
+Version 0.9.12
+
+    * Improve EOF detection when reading files for inclusion in tar
+    
+Version 0.9.11
+
+    * Avoid creating archives with mismatched file sizes

@@ -1,0 +1,73 @@
+Revision history for Fluent::Logger
+
+0.21 2017-03-23T01:33:19Z
+  * Call buffer_overflow_handler at close() (#21 yoheimuta)
+
+0.20 2017-03-01T04:36:41Z
+  * Fix tests only which broken with Fluentd 0.14 (#20 #21)
+
+0.19 2016-12-21T08:44:55Z
+  * Added fluent-logger-ruby compatible buffer_overflow_handler (#17 tokuhirom)
+  * Added truncate_buffer_at_overflow option (#18)
+
+0.18 2016-06-02T05:52:34Z
+  * Support Sub-second time (for Fluentd 0.14 or later)
+
+0.17 2016-05-26T07:57:21Z
+  * Fix error handling (Fluent::Logger::UDP)
+
+0.16 2016-05-25T09:10:32Z
+  * Add Fluent::Logger::UDP
+
+0.15 2016-05-22T01:40:48Z
+  * Switch to Class::Tiny (#13 miyagawa)
+
+0.14 2016-04-19T13:57:18Z
+  * Remove dependency for Proc::Guard (#11)
+
+0.13 2015-02-02T02:50:31Z
+  * Suppress warning (Use of uninitialized value) (shoichikaji)
+  * Fix document (kiyoto)
+
+0.12 2014-08-06T14:07:32Z
+  * Handle perls built without locale support (Hugmeir)
+
+0.11     2013-10-15
+  * No code changes
+  * Migrate to Minilla
+
+0.10     2013-09-09
+  * fix failed test on FreeBSD (bokutin)
+
+0.09     2013-06-06
+  * No code changes
+  * fix failed tests with Test::TCP >= 1.27 (reported by hisaichi5518)
+
+0.08     2012-12-20
+  * fork safe (fujiwara)
+
+0.07     2012-06-14
+  * Tell fluentd flush log forcely on t/04_live.t (cho45)
+
+0.06     2012-04-23
+  * wait child process on t/02_unix_socket.t (tokuhirom)
+
+0.05     2012-04-10
+  * avoid checking RECONNECT_WAIT for testing reconnect (koji_magi)
+
+0.04     2012-01-31
+  * shouldn't need to set prefer_integer for every post (lestrrat)
+  * update README.md
+
+0.03     2012-01-30
+  * added buffering / pending feature
+
+0.02     2011-11-29
+  * added prefer_integer flag
+
+0.01     2011-11-28
+  * First release
+
+0.01_01  2011-11-18
+  * Initial version
+

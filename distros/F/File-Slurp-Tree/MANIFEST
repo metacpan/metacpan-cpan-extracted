@@ -1,0 +1,9 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+META.yml
+README
+lib/File/Slurp/Tree.pm
+t/00compile.t
+t/01spew_slurp.t

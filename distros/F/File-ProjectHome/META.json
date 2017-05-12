@@ -1,0 +1,74 @@
+{
+   "abstract" : "Find home dir of a project",
+   "author" : [
+      "Hiroki Honda <cside.story@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-ProjectHome",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Path::Class" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "File::ProjectHome" : {
+         "file" : "lib/File/ProjectHome.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Cside/File-ProjectHome/issues"
+      },
+      "homepage" : "https://github.com/Cside/File-ProjectHome",
+      "repository" : {
+         "url" : "git://github.com/Cside/File-ProjectHome.git",
+         "web" : "https://github.com/Cside/File-ProjectHome"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "tokubass <tomi21110@gmail.com>"
+   ]
+}

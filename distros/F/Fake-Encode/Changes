@@ -1,0 +1,21 @@
+Revision history for this software.
+
+0.05 2017-03-07 00:00:00
+  - define NORECURS, PM, and PL_FILES in Makefile.PL
+  - created by INABA Hitoshi
+
+0.04  2017-01-27 00:00:00
+  - write "$VERSION = $VERSION = 0.04" in one line
+  - created by INABA Hitoshi
+
+0.03  2017-01-26 00:00:00
+  - set $VERSION as number
+  - created by INABA Hitoshi
+
+0.02  2017-01-23 00:00:00
+  - remove '.' from @INC (CVE-2016-1238: Important unsafe module load path flaw)
+  - created by INABA Hitoshi
+
+0.01 2016-05-31 00:00:00
+  - original version
+  - created by INABA Hitoshi

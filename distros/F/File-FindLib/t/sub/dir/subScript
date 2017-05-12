@@ -1,0 +1,4 @@
+use File::FindLib 'Sub/Find.pm';
+print $Sub::Find::VERSION, $/;
+my $ret= require Sub::Find;
+print "$ret $Sub::Find::loaded\n";

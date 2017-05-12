@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/File/CountLines.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-pod.t
+t/basic.t

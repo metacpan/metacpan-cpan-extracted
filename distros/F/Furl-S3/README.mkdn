@@ -1,0 +1,191 @@
+# NAME
+
+Furl::S3 - Furl based S3 client library.
+
+# SYNOPSIS
+
+  use Furl::S3;
+
+  my $s3 = Furl::S3->new( 
+      aws_access_key_id => '...', 
+      aws_secret_access_key => '...',
+  );
+  $s3->create_bucket($bucket) or die $s3->error;
+
+  my $res = $s3->list_objects($bucket) or die $s3->error;
+  for my $obj(@{$res->{contents}}) {
+      printf "%s\n", $obj->{key};
+  }
+
+# DESCRIPTION
+
+This module uses [Furl](http://search.cpan.org/perldoc?Furl) lightweight HTTP client library and provides very simple interfaces to Amazon Simple Storage Service (Amazon S3)
+
+for more details. see Amazon S3's developer guide and API References.
+
+http://docs.amazonwebservices.com/AmazonS3/2006-03-01/dev/
+
+http://docs.amazonwebservices.com/AmazonS3/2006-03-01/API/
+
+# METHODS
+
+## Furl::S3->new( %args )
+
+returns a new Furl::S3 object.
+
+_%args_ are below.
+
+- aws_access_key_id 
+
+AWS Access Key ID
+
+- aws_secret_access_key
+
+AWS Secret Access Key.
+
+- secure
+
+boolean flag. uses SSL connection or not.
+
+- endpoint
+
+S3 endpoint hostname. the default value is _s3.amazonaws.com_
+
+other parmeters are passed to Furl->new. see [Furl](http://search.cpan.org/perldoc?Furl) documents.
+
+## list_buckets
+
+list all buckets.
+returns a HASH-REF
+
+  {
+      'owner' => {
+        'id' => '...',
+        'display_name' => '..'
+      },
+      'buckets' => [
+          {
+              'creation_date' => '2010-11-30T00:00:00.000Z',
+              'name' => 'Your bucket name'
+          },
+          #...
+      ]
+  }
+
+## create_bucket($bucket, [ \%headers ])
+
+create new bucket.
+returns a boolean value. 
+
+## delete_bucket($bucket);
+
+delete bucket.
+returns a boolean value.
+
+## list_objects($bucket, [ \%params ])
+
+list all objects in specified bucket.
+returna a HASH-REF 
+
+
+
+  {
+      'marker' => '',
+      'common_prefixes' => [],
+      'max_keys' => '10',
+      'contents' => [
+          {
+               'owner' => {
+                   'id' => '..'
+                   'display_name' => '...'
+               },
+               'etag' => 'xxx',
+               'storage_class' => 'STANDARD',
+               'last_modified' => '2010-12-01T00:00:00.000Z',
+               'size' => '10000',
+               'key' => 'foo/bar/baz.txt'
+          },
+          #... 
+      ],
+      'name' => 'Your bucket name',
+      'delimiter' => '',
+      'is_truncated' => 1
+   }
+
+\%params are below.
+see Amazon S3 documents for detail.
+
+http://docs.amazonwebservices.com/AmazonS3/2006-03-01/API/index.html?RESTBucketGET.html
+
+- delimiter
+
+- marker
+
+- max-keys
+
+- prefix
+
+## create_object($bucket, $key, $content, [ \%headers ]);
+
+create new object.
+$content is passed to Furl. so you can specify scalar value or FileHandle object.
+
+you can set any request headers. example is below.
+
+  open my $fh, '<', 'image.jpg' or die $!;
+  $s3->create_object('you-bucket', 'public.jpg', $fh, {
+      content_type => 'image/jpg',
+      'x-amz-acl' => 'public-read',
+  });
+  close $fh;
+
+## get_object($bucket, $key, [ \%headers, \%furl_options ]);
+
+get object.
+
+\%furl_options are passed to Furl->request method. so you can use write_code or write_file to handle response.
+
+returns a HASH-REF.
+
+  {
+      content => $content, 
+      content_length => '..',
+      etag => '...',
+      content_type => '...',
+      last_modified => '...',
+      'x-amz-meta-foo' => 'metadata'
+  }
+
+## get_object_to_file($bucket, $key, $filename);
+
+get object and write to file.
+returns a boolean value.
+
+## head_object($bucket, $key, [ \%headers ]);
+
+get object's metadata.
+returns a HASH-REF
+
+  {
+      content_length => '..',
+      etag => '...',
+      content_type => '...',
+      last_modified => '...',
+      'x-amz-meta-foo' => 'metadata'
+  }
+
+## delete_object($bucket, $key);
+
+delete object.
+returns a boolean value.
+
+# AUTHOR
+
+Tomohiro Ikebe <ikebe {at} livedoor.jp>
+
+# SEE ALSO
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

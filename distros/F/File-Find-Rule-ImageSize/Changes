@@ -1,0 +1,9 @@
+0.03	29th October, 2002
+	fix on the fix (again spotted by Kate Pugh).  Note to self,
+	never release modules while cooking
+
+0.02	28th October, 2002
+	documentation fix (spotted by Kate Pugh)
+
+0.01	25th October, 2002
+	inital CPAN release

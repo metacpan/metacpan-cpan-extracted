@@ -1,0 +1,50 @@
+Revision history for Perl extension File::Sync.
+
+0.11  Sat, Nov 19 2011 14:56:15 -0500
+   - stop clobbering IO::Handle::fsync, fix:
+     https://rt.cpan.org/Public/Bug/Display.html?id=50418
+
+0.10  Sat, Nov 19 2011 12:44:01 -0500
+	- Support for fdatasync()
+
+0.09  Sun, 28 Nov 1999 15:43:38 +1300
+	- Fixed my code so that bare glob refs _do_ work with Perl 5.005.
+
+0.08  Sat, 20 Nov 1999 18:26:20 +1300
+	- Updated synopsis to remove bare glob ref from example, that
+	  doesn't work any more with Perl 5.005.
+
+0.07  Mon, 19 Jul 1999 22:01:06 +1200
+	- Perl 5.005 `make test' fails on fsync(TEST), so this test
+	  has been removed from t/01_fsync.t.
+
+0.06  Sun, 10 Aug 1997 16:18:16 +1200
+	- OS/2 doesn't have a sync() function.  Make it a no-op if
+	  ExtUtils::MakeMaker thinks the machine is OS/2.  Thanks to
+	  Eric Veldhuyzen for letting me know about this.
+
+0.05  Fri, 18 Apr 1997 12:08:00 +1200
+        - OK, only Linux returns an error when fsync'ing a TTY.
+          Time to release a version without the test.
+
+      Tue,  1 Apr 1997 22:53:56 +1200
+	- Irix doesn't return error when fsync'ing a TTY.  Removed
+	  test.
+
+0.04  Sun, 16 Feb 1997 17:04:10 +1300
+	- Functions are *NOT* exported by default any more.  Updated
+	  documentation and tests accordingly.
+
+0.03  Fri Jan 24 21:55:00 1997
+	- Revamped test scripts and documentation.
+	- Added usage check (number of args) to fsync().
+	- Aliases in FileHandle and IO::Handle for fsync method.
+
+0.02  Mon Dec 16 23:30:00 1996
+	- Sync.xs now uses XSRETURN_UNDEF, XSRETURN_YES.
+	- test.pl checks for correct behaviour on errors.
+	- Added README ready for distribution.
+
+0.01  Mon Nov 25 20:19:12 1996
+	- original version; created by h2xs 1.16
+

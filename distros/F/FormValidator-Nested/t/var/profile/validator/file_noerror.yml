@@ -1,0 +1,7 @@
+params:
+  hello_world:
+    name: 'ファイル'
+    validators:
+      - File#max_size:
+          max: 30 
+

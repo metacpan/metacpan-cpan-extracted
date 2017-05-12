@@ -1,0 +1,50 @@
+---
+abstract: 'file and directory objects'
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+build_requires:
+  Module::Build: 0.38
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Fu
+provides:
+  File::Fu:
+    file: lib/File/Fu.pm
+    version: v0.0.8
+  File::Fu::Base:
+    file: lib/File/Fu/Base.pm
+    version: v0.0.8
+  File::Fu::Dir:
+    file: lib/File/Fu/Dir.pm
+    version: v0.0.8
+  File::Fu::Dir::FindKnob:
+    file: lib/File/Fu/Dir.pm
+  File::Fu::Dir::Temp:
+    file: lib/File/Fu/Dir/Temp.pm
+    version: v0.0.8
+  File::Fu::Dir::Token:
+    file: lib/File/Fu/Dir.pm
+  File::Fu::File:
+    file: lib/File/Fu/File.pm
+    version: v0.0.8
+  File::Fu::File::Temp:
+    file: lib/File/Fu/File/Temp.pm
+    version: v0.0.8
+requires:
+  Class::Accessor::Classy: v0.9.0
+  File::Spec: 0
+  File::Which: 0.05
+  IO::File: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Fu
+  homepage: http://enobacon.com/
+  license: http://dev.perl.org/licenses/
+  repository: git://git.enobacon.com/File-Fu.pm.git
+version: v0.0.8

@@ -1,0 +1,8 @@
+Build.PL
+ChangeLog
+lib/File/Lockfile.pm
+lib/File/Lockfile.pod
+MANIFEST			This list of files
+META.yml
+README
+t/01_basic.t

@@ -1,0 +1,115 @@
+Farly - "Firewall Analysis and Rewrite LibrarY"
+
+Farly is a firewall rule analysis library.
+
+Farly translates a vendor specific firewall configuration
+into an easily searchable vendor independent firewall model.
+
+Using the Farly firewall model, Perl script based firewall 
+management tools can be written to perform tasks such as 
+firewall security audits, group or rule optimizations or
+large scale firewall configuration changes.
+
+Farly is object oriented, using a "key value coding" style.
+
+Each line of firewall configuration is represented by an
+Farly::Object object. Each property within the line of
+configuration is represented by a key value pair.
+
+The key describes what the property within the specific 
+line of configuration is, such as "ID," or "SRC_IP."
+ 
+The Farly::Object value objects are the basic types
+found in a firewall configuration, such as IP addresses,
+protocols, port numbers, string identifiers and references
+to other configuration elements.
+
+The entire firewall device model, made up of 
+Farly::Object objects, is stored in an Farly::Object::List.
+The Farly::Object::List class implements object search
+functionality required for firewall rule analysis.
+
+See "Farly" package SYNOPSIS for code which will dump a
+container, illustrating the Farly model. (The file 'test.cfg'
+in the /t directory may be used as an example firewall 
+configuration.)
+
+See the "demo" directory for Farly usage examples.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Parse::RecDescent
+Log::Log4perl
+Template
+Carp
+Scalar::Util
+IO::File
+File::Spec
+
+DEVICES SUPPORTED
+
+Cisco ASA 7.2+
+Cisco FWSM 3.x+ 
+
+LIMITATIONS
+
+- The Farly model is a subset of the firewall configuration relevant
+  to interfaces, objects, groups, rules, and static routes.
+- Interface IP addresses set with 'dhcp' are not supported.
+- NAT configurations are not modeled.
+- No IPv6 support
+- The Cisco "ne" port operator is not currently supported.
+- Cisco's "identity firewall" feature is not currently supported.
+
+BUGS
+
+None known. The most likely bugs are around unrecognized variations within
+a firewall configuration. Farly should throw an exception and display
+the unrecognized line of configuration.
+
+TODO
+
+- More documentation
+- More example scripts
+- More devices supported
+- IPv6 support
+- IPv4 NAT support
+
+ACKNOWLEDGEMENTS
+
+Thank you to eHealth Saskatchewan for supporting the
+testing of this software.
+
+Thank you to Marlin Berg for many valuable insights
+during the construction of this library.
+
+AUTHOR
+
+Trystan Johnson <tjohnson@cpan.org>
+
+COPYRIGHT AND LICENCE
+
+Farly - "Firewall Analysis and Rewrite LibrarY"
+Copyright (C) 2012  Trystan Johnson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>Configure</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<p>#labels Phase-Deploy</p><h1> NAME </h1><p>Foorum::Manual::Configure - configure Foorum</p><p>Generally, run bin/setup.pl</p><h1> Cache Configure </h1><p>we have built-in FileCache in foorum.yml</p><pre class="prettyprint">cache:
+  backends:
+    default:
+      class: 'Cache::FileCache'
+      namespace: 'Foorum'
+      default_expires_in: 600
+</pre><p>optional: cache_root: '/home/faylandfoorum/cache'</p><p>and we can configure Cache::Memcached as backend cache</p><pre class="prettyprint">cache:
+  backends:
+    default:
+      class: 'Cache::Memcached'
+      servers:
+        - '127.0.0.1:11211'
+      compress_threshold: '10_000'
+      debug: 0
+</pre><p>See Also L&lt;Catalyst::Plugin::Cache&gt;</p><h1> Mail Configure </h1><p>we have several conf under directory conf/examples/mail for mail.</p><ul><li>sendmail.yml - under Linux/Unix we recommended this one. cp conf/examples/mail/sendmail.yml conf/mail.yml </li><li>SMTP.yml - if u have a SMTP server. cp it as conf/mail.yml and change SMTP server and user/pass </li><li>Gmail.yml - if u have no choice, try this. </li></ul><h2> See Also </h2><p>L&lt;Email::Send&gt;</p><p><a href="INSTALL.html">INSTALL</a>, <a href="TroubleShooting.html">TroubleShooting</a></p>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/Configure">http://code.google.com/p/foorum/wiki/Configure</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

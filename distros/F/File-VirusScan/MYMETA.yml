@@ -1,0 +1,36 @@
+---
+abstract: 'Unified interface for virus scanning of files/directories'
+author:
+  - "Dave O'Neill (dmo@roaringpenguin.com)"
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Class: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-VirusScan
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor::Fast: 0
+  Data::ResultSet: 0
+  File::Temp: 0
+  HTML::TokeParser: 0
+  IO::Dir: 0
+  IO::File: 0
+  IO::Select: 0
+  IO::Socket::INET: 0
+  IO::Socket::UNIX: 0
+  Scalar::Util: 0
+  perl: 5.008
+version: 0.103

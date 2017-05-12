@@ -1,0 +1,22 @@
+---
+abstract: 'Convenience functions for working with the InteractiveBrokers API'
+author:
+  - 'Jason McManus <infidel AT cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-InteractiveBrokers-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+version: 0.04

@@ -1,0 +1,184 @@
+Revision history for Perl module File::RsyncP.
+
+0.74 Sat Jan 17 16:50:43 PST 2015
+
+  - updated FileList/config.guess FileList/config.sub with more recent
+    versions from rsync.
+
+  - slight tweaks to FileList/t/exclude.t FileList/t/fileList.t.
+
+  - updated LICENSE to GPL v3 and updated headers.
+
+0.72 Sun Jan 11 13:52:23 PST 2015
+
+  - in lib/File/RsyncP.pm, added getcheck(4) to read io_error flag;
+    fixes potential hang.  Report and patch from Martin Wilck.
+
+  - in FileList/flist.c, wrapped strlcpy() definition with
+    #ifndef HAVE_STRLCPY / #endif.  Report and patch by
+    Ryan Schmidt.
+
+  - Changed reset(), protocol() and add() in Digest/Digest.xs to be void.
+
+0.70 Sun Sat Jul 10 09:54:12 PDT 2010
+
+  - Fixed adler32_checksum() in Digest/rsync_lib.c for case
+    where native char is unsigned (eg: arm architecture).
+
+  - in lib/File/RsyncP.pm, --cvs-exclude incorrectly required an
+    argument, reported by Cameron Dale.
+
+0.68 Sat Nov 18 18:29:31 PST 2006
+
+  - Convert exclude/include log messages to utf8.
+
+  - Fixed 2nd digest returned by File::RsyncP::Digest->digest2()
+    when protocol_version <= 26.
+
+0.66 Sun Oct 29 10:15:15 PST 2006
+
+  - Support turning off --perms option, reported by Cameron Dale.
+
+  - Applied patches from Mark Weaver to handle skipping duplicate
+    file names.
+
+  - Added FileList/snprintf.c to handle solaris configure failures.
+
+0.64 Sun Jul 30 19:31:45 PDT 2006
+
+  - Fixed some compiler warnings and verbose declaration
+    reported by Guillaume Filion and Rodrigo Real.
+
+  - Added a couple of tweaks for file names that contain newlines,
+    reported by Robert Waldner.
+
+0.62 Sun Jul  9 11:18:32 PDT 2006
+
+  - Added hardlink support.
+
+  - Added support for protocol version 28.
+
+  - Moved daemon @RSYNCD: protocolVersion send before the getLine
+    to work correctly with rsync on novell (suggested by
+    Jacob Lundqvist).
+
+0.52 Sat May 29 19:16:22 PDT 2004
+
+  - Changed the parent write file handle to be non-blocking.  This
+    should avoid a deadlock reported by several users.
+
+0.51 Sun May  9 23:42:56 PDT 2004
+
+  - Changed newSVpv() to newSVpvn() in Digest/Digest.xs to allow
+    empty argument to blockDigestExtract().
+
+  - csumStart() in File::RsyncP.pm now includes the $phase argument.
+
+0.50 Sat Mar 20 18:19:50 PST 2004
+
+  - Added doPartial option to support BackupPC 2.1.0.
+
+  - Added File::RsyncP::abort() for graceful cleanup mid-transfer.
+
+0.47 Sun Mar 14 21:37:22 PST 2004
+
+  - Changed FileList/FileList.xs so that uid, gid, mode and mtime
+    are forced to be unsigned.  This fixes a problem new to 0.46 that
+    was introduced when newSVuv was replaced with newSVnv to back
+    port to 5.005_03.
+
+0.46 Sun Feb  8 18:11:30 PST 2004
+
+  - Put $VERSION on a new line in lib/File/Rsync.pm and
+    lib/File/RsyncP/FileIO.pm so CPAN can correctly extract
+    the version.  No functional change from 0.45.
+
+0.45 Sat Feb  7 15:37:51 PST 2004
+
+  - Patch from Marlin Prowell for FileList/flist.c that solves a
+    subtle file list corruption problem.  In particular, f->lastdir
+    was being set too early in receive_file_entry(), potentially
+    before it returned to fetch more data and restart.
+
+  - Patches from Lars Thegler to back port to perl 5.005_03.
+
+  - Added Getopt::Long => 2.24 to PREREQ_PM in Makefile.PL, since the
+    OO interface to Getopt::Long that we use was added in this version.
+
+0.44 Wed Jul 23 21:31:18 PDT 2003
+
+  - Fixes to FileList for large file support.
+
+0.43 Sun Jul 20 00:03:40 PDT 2003
+
+  - Changed file length, dev and inode to double.
+
+  - Added File::RsyncP::Digest->protocol, including support for
+    protocol version >= 27 (after MD4 fixes).
+
+  - Added File::RsyncP::Digest->digest2 that returns the old (buggy)
+    and new styles of the MD4 digest.
+
+0.42 Sat Jul 12 09:53:40 PDT 2003
+
+  - Replaced regexp with split() due to 5.8.0 regexp performance problem.
+
+  - Replace $rs->getChunk with rs->getData in final handshake.
+
+0.41 Sat May 10 20:39:33 PDT 2003
+
+  - Fixed VERSION settings
+
+  - Removed inline function in flist.h
+
+0.40 Sat May 10 11:51:58 PDT 2003
+
+  - add pidHandler() callback to caller knows the children's pids.
+
+  - replaced seek() with sysseek() in File::RsyncP::FileIO.
+
+0.31 Sun Feb 23 15:17:05 PST 2003
+
+  - Added new stat remoteErrCnt, which counts the number of error
+    messages returned by the remote side.
+
+  - Couple of minor documentation changes.
+
+0.30 Sun Feb  9 23:06:42 PST 2003
+
+  - Added timeout parameter to File::RsyncP->new.
+
+  - Fixed File::RsyncP::FileIO to handle a received file whose
+    size changed from the file list.
+
+0.20 Fri Jan 17 22:24:11 PST 2003
+
+  - Added rsyncCmdType argument to File::RsyncP->new.
+
+  - Allowed rsyncCmd to be a code reference.
+
+  - Added logHandler to File::RsyncP::FileIO->new, allowing a callback
+    style log function rather than logMsg.
+
+  - Added logHandlerSet to File::RsyncP::FileIO.
+
+  - Added optional needMD4 argument to File::RsyncP::FileIO->csumStart.
+
+  - Renamed sub mkpath to makePath.
+
+  - Renamed sub mkspecial to makeSpecial.
+
+  - Replaced unlink() calls with CORE::unlink().
+
+  - Added handling of special files to File::RsyncP::FileIO->fileListEltSend
+
+  - Added File::RsyncP::FileIO->ignoreAttrOnFile.
+
+  - Sending file deltas now sends deltas if the files are identical,
+    rather than the whole file.
+
+  - Changed t/rsyncLoad.t to use File::RsyncP instead of File::RsyncP::Digest.
+
+0.10 Wed Dec 25 17:25:21 PST 2002
+
+  - Initial version

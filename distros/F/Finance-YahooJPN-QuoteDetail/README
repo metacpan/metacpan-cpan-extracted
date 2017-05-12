@@ -1,0 +1,34 @@
+Finance/YahooJPN/QuoteDetail version 0.01
+=========================================
+
+ This module provides you functions to fetch detail quotes
+  of Japanese stock markets from Yahoo-Japan-Finance.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+ This module and the test script requires internet connection.
+ And the test script will take several seconds to progress.
+ And sometime the test may fail if the network connection is
+ unstable.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::TableExtract;
+  LWP::UserAgent;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Takashi Saeki. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

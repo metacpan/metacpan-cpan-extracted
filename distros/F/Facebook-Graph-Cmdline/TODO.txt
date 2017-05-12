@@ -1,0 +1,13 @@
+* OAuth workflow example.
+* Show how to create a Facebook application: set domain (localhost:8123) and enable long lived tokens.
+* Can I share my application id&secret to let others use? Can they spoof my application?  Create tokens?
+* Error handling in code and token routines
+* documentation
+* tests and test strategy -- how to test that facebook requests work?
+* README.mkd for github
+* code review
+
+Extended:
+* github project page
+* perl advent article
+* use in App::PM::website / App::PM::toolbox to create/update/query facebook events for la.pm.org meetings.

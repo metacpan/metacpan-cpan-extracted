@@ -1,0 +1,36 @@
+---
+name: Flickr-Upload-FireEagle
+version: 0.1
+author:
+  - 'Aaron Straup Cope <ascope@cpan.org>'
+abstract: Flickr::Upload subclass to assign location information using FireEagle
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Date::Parse: 0
+  Error: 0
+  Flickr::Upload: '>= 1.25'
+  Geo::Coordinates::DecimalDegrees: 0
+  Image::Info: 0
+  Net::FireEagle: '>= 1.0'
+  Readonly: 0
+  XML::XPath: 0
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  FUFEException:
+    file: lib/Flickr/Upload/FireEagle.pm
+  Flickr::Upload::FireEagle:
+    file: lib/Flickr/Upload/FireEagle.pm
+    version: 0.1
+  FlickrAPIException:
+    file: lib/Flickr/Upload/FireEagle.pm
+  FlickrUploadException:
+    file: lib/Flickr/Upload/FireEagle.pm
+  NetFireEagleException:
+    file: lib/Flickr/Upload/FireEagle.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

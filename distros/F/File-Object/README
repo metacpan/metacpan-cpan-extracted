@@ -1,0 +1,186 @@
+NAME
+    File::Object - Object system for filesystem paths.
+
+SYNOPSIS
+     use File::Object;
+     my $obj = File::Object->new(%parameters);
+     $obj->dir(@dir);
+     $obj->file(@file_path);
+     my $dir = $obj->get_dir($dir_num);
+     my $file = $obj->get_file;
+     $obj->reset;
+     my $path = $obj->s;
+     $obj->set;
+     $obj->up($num);
+
+METHODS
+    "new(%parameters)"
+            Constructor.
+
+            *       "dir"
+
+                     Directory path in reference to array.
+                     Default value is [].
+
+            *       "file"
+
+                     File path.
+                     Default value is undef.
+
+            *       "type"
+
+                     Type of path.
+                     Types:
+                     - file
+                     - dir
+                     Default value is 'dir'.
+
+    "dir(@dir)"
+             Add directory or directories to object.
+             Returns main object.
+
+    "file(@file_path)"
+             Add file or directory/directories with file to object.
+             Returns main object.
+
+    "get_dir($dir_num)"
+             Returns $dir_num level directory.
+             Default value of $dir_num is 1.
+
+    "get_file()"
+             Returns:
+             - Filename if object is file path.
+             - undef if object is directory path.
+
+    "reset()"
+             Reset to constructor values.
+
+    "s()"
+             Serialize path and return.
+
+    "set()"
+             Set actual values to constructor values.
+
+    "up($up_num)"
+             Go to $up_num upper directory.
+             Returns main object.
+
+ERRORS
+     new():
+             'dir' parameter must be a reference to array.
+             Bad 'type' parameter.
+             Bad file constructor with undefined 'file' parameter.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     up():
+             Cannot go up.
+                     PATH -> path;
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Object;
+
+     # Print actual directory path.
+     print File::Object->new->s."\n";
+
+     # Output which runs from /usr/local/bin:
+     # /usr/local/bin
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Object;
+
+     # Print parent directory path.
+     print File::Object->new->up->s."\n";
+
+     # Output which runs from /usr/local/bin:
+     # /usr/local
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Object;
+
+     # Object with directory path.
+     my $obj = File::Object->new(
+             'dir' => ['path', 'to', 'subdir'],
+     );
+
+     # Relative path to file1.
+     print $obj->file('file1')->s."\n";
+
+     # Relative path to file2.
+     print $obj->file('file2')->s."\n";
+
+     # Output:
+     # Unix:
+     # path/to/subdir/file1
+     # path/to/subdir/file2
+     # Windows:
+     # path\to\subdir\file1
+     # path\to\subdir\file2
+
+EXAMPLE4
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Object;
+
+     # Object with directory path.
+     my $obj = File::Object->new(
+             'dir' => ['path', 'to', 'subdir'],
+     );
+
+     # Relative path to dir1.
+     print $obj->dir('dir1')->s."\n";
+
+     # Relative path to dir2.
+     print $obj->reset->dir('dir2')->s."\n";
+
+     # Output:
+     # Unix:
+     # path/to/subdir/dir1
+     # path/to/subdir/dir2
+     # Windows:
+     # path\to\subdir\dir1
+     # path\to\subdir\dir2
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, FindBin, File::Spec::Functions.
+
+SEE ALSO
+    File::Spec
+        portably perform operations on file names
+
+    Path::Class
+        Cross-platform path specification manipulation
+
+REPOSITORY
+    <https://github.com/tupinek/File-Object>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2009-2016
+     BSD 2-Clause License
+
+VERSION
+    0.10
+

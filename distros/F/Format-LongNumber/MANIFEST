@@ -1,0 +1,8 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Format/LongNumber.pm
+t/001_load.t
+t/002_main.t

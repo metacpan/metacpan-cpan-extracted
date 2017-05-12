@@ -1,0 +1,60 @@
+0.01 Wed Apr 25 02:15:22 PDT 2004
+	initial release
+
+0.02
+	- added more FFmpeg::Stream attributes (height, width, channels, etc)
+
+	- FFmpeg::Stream made to be an uninstantiated base class for specific
+	stream types: FFmpeg::Stream::Video, ::Audio, ::Data, and ::Unknown.
+
+	- removed Inline::C dependency by reimplementing in XS (Dan Sully)
+
+	- added capture_frame() method to FFmpeg::StreamGroup.  this introduces
+	a dependency on Image::Magick::Iterator and Image::Magick.
+
+	- changed Makefile.PL to read from $FFMPEG_ROOT environmental variable
+	rather than a Makefile.PL argument.
+
+0.03	- removed FFmpeg.PMS from distro (oops, should have been gone in 0.02)
+
+	- added method for accessing header duration for RIFF files to
+	FFmpeg::Stream::Video FIXME not done yet.
+
+	- added input_url(), input_url_max_size(), and input_url_referrer() to
+	allow customized downloading of files or their headers.  if
+	input_url_max_size() is used, a second HEAD request is issued to get
+	the real file size so FFMpeg::StreamGroup->duration() still reports
+	the correct value.  this introduces dependency on LWP::UserAgent and
+	HTTP::Request to the library.
+
+0.04	- added force_format() method.
+	- removed Time::Piece dependency.  duration() now returns fractional
+	seconds for the duration of the stream or stream group.  call
+	duration(format => 'HMS') to get a HH::MM::SS formatted string.  i
+	may at some point add support for a 'Time::Piece' and other formats.
+	- corrected a duration bug that reported incorrect durations for long
+	streams (sprintf unsigned int instead of signed int)
+
+6036
+	- Sync to SVN version 6036
+	- Added ffmpeg.c and config.h to distro, removing the need, in most
+	cases, to define $FFMPEG_ROOT.
+	- Renamed FFmpeg::StreamGroup's frame_rate() to video_rate()
+	- Renamed FFmpeg::StreamGroup's frame_size() to video_geometry()
+	- Added all command line options as comments to FFmpeg.xs.  Serves
+	as a list of features to add to fully implement "ffmpeg" commandline
+	program
+	- Added extensions() method to FFmpeg::FileFormat.  Returns a list
+	of file lowercase file extensions associated with the file format.
+	- Added perl hooks for:
+		* audio_bitrate (-ab)
+		* video_codec (-acodec)
+		* audio_rate (-ar)
+		* video_bitrate (-b)
+		* video_codec (-vcodec)
+	- Added transcode() method to FFmpeg::StreamGroup
+
+#TODO#
+* finish documentation for transcode() options
+* implement copyright/author/etc setters to be used by transcode()
+* fix copyright/author/etc retrieval for the problematic .avi file in t/03.avi.t

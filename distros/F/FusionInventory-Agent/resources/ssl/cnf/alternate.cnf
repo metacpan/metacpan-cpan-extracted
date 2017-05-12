@@ -1,0 +1,18 @@
+[ req ]
+default_bits       = 2048
+encrypt_key        = no
+distinguished_name = req_dn
+req_extensions     = req_ext
+prompt             = no
+string_mask        = pkix
+
+[ req_dn ]
+organizationName       = fusioninventory.org
+organizationalUnitName = alternative trusted test certificate
+commonName             = test.fusioninventory.org
+emailAddress           = test@fusioninventory.org
+
+[ req_ext ]
+basicConstraints     = CA:false
+subjectKeyIdentifier = hash
+subjectAltName       = DNS:other.fusioninventory.org, IP:127.0.0.1

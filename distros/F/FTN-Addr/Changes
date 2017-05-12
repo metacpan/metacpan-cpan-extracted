@@ -1,0 +1,20 @@
+Revision history for Perl module FTN-Addr
+
+20090704  2009-07-04
+    Initial version.
+
+20160216  2016-02-16 14:28:40-05:00 America/New_York
+    Return empty list instead of undef in list content on error.
+    New clone method.
+    Field setters do validation too.
+    Field getter with parameter becomes field setter.
+    Documentation changes.
+    Dropped in-place object creation (now returns newly created object instead)
+
+20160302  2016-03-02 00:58:05-05:00 America/New_York
+    Enforce frl-1028.002 ( domain only with characters 'a' .. 'z', '0' .. '9', '-', '_', '~' ).
+    Support for point equal -1.
+    's5', 'f5' and 'fqfa' methods didn't work on calls after first one.
+
+20160303  2016-03-03 00:32:18-05:00 America/New_York
+    Fix typo making net field setter to work incorrectly.

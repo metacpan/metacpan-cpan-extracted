@@ -1,0 +1,51 @@
+---
+abstract: 'Fetch stock quotes from a grab bag of sources.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Quote-Grab
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+provides:
+  Finance::Quote::Ghana:
+    file: Finance/Quote/Ghana.pm
+    version: '14'
+  Finance::Quote::Grab:
+    file: META.yml
+    version: '14'
+  Finance::Quote::MGEX:
+    file: lib/Finance/Quote/MGEX.pm
+    version: '14'
+  Finance::Quote::MLC:
+    file: lib/Finance/Quote/MLC.pm
+    version: '14'
+  Finance::Quote::RBA:
+    file: lib/Finance/Quote/RBA.pm
+    version: '14'
+requires:
+  Finance::Quote: '1.15'
+  HTML::TableExtract: '0'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  LWP: '5.814'
+  Scalar::Util: '0'
+  Test::More: '0'
+  URI::Escape: '0'
+  perl: '5.005'
+resources:
+  homepage: http://user42.tuxfamily.org/finance-quote-grab/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '14'

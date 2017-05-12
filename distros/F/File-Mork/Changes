@@ -1,0 +1,16 @@
+20 Dec 2015 - v0.4 UTF-16
+
+  Fixes for UTF-16 conversion error from Rob O'Neale and James Wright
+
+24 Oct 2006 - v0.3 UTF8
+
+  Patch to support UTF8 from Yohei Fushii 
+
+03 May 2005 - v0.2 Testing
+
+  Add reference to Mozilla::Backup
+  Add tests
+
+28 Apr 2005 - v0.1 Initial Release
+
+    Based on jwz's mork.pl code

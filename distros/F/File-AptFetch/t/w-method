@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+# $Id: w-method 496 2014-02-26 17:39:18Z whynot $
+# Copyright 2009, 2010, 2014 Eric Pozharski <whynot@pozharski.name>
+# GNU GPLv3
+# AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+
+use strict;
+use warnings;
+
+package main;
+use version 0.77; our $VERSION = version->declare( v0.1.1 );
+
+use IO::Handle;
+
+my $fn = <DATA>;
+chomp $fn;
+open STDERR, q|>>|, $fn                        or die qq|[open] (STDERR): $!|;
+
+STDOUT->autoflush( 1 );
+STDERR->autoflush( 1 );
+
+$SIG{$_} = sub { printf STDERR qq|{{{%s}}}\n|, shift @_; exit 0 }      foreach
+  grep -1 == index( $_, '_' ), keys %SIG;
+
+print <<'END_OF_CAPS';
+100 Capabilities
+Version: 1.0
+Single-Instance: true
+Local-Only: true
+Send-Config: true
+
+END_OF_CAPS
+
+1 while( <STDIN> );
+
+# vim: set filetype=perl

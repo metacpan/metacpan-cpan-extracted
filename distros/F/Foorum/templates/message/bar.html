@@ -1,0 +1,19 @@
+[% c.load_once("jquery.ui.css") %]
+<div id='ftabs'>
+    <ul>
+        <li[% IF c.req.path.match('compose') %] selected="selected"[% END %]><a href='/message/compose'><span>[% c.loc('Compose New Message') %]</span></a></li>
+        <li[% IF c.req.path.match('inbox') OR c.req.path.match('message/?$') %] selected="selected"[% END %]><a href='/message/inbox'><span>[% c.loc('Inbox') %]</span></a></li>
+        <li[% IF c.req.path.match('outbox') %] selected="selected"[% END %]><a href='/message/outbox'><span>[% c.loc('Outbox') %]</span></a></li>
+    </ul>
+    <div>
+
+[% content %]
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

@@ -1,0 +1,175 @@
+Revision history for File-CodeSearch
+
+0.7.4   2015-08-22
+        Updating for release of version 0.7.4
+        Removed creation of makefile (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.7.3   2015-05-23
+        Updating for release of version 0.7.3
+        Added todo to manifest (Ivan Wills)
+        Fixed Build.PL (Ivan Wills)
+        Updated dates (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Fixed renamed README (Ivan Wills)
+        Fixed file that lost it's correct version (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added missing =cut (Ivan Wills)
+        Updated README to being a pod file, and removed all the references to VCS::Which (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Reverting bad fix attempt (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        New TODO file (Ivan Wills)
+
+0.7.2   2014-11-19
+        Updating for release of version 0.7.2 (Ivan Wills)
+        Added setting limit so those with other terminal sizes won't break the test (Ivan Wills)
+        Femoved unused argument, added documentation of all argument (Ivan Wills)
+
+0.7.1   2014-11-15
+        Updated documentation (Ivan Wills)
+        [RT 100350] Fixed comment in SYNOPSIS (Ivan Wills)
+
+0.7.0   2014-11-15
+        Fixed spelling (Ivan Wills)
+        Removed breakpoint (Ivan Wills)
+        Better tests for File::CodeSearch using autodie (Ivan Wills)
+        Improving code coverage (Ivan Wills)
+        Improved test coverage (Ivan Wills)
+        Removed break point (Ivan Wills)
+        Added more tests to get to 100% code coverage for ::RegexBuilder (Ivan Wills)
+        More tests to improve code coverage (Ivan Wills)
+        Added documentation on new parameters (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Removed File::CodeSearch::Files (Ivan Wills)
+        Added File::TypeCategories as dependency (Ivan Wills)
+        Moving to File::TypeCategories (Ivan Wills)
+
+0.6.0   2014-11-04
+        Fixed changed build dependency (Ivan Wills)
+        Converted from Test::NoWarnings to Test::Warnings (Ivan Wills)
+        Added test of the _message method (Ivan Wills)
+        Delayed loading of Config::General (Ivan Wills)
+        Test for F::C::Replacer module (Ivan Wills)
+        Removed unnessesary logic (Ivan Wills)
+        Noisy deps install (Ivan Wills)
+        Trying to get travis to work correctly (Ivan Wills)
+
+0.5.9   2014-10-22
+        Readded removed test (Ivan Wills)
+        Added lots more types (Ivan Wills)
+        Added dzil build files (Ivan Wills)
+
+0.5.8   2014-08-21
+        Updated manifest (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Documented quiet mode (Ivan Wills)
+        Added quiet mode to hide warnings (Ivan Wills)
+        Fixed not checking that the user can change into a directory (Ivan Wills)
+        Updating for release of version 0.5.7 (Ivan Wills)
+        Added missing "not" (Ivan Wills)
+        Added skipping making backups for version controlled files (Ivan Wills)
+        Added forcing processing the end of a file when replacing (Ivan Wills)
+        Added check for processing the end of a file (Ivan Wills)
+        Trying to get replace --yes working (Ivan Wills)
+
+0.5.7   2013-07-17
+        Added missing "not" (Ivan Wills)
+        Added skipping making backups for version controlled files (Ivan Wills)
+        Added forcing processing the end of a file when replacing (Ivan Wills)
+        Added check for processing the end of a file (Ivan Wills)
+        Trying to get replace --yes working (Ivan Wills)
+        Improved default types (Ivan Wills)
+        Added configure_requires section (Ivan Wills)
+
+0.5.6   2013-05-13
+        Fixed ignores/skips
+        Fixed kwalitee test
+        Fixed incorrect param name
+        Changed to using Path::Tiny for hopefully better performance
+        changed --path to accept globbed directories
+
+0.5.5   2011-12-09
+        Updated license code
+        Added new generated META.json file
+        Updated ignores to include generated files (and removed those generated files)
+        Fixed mymeta ignore
+        Added ignoring vim files and ~ files by default
+        Added checking that there is something to search with
+        Added defaulting $HOME to $USERPROFILE for windows users
+        Added to documentation
+        Fixed syntax errors
+        Changed default less command to be more sensible, added environmental override, documented
+        Changed command line parameters to be more grep like
+        Fixed not correctly checking if file handle was opened successfully
+        Changed ignore to be a list of file types
+        Removed isolating matched variable
+
+0.5.2   2011-04-15
+        Added IO::Prompt dependency
+        Changed test regexes to being proper quoted regexes to fix issue with perl 5.13
+        Fixed bug in checking for included file types
+        Added ,v RCS files to ignored list
+        Added BUILD method to read the ~/.csrc file for any updated file types
+        Added "bang" check which looks at the first line of a file to determine if the matches a file type
+        Fixed missing bracket and unchanged type suffix name
+        Updated documentation to being more usable and complete
+        Changed so that file type groups can be updated
+        Fixed copyright
+        More ignore sorting
+        Added script to make cs not require all other modules to be installed
+        Fixed bad regex match
+
+0.5.1   2011-01-29
+        Fixed spelling mistakes
+        Cleaned up more POD
+        Cleaned some redundant code
+        Fixed loosely specified attribute, removed replace attribute as it can be determined from regex
+        Added smart ignore case
+        Added to change log and made version a development version
+        Upped version number for release including replacing
+        Fixed not clearing last files contents
+        Almost working (fails for final files
+        Started trying to get replacing working
+        Updated the distribution description
+        Added Replace to tested modules
+        Fixed problem when tests are not run in TEST_AUTHOR mode
+
+0.5.0_1 2010-09-15
+        Fixed not clearing last files contents
+        Almost working (fails for final files)
+        Started trying to get replacing working
+        Updated the distribution description
+        Cleaned Build.PL
+
+0.2.0   2010-07-20
+        Added Replace to tested modules
+        Fixed problem when tests are not run in TEST_AUTHOR mode
+        Fixed (mostly) display of long lines with matches so that they fit on one line
+        Removed debug warning statements
+        Fixed not re-adding newline when the it was removed on very long lines
+        Started to implement replacing
+        Changed the smart regex to be able to find php functions which return references
+        Moved find search sub into separate function call
+        Added the ability to out put with out any colouring or less usage
+
+0.1.0   2010-02-16
+        Added the ability to send the output through less if more than a screen worth is displayed (in smart mode)
+        Removed unused module
+        Fixed operations with symbolic links
+        Added the ability to limit the found results
+        Better checking of new lines etc
+        Moved link checking out of Files so that directory links can be checked for revisits correctly
+        Added limiting displaying of very long line (>255 characters)
+        Fixed not searching into symlink when asked
+        Added counting matches perl file when files_only and totals are specified as well as actually specifying the total number of matches
+        Added the ability to return unique results of a search
+        Removed excess line
+        Fixed warning when $start is not defined
+        Added the ability to split colon (:) separated paths
+
+v0.0.1  2009-08-17
+        Initial Release

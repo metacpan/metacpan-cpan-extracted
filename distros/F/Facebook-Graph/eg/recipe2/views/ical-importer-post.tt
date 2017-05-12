@@ -1,0 +1,7 @@
+<h1>iCal Importer</h1>
+Import complete. <a href="http://www.facebook.com/">View Facebook to see your import.</a>
+
+[% IF response %]
+	<h3>Facebook Response</h3>
+	<textarea style="width: 500px; height: 250px;">[% response %]</textarea>
+[% END %]

@@ -1,0 +1,114 @@
+File::Version version 0.02
+==========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are no dependencies
+
+SYNOPSIS
+       use File::Version;
+
+       my %args = (
+           FILE            => 'foo.txt',
+           SEARCH_PATHS    => ['/projects'],
+           RECURSION_DEPTH => 10,
+           FOLLOW_SYMBOLIC => 0 
+       );
+
+       my $foo = File::Version->new(%args);
+
+METHODS
+       · $foo->locate_ancestors; # recursively search /project 10
+         directories deep for all 'foo.txt' ancestors
+
+       · $foo->locate_descendants; # recursively search /project
+         10 directories deep for all 'foo.txt' descendants
+
+       · $foo->next_version; # next version of 'foo.txt'
+
+       · $foo->search_paths( SEARCH_PATHS => [ '/home' ] ); # now
+         search all home directories
+
+       · $foo->recursion_depth( RECURSION_DEPTH => 5 ); # now
+         seach only 5 directories deep
+
+       · $foo->follow_symbolic( FOLLOW_SYMBOLIC => 1 ); # follow
+         symbolic links (not recommended)
+
+DESCRIPTION
+       This module is useful for creating and locating different
+       versions of a file.  For example, let's say you're working
+       with a first generation file named foo.txt.  Before pro­
+       ceeding, we gather some information about the foo.txt fam­
+       ily tree:
+
+       my %args = (
+           FILE            => '/path/foo.txt',
+           SEARCH_PATHS    => ['/home'],
+           RECURSION_DEPTH => 10,
+           FOLLOW_SYMBOLIC => 0
+       ); 
+
+       my $foo = File::Version->new(%args);
+
+       $foo->locate_descendants might return the following refer­
+       ence :
+
+       $ref = {
+                '1' => {
+                         '/home/bill/1__foo.txt' => '1',
+                         '/home/mary/foobar/test/2__foo.txt' => '2'
+                       },
+                '2' => {
+                         '/home/bill/2_1__foo.txt' => '1',
+                         '/home/john/project/2_2__foo.txt' => '2'
+                         '/home/fred/mystuff/1_1__foo.txt' => '1'
+                       },
+                '3' => {
+                         '/home/jill/2_2_1__foo.txt' => '1'
+                       }
+       };
+
+       meaning that foo.txt has :
+
+       2 children, 3 grandchildren, 1 great grandchild
+
+       $foo->locate_ancestors has the opposite effect, returning
+       undef in this case because foo.txt is an original file.
+
+       $foo->next_version returns '3__foo.txt', meaning the third
+       child of foo.txt.  A file named '3_1__foo.txt' would mean
+       the first child of foo.txt's third child.
+
+SUGGESTIONS
+         · Use the Algorithm::Diff module to compare different
+           versions.
+
+         · The cp_version.pl script (provided with this module)
+           takes filenames as arguments from the command line and
+           spits out the next version of each file.  Alias this
+           script for your convenience.
+
+BUGS
+       This module was written and tested using Perl 5.6.0 under
+       Linux.  If you want this module to work with Windows, at
+       minimum you'll need to change the directory separator to a
+       backslash.  Comments and suggestions welcome.
+
+AUTHOR
+       Nathaniel J. Graham <broom@pincer.org>
+
+COPYRIGHT
+       Copyright 2003, Nathaniel J. Graham.  All Rights Reserved.
+       This program is free software.  You may copy or redis­
+       tribute it under the same terms as Perl itself.
+

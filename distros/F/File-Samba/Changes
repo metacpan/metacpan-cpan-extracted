@@ -1,0 +1,6 @@
+Revision history for Perl extension File::Samba.
+
+0.01  Fri Jun  4 22:43:11 2004
+	- original version; created by h2xs 1.23 with options
+		-X -A -n File::Samba
+

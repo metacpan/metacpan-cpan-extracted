@@ -1,0 +1,18 @@
+Revision history for Perl extension Finance::Bank::AllianceAndLeicester.
+
+1.03 Mon Jun 8 09:40:25 2009
+  - Rewrote to work with most-recent Alliance & Leicester website.
+
+1.02 Tue Oct 10 08:53:36 2006
+  - Reduced PERL version in Makefile.PL to 5.006001 which should
+    solve some installation issues.
+
+1.01  Wed Oct 4 10:06:27 2006
+  - Remove comma from balances
+
+1.00  Mon Jun 26 13:38:23 2006
+  - Final 1.00 release
+
+0.01  Fri Jun 23 20:39:49 2006
+  - original version; created by h2xs 1.23 with options
+    -X -n Finance::Bank::AllianceAndLeicester

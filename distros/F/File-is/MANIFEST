@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/File/is.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00_compile.t
+t/01_File-is.t
+t/distribution.t
+t/fixme.t
+t/perlcritic.t
+t/perlcriticrc
+t/perltidy.conf
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,9 @@
+#fsdb sid cid
+1	10
+2	-
+# *** line above is missing field cid (corrected).
+1	12
+2	12
+# *** line above has 1 extra column (corrected).
+# *** dbfilevalidate: some lines had errors (corrected).
+#   | dbfilevalidate -c

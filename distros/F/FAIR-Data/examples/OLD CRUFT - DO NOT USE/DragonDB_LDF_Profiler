@@ -1,0 +1,366 @@
+#!/usr/bin/perl -w
+
+use strict;
+use URI::Escape;
+use LWP::Simple;
+use XML::XPath;
+use XML::XPath::Parser;
+use RDF::Trine;
+use RDF::Query;
+use RDF::Trine::Model;
+use RDF::Trine::Statement;
+use RDF::Trine::Node::Resource;
+use RDF::Trine::Node::Literal;
+use RDF::Trine::Serializer;
+use RDF::NS '20131205';
+
+#$ENV{'PATH_INFO'} = "/DragonDB_Allele_ProfileImagesSIO/100" unless $ENV{'PATH_INFO'};
+
+my $ns = RDF::NS->new('20131205');   # check at runtime
+die "can't set namespace $!\n" unless ($ns->SET(ldp => 'http://www.w3.org/ns/ldp#'));
+die "can't set namespace $!\n" unless ($ns->SET(sio => 'http://semanticscience.org/ontology/'));
+die "can't set namespace $!\n" unless ($ns->SET(obo => 'http://purl.obolibrary.org/obo/'));
+die "can't set namespace $!\n" unless ($ns->SET(hydra => 'http://www.w3.org/ns/hydra/core#'));
+
+
+
+print "Content-Type: text/turtle\n\n";
+
+
+unless ($ENV{'PATH_INFO'}){
+    printProfilerInfo();   # send out the list of profiles that I can project
+    exit;
+}
+			  
+			  
+			  
+# this is the profiler for the LDP running at http://antirrhinum.net/cgi-bin/LDP/Alleles
+# so get the URLs from that LDP server
+my $sortedURLs = getLDPRecordURLs('http://antirrhinum.net/cgi-bin/LDP/Alleles');
+
+
+my ($blank, $profile_schema, $position) = split '/', $ENV{'PATH_INFO'};
+
+my ($model_to_return, $current_position);
+if ($profile_schema =~ /DragonDB_Allele_ProfileAlleleDescriptions/){
+    ($model_to_return, $current_position) = alleleDescriptions($sortedURLs, $position);
+} elsif ($profile_schema =~ /DragonDB_Allele_ProfileImagesEDAM/){
+    ($model_to_return, $current_position) = alleleImagesEDAM($sortedURLs, $position);
+} elsif ($profile_schema =~ /DragonDB_Allele_ProfileImagesSIO/){
+    ($model_to_return, $current_position) = alleleImagesSIO($sortedURLs, $position);
+}
+
+
+createPagination($model_to_return, scalar(@$sortedURLs), $current_position);  # hypermedia controls
+                       
+serializeThis($model_to_return);
+
+exit;
+
+
+
+sub createPagination {
+    my ($model, $total, $current) = @_;
+    my $this_script = $ENV{'REQUEST_URI'} || "/DragonDB_LDF_Profiler";
+    my $server =  $ENV{'SERVER_NAME'} || "biordf.org";
+    my $path = $ENV{'PATH_INFO'} || "/DragonDB_Allele_ProfileImagesSIO/100";
+    
+    my $this_page= "http://$server/$this_script/$path";
+    
+    $path =~ s/\d+$//;  # get rid of trailing digits on the path, since these are the pagination controls that we are goingto remake
+    my $baseURL = "http://$server/$this_script/$path";
+    if ($current > 0) {
+        # there is a previous page
+        my $prevpage = $current - 11;  #from 106 to 95
+        $prevpage = 0 if $prevpage < 0;
+        my $prevURL = $baseURL . $prevpage;
+        my $statement = statement($this_page, $ns->hydra('previousPage'), $prevURL);
+        $model->add_statement($statement);
+    }
+    if ($total - $current > 0) {
+        # there is a next page
+        my $nextpage = $current;  # current is actually 1 more than the last position serialized, so it is the "next"
+        my $nextURL = $baseURL . $nextpage;
+        my $statement = statement($this_page, $ns->hydra('nextPage'), $nextURL);
+        $model->add_statement($statement);
+    }
+    
+} 
+
+
+sub getLDPRecordURLs {
+    my $LDPServer = shift;
+    
+    #my ($ldprdf) = get($LDPServer);
+    my $store = RDF::Trine::Store::Memory->new();
+    my $model = RDF::Trine::Model->new($store);
+    my $parser = RDF::Trine::Parser->new('turtle');
+    $parser->parse_url_into_model($LDPServer, $model);
+    my $query = RDF::Query->new("Select DISTINCT ?o  where {?s <http://www.w3.org/ns/ldp#contains> ?o}");
+    die "query Select DISTINCT ?o  where {?s <http://www.w3.org/ns/ldp#contains> ?o} has syntax error" unless $query;
+    my @rows = $query->execute($model);
+    my @sortedurls = map {$_->{'o'}->value} (sort {$a->{'o'}->value cmp $b->{'o'}->value} @rows); 
+    # now we have sorted URLs that we will process as per the profile
+    return \@sortedurls;
+}
+
+sub getTrineModelForURL {
+    my ($url) = shift;
+    my $store = RDF::Trine::Store::Memory->new();
+    my $model = RDF::Trine::Model->new($store);
+    my $parser = RDF::Trine::Parser->new('turtle');
+    $parser->parse_url_into_model($url, $model);
+    return $model;
+}
+
+
+sub alleleDescriptions {
+    my ($URLs, $position) = @_;
+    $position ||=0;
+    my @URLs = @$URLs[$position.. scalar(@$URLs)];  # remove all URLs up to this point
+    my $model = createFreshTrineModel();
+    my $counter = 0;
+    foreach my $url(@URLs){
+        $counter++;  # count one URL
+        last if ($counter > 5) ;  # only process 5 at a time
+        my $LDPmodel = getTrineModelForURL($url);
+        my $query = RDF::Query->new("SELECT ?s ?url where {
+                ?s <http://purl.org/dc/elements/1.1/format> 'application/xml' .
+                ?s <http://www.w3.org/ns/dcat#downloadURL> ?url .}");
+        my @rows = $query->execute($LDPmodel);
+        my $xmlrecord = $rows[0]->{'url'}->value;
+        my $alleleURL = $rows[0]->{'s'}->value;
+        
+        my $xml = get($xmlrecord);
+        
+
+        my ($gene, $desc, $images) = extractDataFromXMLRecord($xml);
+    
+        
+        my $statement;
+        
+        $statement = statement($alleleURL, $ns->rdf('type'), $ns->obo('SO_0001023'));
+        $model->add_statement($statement); $statement = "";
+        $statement = statement($ns->obo('SO_0001023'), $ns->rdfs('label'), "Allele");
+        $model->add_statement($statement);  $statement = "";
+        
+        if ($desc) {
+            $statement = statement($alleleURL, $ns->dc('description'), $desc);
+            $model->add_statement($statement);  $statement = "";
+        }
+        
+        if ($gene) {       
+            $statement = statement($alleleURL, $ns->obo('so_variant_of'), $gene);
+            $model->add_statement($statement);  $statement = "";
+            $statement = statement($gene, $ns->rdf('type'),  $ns->obo('SO_0000704'));
+            $model->add_statement($statement); $statement = "";
+            $statement = statement($ns->obo('SO_0000704'), $ns->rdfs('label'), "Gene");
+            $model->add_statement($statement); $statement = "";
+        }        
+        
+    }
+
+    return ($model, ($position + $counter));
+}
+
+sub alleleImagesEDAM {
+    my ($URLs, $position) = @_;
+    $position ||=0;
+    my @URLs = @$URLs[$position .. scalar(@$URLs)];
+    my $model = createFreshTrineModel();
+
+    my $counter = 0;
+    
+    foreach my $url(@URLs){
+        $counter++;
+        last if ($counter > 5) ;  # only process 5 at a time
+        my $LDPmodel = getTrineModelForURL($url);
+        my $query = RDF::Query->new("SELECT ?s ?url where {
+                ?s <http://purl.org/dc/elements/1.1/format> 'application/xml' .
+                ?s <http://www.w3.org/ns/dcat#downloadURL> ?url .}");
+        my @rows = $query->execute($LDPmodel);
+        my $xmlrecord = $rows[0]->{'url'}->value;
+        my $alleleURL = $rows[0]->{'s'}->value;
+        my $xml = get($xmlrecord);
+
+
+        my ($gene, $desc, $images) = extractDataFromXMLRecord($xml);
+    
+        
+        my $statement;
+        
+        $statement = statement($alleleURL, $ns->rdf('type'), $ns->obo('SO_0001023'));
+        $model->add_statement($statement);
+        $statement = statement($ns->obo('SO_0001023'), $ns->rdfs('label'), "Allele");
+        $model->add_statement($statement);
+        
+        foreach my $imageURL(@$images){
+            $statement = statement($alleleURL, $ns->sio('SIO_000205'), $imageURL);
+            $model->add_statement($statement);
+            $statement = statement($imageURL, $ns->rdf('type'), "http://edamontology.org/data_2968");
+            $model->add_statement($statement);
+            $statement = statement("http://edamontology.org/data_2968", $ns->rdfs('label'), "Image");
+            $model->add_statement($statement);
+        }        
+    }
+
+    return ($model, ($position + $counter));
+
+}
+
+
+sub alleleImagesSIO {
+    my ($URLs, $position) = @_;
+    $position ||=0;
+    my @URLs = @$URLs[$position .. scalar(@$URLs)];
+    my $model = createFreshTrineModel();
+
+    my $counter = 0;
+
+    foreach my $url(@URLs){
+        $counter++;
+        last if ($counter > 5) ;  # only process 5 at a time
+        my $LDPmodel = getTrineModelForURL($url);
+        my $query = RDF::Query->new("SELECT ?s ?url where {
+                ?s <http://purl.org/dc/elements/1.1/format> 'application/xml' .
+                ?s <http://www.w3.org/ns/dcat#downloadURL> ?url .}");
+        my @rows = $query->execute($LDPmodel);
+        my $xmlrecord = $rows[0]->{'url'}->value;
+        my $alleleURL = $rows[0]->{'s'}->value;
+        my $xml = get($xmlrecord);
+        
+
+        my ($gene, $desc, $images) = extractDataFromXMLRecord($xml);
+    
+        
+        my $statement;
+        
+        $statement = statement($alleleURL, $ns->rdf('type'), $ns->obo('SO_0001023'));
+        $model->add_statement($statement);
+        $statement = statement($ns->obo('SO_0001023'), $ns->rdfs('label'), "Allele");
+        $model->add_statement($statement);
+        
+        foreach my $imageURL(@$images){
+            $statement = statement($alleleURL, $ns->sio('SIO_000205'), $imageURL);
+            $model->add_statement($statement);
+            $statement = statement($imageURL, $ns->rdf('type'), $ns->sio('SIO_000081'));
+            $model->add_statement($statement);
+            $statement = statement($ns->sio('SIO_000081'), $ns->rdfs('label'), "Image");
+            $model->add_statement($statement);
+        }        
+    }
+
+    return ($model, ($position + $counter));
+
+}
+
+
+
+sub extractDataFromXMLRecord {
+    my $xml = shift;
+    my $xp = XML::XPath->new(xml => $xml);
+
+    my $geneid = $xp->getNodeText('/Allele/Source/gene/@value'); # find all paragraphs
+    my $geneURL = "http://antirrhinum.net/cgi-bin/ace/generic/xml/DragonDB?class=Locus;name=" . (uri_escape($geneid));
+    
+    my $nodeset = $xp->find('/Allele/Description/Phenotype/@value'); # find all paragraphs
+    my $desc;
+    foreach my $node ($nodeset->get_nodelist) {
+        $desc .= $node->getData . "\n";
+    }
+    
+    my $imgnodeset = $xp->find('/Allele/Phenotype_picture/@value'); # find all paragraphs
+    my @images;
+    foreach my $node ($imgnodeset->get_nodelist) {
+        my $imgname = uri_escape($node->getData);
+        my $img_url = "http://antirrhinum.net/cgi-bin/ace/generic/tree/DragonDB?class=Phenotype_Picture&name=$imgname";
+        push @images, $img_url;
+    }
+    return ($geneURL, $desc, \@images);
+}
+
+sub statement {
+	my ($s, $p, $o) = @_;
+	unless (ref($s) =~ /Trine/){
+		$s =~ s/[\<\>]//g;
+		$s = RDF::Trine::Node::Resource->new($s);
+	}
+	unless (ref($p) =~ /Trine/){
+		$p =~ s/[\<\>]//g;
+		$p = RDF::Trine::Node::Resource->new($p);
+	}
+	unless (ref($o) =~ /Trine/){
+		if (($o =~ m'^http://') || ($o =~ m'^https://')){
+			$o =~ s/[\<\>]//g;
+			$o = RDF::Trine::Node::Resource->new($o);
+		} elsif ($o =~ /\D/) {
+			$o = RDF::Trine::Node::Literal->new($o);
+		} else {
+			$o = RDF::Trine::Node::Literal->new($o);				
+		}
+	}
+	my $statement = RDF::Trine::Statement->new($s, $p, $o);
+	return $statement;
+}
+
+sub serializeThis{
+    my $model = shift;
+    my $serializer = RDF::Trine::Serializer->new('turtle');
+    print $serializer->serialize_model_to_string($model);
+}
+
+sub printProfilerInfo {
+    my $ns = RDF::NS->new('20131205');   # check at runtime
+    die "can't set namespace $!\n" unless ($ns->SET(fair => 'http://datafairport.org/schemas/FAIR-schema.owl#'));
+    die "can't set namespace $!\n" unless ($ns->SET(proj => "http://biordf.org/cgi-bin/DataFairPort/DragonDB_LDF_Profiler/"));
+    
+    my $model = createFreshTrineModel();
+    
+    my $stm = statement($ns->proj('DragonDB_Allele_ProfileAlleleDescriptions'), $ns->rdf('type'), $ns->fair('dataProjectorDescriptor'));
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesSIO'), $ns->rdf('type'), $ns->fair('dataProjectorDescriptor'));
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesEDAM'), $ns->rdf('type'), $ns->fair('dataProjectorDescriptor'));
+    $model->add_statement($stm);
+    
+    
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileAlleleDescriptions'), $ns->fair('projectsSource'), "http://antirrhinum.net");
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileAlleleDescriptions'), $ns->fair('projectsFAIRProfile'), "http://biordf.org/DataFairPort/ProfileSchemas/Allele_Profile_Descriptive.rdf");
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileAlleleDescriptions'), $ns->fair('usesAccessor'), "http://antirrhinum.net/cgi-bin/LDP/Alleles");
+    $model->add_statement($stm);
+    $stm = statement("http://antirrhinum.net/cgi-bin/LDP/Alleles", $ns->fair('accessorDescriptor'), "http://biordf.org/DataFairPort/DragonDB_Allele_Accessor.rdf");
+    $model->add_statement($stm);
+    
+    
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesSIO'), $ns->fair('projectsSource'), "http://antirrhinum.net");
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesSIO'), $ns->fair('projectsFAIRProfile'), "http://biordf.org/DataFairPort/ProfileSchemas/Allele_Profile_EDAM.rdf");
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesSIO'), $ns->fair('usesAccessor'), "http://antirrhinum.net/cgi-bin/LDP/Alleles");
+    $model->add_statement($stm);
+    $stm = statement("http://antirrhinum.net/cgi-bin/LDP/Alleles", $ns->fair('accessorDescriptor'), "http://biordf.org/DataFairPort/DragonDB_Allele_Accessor.rdf");
+    $model->add_statement($stm);
+    
+    
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesEDAM'), $ns->fair('projectsSource'), "http://antirrhinum.net");
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesEDAM'), $ns->fair('projectsFAIRProfile'), "http://biordf.org/DataFairPort/ProfileSchemas/Allele_Profile_SIO.rdf");
+    $model->add_statement($stm);
+    $stm = statement($ns->proj('DragonDB_Allele_ProfileImagesEDAM'), $ns->fair('usesAccessor'), "http://antirrhinum.net/cgi-bin/LDP/Alleles");
+    $model->add_statement($stm);
+    $stm = statement("http://antirrhinum.net/cgi-bin/LDP/Alleles", $ns->fair('accessorDescriptor'), "http://biordf.org/DataFairPort/DragonDB_Allele_Accessor.rdf");
+    $model->add_statement($stm);
+    
+    
+    serializeThis($model);
+    
+}
+
+
+sub createFreshTrineModel {
+    my $store = RDF::Trine::Store::Memory->new();
+    my $model = RDF::Trine::Model->new($store);
+    return $model;
+}

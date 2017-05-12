@@ -1,0 +1,83 @@
+Revision history for Perl extension Finance::Bank::IE::PermanentTSB.
+
+0.4
+
+    - Implement CSV export
+
+0.2 and 0.3 Fri Jan 30 13:49:07 GMT 2009
+
+    - Implemented graphs using gnuplot
+      Graph can be viewed and saved on the filesystem using
+      the -i and -g options.
+
+0.1 Thu Jan 29 23:11:58 GMT 2009
+
+    - exit gracefully when open24.ie site is on mantainance
+    - create package ptsb_util to remove all the functions
+      from the main CLI utility
+    - ptsb new option:
+
+          -e <expression> | --expression <expression>
+
+        where expression is a mathematical expression like
+
+        '<300'
+        '=300'
+        '>=300'
+
+        the expression will test the euro amount column
+        only lines matching the expression will be printed
+
+0.09 Wed Jan 28 13:23:04 GMT 2009
+
+    - starting defining test units for both module and CLI
+
+0.08 Tue Jan 27 12:16:44 GMT 2009
+
+    - ~/.ptsbrc file now encrypted using gnupg
+      GnuPG and a priv/pub is now required to use ptsb
+
+0.07 Tue Jan 27 00:13:00 GMT 2009
+
+    - FIXED in PermanentTSB.pm: duplicated values on the array of 
+      statement row. last element of statement page was the same 
+      of the fist one of the next page. fucking permanent tsb web 
+      page! :)
+    - ptsb: printing intial and final balance in statement()
+            (note: put this feature in PermanentTSB.pm?)
+
+0.06 Mon Jan 26 22:09:56 GMT 2009
+
+    - added --regexp feature to the ptsb script
+    - added date check to account_statement()
+      from_date should be > of to_date
+    - added date chedk: from_date cannot be in the future
+    - added option -v to ptsb
+
+0.05 Sun Jan 25 16:00:00 GMT 2009
+
+    - account_statement() prototype has been changed
+    - account type constants have been introduced
+    - created CLI utility called ptsb that can be
+      used by a user to interact with his/her homebanking
+      account. this is still working in progress...
+
+0.04 Sun Jan 25 23:40:00 GMT 2009
+
+    - minor changes
+
+0.03 Sun Jan 25 01:41:41 GMT 2009
+
+    - implemented function account_statement()
+    - perlpod documentation improved
+    - starting migration to git
+
+0.02  Wed Jan 21 15:19:23 GMT 2009
+
+    - check_balance implemented
+
+0.01  Thu Jan 15 14:58:59 2009
+
+	- original version; created by h2xs 1.23 with options
+		-AX Finance::Bank::IE::PermanentTSB
+

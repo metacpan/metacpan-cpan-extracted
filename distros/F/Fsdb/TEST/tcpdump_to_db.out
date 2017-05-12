@@ -1,0 +1,10 @@
+#fsdb time proto src dest flags start end len ack win
+51072.556781 tcp dash.isi.edu.1023 excalibur.usc.edu.ssh S 2306448962 2306448962 0 - 32120
+51072.561734 tcp excalibur.usc.edu.ssh dash.isi.edu.1023 S 1968320001 1968320001 0 2306448963 4096
+51072.561875 tcp dash.isi.edu.1023 excalibur.usc.edu.ssh . - - - 1 32120
+51078.746567 tcp excalibur.usc.edu.ssh dash.isi.edu.1023 P 316 328 12 348 4096
+51078.755176 tcp dash.isi.edu.1023 excalibur.usc.edu.ssh P 348 488 140 328 32696
+51078.847937 tcp excalibur.usc.edu.ssh dash.isi.edu.1023 P 328 468 140 488 4096
+51078.860047 tcp dash.isi.edu.1023 excalibur.usc.edu.ssh . - - - 468 32696
+51078.936255 tcp dash.isi.edu.1023 excalibur.usc.edu.ssh P 488 516 28 468 32696
+#   | tcpdump_to_db

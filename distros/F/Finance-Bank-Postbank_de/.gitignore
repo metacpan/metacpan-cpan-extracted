@@ -1,0 +1,12 @@
+blib
+blibdirs
+Makefile
+*.old
+*.tar.gz
+*.bak
+*.swp
+pm_to_blib
+.lwpcookies
+Finance-Bank-Postbank_de-*
+CVS
+MYMETA.*

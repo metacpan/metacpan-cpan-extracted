@@ -1,0 +1,44 @@
+Revision history for Perl extension Finance::TW::TAIFEX
+
+0.39 Sun Dec 30 15:53:15 CST 2012
+        - 2013 calendar.
+
+0.38 Fri Aug  3 11:53:01 CST 2012
+        - update calender for 2012 typhoon.
+
+0.37 Thu Feb  2 14:51:28 CST 2012
+        - fix two missing Saturdays in 2012 calendar.
+
+0.36 Wed Jan 18 19:02:51 CST 2012
+        - helper scripts for eod data maintenance.
+
+0.35 Tue Dec 27 18:20:00 CST 2011
+        - calendar for 2012.
+        - tx helper scripts.
+        - make next/previous trading day api work across years.
+
+0.34 Sun May  1 17:33:59 CST 2011
+        - correct 2011 calendar.
+
+0.33 Sun Feb  6 21:25:37 CST 2011
+        - Better any-moose deps handling.
+        - correct 2011 lunar new year calendar.
+
+0.32 Sat Dec 25 20:10:39 CST 2010
+        - Use Any::Moose.
+        - Calendar for 2011.
+        - Calendar for 2000-2008.
+
+0.31 Mon Oct 11 09:28:46 CST 2010
+        - Use exchange timezone by default.
+        - Fix dependencies.
+
+0.30 Sat Oct  9 17:03:03 CST 2010
+        - Use moose native attribute traits.
+        - Calendar updates.
+
+0.29  Sat Jan 30 12:03:52 CST 2010
+        - Correct calendar for Feb 2010.
+
+0.28  Fri Jan  1 17:47:05 2010
+        - original version

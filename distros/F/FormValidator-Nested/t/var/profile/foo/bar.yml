@@ -1,0 +1,6 @@
+params:
+  password:
+    validators:
+      - String#max_length:
+          max: 16 
+

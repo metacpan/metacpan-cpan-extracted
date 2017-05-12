@@ -1,0 +1,1 @@
+[% IF FS_wrapper %][% PROCESS $FS_wrapper %][% ELSE %][% content %][% END %]

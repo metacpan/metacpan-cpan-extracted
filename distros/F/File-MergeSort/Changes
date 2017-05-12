@@ -1,0 +1,93 @@
+Revision history for Perl extension File::MergeSort.
+
+1.23  Sat Jan 2 2010
+    - Missed a test file from the MANIFEST, added.
+    - It appears there is an issue with BEGIN{ use_ok() } with older
+      versions of Test::More (such as the version shipped with RHEL
+      and similar Linux distros) which I've been fighting
+      with. Removing the problematic test rather than demand a newer
+      Test::More for now.
+
+1.22  Fri Jan 1 2010
+    - Add ability to skip blank lines in the input files (RT #39969)
+    - Improve tests slightly
+    - Tweak Makefile.PL to include license
+
+1.21  Thu Dec 24 2009
+    - Fix a silly error in a test script that was causing
+      Test::Pod::Coverage to be incorrectly utilised, breaking tests
+      where that module was available.
+
+1.20  Wed Dec 23 2009
+    - After a rather long break, clean up code slightly.
+    - This module no longer strips line endings from the lines read
+      in.
+    - Where the records to be read from input files have the same
+      merge keys they will now be read in the order the files were
+      supplied to the constructor - this should give a more
+      predictable output. Thanks to Randy Osburn for the suggestion.
+
+1.14  Sat Jan 28 2006
+    - Fix problem with distribution, clearly v1.13 was unlucky ;-)
+
+1.13  Fri Jan 27 2006
+    - Fix broken example code.
+    - Add another POD test.
+
+1.12  Mon Apr 11 2005
+    - Added POD coverage tests.
+    - Minor documentation fixes.
+
+1.11  Sun Feb 29 2004
+    - The compressed test files were not included in v1.10, causing
+      tests to fail if IO::Zlib was installed. This release fixes
+      that oversight.
+
+1.10  Sun Feb 29 2004
+    - Small internal cleanups.
+    - IO::Zlib is now optional, rather than a prerequisite.
+      Compressed files are handled if IO::Zlib is installed. If you
+      don't deal with compressed files, there is no longer any need
+      to install IO::Zlib.
+    - If compressed files are specified as input files and IO::Zlib
+      is not installed an exception is raised.
+    - Errors extracting merge key or opening files now cause an
+      exception, rather than a warning.
+    - Test suite fixed.
+
+1.09  Sun Oct 19 2003
+    - Commented out broken tests until they can be fixed.
+    - Added Test::More as a prerequisite
+    - Cleaned up stray Ctrl-M characters in files.
+    - Tidied Authors and Copyright sections of documentation.
+
+1.08  Thu Jul 17 2003
+    - Updated Documentation
+     
+1.07  Fri Jun 27 2003
+    - Cosmetic Changes
+ 
+1.06  Sun May 25 2003
+    - Perform comparisons lexicographically, rather than numerically
+    - Corrected minimum required version of Perl: 5.006 not 5.008.
+    - Doc and code cleanups
+    - More tests
+
+1.05  Sat Mar 15 2003
+    - Improved tests
+
+1.01  Tue Feb 25 2003
+    - Improved documentation and tests
+
+1.0   Thu Sept 12 2002
+    - changed name to more properly characterize algorithm.
+
+0.75  Sat Oct 26 2001
+    - now handles compressed files
+
+0.50  Fri Oct 26 2001
+    - almost ready for prime-time.
+
+0.01  Sun Oct 21 2001
+    - original version; created by h2xs 1.21 with options
+      -Xn File::MergeSort

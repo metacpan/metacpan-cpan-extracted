@@ -1,0 +1,15 @@
+File::Rdiff::Stats			T_PTROBJ
+File::Rdiff::Signature			SIG
+File::Rdiff::Buffers			T_PTROBJ
+File::Rdiff::Job			T_PTROBJ
+
+INPUT
+
+SIG
+	$var = old_sig ($arg)
+
+OUTPUT
+
+SIG
+	sv_setref_pv ($arg, \"${ntype}\", (void *)$var);
+

@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-QuoteHist
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Manip: 0
+  HTML::TableExtract: 2.07
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Text::CSV: 0
+version: 1.24

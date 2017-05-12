@@ -1,0 +1,77 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7ab6fc5313d5eca1462c549031833cc9238e8e92 Build.PL
+SHA1 e3ea3671b77102850387eb78af1e2c992ceb7b13 Changes
+SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
+SHA1 94c12be7b6cecf8ea5f9d6baf89e0538836b08e1 MANIFEST
+SHA1 4a8d9c43625e51a33210ce4674fc92d5d024fcfa META.json
+SHA1 582697577d51907126f6a88942481c5a447149d8 META.yml
+SHA1 70a5e8a5dd41e069e861dd372a65c36d441e865c README
+SHA1 d4615f8d7690101f079b3e32e9d7aaeb8a6a12a9 lib/File/DataClass.pm
+SHA1 a588a2a815407bfcf43b6e144bcf52ff6cb98b28 lib/File/DataClass/Cache.pm
+SHA1 20fa44bd4bfd2f85a2e516b15b70614c92535f12 lib/File/DataClass/Constants.pm
+SHA1 f5e57d7b1661c5fe4426451977109bfb532e2f96 lib/File/DataClass/Exception.pm
+SHA1 e48df2f5571caec4863715ff8f44665dc5bf5338 lib/File/DataClass/Functions.pm
+SHA1 16797cb18978124fc979d547e61a87ef928a36a1 lib/File/DataClass/IO.pm
+SHA1 e178960aaf53f77405fbc71cab4c2cd6c46389cd lib/File/DataClass/List.pm
+SHA1 dd2763963ee62a0d98fd1b12d7f9fb8556cb3a74 lib/File/DataClass/Result.pm
+SHA1 a85bd4d8c7f3b7b5f7e05a87b72160d97f2db743 lib/File/DataClass/ResultSet.pm
+SHA1 31a4e53f1cf525c8af1db10866bf606422378f85 lib/File/DataClass/ResultSource.pm
+SHA1 61c3c15b5bae14c7f59567204630e15bf1e6d1d3 lib/File/DataClass/Schema.pm
+SHA1 716d65684cec4f13eb420486fd35b343d7d43a6b lib/File/DataClass/Storage.pm
+SHA1 8f47b2b5d53d3feac9353fe83e37d63de73475c7 lib/File/DataClass/Storage/Any.pm
+SHA1 382dd0a1e904c9e34cb9e0a2adb95a809ebe6f4b lib/File/DataClass/Storage/JSON.pm
+SHA1 be1328e3058c66287f84e715a55fb54cb509d095 lib/File/DataClass/Types.pm
+SHA1 d17313388670b467940f9b391be8dea887c4b0f4 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 905a84ed4a01bba172b682620964560f04ff93d2 t/03podcoverage.t
+SHA1 c1c29d14c961c30f0ea1ff84dd3b6acb7f4d3e81 t/05kwalitee.t
+SHA1 8b1ef2c2000dda84911be6a6bf76d4de88a4d4dc t/06yaml.t
+SHA1 4b676f6afaf9113f3ffdc431b6ea4f61253b9bb4 t/07podspelling.t
+SHA1 fd47e0674c1702f57a398f3b9708a6b5bfb5dacc t/10exception.t
+SHA1 65d4bf17e5efee89507f3b4f3e5a6556beec7827 t/12types.t
+SHA1 2cab3fa26a136c8ba0058ee2c483143193068608 t/13functions.t
+SHA1 ee4011d3e2738177d37885b80c3319215861fd19 t/15io.t
+SHA1 726d9d24cc6f22af4b68c94f41e4e21a469feae2 t/17constraints.t
+SHA1 a46a1ecb1d398b946533e24ccadf3facd37b1841 t/20data-class.t
+SHA1 6903f6db3e257bdd0ad6f835eb98eecd5b6f71bc t/21hash-merge.t
+SHA1 d3244d6bc81a0a9e0841794cb52d36297ed36738 t/50json.t
+SHA1 770c9e9b899ceacd85261ddf01447852e9aa707b t/bad_format.json
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA1 a1ada75433036087f683f5b2a7ff5843da9fa210 t/default.json
+SHA1 d56ec8af8909771023a070cec3eb235754059a36 t/exceptions.dd
+SHA1 7945ac872575cfbbcedfcb774bda088c8833cadf t/lib/TestTypo.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/mydir/dir1/dira/dirx/file1
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/mydir/dir1/file1
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/mydir/dir2/file1
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/mydir/file1
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/mydir/file2
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/mydir/file3
+SHA1 c0908aadd4d891db9a460dace4f012b6e8a36eff t/other.json
+SHA1 8e0bbeba9b28dd62b5857de3567269995299a482 t/utf8.json
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJY4LUAAAoJEK492j4Im1Bp0dUH/0HFK53oDLvH9aygg9TfThle
+AUe5zWb4mHyqDTnBWuXHFthrRLTKCXmZlc340OiuzHfZT9uRtsiaL2ldjlUSETGv
+3LsqR4eXZxMMoJVZpBkTBB6xeJkayaxLxVXFGrr40En72uA2y1vsVCvHkXAcMVx0
+l7Pp0A4mcG29Zvs3ojVAfg8vklZ331sZVIkb+MQprfyy9fJ7T9zfX+vb64AcoLXl
+W1HZplML7CDSZvMzxEa/7SoTkfB2xHBJ0T5Lz1aZRqJWy4wnkiC6Gir7YSOalYz5
+O7uod7LT/SvyZ6HC24/GkJ5TAeij6m1CrpG1DXsscLxDnQCsNfoVe1QJX0qxaNA=
+=mHJu
+-----END PGP SIGNATURE-----

@@ -1,0 +1,11 @@
+SHELL=/bin/sh
+SCANNER=$HOME/bin/scanvirus.pl
+LOGFILE=$HOME/.procmail_log
+
+:0
+* ^Content-Type.*(application|multipart)
+{
+	:0 HB
+	* !? ${SCANNER} 1
+	/dev/null
+}

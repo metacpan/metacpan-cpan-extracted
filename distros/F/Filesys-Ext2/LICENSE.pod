@@ -1,0 +1,13 @@
+=head1 LICENSE
+
+=over
+
+=item * Thou shalt not claim ownership of unmodified materials.
+
+=item * Thou shalt not claim whole ownership of modified materials.
+
+=item * Thou shalt grant the indemnity of the provider of materials.
+
+=item * Thou shalt use and dispense freely without other restrictions.
+
+=back

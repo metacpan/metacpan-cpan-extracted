@@ -1,0 +1,31 @@
+---
+abstract: 'FreeRADIUS::Database - FreeRADIUS database manager'
+author:
+  - 'Steve Bertrand <steve@ibctech.ca>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120530'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FreeRADIUS-Database
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: 0
+  DBD::mysql: 0
+  DBI: 0
+  DBIx::Class: 0
+  DBIx::Recordset: 0
+  DateTime: 0
+  Test::More: 0
+resources:
+  bugtracker: https://bitbucket.org/spek/freeradius-database/issues
+  repository: https://bitbucket.org/spek/freeradius-database
+version: 0.06

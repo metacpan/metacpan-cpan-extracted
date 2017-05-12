@@ -1,0 +1,17 @@
+---
+name: File-SimpleQuery
+version: 0.01
+author:
+  - 'Ben Prew <btp@cpan.org>'
+abstract: 'Query flat-files, simply!'
+license: unknown
+requires:
+  Test::More: 0
+provides:
+  File::SimpleQuery:
+    file: lib/File/SimpleQuery.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

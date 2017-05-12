@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                FCGI-IIS
+version:             0.05
+abstract:            FCGI wrapper for MS IIS FastCGI
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:     
+    FCGI:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Lyle Hopkins bristol.pm bath.pm

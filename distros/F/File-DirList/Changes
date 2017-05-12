@@ -1,0 +1,19 @@
+Revision history for Perl extension File::DirList.
+
+0.05  Mon Nov 05 10:45:00 2007
+	- Documentation fix: thanks to Pi <pi@pihost.us>
+
+0.04  Sat Oct 20 00:20:00 2007
+	- Bugfix: relative symlinks were not recognized correctly
+
+0.03  Sat Oct 15 23:00:00 2007
+	- perl requirement fixed. We do not need 5.8, 5.5 is enough
+
+0.02  Sat Oct 15 22:10:00 2007
+	- function sortList added
+	- minor error fixed in README
+
+0.01  Sat Oct 13 17:50:49 2007
+	- original version; created by h2xs 1.23 with options
+		-AXcfn File::DirList
+

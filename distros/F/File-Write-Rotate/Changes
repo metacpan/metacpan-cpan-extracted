@@ -1,0 +1,226 @@
+Revision history for File-Write-Rotate
+
+0.31    2016-10-07 (PERLANCAR)
+
+        - Document binmode option [GH#12] [GH#13].
+
+        - Remove usage of Carp to shave a bit off startup overhead.
+
+        - Delay loading Proc::PID::File a bit more.
+
+
+0.30    2016-06-06 (PERLANCAR)
+
+        - No functional changes.
+
+        - Replace inchworm operator with plain 'scalar', causes error in 5.24+
+          [RT#115088] (ref: RT#111786).
+
+
+0.29    2015-10-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- To reduce deps, remove runtime use of Taint::Runtime.
+
+
+0.28    2015-01-26 (PERLANCAR)
+
+        - Now check argument to new(), unknown arguments will croak.
+
+        - Add option: rotate_probability, to increase writing speed by only
+          doing rotate checks probabilistically, at the consequence of writes
+          "spilling" for a bit.
+
+
+0.27    2015-01-23 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Bugfix] Fix compression when logging dir is not the current directory
+          (Jonathan G. Rennison).
+
+
+0.26    2015-01-22 (PERLANCAR)
+
+        - Add option: lock_mode (can be set to 'write' [the default] or
+          'none'/'exclusive'). Setting this option to 'none'/'exclusive' can
+          increase write performance, but setting to 'none' means disabling
+          locking and should be done if you expect only one writer, and setting
+          to 'exclusive' means holding the lock for a long time. (Thanks
+          Jonathan G. Rennison).
+
+
+0.25    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed module SHARYANTO::File::Flock ->
+	  File::Flock::Retry.
+
+
+0.24    2014-12-05 (PERLANCAR)
+
+        - These changes are done by TOSHIOITO++.
+
+	[BUG FIXES]
+
+        - Make sure lock is released even when write() or some hook dies.
+
+        - Fix rotation, rotation by period previously never delete old files.
+
+        [INCOMPATIBLE CHANGES]
+
+        - compress() method now avoids compressing files with the latest period.
+          Before, this method avoided compressing files with the period of
+          "_cur_period" private attribute, which was set by _open(). However,
+          "_cur_period" was not set if compress() was called without calling
+          write() beforehand. The new behavior is a little different from the
+          old, but it's the same in most cases.
+
+
+0.23    2014-11-09 (PERLANCAR)
+
+	- compress() now unlinks uncompressed originals (this is the
+	  original behavior before switching from using gzip utility to
+	  IO::Compress::Gzip).
+
+
+0.22    2014-09-01 (PERLANCAR)
+
+        - No functional changes.
+
+        - POD fixes.
+
+
+0.21    2014-09-01 (PERLANCAR)
+
+        - Introduce hooks (currently:
+          hook_{before_write,after_create,before_rotate,after_rotate}).
+
+        - Add (ro) attribute methods: handle(), path().
+
+
+0.20    2014-08-22 (SHARYANTO)
+
+        - Bug fix: Set timezone when testing, otherwise in UTC+12 (e.g.
+          Auckland) there is change of day [CT].
+
+
+0.19    2014-08-20 (SHARYANTO)
+
+        - Fix bug in file_path() which caused current period log file to be
+          compressed [problem reported by Alceu Rodrigues de Freitas Junior].
+
+
+0.18    2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+        [ENHANCEMENTS]
+
+        - Replace the use of 'gzip' binary with IO::Compress::Gzip, to allow
+          this module to run in OS's other than Unix-like ones [Alceu Rodrigues
+          de Freitas Junior].
+
+        - Add tests for compression.
+
+        [BUG FIXES]
+
+        - Old period logs were never compressed.
+
+
+0.17    2014-07-10 (SHARYANTO)
+
+        - Fix dep version (Test::Warnings 0.014, not 0.14).
+
+
+0.16    2014-07-10 (SHARYANTO)
+
+        - Added support for 'binmode' (to set PerlIO layers, esp. encoding)
+          [thanks Norbert Buchmuller].
+
+
+0.15    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.14    2013-07-03 (SHARYANTO)
+
+        - No functional changes. Force fixed SHARYANTO::File::Flock version
+          (0.49).
+
+
+0.13    2013-04-12 (SHARYANTO)
+
+        - No functional changes. Add FAQ item on why use FWR and the downside.
+
+
+0.12    2013-04-12 (SHARYANTO)
+
+        - No functional changes. Update module name in POD and expand the
+          explanation on the difference between FWR & LDFR.
+
+
+0.11    2012-12-28 (SHARYANTO)
+
+        - No functional changes. Tweak error message.
+
+
+0.10    2012-12-28 (SHARYANTO)
+
+        [NEW FEATURES]
+
+        - Add buffering (attribute: buffer_size) to buffer messages during
+          temporary write() failure.
+
+
+0.09    2012-12-28 (SHARYANTO)
+
+        - Make rotate pass under taint-mode.
+
+
+0.08    2012-12-28 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Can now rotate on the first write() instead of on the second and
+          subsequent.
+
+
+0.07    2012-12-27 (SHARYANTO)
+
+        - Avoid using Log::Any, because we are used as backend for
+          Log::Dispatch::FileWriteRotate (thus, a loop).
+
+
+0.06    2012-12-27 (SHARYANTO)
+
+        - Set autoflush (to pass Log-Any-App09 tests).
+
+
+0.05    2012-12-26 (SHARYANTO)
+
+        - No functional changes. Mention 'period' argument in POD.
+
+
+0.04    2012-12-26 (SHARYANTO)
+
+        - A small fix in DESTROY().
+
+
+0.03    2012-12-25 (SHARYANTO)
+
+        - No functional changes. Extract flocking routines to
+          SHARYANTO::File::Flock.
+
+
+0.02    2012-12-22 (SHARYANTO)
+
+        - No functional changes. Additions/corrections for POD.
+
+
+0.01    2012-12-21 (SHARYANTO)
+
+        - First release.

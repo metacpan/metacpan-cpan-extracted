@@ -1,0 +1,57 @@
+Revision history for FlyBy
+
+0.095  2016-11-04 06:42:50 CST
+
+0.094  2016-10-12 06:43:31 CAT
+        - Fixed auto-vivification bug on ->query
+
+0.093  2015-05-06 06:43:31 CAT
+        - Copy records on non-reduced queries
+        - Silently strip undefined values from queries
+
+0.092  2015-04-26 15:59:56 CAT
+        - Silently strip undefined values from records
+
+0.091  2015-04-15 13:55:56 CAT
+        - Use empty_clone to keep sets in same universe
+
+0.090  2015-04-06 16:45:32 CAT
+        - Fix broken per-key OR
+        - Move to hash-reference raw queries
+
+0.081  2015-04-06 10:28:18 CAT
+        - Explicitly remove `AND NOT` from the parsing.
+
+0.080  2015-04-06 10:19:42 CAT
+        - String query grammer changes
+            - `AND` connects multiple keys per query
+            - `OR` connects multiple values per key
+            - `AND NOT` is deprecated in favor of `AND 'key' IS NOT 'value'`
+        - Raw query format simplified with implied `AND`
+
+0.070  2015-04-05 14:08:17 CAT
+        - Add alternative raw `OR` syntax
+
+0.060  2015-04-03 18:06:53 CAT
+        - Add support for negative matching (`!` or `IS NOT`)
+
+0.051  2015-03-29 13:02:21 CAT
+        - Fix for data structure in test
+
+0.05  2015-03-29 12:37:19 CAT
+        - Revive perl datastructure queries with minor changes
+
+0.04  2015-03-26 08:12:12 CAT
+        - Improve quoting regex portability
+        - Change analysis error message
+
+0.03  2015-03-26 06:23:56 CAT
+        - Improve query syntax friendliness with string queries
+        - Methods return arrays instead of references
+
+0.02  2015-03-24 10:23:16 CAT
+        - Correct autovivification issue on query
+        - Add ability to introspect on keys and values
+
+0.01  2015-03-24 07:13:25 CAT
+        - Initial release

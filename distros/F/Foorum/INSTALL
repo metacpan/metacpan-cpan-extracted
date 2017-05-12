@@ -1,0 +1,56 @@
+
+=pod
+
+=head1 NAME
+
+Foorum::Manual::INSTALL - install Foorum
+
+=head1 Steps
+
+=head2 Database
+
+MySQL and SQLite are supported with tests while PostgreSQL are still marked as EXPERIMENTAL.
+
+=head3 MySQL
+
+  * mysql -uroot -p
+  * mysql> CREATE DATABASE foorum;
+  * mysql> CREATE DATABASE theschwartz;
+  * mysql> exit;
+  * mysql -uroot -p foorum < bin/db/foorum.sql
+  * mysql -uroot -p theschwartz < bin/db/theschwartz.sql
+
+=head3 SQLite
+
+Download sqlite3 from L<http://www.sqlite.org/download.html>
+
+  * sqlite3 foorum.db
+  * sqlite> .read bin/db/foorum.sqlite.sql
+  * sqlite> .read bin/db/theschwartz.sqlite.sql
+  * sqlite> .quit
+
+=head3 PostgreSQL (EXPERIMENTAL)
+
+files are bin/db/foorum.pg.sql and bin/db/theschwartz.pg.sql
+
+USE IT AT YOUR OWN RISK.
+
+=head2 Perl
+
+  * perl bin/setup.pl
+  * perl Makefile.PL; make; make test; make realclean;
+  * perl bin/foorum_server.pl
+
+=head2 Apache Configure
+
+  * remember set Options -Index in $Foorum/root/upload, so that nobody can view /upload URL
+
+  $ vim Foorum/root/upload/.htaccess
+  Options -Indexes
+
+
+=head1 SEE ALSO
+
+L<Foorum::Manual::Configure>, L<Foorum::Manual::TroubleShooting>
+
+=cut

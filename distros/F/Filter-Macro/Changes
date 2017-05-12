@@ -1,0 +1,18 @@
+[Changes for 0.11 - 2006-05-11]
+
+* Oops, mis-listed the Filter::Simple::Compile dependency as
+  Filter::Simple::Cached.
+
+[Changes for 0.10 - 2006-05-09]
+
+* Switched to be based on Filter::Simple::Compile, a drop-in
+  replacement powered by Module::Compile to provide cached
+  filtering.
+
+[Changes for 0.02 - 2004-07-21]
+
+* Many typo fixes and clarifications in POD.
+
+[Changes for 0.01 - 2004-07-21]
+
+* First CPAN release.

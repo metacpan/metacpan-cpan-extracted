@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+# $Id$
+
+use strict;
+use warnings;
+use File::Find::Object;
+use Getopt::Long;
+
+my %options;
+
+GetOptions(
+    'd' => \$options{depth},
+    'n' => \$options{nonet},
+    'f' => \$options{nocrossfs},
+    'l' => \$options{followlink},
+);
+
+my $tree = File::Find::Object->new({ %options }, @ARGV);
+
+while (my $r = $tree->next()) {
+    print $r ."\n";
+}

@@ -1,0 +1,6 @@
+lib/Finance/Bitcoin/Yacuna.pm
+README
+MANIFEST
+COPYING
+Makefile.PL
+yacuna.spec

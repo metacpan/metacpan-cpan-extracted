@@ -1,0 +1,42 @@
+---
+abstract: 'time stamped log file'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Stamped
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  File::Stamped:
+    file: lib/File/Stamped.pm
+    version: '0.08'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: ssh://git@github.com/tokuhirom/File-Stamped/issues
+  homepage: ssh://git@github.com/tokuhirom/File-Stamped
+  repository: ssh://git@github.com/tokuhirom/File-Stamped.git
+version: '0.08'
+x_contributors:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'kan fushihara <kan.fushihara@gmail.com>'

@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Filesys/Virtual/DPAP.pm
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+davdpap.pl
+SIGNATURE    Added here by Module::Build

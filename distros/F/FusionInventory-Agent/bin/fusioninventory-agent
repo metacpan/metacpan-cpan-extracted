@@ -1,0 +1,653 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib './bin';
+use setup;
+
+use English qw(-no_match_vars);
+use Getopt::Long;
+use Pod::Usage;
+
+use FusionInventory::Agent;
+
+Getopt::Long::Configure( "no_ignorecase" );
+
+my $options = {};
+
+GetOptions(
+    $options,
+    'additional-content=s',
+    'backend-collect-timeout=s',
+    'ca-cert-dir=s',
+    'ca-cert-file=s',
+    'conf-file=s',
+    'conf-reload-interval=i',
+    'config=s',
+    'color',
+    'daemon|d',
+    'no-fork',
+    'debug+',
+    'delaytime=s',
+    'force|f',
+    'help|h',
+    'html',
+    'lazy',
+    'list-tasks',
+    'setup',
+    'local|l=s',
+    'logger=s',
+    'logfile=s',
+    'logfile-maxsize=i',
+    'no-category=s',
+    'no-httpd',
+    'no-ssl-check',
+    'no-compression|C',
+    'no-task=s',
+    'no-p2p',
+    'password|p=s',
+    'pidfile=s',
+    'proxy|P=s',
+    'httpd-ip=s',
+    'httpd-port=s',
+    'httpd-trust=s',
+    'scan-homedirs',
+    'scan-profiles',
+    'server|s=s',
+    'tag|t=s',
+    'tasks=s',
+    'timeout=i',
+    'user|u=s',
+    'version',
+    'wait|w=s',
+    # deprecated options
+    'stdout',
+    # Platform specific option
+    'no-win32-ole-workaround'
+) or pod2usage(-verbose => 0);
+
+pod2usage(-verbose => 0, -exitstatus => 0) if $options->{help};
+
+if ($options->{version}) {
+    map { print $_."\n" } $FusionInventory::Agent::VERSION_STRING,
+        @{$FusionInventory::Agent::COMMENTS};
+    exit 0;
+}
+
+if ($options->{setup}) {
+    foreach my $key (keys %setup) {
+        print "$key: $setup{$key}\n";
+    }
+    exit 0;
+}
+
+if ($options->{'conf-file'}) {
+    if ($options->{config}) {
+        if ($options->{config} ne 'file') {
+            print STDERR
+                "don't use --conf-file with $options->{config} backend";
+            exit 1;
+        }
+    } else {
+        $options->{config} = 'file';
+    }
+}
+
+if ($OSNAME eq 'MSWin32' && ! $options->{'no-win32-ole-workaround'}) {
+    # From here we may need to avoid crashes due to not thread-safe Win32::OLE
+    FusionInventory::Agent::Tools::Win32->require();
+    FusionInventory::Agent::Tools::Win32::start_Win32_OLE_Worker();
+}
+
+my $agent = FusionInventory::Agent->new(%setup);
+
+if ($options->{'list-tasks'}) {
+    my %tasks = $agent->getAvailableTasks();
+    print "Available tasks : \n";
+    foreach my $task (keys %tasks) {
+        print "$task (v$tasks{$task})\n";
+    }
+
+    if ($options->{'tasks'}) {
+        $agent->init(options => $options);
+        my $tasksExecutionPlan = $agent->getTasksExecutionPlan();
+        print "\nTasks planned for execution : \n";
+        foreach my $task (@$tasksExecutionPlan) {
+            print "$task (v$tasks{$task})\n";
+        }
+    }
+
+    exit 0;
+}
+
+if ($options->{wait}) {
+    my $time = int rand($options->{wait});
+    sleep $time;
+}
+
+eval {
+    $agent->init(options => $options);
+    $agent->run();
+};
+
+if ($EVAL_ERROR) {
+    print STDERR "Execution failure:.\n";
+    print STDERR $EVAL_ERROR;
+    exit 1;
+}
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+fusioninventory-agent - FusionInventory agent For Linux/UNIX, Windows and MacOSX
+
+=head1 SYNOPSIS
+
+B<fusioninventory-agent> [options] [--server server|--local path]
+
+  Target definition options:
+    -s --server=URI                send tasks result to a server
+    -l --local=PATH                write tasks results locally
+
+  Target scheduling options:
+    --delaytime=LIMIT              maximum delay before first target,
+                                     in seconds (3600)
+    --lazy                         do not contact the target before
+                                   next scheduled time
+
+  Task selection options:
+    --list-tasks                   list available tasks and exit
+    --no-task=TASK[,TASK]...       do not run given task
+    --tasks=TASK1[,TASK]...[,...]  run given tasks in given order
+
+  Inventory task specific options:
+    --no-category=CATEGORY         do not list given category items
+    --scan-homedirs                scan user home directories (false)
+    --scan-profiles                scan user profiles (false)
+    --html                         save the inventory as HTML (false)
+    -f --force                     always send data to server (false)
+    --backend-collect-timeout=TIME timeout for inventory modules
+                                     execution (30)
+    --additional-content=FILE      additional inventory content file
+
+  Package deployment task specific options:
+    --no-p2p                       do not use peer to peer to download
+                                     files (false)
+
+  Network options:
+    -P --proxy=PROXY               proxy address
+    -u --user=USER                 user name for server authentication
+    -p --password=PASSWORD         password for server authentication
+    --ca-cert-dir=DIRECTORY        CA certificates directory
+    --ca-cert-file=FILE            CA certificates file
+    --no-ssl-check                 do not check server SSL certificate
+                                     (false)
+    -C --no-compression            do not compress communication with server
+                                     (false)
+    --timeout=TIME                 connection timeout, in seconds (180)
+
+  Web interface options:
+    --no-httpd                     disable embedded web server (false)
+    --httpd-ip=IP                  network interface to listen to (all)
+    --httpd-port=PORT              network port to listen to (62354)
+    --httpd-trust=IP               trust requests without authentication
+                                     token (false)
+
+  Logging options:
+    --logger=BACKEND               logger backend (stderr)
+    --logfile=FILE                 log file
+    --logfile-maxsize=SIZE         maximum size of the log file in MB (0)
+    --logfacility=FACILITY         syslog facility (LOG_USER)
+    --color                        use color in the console (false)
+
+  Configuration options:
+    --config=BACKEND                   configuration backend
+    --conf-file=FILE                   configuration file
+    --conf-reload-interval=<SECONDS>   number of seconds between two
+                                         configuration reloadings
+
+  Execution mode options:
+    -w --wait=LIMIT                maximum delay before execution,
+                                     in seconds
+    -d --daemon                    run the agent as a daemon (false)
+    --no-fork                      don't fork in background (false)
+    -t --tag=TAG                   add given tag to inventory results
+    --debug                        debug mode (false)
+    --setup                        print the agent setup directories
+                                     and exit
+    --version                      print the version and exit
+    --no-win32-ole-workaround      [win32 only] disable win32 work-around
+                                     used to better handle Win32::OLE apis.
+                                     !!! Use it at your own risk as you may
+                                     experiment perl crash under win32 !!!
+
+=head1 DESCRIPTION
+
+The F<fusioninventory-agent> agent is a generic multi-platform agent. It can
+perform a large array of management tasks, such as local inventory, software
+deployment or network discovery. It can be used either standalone, or in
+combination with a compatible server (OCS, GLPI, OTRS) acting as a centralized
+control point.
+
+=head1 OPTIONS
+
+Most of the options are available in a I<short> form and a I<long> form.  For
+example, the two lines below are all equivalent:
+
+    % fusioninventory-agent -s localhost
+    % fusioninventory-agent --server localhost
+
+=head2 Target definition options
+
+=over
+
+=item B<-s>, B<--server>=I<URI>
+
+Send the results of tasks execution to given server.
+
+If I<URI> doesn't start with http:// or https://, the agent assume the
+parameter is a hostname and rewrite it as:
+
+    % --server=http://servername/ocsinventory
+
+In general, OCS Inventory server URL have this format:
+
+    http://servername/ocsinventory
+
+and FusionInventory for GLPI this one:
+
+    http://servername/glpi/plugins/fusioninventory/front/plugin_fusioninventory.communication.php
+
+Multiple values can be specified, using comma as a separator.
+
+=item B<-l>, B<--local>=I<PATH>
+
+Write the results of tasks execution locally.
+
+Exact behaviour according to given path:
+
+=over
+
+=item *
+
+if I<PATH> is a directory, a file will be created therein
+
+=item *
+
+if I<PATH> is a file, it will be used directly
+
+=item *
+
+if I<PATH> is '-', STDOUT will be used
+
+=back
+
+Multiple values can be specified, using comma as a separator.
+
+=back
+
+=head2 Target scheduling options
+
+=over
+
+=item B<--delaytime>=I<LIMIT>
+
+Set an initial delay before the first target, whose value is computed randomly
+between LIMIT / 2 and LIMIT seconds. This setting is ignored for server targets
+after the initial contact, in favor of server-specified parameter
+(PROLOG_FREQ).
+
+=item B<--lazy>
+
+Do not contact the target before next scheduled time.
+
+This option is only available when the agent is not run as a server.
+
+=back
+
+=head2 Task selection options
+
+=over
+
+=item B<--list-tasks>
+
+List all available tasks, tasks planned for execution and exit
+
+=item B<--no-task>=I<TASK>
+
+Do not run given task.
+
+Multiple values can be specified, using comma as a separator. See option
+I<--list-tasks> for the list of available tasks.
+
+=item B<--tasks>=I<TASK>
+
+Run given tasks in given order.
+
+Multiple tasks can be specified, using comma as a separator.
+A task can be specified several times. if '...' is given as last element,
+all other available tasks are executed.
+
+See option I<--list-tasks> for the list of available tasks.
+
+Examples :
+* --tasks=inventory,deploy,inventory
+  First task executed is 'inventory', second task is 'deploy', third and last
+  task is 'inventory'.
+
+* --tasks=inventory,deploy,...
+  First executed task is 'inventory', second task is 'deploy' and then all
+  other available tasks are executed.
+
+=back
+
+=head2 Inventory task specific options
+
+=over
+
+=item B<--no-category>=I<CATEGORY>
+
+Do not list given category items in inventory.
+
+Multiple values can be specified, using comma as a separator. The available
+categories are:
+
+=over 4
+
+=item * battery
+
+=item * controller
+
+=item * cpu
+
+=item * drive
+
+=item * environment
+
+=item * input
+
+=item * license
+
+=item * local_group
+
+=item * local_user
+
+=item * lvm
+
+=item * memory
+
+=item * modem
+
+=item * monitor
+
+=item * network
+
+=item * printer
+
+=item * process
+
+=item * slot
+
+=item * software
+
+=item * sound
+
+=item * storage
+
+=item * usb
+
+=item * user
+
+=item * video
+
+=item * virtualmachine
+
+=back
+
+=item B<--scan-homedirs>
+
+Allow the agent to scan home directories for virtual machines.
+
+=item B<--scan-profiles>
+
+Allow the agent to scan user profiles for software.
+
+=item B<--html>
+
+Save the inventory as HTML.
+
+This is only used for local inventories.
+
+=item B<-f>, B<--force>
+
+Send an inventory to the server, even if this last one doesn't ask for it.
+
+=item B<--backend-collect-timeout>=I<TIME>
+
+Timeout for inventory modules execution.
+
+=item B<--additional-content>=I<FILE>
+
+Additional inventory content file.
+
+This file should be an XML file, using same syntax as the one produced by the
+agent.
+
+=back
+
+=head2 Package deployment task specific options
+
+=over
+
+=item B<--no-p2p>
+
+Do not use peer to peer to download files.
+
+=back
+
+=head2 Server target specific options
+
+=over
+
+=item B<-P>, B<--proxy>=I<PROXY>
+
+Use I<PROXY> as HTTP proxy.
+
+By default, the agent uses HTTP_PROXY environment variable.
+
+=item B<-u> I<USER>, B<--user>=I<USER>
+
+Use I<USER> for server authentication.
+
+=item B<-p>, B<--password>=I<PASSWORD>
+
+Use I<PASSWORD> for server authentication.
+
+=item B<--ca-cert-dir>=I<DIRECTORY>
+
+CA certificates directory.
+
+=item B<--ca-cert-file>=I<FILE>
+
+CA certificates file.
+
+=item B<--no-ssl-check>
+
+Do not check server SSL certificate.
+
+=item B<--timeout>=I<TIME>
+
+Timeout for server connections.
+
+=back
+
+=head2 Web interface options
+
+=over
+
+=item B<--no-httpd>
+
+Disable the embedded web server.
+
+=item B<--httpd-ip>=I<IP>
+
+The network interface to use for the embedded web server (all).
+
+=item B<--httpd-port>=I<PORT>
+
+The network port to use for the embedded web server (62354).
+
+=item B<--httpd-trust>=I<IP>
+
+Trust requests from given addresses without authentication token (false).
+
+For example: "192.168.0.0/24", "192.168.168.0.5" or an IP range like
+"20.34.101.207 - 201.3.9.99". Hostnames are also accepted. See L<Net::IP>
+documentation to get more example.
+
+Multiple values can be specified, using comma as a separator.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--logger>=I<BACKEND>
+
+Logger backend to use.
+
+Multiple values can be specified, using comma as a separator. The available
+backends are:
+
+=over 4
+
+=item
+
+stderr: log messages directly in the console.
+
+=item
+
+file: log messages in a file.
+
+=item
+
+syslog: log messages through the local syslog server.
+
+=back
+
+Multiple values can be specified, using comma as a separator.
+
+=item B<--logfile>=I<FILE>
+
+Log message in I<FILE> (implies File logger backend).
+
+=item B<--logfile-maxsize>=I<SIZE>
+
+Max logfile size in MB, default is unlimited. When the max size is reached, the
+file is truncated. This is only useful if there is no log rotation mechanism on
+the system.
+
+=item B<--logfacility>=I<FACILITY>
+
+Syslog facility to use (default LOG_USER).
+
+=item B<--color>
+
+Display color on the terminal, when the Stderr backend is used.
+
+This options is ignored on Windows.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+
+=item B<--config>=I<BACKEND>
+
+Configuration backend to use.
+
+The available backends are:
+
+=over 4
+
+=item
+
+file: read configuration from a file (default anywhere else as Windows).
+
+=item
+
+registry: read configuration from the registry (default on Windows).
+
+=item
+
+none: don't read any configuration.
+
+=back
+
+=item B<--conf-file>=I<FILE>
+
+Use I<FILE> as configuration file (implies file configuration backend).
+
+=item B<--conf-reload-interval>=I<SECONDS>
+
+SECONDS is the number of seconds between two configuration reloadings.
+Default value is 0, which means that configuration is never reloaded.
+Minimum value is 60. If given value is less than this minimum, it is set to
+this minimum. If given value is less than 0, it is set to 0.
+
+=back
+
+=head2 Execution mode options
+
+=over
+
+=item B<-w> I<LIMIT>, B<--wait>=I<LIMIT>
+
+Wait a random delay whose value is computed randomly between 0 and LIMIT
+seconds, before execution. This is useful when execution is triggered from some
+kind of system scheduling on multiple clients, to spread the server load.
+
+=item B<-d>, B<--daemon>
+
+Run the agent as a daemon.
+
+=item B<--no-fork>
+
+Don't fork in background.
+
+This is only useful when running as a daemon.
+
+=item B<--pidfile>=I<FILE>
+
+Store pid in I<FILE>.
+
+This is only useful when running as a daemon.
+
+=item B<--tag>=I<TAG>
+
+Add the given tag to every inventory results.
+
+=item B<--debug>
+
+Turn the debug mode on. You can use the parameter up to 3 times in a row
+to increase the verbosity (e.g: B<--debug --debug>).
+
+Level 3 turns on the debug mode of some external libraries like Net::SSLeay.
+These messages will only be be printed on STDERR.
+
+=item B<--setup>
+
+Print the agent setup directories and exit.
+
+=item B<--version>
+
+Print the version and exit.
+
+=back

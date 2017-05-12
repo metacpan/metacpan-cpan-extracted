@@ -1,0 +1,23 @@
+Revision history for Perl extension Finance::Budget.
+
+0.05  Sun Jan  8 13:55:41 2017
+    - fixed a logic error in sanity checking categorizer list
+    - adding last occurences getter
+    - fixed a bug in recent history parsing
+
+0.04  Thu Jan  5 20:43:37 2017
+    - fixed bugs in the synopsis
+    - malformed transacton type dies with help
+
+0.03  Wed Jan  4 19:52:42 2017
+    - added support for the 'currency_symbol' constructor option
+    - fixed bug in honoring 'exceptions' list
+    - get META.yml and META.json
+
+0.02  Tue Jan  3 21:00:17 2017
+    - added chokepoint iterator
+    - improved POD
+
+0.01  Sun Jan  1 18:42:29 2017
+	- original version; created by h2xs 1.23 with options
+		-XA -n Finance::Budget

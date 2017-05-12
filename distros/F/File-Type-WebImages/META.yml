@@ -1,0 +1,22 @@
+---
+name: File-Type-WebImages
+version: 1.01
+author:
+  - |-
+    Paul Mison <pmison@fotango.com> - wrote original File::Type
+    Mark Stosberg <mark@summersault.com> - hacked up this.
+abstract: determine web image file types using magic
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::File: 0.01
+  Test::More: 0.01
+provides:
+  File::Type::WebImages:
+    file: lib/File/Type/WebImages.pm
+    version: 1.01
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

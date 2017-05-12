@@ -1,0 +1,7 @@
+Filesys::Virtual::Chroot is a pure perl virtual chroot framework.
+
+The module is designed to provide a virtual chroot environment. This module
+only simulates a chroot environment and only provides a advisory functions for
+your application. This module is B<NOT> intended to provide application 
+security!!!
+

@@ -1,0 +1,9 @@
+Revision history for File-Send
+
+0.002     2013-06-16 23:50:15 Europe/Amsterdam
+          Switch to Sub::Exporter::Progressive
+          Get rid of retry logic in fallback code
+          Don't croak on EAGAIN
+
+0.001     2011-10-14 20:50:35 Europe/Amsterdam
+    -

@@ -1,0 +1,18 @@
+#########[[% config.name %]] Welcome to land [% config.name %]###########
+Dear [% user.nickname %],
+
+Welcome to join us!
+
+Now you can:
+
+  * View Your Personal Homepage - [% config.site.domain %]u/[% user.username %]
+  * Edit Profile - [% config.site.domain %]profile/edit
+  * Edit Your Settings - [% config.site.domain %]settings
+  * Post Topic, Send Messages, and more.
+
+If you have more questions, please refer to our Help Center ( [% config.site.domain %]help ).
+
+Wish you have a happy trip!
+
+Best Regards,
+Yours, [% config.name %] - [% config.site.domain %]

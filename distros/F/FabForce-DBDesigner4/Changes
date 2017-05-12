@@ -1,0 +1,125 @@
+Revision history for Perl extension FabForce::DBDesigner4.
+
+0.34 2015-01-16
+
+    + added metaresources to dist.ini
+    + added todo
+
+0.32  2013-03-20
+
+    + keep more details about columns
+
+0.31  2011-10-27
+
+    + add *::SQL::Sqlite to handle autoincrement in sqlite
+    + added tests for new module
+
+0.306  2010-11-28
+
+    + fix manifest check
+
+0.305  2010-11-26
+
+    + \a in column attributes have to be substituted with '
+    + move to Dist::Zilla
+
+0.304  2009-11-22
+
+    + fix bug in META.yml
+
+0.303  2009-11-22
+
+    + bumped version of FF::DBD::SQL, as the PAUSE indexer said, that a
+      previous version of FF::DBD had a higher version of FF::DBD::SQL included
+
+0.302  2009-08-14
+
+    + added Perl::Critic tests for *::SQL::Utils and *::SQL::Mysql
+    + Version bumps for changed files
+
+0.301  2009-08-12
+
+    + reorder MANIFEST
+    - bugfix: take care of params for datatypes
+    + add tests for bugfix
+    + change license information to be more specific
+
+0.3  2009-08-12
+
+    + add sql_options when creating sql. currently only mysql backend supports that
+
+0.201  2009-05-06
+
+    + add test for mysql and drop tables
+    + minor bugfix in mysql module
+
+0.2  2009-05-05
+
+    + remove sql parsing functions
+    + remove xml writing functions
+    + add mysql specific module
+    + update documentation
+
+0.14 2009-01-06
+
+    + bugfix in XML parsing: add default value even it is "0"
+    + do not "AUTOINCREMENT" on non-numeric columns
+    + add tests for new functionality
+
+0.13 2009-01-03
+
+    + add parameter for DB type to support different SQL dialects
+       currently supports:
+        * mysql
+        * other
+    + add test for mysql
+
+0.12 2008-05-13
+
+    + added check for env variable RELEASE_TESTING in 98_perl_critic.t
+
+0.10 2007-07-28
+
+    - bugfix: removed wrong prereq in 98_perl_critic.t
+
+0.09 2007-07-25
+
+    + added test: 98_perl_critic.t
+    + changed: adopted some Perl::Critic metrics
+    Table.pm:
+      - bugfix: unique column names in column_names
+    XML.pm:
+      + major code cleanup: removed all the nasty global vars
+      - removed use of Data::Dumper
+    
+0.08  2007-07-10
+
+    SQL.pm:   
+      + code cleanup
+    Table.pm: 
+      + some workarounds for missing details in xml information
+      + column_names()
+      + code cleanup
+      + get_foreign_keys()
+
+0.06  2006-11-21
+
+    Tests improved
+
+0.04  2006-10-30
+
+    DBDesigner4.pm: 
+      + getSQL() added: get the CREATE statements
+    SQL.pm:
+      + getSQL() added: get the CREATE statements
+        
+0.03  2006-01-27
+
+    - fixed one minor bug
+    - typo in documentation
+
+0.01  2005-08-08
+
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.6.1 -n FabForce::DBDesigner4
+

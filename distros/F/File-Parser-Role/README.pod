@@ -1,0 +1,89 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+File::Parser::Role A simple role to make life easier when you parse files.
+
+=head1 SYNOPSIS
+
+    package MyFileParser;
+
+    use Moo;
+    has blob => ( is => "rw" );
+
+    sub parse {
+
+      my $self = shift;
+      my $fh = $self->fh;
+
+      local $/;
+
+      # just stuff it here, so not really parsing it
+      $self->blob( <$fh> );
+
+    }
+
+    with "File::Parser::Role";
+
+    1;
+
+
+And then in some nearby code:
+
+    my $file_obj = MyFileParser->new( "some.file" );
+
+    print length $file_obj->blob; # blob now has the file content because of our sub parse
+
+    print $file_obj->size;        # size of file as reported by -s
+
+
+=head1 DESCRIPTION
+
+A simple role that provides the tedious necessities when parsing files:
+
+=over
+
+=item * make Moo constructor work with filename as one single argument
+
+=item * if its a filename, handle it properly if it doesnt exist
+
+=item * provide a read-only file handle to the resource
+
+=item * run a required C<sub parse {}>
+
+=item * fetch its size (its a nice thing to have)
+
+=item * accept file handles and other weirdness such as L<Path::Tiny>, L<IO::All>, L<IO::File>, L<Mojo::Path>.
+
+=item * accept references to content
+
+=back
+
+All that is left is for you is the fun bit: write the code that does the parsing
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2014, Torbjørn Lindahl
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

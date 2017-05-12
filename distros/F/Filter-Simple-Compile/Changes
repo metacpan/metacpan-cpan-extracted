@@ -1,0 +1,8 @@
+[Changes for 0.02 - 2006-09-10]
+
+* Add a missing dependency on Module::Compile 0.17.
+  Reported by: Alexandr Ciornii
+
+[Changes for 0.01 - 2006-05-09]
+
+* Initial CPAN release.

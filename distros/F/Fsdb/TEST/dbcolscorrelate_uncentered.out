@@ -1,0 +1,4 @@
+#fsdb correlation
+# data from http://en.wikipedia.org/wiki/Correlation, date 23-Sep-08
+1
+#   | dbcolscorrelate --nosample x y

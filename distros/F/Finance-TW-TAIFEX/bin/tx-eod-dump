@@ -1,0 +1,42 @@
+#!perl
+use strict;
+use warnings;
+use Finance::TW::TAIFEX;
+
+my $taifex = Finance::TW::TAIFEX->new;
+
+my $product = shift || 'TX';
+my $dir = shift || 'taifex-interday';
+mkdir($dir);
+
+my $data;
+for my $y (1998..$taifex->context_date->year) {
+    for my $m (1..12) {
+        my $file = sprintf('%s/%d-%02d.csv', $dir, $y, $m);
+        next unless -e $file;
+
+        open my $fh, '<', $file or die "$file: $!";
+
+        <$fh>;
+        while (<$fh>) {
+            s/\s//g;
+            my ($date, $contract, $month, $o, $h, $l, $c, undef, undef, $vol, $settlement, $oi) = split ',';
+            next unless $date =~ m|^$y/$m|;
+            next unless $contract eq 'TX';
+
+            my ($y, $m, $d) = split '/', $date;
+            $date = sprintf('%04d-%02d-%02d', $y, $m, $d).$/;
+            if ( $data->{$date} ) {
+                warn "==> $data->{$date}{month} vs $month" if $month < $data->{$date}{month};
+            }
+            else {
+                $data->{$date} = { month => $month, data => [$o, $h, $l, $c, $vol] };
+            }
+        }
+    }
+}
+
+for (sort keys %$data) {
+    print join("\t", @{$data->{$_}{data}}, $_);
+}
+

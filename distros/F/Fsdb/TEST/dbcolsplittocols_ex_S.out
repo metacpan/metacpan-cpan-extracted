@@ -1,0 +1,8 @@
+#fsdb -F S first_last first last
+John_Heidemann  John  Heidemann
+Greg_Johnson  Greg  Johnson
+Root  Root  -
+# this is a simple database
+#  | dbcolrename fullname first_last
+#  | /home/johnh/BIN/DB/dbcol first_last
+#   | dbcolsplittocols first_last

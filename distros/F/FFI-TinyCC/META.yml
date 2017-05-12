@@ -1,0 +1,43 @@
+---
+abstract: 'Tiny C Compiler for FFI'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::TinyCC: '0'
+  Archive::Ar: '2.02'
+  File::chdir: '0'
+  IPC::System::Simple: '0'
+  Module::Build: '0.3601'
+  Path::Class: '0.26'
+  Test::More: '0.94'
+  autodie: '0'
+  perl: '5.008001'
+configure_requires:
+  Alien::TinyCC: '0'
+  Archive::Ar: '2.02'
+  File::chdir: '0'
+  IPC::System::Simple: '0'
+  Module::Build: '0.3601'
+  Path::Class: '0'
+  autodie: '0'
+  perl: '5.008001'
+dynamic_config: '1'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI-TinyCC
+requires:
+  Alien::TinyCC: '0'
+  FFI::Platypus: '0.15'
+  FFI::Platypus::Type::StringArray: '0.01'
+  File::ShareDir: '0'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/FFI-TinyCC/issues
+  homepage: https://metacpan.org/pod/FFI::TinyCC
+  repository: git://github.com/plicease/FFI-TinyCC.git
+version: '0.24'
+x_serialization_backend: 'YAML::Tiny version 1.69'

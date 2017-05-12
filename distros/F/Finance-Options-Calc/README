@@ -1,0 +1,43 @@
+NAME
+    `Finance::Options::Calc' - Option analysis based on different option pricing
+    models.
+
+SYNOPSIS
+        use Finance::Options::Calc;
+     
+        print b_s_call(90, 80, 20, 30, 4.5);
+        print b_s_put (90, 80, 20, 30, 4.5);
+        print call_delta(90, 80, 20, 30, 4.5); 
+        print put_delta(90, 80, 20, 30, 4.5);
+        print call_theta(90, 80, 20, 30, 4.5);
+        print put_theta(90, 80, 20, 30, 4.5); 
+        print gamma(90, 80, 20, 30, 4.5);
+        print vega(90, 80, 20, 30, 4.5);
+        print call_rho(90, 80, 20, 30, 4.5);
+        print put_rho(90, 80, 20, 30, 4.5);
+
+DESCRIPTION
+    b_s_call() subroutines returns theorical value of the call option based on
+    Black_Scholes model. The arguments are current stock price, strike price, time to
+    expiration (calender days, note this module does NOT use business days),
+    volatility(%), annual interest rate(%) in order.
+
+    b_s_put() subroutines returns theorical value of the put option based on
+    Black_Scholes model. The arguments are current stock price, strike price, time to
+    expiration (calender days, note this module does NOT use business days),
+    volatility(%), annual interest rate(%) in order.
+
+    call_delta() returns call delta.
+
+    put_delta() returns put delta.
+
+    Other methods are similar.
+
+TODO
+    more calculation models will be included.
+
+AUTHOR
+    Chicheng Zhang
+
+    chichengzhang@hotmail.com
+

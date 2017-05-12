@@ -1,0 +1,35 @@
+Revision history for Perl module File-stat-Extra
+
+0.008     2016-08-17
+  * Fixed misplaced SYNOPSIS
+  * Added Travis and AppVeyor testing
+
+0.007     2016-08-10
+  * Amendments for Test::Synopsis > v0.13
+  * Removed Build.PL, require >= v0.009 of PluginBundle
+  * Updated author e-mail address
+  * Documentation and test cosmetics
+
+0.006     2015-03-30
+  * Explicitly overloading comparison operators to prevent problems on some systems
+  * Not overloading operators that aren't supported by active Perl version
+    (e.g., filetests < v5.12 and the smartmatch operator < v5.10) 
+  * Not (implicitly) overloading operators (e.g., +, -, * etc.) that have no meaning
+
+0.005     2015-03-27
+  * Creating own S_IS* functions to stay more version independent from File::stat
+  * Adaptations for compatibility with Perl v5.6
+
+0.004     2015-03-27
+  * Filetest overloading only supported in Perl 5.12 and higher
+
+0.003     2015-03-26
+  * Removed faulty (and unnecessary) tests
+
+0.002     2015-03-26
+  * Symlink tests not run on systems that do not support them
+  * Added diagnostics output for failed tests
+  * Documentation cosmetics
+
+0.001     2015-03-25
+  * Initial release

@@ -1,0 +1,48 @@
+Perl Module File-Info:
+
+    Tool for caching File Information
+
+Description:
+
+Modules & Classes:
+
+    File::Info - Store file information persistently for fast lookup
+
+Executables:
+
+    fileinfo-dump - Dump information found in .fileinfo file in human-readable
+                    fashion.
+
+Required Perl Version:
+
+    5_005.62
+
+Required Packages:
+
+    Class-MethodMaker   1.02
+    IPC::Run            0.44
+    DB_File            1.803
+    Storable          1.0.14
+    MLDBM               2.00
+    Log-Info            1.03
+
+Optional Packages:
+
+    Archive-Par         1.52
+    Digest-MD5          2.00
+
+Required Executables:
+
+    *None*
+
+Package Maintainer: 
+
+    Martyn J. Pearce fluffy@cpan.org
+
+Copyright: 
+
+    Copyright (c) 2002, 2003 Martyn J. Pearce.  This program is free software;
+    you can redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+13th January, 2003

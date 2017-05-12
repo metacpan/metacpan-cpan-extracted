@@ -1,0 +1,215 @@
+#!/usr/bin/perl -w
+# catalogage arborescence et archives
+
+use strict;
+use warnings;
+use 5.010;
+use Env;
+use File::Basename qw(basename);
+use Cwd qw(abs_path);
+use Getopt::Long;
+use Term::ProgressBar;
+use YAML::Tiny;
+use Log::Log4perl qw(:easy);
+use Data::Dumper qw(Dumper);
+
+use File::Catalog;
+
+# version
+my $VERSION = 0.003;
+
+#--- options
+my $opt_fic_bd;
+my $opt_tmp;
+my $opt_password;
+my $opt_ext      = 0;
+my $opt_archives = 0;
+my $opt_debug    = 0;
+GetOptions(
+    "bd=s"       => \$opt_fic_bd,
+    "archives!"  => \$opt_archives,
+    "tmp=s"      => \$opt_tmp,
+    "password:s" => \$opt_password,
+    "debug!"     => \$opt_debug,
+    "extension!" => \$opt_ext,
+    "version"    => sub { say f_version() and exit 0 },
+    "usage"      => sub { say f_usage() and exit 0 },
+    "help"       => sub { say f_help() and exit 0 }
+) or die f_usage() . "\n";
+
+# extension (permet de consulter/lister une bd etendue)
+my $extension;
+my $ajout  = 1;
+my $ficext = $ENV{HOME} . "/.ktlext.yml";
+if ($opt_ext and -f $ficext) {
+    my $yaml = YAML::Tiny->read($ficext);
+    $extension = $yaml->[0];
+    $ajout = 0 unless exists $extension->{trigger};
+}
+
+# initialisation
+my %options = (
+    bd       => $opt_fic_bd,
+    archives => $opt_archives,
+    tmp      => $opt_tmp,
+    password => $opt_password,
+    debug    => $opt_debug
+);
+$options{extension} = $extension if defined $extension;
+my $ktl = File::Catalog->initialiser(%options);
+
+# commandes
+my $cmd = shift;
+
+#say "commande : $cmd";
+
+if ($cmd ~~ [ "a", "add", "ajouter" ]) {
+    if ($ajout) {
+        ajouter($ktl, @ARGV);
+    }
+    else {
+        say "Ajout impossible : extension definie dans .ktlext.yml";
+    }
+}
+
+if ($cmd ~~ [ "l", "list", "lister" ]) {
+    lister($ktl, @ARGV);
+}
+
+if ($cmd ~~ [ "r", "dir", "rep", "repertoires" ]) {
+    lister_rep($ktl, @ARGV);
+}
+
+if ($cmd ~~ [ "p", "purge", "purger" ]) {
+    purger($ktl, @ARGV);
+}
+
+if ($cmd ~~ [ "d", "duplicates", "doublons" ]) {
+    doublons($ktl, @ARGV);
+}
+
+# cloture BD
+$ktl->terminer();
+
+# fin.
+exit 0;
+
+#=== FONCTIONS ===
+
+# ajouter une arborescence au catalogue
+sub ajouter {
+    my ($ktl, @lst) = @_;
+
+    # parcours et analyse
+    foreach my $repertoire (@lst) {
+        chop(my $nb_fic =
+              `find $repertoire -type f | fgrep -v '/.git/' | fgrep -v '/.svn/' | fgrep -v '/CVS/' | wc -l`);
+        say $repertoire;
+        if (!$opt_debug) {
+            $ktl->{barre} = Term::ProgressBar->new(
+                {
+                    name  => sprintf("[%5d fichiers] ", $nb_fic),
+                    count => $nb_fic,
+                    ETA   => "linear",
+                }
+            );
+        }
+        $ktl->{nbfic} = 0;
+        $ktl->parcourir_repertoire(abs_path($repertoire));
+        say "";
+    }
+}
+
+# lister le contenu du catalogue
+sub lister {
+    my ($ktl, $filtre) = @_;
+
+    DEBUG "lister: " . ((defined $filtre) ? $filtre : "-");
+    my $lst = $ktl->{db}->lister_fichiers($filtre);
+
+    #DEBUG "lst: " . Dumper($lst);
+    my @lst = map { $_->[2] } @$lst;
+    foreach my $fic (@lst) {
+        say $fic;
+    }
+}
+
+# lister les repertoires du catalogue
+sub lister_rep {
+    my ($ktl, $filtre) = @_;
+
+    my @lst = $ktl->{db}->lister_repertoires($filtre);
+    foreach my $rep (@lst) {
+        say $rep;
+    }
+}
+
+# purger une liste de repfic
+sub purger {
+    my ($ktl, $ficin) = @_;
+
+    # verif acces fichier
+    -f $ficin and -r $ficin and -T $ficin
+      or die "Readable text file not found : $ficin\n";
+
+    # ouverture fichier en lecture seule
+    open FICIN, $ficin;
+
+    # purge de chaque entree
+    foreach my $entree (<FICIN>) {
+        chop $entree;
+
+        # suppression des commentaires
+        $entree =~ s/#.*//;
+
+        # saut des lignes vides
+        $entree =~ /^\s*$/ and next;
+
+        # purge de l'entree
+        $ktl->purger_entree($entree);
+    }
+
+    # fermeture fichier
+    close FICIN;
+
+    # fin
+    say "End.";
+}
+
+# lister les doublons
+sub doublons {
+    my ($ktl, $filtre) = @_;
+
+    my @lst = $ktl->{db}->lister_doublons($filtre);
+    foreach my $dbl (@lst) {
+        say $dbl;
+    }
+}
+
+#=== AIDE ===
+
+# version
+sub f_version {
+    return sprintf "version: %s", $VERSION;
+}
+
+# usage
+sub f_usage {
+    my $exe = basename($0);
+    my $usage =
+        "usage: $exe [--debug] [--archives] [--tmp=/rep/tmp] [--bd=<BD>] <command> <params>\n"
+      . "       $exe [<OPTIONS>] [a|add|ajouter] <REP1> .. <REPn> : ajoute des arborescences au catalogue\n"
+      . "       $exe [<OPTIONS>] [l|list|lister] <FILTRE> : liste les entrees du catalogue satisfaisant le filtre\n"
+      . "       $exe [<OPTIONS>] [p|purge|purger] <FICHIER> : purge le catalogue des entrees listees dans le fichier\n"
+      . "       $exe [<OPTIONS>] [d|duplicates|doublons] <FILTRE> : liste les doublons du catalogue satisfaisant le filtre\n";
+}
+
+sub f_help {
+    my $aide = "KTL : Outils de catalogage d'arborescence...\n";
+    $aide .= f_version() . "\n";
+    $aide .= f_usage();
+
+}
+
+# fin.
+

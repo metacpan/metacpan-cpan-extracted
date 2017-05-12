@@ -1,0 +1,55 @@
+---
+abstract: 'change directory temporarily for a limited scope'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-pushd
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  File::pushd:
+    file: lib/File/pushd.pm
+    version: '1.014'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Exporter: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/File-pushd/issues
+  homepage: https://github.com/dagolden/File-pushd
+  repository: https://github.com/dagolden/File-pushd.git
+version: '1.014'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Diab Jerius <djerius@cfa.harvard.edu>'
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

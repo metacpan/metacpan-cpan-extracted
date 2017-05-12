@@ -1,0 +1,7 @@
+language: perl
+perl:
+        - "5.12"
+
+notifications:
+        on_success: change
+        on_failure: change

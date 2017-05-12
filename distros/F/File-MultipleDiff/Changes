@@ -1,0 +1,19 @@
+Revision history for File-MultipleDiff
+
+0.01    2013/01
+        First version, released on an unsuspecting world.
+
+0.02    2013/01
+        Description improved
+
+0.03    2013/01
+        Description improved
+
+0.04    2013/01
+        Enhanced Makefile.PL: dependencies added
+
+0.05    2013/01
+        Description essentially improved
+
+0.06    2013/04
+        Dependency added (File::Tie) for very old Perl distributions

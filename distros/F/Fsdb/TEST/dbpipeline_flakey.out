@@ -1,0 +1,9 @@
+die#fsdb name test1
+a	85
+b	75
+#   | dbcol name test1 --input - --output [::FsdbIPC]
+#  | dbroweval  '{ _test1 += 1; }'
+#  | dbroweval  '{ _test1 += 1; }'
+#  | dbroweval  '{ _test1 += 1; select(undef,undef,undef,0.1); }'
+#  | dbroweval  '{ _test1 += 1; if (++$count == 2) { print STDERR "die"; }; }'
+#  | dbroweval  '{ _test1 += 1; select(undef,undef,undef,0.1); }'

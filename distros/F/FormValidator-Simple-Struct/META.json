@@ -1,0 +1,93 @@
+{
+   "abstract" : "Validation module for nested array ,hash ,scalar  like FormValidator::Simple",
+   "author" : [
+      "S2 <s2otsa59@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FormValidator-Simple-Struct",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Email::Valid" : "0",
+            "Hash::MultiValue" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Time::Piece" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "FormValidator::Simple::Struct" : {
+         "file" : "lib/FormValidator/Simple/Struct.pm",
+         "version" : "0.18"
+      },
+      "FormValidator::Simple::Struct::AllowCharacter" : {
+         "file" : "lib/FormValidator/Simple/Struct/AllowCharacter.pm",
+         "version" : "0.18"
+      },
+      "FormValidator::Simple::Struct::CharTypes" : {
+         "file" : "lib/FormValidator/Simple/Struct/CharTypes.pm",
+         "version" : "0.18"
+      },
+      "FormValidator::Simple::Struct::Regex" : {
+         "file" : "lib/FormValidator/Simple/Struct/Regex.pm",
+         "version" : "0.18"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/S2/FormValidator-Simple-Struct/issues"
+      },
+      "homepage" : "https://github.com/S2/FormValidator-Simple-Struct",
+      "repository" : {
+         "url" : "git://github.com/S2/FormValidator-Simple-Struct.git",
+         "web" : "https://github.com/S2/FormValidator-Simple-Struct"
+      }
+   },
+   "version" : "0.18",
+   "x_contributors" : [
+      "S2 <s2otsa@hotmail.com>",
+      "Sato shinihiro <shinichiro@wano.co.jp>"
+   ]
+}

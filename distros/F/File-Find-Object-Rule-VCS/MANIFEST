@@ -1,0 +1,18 @@
+Build.PL
+Changes
+Changes.FFR-VCS.txt
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+inc/Test/Run/Builder.pm
+lib/File/Find/Object/Rule/VCS.pm
+t/01_compile.t
+t/02_main.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t

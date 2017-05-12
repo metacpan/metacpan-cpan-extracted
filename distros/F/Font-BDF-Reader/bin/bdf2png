@@ -1,0 +1,125 @@
+#!/usr/bin/perl -w
+use strict;
+use Font::BDF::Reader;
+use GD;
+
+my %h2b		= ( '0'	=> "0000",
+		    '1'	=> "0001",
+		    "2"	=> "0010",
+		    "3"	=> "0011",
+		    "4"	=> "0100",
+		    "5"	=> "0101",
+		    "6"	=> "0110",
+		    "7"	=> "0111",
+		    "8"	=> "1000",
+		    "9"	=> "1001",
+		    "a"	=> "1010",
+		    "A"	=> "1010",
+		    "b"	=> "1011",
+		    "B"	=> "1011",
+		    "c"	=> "1100",
+		    "C"	=> "1100",
+		    "d"	=> "1101",
+		    "D"	=> "1101",
+		    "e"	=> "1110",
+		    "E"	=> "1110",
+		    "f"	=> "1111",
+		    "F"	=> "1111",
+		  );
+
+my $bdf_filename	= shift;
+my $bdf_base		= $bdf_filename;
+$bdf_base		=~ s/\..*//;
+
+# my $BDF		= Font::BDF::Reader->new();
+# $BDF->open_bdf_file( $bdf_filename );
+# $BDF->read_bdf_metadata;
+# use Data::Dumper;
+# print Dumper( $BDF->get_bdf_metadata ), "\n";
+# print Dumper( $BDF->get_font_info_by_STARTCHAR( $BDF->read_bdf_char ) ), "\n";
+# exit 1;
+
+my $BDF		= Font::BDF::Reader->new( $bdf_filename );
+
+
+my @starchars	= $BDF->get_all_STARTCHAR;
+foreach my $starchar (@starchars) {
+  my $png_data	= font_to_png( $BDF->get_font_info_by_STARTCHAR( $starchar ) );
+  my $png_file	= "$bdf_base.$starchar.png";
+  my $FH	= IO::File->new( ">$png_file" )
+    || die "Error opening file for write: '$png_file'";
+  binmode $FH;
+  print $FH $png_data;
+}
+
+sub font_to_png {
+  my $font_data	= shift;
+  my $BBX	= $font_data->{BBX};
+  my $x		= $BBX->[0];
+  my $y		= $BBX->[0];
+  my $BITMAP	= $font_data->{BITMAP};
+  # create a new image
+  my $I		= GD::Image->new( $x, $y );
+  # allocate some colors
+  my $white	= $I->colorAllocate( 255, 255, 255 );
+  my $black	= $I->colorAllocate( 0, 0, 0 );
+  # make the background transparent
+  $I->transparent( $white );
+  # Fill with transparency
+  $I->rectangle( 0, 0, $x, $y, $white );
+  $I->fill( 1, 1, $white );
+
+  my $line_number	= 0;
+  foreach my $line ( @$BITMAP ) {
+    $line	=~ s/(.)/$h2b{$1}/eg;
+    my @pels	= split //, $line;
+    foreach my $i ( 0 .. $x - 1 ) {
+      if( $pels[$i] ) {
+	$I->setPixel( $i, $line_number, $black );
+      }
+    }
+    $line_number++;
+  }
+  return $I->png;
+}
+
+
+=head1 NAME
+
+bdf2png convert a BDF file into a number of transparent PNG files
+
+=head1 SYNOPSIS
+
+  bdf2png BDF_FILE
+
+=head1 DESCRIPTION
+
+This script takes the BDF file 'BDF_FILE' and creates a PNG file for
+each character defined by the BDF file.  For a BDF file named "kanji48.bdf",
+each PNG file will be named "kanji48.STARTCHAR.pdf".
+
+It uses the Font::BDF::Reader module to read data from the BDF file, and the GD module to
+create the PNG files.
+
+=head1 SEE ALSO
+
+The module Font::BDF::Reader.
+
+The specifications for the BDF format can be found here:
+http://partners.adobe.com/asn/developer/PDFS/TN/5005.BDF_Spec.pdf.
+
+=head1 AUTHOR
+
+Desmond Lee, E<lt>dclee@shaw.ca<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003 by Desmond Lee
+
+This script is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+
+

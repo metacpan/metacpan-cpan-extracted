@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+use Font::TTF::Font;
+use Getopt::Std;
+use Pod::Usage;
+use Font::TTF::Scripts::Deflang;
+use Font::TTF::Scripts::Name;
+
+our $CHAIN_CALL;
+our ($if, $of, %opts);
+
+unless ($CHAIN_CALL)
+{
+    getopts('d:hn:', \%opts);
+
+    unless (defined $ARGV[1] || defined $opts{h})
+    {
+        pod2usage(1);
+        exit;
+    }
+
+    if ($opts{h})
+    {
+        pod2usage( -verbose => 2, -noperldoc => 1);
+        exit;
+    }
+
+    $if = Font::TTF::Font->open($ARGV[0]) || die "Can't read font $ARGV[0]";
+}
+
+$of = ttfdeflang($if, %opts);
+$fname = $of->{'name'}->read->find_name(1);
+$name = $opts{'n'} || $opts{'d'};
+$of = ttfname($of, 'n' => "$fname $name");
+
+unless ($CHAIN_CALL)
+{ $of->out($ARGV[1]) || die "Can't write to font file $ARGV[1]. Do you have it installed?"; }
+
+
+__END__
+
+=head1 NAME
+
+ttfname - renames font files
+
+=head1 SYNOPSIS
+
+  ttfdeflang -d lang infile.ttf outfile.ttf
+Creates a font with the given language id as being default.
+
+=head1 OPTIONS
+
+  -d lang   Language id to use as default
+
+=head1 AUTHOR
+
+Martin Hosken L<http://scripts.sil.org/FontUtils>.
+(see CONTRIBUTORS for other authors).
+
+=head1 LICENSING
+
+Copyright (c) 1998-2014, SIL International (http://www.sil.org)
+
+This script is released under the terms of the Artistic License 2.0.
+For details, see the full text of the license in the file LICENSE.
+
+=cut 

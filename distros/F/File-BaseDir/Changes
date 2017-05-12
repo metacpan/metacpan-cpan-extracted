@@ -1,0 +1,38 @@
+Revision history for Perl extension File::BaseDir.
+
+0.07 21 Apr 2015
+    Use temporary files for 03_userdirs.t test, fix for RT bug 103805
+
+0.06 6 Apr 2015
+    Added prerequsite module build_requires section of Build.PL
+
+0.05 4 Apr 2015
+    Added prerequsitie module to Build.PL
+
+0.04 3 Apr 2015
+    Fix for RT bug #41744 . Remove warning message when $ENV{HOME} is not defined
+    Fix for RT bugs # 88502 and #54929, typos corrected
+	Fix for RT bug #41744 . Remove warning message when $ENV{HOME} is not defined
+    Fix for RT bugs #50343, added more functionality
+	Fixed some OS depedendancies in test suite.
+	
+
+0.03  Wed Oct 24 2007
+	- Added lookup methods for files and dirs:
+		data_home, data_files, data_dirs,
+		config_home, config_files, config_dirs & cache_home;
+		suggested by Matisse Enzer
+	- Deprecated xdg_data_files and xdg_config_files;
+		suggested by Michael Schwern
+	- Added a bit of Win32 support
+	- Extended tests to full coverage
+
+0.02  Thu Sep  4 2003
+        - forgot to remove h2xs default "use 5.008" tag :(
+	emergency release it is ...
+
+0.01  Wed Sep  3 18:33:59 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n File::BaseDir
+	- Added methods for all environment variables defined by the spec
+

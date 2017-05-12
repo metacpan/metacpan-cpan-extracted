@@ -1,0 +1,476 @@
+NAME
+    FormValidator::Simple - validation with simple chains of constraints
+
+SYNOPSIS
+        my $query = CGI->new;
+        $query->param( param1 => 'ABCD' );
+        $query->param( param2 =>  12345 );
+        $query->param( mail1  => 'lyo.kato@gmail.com' );
+        $query->param( mail2  => 'lyo.kato@gmail.com' );
+        $query->param( year   => 2005 );
+        $query->param( month  =>   11 );
+        $query->param( day    =>   27 );
+
+        my $result = FormValidator::Simple->check( $query => [
+            param1 => ['NOT_BLANK', 'ASCII', ['LENGTH', 2, 5]],
+            param2 => ['NOT_BLANK', 'INT'  ],
+            mail1  => ['NOT_BLANK', 'EMAIL_LOOSE'],
+            mail2  => ['NOT_BLANK', 'EMAIL_LOOSE'],
+            { mails => ['mail1', 'mail2'       ] } => ['DUPLICATION'],
+            { date  => ['year',  'month', 'day'] } => ['DATE'],
+        ] );
+
+        if ( $result->has_error ) {
+            my $tt = Template->new({ INCLUDE_PATH => './tmpl' });
+            $tt->process('template.html', { result => $result });
+        }
+
+    template example
+
+        [% IF result.has_error %]
+        <p>Found Input Error</p>
+        <ul>
+
+            [% IF result.missing('param1') %]
+            <li>param1 is blank.</li>
+            [% END %]
+
+            [% IF result.invalid('param1') %]
+            <li>param1 is invalid.</li>
+            [% END %]
+
+            [% IF result.invalid('param1', 'ASCII') %]
+            <li>param1 needs ascii code.</li>
+            [% END %]
+
+            [% IF result.invalid('param1', 'LENGTH') %]
+            <li>input into param1 with characters that's length should be between two and five. </li>
+            [% END %]
+
+        </ul>
+        [% END %]
+
+    example2
+
+        [% IF result.has_error %]
+        <ul>
+            [% FOREACH key IN result.error %]
+                [% FOREACH type IN result.error(key) %]
+                <li>invalid: [% key %] - [% type %]</li>
+                [% END %]
+            [% END %]
+        </ul>
+        [% END %]
+
+DESCRIPTION
+    This module provides you a sweet way of form data validation with simple
+    constraints chains. You can write constraints on single line for each
+    input data.
+
+    This idea is based on Sledge::Plugin::Validator, and most of validation
+    code is borrowed from this plugin.
+
+    (Sledge is a MVC web application framework: http://sl.edge.jp [Japanese]
+    )
+
+    The result object this module returns behaves like
+    Data::FormValidator::Results.
+
+HOW TO SET PROFILE
+        FormValidator::Simple->check( $q => [
+            #profile
+        ] );
+
+    Use 'check' method.
+
+    A hash reference includes input data, or an object of some class that
+    has a method named 'param', for example CGI, is needed as first
+    argument.
+
+    And set profile as array reference into second argument. Profile
+    consists of some pairs of input data and constraints.
+
+        my $q = CGI->new;
+        $q->param( param1 => 'hoge' );
+
+        FormValidator::Simple->check( $q => [
+            param1 => [ ['NOT_BLANK'], ['LENGTH', 4, 10] ],
+        ] );
+
+    In this case, param1 is the name of a form element. and the array ref "[
+    ['NOT_BLANK']... ]" is a constraints chain.
+
+    Write constraints chain as arrayref, and you can set some constraints
+    into it. In the last example, two constraints 'NOT_BLANK', and 'LENGTH'
+    are set. Each constraints is should be set as arrayref, but in case the
+    constraint has no argument, it can be written as scalar text.
+
+        FormValidator::Simple->check( $q => [
+            param1 => [ 'NOT_BLANK', ['LENGTH', 4, 10] ],
+        ] );
+
+    Now, in this sample 'NOT_BLANK' constraint is not an arrayref, but
+    'LENGTH' isn't. Because 'LENGTH' has two arguments, 4 and 10.
+
+  MULTIPLE DATA VALIDATION
+    When you want to check about multiple input data, do like this.
+
+        my $q = CGI->new;
+        $q->param( mail1 => 'lyo.kato@gmail.com' );
+        $q->param( mail2 => 'lyo.kato@gmail.com' );
+
+        my $result = FormValidator::Simple->check( $q => [
+            { mails => ['mail1', 'mail2'] } => [ 'DUPLICATION' ],
+        ] )
+
+        [% IF result.invalid('mails') %]
+        <p>mail1 and mail2 aren't same.</p>
+        [% END %]
+
+    and here's an another example.
+
+        my $q = CGI->new;
+        $q->param( year  => 2005 );
+        $q->param( month =>   12 );
+        $q->param(   day =>   27 );
+
+        my $result = FormValidator::Simple->check( $q => [ 
+            { date => ['year', 'month', 'day'] } => [ 'DATE' ],
+        ] );
+
+        [% IF result.invalid('date') %]
+        <p>Set correct date.</p>
+        [% END %]
+
+  FLEXIBLE VALIDATION
+        my $valid = FormValidator::Simple->new();
+
+        $valid->check( $q => [ 
+            param1 => [qw/NOT_BLANK ASCII/, [qw/LENGTH 4 10/] ],
+        ] );
+
+        $valid->check( $q => [
+            param2 => [qw/NOT_BLANK/],
+        ] );
+
+        my $results = $valid->results;
+
+        if ( found some error... ) {
+            $results->set_invalid('param3' => 'MY_ERROR');
+        }
+
+    template example
+
+        [% IF results.invalid('param1') %]
+        ...
+        [% END %]
+        [% IF results.invalid('param2') %]
+        ...
+        [% END %]
+        [% IF results.invalid('param3', 'MY_ERROR') %]
+        ...
+        [% END %]
+
+HOW TO SET OPTIONS
+    Option setting is needed by some validation, especially in plugins.
+
+    You can set them in two ways.
+
+        FormValidator::Simple->set_option(
+            dbic_base_class => 'MyProj::Model::DBIC',
+            charset         => 'euc',
+        );
+
+    or
+
+        $valid = FormValidator::Simple->new(
+            dbic_base_class => 'MyProj::Model::DBIC',
+            charset         => 'euc',
+        );
+
+        $valid->check(...)
+
+VALIDATION COMMANDS
+    You can use follow variety validations. and each validations can be used
+    as negative validation with 'NOT_' prefix.
+
+        FormValidator::Simple->check( $q => [ 
+            param1 => [ 'INT', ['LENGTH', 4, 10] ],
+            param2 => [ 'NOT_INT', ['NOT_LENGTH', 4, 10] ],
+        ] );
+
+    SP  check if the data has space or not.
+
+    INT check if the data is integer or not.
+
+    UINT
+        unsigined integer check. for example, if -1234 is input, the
+        validation judges it invalid.
+
+    DECIMAL
+            $q->param( 'num1' => '123.45678' );
+
+            my $result = FormValidator::Simple->check( $q => [ 
+                num1 => [ ['DECIMAL', 3, 5] ],
+            ] );
+
+        each numbers (3,5) mean maximum digits before/after '.'
+
+    ASCII
+        check is the data consists of only ascii code.
+
+    LENGTH
+        check the length of the data.
+
+            my $result = FormValidator::Simple->check( $q => [
+                param1 => [ ['LENGTH', 4] ],
+            ] );
+
+        check if the length of the data is 4 or not.
+
+            my $result = FormValidator::Simple->check( $q => [
+                param1 => [ ['LENGTH', 4, 10] ],
+            ] );
+
+        when you set two arguments, it checks if the length of data is in
+        the range between 4 and 10.
+
+    HTTP_URL
+        verify it is a http(s)-url
+
+            my $result = FormValidator::Simple->check( $q => [
+                param1 => [ 'HTTP_URL' ],
+            ] );
+
+    SELECTED_AT_LEAST
+        verify the quantity of selected parameters is counted over allowed
+        minimum.
+
+            <input type="checkbox" name="hobby" value="music" /> Music
+            <input type="checkbox" name="hobby" value="movie" /> Movie
+            <input type="checkbox" name="hobby" value="game"  /> Game
+
+            my $result = FormValidator::Simple->check( $q => [ 
+                hobby => ['NOT_BLANK', ['SELECTED_AT_LEAST', 2] ],
+            ] );
+
+    REGEX
+        check with regular expression.
+
+            my $result = FormValidator::Simple->check( $q => [ 
+                param1 => [ ['REGEX', qr/^hoge$/ ] ],
+            ] );
+
+    DUPLICATION
+        check if the two data are same or not.
+
+            my $result = FormValidator::Simple->check( $q => [ 
+                { duplication_check => ['param1', 'param2'] } => [ 'DUPLICATION' ],
+            ] );
+
+    EMAIL
+        check with Email::Valid.
+
+    EMAIL_MX
+        check with Email::Valid, including mx check.
+
+    EMAIL_LOOSE
+        check with Email::Valid::Loose.
+
+    EMAIL_LOOSE_MX
+        check with Email::Valid::Loose, including mx check.
+
+    DATE
+        check with Date::Calc
+
+            my $result = FormValidator::Simple->check( $q => [ 
+                { date => [qw/year month day/] } => [ 'DATE' ]
+            ] );
+
+    TIME
+        check with Date::Calc
+
+            my $result = FormValidator::Simple->check( $q => [
+                { time => [qw/hour min sec/] } => ['TIME'],
+            ] );
+
+    DATETIME
+        check with Date::Calc
+
+            my $result = FormValidator::Simple->check( $q => [ 
+                { datetime => [qw/year month day hour min sec/] } => ['DATETIME']
+            ] );
+
+    DATETIME_STRPTIME
+        check with DateTime::Format::Strptime.
+
+            my $q = CGI->new;
+            $q->param( datetime => '2006-04-26T19:09:21+0900' );
+
+            my $result = FormValidator::Simple->check( $q => [
+              datetime => [ [ 'DATETIME_STRPTIME', '%Y-%m-%dT%T%z' ] ],
+            ] );
+
+    DATETIME_FORMAT
+        check with DateTime::Format::***. for example,
+        DateTime::Format::HTTP, DateTime::Format::Mail,
+        DateTime::Format::MySQL and etc.
+
+            my $q = CGI->new;
+            $q->param( datetime => '2004-04-26 19:09:21' );
+
+            my $result = FormValidator::Simple->check( $q => [
+              datetime => [ [qw/DATETIME_FORMAT MySQL/] ],
+            ] );
+
+    GREATER_THAN
+        numeric comparison
+
+            my $result = FormValidator::Simple->check( $q => [
+                age => [ ['GREATER_THAN', 25] ],
+            ] );
+
+    LESS_THAN
+        numeric comparison
+
+            my $result = FormValidator::Simple->check( $q => [
+                age => [ ['LESS_THAN', 25] ],
+            ] );
+
+    EQUAL_TO
+        numeric comparison
+
+            my $result = FormValidator::Simple->check( $q => [
+                age => [ ['EQUAL_TO', 25] ],
+            ] );
+
+    BETWEEN
+        numeric comparison
+
+            my $result = FormValidator::Simple->check( $q => [
+                age => [ ['BETWEEN', 20, 25] ],
+            ] );
+
+    ANY check if there is not blank data in multiple data.
+
+            my $result = FormValidator::Simple->check( $q => [ 
+                { some_data => [qw/param1 param2 param3/] } => ['ANY']
+            ] );
+
+    IN_ARRAY
+        check if the food ordered is in menu
+
+            my $result = FormValidator::Simple->check( $q => [
+                food => [ ['IN_ARRAY', qw/noodle soba spaghetti/] ],
+            ] };
+
+HOW TO LOAD PLUGINS
+        use FormValidator::Simple qw/Japanese CreditCard/;
+
+    FormValidator::Simple::Plugin::Japanese,
+    FormValidator::Simple::Plugin::CreditCard are loaded.
+
+    or use 'load_plugin' method.
+
+        use FormValidator::Simple;
+        FormValidator::Simple->load_plugin('FormValidator::Simple::Plugin::CreditCard');
+
+MESSAGE HANDLING
+    You can custom your own message with key and type.
+
+        [% IF result.has_error %]
+            [% FOREACH key IN result.error %]
+                [% FOREACH type IN result.error(key) %]
+                <p>error message:[% type %] - [% key %]</p>
+                [% END %]
+            [% END %]
+        [% END %]
+
+    And you can also set messages configuration before. You can prepare
+    configuration as hash reference.
+
+        FormValidator::Simple->set_messages( {
+            action1 => {
+                name => {
+                    NOT_BLANK => 'input name!',
+                    LENGTH    => 'input name (length should be between 0 and 10)!',
+                },
+                email => {
+                    DEFAULT => 'input correct email address!',
+                },
+            },
+        } );
+
+    or a YAML file.
+
+        # messages.yml
+        DEFAULT:
+            name:
+                DEFAULT: name is invalid!
+        action1:
+            name:
+                NOT_BLANK: input name!
+                LENGTH: input name(length should be between 0 and 10)!
+            email:
+                DEFAULT: input correct email address!
+        action2:
+            name:
+                DEFAULT: ...
+                
+    # in your perl-script, set the file's path.
+        FormValidator::Simple->set_messages('messages.yml');
+
+    DEFAULT is a special type. If it can't find setting for indicated
+    validation-type, it uses message set for DEFAULT.
+
+    after setting, execute check(),
+
+        my $result = FormValidator::Simple->check( $q => [
+            name  => [qw/NOT_BLANK/, [qw/LENGTH 0 10/] ],
+            email => [qw/NOT_BLANK EMAIL_LOOSE/, [qw/LENGTH 0 20/] ],
+        ] );
+
+        # matching result and messages for indicated action.
+        my $messages = $result->messages('action1');
+
+        foreach my $message ( @$messages ) {
+            print $message, "\n";
+        }
+
+    When it can't find indicated action, name, and type, it searches proper
+    message from DEFAULT action. If in template file,
+
+        [% IF result.has_error %]
+            [% FOREACH msg IN result.messages('action1') %]
+            <p>[% msg %]</p>
+            [% END %]
+        [% END %]
+
+    you can set each message format.
+
+        FormValidator::Simple->set_message_format('<p>%s</p>');
+        my $result = FormValidator::Simple->check( $q => [
+            ...profile
+        ] );
+
+        [% IF result.has_error %]
+            [% result.messages('action1').join("\n") %]
+        [% END %]
+
+RESULT HANDLING
+    See FormValidator::Simple::Results
+
+SEE ALSO
+    Data::FormValidator
+
+    http://sl.edge.jp/ (Japanese)
+
+    http://sourceforge.jp/projects/sledge
+
+AUTHOR
+    Lyo Kato <lyo.kato@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

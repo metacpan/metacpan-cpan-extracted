@@ -1,0 +1,47 @@
+Revision history for Perl extension File::Tabular.
+
+0.72 04.11.2008
+  - no warnings 'numeric' when applying numeric filters on empty fields
+
+0.71 01.12.2007 
+  - new operator '#' for matching with a vector of integers
+
+0.70 15.10.2006 - Added support for escape sequences in fieldSep/recordSep
+
+0.69 08.06.2006 - Fixed bug: date2str
+
+0.68 04.04.2006 - Fixed bug: new() was creating a closure with circular 
+                  dependencies
+
+0.67 02.03.2006 - Fixed bug: "use locale" was missing
+
+0.66 26.09.2005 - Fixed bug in _cplSubQ, accented chars no longer go 
+                  through quotemeta
+
+0.65 05.06.2005 - Added special query "KEY:value" to build a regex that 
+	          searches on the first column.
+	        - Added option "avoidMatchKey" in "new" method
+	        - Added methods: stat, atime, ctime, mtime
+		- Optimized _getField
+	        - Replaced 'readline' by 'read' in copyData
+		- Replaced open("+>") by File::Temp->new for tempfiles
+		- Fixed bug, preMatch/postMatch did not work
+		- Added conditions where preMatch/postMatch will not apply
+                - Apply quotemeta to queries with operator ':'
+		- Changed _cplSubQ for compatibility with 
+	          Search::QueryParser v0.91
+
+0.64 03.05.2005 Added argument "implicitPlus" in method compileFilter
+                and possibility to pass a pre-parsed query as argument
+
+                Fixed a bug in writeKeys due to improper layer in temp files
+	        (now forcing 'crlf' layer, "portably open a text file"
+ 		 according to PerlIO manpage)
+
+0.63 22.03.2005 Fixed a bug in _cplQ (comparison with $self->{rxDate})
+
+0.62 09.03.2005 Fixed a bug in _printRow (missing \Q..\E in regexes)
+
+0.61 26.02.2005 Removed old and useless dependencies in t/File-Tabular.t
+
+0.60 25.02.2005 First CPAN release

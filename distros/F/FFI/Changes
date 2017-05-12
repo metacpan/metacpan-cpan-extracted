@@ -1,0 +1,73 @@
+Revision history for Perl extension FFI.
+
+1.10  Tue Mar 23, 2017
+  - More aggressive libm discovery for tests on Debian
+
+1.09  Sun Aug 2, 2015
+  - Use Alien::FFCall
+
+1.08  Tue Jun 23, 2015
+  - Add irc.perl.org #irc
+
+1.07  Mon Mar 2, 2015
+  - use DynaLoader::dl_find_symbol_anywhere if libc cannot
+    easily be guessed
+
+1.06  Sun Mar 1, 2015
+  - Fixes for FreeBSD
+  - Fixes for cygwin
+  - Use Devel::CheckLib for more reliable probe of libffcall
+
+1.05  Sun Mar 1, 2015
+  - Fix for 64 bit platforms
+
+1.04  2008-09-06
+  [Maintenance release]
+  - Avoid CPAN testers emails when libffi is not installed.
+
+1.03  2007-12-26
+  [Maintenance release]
+  - Fix build on cygwin (Thanks Reini Urban). Closes #31913.
+
+1.02  2007-02-07
+  [Maintenance release]
+  - Probe for a system ffcall instead of bundling its sources.
+  - For Windows, bundle prebuilt ffcall-1.10 libs. (Works with
+    Strawberry Perl and MSVC-built perls, including ActivePerl.)
+
+1.01  Thu Jun 19 22:04:59 2003
+  [Installation improvements]
+  - FFI now uses the _installed_ ffcall libraries and headers,
+    rather than those in the ./ffcall directory.
+  - Linux installation now works.
+  - Fixed two warnings in FFI.xs.
+  - Replaced the old ./ffcall contents with the current ffcall-1.8.
+  - t/basic.t now uses Test, and win32.t was tweaked.  Hopefully the
+    automated module testers will now be happier.
+
+1.00  Tue Oct 31 14:47:45 2000
+  - Tidied up
+  - Implemented workaround for DynaLoader problems on ActiveState
+    binary build
+  - Set version to 1.00, to reflect "final" status
+
+0.05  Unknown
+  - Experimental version
+
+0.04  Unknown
+  - Experimental version
+
+0.03  Unknown
+  - Experimental version
+
+0.02  Unknown
+  - Experimental version
+
+0.01  Fri Sep 24 13:06:36 1999
+  - original version; created by h2xs 1.19
+
+
+
+
+
+

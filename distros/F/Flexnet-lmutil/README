@@ -1,0 +1,170 @@
+NAME
+    Flexnet::lmutil - Convenient OO-interface for Flexnet license server
+    utility lmutil
+
+VERSION
+    Version 1.5
+
+DESCRIPTION
+    Flexnet::lmutil is a small wrapper around the Flexnet license server
+    utility lmutil, currently implementing the sub-functions lmstat and
+    lmremove. The module parses the output of lmstat and returns an
+    easy-to-use data structure. This makes it easy to work further with
+    lmstat output for e.g. web pages, monitoring plugins etc.
+
+SYNOPSIS
+     use Flexnet::lmutil;
+
+     my $lmutil = new Flexnet::lmutil (
+            lm_license_path => 'port@host',
+            ...
+        
+     );
+
+     $status = $lmutil->lmstat (
+            feature => 'feature',
+        
+             OR
+        
+            daemon => 'daemon',
+        
+            OR
+        
+            'all'
+     );
+
+     $lmutil->lmremove (
+                    feature => 'feature',
+                    serverhost => 'host',
+                    port => 'port',
+                    handle => 'handle'
+            );
+
+DETAILS
+    new
+     Possible arguments for the constructor are:
+
+     `lm_license_path'
+         either the full pathname of the license file or the string
+         `port@host' or even `port1@host1:port2@host2'...
+
+     `verbose'
+         show command line call
+
+     `testfile'
+         textfile containing lmstat output (for testing), does not run
+         lmstat
+
+    lmstat
+     Possible arguments for `lmstat' are:
+
+     `feature'
+         get info about feature usage
+
+     `daemon'
+         get info about daemon usage
+
+     `all'
+         get info about usage of all daemons and features
+
+     `lmstat' returns a hash reference with the following keys:
+
+     * `server'
+     * `vendor'
+     * `feature'
+
+     server points to another structure like
+
+      'server' => {
+          'elba.uni-paderborn.de' => {
+              'ok' => 1,
+              'status' => 'UP'
+          }
+      },
+
+     vendor points to a structure like
+
+      'vendor' => {
+          'cdslmd' => {
+              'ok' => 1,
+              'status' => 'UP v11.11',
+              'version' => '11.11'
+          }
+      }
+
+     feature points to a structure like
+
+      'feature' => {
+          'MATLAB' => {
+              'reservations' => [
+                  {
+                      'reservations' => '1',
+                      'group' => 'etechnik-labor',
+                      'type' => 'HOST_GROUP'
+                  }
+              ],
+              'issued' => '115',
+              'used' => '36',
+              'users' => [
+                  {
+                      'serverhost' => 'dabu.uni-paderborn.de',
+                      'startdate' => 'Wed 8/12 17:18',
+                      'port' => '27000',
+                      'licenses' => 1,
+                      'display' => 'bessel',
+                      'host' => 'bessel',
+                      'handle' => '4401',
+                      'user' => 'hangmann'
+                  },
+              ]
+          },
+      },
+      ...
+
+    lmremove
+     The `lmremove' method expects the following arguments as a hash:
+
+      feature => 'feature',
+      serverhost => 'host',
+      port => 'port',
+      handle => 'handle'
+
+AUTHOR
+    Christopher Odenbach, `<odenbach at uni-paderborn.de>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-flexnet-lmutil at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Flexnet-lmutil. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Flexnet::lmutil
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Flexnet-lmutil
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Flexnet-lmutil
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Flexnet-lmutil
+
+    * Search CPAN
+        http://search.cpan.org/dist/Flexnet-lmutil/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2015 Christopher Odenbach.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

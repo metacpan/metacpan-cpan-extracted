@@ -1,0 +1,18 @@
+Perl bindings
+-------------
+
+Mark Glines <mark@glines.org> - original author of perl bindings, ithreads
+Dobrica Pavlinusic <dpavlin@rot13.org> - current maintainer
+Richard Dawe <rich@phekda.gotadsl.co.uk> - lot of improvements
+Mark Wilkinson <mark.wilkinson@2pmtech.com> - added mount options
+Csaba Henk <csaba.henk@creo.hu> - update to API 25
+Vladimir V. Kolpakov <w@sfgate.com> - contributed cleanup for warnings
+Andrew Chadwick <andrewc@cpan.org> - fixes for Ubuntu and dh-make-perl (fakeroot)
+Chris Dolan <cdolan@cpan.org> - fixes for MacFuse 1.1.0
+Reuben Thomas <rrt@sc3d.org> - contributed examples/filter_attr_fs.pl
+jaslong from CPAN::Forum - documentation patch for fuse_get_context
+Justin Fletcher <gerph@gerph.org> - added file handles on open files
+Derrik Pates <demon@now.ai> - added 64-bit support and fuse 2.6 binding, *BSD support
+Daniel Frett <daniel.frett@ccci.org> - make static callbacks thread-safe
+Alex Sudakov <cygakob@gmail.com> - fixes for readdir support
+Bojan Petrovic <bojan_petrovic@fastmail.fm> - FreeBSD support

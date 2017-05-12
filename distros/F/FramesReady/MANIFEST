@@ -1,0 +1,31 @@
+MANIFEST			This file
+ChangeLog			Log of Changes 
+Makefile.PL			Makefile generator
+README				Get you started with this package
+TODO				The To-Do list for the library
+lib/HTTP/Response/Tree.pm	Class encapsulating HTTP Responses
+lib/LWP/UserAgent/FramesReady.pm	A WWW UserAgent class
+t/README			How to run and set up tests
+t/TEST				Run tests
+t/base/ua.t			Basic LWP::UserAgent tests
+t/html/form.t			Test HTML::Form module
+t/local/autoload.t		Test autoloading of LWP::Protocol modules
+t/local/frames.t		Test frame with emulation processing
+t/local/http.t			Test http to local server
+t/local/protosub.t		Test with other protocol module
+t/net/config.pl.dist		Suggested configuration for net tests
+t/net/frames.s
+t/net/http-get.t
+t/net/http-post.t
+t/net/http-timeout.t
+t/net/mirror.t
+t/net/moved.t
+t/net/proxy.t
+t/net/cgi-bin/frame1
+t/net/cgi-bin/frametst
+t/net/cgi-bin/moved
+t/net/cgi-bin/nph-slowdata
+t/net/cgi-bin/slowread
+t/net/cgi-bin/test
+t/net/cgi-bin/timeout
+META.yml                                 Module meta-data (added by MakeMaker)

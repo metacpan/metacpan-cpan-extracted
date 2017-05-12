@@ -1,0 +1,73 @@
+Revision history for Perl extension File::HStore.
+
+commit c6e76967271f28d56bd878577db45e73d662a039
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sun Jun 1 22:13:37 2008 +0200
+
+    Move from Digest::SHA1 and Digest::SHA2 to Digest::SHA
+    as recommended in :
+    
+    http://search.cpan.org/~avar/Digest-SHA2-1.1.1/SHA2.pm#DEPRECATED
+    
+    and also requested in the FreeBSD ports tree :
+    
+    http://www.freebsd.org/cgi/query-pr.cgi?pr=115911
+    
+    The underlying functionality of the library remains the same.
+
+commit e495f00d8f5a7b1a1a239eed0b54b1e68bbdd5bc
+Author: adulau <adulau@7e09cfe9-a971-da11-a13d-000423ba250e>
+Date:   Sun Nov 26 17:21:05 2006 +0000
+
+    Initial import of my working dir for File::HStore (based
+    on 0.09 released in CPAN). Useful for me... until now. Maybe
+    some other fixes required for other.
+    
+
+0.09  Sun Nov 26 16:03:21 2006
+
+	- An example added
+	- Added the getpath function to get fs location of an id
+	- The debug print removed
+	- Metafile fixed
+	- added the lib path in test
+
+0.08  Thu Jul 20 16:15:30 2006
+	
+	- Privating internal function
+	- pod-coverage.t test added
+
+0.07  Wed May 17 22:58:17 2006
+	
+	- Fixed POD errors
+	- pod.t test added
+
+0.06  Sun Jan 1 16:19:22 2006
+
+	- Fixed the FAT format bug / to keep the real name of the file
+
+0.05  Sun Sep 18 21:45:23 2005
+
+	- Minor cleanup in the library
+	- Added a comment regarding the SHA-1 vulnerability
+	  (following the Mark Shelor request, thanks to him)
+
+0.04  Sun Jul 31 13:34:12 2005
+     or the rainy What The Hack 2005 version
+
+	- Fixed the Perl requirement to a lower version
+	- Added support for the Free Archive Format
+
+0.03  Sat Jul 23 11:39:34 2005
+
+	- Fixed the PREREQ_PM
+
+0.02  Tue Jul 19 22:23:48 2005
+	
+	- Support for SHA2 added
+	- Made return codes more consistent
+
+0.01  Sun Jun 19 11:00:40 2005
+
+	- First release of File::HStore 0.01
+

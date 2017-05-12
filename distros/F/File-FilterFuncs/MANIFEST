@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+LICENSE
+t/File-FilterFuncs.t
+t/FF_Common.pm
+t/source.txt
+lib/File/FilterFuncs.pm
+lib/File/FilterFuncs.pod
+META.yml                                 Module meta-data (added by MakeMaker)

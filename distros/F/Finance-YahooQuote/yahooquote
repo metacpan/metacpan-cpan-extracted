@@ -1,0 +1,79 @@
+#!/usr/bin/perl -w
+
+# Copyright (C) 2002 Dirk Eddelbuettel <edd@debian.org>, and GPL'ed
+# Based on the original example by Dj Padzensky
+#
+# $Id: yahooquote,v 1.2 2002/12/24 17:50:28 edd Exp $
+
+use strict;
+use Getopt::Long;
+use Finance::YahooQuote;
+
+my $verbose = 0;
+GetOptions("verbose" => \$verbose);
+
+die "Usage: $0 [--verbose] symbol [symbol ...]\n" if $#ARGV == -1;
+
+my @h = ("Symbol","Name","Last","Trade Date","Trade Time","Change","% Change",
+	 "Volume","Avg. Daily Volume","Bid","Ask","Prev. Close","Open",
+	 "Day's Range","52-Week Range","EPS","P/E Ratio","Div. Pay Date",
+	 "Div/Share","Div. Yield","Mkt. Cap","Exchange");
+
+$Finance::YahooQuote::TIMEOUT = 30;
+my @q = getquote(@ARGV);
+
+foreach $a (@q) {
+  foreach (0..$#h) {
+    if ($verbose) {
+      print "$h[$_]: $$a[$_]\n";
+    } else {
+      print "$$a[$_]\t" if $h[$_] =~ /(Name|Symbol|Last|Trade Date|Exchange)/m;
+    }
+  }
+  print "\n";
+}
+
+
+=head1 NAME
+
+yahooquote - Get stock quotes from Yahoo!
+
+=head1 SYNOPSIS
+
+  yahooquote SAPG.F JARD.SI 0307.HK BII.L DIA INTC T BCE.TO \
+           CDL.NZ CTI.AX SCIL.SI TELMEXL.MX FTE.PA OLIV.MI  \
+           TEF.MC VOLVA.ST EBTP4.SA
+  yahooquote --verbose T BCE.TO DTEGN.F
+
+=head1 DESCRIPTION
+
+This scripts provides a simple example for the use of B<Finance::YahooQuote>
+as well as a simple check means of downloading a quote, or checking a symbol.
+
+=head1 COPYRIGHT
+
+Copyright 1998 - 2002 Dj Padzensky
+Copyright 2002 Dirk Eddelbuettel
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+The information that you obtain with this library may be copyrighted
+by Yahoo! Inc., and is governed by their usage license.  See
+http://www.yahoo.com/docs/info/gen_disclaimer.html for more
+information.
+
+=head1 AUTHOR
+
+Dj Padzensky (C<djpadz@padz.net>), PadzNet, Inc., wrote the original 
+version which Dirk Eddelbuettel (C<edd@debian.org>) extended slightly.
+
+=head1 SEE ALSO
+
+L<Finance::YahooQuote>
+
+=cut
+
+

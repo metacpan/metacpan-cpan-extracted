@@ -1,0 +1,17 @@
+#h name uid
+# should make 3 lines
+John__Heidemann  2274
+# should make 3 lines
+Greg_Johnson_    2275
+# should make 2 lines
+_Root    0
+# check for duplicate entries; should make 4 lines
+a___b 1
+# expect 1 line (special case)
+_ 1
+# expect 1 lines (special case)
+__
+# this is a simple database
+# modified to test various corner cases
+#  | dbcol fullname uid
+#  | dbcolrename fullname name

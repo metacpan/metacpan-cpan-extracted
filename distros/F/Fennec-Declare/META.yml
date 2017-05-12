@@ -1,0 +1,32 @@
+---
+abstract: 'Declarative interface for Fennec.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fennec-Declare
+provides:
+  Fennec::Declare:
+    file: lib/Fennec/Declare.pm
+    version: 1.002
+  Fennec::Declare::Magic:
+    file: lib/Fennec/Declare/Magic.pm
+requires:
+  Devel::Declare::Parser: 0.017
+  Devel::Declare::Parser::Fennec: 0.004
+  Exporter::Declare: 0.107
+  Exporter::Declare::Magic: 0.107
+  Fennec: 1.012
+resources:
+  bugtracker: http://github.com/exodist/Fennec-Declare/issues
+  homepage: http://open-exodus.net/projects/Fennec-Declare
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Fennec-Declare
+version: 1.002

@@ -1,0 +1,26 @@
+Changes to 2.719 from 2.718
+
+
+01) Typo corrected in po/hu.po; after that new Langauge_hu.pm generated.
+
+
+
+Changes to 2.718 from 2.717
+
+
+01) Handle correctly Japanese Language in many situation(mail,search etc).
+
+02) Replace Japanese message catalogue.
+
+03) Add  message catalogue.
+
+04) Change locale settings. Pass OMatic.pm to LANG environment value.
+    So When install fom, it can use i18n function.
+
+05) add i18n test module.
+
+06) Notification e-mail patch from Nick Stephen.
+
+07) Case-conversion of accentuated chars added. (Hungarian only)
+
+08) Some bug fix.

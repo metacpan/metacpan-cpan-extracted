@@ -1,0 +1,7 @@
+Revision history for Perl extension Function::Composition
+
+0.0.2   Thu Apr 25 05:26:55 CST 2013
+        - no require Modern::Perl in test cases
+
+0.0.1   Tue Apr 23 04:03:14 CST 2013
+        - original version

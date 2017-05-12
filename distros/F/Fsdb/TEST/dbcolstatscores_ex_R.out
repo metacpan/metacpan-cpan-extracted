@@ -1,0 +1,40 @@
+#fsdb -R C name id test1 zscore tscore
+name: c
+id: 3
+test1: 65
+zscore: -1.1531
+tscore: 38.469
+
+name: b
+id: 2
+test1: 70
+zscore: -0.69188
+tscore: 43.081
+
+name: e
+id: 5
+test1: 70
+zscore: -0.69188
+tscore: 43.081
+
+name: a
+id: 1
+test1: 80
+zscore: 0.23063
+tscore: 52.306
+
+name: d
+id: 4
+test1: 90
+zscore: 1.1531
+tscore: 61.531
+
+name: f
+id: 6
+test1: 90
+zscore: 1.1531
+tscore: 61.531
+
+#  | dbsort -n test1
+#   | dbfilealter -R C
+#   | dbcolstatscores --tmean 50 --tstddev 10 test1

@@ -1,0 +1,85 @@
+Revision history for Perl extension Filesys::SmbClientParser.
+
+2.7  2004/04/14 21:53:18  alian
+- fix rt#5896: Will Not work on shares that contain spaces in names
+
+2.6  2004/01/28 22:58:42  alian
+- Fix Auth that only allow \w in password
+- Fix mget & mput bug with ';' (reported by Nathan Vonnahme).
+- Fix bug if password contain & => quote password (reported by Gael LEPETIT).
+- Fix du and incorrect order at return time in array context (reported by 
+rachinsky at vdesign.ru).
+- Fix dir method that didn't allow space in directory name => quote dir. (fixed
+by torstei at linpro.no).
+- Add test for Auth, mget, mput.
+
+2.5  2002/11/12 18:53:44  alian
+ - Update POD documentation
+ - Correct t/02?.pl
+ - Add t/03?.pl
+
+2.4  2002/11/08 23:51:19  alian
+ - Correct a bug that didn't set smbclient path when pass as arg of new.
+ (thanks to Andreas Dahl for report and patch).
+ - Correct a bug in error parsing that disable use of file or dir with
+ ERR in his name. Eg: JERRY. (Thanks to Jason Sloderbeck for report).
+ - Update test suite for tracking these bugs.
+
+2.3  2002/08/13 13:44:00;  author: alian;  state: Exp;  lines: +47 -28
+ - Update smbclient detection (scan ENV{PATH} and try wich)
+ - Update get, du method for perl -w mode
+ - Update command method for perl -T mode
+ - Update all exec command: add >&1 for Solaris output on STDERR
+ - Add NT_STATUS_ message detection for error
+ - Add Test::Simple tests like
+
+2.2  2002/08/08 23:28:22  alian
+ - Correction bug sur option -N de smbclient (tks to reiffer@kph.uni-mainz.de)
+
+2.1  2002/04/11 23:39:34  alian
+ - Add du method  (thanks to Ben Scott <scotsman@CSUA.Berkeley.EDU>)
+ - Correct pwd method
+
+2.0  2002/01/25 11:46:41  alian
+ - Add IP parameter
+ - Add some quote for space in name usage
+ (tks to Mike Rosack for his BuzzSearch version)
+ - Update POD documentation
+ - Update all return code error: undef is always return if error,
+ and method err return last string error find.
+ This is why I pass to 2.0 release.
+ - Correct no error code in mkdir, delete
+ - Debug GetGroups method
+ - Debug case if share is defined in GetShare or GetHosts
+ - Add hash parameter to constructor
+
+1.4  2001/05/30 07:58:42  alian
+ - Add workgroup parameter (tkx to <ClarkJP@nswccd.navy.mil> for suggestion)
+ - Correct a bug with directory (double /) tks to  <erranp@go2net.com>
+ - Correct a bug with mput method : recurse used if needed <erranp@go2net.com>
+ - Correct quoting pb in get routine (tkx to <joetr@go2net.com>)
+ - Move and complete POD documentation
+ 
+1.3  2001/04/19 17:01:10  alian
+ - Remove CR/LF from 1.2 version (thanks to Sean Sirutis <seans@go2net.com>)
+
+1.2  2001/04/15 15:20:50  alian
+ - Correct mput subroutine wrongly defined as mget
+ - Added DEBUG level
+ - Add pod doc for User, Password, Share, Host
+ - Added rename and pwd method
+ - Changed $recurse in mget so that it is always defined after testing
+ - Added Auth() method, an alternative to explicit give of user/passwd
+ (like -A option in smbclient)
+Thanks to brian.graham@centrelink.gov.au for this features
+
+0.3  2000/01/12 01:20:32  alian
+  - Add methods mget and mput
+
+0.2  2000/11/20 19:08:11  Administrateur
+ - Correct path of smbclient in new
+ - Correct arg when no password
+ - Correct error in synopsis
+
+0.01  Sat Nov 18 23:03:04 2000
+  - original version; created by h2xs 1.19

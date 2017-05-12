@@ -1,0 +1,68 @@
+{
+   "abstract" : "Calculate Finnish bank payment reference number (viitenumero)",
+   "author" : [
+      "Oskari Okko Ojala <okko@cpan.org>, Frantic Oy http://www.frantic.com/"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Finance-Bank-FI-ReferenceNumber",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::ScriptRunner" : "0",
+            "Catalyst::Test" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::WWW::Mechanize::Catalyst" : "0",
+            "lib" : "0",
+            "ok" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/okko/Finance-Bank-FI-ReferenceNumber.git",
+         "web" : "http://github.com/okko/Finance-Bank-FI-ReeferenceNumber"
+      }
+   },
+   "version" : "0.004",
+   "x_authority" : "cpan:OKKO"
+}
+

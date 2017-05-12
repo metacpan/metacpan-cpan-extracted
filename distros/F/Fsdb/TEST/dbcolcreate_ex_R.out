@@ -1,0 +1,9 @@
+#fsdb -R C test foo
+test: a
+foo: -
+
+test: b
+foo: -
+
+#   | dbfilealter -R C
+#   | dbcolcreate foo

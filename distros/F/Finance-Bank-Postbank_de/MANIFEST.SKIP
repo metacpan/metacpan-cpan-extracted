@@ -1,0 +1,15 @@
+.cvsignore$
+^.lwpcookies
+^.releaserc
+^.git/
+^blib/
+^Finance-Bank-Postbank_de-.*
+CVS/
+^pm_to_blib
+.tar.gz$
+.old$
+.bak$
+^MYMETA.*
+^Makefile$
+^cvstest$
+^blibdirs$

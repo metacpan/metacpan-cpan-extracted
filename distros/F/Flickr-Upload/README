@@ -1,0 +1,48 @@
+Flickr::Upload
+==============
+
+Uploader for flickr.com
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+============
+
+- LWP::UserAgent
+- HTTP::Request::Common
+- Flickr::API
+- Pod::Usage
+- Getopt::Long
+- XML::Simple
+- Net::OAuth
+
+EXAMPLES
+========
+
+flickr_upload is a completely functional batch uploading tool. There's also
+a good amount of examples included as tests in t/ of the source
+distribution. And you can always ask me how to do something if it's not
+obvious. I might even know.
+
+Git repository at:
+git://gitorious.org/flickrupload/mainline.git
+http://git.gitorious.org/flickrupload/mainline.git
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2004,2005,2006,2007,2008 by Christophe Beauregard
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+This module is not an official Flickr.com (or Ludicorp, or Yahoo) service.

@@ -1,0 +1,51 @@
+Revision history for Perl module File::Tools
+
+0.09 2013-10-17
+
+    - Update bloody changes file.
+
+0.08 2013-10-17
+
+    - Update GitHub Link
+
+0.07 2013-10-17
+
+    - Add license key to META file
+    - Update GitHub Link
+
+0.06 2012-07-27
+
+    - Move to Github
+    - Replace Build.PL by Makefile.PL using ExtUtils::MakeMaker
+
+0.05 2008-06-08
+
+   - move pod test files to xt/
+   - add Perl:Critic test file to xt/
+   - cleanup some tests
+   - add Test::NoWarnings
+
+0.04 2007-05-18
+
+   - export catfile
+   - add 'mkpath' from File::Path
+   - remove the 'mail' function that used non-standard module
+   - remove the 'chmod' function that used non-standard module
+   - add compare to the list of exported methods (missed in 0.03)
+
+0.03 2006-08-16
+
+   - add Test::Pod and Test::Pod::Coverage to improve CPANTS rating
+   - use Test::Perl::Critic but don't distribute with it
+   - add compare function using File::Compare
+
+0.02 2006-04-24
+
+   - Adding catfile, slurp
+   - Adding some tests (increasing total coverage from 41.9 to 71.5)
+
+
+0.01 2006-04-14
+
+   - Initial release
+

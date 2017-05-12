@@ -1,0 +1,46 @@
+######################################################################
+Revision history for Perl extension File::Comments
+
+0.08  2010/12/10
+      (ms) [RT 63788] Adapting to HTML::Element >=4 change that
+           omits trailing newline in generated HTML. Patch by 
+           Paul (city-fan.org).
+
+0.07  2006/10/09
+      (ms) PPI::Document's constructor now wants a reference to a
+           text string.
+      (ms) fixed uninitialized messages in ::target::load DEBUG message.
+
+0.06  2005/05/01
+      (ms) Added stripped() method stripping comments from a file
+           and returning the stripped text.
+
+0.05  02/17/2005
+      (ms) Mike Castle provided valuable doc fixes.
+      (ms) Adam K provided workaround for PPI memleak.
+      (ms) introduced default_plugin parameter
+      (ms) added documentation about plugin inheritance
+
+0.04  02/15/2005
+      (ms) PPI is leaking memory, added optional # and POD comment parser
+           when env var FILE_COMMENTS_PERL_NO_PPI is set. Added dependency
+           on Pod::Parser
+      (ms) cold calls are optional now with new(cold_calls => 0)
+      (ms) fixed javascript to accept /* ... */
+      (ms) added documentation
+
+0.03  02/08/2005
+      (ms) Moved extracting functions from Plugin.pm into plugins
+      (ms) Added Shell plugin
+      (ms) added .H to C plugin
+      (ms) perl plugin now takes __END__ literally. 
+      (ms) Fallback if perl parsing fails: return entire script text
+           as comment.
+      (ms) JavaScript plugin now accepts both single and multi C comments
+
+0.02  02/07/2005
+      (ms) Added PPI parser to Perl plugin, enabling inline comments.
+      (ms) Added HTML::TokeParser to HTML plugin.
+
+0.01  02/06/2005
+      (ms) Where it all began.

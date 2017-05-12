@@ -1,0 +1,48 @@
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='/profile/edit'><span>[% c.loc('Edit Profile') %]</span></a></li>
+        <li><a href='/profile/change_username'><span>Change Username</span></a></li>
+        <li><a href='/profile/change_password'><span>Change Password</span></a></li>
+        <li selected="selected"><a href='javascript:void(0);'><span>Change Email</span></a></li>
+        <li><a href='/profile/profile_photo'><span>Profile Photo</a></span></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<form method='post'>
+<table align='center'>
+	<tbody>
+	<tr class='misc1'><td width='20%' align='right'>Username:</td><td>[% c.user.username %]
+	</td></tr>
+	<tr class='misc2'><td align='right'>Password:</td><td><input type='password' name='password' size='12' />
+    [% IF c.form.error('password') %]
+	    Please type your password correctly.
+	[% END %]
+	</td></tr>
+    <tr class='misc2'><td align='right'>[% c.loc("Email") %]</td><td><input type='text' name='email' size='24' class="{required:true,email:true}" />
+	[% IF c.form.error('email') %]
+	    [% IF c.form.error('email', 'DBIC_UNIQUE') %]
+	    This email is used by another one.
+	    [% ELSIF c.form.error('email', 'EMAIL_DUPLICATION') %]
+	    You should type a different email.
+	    [% ELSE %]
+	    you should spec a correct email.
+	    [% END %]
+	[% END %]
+	</td></tr>
+	<tr class='misc2'><td></td><td><input type='submit' /></td></tr>
+	</tbody>
+</table>
+</form>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

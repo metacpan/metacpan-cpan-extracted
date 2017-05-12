@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Finance/Optical/CookBook.pod
+lib/Finance/Optical/StrongBuy.pm
+t/Finance-Optical-StrongBuy.t

@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+test.pl
+Yahoo.pm
+CHANGES
+META.yml                                 Module meta-data (added by MakeMaker)

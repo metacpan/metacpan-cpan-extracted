@@ -1,0 +1,19 @@
+Revision history for File-Format-CRD
+
+0.0.4   2015-05-30
+        - Convert the build system to Dist-Zilla.
+            - Improvements such as links to the VCS repositories.
+
+0.0.3   2014-02-02
+        - Consistent $VERSION (CPANTS).
+
+0.0.2   2014-01-29
+        - Specify minimum version of perl (CPANTS Kwalitee).
+        - Add t/cpan-changes.t.
+        - Add the LICENSE file (CPANTS Kwalitee).
+        - Add t/style-trailing-space.t .
+        - Add scripts/bump-version-number.pl
+
+0.0.1   2010-03-25
+        - First version, released on an unsuspecting world.
+

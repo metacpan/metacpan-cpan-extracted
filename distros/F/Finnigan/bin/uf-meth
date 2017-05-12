@@ -1,0 +1,318 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature qw/state say/;
+use 5.010;
+
+use Getopt::Declare;
+use Encode qw//;
+use Data::Hexdumper qw/hexdump/;
+use Finnigan;
+
+my $args = new Getopt::Declare q{
+  [strict]
+  [mutex: -h -w]
+  [mutex: -e -l]
+  [mutex: -e -d]
+  [mutex: -e -p]
+  [mutex: -l -p]
+  [mutex: -l -d]
+  [mutex: -H -c]
+  -e[xtract]		extract the entire OLE2 container (Microsoft Compound File)
+  -l[ist]		list container contents
+  -p <path>		give the full path to extract a single component
+  -d[ump]		display the structure of the method file or its components
+  -h[tml]		display structure as html [requires: -d || -l]
+  -w[iki]		dislpay in wiki table format [requires: -d || -l]
+  -r[elative]		show relative addersess in dump [requires: -d]
+  -H[eader]		display the embedded Finnigan header [requires: -d]
+  -c[ontainer]		display the OLE2 container's structure [requires: -d]
+  -s[ize]		tell object size in all forms of dump [requires: -d]
+  <file>		input file [required]
+
+Default:
+
+  List instrument tag mapping (instrument name -> directory name)
+}
+  or exit(-1);
+
+my $file = $args->{"<file>"};
+-e $file or die "file '$file' does not exist";
+-f $file or die "'$file' is not a plain file";
+-s $file or die "'$file' has zero size";
+
+# -----------------------------------------------------------------------------
+open INPUT, "<$file" or die "can't open '$file': $!";
+binmode INPUT;
+
+my $header = Finnigan::FileHeader->decode(\*INPUT);
+my $seq_row = Finnigan::SeqRow->decode(\*INPUT, $header->version);
+my $cas_info = Finnigan::CASInfo->decode(\*INPUT);
+my $rfi = Finnigan::RawFileInfo->decode(\*INPUT, $header->version);
+
+if ( $rfi->preamble->data_addr == tell INPUT ) {
+  say STDERR "Method file not present";
+  exit;
+}
+my $mf = Finnigan::MethodFile->decode(\*INPUT);
+
+if ( exists $args->{-s} ) {
+  if ( exists $args->{-H} ) {
+    say "size: " . $mf->header->size;
+  }
+  elsif ( exists $args->{-c} ) {
+    say "size: " . $mf->container->size;
+  }
+  else {
+    say "size: " . $mf->size;
+  }
+}
+
+if ( exists $args->{-d} ) {
+  if ( exists $args->{-h} ) {
+    if ( exists $args->{-H} ) {
+      $mf->header->dump(style => 'html', relative => exists $args->{-r});
+    }
+    elsif ( exists $args->{-c} ) {
+      $mf->container->dump(style => 'html', relative => exists $args->{-r});
+    }
+    else {
+      $mf->dump(style => 'html', relative => exists $args->{-r});
+    }
+  }
+  elsif ( exists $args->{-w} ) {
+    if ( exists $args->{-H} ) {
+      $mf->header->dump(style => 'wiki', relative => exists $args->{-r});
+    }
+    elsif ( exists $args->{-c} ) {
+      $mf->container->dump(style => 'wiki', relative => exists $args->{-r});
+    }
+    else {
+      $mf->dump(style => 'wiki', relative => exists $args->{-r});
+    }
+  }
+  else {
+    if ( exists $args->{-H} ) {
+      $mf->header->dump(relative => exists $args->{-r});
+    }
+    elsif ( exists $args->{-container} ) {
+      $mf->header->dump(relative => exists $args->{-r});
+    }
+    elsif ( exists $args->{-p} ) {
+      my ($dirent, $data);
+      unless ( $dirent = $mf->container->find($args->{-p}) ) {
+        say "$args->{-p} not found";
+        exit -1;
+      }
+      unless ( $data = $dirent->data ) {
+        say "$args->{-p} has no data";
+        exit -1;
+      }
+      print hexdump(data => $data);
+    }
+    else {
+      $mf->dump(relative => exists $args->{-r});
+    }
+  }
+}
+
+elsif ( exists $args->{-l} ) {
+  if ( exists $args->{-h} ) {
+    $mf->container->list(style => 'html');
+  }
+  elsif ( exists $args->{-w} ) {
+    $mf->container->list(style => 'wiki');
+  }
+  else {
+    $mf->container->list();
+  }
+}
+
+elsif ( exists $args->{-e} ) {
+  my $rec;
+  my $bytes_to_read = $mf->file_size;
+  my $addr = $mf->container->addr;
+  seek INPUT, $addr, 0;
+  my $nbytes = read INPUT, $rec, $bytes_to_read;
+  $nbytes == $bytes_to_read
+    or die "could not read $bytes_to_read bytes of the OLE2 container at $addr";
+  print $rec;
+}
+
+elsif ( exists $args->{-p} ) {
+  my ($dirent, $data);
+  unless ( $dirent = $mf->container->find($args->{-p}) ) {
+    say "$args->{-p} not found";
+    exit -1;
+  }
+  unless ( $data = $dirent->data ) {
+    say "$args->{-p} has no data";
+    exit -1;
+  }
+  if ($args->{-p} =~ /Text/) {
+    # windows encoding is not readable on a text terminal
+    binmode STDOUT, ":utf8";
+    print $data;
+    #print Encode::decode('UTF-16LE', (pack "C*", unpack "U0C*", $data));
+  }
+  else {
+    print $data;
+  }
+  #      $mf->header->dump(relative => exists $args->{-r});
+}
+
+else {
+  # default (no options given)
+  foreach my $i ( 1 .. $mf->n ) {
+    my ($name, $dirname) = $mf->instrument_name($i);
+    say "$name -> $dirname";
+  }
+}
+
+__END__
+=head1 NAME
+
+uf-meth - decode the embedded method file in a Finnigan raw file
+
+=head1 SYNOPSIS
+
+uf-meth [options] <file>
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exit.
+
+=item B<-e[xtract]>
+
+extract the entire OLE2 container (Microsoft Compound
+File) 
+
+=item B<-l[ist]>
+
+list the container contents
+
+=item B<--dump>
+
+Prints a table listing all structure elements with their seek
+addresses, sizes, acess keys and values. Complex sub-structures are
+represented by short summaries and their contents can be examined
+separately (see the B<-H> and B<-p> options}
+
+=item B<--html>
+
+Dump as html table.
+
+=item B<--wiki>
+
+Dump as a wiki-style table.
+
+=item B<-s[ize]>
+
+Show overall structure size in bytes.
+
+=item B<--relative>
+
+Show relative addresses of all itmes. The default is to show the
+absolute seek address.
+
+=item B<-H[eader]>
+
+Dump the contents of [FileHeader], instead of the parent object.
+
+=item B<-p[ath]> <path>
+
+Give the full path to extract a single component from the compound OLE2 container.
+
+
+=back
+
+=head1 DESCRIPTION
+
+B<uf-meth> displays the contents of the [MethodFile] structure, its
+component [FileHeader], and the compound file (OLE2) storage embedded
+within.
+
+By default, it lists the instrument methods comtained in the compound
+file, along with with their directory names.
+
+=head1 SEE ALSO
+
+Finnigan::MethodFile
+
+Finnigan::OLE2File
+
+=head1 EXAMPLES
+
+=over 4
+
+=item List all instruments described in the method file:
+
+  uf-meth sample.raw
+
+Example output (name translation table):
+
+    Surveyor Sample Pump -> Surveyor Sample Pump
+    Surveyor MS Pump -> Surveyor MS Pump
+    Micro AS -> Micro AS
+    LTQ-FT MS -> LTQ
+
+
+=item List the method file directory:
+
+  uf-meth -l sample.raw
+
+Example output:
+
+  LTQ 
+    Data (2560 bytes)
+    Text (11742 bytes)
+    Header (1396 bytes)
+  Micro AS 
+    Data (641 bytes)
+    Text (1164 bytes)
+  Surveyor MS Pump 
+    Data (228 bytes)
+    Text (1176 bytes)
+    Comments (4 bytes)
+  Surveyor Sample Pump
+    Data (228 bytes)
+    Text (1176 bytes)
+    Comments (4 bytes)
+
+=item Print the text description of the analyzer method:
+
+  uf-meth sample.raw -p LTQ/Text > method.ltq
+
+
+=item Extract the raw binary data of the analyzer method:
+
+  uf-meth sample.raw -p LTQ/Data > method.ltq.data
+
+=item Prints the hex dump of LTQ/Header:
+
+  uf-meth sample.raw -dp LTQ/Header
+
+Example output:
+
+  0x0000 : 05 A1 54 00 68 00 65 00 72 00 6D 00 6F 00 20 00 : ..T.h.e.r.m.o...
+  0x0010 : 46 00 69 00 6E 00 6E 00 69 00 67 00 61 00 6E 00 : F.i.n.n.i.g.a.n.
+  0x0020 : 20 00 4C 00 54 00 51 00 00 00 00 00 00 00 00 00 : ..L.T.Q.........
+  0x0030 : 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 : ................
+  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+=item Dump the MethodFile structure with relative addresses:
+
+  uf-meth -dr sample.raw
+
+=item Dump the Finnigan header residing in the MethodFile, with relative addresses:
+
+  uf-meth -drH sample.raw
+
+=back
+
+=cut

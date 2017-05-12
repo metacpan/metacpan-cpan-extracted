@@ -1,0 +1,8 @@
+vars:
+ top_secret: nothing
+
+#opts
+	#define opts
+
+#cmd
+	#define cmds

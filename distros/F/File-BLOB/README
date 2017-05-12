@@ -1,0 +1,219 @@
+NAME
+    File::BLOB - A file (with name, and other metadata) you can BLOBify
+
+SYNOPSIS
+      # Create a File::BLOB object from data or a filehandle
+      $file = File::BLOB->new( 'data'         ); # Copies
+      $file = File::BLOB->new( \$data         ); # Doesn't copy
+      $file = File::BLOB->new( $filehandle    );
+      
+  # Create from an existing file
+      $file = File::BLOB->from_file( 'filename.txt' );
+      
+  # Create from a file uploaded via CGI
+      $file = File::BLOB->from_cgi( $CGI, 'param' );
+      
+  # You can assign arbitrary headers/metadata when creating objects
+      $file = File::BLOB->new( 'filename.txt',
+            content_type => 'text/plain',
+            filename     => 'myname.txt',
+            owner        => 'ADAMK',
+            );
+      if ( $file->get_header('filename') eq 'filename.txt' ) {
+            $file->set_header( 'filename' => 'yourname.txt' );
+      }
+      
+  # Get or change the content
+      if ( $file->get_content =~ /FOO/ ) {
+            my $backup = $file->get_content;
+            $file->set_content( 'data'      );
+            $file->set_content( \$data      );
+            $file->set_content( $filehandle );
+      }
+      
+  # Freeze to and thaw from a BLOB
+      my $blob = $file->freeze;
+      $file = File::BLOB->thaw( $blob );
+
+DESCRIPTION
+    One of the most common types of data found in systems ranging from email
+    to databases is a "file". And yet there is no simple way to create a
+    store a file is a chunk of data across all of these systems.
+
+    Modules designed for email aren't easily reusable in databases, and
+    while databases often support "BLOB" data types, they don't keep file
+    names and encoding types attached so that these files are usable beyond
+    treating them as mere data.
+
+    "File::BLOB" is an object that represents a file, Storable as a BLOB in
+    a database or some other system, but retaining metadata such as file
+    name, type and any other custom headers people want to attach.
+
+    The range of tasks it is intented to span include such things as pulling
+    a file from the database and sending it straight to the browser, saving
+    an object from CGI to a database, and so on.
+
+    In general, for code that needs to span problem domains without losing
+    the name of the file or other data.
+
+  Storage Format
+    "File::BLOB" stores its data in a way that is compatible with both
+    Storable and HTTP. The stored form looks a lot like a HTTP response,
+    with a series of newline-seperated header lines followed by two newlines
+    and then file data.
+
+METHODS
+new
+      $file = File::BLOB->new( $data     );
+      $file = File::BLOB->new( \$data    );
+      $file = File::BLOB->new( $iohandle );
+      $file = File::BLOB->new( $data,
+            header   => 'value',
+            filename => 'file.txt',
+            );
+
+    Creates a new "File::BLOB" object from data.
+
+    It takes as its first param the data, in the form of a normal scalar
+    string (which will be copied), a "SCALAR" reference (which will not be
+    copied), or as a filehandle (any subclass of IO::Handle can be used).
+
+    While the "content_length" header will be set automatically, you may
+    wish to provide the "content_type" header yourself if know, to avoid
+    having to load File::Type to determine the file type.
+
+    Returns a "File::BLOB" object, or dies on error.
+
+  from_file
+      $file = File::BLOB->from_file( "/home/me/some_picture.gif" );
+      $file = File::BLOB->from_file( "foo.txt",
+            'content_type' => 'text/plain',
+            'foo'          => 'bar',
+            );
+
+    The "from_file" method provides an alternative constructor that creates
+    an object directly from a file, using that filename and detecting the
+    MIME type automatically.
+
+    The same rules as for the "new" constructor apply regarding additional
+    parameters.
+
+    Returns a new "File::BLOB" object, or dies on error.
+
+  from_cgi
+      my $file = File::BLOB->from_cgi( $CGI, 'param' );
+
+    The "from_cgi" constructor allows you to create a "File::BLOB" object
+    from a named file upload field in a CGI form.
+
+    It takes a CGI object and a CGI param name. Only a single file upload
+    for the param is supported.
+
+    When called in list context, the "from_cgi" method will return a list of
+    "File::BLOB" objects, or the null list of there are no uploaded files
+    for the param.
+
+    When called in scalar context, the "from_cgi" method return a single
+    "File::BLOB" object (if more than one the first), or false ('') if there
+    are no file uploads.
+
+    An exception will be thrown if an error is encountered.
+
+  get_content
+      my $data = $file->get_content;
+      my $copy = $$data;
+
+    The "get_content" returns the contents of the file as "SCALAR"
+    reference.
+
+    Please note that the reference returned points to the actual data in the
+    object, so it should not modified. If you want to modify the contents,
+    you need to copy it first.
+
+  set_content
+      $file->set_content( $data     );
+      $file->set_content( \$data    );
+      $file->set_content( $iohandle );
+
+    The "set_content" method sets the contents of the file to a new value.
+
+    It takes a single param which should be an ordinary scalar (which will
+    be copied), a "SCALAR" reference (which will not be copied), or a
+    filehandle (any object which is a subclass of IO::Handle).
+
+    Because you aren't really meant to use this to add in entirely new
+    content, any "content_type" header will not be changed, although the
+    "content_length" header will be updated.
+
+    So while the modification of content without changing its type is fine,
+    don't go adding different types of data.
+
+    Returns true, or dies on error.
+
+  get_header
+      my $name = $file->get_header('filename');
+
+    The "get_header" method gets a named header for the file.
+
+    Names are case-insensitive but must be a valid Perl identifier. For
+    things that have a dash in HTTP (Content-Type:) use an underscore
+    instead.
+
+    Returns the header as a string, "undef" if a header by that name does
+    not exist, or dies on error.
+
+  set_header
+      # Set a header
+      $file->set_header('filename', 'foo.txt');
+      
+  # Delete a header
+      $file->set_header('filename', undef    );
+
+    The "set_header" method takes a header name and a value, and sets the
+    header to that value.
+
+    Names are case-insensitive but must be a valid Perl identifier. For
+    things that have a dash in HTTP (Content-Type:) use an underscore
+    instead.
+
+    Values must be a normal string of non-null length. If the value passed
+    is "undef", the header will be deleted. Deleting a non-existant header
+    will not cause an error.
+
+    Returns true if header set or dies on error.
+
+  freeze
+      my $string = $file->freeze;
+
+    The "freeze" method generates string that will be stored in the
+    database.
+
+    Returns a normal string.
+
+  thaw
+      my $file = File::BLOB->thaw( $string );
+
+    The "thaw" method takes a string previous created by the "frozen"
+    method, and creates the "File::BLOB" object from it.
+
+    Returns a "File::BLOB" object, or dies on error.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-BLOB>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

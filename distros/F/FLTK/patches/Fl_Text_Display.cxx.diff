@@ -1,0 +1,46 @@
+--- Fl_Text_Display.cxx.orig	Mon Sep 25 14:12:38 2000
++++ Fl_Text_Display.cxx	Mon Sep 25 14:10:01 2000
+@@ -1044,7 +1044,9 @@
+   Fl_Color foreground;
+   Fl_Color background;
+ 
+-  if ( style & STYLE_LOOKUP_MASK ) {
++  if (( style & STYLE_LOOKUP_MASK ) &&
++      ( style & STYLE_LOOKUP_MASK ) - 'A' >= 0 &&
++      ( style & STYLE_LOOKUP_MASK ) - 'A' < mNStyles) {
+     styleRec = &mStyleTable[ ( style & STYLE_LOOKUP_MASK ) - 'A' ];
+     font = styleRec->font;
+     size = styleRec->size;
+@@ -1239,9 +1241,11 @@
+   Fl_Font font;
+   int size;
+ 
+-  if ( style & STYLE_LOOKUP_MASK ) {
+-    font = mStyleTable[ ( style & STYLE_LOOKUP_MASK ) - 'A' ].font;
+-    size = mStyleTable[ ( style & STYLE_LOOKUP_MASK ) - 'A' ].size;
++  if ( (style & STYLE_LOOKUP_MASK ) &&
++     (style & STYLE_LOOKUP_MASK) - 'A' >= 0 && 
++     (style & STYLE_LOOKUP_MASK) - 'A' < mNStyles) {
++      font = mStyleTable[ ( style & STYLE_LOOKUP_MASK ) - 'A' ].font;
++      size = mStyleTable[ ( style & STYLE_LOOKUP_MASK ) - 'A' ].size;
+   } else {
+     font = text_font();
+     size = text_size();
+@@ -1660,7 +1664,16 @@
+       style = ( unsigned char ) mStyleBuffer->character(
+                 lineStartPos + i ) - 'A';
+ 
+-      fl_font( mStyleTable[ style ].font, mStyleTable[ style ].size );
++      /* 
++       * Verify that the returned style index is within the range of the
++       * style table before calling fl_font(). If not, default to the 
++       * style-less font.
++       */
++      if(style >= 0 && style < mNStyles) {
++        fl_font( mStyleTable[ style ].font, mStyleTable[ style ].size );
++      } else {
++        fl_font( text_font(), text_size() );
++      }
+ 
+       width += ( int ) fl_width( expandedChar, len );
+ 

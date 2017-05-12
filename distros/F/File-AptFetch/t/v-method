@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+# $Id: v-method 506 2014-07-04 18:07:33Z whynot $
+# Copyright 2014 Eric Pozharski <whynot@pozharski.name>
+# GNU GPLv3
+# AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+
+use strict;
+use warnings;
+
+package main;
+use version 0.77; our $VERSION = version->declare( v0.1.3 );
+
+use IO::Handle;
+
+STDOUT->autoflush( 1 );
+
+my $fn = DATA->getline;
+chomp $fn;
+open STDERR, q|>>|, $fn                        or die qq|[open] (STDERR): $!|;
+my $tout = DATA->getline;
+chomp $tout;
+$tout = [ split m{:}, $tout, 2 ];
+my $rv = $tout->[1] || 0;
+$tout = $tout->[0];
+
+my $mark = time;
+$SIG{ALRM} = sub { exit $rv };
+alarm $tout;
+
+# http://www.cpantesters.org/cpan/report/a89a6424-f5bd-11e3-a67d-9fe3ee8e7edf
+# http://www.cpantesters.org/cpan/report/b6730998-f5e0-11e3-a67d-9fe3ee8e7edf
+# http://www.cpantesters.org/cpan/report/fc49f1c6-f477-11e3-a67d-9fe3ee8e7edf
+# http://www.cpantesters.org/cpan/report/eaf540be-f437-11e3-a67d-9fe3ee8e7edf
+# http://www.cpantesters.org/cpan/report/8b275224-f7cc-11e3-a67d-9fe3ee8e7edf
+# http://www.cpantesters.org/cpan/report/287848b4-f771-11e3-a67d-9fe3ee8e7edf
+# http://www.cpantesters.org/cpan/report/63bbe4ac-f5ab-11e3-a67d-9fe3ee8e7edf
+my $data = [ DATA->getlines ];
+chomp @$data;
+unshift @$data, split m{\n}, <<"END_OF_HEADER";
+100 Capabilities
+Single-Instance: true
+Version: $VERSION
+
+___
+END_OF_HEADER
+
+my $self = ( split m{/}, $0 )[-1] . ':';
+
+for(;;)                                 {
+    while( defined( my $line = shift @$data )) {
+        $line eq q|___|                                              and last;
+        $line =~ s{\Q+++\E}{$self}g;
+        print STDERR qq|[$line]\n|;
+        print STDOUT qq|$line\n|;
+        $line                           or last }
+    while( my $line = STDIN->getline ) {
+        chomp $line;
+        print STDERR qq|{$line}\n|;
+        $line                   or last }}
+
+# vim: set filetype=perl

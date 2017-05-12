@@ -1,0 +1,32 @@
+---
+name: Finance-Bank-LloydsTSB
+version: 1.35
+author:
+  - 'Original by Simon Cozens <simon@cpan.org>'
+  - 'Improvements by Adam Spiers <aspiers@cpan.org>'
+abstract: Check your bank accounts from Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::ElementTable: 0
+  HTML::TableExtract: 0
+  HTML::TreeBuilder: 0
+  WWW::Mechanize: 0.39
+provides:
+  Finance::Bank::LloydsTSB:
+    file: lib/Finance/Bank/LloydsTSB.pm
+    version: 1.35
+  Finance::Bank::LloydsTSB::Account:
+    file: lib/Finance/Bank/LloydsTSB/Account.pm
+    version: 1.35
+  Finance::Bank::LloydsTSB::Statement:
+    file: lib/Finance/Bank/LloydsTSB/Statement.pm
+    version: 1.35
+  Finance::Bank::LloydsTSB::utils:
+    file: lib/Finance/Bank/LloydsTSB/utils.pm
+    version: 1.35
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

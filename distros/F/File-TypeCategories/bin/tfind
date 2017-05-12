@@ -1,0 +1,236 @@
+#!/usr/bin/perl
+
+# Created on: 2014-11-07 16:40:29
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Term::ANSIColor qw/:constants/;
+use Path::Tiny;
+use File::TypeCategories;
+
+our $VERSION = 0.06;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+my $REVERSE  = REVERSE;
+my $RESET    = RESET;
+my $BLUE     = BLUE;
+my $BOLD     = BOLD;
+my $ON_RED   = ON_RED;
+my $ON_GREEN = ON_GREEN;
+
+my %option;
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'sre_smart|smart|m',
+        'path|p=s@',
+        'file_symlinks|links|l',
+        'file_recurse|R!',
+        'file_include|include|n=s@',
+        'file_include_type|include_type|int|N=s@',
+        'file_exclude|exclude|x=s@',
+        'file_exclude_type|exclude_type|ext|X=s@',
+        'file_ignore=s',
+        'file_ignore_add|d=s',
+        'file_ignore_remove|I=s',
+        'out_suround|suround|context|C=n',
+        'out_suround_before|before|B=n',
+        'out_suround_after|after|A=n',
+        'out_totals|totals|t',
+        'out_files_only|files-only|f',
+        'out_quiet|quiet|q!',
+        'out_unique|unique|u!',
+        'out_limit|limit=i',
+        'verbose|v+',
+        'man',
+        'help',
+        'version',
+    ) or pod2usage(2);
+
+    if ( $option{'version'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+    elsif ( !@ARGV ) {
+        warn "No search term specified\n";
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+
+    my @files = map { path $_ } map {glob $_} map {split /:/, $_} $option{path} ? @{$option{path}} : ('.');
+
+    if ($option{out_suround}) {
+        $option{out_suround_before} ||= $option{out_suround};
+        $option{out_suround_after}  ||= $option{out_suround};
+        delete $option{out_suround};
+    }
+
+    my $lines = 80;
+    if ($option{sre_smart}) {
+        ($lines) = split /\s+/, `stty size` || 40;
+        if (( !$option{file_include_type} || !@{ $option{file_include_type} }) && grep {$_ eq $ARGV[0]} qw/n b ss/) {
+            $option{file_include_type}[0] = 'programing';
+        }
+        if ( !exists $option{ignore} ) {
+            my $re = join ' ', @ARGV;
+            if ( $re =~ /[A-Z]/ && $re =~ /[a-z]/ ) {
+                $option{ignore} = 0;
+            }
+            else {
+                $option{ignore} = 1;
+            }
+        }
+    }
+
+    my $tc = File::TypeCategories->new(params('file', %option));
+
+    if ($option{bw}) {
+        $REVERSE = '';
+        $RESET   = '';
+        $BLUE    = '';
+        $BOLD    = '';
+        $ON_RED  = '';
+    }
+
+    my $re = join ' ', @ARGV;
+    $re = qr/$re/;
+
+    while ( my $file = shift @files ) {
+        next if !$tc->file_ok($file);
+
+        if (-d $file) {
+            eval { push @files, $file->children };
+        }
+
+        if ($file =~ /$re/) {
+            print "$file\n";
+        }
+    }
+
+    return;
+}
+
+sub params {
+    my ($name, %var) = @_;
+    my %params;
+
+    VAR:
+    for my $key (keys %var) {
+        next VAR if $key !~ /^ $name _ /xms;
+        my $new_key = $key;
+        $new_key =~ s/^ $name _ //xms;
+        $params{$new_key} = $var{$key};
+    }
+
+    return %params;
+}
+
+__DATA__
+
+=head1 NAME
+
+tfind - Find files based on file types
+
+=head1 VERSION
+
+This documentation refers to tfind version 0.06
+
+=head1 SYNOPSIS
+
+   tfind [option] regex
+
+ OPTIONS:
+  -m --smart    Smart regular expression
+  -p --path[=]path
+                Don't use the current directory for searching use path
+  -l --links    Match symlinks
+  -n --include[=]regex
+                Match by regex
+  -N --int[=]type
+                Match only files of this type (multiples ok)
+  -x --exclude[regex
+                Exclude by regex
+  -X --ext[=]type
+                Don't match files of this type (multiples ok)
+     --ignore[=]type
+                Add type to the types to be ignored (multiples ok)
+  -d --ignore_add[=]type
+  -I --ignore_remove[=]type
+  -C --context[=]int
+  -B --before[=]int
+  -A --after[=]int
+  -t --totals
+  -f --files-only
+  -q --quiet
+  -u --unique
+     --limit[=]int
+
+  -v --verbose       Show more detailed option
+     --version       Prints the version information
+     --help          Prints this help information
+     --man           Prints the full documentation for tfind
+
+=head1 DESCRIPTION
+
+This program provides a quick way to search for files using regular
+expressions and optionally limiting the results based on file types.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

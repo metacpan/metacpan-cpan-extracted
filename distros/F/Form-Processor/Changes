@@ -1,0 +1,159 @@
+Revision history for Perl extension Form::Processor.
+
+1.162360  2016-08-23 14:06:06-07:00 America/Los_Angeles
+    - Added EnterPassword, TxtPassword, and ScryptPassword.
+    - If just looking at this distribution please look at HTML::FormHandler instead.
+    - Moved to Dist::Zilla for packaging (which is the reason for the jump in version number).
+    - Ran perltidy, and a few PerlCritic updates -- but too many to be safe.
+    - Changed an "Integer" field default length from 8 to 10 digits.
+    - Updated the "CIDR_list" field with updated tests to catch invalid formatted lists.
+    - Added global variable LANGUAGE_HANDLE to be checked before env variable.
+
+
+0.31 Wed Jul 11 21:41:02 PDT 2012
+    - Fixed missing localization of string.
+      RT #78319 reported by Fred Moyer.
+
+0.30 Thu Oct  6 05:05:47 EEST 2011
+    This is a version bump only. No code changes.
+
+0.22 Thu Sep 15 17:00:36 EEST 2011  (Lamu)
+    encode_utf8 the MD5_Password so md5_hex won't croak on wide chars
+
+0.21 Wed Jun  1 17:51:27 PDT 2011
+    When updating the Email field left out the lower case.
+    Email::Valid does not lowercase the domain, and
+    it is common practice to lowercase the local
+    part.
+
+0.20 Thu May 19 05:19:37 PDT 2011
+    Note: ** Potential breakage of your application **
+
+    Added the "max_size" attribute to Form::Processor::Field
+    base class which defaults to 10,000.
+
+    The Text field's "size" default has been changed from
+    zero to 2,500.
+
+    The Text field was simply a base class that added lengths
+    and was intended to be overridden.  But, as a sanity
+    check for all fields there is now this default of 2,500
+    characters.
+
+    It is still expected that users create their own Field
+    subclasses to match their applications and add validation.
+
+
+    The Email field is now limited to 254 characters
+    and uses the output from Email::Valid::address.
+
+
+    New Form attribute "use_existing_values" has
+    been added and a new Field attribute "must_submit".
+    See docs for these related attributes.
+
+
+0.19 Fri Jul 25 17:47:36 UTC 2008
+    Fix spelling error in error message in "test_ranges".
+
+
+0.18 Thu Feb 28 04:46:06 UTC 2008
+    No Changes -- just added version numbers to fields to
+    make CPAN indexer happy.
+
+0.17 Thu Feb 28 03:58:59 UTC 2008
+    Allow for a zero id passed in as a single parameter
+    to new.  An integer primary key of zero is asking for
+    trouble...
+
+0.16 Sat Jan 19 22:41:56 UTC 2008
+    Changed the field's "id" method to be mutable.
+
+    Changed the "test_multiple" field method to look at input
+    catch multiple values in all cases not just for fields with
+    options.
+
+0.15 Sat Dec  1 18:16:30 UTC 2007
+    Fixed failing tests when recommended modules did not exist.
+    Got spanked by CPAN testers for that one.
+
+
+0.14 Thu Nov 29 13:50:31 UTC 2007
+    Moved to Module::Install for questionable reasons
+
+    Removed field dependencies to make installation less
+    of a pain for those that do not need all field types.
+
+    Added new fields:
+        WeekdayStr
+        MD5_Password
+        Date_yyy_mm_dd
+        CIDR_List
+
+    A bit more docs for fields.  As with all modules,
+    looking at the source is always a good idea.
+
+0.13 Not released to CPAN
+        Added "min_length" to Text field.
+
+
+0.12 Fri Jun 22 03:27:33 UTC 2007
+        Fixed problem with loading fields prefixed with a plus sign.
+
+        Forced checkboxes to value="1" in form_widgets.tt since
+        HTML::FillInForm uses value="on".
+
+        Added range_start and range_end to base class
+        (was only in IntRange before).
+
+0.11 Mon Jun 18 19:10:13 UTC 2007
+        Uncommented dependencies on Html::Tidy and Template Toolkit.
+        The tests checks that all fields compile now so need to include
+        all dependencies and CPAN testers complain when not all tests pass.
+
+        Add size attribute to Text field type, and validate on that size.
+        Also gives a way for markup to add a size to text input fields.
+
+
+0.10 Tue Jun 12 14:14:50 UTC 2007
+        Fix missing init_options in Select.pm
+
+0.09 Tue Jun 12 05:00:57 UTC 2007
+        Moved Catalyst::Plugin::Form::Processor
+        to separate module.
+        Moved Catalyst demo application to Catalyst Plugin.
+        Weakened form and parent_field to avoid circular references
+        and removed DESTROY method.
+        Devel::Cycle is handy.
+
+0.08 Mon Jun 11 06:14:25 UTC 2007
+        Added Hidden and Upload field types.
+        Added demo Catalyst application (in t/example)
+        Worked on a few of the compound fields a bit.
+
+0.07 Wed Apr 11 15:49:45 PDT 2007
+        Add in dependencies to Makefile.PL
+        0.08 will have more complete tests
+
+0.06 Tue Apr 10 23:45:15 UTC 2007
+        Added Locale::Maketext support.
+        Language files are empty and can be provided by
+        the user as needed, or a L::M language handle can be
+        passed if using site-wide lexicons.
+
+0.05 Sun Apr  8 17:45:07 UTC 2007
+        Removed locale-dependent tests
+
+0.04 Sat Apr  7 05:32:38 UTC 2007
+        Add UNIVERSAL::require as dependency.
+        Caught by a fine CPAN tester.
+
+0.03 Tue Apr  3 21:35:36 UTC 2007
+        Rename to Form::Processor for CPAN release
+
+0.02 2006-06-04
+        Place into production
+
+0.01  2005-11-11 21:10:25 -0800
+        Import into local subversion repo
+

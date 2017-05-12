@@ -1,0 +1,29 @@
+---
+abstract: 'Private loan under UK tax law.'
+author:
+  - 'Raphael Mankin, C<< <rapmankin at cpan.org> >>'
+  - 'Raphael Mankin <rapmankin@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Loan-Private
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::General: 0
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  Getopt::Long: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

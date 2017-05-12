@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+
+# - archive_radacct
+# - utility script for FreeRADIUS::Database
+# - archives the radacct table 
+
+use strict;
+use warnings;
+
+use DateTime;
+use Getopt::Long;
+use Pod::Usage;
+use FreeRADIUS::Database;
+
+my ( $month, $help, $man ) = 0;
+
+my $result = GetOptions(        
+                'month|m=s' => \$month,        
+                'help|h'    => \$help,        
+                'man|M'     => \$man,
+    );
+pod2usage({ -verbose => 1 }) if $help;
+pod2usage({ -verbose => 2 }) if $man;
+
+pod2usage({        
+        -msg        => "\n\n--month argument requires a parameter in the form YYYY-MM\n\n",
+        -verbose    => 1,
+    }) if $month !~ m{ \A \d{4}-(0|1)\d \z }xms;
+
+my $radius  = FreeRADIUS::Database->new();
+
+if ( $month ) {
+    $radius->archive_radacct( { month => $month } );
+}
+else {
+    $radius->archive_radacct();
+}
+
+__END__
+
+=head1 NAME
+
+archive_radacct - Remove a months worth of data out of the `radacct` table and
+                  archive it into a `radacct-YYYY-MM` table.
+
+=head1 SYNOPSIS    
+    
+    # specify a specific month to process    
+
+    archive_radacct --month|-m 2009-06 
+    
+    # display help    
+    
+    archive_radacct --help|-h    
+
+    # display the manual page    
+
+    archive_radacct  --man|-M
+
+=head1 OPTIONS
+
+=over 8
+
+=item --month | -m
+
+Specify the month in which you want to work on in the form YYYY-MM. If
+the month parameter is not supplied, we will work on the month that was
+existent three months ago.
+
+=back
+
+=head1 DESCRIPTION
+
+archive_radacct is a utility script for the FreeRADIUS::Database module.
+
+It archives data from the `radacct' table into a newly created table
+in the database. If the 'delete_after_archive' directive in the
+freeradius_database.conf file is enabled, we will delete from the
+radacct table after the archive is complete.
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012 by Steve Bertrand
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

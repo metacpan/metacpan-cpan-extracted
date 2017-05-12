@@ -1,0 +1,67 @@
+NAME
+
+Finance::Bank::ABSA - Check your ABSA bank accounts from Perl
+
+SYNOPSIS
+
+  use Finance::Bank::ABSA;
+  my @ABSAaccounts = Finance::Bank::ABSA->check_ABSA_balance(
+      bankingid  => "xxxxxxxxx",
+      mypassword => "xxxxxxx",
+      seccode    => "xxxxxx"
+  );
+
+  foreach (@ABSAaccounts) {
+      printf "  %-21s : %-18s : ZAR %12.2f : ZAR %12.2f\n",
+        $_->{name}, $_->{account}, $_->{balance}, $_->{available};
+  }
+
+DESCRIPTION
+
+This module provides a rudimentary interface to the South African
+ABSA online banking system at https://vs1.absa.co.za/ibs/UserAuthentication.do
+which is where http://www.absadirect.co.za redirects to.
+
+DEPENDENCIES
+
+You will need either Crypt::SSLeay or IO::Socket::SSL installed
+for HTTPS support to work with LWP.  This module also depends on
+WWW::Mechanize and HTML::TokeParser for screen-scraping.
+
+CLASS METHODS
+
+    check_ABSA_balance(bankingid => $u, mypassword => $p, seccode => $s)
+
+Return an array of account hashes, one for each of your bank accounts.
+
+ACCOUNT HASH KEYS
+
+    $ac->name
+    $ac->account
+    $ac->balance
+    $ac->available
+
+Returns the account name, account number, real balance and available
+balance which includes overdraft/creditlines.
+
+WARNING
+
+This warning is from Simon Cozens' Finance::Bank::LloydsTSB, and seems
+just as apt here.
+
+This is code for online banking, and that means your money, and
+that means BE CAREFUL. You are encouraged, nay, expected, to audit
+the source of this module yourself to reassure yourself that I am not
+doing anything untoward with your banking data. This software is useful
+to me, but is provided under NO GUARANTEE, explicit or implied.
+
+THANKS
+
+Chris Ball for Finance::Bank::HSBC, upon which a lot of this code is
+based. Also to Simon Cozens for Finance::Bank::LloydsTSB, upon which
+most of Finance::Bank::HSBC is based, Andy Lester (and Skud, by continuation)
+for WWW::Mechanize, Gisle Aas for HTML::TokeParser.
+
+AUTHOR
+
+Leon Cowle <leon@leolizma.com>

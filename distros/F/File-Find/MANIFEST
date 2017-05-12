@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/File-Find-ProjectCycleMigration.t
+lib/File/Find/ProjectCycleMigration.pm

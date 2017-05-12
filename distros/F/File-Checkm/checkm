@@ -1,0 +1,342 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+
+my $VERSION = $File::Checkm::VERSION;
+
+use File::Checkm;
+use File::Path;
+use File::Find;
+#use File::OM;
+
+use Pod::Usage;
+# this :config allows -h24w80 for '‐h 24 ‐w 80', -vax for --vax or --Vax
+use Getopt::Long qw(:config bundling_override);
+
+my $dir;	# global defining our directory
+my $M = $File::Checkm::manfilename;
+
+#my $om;		# output multiplexer routine
+my %o;		# global to communicate options to module
+
+my %opt = (
+	algorithm	=> 0,
+	alg		=> 0,		# non-command-line option
+	cols		=> 0,
+	digest		=> 0,		# non-command-line option
+	digester	=> 0,		# non-command-line option
+	directory	=> 0,
+	fieldscount	=> 0,		# non-command-line option
+	force		=> 0,
+	format		=> 0,
+	help		=> 0,
+	man		=> 0,
+	mani_digester	=> 0,		# non-command-line option
+	mtime		=> 0,		# non-command-line option
+	om		=> 0,		# non-command-line option
+	output		=> 0,
+	preventlinks	=> 0,
+	size		=> 0,		# non-command-line option
+	temper		=> 0,
+	version		=> 0,
+	verbose		=> 0,
+);
+# We piggyback more than just command-line options in the %opt hash,
+# so be careful not to collide with non-command-line options.
+
+# xxx for 'pt', add -P option and make lstree*s* similar to Checkm.pm
+# xxx make 'snag' version recognize number to left of suffix, eg,
+#     "snag --mknext manifest1.txt"; also,
+#     "snag --mknext v1/manifest.txt"  ?? (up the dir number?)
+#     "checkm over > `snag --mknext manifest1.txt`" should work
+#     also, convert? options to commands, eg, 
+#     $ snag next manifest1.txt
+#     $ snag highest manifest1.txt
+#     $ snag lowest manifest1.txt
+
+# main
+{
+	GetOptions(\%opt,
+		'algorithm|a=s',
+		'cols|c=s',
+		'directory|d=s',
+		'force|f',
+		'format|m=s',
+		'help|h|?',
+		'output|o=s',
+		'man',
+		'preventlinks|P',
+		'temper',
+		'version',
+		'verbose|v',
+	)
+			or  pod2usage(-exitstatus => 2, -verbose => 1);
+
+	$opt{help}	and help(), exit(0);
+	$opt{man}	and pod2usage(-exitstatus => 0, -verbose => 2);
+	$opt{version}	and print("$VERSION\n"), exit(0);
+
+	my $format = $opt{format} || 'Plain';	# given format name
+	my %om_opt = (
+		outhandle	=> *STDOUT,
+	);
+	#$om = File::OM->new($format, \%om_opt) or
+	#	pod2usage("$0: unknown format: $format");
+	#$opt{om} = $om;
+
+	my $cols = $opt{cols} ||= "fadsm";
+	my $fields = 0;			# number of fields to do
+	$cols =~ s/f//	and $fields++, $opt{fname} = 1;
+	$cols =~ s/a//	and $fields++, $opt{aname} = 1;
+	$cols =~ s/d//	and $fields++, $opt{digest} = 1;
+	$cols =~ s/s//	and $fields++, $opt{size} = 1;
+	$cols =~ s/m//	and $fields++, $opt{mtime} = 1;
+	$opt{fieldscount} = $fields;
+	$cols =~ /[^-]/ and		# warn if $cols isn't a "-"
+		print STDERR "warning: extra characters ($cols) after --cols\n";
+
+	my @algs_to_try = ("SHA-256", "MD5");		# default list
+	if ($opt{algorithm} eq "-") {	# '-' means our current best idea of
+		@algs_to_try = ("MD5");	# most widely available single alg
+		$opt{algorithm} = 0;	# triggers defaulting code below
+	}
+	elsif ($opt{algorithm}) {	# if user specified something
+		# XXXX let user specify comma-separated list of algs?
+		@algs_to_try = split(',', $opt{algorithm});
+	}
+	my $digester;
+	for my $alg (@algs_to_try) {
+		$opt{algorithm} = uc $alg;
+		$digester = File::Checkm::make_digester($opt{algorithm});
+		$digester	and last;
+	}
+	unless ($digester) {
+		my $exitcode = $opt{algorithm} =~ /list|help/i ? 0 : 1;
+		my $FH = $exitcode ? *STDERR : *STDOUT;
+		$exitcode and print $FH
+				join(", ", @algs_to_try), ": digest algorithm",
+				(@algs_to_try == 1 ? "" : "s"), " not found\n";
+		print $FH "Algorithms that seem to be installed:\n";
+		print $FH join("\n", File::Checkm::list_digesters()), "\n";
+		exit $exitcode;
+	}
+	$opt{digester} = $digester;		# main content digester
+	$opt{mani_digester} =			# manifest digester
+		File::Checkm::make_digester($opt{algorithm}) or
+			print STDERR "Couldn't create manifest digester: $!\n";
+	# XXX what if mani_digester can't be created? what if it's
+	# different from the regular digester?
+	$opt{alg} = lc $opt{algorithm};
+	$opt{alg} =~ tr/-//d;
+
+	my $cmd = shift @ARGV;
+	defined($cmd)		or help(), exit(1);
+	$cmd = "do_" . lc($cmd);
+	defined(&$cmd)	or pod2usage("$0: unknown command: $cmd");
+
+	# Which directory or file?
+	#
+	$dir = $opt{directory} || ".";
+
+	no strict 'refs';		# permits the next call
+	#exit &$cmd(@ARGV);
+	my $ret = &$cmd(@ARGV);
+	#print "ret=$ret\n";
+	exit $ret;
+}
+
+#######################
+#
+# Command functions.
+#
+
+sub do_help { my( $topic )=@_;
+
+	$topic ||= "";
+	pod2usage(-exitstatus => 0, -verbose => 2)
+	#return print "XXX place holder for help on $topic\n";
+}
+
+sub do_over { my( @trees )=@_;
+
+	scalar(@trees) == 0 and
+		push(@trees, $dir);	# default if no args
+
+	#$o{om} = $om;
+	#$o{algorithm} = $opt{algorithm};
+	#$o{alg} = $opt{alg};
+	#$o{force} = $opt{force};
+	#$o{digest} = $opt{digest};
+	#$o{size} = $opt{size};
+	#$o{mtime} = $opt{mtime};
+	#$o{fieldscount} = $opt{fieldscount};
+
+	# optional 3rd arg is &visit function to use instead
+
+	#return File::Checkm::checkm_trees(\@trees, \%o);
+	return File::Checkm::checkm_trees(\@trees, \%opt);
+}
+
+sub help {
+	print << 'EOI';
+
+checkm - create a checkm manifest
+
+  checkm [opts] over [name ...]      # create manifest for named files/dirs
+
+The checkm command takes one subcommand (currently), "over", that writes
+a Checkm file manifest to the standard output computed over all files and
+directories (recursively) given as arguments, or the current directory by
+default.  On platforms that support them, symbolic links are followed unless
+you use -P to prevent it.  Normally each file produces five Checkm fields,
+
+    filename | algorithm | digest | size | modtime
+
+Use -c (--cols) to select only desired fields, designated by first letter.
+The default field set corresponds to "-c fadsm" and "-c -" asks checkm to
+compute no per-file digests, the most useful output then being the final
+octet/file count summary (oxum).
+
+Options examples:
+  -a <algorithm>  use given digest algorithm (SHA-256 default, or MD5)
+  -a list         list digest algorithms installed on your platform
+  -c fad          produce only the first 3 fields
+  -c fs           produce only fields 1 and 4
+  -v              be verbose with errors
+  -h              print this help text
+EOI
+
+	return 1;
+#checkm - verify and transfer files with a checkm manifest
+#
+#  checkm [opts] over [fdir ...]   # compute manifest for named files/dirs
+#
+#  checkm [opts] in [manifest ...]          # verify one or more manifests
+#  checkm [opts] out [manifest [file ...]   # write a manifest given files
+#  checkm [opts] to remote [manifest]         # copy files to remote location
+#  checkm [opts] from remote [manifest]       # copy files from remote location
+}
+
+# XXX get consistent with return status
+
+__END__
+
+=for roff
+.nr PS 12p
+.nr VS 14.4p
+
+=head1 NAME
+
+checkm - create a checkm manifest
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<checkm> [B<opts>] B<over> [I<name> ...]
+
+=back
+
+=head1 DESCRIPTION
+
+The B<checkm> command takes one subcommand (currently), B<over>, that
+writes a Checkm file manifest to the standard output computed over all
+files and directories (recursively) given as arguments, or the current
+directory by default.  On platforms that support them, symbolic links are
+followed unless B<-P> is used to prevent it.
+
+Up to five Checkm fields are produced (all five of these by default):
+
+    filename | algorithm | digest | size | modtime
+
+(If symbolic links are being followed, L<stat(1)> is already done for
+each file, so size and modtime come at no extra cost.) Use B<-c> to
+select only desired fields, designated by first letter.  The default
+field set corresponds to B<-c fadsm> and B<-c -> asks B<checkm> to
+compute no per-file digests, the most useful output then being the final
+octet/file count summary (oxum).  Options examples:
+
+ -a <algorithm>  use given digest algorithm (SHA-256 default, or MD5)
+ -a list         list digest algorithms installed on your platform
+ -c fad          produce only the first 3 fields
+ -c fs           produce only fields 1 and 4
+ -v              be verbose with errors
+ -h              print this help text
+
+An algorithm can be specified with the B<--algorithm> (B<-a>) option.
+Currently MD5 is used by default, unless SHA-256 is found to be
+installed.  An algorithm given as "-" causes the weaker alternative to be
+selected.
+
+Once processing has begun, errors are printed as comments in the produced
+manifest.  Use B<--verbose> to see them also on standard error.
+
+During processing, various comment lines are written.  A comment line
+of the form B<#%checkm_stats|>I<oxum+dinks> contains a summary of the
+octets and files (oxum) processed and the directories, links, and special
+files seen (dinks). The last line is a check-point line that contains a
+digest of the file contents from the beginning of the file (or from the
+beginning of the previous check-point line) up to and including the line
+end of the immediately preceding line.  A simple way to detect if two
+manifest differ is to compare their respective check-point digests.
+
+This beta-level software has not been extensively tested.
+
+=head1 EXAMPLES
+
+   $ checkm over myobjs/       # recurse through all files under myobjs/
+   $ checkm -a SHA-384 over    # use SHA-384 algorithm over files in "."
+
+=head1 OPTIONS
+
+=over
+
+=item B<-a>, B<--algorithm> I<name>
+
+Use the named digest algorithm.  If I<name> is C<list>, produce a list of
+algorithms currently installed on your platform (it may be easy to
+install others).  If I<name> is "-", use the command's best guess as to
+the most widely available (not usually strongest, however) algorithm.
+If I<name> is sequence of comma-separated algorithms, use the first
+available.
+
+=item B<-h>, B<--help>
+
+Print help documentation.
+
+=item B<--man>
+
+Print full documentation.
+
+=item B<-v>, B<--verbose>
+
+Print errors on the standard error output as well as in manifest
+comment lines.
+
+=item B<--version>
+
+Print the current version number and exit.
+
+=back
+
+=head1 SEE ALSO
+
+md5(1), sha1sum(1)
+
+=head1 AUTHOR
+
+John Kunze I<jak at ucop dot edu>
+
+=head1 COPYRIGHT
+
+Copyright 2010 UC Regents.  Open source BSD license.
+
+=begin CPAN
+
+=head1 README
+
+=head1 SCRIPT CATEGORIES
+
+=end CPAN

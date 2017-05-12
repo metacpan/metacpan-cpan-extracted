@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>Tutorial2</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<h1> NAME </h1><p>Foorum::Manual::Tutorial2 - Tutorial 2: Dive into Foorum: TheSchwartz</p><h2> TheSchwartz introduction </h2><p><a href="http://search.cpan.org/perldoc?TheSchwartz" rel="nofollow">TheSchwartz</a></p><p>As CPAN perldoc says: reliable job queue. Basically it splitted into two parts, one is worker while the other is client.</p><p>Worker script:</p><ul><li><a href="http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_worker.pl" rel="nofollow">http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_worker.pl</a> </li><li><a href="http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_worker_scraper.pl" rel="nofollow">http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_worker_scraper.pl</a> </li></ul><p>We may have several workers to deal with different tasks. For example TheSchwartz_worker.pl deal with some tasks while TheSchwartz_worker_scraper.pl deal with scraper task.</p><p>What's worker for? In my idea, that's just a script to monitor a table in database (check if there is any task to do) every 5 secs. Faked code like this:</p><pre class="prettyprint">while (1) {
+    # check if there is any new TODO task in one table of theschwartz database.
+    if ($has_new_task) { # scalar @new_tasks
+        foreach my $new_task (@new_tasks) {
+            $new_task-&gt;worker();
+        }
+    }
+    sleep 5;
+</pre><p>Where does new task from? Foorum has two ways, always one is form Foorum/Controller|Model, the other is from cron scripts.</p><p>example code:</p><ol><li>in Foorum/Model </li></ol><pre class="prettyprint">use Foorum::ExternalUtils qw/theschwartz/;
+my $client = theschwartz();
+$client-&gt;insert(
+    'Foorum::TheSchwartz::Worker::WorkerExample',
+    @args
+);
+</pre><ol><li>in cron script. <a href="http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_client.pl" rel="nofollow">http://foorum.googlecode.com/svn/trunk/bin/cron/TheSchwartz_client.pl</a> </li></ol><p>That's a simple introduction. Maybe I'm wrong here. :)</p><h2> Worker in Foorum </h2><p>For now, we have several workers:</p><ul><li>Foorum::TheSchwartz::Worker::DailyChart </li><li>Foorum::TheSchwartz::Worker::DailyReport </li><li>Foorum::TheSchwartz::Worker::Hit </li><li>Foorum::TheSchwartz::Worker::RemoveOldDataFromDB </li><li>Foorum::TheSchwartz::Worker::ResizeProfilePhoto </li><li>Foorum::TheSchwartz::Worker::SendScheduledEmail </li><li>Foorum::TheSchwartz::Worker::SendStarredNofication </li><li>etc. </li></ul><p>There is a simple <a href="RULES.html">RULES</a> that why we use TheSchwartz, put heavy code on backend script instead of httpd.</p><ul><li>Hit is a cron script to update topic hits and Popular. </li><li>RemoveOldDataFromDB - remove useless data from database because it's outdated. </li><li>ResizeProfilePhoto  - let httpd load Image::Magick is not so good. </li><li>SendScheduledEmail  - send email, web insert data into table then this worker send email behind </li><li>SendStarredNofication - oh, typo here, should be Notification. ;) </li></ul><h2> How to write a Worker in Foorum? </h2><p>OK, please borrow code from exist ones.</p><h1> SEE ALSO </h1><p><a href="Tutorial1.html">Tutorial1</a>, <a href="Tutorial3.html">Tutorial3</a>, <a href="Tutorial4.html">Tutorial4</a>, <a href="Tutorial5.html">Tutorial5</a></p>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/Tutorial2">http://code.google.com/p/foorum/wiki/Tutorial2</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

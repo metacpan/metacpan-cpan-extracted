@@ -1,0 +1,76 @@
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+Finance::NASDAQ::Markets - Perl extension to download realtime quotes for all major markets indices sectors
+
+=head1 SYNOPSIS
+
+  use Finance::NASDAQ::Markets;
+  use Data::Dumper;
+  my @idx = Finance::NASDAQ::Markets::index();
+  my @sec = Finance::NASDAQ::Markets::sector();
+  print Dumper [@idx,@sec];
+  
+=head2 MORE
+
+    #!/usr/bin/perl
+    package main;
+
+    use Data::Dumper;
+    use Finance::Optical::StrongBuy;
+    use Finance::NASDAQ::Markets;
+    use Finance::Google::Sector::Mean;
+
+
+
+
+    my @sector = sectorsummary();
+
+    my @idx = index();
+
+    my @sec = sector();
+
+
+
+    my $new = Finance::Optical::StrongBuy->new("/tmp");
+    foreach my $symbol (qw/C BAC WFC WM F GE AAPL GOOG/){
+        $new->callCheck($symbol);
+    }
+
+    print Dumper [@idx,@sec,@sector ,$new];
+
+
+    1;
+
+=head1 DESCRIPTION
+
+Loads the quotes and change pct. information 
+for a wide range of indices and sectors
+from nasdaq. should be realtime!
+
+=head2 EXPORT
+
+None by default.
+
+=head1 SEE ALSO
+
+Finance::Optical::StrongBuy
+Finance::Google::Sector::Mean
+
+=head1 AUTHOR
+
+Hagen Geissler
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Hagen Geissler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
+
+

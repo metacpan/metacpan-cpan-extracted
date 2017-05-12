@@ -1,0 +1,8 @@
+1.22	Tuesday 6th June, 2006
+        Fixed a dependency error caused by the Filesys::Virtual
+	distribution being split up.
+	Norman Nunley implemented ->grep
+        Fixed the TODO case of what to do when an argument to ->in is a file.
+
+1.21	Tuesday 18th May, 2004
+	Initial CPAN release

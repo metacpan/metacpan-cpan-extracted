@@ -1,0 +1,12 @@
+Revision history for Perl extension Fcntl::Packer.
+
+0.03  Apr 22, 2013
+        - fix compilation error on 32bits systems requiring Math::Int64
+
+0.02  Apr 16, 2013
+        - do not use Math::Int64 on 64bit systems
+
+0.01  Tue Apr 16 12:21:07 2013
+	- original version; created by h2xs 1.23 with options
+		-An Fcntl::Packer
+

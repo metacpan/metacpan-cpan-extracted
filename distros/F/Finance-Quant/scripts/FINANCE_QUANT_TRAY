@@ -1,0 +1,794 @@
+#!/usr/bin/perl -w
+use strict;
+use Glib qw/TRUE FALSE/;
+
+
+package Gtk2::Ex::ZNotify;
+use Gtk2;
+use Glib qw/TRUE FALSE/;
+
+use constant wbsize           => 16;    #window border size
+use constant messageTextWidth => 300;
+
+use Glib::Object::Subclass Gtk2::Window::
+ ,#parent class, derived from Glib::Object
+ signals => {
+   show               => \&on_show,
+   size_allocate      => \&on_size_allocate,
+   style_set          => \&on_style_set,
+   expose_event       => \&on_expose_event,
+   enter_notify_event => \&on_enter_notify_event,
+   leave_notify_event => \&on_leave_notify_event,
+ },
+ properties => [
+
+   Glib::ParamSpec->object(
+      'parent_widget',                                   'parent_widget',
+      'The parent widget on which this popup will show', 'Gtk2::Widget',
+      [ qw/readable writable/ ]
+   ),
+   Glib::ParamSpec->string(
+      'message',
+      'message',
+      'The heading for this message',
+      'This is sample heading',
+      [ qw/readable writable/ ]
+   ),
+
+   Glib::ParamSpec->enum(
+      'messageType',             'messageType',
+      'Type of message this is', 'Gtk2::MessageType',
+      'info', [ qw/readable writable/ ]
+   ),
+
+   Glib::ParamSpec->int(
+      'timeout', 'timeout',
+      'Timeout in milli-seconds before hide, 0 = never hide',
+      0, 10000000, 0, [ qw/readable writable/ ]
+   ),
+
+   Glib::ParamSpec->int(
+      'x', 'x',
+      'x position for pointer',
+      0, 64000, 0, [ qw/readable writable/ ]
+   ),
+
+   Glib::ParamSpec->int(
+      'y', 'y',
+      'y position for pointer',
+      0, 64000, 0, [ qw/readable writable/ ]
+   ),
+
+ ];
+
+sub INIT_INSTANCE {
+
+   my $self = shift;
+
+   $self->{ activeBackgroundColor } =
+    new Gtk2::Gdk::Color( ( 249 * 257 ), ( 253 * 257 ), ( 202 * 257 ) );
+    #Remember to * with 257!!
+ 
+   $self->{ inactiveBackgroundColor } =
+    new Gtk2::Gdk::Color( ( 255 * 257 ), ( 255 * 257 ), ( 255 * 257 ) );
+
+#Initial setup
+   $self->app_paintable( TRUE );
+   $self->{ activebackground }   = undef;
+   $self->{ inactivebackground } = undef;
+
+#Create the layout of the window
+   my $outBox = new Gtk2::HBox();
+   $outBox->set_border_width( wbsize );
+
+   $self->add( $outBox );
+
+   my $closeBox = new Gtk2::VBox();
+   $closeBox->set_border_width( 3 );
+
+   $outBox->pack_end( $closeBox, TRUE, TRUE, 0 );
+
+   my $eBox = new Gtk2::EventBox();
+
+#Add event handler for the "close" event box
+   $eBox->signal_connect(
+      'button-press-event' => sub {
+         $self->hide();
+         $self->destroy();
+      }
+   );
+
+   my $closeImg = new Gtk2::Image();
+   $closeImg->set_from_stock( 'gtk-close', 'menu' );
+   $eBox->add( $closeImg );
+
+   $closeBox->pack_start( $eBox, FALSE, FALSE, 0 );
+
+   my $padder = new Gtk2::Label( "" );
+   $outBox->pack_start( $padder, FALSE, FALSE, 5 );
+
+   my $vbox = new Gtk2::VBox();
+   $vbox->set_border_width( 10 );
+   $outBox->pack_start( $vbox, TRUE, TRUE, 0 );
+
+   my $hbox = new Gtk2::HBox();
+   $hbox->set_spacing( 5 );
+   my $iconVBox = new Gtk2::VBox();
+   my $msgImage = new Gtk2::Image();
+   $self->{ msgImage } =
+    $msgImage;    #Needed in order to configure after creation!
+   $iconVBox->pack_start( $msgImage, FALSE, FALSE, 0 );
+   $hbox->pack_start( $iconVBox,     FALSE, FALSE, 0 );
+   $vbox->pack_start( $hbox,         FALSE, FALSE, 0 );
+ 
+   my $messageVBox = new Gtk2::VBox();
+   $hbox->pack_start( $messageVBox, TRUE, TRUE, 0 );
+
+   my $l = new Gtk2::Label();
+   $l->set_line_wrap( FALSE );
+   $l->set_use_markup( TRUE );
+   $l->set_selectable( FALSE );
+   $l->set_alignment( 0, 0 );
+   $l->set_line_wrap( TRUE );
+   $l->{ width_request } = messageTextWidth;
+   $self->{ lblHeading } = $l;    #Needed in order to configure after creation!
+   $messageVBox->pack_start( $l, FALSE, TRUE, 0 );
+   $self->{ msgVBox } = $messageVBox;  #Needed in order to configure after creation!
+
+   my $spacer = new Gtk2::Label();
+   $spacer->set_markup( "<span size='small' background = 'green' foreground= 'black'>......................................................</span>" );
+   $messageVBox->pack_end( $spacer, FALSE, FALSE, 0 );
+
+# the timeout eventhandler ID
+   $self->{ closeWindowTimeoutID } = 0;
+
+#Add the background property in order to change it
+   $self->{ background } = undef;
+
+}
+
+#Chose this event to set up the various widgets in order so they can be in place BEFORE
+#The size_allocation happens
+sub on_style_set() {
+
+   my ( $self, $event ) = @_;
+
+#Set up the heading
+   $self->{ lblHeading }->set_markup( "<span size=\"small\" weight=\"bold\" foreground= 'black'>"
+       . $self->{ message }
+       . "</span>" );
+
+#set up the icon to display
+   ( $self->{ messageType } =~ m/info/ )
+    && ( $self->{ msgImage }->set_from_stock( 'gtk-dialog-info', 'button' ) );
+   ( $self->{ messageType } =~ m/warning/ )
+    && (
+      $self->{ msgImage }->set_from_stock( 'gtk-dialog-warning', 'button' ) );
+   ( $self->{ messageType } =~ m/question/ )
+    && (
+      $self->{ msgImage }->set_from_stock( 'gtk-dialog-question', 'button' ) );
+   ( $self->{ messageType } =~ m/error/ )
+    && ( $self->{ msgImage }->set_from_stock( 'gtk-dialog-error', 'button' ) );
+
+
+   $self->signal_chain_from_overridden( $event );
+   return FALSE;
+}
+
+#This will start the timeout handler if the timeout value was more than 0
+sub on_show() {
+
+   my ( $self, $event ) = @_;
+
+   $self->signal_chain_from_overridden;
+
+   if ( ( $self->{ closeWindowTimeoutID } == 0 ) && $self->{ timeout } > 0 ) {
+      $self->{ closeWindowTimeoutID } = Glib::Timeout->add(
+         $self->{ timeout },
+         sub {
+            hide_window_callback( $self );
+            return FALSE;
+         }
+      );
+   }
+
+}
+
+sub hide_window_callback() {
+
+   my ( $self ) = @_;
+   $self->hide();
+   $self->destroy();
+   return FALSE;
+
+}
+
+#this will do some magick to create the outline for the notification window
+sub on_size_allocate() {
+
+   my ( $self, $sized ) = @_;
+
+#Very important to be at the start :)
+   $self->signal_chain_from_overridden( $sized );
+
+   if ( !( $self->{ background } ) ) {
+      my $mask;
+
+#Set the values for the active and inactive backgrounds
+      ( $self->{ activebackground }, $self->{ inactivebackground }, $mask ) =
+       RenderBubbles( $self, $sized );
+      $self->{ background } = $self->{ inactivebackground };
+
+      if ( $mask ) {
+         $self->shape_combine_mask( $mask, 0, 0 );    #Shape the window
+      }
+      else {
+         print "mask was null, could not shape the window\n";
+      }
+   }
+}
+
+sub on_expose_event() {
+
+   my ( $self, $event ) = @_;
+
+   my $state = $self->state;
+   #print "EXPOSE EVENT $state\n";
+
+   if ( $state eq 'active' ) {
+      $self->{ background } = $self->{ activebackground };
+   }
+   else {
+      $self->{ background } = $self->{ inactivebackground };
+   }
+
+   my $gc = Gtk2::Gdk::GC->new( $self->window );
+   $self->window->draw_pixbuf(
+      $gc, $self->{ background },
+      0, 0, 0, 0,
+      $self->{ background }->get_width(),
+      $self->{ background }->get_height(),
+      'none', 0, 0
+   );
+
+   $self->signal_chain_from_overridden( $event );
+   return FALSE;
+}
+
+
+sub on_enter_notify_event() {
+
+   my ( $self, $event ) = @_;
+   $self->signal_chain_from_overridden( $event );
+
+   if ( $self->{ closeWindowTimeoutID } != 0 ) {
+
+#Remove the timeout cause the user is interested in the message
+      Glib::Source->remove( $self->{ closeWindowTimeoutID } );
+      $self->{ closeWindowTimeoutID } = 0;
+   }
+
+   $self->set_state( 'active' );
+   return FALSE;
+}
+
+sub on_leave_notify_event() {
+   my ( $self, $event ) = @_;
+   $self->signal_chain_from_overridden( $event );
+
+   $self->set_state( 'normal' );
+   $self->queue_draw();
+
+   if ( $self->{ closeWindowTimeoutID } != 0 ) {
+      Glib::Source->remove( $self->{ closeWindowTimeoutID } );
+      $self->{ closeWindowTimeoutID } = 0;
+   }
+
+   if ( $self->{ timeout } > 0 ) {
+
+#restart the timeout they lost interest
+      $self->{ closeWindowTimeoutID } = Glib::Timeout->add(
+         $self->{ timeout },
+         sub {
+            &hide_window_callback( $self );
+            return FALSE;
+         }
+      );
+   }
+   return FALSE;
+}
+
+
+sub RenderBubbles() {
+
+   my ( $win, $size ) = @_;
+   my ( $pbactive, $pbinactive, $pbbm );
+   my ( $pmHeight, $pmWidth );
+
+   my $daPixmap;    #Drawing Area pixmap
+   my $daBitmap;    #Drawing Area bitmap
+
+   my $self = $win;
+   $win->realize();
+
+   $pmHeight = $size->height - ( wbsize * 2 );
+   $pmWidth  = $size->width -  ( wbsize * 2 );
+
+   my $gc = Gtk2::Gdk::GC->new( $win->window );    #Create a Graphic Context
+
+   #print $win->window->get_window_type;
+
+#-----------------------------------------------------
+#--------- Build active Pixbuf------------------------
+#-----------------------------------------------------
+   my $pm =
+    Gtk2::Gdk::Pixmap->new( $win->window, $size->width, $size->height, -1 );
+
+# Paint the background white
+   $gc->set_rgb_fg_color( Gtk2::Gdk::Color->parse( 'white' ) );
+   $pm->draw_rectangle( $gc, TRUE, 0, 0, $size->width, $size->height );
+
+#/***********************************
+#    draw painted oval window
+#***********************************/
+# Paint the inside of the window
+
+   $gc->set_rgb_fg_color( $self->{ activeBackgroundColor } );
+   $pm->draw_polygon( $gc, TRUE,
+      CalculateRect( wbsize, wbsize, $pmHeight, $pmWidth ) );
+
+# Paint the border of the window
+   $gc->set_rgb_fg_color( Gtk2::Gdk::Color->parse( 'black' ) );
+   $pm->draw_polygon( $gc, FALSE,
+      CalculateRect( wbsize, wbsize, $pmHeight - 1, $pmWidth - 1 ) );
+
+#/***********************************
+#    add tab to bitmap
+#***********************************/
+
+#// Draw colored pointer
+   $gc->set_rgb_fg_color( $self->{ activeBackgroundColor } );
+
+   my @list = CalcPointerMoveWindow( $self, 
+            $size->width, $size->height, wbsize,
+             $self->{ parent_widget } );
+   
+   $pm->draw_polygon( $gc, TRUE, @list );
+   $gc->set_rgb_fg_color( Gtk2::Gdk::Color->parse( 'black' ) );
+
+#// subtract one because the fill above used and extra line
+   $pm->draw_line( $gc, $list[ 0 ], ( $list[ 1 ] - 1 ), $list[ 2 ],
+      $list[ 3 ] );
+
+   $pm->draw_line( $gc, $list[ 2 ], $list[ 3 ], $list[ 4 ],
+      ( $list[ 5 ] - 1 ) );
+
+
+   my $pb =
+    Gtk2::Gdk::Pixbuf->new( 'rgb', TRUE, 8, $size->width, $size->height );
+   $pb->get_from_drawable( $pm, $pm->get_colormap, 0, 0, 0, 0, $size->width,
+      $size->height );
+
+   $pb = $pb->add_alpha( TRUE, 255, 255, 255 );
+
+   ( $daPixmap, $daBitmap ) = $pb->render_pixmap_and_mask( 255 );
+
+   $pbactive = $pb;          #The active layout
+   $pbbm     = $daBitmap;    #The mask
+
+#-----------------------------------------------------
+#--------- Build INACATIVE Pixbuf---------------------
+#-----------------------------------------------------
+
+#// Reset backgound to white and get next bitmap (The inactive one)
+   $gc->set_rgb_fg_color( Gtk2::Gdk::Color->parse( 'white' ) );
+   $pm->draw_rectangle( $gc, TRUE, 0, 0, $size->width, $size->height );
+
+#// Paint the border of the window
+   $gc->set_rgb_fg_color( Gtk2::Gdk::Color->parse( 'black' ) );
+   $pm->draw_polygon( $gc, FALSE,
+      CalculateRect( wbsize, wbsize, $pmHeight - 1, $pmWidth - 1 ) );
+
+#// Draw white pointer
+   $gc->set_rgb_fg_color( Gtk2::Gdk::Color->parse( 'white' ) );
+   $pm->draw_polygon( $gc, TRUE, @list );
+
+   $gc->set_rgb_fg_color( Gtk2::Gdk::Color->parse( 'black' ) );
+
+#// subtract one because the fill above used and extra line
+   $pm->draw_line( $gc, $list[ 0 ], ( $list[ 1 ] - 1 ), $list[ 2 ],
+      $list[ 3 ] );
+
+   $pm->draw_line( $gc, $list[ 2 ], $list[ 3 ], $list[ 4 ],
+      ( $list[ 5 ] - 1 ) );
+
+   $pb =
+    Gtk2::Gdk::Pixbuf->get_from_drawable( $pm, $pm->get_colormap, 0, 0, 0, 0,
+      $size->width, $size->height );
+   $pbinactive = $pb;    #fetch the incative bixbuf
+
+   my @return_value = ( $pbactive, $pbinactive, $pbbm );
+   return @return_value;
+}
+
+
+sub CalcPointerMoveWindow() {
+   my ( $self, $width, $height, $wbsize, $parentWidget ) = @_;
+
+   my ( $parentX, $parentY, $parentWidth, $parentHeight, $parentDepth );
+   my ( $midParentX, $midParentY, $posX, $posY );
+   my $ptsize = $wbsize;
+   my ( $drawRight, $drawDown );
+
+# test for a real window or an x y option
+   if( defined $parentWidget ){    
+   ( $parentX, $parentY, $parentWidth, $parentHeight, $parentDepth ) =
+                                           $parentWidget->window->get_geometry();
+   ( $parentX, $parentY ) = $parentWidget->window->get_origin();
+   $midParentX = $parentX + ( $parentWidth / 2 );
+   $midParentY = $parentY + ( $parentHeight / 2 );
+   }else{
+      $parentX  = $self->{x};
+      $parentY  = $self->{y};
+      $midParentX = $self->{x};
+      $midParentY = $self->{y};
+   }
+
+
+my ($x0, $y0, $width0, $height0, $depth) = 
+       Gtk2::Gdk::Screen->get_default->get_root_window->get_geometry;
+ #print "$x0, $y0, $width0, $height0, $depth\n";
+
+# Do we draw to the left or to the right of the icon/window
+   if ( $parentX >= $width0/2  ) {
+      $drawRight = FALSE;
+      $posX      = $midParentX - $width;
+   }
+   else {
+      $drawRight = TRUE;
+      $posX      = $midParentX;
+   }
+
+# Do we draw above or below the icon/window
+   if ( $parentY >=  $height0/2 ) {
+      $drawDown = FALSE;
+      $posY     = $midParentY - $height;
+   }
+   else {
+      $drawDown = TRUE;
+      $posY     = $midParentY;
+   }
+
+
+   $self->move( $posX, $posY );
+   $self->show_all();
+
+   my @list;
+
+   if ( $drawRight ) {
+      if ( $drawDown ) {
+         push @list, $wbsize;
+         push @list, ( $wbsize + $ptsize );
+
+         push @list, 0;
+         push @list, 0;
+
+         push @list, ( $wbsize + $ptsize );
+         push @list, ( $wbsize );
+      }
+      else {
+
+         push @list, ( $wbsize + $ptsize );
+         push @list, ( $height - $wbsize );
+
+         push @list, 0;
+         push @list, $height;
+
+         push @list, $wbsize;
+         push @list, ( $height - $wbsize - $ptsize );
+
+      }
+   }
+   else {
+      if ( $drawDown ) {
+         push @list, ( $width - $wbsize - $ptsize );
+         push @list, $wbsize;
+
+         push @list, $width;
+         push @list, 0;
+
+         push @list, ( $width - $wbsize );
+         push @list, ( $wbsize + $ptsize );
+      }
+      else {
+         push @list, ( $width - $wbsize - $ptsize );
+         push @list, ( $height - $wbsize );
+
+         push @list, $width;
+         push @list, $height;
+
+         push @list, ( $width - $wbsize );
+         push @list, ( $height - $wbsize - $ptsize );
+      }
+   }
+
+   return @list;
+}
+
+
+sub CalculateRect() {
+
+   my ( $xorg, $yorg, $width, $height ) = @_;
+
+   my @list = (
+
+# top left corner
+      $xorg         => ( $yorg + 4 ),
+      ( $xorg + 1 ) => ( $yorg + 4 ),
+      ( $xorg + 1 ) => ( $yorg + 2 ),
+      ( $xorg + 2 ) => ( $yorg + 2 ),
+      ( $xorg + 2 ) => ( $yorg + 1 ),
+      ( $xorg + 4 ) => ( $yorg + 1 ),
+      ( $xorg + 4 ) => ( $yorg ),
+
+# top Right corner
+      ( ( $xorg + $height ) - 4 ) => $yorg,
+      ( ( $xorg + $height ) - 4 ) => ( $yorg + 1 ),
+      ( ( $xorg + $height ) - 2 ) => ( $yorg + 1 ),
+      ( ( $xorg + $height ) - 2 ) => ( $yorg + 2 ),
+      ( ( $xorg + $height ) - 1 ) => ( $yorg + 2 ),
+      ( ( $xorg + $height ) - 1 ) => ( $yorg + 4 ),
+      ( ( $xorg + $height ) )     => ( $yorg + 4 ),
+
+# bottom Right corner
+      ( $xorg + $height ) => ( ( $yorg + $width ) - 4 ),
+      ( ( $xorg + $height ) - 1 ) => ( ( $yorg + $width ) - 4 ),
+      ( ( $xorg + $height ) - 1 ) => ( ( $yorg + $width ) - 2 ),
+      ( ( $xorg + $height ) - 2 ) => ( ( $yorg + $width ) - 2 ),
+      ( ( $xorg + $height ) - 2 ) => ( ( $yorg + $width ) - 1 ),
+      ( ( $xorg + $height ) - 4 ) => ( ( $yorg + $width ) - 1 ),
+      ( ( $xorg + $height ) - 4 ) => ( $yorg + $width ),
+
+# bottom Left corner
+      ( $xorg + 4 ) => ( $yorg + $width ),
+      ( $xorg + 4 ) => ( ( $yorg + $width ) - 1 ),
+      ( $xorg + 2 ) => ( ( $yorg + $width ) - 1 ),
+      ( $xorg + 2 ) => ( ( $yorg + $width ) - 2 ),
+      ( $xorg + 1 ) => ( ( $yorg + $width ) - 2 ),
+      ( $xorg + 1 ) => ( ( $yorg + $width ) - 4 ),
+      $xorg => ( ( $yorg + $width ) - 4 ),
+   );
+   return @list;
+}
+
+package main;
+
+use Gtk2 -init;
+use MIME::Base64;
+
+# a 32 X 32 png
+my $icodata = decode_base64(
+      'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAAGXcA1uAAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wBDgQJDdztR18AAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAB1ElEQVRIx81VzUrrQBT+kjpOzI10k51u3IobC14o6CwD+hAupCt9Aym4KPQRXPkG3VsYcDMK3RXkvoK7m02o2LFpGRd1YqeZxLYqeCCQMN93vvMz58QJKFV4N1e/nLYpnNkTxwrLfRgwABhIiU3Pm6J6YQgAGPIUm543RQSUqoBS1W61lH4PKFU5V1bBgZQ4YgwAsDZ74EcUB711M6oJU6gIpzhcQ2MgZf5kNsT5p91qKaXUYmloO2IM90KY0g3fzwEnTGHIU9wLgetqFTVC8kn0whB/d/9j1BxjIyJWRYOgk8z6YSMAKM2hVGERc8sObX0oJHQ5t5IKCcdRhAchcgUozeFZvuLf9hbqcfyhUCMka8o8OPAo6nGcjQAAuP00RcP3DZIGazMUAOA8STLSPLiwSudJgj/1einYIHQ5xy3n2Wwt1Gk97KWEH79Ly5q7KvGy2cRASvue+A6B2eKXNeJLJZowhRohqAgH/TT9vgwmTOFZvmLUHOPxboyG76MXhtYRyTK4rlaxTwgukqQwmukiHKEiXOuO08vz5uWluEQ2oc8cr3RNtdBZJ0Y/TZd2/GkPdjod7D09IbxiKzu3ZtDlHIeWa3cSRcYf69dM8tK7ZVl7A9Acz+IZAc0kAAAAAElFTkSuQmCC'
+   );
+
+my $icopixbuf = do {
+     my $loader = Gtk2::Gdk::PixbufLoader->new();
+     $loader->write( $icodata );
+     $loader->close();
+     $loader->get_pixbuf();
+  };
+
+my ($xscr, $yscr) = (Gtk2::Gdk->screen_width, Gtk2::Gdk->screen_height);
+#print "$xscr $yscr\n";
+
+my $window = Gtk2::Window->new;
+$window->set_border_width(10);
+$window->set_title('Window 0');
+my $width = 300;
+my $height = 100;
+$window->set_size_request($width,$height);
+$window->set_gravity('GDK_GRAVITY_SOUTH_EAST');
+$window->signal_connect( delete_event => sub { Gtk2->main_quit; 1 } );
+$window->move($xscr,$yscr);
+
+my $window1 = Gtk2::Window->new;
+$window1->set_border_width(10);
+$window1->set_title('Window 1');
+$window1->set_size_request($width,$height);
+$window1->set_gravity('GDK_GRAVITY_SOUTH_WEST');
+$window1->move(0,$yscr);
+
+my $window2 = Gtk2::Window->new;
+$window2->set_border_width(10);
+$window2->set_title('Window 2');
+$window2->set_size_request($width,$height);
+$window2->set_gravity('GDK_GRAVITY_NORTH_WEST');
+$window2->move(0,0);
+
+my $statusicon = Gtk2::StatusIcon->new_from_pixbuf($icopixbuf);
+# will make a nice icon automagically from a file if desired
+#my $statusicon = Gtk2::StatusIcon->new_from_file('stock.png');
+
+$statusicon->set_tooltip( "Info v1.0" );
+#show in tray
+$statusicon->set_visible( 1 );
+
+$statusicon->signal_connect( 'activate',   sub { print "1\n" } );
+$statusicon->signal_connect( 'popup-menu', \&config_it );
+
+my $vbox = Gtk2::VBox->new;
+my $b    = Gtk2::Button->new_from_stock( "gtk-close" );
+$b->signal_connect('button_press_event' => sub { exit  });
+$vbox->pack_start( $b, TRUE, TRUE, 0 );
+$window->add( $vbox );
+$vbox->show_all;
+
+#$window->show_all();
+#$window1->show_all();
+#$window2->show_all();
+
+# messageTypes: info warning question error
+
+my $id3 = Glib::Timeout->add (10000, sub {
+
+   my ($screen,$rect)=$statusicon->get_geometry;
+   my ($x,$y,$w, $h) = $rect->values;
+#  print "exposed $x $y $w $h\n";
+  my @message = ();
+
+  my $reports=`tree /tmp/Finance-Quant/ | egrep -c '*html'`;  
+  my $bt=`tree /tmp/Finance-Quant/ | egrep -c '*data'`;
+  my $stb=`tree -f /tmp/Finance-Quant/ | egrep -c 'ibes-strong-buy'`;
+  my $symbols = `tree /tmp/Finance-Quant/ | egrep directories`;
+  my $charts=`tree -f /tmp/Finance-Quant/ | egrep -c 'charts'`;
+  
+
+ # $symbols =~ s/^(.*)directories, (.*)files/$2/;
+  
+  
+  
+  my $test = Gtk2::Ex::ZNotify->new(
+      type          => 'popup',
+      #   parent_widget => $window, # undefind, use x y location
+      "messageType"   => "info",
+      "timeout"       => 10000,
+      "message"       => "".($symbols)."strong buy:".($stb-1)."\nbacktests:".$bt."reports:".$reports." charts:".$charts,
+      "x"             => ($x + $w/2),
+      "y"             => ($y + $h ),
+   );
+ $test->show_all();
+ return  1;	# don't run again
+  });
+
+
+Gtk2->main;
+
+
+sub click {
+
+   
+   return 1;
+}
+
+
+#right click menu
+sub menu {
+   my $menu = Gtk2::Menu->new();
+
+   #VCI
+   my $menu_VCI = Gtk2::ImageMenuItem->new_with_label("CLI UI");
+   $menu_VCI->set_image(Gtk2::Image->new_from_stock('gtk-refresh',
+'menu'));
+
+      $menu_VCI->signal_connect(activate => sub {
+print system ('financequant &');
+   });
+
+
+   $menu->add($menu_VCI);
+
+   #configure
+   my $menu_pref = Gtk2::ImageMenuItem->new_with_label("XML DUMP");
+      $menu_pref->signal_connect(activate => sub {
+my $response=0;
+ my $error =0;
+print system ('FINANCE_QUANT_XML_RESULTS');
+
+print $response;
+   });
+   $menu_pref->set_image(Gtk2::Image->new_from_stock('gtk-preferences','menu'));
+   $menu->add($menu_pref);
+
+
+
+   #configure
+   my $menu_http = Gtk2::ImageMenuItem->new_with_label("HTTP REPORTS");
+      $menu_http->signal_connect(activate => sub {
+            system("FINANCE_QUANT_HTTP_SERVER &");
+   });
+   $menu_http->set_image(Gtk2::Image->new_from_stock('gtk-media-play','menu'));
+   $menu->add($menu_http);
+
+
+
+   #separator
+   my $menu_sep = Gtk2::SeparatorMenuItem->new();
+   $menu->add($menu_sep);
+
+   #Quit
+   my $menu_quit = Gtk2::ImageMenuItem->new_with_label("Quit");
+   $menu_quit->signal_connect(activate => sub {Gtk2->main_quit});
+   $menu_quit->set_image(Gtk2::Image->new_from_stock('gtk-quit', 'menu'));
+   $menu->add($menu_quit);
+
+
+   
+   return $menu;
+}
+
+
+
+#Program interfaces
+sub interface {
+   my $interface = Gtk2::Menu->new;
+
+   #menu items for VCI
+   #Progress bar for number of downloads; just a countng bar
+
+   #Add the correct controls to menu
+   my $menu_vci_connect = Gtk2::ImageMenuItem->new_with_label("Connect");
+   $interface->add($menu_vci_connect);
+   my $menu_vci_stop = Gtk2::ImageMenuItem->new_with_label("Stop");
+   $interface->add($menu_vci_stop);
+
+   $interface->show_all;
+    
+   
+
+}
+
+
+
+
+sub config_it{
+
+my $menu = menu();
+   $menu->show_all();
+
+ #to position the menu under the icon, instead of at mouse position
+ my ($x, $y, $push_in) = Gtk2::StatusIcon::position_menu($menu, $statusicon);
+ print "$x, $y, $push_in\n";
+ $menu->popup( undef, undef, sub{return ($x,$y,0)} , undef, 0, 0 );
+ return 1;
+}
+
+1;
+
+
+__DATA__
+=head1 NAME
+  
+  FINANCE_QUANT_TRAY
+  
+=head1 DESCRIPTION
+
+  TRAY icon displaying calculation progress
+
+=head1 SYNOPSIS
+
+  FINANCE_QUANT_TRAY
+
+=head1 SEE ALSO
+
+  part of Finance::Quant  
+  
+=head1 AUTHOR
+
+  Hagen Geissler, E<lt>santex@cpan.org<gt>
+  
+=head1 COPYRIGHT AND LICENSE
+  Copyright (C) 2012 by Hagen Geissler
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself, either Perl version 5.12.4 or,
+  at your option, any later version of Perl 5 you may have available.
+=cut

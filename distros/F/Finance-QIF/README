@@ -1,0 +1,49 @@
+Finance-QIF version 3.02
+=======================
+
+Simple QIF file reader. QIF is a common financial software export file
+format.  This module was developed to support Quicken QIF exports.
+This module reads QIF records from a data file passing each successive
+record to the caller for processing.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp, IO::File
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Matthew McGillis
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+COMMENTS
+
+We have put together a new version of FInance::QIF. I was looking for
+something that could process a complete export from Quicken. I took a
+look at the original Finance::QIF currently available at CPAN and
+found it could not process much of a typical Quicken QIF file. This
+new version of Finance::QIF is fairly different from the existing
+Finance::QIF. We have contacted the previous owner and asked for
+permission to take ownership of the existing Finance::QIF. They agreed
+to let us pick up the code.
+
+This version does have different API's than the 1.X so anyone porting code
+to this new version will have to make modifications to get things working.
+
+The software is available at
+http://sourceforge.net/projects/finance-qif
+
+Regards,
+Matthew McGillis & Phil Lobbes

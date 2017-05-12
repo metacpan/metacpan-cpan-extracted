@@ -1,0 +1,90 @@
+IFORMAT(I4)                                   
+   1
+
+IFORMAT(2I4)                                   
+   1   2
+
+IFORMAT(I4)                                   
+   1   2
+
+IFORMAT(2I4)                                   
+   1
+
+IFORMAT(I4)                                   
+
+
+IFORMAT(I4)                                   
+  1
+
+IFORMAT(BZI4)                                   
+  1
+
+IFORMAT(BZI4)                                   
+
+
+IFORMAT(BNI4)                                   
+  1
+
+IFORMAT(BZI4)                                   
+ 1 1
+
+IFORMAT(BNI4)                                   
+ 1 1
+
+DFORMAT(F8.3)
+    1.234
+
+DFORMAT(F8.3)
+1.234
+
+DFORMAT(F8.3)
+
+
+DFORMAT(F8.3)
+    1234
+
+DFORMAT(F8.3)
+   1234
+
+DFORMAT(F8.3)
+   123
+
+DFORMAT(2PF8.3)
+    1.234
+
+DFORMAT(-2PF8.3)
+    1.234
+
+LFORMAT(L8)
+       T
+
+LFORMAT(L8)
+       F
+
+LFORMAT(L8)
+ True
+
+LFORMAT(L8)
+ true
+
+LFORMAT(L8)
+.TRUE.
+
+LFORMAT(L8)
+      .T
+
+LFORMAT(L8)
+tomato
+
+LFORMAT(L8)
+ falcon
+
+CFORMAT(A26)
+abcdefghijklmnopqrstuvwxyz
+
+CFORMAT(A26)
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+CFORMAT(A26)
+   xyz   
+

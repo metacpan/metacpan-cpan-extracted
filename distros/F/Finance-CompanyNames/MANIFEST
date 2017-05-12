@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+Changes
+CompanyNames.pm
+CompanyNames/TextSupport.pm
+t/01basic.t

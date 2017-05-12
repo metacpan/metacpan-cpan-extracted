@@ -1,0 +1,9 @@
+Revision history for Perl extension Furl::S3
+
+0.02
+        - use Furl::HTTP
+        - handle utf-8 string correctly
+        - added copy_object method
+
+0.01    Mon Nov 29 11:52:08 2010
+        - original version

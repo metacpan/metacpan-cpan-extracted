@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+# PODNAME:  farabi
+# ABSTRACT: Run Farabi web server
+our $VERSION = '0.47'; # VERSION
+
+use File::Basename 'dirname';
+use File::Spec::Functions qw(catdir splitdir);
+
+# Source directory has precedence
+my @base = ( splitdir( dirname(__FILE__) ), '..' );
+my $dev = -e catdir( @base, 't' );
+my $lib = join( '/', @base, 'lib' );
+$dev ? unshift( @INC, $lib ) : push( @INC, $lib );
+
+use Getopt::Long;
+my $host = "*";
+my $port;
+my $opt_version;
+my $help;
+my $result = GetOptions(
+	"host=s"  => \$host,
+	"port=i"  => \$port,
+	"help"    => \$help,
+	"version" => \$opt_version,
+);
+
+if ($help) {
+	print <<HELP;
+Usage: farabi [switches]
+   help       Shows this page
+   host       HTTP hostname (default is *)
+   port       HTTP port. It is port 4040 when CPAN-installed otherwise it is 3000
+   version    Shows Farabi version
+HELP
+
+	exit;
+}
+
+if ($opt_version) {
+	my $version;
+	if ( open my $fh, "<", "dist.ini" ) {
+		while ( my $line = <$fh> ) {
+			if ( $line =~ /^version\s*=\s*(\S+)/ ) {
+				$version = "$1 (unreleased)";
+			}
+		}
+		close $fh;
+	}
+	require Farabi;
+	$version = $version // ($Farabi::VERSION || 'unreleased');
+	say "Farabi v$version";
+	exit;
+}
+
+# Start commands for application
+require Mojolicious::Commands;
+$port = $port // ($dev ? 3000 : 4040);
+say "Farabi trying to listen at http://$host:$port";
+Mojolicious::Commands->start_app( 'Farabi', 'daemon', '-l',
+	"http://$host:$port" );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+farabi - Run Farabi web server
+
+=head1 VERSION
+
+version 0.47
+
+=head1 AUTHOR
+
+Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Ahmad M. Zawawi.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

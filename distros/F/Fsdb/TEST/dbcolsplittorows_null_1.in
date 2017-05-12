@@ -1,0 +1,9 @@
+#h name uid
+John__Heidemann  2274
+Greg_Johnson_    2275
+_Root    0
+_ 1
+# this is a simple database
+# modified to test various corner cases
+#  | dbcol fullname uid
+#  | dbcolrename fullname name

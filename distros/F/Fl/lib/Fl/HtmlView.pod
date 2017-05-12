@@ -1,0 +1,333 @@
+class 'Fl::HtmlView';
+isa 'Fl::Group';
+include 'FL/Fl_Help_View.H';
+widget_type 'Fl_Help_View';
+
+=pod
+
+=head1 NAME
+
+Help::HtmlView - HTML Display Widget
+
+=head1 Description
+
+The Fl::HtmlView widget displays HTML text. It's based on Fl_Help_View. Why
+is the widget not Fl_Html_View upstream? I don't know either... Anwyay! Here
+we go!
+
+Most HTML 2.0 elements are supported, as well as a primitive implementation of
+tables. GIF, JPEG, and PNG images are displayed inline.
+
+=head2 Supported HTML Tags
+
+=over
+
+=item A: HREF/NAME
+
+=item B
+
+=item BODY: BGCOLOR/TEXT/LINK
+
+=item BR
+
+=item CENTER
+
+=item CODE
+
+=item DD
+
+=item DL
+
+=item DT
+
+=item EM
+
+=item FONT: COLOR/SIZE/FACE=(helvetica/arial/sans/times/serif/symbol/courier)
+
+=item H1/H2/H3/H4/H5/H6
+
+=item HEAD
+
+=item HR
+
+=item I
+
+=item IMG: SRC/WIDTH/HEIGHT/ALT
+
+=item KBD
+
+=item LI
+
+=item OL
+
+=item P
+
+=item PRE
+
+=item STRONG
+
+=item TABLE: TH/TD/TR/BORDER/BGCOLOR/COLSPAN/ALIGN=CENTER|RIGHT|LEFT
+
+=item TITLE
+
+=item TT
+
+=item U
+
+=item UL
+
+=item VAR
+
+=back
+
+=head2 Supported Color Names
+
+=over
+
+=item black
+
+=item red
+
+=item green
+
+=item yellow
+
+=item blue
+
+=item magenta
+
+=item fuchsia
+
+=item cyan
+
+=item aqua
+
+=item white
+
+=item gray
+
+=item grey
+
+=item lime
+
+=item maroon
+
+=item navy
+
+=item olive
+
+=item purple
+
+=item silver
+
+=item teal
+
+=back
+
+=head2 Supported URLs
+
+=over
+
+=item file://
+
+=item http://
+
+=item ftp://
+
+=item https://
+
+=ipp://
+
+=item mailto://
+
+=item news://
+
+=back
+
+=head1 Methods
+
+Fl::HtmlView inherits from Fl::Group and Fl::Widget. On top of that, it
+exposes the following methods...
+
+
+=head2 new(...)
+
+    my $hv_a = Fl::HtmlView->new(0, 0, 250, 500, 'Important Stuff');
+    my $hv_b = Fl::HtmlView->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Help_View *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 clear_selection(...)
+
+    $hv_b->clear_selection();
+
+Removes the current text selection.
+
+=cut
+
+xs {name        => 'clear_selection',
+    definitions => [
+                    {returns => 'void'}
+    ]
+};
+
+=pod
+
+=head2 directory(...)
+
+    $hv_b->directory();
+
+Returns the current directory for the text in the buffer.
+
+=cut
+
+xs {name        => 'directory',
+    definitions => [
+                    {returns => 'const char *'}
+    ]
+};
+
+=pod
+
+=head2 filename(...)
+
+    $hv_b->filename();
+
+Returns the current filename for the text in the buffer.
+
+=cut
+
+xs {name        => 'filename',
+    definitions => [
+                    {returns => 'const char *'}
+    ]
+};
+
+=pod
+
+=head2 find(...)
+
+    my $position = $hv_b->find('summer');
+       $position = $hv_b->find('summer', $position);
+
+Finds the specified string at starting C<$position>. Default value for
+C<$position> is zero (C<0>) which would obviously start the search at the
+beginning.
+
+The return value is the matching position or C<-1> if the search string is not
+found.
+
+=cut
+
+xs {name        => 'find',
+    definitions => [
+                    {   required => [['const char *', 's']],
+                        optional => [[qw[int position 0]]],
+                        returns  => 'int'}
+    ]
+};
+
+=pod
+
+=head2 leftline(...)
+
+    my $position = $hv_b->leftline( );
+
+Gets the left position in pixels.
+
+    $hv_b->leftline( 20 );
+
+Scrolls the text to the indicated position, given a pixel column.
+
+If the given pixel value left is out of range, then the text is scrolled to
+the left or right side of the document.
+
+=cut
+
+xs {name        => 'leftline',
+    definitions => [
+                    {   required => [[qw[int left]]],
+                        returns  => 'void'},
+                    {   returns  => 'int' }
+    ]
+};
+
+=pod
+
+=head2 link(...)
+
+This method assigns a callback function to use when a link is followed or a
+file is loaded (via Fl::HtmlView->load()) that requires a different file or
+path.
+
+The callback function receives a pointer to the Fl::HtmlView widget and the
+URI or full pathname for the file in question. It must return a pathname that
+can be opened as a local file or C<undef>.
+
+The link function can be used to retrieve remote or virtual documents,
+returning a temporary file that contains the actual data. If the link function
+returns C<undef>, the value of the Fl::HtmlView widget will remain unchanged.
+
+If the link callback cannot handle the URI scheme, it should return the uri
+value unchanged or set the value() of the widget before returning C<undef>.
+
+=cut
+
+# TODO: I need a callback method for this! Quick! Before release to PAUSE!
+0 &&
+xs {name        => 'link',
+    definitions => [
+                    {   required => [['SV *', 'callback']],
+                        returns  => 'void'}
+    ]
+};
+
+xs {name        => 'value',
+    definitions => [
+                    {   required => [['const char *', 'html']],
+                        returns  => 'void'}
+    ]
+};
+
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

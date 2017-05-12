@@ -1,0 +1,17 @@
+[%- WRAPPER entities_main.tt -%]
+
+
+[% import(found.records.0); %]
+
+<h2>HTML Entity [% Name %]</h2>
+
+Entity named <b>[% Name %]</b> corresponds to character [% Char %]
+(latin character number [% Num %]):
+
+<blockquote>
+  [% Description %]
+</blockquote>
+
+<a href="?M=[% Num %]">Edit</a>
+
+[%- END -%]

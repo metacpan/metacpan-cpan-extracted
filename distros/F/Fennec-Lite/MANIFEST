@@ -1,0 +1,8 @@
+Build.PL
+lib/Fennec/Lite.pm
+MANIFEST			This list of files
+META.yml
+README
+t/Acceptance.t
+t/OO.t
+t/RunByLine.t

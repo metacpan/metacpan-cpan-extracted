@@ -1,0 +1,55 @@
+# test6b.hash                             -*-cperl-*-
+#
+# Hashref tree for the namelist in test6b.nml
+#
+
+$namesref = [ 'init_pars', 'eos_init_pars' ];
+
+$hashref =
+  { 'init_pars' =>
+    { 'cvsid'       => { value => [ '@Id: test6b.nml,v 1.1 2006/12/18 23:14:12 dobler Exp @                                                                    ' ],
+                         stype => 'single-quote string',    type => 1 },
+      'ip'          => { value => [ '14' ],
+                         stype => 'integer',                type => 4 },
+      'xyz0'        => { value => [ '-1.65441024',
+                                    '-1.65441024',
+                                   '-2.61195993' ],
+                         stype => 'unspecified float',      type => 5 },
+      'xyz1'        => { value => [ '1.65441048',
+                                    '1.65441048',
+                                   '0.593460083' ],
+                         stype => 'unspecified float',      type => 5 },
+      'lxyz'        => { value => [ '3.30882072',
+                                    '3.30882072',
+                                    '3.20542002' ],
+                         stype => 'unspecified float',      type => 5 },
+      'lperi'       => { value =>[ 'T', 'T', 'F' ],
+                         stype => 'logical',                type => 3},
+      'lshift_origin' => { value => [ 'F', 'F', 'F' ],
+                           stype => 'logical',              type => 3},
+      'coord_system'  => { value => [ 'cartesian' ],
+                           stype => 'single-quote string',  type => 1 },
+      'lequidist'   => { value => [ 'T', 'T', 'T' ],
+                         stype => 'logical',                type => 3},
+      'zeta_grid0'  => { value => [ '0.E+0' ],
+                         stype => 'single precision float', type => 6 },
+      'grid_func'   => { value => [ 'linear                   ',
+                                  'linear                   ',
+                                  'linear                   ' ],
+                         stype => 'single-quote string',    type => 1 },
+      'init_loops'  => { value => [ '1' ],
+                         stype => 'integer',                type => 4 },
+      'lwrite_2d'   => { value =>[ 'F' ],
+                         stype => 'logical',                type => 3},
+    },
+
+    'eos_init_pars' =>
+    { 'xhe'         => { value => [ '0.100000001' ],
+                         stype => 'unspecified float',      type => 5 },
+      'lconst_yh'   => { value => [ 'F' ],
+                         stype => 'logical',                type => 3},
+    }
+
+  };
+
+$nlists = (keys %$hashref) + 0.;

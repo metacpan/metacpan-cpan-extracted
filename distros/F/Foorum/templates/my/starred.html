@@ -1,0 +1,42 @@
+[% title = 'My Starred Items' %]
+
+[% c.load_once("site/star.js") %]
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='/u/[% c.user.username %]'><span>My Homepage</span></a></li>
+        <li><a href='/u/[% c.user.username %]/topics'><span>[% c.loc('My Recent Topics') %]</span></a></li>
+        <li selected="selected"><a href='/my/starred'><span>[% c.loc('My Starred Items') %]</span></a></li>
+        <li><a href='/u/[% c.user.username %]/shared'><span>[% c.loc('My Shared Items') %]</span></a></li>
+    </ul>
+    <div>
+
+<div class='one'>
+<table align='center'>
+<tr align='center' class='title'><td width='20'>[% c.loc("Star") %]</td><td align='left'>[% c.loc("Subject") %]</td><td width='180'>[% c.loc("Author") %]</td><td width='180'>[% c.loc("Last Update") %]</td></tr>
+[% FOREACH item IN starred_items %]
+<tr align='center' class='misc[% IF loop.count mod 2 %]1[% ELSE %]2[% END %]'>
+
+<td><a href="javascript:star('[% item.object_type %]', '[% item.object_id %]', 'starDiv_[% item.object_type %]_[% item.object_id %]')"><span id='starDiv_[% item.object_type %]_[% item.object_id %]'><img src='[% c.config.dir.images %]/site/t/star_on.gif' /></span></a></td>
+
+[% INCLUDE include/object_tds.html object = item %]
+
+</tr>
+[% END %]
+</table>
+
+<br />
+<table align='center'>
+<tr><td class='misc1'>[% INCLUDE sub/pager.html %]</td></tr>
+</table>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

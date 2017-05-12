@@ -1,0 +1,97 @@
+Flickr::Tools
+=============
+
+Some of these modules are being integrated with the Flickr::API distribution started by
+Cal Henderson. The rest are being reworked to follow more current practice.
+
+
+
+A NOTE ON TESTING
+
+For complete testing, some additional information is required from you
+(your api_key and secret, for example) which is stored in a storable
+formatted config file. Other additional information is in key/value pairs
+in the test values file.
+
+make test MAKETEST_OAUTH_CFG=$HOME/oauth-testing.st [TEST_VERBOSE=1]
+ MAKETEST_VALUES=$HOME/values_file
+
+There are some simple tools for building these files in the Flickr::API
+distribution scripts directory. 
+
+
+THE MODULES
+
+These modules provide a set of classes that can be used to work with Flickr, 
+using it's REST API, as provided by the Flickr::API distribution.
+
+The object of this set of classes is to take the "raw" interface that the 
+Flickr::API provides and turn it into a more usable set of objects which 
+are easier and faster to use, while providing full access to all the 
+functionality provided by Flickr.
+
+This distribution formerly provided two sets of classes:
+
+-> The Flickr::API::* modules (eg: Flickr::API::Photos, Flickr::API::People) 
+provide a lower-level way to access the information. They essentially get the 
+output from the Flickr::API module and transform in into a cleaner, easier to 
+work with hash. These modules are essentially there to be used by the next 
+set of modules, but they may be used directly if you should wish to do so.
+
+These modules are moving into Flickr::API distribution.
+
+
+
+-> The Flickr::Tools::* modules (eg: Flickr::Tools::Person, Flickr::Tools::Photo)
+provide higher-level access to the information on a photo, person, etc. This
+is the preferred interface that a typical programmer might choose to use.
+
+These modules are continuing in the Flickr::Tools distribution.
+
+
+
+STATUS
+
+This is an early release of the distribution and there are only a limited 
+number of methods available at the moment.
+
+Also, this is a "testing the waters" version. I expect the API of the objects 
+will change.
+
+Read the TODO file for some of the plans for the future of this distribution. 
+
+
+
+INSTALLATION
+
+You probably don't want to install v1.21 of Flickr::Tools, V1.22 may by
+marginally useful.
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+Flickr::API
+Moo
+CHI
+Type::Tiny
+Perl 5.10 and later
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Nuno Nunes (effectively versions < 1.0)
+Copyright (c) 2015 Louis B. Moore (effectively versions >= 1.0)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This is clarified as being under the Perl Foundation Artistic License 2
+
+

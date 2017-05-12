@@ -1,0 +1,11 @@
+- schema: Test
+  name: test1
+  data:
+    id: 1
+    mail: chiba1@geminium.com
+- schema: Test
+  name: test2
+  data:
+    id: 2
+    mail: chiba2@geminium.com
+

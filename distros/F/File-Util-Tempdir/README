@@ -1,0 +1,39 @@
+SYNOPSIS
+
+     use File::Util::Tempdir qw(get_tempdir);
+    
+     my $dir = get_tempdir();
+
+DESCRIPTION
+
+FUNCTIONS
+
+    None are exported by default, but they are exportable.
+
+ get_tempdir() => str
+
+    A cross-platform way to get system-wide temporary directory.
+
+    On Windows: it first looks for one of these environment variables in
+    this order and return the first value that is set: TMP, TEMP, TMPDIR,
+    TEMPDIR. If none are set, will look at these directories in this order
+    and return the first value that is set: C:\TMP, C:\TEMP. If none are
+    set, will die.
+
+    On Unix: it first looks for one of these environment variables in this
+    order and return the first value that is set: TMPDIR, TEMPDIR, TMP,
+    TEMP. If none are set, will look at these directories in this order and
+    return the first value that is set: /tmp, /var/tmp. If none are set,
+    will die.
+
+SEE ALSO
+
+    File::Spec has tmpdir function. It also tries to look at environment
+    variables, e.g. on Unix it will look at TMPDIR (but not TEMPDIR) and
+    then falls back to /tmp (but not /var/tmp).
+
+    File::HomeDir, a cross-platform way to get user's home directory and a
+    few other related directories.
+
+    File::Temp to create a temporary directory.
+

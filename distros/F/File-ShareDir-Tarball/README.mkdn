@@ -1,0 +1,68 @@
+# NAME
+
+File::ShareDir::Tarball - Deal transparently with shared files distributed as tarballs
+
+# VERSION
+
+version 0.2.2
+
+# SYNOPSIS
+
+    use File::ShareDir::Tarball ':all';
+
+    # use exactly like File::ShareDir
+    $dir = dist_dir('File-ShareDir');
+
+# DESCRIPTION
+
+If the shared files of a distribution are contained in a
+tarball (see [Dist::Zilla::Plugin::ShareDir::Tarball](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::ShareDir::Tarball) for
+why you would want to do that), automatically 
+extract the archive in a temporary
+directory and return the path to that directory. If called for a regular distribution without a bundle file
+(`shared-files.tar.gz`), it'll return the original shared dir. 
+In other words,
+from the consumer point of view, it'll behave just like [File::ShareDir](http://search.cpan.org/perldoc?File::ShareDir).
+
+# EXPORT TAGS
+
+## :all
+
+Exports `dist_dir()` and `dist_file()`.
+
+# EXPORTABLE FUNCTIONS
+
+## dist\_dir( $distribution )
+
+Behaves just like `dist_dir()` from [File::ShareDir](http://search.cpan.org/perldoc?File::ShareDir).
+
+## dist\_file( $distribution, $file )
+
+Behaves just like `dist_file()` from [File::ShareDir](http://search.cpan.org/perldoc?File::ShareDir).
+
+# SEE ALSO
+
+- [Test::File::ShareDir](http://search.cpan.org/perldoc?Test::File::ShareDir)
+
+To test or use a shared dir that is not deployed yet. 
+
+- [Dist::Zilla::Plugin::ShareDir::Tarball](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::ShareDir::Tarball)
+
+[Dist::Zilla](http://search.cpan.org/perldoc?Dist::Zilla) plugin to create the tarball effortlessly.
+
+- [Module::Build::CleanInstall](http://search.cpan.org/perldoc?Module::Build::CleanInstall)
+
+Provides an alternative to this module by subclassing [Module::Build](http://search.cpan.org/perldoc?Module::Build) and,
+upon installation, remove the files from previous installations as given in
+the _packlist_.
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

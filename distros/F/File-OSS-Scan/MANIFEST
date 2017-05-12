@@ -1,0 +1,12 @@
+Changes
+lib/File/OSS/Scan.pm
+lib/File/OSS/Scan/Constant.pm
+lib/File/OSS/Scan/Matches.pm
+lib/File/OSS/Scan/Ruleset.pm
+lib/File/OSS/Scan/Cache.pm
+README
+t/00-basic.t
+MANIFEST
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

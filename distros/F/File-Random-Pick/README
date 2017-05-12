@@ -1,0 +1,41 @@
+SYNOPSIS
+
+     use File::Random::Pick qw(random_line);
+     my $line  = random_line("/usr/share/dict/words");
+     my @lines = random_line("/usr/share/dict/words", 3);
+    
+     # also accepts a filehandle
+     my $line = random_line($fh);
+
+DESCRIPTION
+
+    This module can return random lines from a specified file.
+
+    Compared to the existing File::Random, this module does not return
+    duplicates. I have also submitted a ticket to incorporate this
+    functionality into File::Random [1]. It also accepts a filehandle, for
+    convenience.
+
+FUNCTIONS
+
+ random_line($path_or_handle [ , $num_lines ]) => list
+
+    Return random lines from a specified file (or filehandle). Will not
+    return duplicates (meaning, will not return the same line of the file
+    twice, but might still return duplicates if two or more lines contain
+    the same content). Will die on failure to open file. $num_lines
+    defaults to 1. If there are less than $num_lines available in the file,
+    will return just the available number of lines.
+
+    The algorithm used is from perlfaq (perldoc -q "random line"), which
+    scans the file once. The algorithm is for returning a single line and
+    is modified to support returning multiple lines.
+
+SEE ALSO
+
+    File::Random
+
+    File::RandomLine
+
+    [1] https://rt.cpan.org/Ticket/Display.html?id=109384
+

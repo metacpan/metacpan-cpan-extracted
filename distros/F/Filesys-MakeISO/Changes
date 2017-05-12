@@ -1,0 +1,8 @@
+Revision history for Filesys::MakeISO
+
+0.1.0  2006-01-14
+    - Changed to driver classes with Module::Pluggable.
+    - Released two drivers: Mkisofs and MagicISO (Win32).
+
+0.0.1  2006-01-08
+    - Initial release. Only supports mkisofs.

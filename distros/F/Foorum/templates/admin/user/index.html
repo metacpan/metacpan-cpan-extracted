@@ -1,0 +1,21 @@
+[% WRAPPER 'admin/bar.html' %]
+
+[% url_base = '/admin/user' %]
+<div class='one'>
+<table align='center'>
+<tr class='title'><td colspan='4'>User Lists</td></tr>
+<tr class='misc1'><td colspan='4'>[% INCLUDE sub/pager.html %]</td></tr>
+<tr class='misc2'><td>ID</td><td>NAME</td><td>Status</td><td>ACTION</td></tr>
+[% FOREACH u IN users %]
+<tr class='misc[% IF loop.count mod 2;'2';ELSE;'1';END; %]'>
+    <td>[% u.user_id %]</td>
+    <td>[% u.username %]</td>
+    <td>[% u.status %]</td>
+    <td> <a href='[% url_base %]/edit?user_id=[% u.user_id %]'>Edit</a> <a href='[% url_base %]/ban?username=[% u.username %]'>Ban</a></td>
+</tr>
+[% END %]
+<tr class='misc1'><td colspan='4'>[% INCLUDE sub/pager.html %]</td></tr>
+</table>
+</div>
+
+[% END %]

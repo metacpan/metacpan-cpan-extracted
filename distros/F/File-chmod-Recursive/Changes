@@ -1,0 +1,81 @@
+Version History for File-chmod-Recursive
+Mithun Ayachit
+
+
+
+1.0.3
+
+
+-   Merged #2 - print out mode as octal when in verbose mode
+
+
+
+1.0.2
+
+
+-   [#1] do not use fatal warnings
+-   Fix the reason for warnings on File::chmod
+
+
+
+1.0.1
+
+
+-   Bump version to allow change in version number strategy
+
+
+
+0.6.1
+
+
+-   No functional changes. Use semver and move bugtracker to
+    github-issues
+
+
+
+0.06
+
+
+-   Added a verbose option, similar to chmod -v
+-   Added an rchmod/chmodr alias for the lazy folks
+
+
+
+0.05
+
+
+-   Fixed File-Find imports
+
+
+
+0.04
+
+
+-   Fixed dependency in Build.PL
+-   Match paths only once, i.e chmod a path only once
+
+
+
+0.03
+
+
+-   Added more options for selective permissions
+-   Do not follow symlinks unless requested
+
+
+
+0.02
+
+
+-   Removed Check for regex ref (That should teach me to write tests)
+-   Return scalar value instead of a list, similar to chmod
+-   Updated _chmod_ links to point to perldoc
+
+
+
+0.01
+
+
+-   Initial release
+
+------------------------------------------------------------------------

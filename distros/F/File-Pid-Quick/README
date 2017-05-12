@@ -1,0 +1,22 @@
+File::Pid::Quick version 1.02
+=============================
+
+This module provides PID file based prevention of concurrent instances of
+a script, with as brief and simple an operational interface as possible.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+AUTHOR
+    Matthew Sheahan, <chaos@lostsouls.org>
+
+COPYRIGHT
+    Copyright (c) 2007, 2010 Matthew Sheahan.  All rights reserved.
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

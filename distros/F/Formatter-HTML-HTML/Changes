@@ -1,0 +1,23 @@
+Revision history for Perl extension Formatter::HTML::HTML.
+
+0.97	2005-11-19
+        - Fixed a spec violation (duh!) bug, I had used uri instead of
+	url.
+	
+0.96	2005-09-16
+	- Added an config_file hashref parameter, useful for enabling
+	users to configure tidy, adding the possibility of XHTML output.
+
+0.95	2005-03-10
+	- Test depend on specific versions of stuff. That is bad, but
+	  I think I'll just mark them TODO for now.
+	- Added SIGNATURE.
+
+0.94	2005-02-01
+	- Second release. Does really work! Thanks to Ben Trott for
+	pointing out that the clean method actually returns the
+	cleaned string, not just OK. 
+
+0.93_1 	2005-01-28 
+	- Initial release. Doesn't really work...
+

@@ -1,0 +1,28 @@
+= 2003/11/25
+
+Changed the name to File::OldSlurp
+
+Alex BATKO <abatko@cs.mcgill.ca> sent in some typo fixes.
+
+= 2003/09/04
+
+This is the last release of File::Slurp by David Sharnoff.
+After this release, the File::Slurp namespace will be
+given to Uri Guttman <uri@stemsystems.com>.
+
+The only change in this release: a fix to the test suite
+'cause Uri Guttman noticed it was buggy.
+
+= 2002/10/31
+
+Change __DATA__ to __END__.  Don't know why I had
+it wrong in the first place.
+
+= 2002/03/05
+
+Changed the license to make the Debian folks happy.
+Changed the temporary file directory location code in
+the test suite to make the Win32 people happy.
+All changes for this release integrated by 
+Alexander Zangerl <az@snafu.priv.at>.  Thank you!
+

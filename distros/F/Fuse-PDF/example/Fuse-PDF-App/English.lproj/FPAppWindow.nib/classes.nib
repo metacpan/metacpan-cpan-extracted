@@ -1,0 +1,37 @@
+{
+    IBClasses = (
+        {CLASS = DragWell; LANGUAGE = ObjC; SUPERCLASS = NSBox; }, 
+        {
+            ACTIONS = {clickLink = id; mountPDF = id; unmountPDF = id; }; 
+            CLASS = FPAppWindow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                dropWell = DragWell; 
+                fuseLink = NSTextField; 
+                fuseStatus = NSTextField; 
+                imageView = NSImageView; 
+                mountButton = NSButton; 
+                pdfList = NSTableView; 
+                unmountButton = NSButton; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {clickLink = id; mountPDF = id; unmountPDF = id; }; 
+            CLASS = MainWindow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                dropWell = NSBox; 
+                fuseLink = NSTextField; 
+                fuseStatus = NSTextField; 
+                mountButton = NSButton; 
+                pdfList = NSTableView; 
+                unmountButton = NSButton; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = URLTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

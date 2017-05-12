@@ -1,0 +1,330 @@
+NAME
+    Flickr::Upload::FireEagle - Flickr::Upload subclass to assign location
+    information using FireEagle
+
+SYNOPSIS
+     use Getopt::Std;
+     use Config::Simple;
+     use Flickr::Upload::FireEagle;
+
+     # c: path to a config file
+     # p: path to a photo
+
+     my %opts = ();
+     getopts('c:p:', \%opts);
+        
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     my %fireeagle_args = ('consumer_key' => $cfg->param('fireeagle.consumer_key'), 
+                           'consumer_secret' => $cfg->param('fireeagle.consumer_secret'), 
+                           'access_token' => $cfg->param('fireeagle.access_token'), 
+                           'access_token_secret' => $cfg->param('fireeagle.access_token_secret'));
+
+     my %flickr_args = ('key' => $cfg->param('flickr.api_key'), 
+                        'secret' => $cfg->param('flickr.api_secret'), 
+                        'fireeagle' => \%fireeagle_args);
+
+     my $uploadr = Flickr::Upload::FireEagle->new(\%flickr_args);
+
+     my $photo_id = $uploadr->upload('photo' => $opts{'p'},
+                                     'auth_token' => $cfg->param('flickr.auth_token'));
+                                        
+     print "photo : $photo_id\n";
+
+DESCRIPTION
+    Flickr::Upload subclass to assign location information using FireEagle
+    and if a photo contains relevant GPS information in its EXIF headers
+    update your location as well.
+
+HOW DOES IT WORK?
+    Well. It's a bit involved.
+
+    The first thing that happens is the photo you're trying to upload is
+    poked for EXIF data, specifically any GPS information and when it was
+    taken (the using *DateTimeOrginal* field).
+
+    If there is no date information, the current time is assumed.
+
+    If there is GPS data then the date is tested to see if the photo was
+    taken falls within an allowable window of time. By default, this is (1)
+    hour from "right now". An alternate value may be set by passing an
+    *offset_gps* argument, measured in seconds, to the *upload* method.
+
+    If the GPS information was added recently enough then FireEagle is
+    queried for your most recent location hierarchy. If the GPS information
+    is more recent than the data stored in the hierarchy (the location with
+    the "best guess" of being correct) then FireEagle is updated with the
+    latitude and longitude recorded in the photo.
+
+    Moving right along, whether or not we've just updated FireEagle the
+    service is queried for your current location (again).
+
+    Once the hierarchy has been retrieved, the next step is to try and
+    retrieve a "context" node. Whereas when testing GPS information the
+    "best guess" node is assumed this is not necessarily the case when
+    trying to use FireEagle to add tags.
+
+    The context node is determined by comparing the photo's date against the
+    *located-at* (or date recorded) attribute for specific items in the
+    FireEagle hierarchy. Since most cameras still don't record GPS
+    information it is necessary to do some work to gues^H^H^H I mean infer
+    how "close" you are to the last recorded location.
+
+    For example, if it's been more than a couple of hours since you last
+    updated FireEagle you might still be in the same neighbourhood but if
+    it's been more than half a day chances are good that you're been on the
+    move but are still in the same city.
+
+    (It goes without saying that there are lots of edge cases some of which
+    will try to be addressed in the as-yet unwritten
+    Flickr::Upload::FireDopplr.)
+
+    The following tests are applied :
+
+    * First a "best guess" location is queried
+        If it is present and its *located-at* date is less than or equal to
+        an hour, it is the context node.
+
+        An alternate value may be set by passing a *offset_fireeagle_exact*
+        argument, measured in seconds, to the *upload* method.
+
+    * Next a location of type "neighborhood" is queried
+        If it is present and its *located-at* date is less than or equal to
+        two hours, it is the context node.
+
+        An alternate value may be set by passing a
+        *offset_fireeagle_neighbourhood* (or neighborhood) argument,
+        measured in seconds, to the *upload* method.
+
+    * Next a location of type "locality" is queried
+        If it is present and its *located-at* date is less than or equal to
+        twelve hours, it is the context node.
+
+        An alternate value may be set by passing a
+        *offset_fireeagle_locality* argument, measured in seconds, to the
+        *upload* method.
+
+    * If none of those tests pass then...
+        ...there is no context node.
+
+    Assuming that a context node has been identified *and* there is GPS
+    information stored in the photo, the *flickr.places.findByLatLon* method
+    is called (passing the photo's latitude and longitude) to ensure that
+    the (Flickr) places IDs for both the response and the context node
+    match.
+
+    If they *don't* match then the context node is destroyed and the
+    following tags are added : places:PLACETYPE=PLACEID; woe:id=WOEID; the
+    name of the location (formatted according to the object's "tagify"
+    rules).
+
+    On the other hand, if the context node is still around, after all that,
+    then it is used to add tags.
+
+    At a minimum a fireeagle:id=CONTEXTNODEID tag is added. If the place
+    type for the context node is equal to or more precise than a
+    neighbourhood, the neighbourhood's name is added as a tag. If the place
+    type for the context node is equal to or more precise than a locality,
+    the locality's name is added as a tag as well as fireeagle:id=ID,
+    places:locality=PLACEID and woe:id=WOEID tags.
+
+    We're almost done : Assuming a context node and no GPS information in
+    the photo, the nodes latitude and longitude are calculated to use as
+    arguments when calling the *flickr.photos.geo.setLocation* method.
+
+    The coordinates are "calculated" because not every location in the
+    FireEagle hierarchy has a centroid. If no centroid is present then the
+    node's bounding box is used and the centroid is assumed to be the center
+    of the box. The photo's "accuracy" (in Flickr terms) is determined
+    according to the node's place type.
+
+    Finally, the photo is uploaded (and geotagged if necessary).
+
+    No really.
+
+ERROR HANDLING
+    Flickr::Upload::FireEagle subclasses Error.pm to catch and throw
+    exceptions. Although this is still a mostly un-Perl-ish way of doing
+    things, it seemed like the most sensible way to handle the variety of
+    error cases. I don't love it but we'll see.
+
+    This means that the library will throw fatal exceptions and you will
+    need to code around it using either *eval* or - even better - *try* and
+    *catch* blocks.
+
+    There are four package specific exception handlers :
+
+    * FUFEException
+        An error condition specific to *Flickr::Upload::FireEagle* was
+        triggered.
+
+    * FlickrUploadException
+        An error condition specific to *Flickr::Upload* was triggered.
+
+    * FlickrAPIException
+        An error condition specific to calling the Flickr API (read :
+        *Flickr::API*) was triggered.
+
+        This is the only exception handler that defines its own additional
+        methods. They are :
+
+        * error_code
+            The numeric error code returned by the Flickr API.
+
+        * error_message
+            The textual error message returned by the Flickr API.
+
+    * NetFireEagleException
+        An error condition specific to *Net::FireEagle* was triggered.
+
+CAVEATS
+    *   Asynchronous uploads are not support and will trigger an exception.
+
+PACKAGE METHODS
+  __PACKAGE__->new(\%args)
+    All the same arguments required by the *Flickr::Upload* constructor plus
+    the following :
+
+    * fireeagle
+        A hash reference containing the following keys :
+
+        * consumer_key
+            String. *required*
+
+            A valid FireEagle consumer key.
+
+        * consumer_secret
+            String. *required*
+
+            A valid FireEagle consumer secret.
+
+        * access_token
+            String. *required*
+
+            A valid FireEagle access token.
+
+        * access_token_secret
+            String. *required*
+
+            A valid FireEagle access token secret.
+
+        * tagify
+            String.
+
+            An optional flag to format tags for cities, specific to a
+            service. Valid services are :
+
+            * delicious
+                City names are lower-cased and spaces are removed.
+
+            * flickr
+                City names are wrapped in double-quotes if they contain
+                spaces.
+
+            The default value is *flickr*
+
+    Returns a *Flickr::Upload::FireEagle* object.
+
+OBJECT METHODS YOU SHOULD CARE ABOUT
+  $obj->upload(%args)
+    Valid arguments are anything you would pass the Flickr::Upload *upload*
+    method except the *async* flag which is not honoured yet. I'm working on
+    it.
+
+    In additional, you may pass the following optional parameters :
+
+    * geo
+        This must be a hash reference with the following keys :
+
+        * perms
+            Hash reference.
+
+            A hash reference containing is_public, is_contact, is_family and
+            is_friend keys and their boolean values to set the geo
+            permissions on your uploaded photo.
+
+            If this is not defined then your default viewing settings for
+            geo data will be left in place.
+
+    * offset_gps
+        Int.
+
+        The maximum amount of time (in seconds) between the time of your
+        last FireEagle update and the date on which the photo was taken in
+        which a photo can be considered reliable for updating your location
+        in FireEagle.
+
+        The default is 3600 (seconds, or 1 hour).
+
+    * offset_fireeagle_exact
+        The maximum amount of time (in seconds) between the time of your
+        last FireEagle update and the date on which the photo was taken in
+        which FireEagle can be considered reliable for updating your
+        location in FireEagle at street level.
+
+        The default is 3600 (seconds, or 1 hour).
+
+    * offset_fireeagle_neighbourhood (or offset_fireeagle_neighborhood)
+        The maximum amount of time (in seconds) between the time of your
+        last FireEagle update and the date on which the photo was taken in
+        which FireEagle can be considered reliable for updating your
+        location in FireEagle at the neighbourhood level.
+
+        The default is 7200 (seconds, or 2 hours).
+
+    * offset_fireeagle_locality
+        The maximum amount of time (in seconds) between the time of your
+        last FireEagle update and the date on which the photo was taken in
+        which FireEagle can be considered reliable for updating your
+        location in FireEagle at the locality (city) level.
+
+        The default is 43200 (seconds, or 12 hours).
+
+    Returns a photo ID!
+
+VERSION
+    0.1
+
+DATE
+    $Date: 2008/04/22 07:01:19 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+NOTES
+    Aside from requiring your own Flickr API key, secret and authentication
+    token you will also need similar FireEagle (OAuth) credentials. Since
+    Flickr::Upload::FireEagle already requires that you install the
+    excellent *Net::FireEagle* you should just use the command line
+    *fireeagle* client for authorizing yourself with FireEagle.
+
+SEE ALSO
+    Net::FireEagle
+
+    Flickr::Upload
+
+    Flickr::Upload::Dopplr
+
+    Flickr::API
+
+    Error
+
+    <http://www.fireeagle.com/>
+
+    <http://fireeagle.yahoo.net/developer>
+
+    <http://laughingmeme.org/2008/01/18/flickr-place-ids/>
+
+    <http://oauth.net/>
+
+BUGS
+    Sure, why not.
+
+    Please report all bugs via http://rt.cpan.org/
+
+LICENSE
+    Copyright (c) 2007-2008 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

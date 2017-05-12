@@ -1,0 +1,7 @@
+#!/usr/local/bin/perl
+
+use Finance::HSHrates;
+
+@a = Finance::HSHrates::getrates();
+
+print "30 Year Fixed: $a[0]\nPoints: $a[1]\n15 Year Fixed: $a[2]\nPoints: $a[3]\n1-Year Adjustable: $a[4]\nPoints: $a[5]\n";

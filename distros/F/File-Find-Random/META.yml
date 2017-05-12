@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: File-Find-Random
+version: 0.5
+license: perl
+distribution_type: module
+requires:
+  Error: 0.15
+  File::Find: 1.04
+  perl: 5.6.0
+recommends: {}
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+conflicts: {}
+dynamic_config: 0
+provides:
+  Error::File::Find::Random:
+    file: lib/File/Find/Random.pm
+    version: ~
+  File::Find::Random:
+    file: lib/File/Find/Random.pm
+    version: 1
+generated_by: Module::Build version 0.18

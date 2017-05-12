@@ -1,0 +1,13 @@
+params:
+  user:
+    name: 'ユーザ'
+    nested: 'user'
+    validators:
+      - Blank#not_blank
+  user_array:
+    name: 'ユーザarray'
+    nested: 'user'
+    array: 1
+    validators:
+      - Blank#not_blank
+

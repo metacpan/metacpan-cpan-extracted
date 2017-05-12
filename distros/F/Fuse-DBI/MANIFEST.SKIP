@@ -1,0 +1,6 @@
+.svn/
+blib/
+Makefile
+Makefile.old
+t/.svn/
+pm_to_blib

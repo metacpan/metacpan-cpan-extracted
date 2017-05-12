@@ -1,0 +1,87 @@
+Revision history for Perl extension File::Flat.
+
+1.04 Mon 24 Mar 2008
+	- Removing dependency on File::Slurp
+
+1.03 Sat  1 Mar 2008
+	- Incremental release to clear out some CPAN Testers failures
+	- No need to upgrade
+
+1.02 Tue 11 Dec 2007
+	- Cygwin is clearly insane, skip root and win32 test sets
+	- More aggressive dependencies, particularly on Win32
+
+1.01 Tue 11 Dec 2007
+	- No functional changes
+	- Correcting dependency
+	- Updating to Module::Install 0.68
+	- Updating bundled tests
+
+1.00 Sun 14 Jan 2007
+	- FINALLY completed full functionality on Win32
+
+0.96 Wed 19 Jul 2006
+	- Moving from CVS to new SVN repository
+	- Upgrading to Module::Install
+
+0.95 Sat Nov  7 2004
+	- More cached stats
+	- Using prefork.pm to preload File:: modules in forking scenarios
+
+0.94 Tue Sep  5 2004
+	- After discovering CVS Monitor was using a private method, and now
+	  breaks, added an alias back in. No user-visible changes.
+
+0.93 Tue Sep 29 2004
+	- Broke out API tests to use proper Test::ClassAPI testing
+	- Removed use of, bundling of, and direct dependency on Class::Inspector
+	- Added general support for pruning
+	- Added File::Flat::prune static method
+	- Added File::Flat::Object::prune instance method
+	- Added full unit testing for the prune methods
+	- Added full POD for the methods, and $AUTO_PRUNE
+	- Added fixes or workarounds to resolve a number of warnings
+	- Moved Makefile.PL to a Module::Install-based one
+
+0.92 Mon Jul 26 2004
+	- Converting to use File::Slurp where appropriate
+	- Upgraded dependencies to the new File::Spec version of File::Remove
+	- Updated dependency list
+
+0.91 Tue Oct 14 19:31 2003
+	- Instead of letting File::Spec->rel2abs contantly do slow forking
+	  Cwd::_backtick_pwd calls constantly. Use the faster Cwd::getcwd
+	  FIRST, and pass it to rel2abs as the $base value.
+
+0.9  Fri Jul 25 21:00:12 2003
+	- Following prompting from Schwern, implemented a bunch of
+	  test related changes, to try and get File::Flat to build/test/run
+	  on non-Unix platforms.
+
+0.8  Wed May 07 00:56:21 2003
+	- Bug in the test script, fixed
+
+0.7  Tue May 06 23:58:54 2003
+	- IO::File cannot be autoloaded. Always load it
+
+0.6  Sun Dec 08 23:24:15 2002
+	- Fixes a bug where the tests will fail is run as root
+
+0.5  Thu Nov 28 15:19:32 2002
+	- Fixed a bug that caused large amounts of warnings to be
+	  generated when ->canWrite, ->write, ->makeDirectory was used.
+
+0.4  Fri Nov 22 14:38:23 2002
+	- Fixed a significant bug in makeDirectory
+
+0.3  Wed Nov 20 14:21:54 2002
+	- Added Class::Autouse to Makefile
+
+0.2  Mon Nov 18 15:37:23 2002
+	- Completed main method set
+	- Added full testing suite ( 73% coverage )
+	- Added documentation
+
+0.1  Thu May 23 21:01:52 2002
+	- original version
+

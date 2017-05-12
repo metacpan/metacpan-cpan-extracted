@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/trash
+lib/File/Trash.pm
+t/00.t
+t/01_untrash.t
+t/02.t
+t/99_cleanup.t
+META.yml                                 Module meta-data (added by MakeMaker)

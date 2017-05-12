@@ -1,0 +1,33 @@
+Package: 9fonts
+Version: 1-4
+Priority: optional
+Section: x11
+Maintainer: Karl Sackett <krs@debian.org>
+Depends: elf-x11r6lib
+Architecture: all
+Filename: stable/binary-i386/x11/9fonts_1-4.deb
+msdos-filename: stable/msdos-i386/x11/9fonts.deb
+Size: 1052654
+MD5sum: 7df4d447321728f9fb13d1be3b2c72ea
+Description: libXg UTF fonts for X
+ The libXg fonts contain Unicode characters encoded using UTF-2 (UTF-FSS).
+ Applications like sam, 9term, and wily can use these fonts to display
+ and edit files with Unicode characters.
+installed-size: 3465
+
+Package: 9menu
+Version: 1.4-6
+Priority: optional
+Section: x11
+Maintainer: Karl Sackett <krs@debian.org>
+Depends: elf-x11r6lib, libc5 (>= 5.4.7-3)
+Architecture: i386
+Filename: stable/binary-i386/x11/9menu_1.4-6.deb
+msdos-filename: stable/msdos-i386/x11/9menu.deb
+Size: 9058
+MD5sum: b48cb642ed71f0c6bd1a6389f33eeee5
+Description: Creates X menus from the shell.
+ This is 9menu, a simple program that allows you to create X menus from
+ the shell, where each menu item will run a command. 9menu is intended
+ for use with 9wm, but can be used with any other window manager.
+installed-size: 25

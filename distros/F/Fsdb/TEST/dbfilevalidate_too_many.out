@@ -1,0 +1,8 @@
+#fsdb sid cid
+1	10
+2	11	extrafield
+# *** line above has 1 extra column.
+1	12
+2	12
+# *** dbfilevalidate: some lines had errors.
+#   | dbfilevalidate

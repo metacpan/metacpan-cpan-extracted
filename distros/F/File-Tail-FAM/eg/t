@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+###########################################
+# xx -- 
+# Mike Schilli, 2005 (m@perlmeister.com)
+###########################################
+use strict;
+use Log::Log4perl qw(:easy);
+use Sysadm::Install qw(:all);
+
+Log::Log4perl->easy_init({
+    level  => $DEBUG,
+    layout => "%F{1}-%L: %m%n",
+});
+
+use File::Tail::FAM;
+
+my $t = File::Tail::FAM->new(file => "/tmp/abc" );
+
+while(1) {
+    print "Foo\n";
+    if(defined( my $data = $t->read_nonblock() )) {
+        print "New data available: ", $data, "\n";
+    } else {
+        print "No change\n";
+    }
+
+    print "Bar\n";
+    sleep 5;
+}
+
+__END__
+while(defined( my $data = $t->read())) {
+    print "data=[$data]\n";
+}
+
+print "end\n";
+
+__END__
+    my $modified = $t->changed();
+    if($modified) {
+        print "Modified!\n";
+    } 
+    sleep 5;
+}

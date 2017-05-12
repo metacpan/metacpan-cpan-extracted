@@ -1,0 +1,160 @@
+2009-11-14 12:42  cvs
+
+	* lib/File/PathInfo.pm, lib/File/PathInfo.pod, t/0_fpi.t: made sure
+	  that set() returns abs path resolved to resource
+
+2009-08-29 20:01  cvs
+
+	* Changes, File-PathInfo-1.08.tar.gz, File-PathInfo-1.09.tar.gz,
+	  File-PathInfo-1.12.tar.gz, File-PathInfo-1.13.tar.gz,
+	  File-PathInfo-1.15.tar.gz, File-PathInfo-1.17.tar.gz,
+	  File-PathInfo-1.19.tar.gz, MANIFEST, META.yml, Makefile.PL,
+	  README, lib/File/PathInfo.pm: Made sure perl gpl license shows.
+	  Cleaned up docs.  Added README and Changes file.  Made sure
+	  dependencies properly show up.
+
+	  Made sure Makefile.PL will conk out if os is windows like.
+
+2008-10-11 22:25  cvs
+
+	* lib/File/PathInfo.pm: made sure calling errstr() can be for set
+	  also as well as get
+
+2007-05-06 19:53  cvs
+
+	* File-PathInfo-1.15.tar.gz, lib/File/PathInfo.pm: made tweaks
+
+2007-05-06 19:47  cvs
+
+	* META.yml, lib/File/PathInfo.pm: made it so 516 doesnt crash up
+	  when DOC ROOT is not set
+
+2007-05-03 11:11  cvs
+
+	* lib/File/PathInfo.pm: changes
+
+2007-04-06 18:21  cvs
+
+	* File-PathInfo-1.13.tar.gz: added dist
+
+2007-04-06 18:20  cvs
+
+	* lib/File/PathInfo.pm: changed things
+
+2007-04-06 18:15  cvs
+
+	* t/2.t: took out test
+
+2007-04-06 18:14  cvs
+
+	* Makefile.PL: tweaked
+
+2007-03-27 18:46  cvs
+
+	* File-PathInfo-1.12.tar.gz: added dist
+
+2007-03-22 17:53  cvs
+
+	* lib/File/PathInfo.pm, t/0_fpi.t, t/1_fpi_hash.t: took out meta..
+	  putting in File::PathInfo::Ext instead
+
+2007-03-21 17:49  cvs
+
+	* lib/File/PathInfo.pm, t/2.t: working on meta
+
+2007-03-21 17:44  cvs
+
+	* t/2.t: added test
+
+2007-03-21 17:43  cvs
+
+	* lib/File/PathInfo.pm, t/0_fpi.t: added meta and reduced usage to
+	  one stat only
+
+2007-03-16 13:09  cvs
+
+	* File-PathInfo-1.09.tar.gz, META.yml: added dist
+
+2007-03-16 13:07  cvs
+
+	* lib/File/PathInfo.pm, t/0_fpi.t, t/1_fpi_hash.t: made changes so
+	  it wont freak out when smart::comment appears, took it out
+
+2007-02-07 14:45  cvs
+
+	* File-PathInfo-1.07.tar.gz, File-PathInfo-1.08.tar.gz, META.yml:
+	  added updated distro
+
+2007-02-07 14:44  cvs
+
+	* File-PathInfo-1.07.tar.gz, lib/File/PathInfo.pm, t/1_fpi_hash.t:
+	  will not freak out if file is not in doc root
+
+2007-02-06 12:22  cvs
+
+	* File-PathInfo-1.07.tar.gz: addded 1.0.7 ver
+
+2007-02-06 12:21  cvs
+
+	* File-PathInfo-1.01.tar.gz, File-PathInfo-1.02.tar.gz,
+	  File-PathInfo-1.06.tar.gz, META.yml: new dist 07
+
+2007-02-06 12:20  cvs
+
+	* File-PathInfo-1.06.tar.gz, lib/File/PathInfo.pm, t/1_fpi_hash.t:
+	  working nice
+
+2006-12-20 12:35  cvs
+
+	* File-PathInfo-1.06.tar.gz, META.yml: added dist
+
+2006-12-20 12:34  cvs
+
+	* lib/File/PathInfo.pm, t/0_fpi.t: added test for not on disk and
+	  nicer carp
+
+2006-12-20 12:19  cvs
+
+	* lib/File/PathInfo.pm: fixed error where if file did not exist, it
+	  kept goig to try to match abs loc and ans filename, but there was
+	  nothing there so it died whenever a file being asked for was not
+	  there
+
+2006-12-19 12:51  cvs
+
+	* META.yml: added META.yml
+
+2006-12-19 12:50  cvs
+
+	* lib/File/PathInfo.pm: added severe confess on failure, very
+	  helpful
+
+2006-12-19 12:30  cvs
+
+	* lib/File/PathInfo.pm: made pod improvs
+
+2006-12-18 14:25  cvs
+
+	* File-PathInfo-1.02.tar.gz, META.yml: added dist
+
+2006-12-18 14:21  cvs
+
+	* lib/File/PathInfo.pm: had a bug, if the filename did not have
+	  extension, then 'filename_only()' was not returning
+
+2006-12-08 12:52  cvs
+
+	* File-PathInfo-1.01.tar.gz, MANIFEST, META.yml, Makefile.PL,
+	  lib/File/PathInfo.pm, t/0_fpi.t, t/1_fpi_hash.t,
+	  t/public_html/.hidden_file.txt, t/public_html/house.txt,
+	  t/public_html/oake.jpg, t/public_html/demo/civil.txt,
+	  t/public_html/demo/hellokitty.gif: Initial revision
+
+2006-12-08 12:52  cvs
+
+	* File-PathInfo-1.01.tar.gz, MANIFEST, META.yml, Makefile.PL,
+	  lib/File/PathInfo.pm, t/0_fpi.t, t/1_fpi_hash.t,
+	  t/public_html/.hidden_file.txt, t/public_html/house.txt,
+	  t/public_html/oake.jpg, t/public_html/demo/civil.txt,
+	  t/public_html/demo/hellokitty.gif: init stable import
+

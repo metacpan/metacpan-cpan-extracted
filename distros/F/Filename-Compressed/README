@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Filename::Compressed qw(check_compressed_filename);
+     my $res = check_compressed_filename(filename => "foo.txt.gz");
+     if ($res) {
+         printf "File is compressed with %s, uncompressed name: %s\n",
+             $res->{compressor_name},
+             $res->{uncompressed_filename};
+     } else {
+         print "File is not compressed\n";
+     }
+
+DESCRIPTION
+
+SEE ALSO
+
+    Filename::Archive
+

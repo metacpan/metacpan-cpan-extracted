@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+t/Flame-Palette.t
+lib/Flame/Palette.pm

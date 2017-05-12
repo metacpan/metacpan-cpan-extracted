@@ -1,0 +1,18 @@
+
+This directory contains example scripts demonstrating how to use the FLTK
+Perl module. Here is a quick summary of what each example is:
+
+  hello.pl      - The ubiquitous Hello World.
+  boxtypes.pl   - The boxtypes demo from FLTK redone in Perl.
+  browser.pl    - The browser demo from FLTK redone in Perl.
+  buttons.pl    - The buttons demo from FLTK redone in Perl.
+  fonts.pl      - Simple example demonstrating font usage.
+  input.pl      - The input demo from FLTK redone in Perl.
+  label.pl      - The label demo from FLTK redone in Perl.
+  menu.pl       - Very short example of a menu.
+  pack.pl       - The pack demo from FLTK redone in Perl.
+  radio.pl      - The radio demo from FLTK redone in Perl.
+  tabs.pl       - The tabs demo from FLTK redone in Perl.
+  tile.pl       - The tile demo from FLTK redone in Perl.
+  viewer.pl     - A simple Text Editor demo that syntax highlights Perl code.
+

@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Finance/NASDAQ/CookBook.pod
+lib/Finance/NASDAQ/Markets.pm
+t/Finance-NASDAQ-Markets.t

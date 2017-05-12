@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.23.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 35c8c3c54dcd4b29ffc5fcc57fe1d8d26377440f Changes
+SHA1 589dabefdc4a9d947c4f9a94c589440b6c16404c MANIFEST
+SHA1 07da0be359c26e3a4bb239422c2fe9be4c23a689 META.yml
+SHA1 f78c119221bd540d1d3b51ee2ccbf5d7676197e0 Makefile.PL
+SHA1 b6d626aff40e3fb224c78f30ea5c54b256d5e365 README
+SHA1 38427cbc539703b2f64088a59d6896c062d2dcd9 lib/Finance/Bank/Fubon/TW.pm
+SHA1 9ae3c64582959a672adb6372bbdbcdba65daa388 t/0-signature.t
+SHA1 9650159289b31b3c4870273376635dda7611bd6f t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (FreeBSD)
+
+iD8DBQE+xrpDtLPdNzw1AaARAiS7AKC35x+QpOBMEWTt3YE1p6yT3XGzrACfR1Mi
+WR3Q+UUESasdDFg3VBfCTcQ=
+=qmRs
+-----END PGP SIGNATURE-----

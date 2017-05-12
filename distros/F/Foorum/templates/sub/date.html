@@ -1,0 +1,18 @@
+[% USE date %]
+
+[% MACRO date_format(intime, fmt) BLOCK;
+
+    UNLESS fmt;
+        fmt = '%Y-%m-%d %I:%M:%S';
+    END;
+    IF c.config.timezonediff;
+        intime = intime + c.config.timezonediff;
+    END;
+
+    IF intime == '-' OR intime <= 0;
+        intime;
+    ELSE;
+        date.format(intime, format => fmt);
+    END;
+
+END; %]

@@ -1,0 +1,9 @@
+#fsdb name id test1 percentile
+c	3	65	1
+b	2	70	0.83333
+e	5	70	0.83333
+a	1	80	0.5
+d	4	90	0.33333
+f	6	90	0.33333
+#  | dbsort -n test1
+#   | dbcolpercentile -S --ascending test1

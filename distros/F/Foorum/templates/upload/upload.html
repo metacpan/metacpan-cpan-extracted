@@ -1,0 +1,24 @@
+[% USE Math %]
+
+[% upload_id = upload.upload_id;
+   filetype  = upload.filetype;
+   dir1 = upload_id / 3200 / 3200;
+   dir1 = Math.int(dir1);
+   dir2 = upload_id / 3200;
+   dir2 = Math.int(dir2);
+%]
+
+<div class='attachment'>
+[% IF filetype == 'jpg' OR filetype == 'jpeg' OR filetype == 'gif' OR filetype == 'gif' %]
+
+[% global_has_photos = 1 %][%# refer comment/show.html %]
+
+<a href="[% c.config.dir.upload %]/[% dir1 _ '/' _ dir2 _ '/' _ upload.filename %]" target='_blank'><img src='[% c.config.dir.upload %]/[% dir1 _ '/' _ dir2 _ '/' _ upload.filename %]' /></a>
+
+[% ELSE %]
+
+We have <a href="[% c.config.dir.upload %]/[% dir1 _ '/' _ dir2 _ '/' _ upload.filename %]">[% upload.filename %]</a> attached.
+
+[% END %]
+</div>
+<p></p>

@@ -1,0 +1,74 @@
+<html>
+<head>
+<title>Tutorial1</title>
+<link type="text/css" rel="stylesheet" href="static/d_20071112.css" />
+<!--[if IE]>
+<link type="text/css" rel="stylesheet" href="static/d_ie.css" />
+<![endif]--> 
+</head>
+<body class="t6">
+<div id="wikicontent">
+<h1> NAME </h1><p>Foorum::Manual::Tutorial1 - Tutorial 1: Catalyst Plugins used in Foorum</p><h2> Config::YAML </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Config::YAML::XS" rel="nofollow">Catalyst::Plugin::Config::YAML::XS</a></p><p>Why we are using Config::YAML::XS instead ConfigLoader is under a simple <a href="RULES.html">RULES</a>, Fast is better.</p><h2> Static::Simple </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Static::Simple" rel="nofollow">Catalyst::Plugin::Static::Simple</a></p><p>I think I need let Static::Simple be configurable later. because it's better let Apache handles static contents.</p><h2> Authentication </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Authentication" rel="nofollow">Catalyst::Plugin::Authentication</a></p><p>Authentication is a important part in Foorum. viacheslav.t suggests</p><blockquote>Another thing that i am concerned about is a way how to plug-in your forum to an
+existing Cat application. For example i have my own user infrastructure and
+registration, banning, blocking system (some things are borrowed from your code
+;-)...
+</blockquote><p>I'm strongly agree with him. so we will rewrite this part later.</p><p>but for now. in foorum.yml</p><pre class="prettyprint">authentication:
+  default_realm: 'members'
+  password_hash_type: "SHA-1"
+  realms:
+    members:
+      credential:
+        class: 'Password'
+        password_field: 'password'
+        password_type: "hashed"
+        password_hash_type: "SHA-1"
+      store:
+        class: 'FromSub::Hash'
+        model_class: "UserAuth"
+</pre><p>here we are using Credential::Password and a Store::FromSub::Hash.</p><p>I must admit that FromSub::Hash is not good enough. but it doesn't hit database every request for $c-&gt;user. Store::DBIC is nice yet our Model/User.pm sub get is returning a cached user hash. so we use FromSub::Hash.</p><h2> Cache </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Cache" rel="nofollow">Catalyst::Plugin::Cache</a></p><p>before we use Catalyst::Plugin::Cache::Memcached, but that's not so flexiable. so we turn to use Catalyst::Plugin::Cache. the configuration in foorum.yml is:</p><pre class="prettyprint">cache:
+  backends:
+    default:
+      class: 'Cache::FileCache'
+      namespace: 'Foorum'
+      default_expires_in: 600
+</pre><p>meanwhile, we can use Memcached:</p><pre class="prettyprint">cache:
+  backends:
+    default:
+      class: Cache::Memcached
+      compress_threshold: 10_000
+      debug: 0
+      servers:
+        - 127.0.0.1:11211
+</pre><h2> Session::DynamicExpiry </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Session::DynamicExpiry" rel="nofollow">Catalyst::Plugin::Session::DynamicExpiry</a></p><p>for the "Remember Me?".</p><h2> Session </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Session" rel="nofollow">Catalyst::Plugin::Session</a></p><p>that's pretty normal here. we use DBIC and Cookie. no URI since that's bad.</p><h2> I18N </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::I18N" rel="nofollow">Catalyst::Plugin::I18N</a></p><p>check Foorum/I18N/cn.po and tw.po then u can write one for your own. that's easy!</p><h2> FormValidator::Simple </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::FormValidator::Simple" rel="nofollow">Catalyst::Plugin::FormValidator::Simple</a></p><p>we are going to HTML::FormFu.</p><h2> Captcha </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::Captcha" rel="nofollow">Catalyst::Plugin::Captcha</a></p><pre class="prettyprint">captcha:
+  session_name: captcha_string
+  new:
+    width: 80
+    height: 30
+    lines: 1
+    gd_font: giant
+  create:
+    - normal
+    - rect
+  particle:
+    - 100
+  out:
+    force: jpeg
+</pre><h2> PageCache </h2><p><a href="http://search.cpan.org/perldoc?Catalyst::Plugin::PageCache" rel="nofollow">Catalyst::Plugin::PageCache</a></p><p>it's configurable. u can disable by set</p><pre class="prettyprint">function_on:
+  maintain: 0
+  register: 1
+  create_forum: 1
+  scraper: 0
+  page_cache: 0
+</pre><p>when page_cache: 1, it will be enabled.</p><h1> SEE ALSO </h1><p><a href="I18N.html">I18N</a>, <a href="Configure.html">Configure</a>, <a href="Tutorial2.html">Tutorial2</a>, <a href="Tutorial3.html">Tutorial3</a>, <a href="Tutorial4.html">Tutorial4</a>, <a href="Tutorial5.html">Tutorial5</a></p>
+</div>
+<h1>WHERE TO GO NEXT</h1>
+<ul>
+<li>Get the lastest version from <a href="http://code.google.com/p/foorum/wiki/Tutorial1">http://code.google.com/p/foorum/wiki/Tutorial1</a></li>
+<li><a href="index.html">Index Page</a></li>
+</ul>
+<script src="static/prettify.js"></script>
+<script>
+ prettyPrint();
+</script>
+</body>
+</html>

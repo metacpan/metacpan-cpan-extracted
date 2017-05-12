@@ -1,0 +1,245 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+rrr-server - watch a tree and continuously update indexfiles
+
+=head1 SYNOPSIS
+
+  rrr-server [options] principalfile
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--verbose|v+>
+
+More feedback.
+
+=back
+
+=head1 DESCRIPTION
+
+After you have setup a tree watch it with inotify and keep it
+uptodate. Depends on inotify which probably only exists on linux.
+
+=head1 PREREQUISITE
+
+Linux::Inotify2.
+
+It is not declared as prerequisites of the F:R:M:Recent package
+because server side handling is optional. XXX Todo: make server side
+handling a separate package so we can declare Inotify2 as prereq.
+
+=cut
+
+use strict;
+use warnings;
+
+use File::Find qw(find);
+use File::Rsync::Mirror::Recent;
+use File::Spec;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+use Time::HiRes qw(time);
+
+our %Opt;
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(1);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (@ARGV != 1) {
+    pod2usage(1);
+}
+
+sub my_inotify {
+    my($inotify, $directory) = @_;
+    unless ($inotify->watch
+        (
+         $directory,
+         IN_CLOSE_WRITE()
+         |IN_MOVED_FROM()
+         |IN_MOVED_TO()
+         |IN_CREATE()
+         |IN_DELETE()
+         |IN_DELETE_SELF()
+         |IN_MOVE_SELF()
+        )) {
+        # or die "watch creation failed: $!";
+        if ($!{ENOSPC}) {
+            die "Alert: ENOSPC reached, probably your system needs to increase the amount of inotify watches allowed per user via '/proc/sys/fs/inotify/max_user_watches'\n";
+        } else {
+            for my $err (qw(ENOENT EBADF EEXIST)) {
+                if ($!{$err}) {
+                    warn "$err encountered on '$directory'. Giving up on this watch, trying to continue.\n" if $Opt{verbose};
+                    return;
+                }
+            }
+            die "Alert: $!";
+        }
+    }
+}
+
+sub handle_file {
+    my($rf,$fullname,$type,$batch) = @_;
+    push @$batch, {path => $fullname, type => $type};
+}
+
+sub newdir {
+    my($inotify,$rf,$fullname,$batch) = @_;
+    return if -l $fullname;
+    my_inotify($inotify, $fullname);
+    # immediately inspect it, we certainly have missed the first
+    # events in this directory
+    opendir my $dh, $fullname or return;
+    for my $dirent (readdir $dh) {
+        next if $dirent eq "." || $dirent eq "..";
+        my $abs = File::Spec->catfile($fullname,$dirent);
+        if (-l $abs || -f _) {
+            warn "[..:..:..] Readdir_F  $abs\n" if $Opt{verbose};
+            handle_file($rf,$abs,"new",$batch);
+        } elsif (-d $abs) {
+            warn "[..:..:..] Readdir_D  $abs\n" if $Opt{verbose};
+            newdir($inotify,$rf,$abs,$batch);
+        }
+    }
+}
+
+sub handle_event {
+    my($inotify,$rf,$ev,$batch) = @_;
+    my @stringifiedmask;
+    for my $watch (
+                   "IN_CREATE", "IN_CLOSE_WRITE", "IN_MOVED_TO", # new
+                   "IN_DELETE", "IN_MOVED_FROM",            # delete
+                   "IN_DELETE_SELF", "IN_MOVE_SELF",        # self
+                  ) {
+        if ($ev->$watch()){
+            push @stringifiedmask, $watch;
+            # new directories must be added to the watches, deleted
+            # directories deleted; moved directories both
+        }
+    }
+    my $rootdir = $rf->localroot;
+    # warn sprintf "rootdir[$rootdir]time[%s]ev.w.name[%s]ev.name[%s]ev.fullname[%s]mask[%s]\n", time, $ev->w->name, $ev->name, $ev->fullname, join("|",@stringifiedmask);
+    my $ignore = 0;
+    if ($ev->w->name eq $rootdir) {
+        my $meta = $rf->meta_data;
+        my $ignore_rx = qr((?x: ^ \Q$meta->{filenameroot}\E - [0-9]*[smhdWMQYZ] \Q$meta->{serializer_suffix}\E ));
+        if ($ev->name =~ $ignore_rx) {
+            # warn sprintf "==> Ignoring object in rootdir looking like internal file: %s", $ev->name;
+            $ignore++;
+        }
+    }
+    unless ($ignore) {
+        my $fullname = $ev->fullname;
+        my($reportname) = $fullname =~ m{^\Q$rootdir\E/(.*)};
+        my $time = sprintf "%02d:%02d:%02d", (localtime)[2,1,0];
+        if (0) {
+        } elsif ($ev->IN_Q_OVERFLOW) {
+            $rf->_requires_fsck(1);
+        } elsif ($ev->IN_DELETE || $ev->IN_MOVED_FROM) {
+            # we don't know whether it was a directory, we simply pass
+            # it to $rf. $rf must be robust enough to swallow bogus
+            # deletes. Alternatively we could look into $rf whether
+            # this object is known, couldn't we?
+            handle_file($rf,$fullname,"delete",$batch);
+            warn "[$time] Deleteobj  $reportname (@stringifiedmask)\n" if $Opt{verbose};
+        } elsif ($ev->IN_DELETE_SELF || $ev->IN_MOVE_SELF) {
+            $ev->w->cancel;
+            warn "[$time] Delwatcher $reportname (@stringifiedmask)\n" if $Opt{verbose};
+        } elsif (-l $fullname) {
+            handle_file($rf,$fullname,"new",$batch);
+            warn "[$time] Updatelink $reportname (@stringifiedmask)\n" if $Opt{verbose};
+        } elsif ($ev->IN_ISDIR) {
+            newdir($inotify,$rf,$fullname,$batch);
+            warn "[$time] Newwatcher $reportname (@stringifiedmask)\n" if $Opt{verbose};
+        } elsif (-f _) {
+            if ($ev->IN_CLOSE_WRITE || $ev->IN_MOVED_TO) {
+                handle_file($rf,$fullname,"new",$batch);
+                warn "[$time] Updatefile $reportname (@stringifiedmask)\n" if $Opt{verbose};
+            }
+        } else {
+            warn "[$time] Ignore     $reportname (@stringifiedmask)\n" if $Opt{verbose};
+        }
+    }
+}
+
+sub init {
+    my($inotify, $rootdir) = @_;
+    foreach my $directory ( File::Find::Rule->new->directory->not( File::Find::Rule->new->symlink )->in($rootdir) ) {
+        my_inotify($inotify, $directory);
+    }
+
+}
+
+# Need also to verify that we watch all directories we encounter.
+sub fsck {
+    my($rf) = @_;
+    0 == system $^X, "-Ilib", "bin/rrr-fsck", $rf->rfile, "--verbose" or die;
+}
+
+MAIN: {
+    my($principal) = @ARGV;
+    $principal = File::Spec->rel2abs($principal);
+    my $recc = File::Rsync::Mirror::Recent->new
+        (local => $principal);
+    my($rf) = $recc->principal_recentfile;
+    my $rootdir = $rf->localroot;
+    for my $req (qw(Linux::Inotify2 File::Find::Rule)) {
+        eval qq{ require $req; 1 };
+        if ($@) {
+            die "Failing on 'require $req': $@"
+        } else {
+            $req->import;
+        }
+    }
+
+    my $inotify = new Linux::Inotify2
+        or die "Unable to create new inotify object: $!";
+
+    init($inotify, $rootdir);
+    fsck($rf);
+    my $last_aggregate_call = 0;
+
+    while () {
+        my @events = $inotify->read;
+        unless ( @events > 0 ) {
+            print "Alert: inotify read error: $!";
+            last;
+        }
+        my @batch;
+        foreach my $event (@events) {
+            handle_event($inotify,$rf,$event,\@batch);
+        }
+        $rf->batch_update(\@batch) if @batch;
+        if (time > $last_aggregate_call + 60) { # arbitrary
+            $rf->aggregate;
+            $last_aggregate_call = time;
+        }
+        if ($rf->_requires_fsck) {
+            fsck($rf);
+            $rf->_requires_fsck(0);
+        }
+    }
+}
+
+__END__
+
+
+# Local Variables:
+# mode: cperl
+# coding: utf-8
+# cperl-indent-level: 4
+# End:

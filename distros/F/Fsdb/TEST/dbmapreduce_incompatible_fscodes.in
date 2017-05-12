@@ -1,0 +1,6 @@
+#fsdb -F S experiment duration
+ufs mab sys  37.2
+ufs mab sys  37.3
+ufs rcp real  264.5
+ufs rcp real  277.9
+# test trailing comment

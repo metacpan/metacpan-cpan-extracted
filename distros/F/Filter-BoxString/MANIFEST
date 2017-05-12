@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/lib/Filter/BoxString/02filter.t
+t/lib/Filter/BoxString/03filter.t
+t/lib/Filter/BoxString/04filter.t
+t/lib/Filter/BoxString/05filter.t
+t/lib/Filter/BoxString/06filter.t
+t/lib/Filter/BoxString/00filter.t
+t/lib/Filter/BoxString/01filter.t
+lib/Filter/BoxString.pm

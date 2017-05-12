@@ -1,0 +1,11 @@
+0.03 Wed Apr  9 2014 Pavel Shaydo <zwon@cpan.org>
+    - fix test
+    - add caveats section to documentation
+
+0.02 Tue Mar 25 2014 Pavel Shaydo <zwon@cpan.org>
+    - fix dependencies versions
+    - work with perls before 5.10
+
+0.01 Sat Mar 22 2014 Pavel Shaydo <zwon@cpan.org>
+    - First version, released on an unsuspecting world.
+

@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/File/Parser/Role.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00.load.t
+t/test_data/some_file_binary.data
+t/test_data/some_file_latin1.txt
+t/test_data/some_file_utf8.txt
+t/oddities.t
+t/constructor.t
+t/constructor_args.t
+t/test_BUILD.t
+t/lib/TestClassWithBuild.pm
+t/lib/TestClass.pm
+META.yml
+META.json

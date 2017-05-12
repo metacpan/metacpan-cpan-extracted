@@ -1,0 +1,725 @@
+NAME
+    File::Maker - mimics a make by loading a database and calling targets
+    methods
+
+SYNOPSIS
+     #####
+     # Subroutine interface
+     #
+     use File::Maker qw(load_db);
+
+     \%data = load_db($pm);
+
+     ######
+     # Object interface
+     #
+     require File::Maker;
+
+     $maker = $maker->load_db($pm);
+
+     $maker->make_targets(\%targets, @targets, \%options ); 
+     $maker->make_targets(\%targets, \%options  ); 
+
+     $maker = new File::Maker(@options);
+
+    Generally, if a subroutine will process a list of options, "@options",
+    that subroutine will also process an array reference, "\@options",
+    "[@options]", or hash reference, "\%options", "{@options}". If a
+    subroutine will process an array reference, "\@options", "[@options]",
+    that subroutine will also process a hash reference, "\%options",
+    "{@options}". See the description for a subroutine for details and
+    exceptions.
+
+DESCRIPTION
+    When porting low level C code from one architecture to another,
+    makefiles do provide some level of automation and save some time.
+    However, once Perl or another high-level language is up and running, the
+    high-level language usually allows much more efficient use of
+    programmers time; otherwise, whats point of the high-level language.
+    Thus, makes great economically sense to switch from makefiles to
+    high-level language.
+
+    The "File::Maker" program module provides a "make" style interface as
+    shown in the herein above. The "@targets" contains a list of targets
+    that mimics the targets of a "makefile". The targets are subroutines
+    written in Perl in a separate program module from the "File::Maker". The
+    separate target program module inherits the methods in the "File::Maker"
+    program module as follows:
+
+     use File::Maker;
+     use vars qw( @ISA );
+     @ISA = qw(File::Maker);
+
+    The "File::Maker" methods will then find the target subroutines in the
+    separate target program module.
+
+    The "File::Maker" provides for the loading of a hash from a program
+    module to provide for the capabilities of "defines" in a "makefile". The
+    option "pm =" $file> tells "File::Maker" to load a database from the
+    __DATA__ section of a program module that is in the Tie::Form format.
+    The "Tie::Form" format is a very flexible lenient format that is about
+    as close to a natural language form and still have the precision of
+    being machine readable. This provides a more flexible alternative to the
+    defines in a "makefile". The define hash is in a separate, very flexible
+    form program module. This arrangement allows one target program module
+    that inherits the "File::Maker" program module to produce as many
+    different outputs as there are Tie::Form program modules.
+
+METHODS
+  load_db
+
+     \%data = load_db($pm);
+     $maker = $maker->load_db($pm);
+
+    The "load_db" subroutine loads the "__DATA__" of "$pm" using "Tie::Form"
+    progrma module. The results are return as a hash. If called as a object,
+    the objec "$maker" have hash data. The return keys are as follows:
+
+     key              description
+     -------------------------------------------------------------- 
+     FormDB_File      the absoute file of $pm
+     FormDB_PM        $pm
+     FormDB_Record    __DATA__ section of $pm
+     FormDB           ordered name,value pairs of __DATA__ section
+
+  make_targets
+
+     $maker->make_targets(\%targets, @targets); 
+     $maker->make_targets(\%targets, @targets, \%options); 
+
+     $maker->make_targets(\%targets); 
+     $maker->make_targets(\%targets, \%options);
+
+    The "make_targets" subroutine executes the "@targets" in order after
+    substituing an expanded list "$target[$targets[$i]}" list if it exists,
+    as follows:
+
+     $result = $self->$target[$i]( @args )  
+
+    The "@args" do not exists unless the "$taget[$i]" is itself an array
+    reference in which case the "make_targets" subroutine assumes the array
+    referenced is
+
+     [$target, @args]
+
+    The return "$result" may be a reference to an object, usually the same
+    class as the original $result, or a "$success" flag of 1 or undef. If
+    "$result" is a reference, the "make_targets" subroutine will set <$self>
+    to the new object "$result". Thus, by returning an reference, a target
+    may pass data to the next targe or even change the class of "$self".
+
+  new
+
+     $maker = new File::Maker(@options);
+     $maker = new File::Maker(\@options);
+     $maker = new File::Maker(\%options);
+
+    The "new" subroutine returns an object whose object data is a hash
+    reference of "@options".
+
+REQUIREMENTS
+    Some day.
+
+DEMONSTRATION
+     #########
+     # perl Maker.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Package;
+         my $fp = 'File::Package';
+         my $loaded = '';
+
+         use File::SmartNL;
+         my $snl = 'File::SmartNL';
+
+         use File::Spec;
+
+         my @inc = @INC;
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package( '_Maker_::MakerDB' )
+     $errors
+
+     # ''
+     #
+     $snl->fin(File::Spec->catfile('_Maker_','MakerDB.pm'))
+
+     # '#!perl
+
+     # package  _Maker_::MakerDB;
+
+     # use strict;
+     # use warnings;
+     # use warnings::register;
+
+     # use vars qw($VERSION $DATE $FILE );
+     # $VERSION = '0.01';
+     # $DATE = '2004/05/10';
+     # $FILE = __FILE__;
+
+     # use File::Maker;
+     # use vars qw( @ISA );
+     # @ISA = qw(File::Maker);
+
+     # ######
+     # # Hash of targets
+     # #
+     # my %targets = (
+     #    all => [ qw(target1 target2) ],
+     #    target3 => [ qw(target1 target3) ],
+     #    target4 => [ qw(target1 target2 target4) ],
+     #    __no_target__ => [ qw(target3 target4 target5) ],
+     # );
+
+     # my $data = '';
+
+     # sub make
+     # {
+     #    my $self = shift @_;
+     #    $self->make_targets( \%targets, @_ );
+     #    my $result = $data;
+     #    $data = '';
+     #    $result
+     # }
+
+     # sub target1
+     # {
+     #   $data .= ' target1 ';
+     #   1
+     # }
+
+     # sub target2
+     # {
+     #   $data .= ' target2 ';
+     #   1
+     # }
+
+     # sub target3
+     # {
+     #   $data .= ' target3 ';
+     #   1
+     # }
+
+     # sub target4
+     # {
+     #   $data .= ' target4 ';
+     #   1
+     # }
+
+     # sub target5
+     # {
+     #   $data .= ' target5 ';
+     #   1
+     # }
+
+     # 1
+
+     #__DATA__
+
+     #Revision: -^
+     #End_User: General Public^
+     #Author: http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com^
+     #Version: ^
+     #Classification: None^
+
+     #~-~
+     #'
+     #
+
+     ##################
+     # No target
+     # 
+
+     my $maker = new _Maker_::MakerDB( pm => '_Maker_::MakerDB' )
+     $maker->make( )
+
+     # ' target1  target2 '
+     #
+
+     ##################
+     # FormDB_File
+     # 
+
+     $maker->{FormDB_File}
+
+     # 'E:\User\SoftwareDiamonds\installation\t\File\_Maker_\MakerDB.pm'
+     #
+
+     ##################
+     # FormDB_PM
+     # 
+
+     $maker->{FormDB_PM}
+
+     # '_Maker_::MakerDB'
+     #
+
+     ##################
+     # FormDB_Record
+     # 
+
+     $maker->{FormDB_Record}
+
+     # '
+
+     #Revision: -^
+     #End_User: General Public^
+     #Author: http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com^
+     #Version: ^
+     #Classification: None^
+
+     #~-~
+     #'
+     #
+
+     ##################
+     # FormDB
+     # 
+
+     $maker->{FormDB}
+
+     # [
+     #          'Revision',
+     #          '-',
+     #          'End_User',
+     #          'General Public',
+     #          'Author',
+     #          'http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com',
+     #          'Version',
+     #          '',
+     #          'Classification',
+     #          'None'
+     #        ]
+     #
+
+     ##################
+     # Target all
+     # 
+
+     $maker->make( 'all' )
+
+     # ' target1  target2 '
+     #
+
+     ##################
+     # Unsupport target
+     # 
+
+     $maker->make( 'xyz' )
+
+     # ' target3  target4  target5 '
+     #
+
+     ##################
+     # target3
+     # 
+
+     $maker->make( 'target3' )
+
+     # ' target1  target3 '
+     #
+
+     ##################
+     # target3 target4
+     # 
+
+     $maker->make( qw(target3 target4) )
+
+     # ' target1  target3  target1  target2  target4 '
+     #
+
+     ##################
+     # Include stayed same
+     # 
+
+     [@INC]
+
+     # [
+     #          'E:\User\SoftwareDiamonds\installation\t\File\lib',
+     #          'E:/User/SoftwareDiamonds/installation/t/File',
+     #          'E:\User\SoftwareDiamonds\installation\lib',
+     #          'D:/Perl/lib',
+     #          'D:/Perl/site/lib',
+     #          '.'
+     #        ]
+     #
+
+QUALITY ASSURANCE
+    Running the test script "Maker.t" verifies the requirements for this
+    module. The "tmake.pl" cover script for Test::STDmaker automatically
+    generated the "Maker.t" test script, "Maker.d" demo script, and
+    "t::File::Maker" STD program module POD, from the "t::File::Maker"
+    program module contents. The "tmake.pl" cover script automatically ran
+    the "Maker.d" demo script and inserted the results into the
+    'DEMONSTRATION' section above. The "t::File::Maker" program module is in
+    the distribution file File-Maker-$VERSION.tar.gz.
+
+NOTES
+  Author
+
+    The holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  Copyright Notice
+
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  Binding Requirements Notice
+
+    Binding requirements are indexed with the pharse 'shall[dd]' where dd is
+    an unique number for each header section. This conforms to standard
+    federal government practices, STD490A 3.2.3.6. In accordance with the
+    License, Software Diamonds is not liable for any requirement, binding or
+    otherwise.
+
+  License
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE ALSO
+    Tie::Form
+    Docs::Site_SVD::File_Maker
+    Test::STDmaker
+    ExtUtils::SVDmaker
+NAME
+    Docs::Site_SVD::File_Maker - mimics a make by loading a database and
+    calling targets methods
+
+Title Page
+     Software Version Description
+
+     for
+
+     Docs::Site_SVD::File_Maker - mimics a make by loading a database and calling targets methods
+
+     Revision: D
+
+     Version: 0.05
+
+     Date: 2004/05/13
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright 2004 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The system is the Perl programming language software. As established by
+    the Perl referenced documents, program modules, such the "File::Maker"
+    module, extends the Perl language.
+
+    The system is the Perl programming language software. As established by
+    the Perl referenced documents, program modules, such the
+    "DataPort::Maker" module, extends the Perl language.
+
+    The "File::Maker" provides a "make" style interface for modules as shown
+    below:
+
+     \%targets, @targets, \%options 
+     \%targets, @targets 
+     \%targets, \%options
+
+    The *\%targets* contains a list of targets that are supplied by the
+    using program module. The option "-pm = file" tells "File::Maker" to
+    load a database from the __DATA__ section of a program module that is in
+    the Tie::Form format. This provides a more flexible alternative to the
+    defines and macros in a "makefile".
+
+  1.3 Document overview.
+
+    This document releases File::Maker version 0.05 providing description of
+    the inventory, installation instructions and other information necessary
+    to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     File-Maker-0.05.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright 2004 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   Commercial installation of the binary or source must visually
+            present to the installer the above copyright notice, this list
+            of conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions; otherwise, a license
+            fee must be paid to Softwareware Diamonds.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/File_Maker.pm                              0.05    2004/05/13 revised 0.04
+     MANIFEST                                                     0.05    2004/05/13 generated, replaces 0.04
+     Makefile.PL                                                  0.05    2004/05/13 generated, replaces 0.04
+     README                                                       0.05    2004/05/13 generated, replaces 0.04
+     lib/File/Maker.pm                                            0.05    2004/05/13 revised 0.04
+     t/File/Maker.d                                               0.01    2004/05/10 unchanged
+     t/File/Maker.pm                                              0.01    2004/05/10 unchanged
+     t/File/Maker.t                                               0.04    2004/05/13 revised 0.03
+     t/File/_Maker_/MakerDB.pm                                    0.01    2004/05/10 unchanged
+     t/File/File/Package.pm                                       1.17    2004/05/13 unchanged
+     t/File/File/SmartNL.pm                                       1.16    2004/05/13 revised 1.15
+     t/File/Test/Tech.pm                                          1.25    2004/05/13 revised 1.24
+     t/File/Data/Secs2.pm                                         1.23    2004/05/13 revised 1.22
+     t/File/Data/SecsPack.pm                                      0.08    2004/05/13 revised 0.07
+
+  3.3 Changes
+
+    Changes are as follows:
+
+    File-Maker-0.01
+        Originated
+
+    File-Maker-0.02
+        Need a return at top of the "__DATA__" record to be compatible with
+        obsolete "DataPort::Maker" program module.
+
+    File-Maker-0.03
+        Restore "@INC" in "load_db" subroutine. Added test for the same.
+
+    File-Maker-0.04
+        Failures for 0.03:
+
+         Subject: FAIL File-Maker-0.03 i386-netbsd 1.6 
+         Subject: FAIL File-Maker-0.03 sparc-linux 2.4.21-pre7 
+         Subject: FAIL File-Maker-0.03 i386-freebsd 4.6.2-release 
+
+         From: alian@cpan.org (CPAN Tester; CPAN++ automate ) 
+
+         t/File/Maker....# Test 6 got: '
+
+         Revision: -^
+         End_User: General Public^
+         Author: http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com^
+         Version: ^
+         Classification: None^
+
+         ~-~
+         ' (t/File/Maker.t at line 190)
+         #   Expected: '
+
+         Revision: -^
+         End_User: General Public^
+         Author: http://www.SoftwareDiamonds.com support@SoftwareDiamonds.com^
+         Version: ^
+         Classification: None^
+
+         ~-~
+         '
+
+        CORRECTIVE:
+
+        Probably differences in New Line for Unix versus Microsoft. Thus,
+        run the "__DATA__" through the smartNL routine to see if File-Maker
+        has a better reception in the UNIX world.
+
+    File-Maker-0.04
+        Had "DataPort::Maker" for POD NAME. Changed POD NAME to
+        "File::Maker"
+
+        \item File-Maker-0.05
+
+        Changed synopsis for a target so that it now nay return a "$self"
+        object reference as well as "$success". This allows targets to pass
+        data between each other via the "$self" underlying data or even
+        create a different class object for $self.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'File-Maker-0.05.tar.gz' and download to a temporary
+        installation directory. Enter the following where $make is 'nmake'
+        for microsoft windows; otherwise 'make'.
+
+         gunzip File-Maker-0.05.tar.gz
+         tar -xf File-Maker-0.05.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         'File::Package' => '1.16',
+         'Tie::Form' => '0.01',
+         'Tie::Layers' => '0.02',
+         'Data::Startup' => '0.02',
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/File/Maker.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There are no known open issues.
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+    DID Data Item Description
+
+    DOD Department of Defense
+
+    POD Plain Old Documentation
+
+    SVD Software Version Description
+
+    US  United States
+
+2.0 SEE ALSO
+    File::Maker

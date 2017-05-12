@@ -1,0 +1,94 @@
+{
+   "abstract" : "Get stock and mutual fund quotes from various exchanges",
+   "author" : [
+      "Dj Padzensky <djpadz@padz.net>, PadzNet, Inc.",
+      "Linas Vepstas <linas@linas.org>",
+      "Yannick LE NY <y-le-ny@ifrance.com>",
+      "Paul Fenwick <pjf@cpan.org>",
+      "Brent Neal <brentn@users.sourceforge.net>",
+      "Volker Stuerzl <volker.stuerzl@gmx.de>",
+      "Keith Refson <Keith.Refson#earth.ox.ac.uk>",
+      "Rob Sessink <rob_ses@users.sourceforge.net>",
+      "Leigh Wedding <leigh.wedding@telstra.com>",
+      "Tobias Vancura <tvancura@altavista.net>",
+      "James Treacy <treacy@debian.org>",
+      "Bradley Dean <bjdean@bjdean.id.au>",
+      "Erik Colson <eco@ecocode.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Finance-Quote",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Carp" : "0",
+            "DateTime" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "HTML::Parser" : "0",
+            "HTML::TableExtract" : "0",
+            "HTML::TokeParser" : "0",
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::Simple" : "0",
+            "LWP::UserAgent" : "0",
+            "Mozilla::CA" : "0",
+            "POSIX" : "0",
+            "Time::Piece" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "utf8" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Finance-Quote"
+      },
+      "homepage" : "http://finance-quote.sourceforge.net/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/finance-quote/finance-quote",
+         "web" : "https://github.com/finance-quote/finance-quote"
+      }
+   },
+   "version" : "1.38"
+}
+

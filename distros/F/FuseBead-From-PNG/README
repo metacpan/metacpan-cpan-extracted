@@ -1,0 +1,330 @@
+NAME
+    FuseBead::From::PNG - Convert PNGs into plans to build a two dimensional
+    fuse bead replica.
+
+SYNOPSIS
+      use FuseBead::From::PNG;
+
+      my $object = FuseBead::From::PNG;
+
+      $object->bead_tally();
+
+DESCRIPTION
+    Convert a PNG into a block list and plans to build a fuse bead replica
+    of the PNG. This is for projects that use fuse bead such as perler or
+    hama.
+
+    The RGB values where obtained from Bead List with RGB Values
+    (https://docs.google.com/spreadsheets/d/1f988o68HDvk335xXllJD16vxLBuRcmm
+    3vg6U9lVaYpA/edit#gid=0). Which was posted in the bead color subreddit
+    beadsprites (https://www.reddit.com/r/beadsprites) under this post Bead
+    List with RGB Values
+    (https://www.reddit.com/r/beadsprites/comments/291495/bead_list_with_rgb
+    _values/).
+
+    The generate_instructions.pl script under bin/ has been setup to
+    optimally be used the 22k bucket of beads from Perler.
+    (http://www.perler.com/22000-beads-multi-mix-_17000/17000.html)
+
+    $hash->{'filename'} = $args{'filename'};
+
+        $hash->{'unit_size'} = $args{'unit_size'} || 1;
+
+        # White list default
+        $hash->{'whitelist'} = ($args{'whitelist'} && ref($args{'whitelist'}) eq 'ARRAY' && scalar(@{$args{'whitelist'}}) > 0) ? $args{'whitelist'} : undef;
+
+        # Black list default
+        $hash->{'blacklist'} = ($args{'blacklist'} && ref($args{'blacklist'}) eq 'ARRAY' && scalar(@{$args{'blacklist'}}) > 0) ? $args{'blacklist'} : undef;
+
+USAGE
+  new
+     Usage     : ->new()
+     Purpose   : Returns FuseBead::From::PNG object
+
+     Returns   : FuseBead::From::PNG object
+     Argument  :
+        filename - Optional. The file name of the PNG to process. Optional but if not provided, can't process the png.
+            e.g. filename => '/location/of/the.png'
+
+        unit_size - Optional. The size of pixels squared to determine a single unit of a bead. Defaults to 1.
+            e.g. unit_size => 2 # pixelated colors are 2x2 in size
+
+        whitelist - Optional. Array ref of colors, dimensions or color and dimensions that are allowed in the final plan output.
+            e.g. whitelist => [ 'BLACK', 'WHITE', '1x1x1', '1x2x1', '1x4x1', 'BLACK_1x6x1' ]
+
+        blacklist - Optional. Array ref of colors, dimensions or color and dimensions that are not allowed in the final plan output.
+            e.g. blacklist => [ 'RED', '1x10x1', '1x12x1', '1x16x1', 'BLUE_1x8x1' ]
+
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  bead_dimensions
+     Usage     : ->bead_dimensions()
+     Purpose   : returns a hashref with bead dimension information in millimeters (metric) or inches (imperial)
+
+     Returns   : hashref with bead dimension information, millimeters is default
+     Argument  : $type - if set to imperial then dimension information is returned in inches
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  bead_colors
+     Usage     : ->bead_colors()
+     Purpose   : returns bead color constants consolidated as a hash.
+
+     Returns   : hashref with color constants keyed by the official color name in key form.
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  beads
+     Usage     : ->beads()
+     Purpose   : Returns a list of all possible bead beads
+
+     Returns   : Hash ref with L<FuseBead::From::PNG::Bead> objects keyed by their identifier
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  png
+     Usage     : ->png()
+     Purpose   : Returns Image::PNG::Libpng object.
+
+     Returns   : Returns Image::PNG::Libpng object. See L<Image::PNG::Libpng> for more details.
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  png_info
+     Usage     : ->png_info()
+     Purpose   : Returns png IHDR info from the Image::PNG::Libpng object
+
+     Returns   : A hash of values containing information abou the png such as width and height. See get_IHDR in L<Image::PNG::Libpng> for more details.
+     Argument  : filename  => the PNG to load and part
+                 unit_size => the pixel width and height of one unit, blocks are generally identified as Nx1 blocks where N is the number of units of the same color
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  bead_row_length
+     Usage     : ->bead_row_length()
+     Purpose   : Return the width of one row of beads. Since a bead list is a single dimension array this is useful to figure out whict row a bead is on.
+
+     Returns   : The length of a row of beads (image width / unit size)
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  bead_col_height
+     Usage     : ->bead_col_height()
+     Purpose   : Return the height in beads.
+
+     Returns   : The height of a col of beads (image height / unit size)
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  process
+     Usage     : ->process()
+     Purpose   : Convert a provided PNG into a list of bead blocks that will allow building of a two dimensional bead replica.
+
+     Returns   : Hashref containing information about particular bead beads found to be needed based on the provided PNG.
+                 Also included is the build order for those beads.
+     Argument  : view => 'a view' - optionally format the return data. options include: JSON and HTML
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  mirror
+     Usage     : ->mirror()
+     Purpose   : Getter / Setter for the mirror option. Set to 1 (true) by default. This option will mirror the image when displaying it as plans. The reason is then the mirror of the image is what is placed on the peg board so that side can be ironed and, when turned over, the image is represented in it's proper orientation.
+
+     Returns   : Either 1 or 0
+     Argument  : a true or false value that will set whether the plans are mirrored to the image or not
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  whitelist
+     Usage     : ->whitelist()
+     Purpose   : return any whitelist settings stored in this object
+
+     Returns   : an arrayref of whitelisted colors and/or blocks, or undef
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  has_whitelist
+     Usage     : ->has_whitelist(), ->has_whitelist($filter)
+     Purpose   : return a true value if there is a whitelist with at least one entry in it based on the allowed filters, otherwise a false value is returned
+
+     Returns   : 1 or 0
+     Argument  : $filter - optional scalar containing the filter to restrict test to
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  is_whitelisted
+     Usage     : ->is_whitelisted($value), ->is_whitelisted($value, $filter)
+     Purpose   : return a true if the value is whitelisted, otherwise false is returned
+
+     Returns   : 1 or 0
+     Argument  : $value - the value to test, $filter - optional scalar containing the filter to restrict test to
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  blacklist
+     Usage     : ->blacklist
+     Purpose   : return any blacklist settings stored in this object
+
+     Returns   : an arrayref of blacklisted colors and/or blocks, or undef
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  has_blacklist
+     Usage     : ->has_blacklist(), ->has_whitelist($filter)
+     Purpose   : return a true value if there is a blacklist with at least one entry in it based on the allowed filters, otherwise a false value is returned
+
+     Returns   : 1 or 0
+     Argument  : $filter - optional scalar containing the filter to restrict test to
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  is_blacklisted
+     Usage     : ->is_blacklisted($value), ->is_whitelisted($value, $filter)
+     Purpose   : return a true if the value is blacklisted, otherwise false is returned
+
+     Returns   : 1 or 0
+     Argument  : $value - the value to test, $filter - optional scalar containing the filter to restrict test to
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  _png_blocks_of_color
+     Usage     : ->_png_blocks_of_color()
+     Purpose   : Convert a provided PNG into a list of rgb values based on [row][color]. Size of blocks are determined by 'unit_size'
+
+     Returns   : A list of hashes contain r, g and b values. e.g. ( { r => #, g => #, b => # }, { ... }, ... )
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+     =head2  _color_score
+
+     Usage     : ->_color_score()
+     Purpose   : returns a score indicating the likeness of one color to another. The lower the number the closer the colors are to each other.
+
+     Returns   : returns a positive integer score
+     Argument  : $c1 - array ref with rgb color values in that order
+                 $c2 - array ref with rgb color values in that order
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  _find_bead_color
+     Usage     : ->_find_bead_color
+     Purpose   : given an rgb params, finds the optimal bead color
+
+     Returns   : A bead color common name key that can then reference bead color information using L<FuseBead::From::PNG::bead_colors>
+     Argument  : $r - the red value of a color
+                 $g - the green value of a color
+                 $b - the blue value of a color
+     Throws    :
+
+     Comment   : this subroutine is memoized as the name _find_bead_color_fast
+     See Also  :
+
+  _approximate_bead_colors
+     Usage     : ->_approximate_bead_colors()
+     Purpose   : Generate a list of bead colors based on a list of blocks ( array of hashes containing rgb values )
+
+     Returns   : A list of bead color common name keys that can then reference bead color information using L<FuseBead::From::PNG::bead_colors>
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  _generate_bead_list
+     Usage     : ->_approximate_bead_colors()
+     Purpose   : Generate a list of bead colors based on a list of blocks ( array of hashes containing rgb values ) for either knob orientation (calls _knob_forward_bead_list or _knob_up_bead_list)
+
+     Returns   : A list of bead color common name keys that can then reference bead color information using L<FuseBead::From::PNG::bead_colors>
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+     =head2 _bead_list
+
+     Usage     : ->_bead_list()
+     Purpose   : Generate a list of bead colors based on a list of blocks ( array of hashes containing rgb values ) for knob up orientation
+
+     Returns   : A list of bead color common name keys that can then reference bead color information using L<FuseBead::From::PNG::bead_colors>
+     Argument  :
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+  _list_filters
+     Usage     : ->_list_filters()
+     Purpose   : return whitelist/blacklist filters
+
+     Returns   : an hashref of filters
+     Argument  : an optional filter restriction to limit set of filters returned to just one
+     Throws    :
+
+     Comment   :
+     See Also  :
+
+BUGS
+SUPPORT
+AUTHOR
+        Travis Chase
+        CPAN ID: GAUDEON
+        gaudeon@cpan.org
+        https://github.com/gaudeon/FuseBead-From-Png
+
+COPYRIGHT
+    This program is free software licensed under the...
+
+        The MIT License
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

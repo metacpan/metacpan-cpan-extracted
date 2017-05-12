@@ -1,0 +1,3 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n median q1 q2 q3
+44.208 15.781 35.697 6.6649 37.543 50.873 0.95 1061 52633 16 75 24 43 30 43 50
+#   | dbcolstats -m -q 4 midterm

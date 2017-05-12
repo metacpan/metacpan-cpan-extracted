@@ -1,0 +1,12 @@
+<?xml version='1.0' standalone='yes'?>
+<gnuPod>
+ <files>
+  <file addtime="3389919728" album="Born to Pick" artist="7th Day Buskers" title="Loch Lamor" />
+  <file addtime="3389919728" album="Born to Pick" artist="7th Day Buskers" title="The Floods" />
+  <file addtime="3389919735" album="Copland Conducts Copland" artist="Aaron Copland" title="Our Town" />
+ </files>
+ <!-- non-file stuff will be ingnored -->
+ <playlist name="new shows" plid="97241" >
+   <regex artist="^(Le Show|This American Life)$" />
+ </playlist>
+</gnuPod>

@@ -1,0 +1,84 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4550c9415f6b04605ad175d64780da7dd52dcb33 .gitignore
+SHA1 017efba0abbc4a1581d7817e48ac58cfa3868554 .travis.yml
+SHA1 7ba0675e61d8ed59291f4e4efa8b2cc57346687b Call/Call.pm
+SHA1 32884d7a2d6419f34c0f00dca44518cf83e1250b Call/Call.xs
+SHA1 3d1e6a5e07761b79dae2a67df5e7484ab8517e02 Call/Makefile.PL
+SHA1 ab106878b5b6770b97a1a6bfc6ae327930aca030 Call/ppport.h
+SHA1 bb5316cb0f0ae4449f3973242908bf656b446aea Call/typemap
+SHA1 706132e3b2b9314e470715a7972ef413e2dc36fe Changes
+SHA1 0a2911165b471b24d9bc58f4acd1bc00481a6b79 Exec/Exec.pm
+SHA1 032b23ee4ed3afe01e6ccb3bb3799b722b0ff755 Exec/Exec.xs
+SHA1 f5c86e77cfcb10451775fc0d2c1448ba1b7ee7f7 Exec/Makefile.PL
+SHA1 9888793a3594912d7461a8a656d44b5424f54832 MANIFEST
+SHA1 1297205bc504429646d73644aefd1e8840800f17 MANIFEST.SKIP
+SHA1 bbc24902b699b4567be2a477e57a7ecf100fd1af META.json
+SHA1 7dac46b9f3977b47721336ac633e97a38bbbdce0 META.yml
+SHA1 e43f2ebb63e8113eb06ad06b1b3993b928da602c Makefile.PL
+SHA1 30550585a939336b58bef8fb715629c10ffb09b0 README
+SHA1 d298989d6a6dde3eae4563d91c7c7cd3c511e050 decrypt/Makefile.PL
+SHA1 066b3ec45fe0502d50e25094b05888297e161fa0 decrypt/decr
+SHA1 c427aa7a1995dc902ec931503ec5917074e12ce9 decrypt/decrypt.pm
+SHA1 9af50516a407295e7a0f2d1740d33b8fbdd28ca2 decrypt/decrypt.xs
+SHA1 6e5d44e0c42fbdc697b6d0b1dd187a128a56abb4 decrypt/encrypt
+SHA1 0bf507061d318b097119837bbda8411f06c2bfb5 examples/closure/Count.pm
+SHA1 b8965a11e0a20642dfe99421961a112edf2a8706 examples/closure/Decompress.pm
+SHA1 b571192030a49517999c4d640c65c679ffabe987 examples/closure/Include.pm
+SHA1 58648f39b04f74496015a680fd5d3d99b074a359 examples/closure/Joe2Jim.pm
+SHA1 4fe4ce8beaf7f5849113ace1677870e07f877443 examples/closure/NewSubst.pm
+SHA1 b4f98a32c6205675a7e041e0c837503b583e4c9d examples/closure/Subst.pm
+SHA1 a6273396754c279634b5aac7ef1f604429d6e8d1 examples/closure/UUdecode.pm
+SHA1 71b1257f8c9e64c891183e47ac57ad549138ed62 examples/filtdef
+SHA1 429a322f7343d14d66d0bae4e489617a299433ce examples/filtuu
+SHA1 f292b8b9cfb316ada1dce3d94f189c20710c9d11 examples/method/Count.pm
+SHA1 6cf89f5cc21c4aa02a6ea905292f0d4fe82f28d6 examples/method/Decompress.pm
+SHA1 fc6a95368aee62a2992521dd518087e6132c01cf examples/method/Joe2Jim.pm
+SHA1 2d4b9dd848b9eeb0de0ee7667f8ba105f1545125 examples/method/NewSubst.pm
+SHA1 a9cdfae6778ebaccf11e9e73cc9bd5d4db48df7d examples/method/Subst.pm
+SHA1 4c1705bf10a64379adc1c07517f0da93b795c438 examples/method/UUdecode.pm
+SHA1 2e6db8564c4fc18399d98c05609afcfe2e030653 lib/Filter/cpp.pm
+SHA1 2a98ca8e4df7d3bff94637dc870e47c95c030913 lib/Filter/exec.pm
+SHA1 a8731459699c802f358b30a9dc96eef70f904e86 lib/Filter/sh.pm
+SHA1 cef9663cf8f6d83ee79b390d14d7a6e4683fb457 mytest
+SHA1 29b4c5c112b01b5af68173200c65fc67c14e8803 perlfilter.pod
+SHA1 27a050d63efa7dc0ade905a575fe7fe161784a32 t/call.t
+SHA1 39853585450ea13a129b907c9bcacd9f562f1267 t/cpp.t
+SHA1 d25cb02e96546f21df45d4cd332145d777715f79 t/decrypt.t
+SHA1 8026e61c3b75f8e9779c4c3b99ef67967fdf5131 t/exec.t
+SHA1 0b4a731a8bfc6f8b4167b748e5033dc5e2d054ac t/filter-util.pl
+SHA1 97cf6b8d22504e4a24bbcb895afb780ac336959f t/order.t
+SHA1 9b4350d540053c0570225de8bc439467c6e0064c t/rt_101033.pm
+SHA1 d927984c7ed6466f9093715fde416fc8e592c850 t/rt_101033.t
+SHA1 cb1d3b4c78b220b0c6649f84856e0038231f30b4 t/rt_54452-rebless.t
+SHA1 802f7fd9b4f488753496c379818526bbd712e61e t/sh.t
+SHA1 8633847bf4b739e5255c2bc9a33bef08f31760d3 t/tee.t
+SHA1 42b4a5a2b5e9422d59c10189414af56b1ef0eaf1 t/z_kwalitee.t
+SHA1 156c526df9fe3c9a6f5a23ad37107d565410e756 t/z_manifest.t
+SHA1 993b3cef8c06a70d99829facf76140864eb57240 t/z_meta.t
+SHA1 ade48e2b6098a0a329312543e1451e7e7fb7bc5f t/z_perl_minimum_version.t
+SHA1 c693266a614bee88f3c85c3b2ced1a82236b52fc t/z_pod-coverage.t
+SHA1 c8aa3903d3aba84c19bbd94d677620c758fa07d5 t/z_pod.t
+SHA1 8568bca5a96669cb8d8a37eec0453ead6f331b3e tee/Makefile.PL
+SHA1 e1f203cf14053c62cc3a8390f891b4b31fa93f1e tee/tee.pm
+SHA1 86da5dd869daf1b40405e827eae0241a07e0ce56 tee/tee.xs
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWIWCWgAKCRCabZJij/3J
+QiUMAJ94LwoNedIyW5PzmiEVDoLB/ZpohwCcDkDvXT4+EPoIAl5HCT2ypvJCa5Y=
+=xFXY
+-----END PGP SIGNATURE-----

@@ -1,0 +1,24 @@
+$VAR1 = [
+          bless( {
+                   'primary_seq' => bless( {
+                                             'display_id' => 'seq1',
+                                             '_seq_length' => undef,
+                                             '_root_verbose' => '0',
+                                             'seq' => 'attccgcggcggtg',
+                                             '_nowarnonempty' => undef,
+                                             'alphabet' => 'dna'
+                                           }, 'Bio::PrimarySeq' ),
+                   '_root_verbose' => '0'
+                 }, 'Bio::Seq' ),
+          bless( {
+                   'primary_seq' => bless( {
+                                             'display_id' => 'seq2',
+                                             '_seq_length' => undef,
+                                             '_root_verbose' => '0',
+                                             'seq' => 'tttctgaggccttt',
+                                             '_nowarnonempty' => undef,
+                                             'alphabet' => 'dna'
+                                           }, 'Bio::PrimarySeq' ),
+                   '_root_verbose' => '0'
+                 }, 'Bio::Seq' )
+        ];

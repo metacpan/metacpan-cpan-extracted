@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: FormValidator-Simple-Plugin-NetAddr-IP
+version: 0.01
+author:
+  - Eric Hacker <hacker@cpan.org>
+abstract: IP Address validation
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  FormValidator::Simple: 0
+  NetAddr::IP: 3
+provides:
+  FormValidator::Simple::Plugin::NetAddr::IP:
+    file: lib/FormValidator/Simple/Plugin/NetAddr/IP.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: |-
+    http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

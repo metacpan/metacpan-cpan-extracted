@@ -1,0 +1,33 @@
+Finance-OFX version 0.01
+========================
+
+The Finance::OFX module is an implementation of an Open Financial Exchange 
+client. At the moment it can be used to query account information and 
+transaction statements from financial institutions supporting OFX version 1. 
+Eventually it should be able to handle all OFX v1 and v2 operations, as well 
+as load saved files (in case you're like me and have several years worth of 
+manually downloaded ofx files).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Data::GUID
+  HTML::Parser
+  HTTP::Date
+  LWP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Brandon Fosdick
+
+This software is provided under the terms of the BSD License.

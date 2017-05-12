@@ -1,0 +1,32 @@
+---
+abstract: 'Source filter uncompressing gzip files.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Filter-gunzip
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+requires:
+  Compress::Raw::Zlib: '0'
+  Filter::Util::Call: '0'
+  PerlIO: '0'
+  PerlIO::gzip: '0'
+  Test: '0'
+  Test::More: '0'
+  perl: '5.006'
+resources:
+  homepage: http://user42.tuxfamily.org/filter-gunzip/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '6'

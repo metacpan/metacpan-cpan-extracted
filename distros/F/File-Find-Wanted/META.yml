@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               File-Find-Wanted
+version:            1.00
+abstract:           More obvious wrapper around File::Find
+author:
+    - Andy Lester <andy@petdance.com>
+license:            artistic_2
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Find-Wanted
+    license:     http://www.opensource.org/licenses/artistic-license-2.0.php
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

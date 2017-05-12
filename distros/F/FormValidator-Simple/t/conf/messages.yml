@@ -1,0 +1,10 @@
+test:
+    data1:
+        DEFAULT: default message for data1
+        NOT_BLANK: not blank message for data1
+        INT: input integer for data1
+        LENGTH: data1 has wrong length
+    data2:
+        DEFAULT: default error for data2
+    data3:
+        NOT_BLANK: input data3

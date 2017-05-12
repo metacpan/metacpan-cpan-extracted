@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name:               Finnigan
+version:            0.0206
+abstract:           Thermo/Finnigan mass spec data decoder
+author:
+    - Gene Selkov <selkovjr@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:             1.08
+    Data::Hexdumper:  2.01
+    Data::UUID:       1.06
+    Digest::SHA1:     2.13
+    Encode:           2.23
+    File::Basename:   2.77
+    Getopt::Declare:  1.13
+    Getopt::Long:     2.37
+    MIME::Base64:     3.07
+    Module::Find:     0.06
+    Scalar::Util:     1.21
+    Tie::IxHash:      1.21
+    XML::Generator:   1.04
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

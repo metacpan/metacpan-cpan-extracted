@@ -1,0 +1,20 @@
+Changes for Filter::QuasiQuote releases
+=======================================
+
+0.07 - Aug 20, 2008
+* Now we enforce the use of newline characters in the filter because the user concrete filters seem having problems doing it right.
+
+0.06 - Aug 18, 2008
+* Improved the parsing speed of the quasiquote parser by using maximized step length.
+
+0.05 - Aug 6, 2008
+* Fixed the license in Makefile.PL; should be "MIT" rather than "perl".
+
+0.04 - Aug 6, 2008
+* Changed the filter method API. The argument list is now:
+    $source, $filename, $line_number, $col_number
+* No longer use utf8 encoding in the POD due to the failure in some peculiar systems w/o utf8 encoding support.
+
+0.01 - Aug 5, 2008
+* Initial CPAN release
+

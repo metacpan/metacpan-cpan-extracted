@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://web.resource.org/cc/" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:admin="http://webns.net/mvcb/">
+  <channel rdf:about="http://feeds.delicious.com">
+    <title>Delicious/veselosky</title>
+    <link>http://delicious.com/veselosky</link>
+    <description>bookmarks posted by veselosky</description>
+    <cc:license rdf:resource="http://creativecommons.org/licenses/by-nd/2.5/"/>
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="http://dev.chromium.org/spdy/spdy-whitepaper"/>
+        <rdf:li rdf:resource="http://spinlock.ch/pub/feincms/html/"/>
+        <rdf:li rdf:resource="http://slott-softwarearchitect.blogspot.com/2009/10/breaking-into-agile.html"/>
+        <rdf:li rdf:resource="http://scie.nti.st/2007/11/14/hosting-git-repositories-the-easy-and-secure-way"/>
+      </rdf:Seq>
+    </items>
+  </channel>
+  <item rdf:about="http://dev.chromium.org/spdy/spdy-whitepaper">
+    <title>SPDY: An experimental protocol for a faster web</title>
+    <dc:date>2009-11-14T20:25:01Z</dc:date>
+    <link>http://dev.chromium.org/spdy/spdy-whitepaper</link>
+    <dc:creator>veselosky</dc:creator>
+    <description>Just in case you didn&amp;#039;t already know that Google is populated with extremely smart people, these folks are trying to accelerate the web by rewriting the HTTP protocol itself, adding things like header compression and multiplexing requests. Still just an experiment, but tomorrow...?</description>
+    <dc:subject>google http protocol web performance spdy webdev</dc:subject>
+    <taxo:topics>
+      <rdf:Bag>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/google"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/http"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/protocol"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/web"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/performance"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/spdy"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/webdev"/>
+      </rdf:Bag>
+    </taxo:topics>
+  </item>
+  <item rdf:about="http://spinlock.ch/pub/feincms/html/">
+    <title>FeinCMS - An extensible Django-based CMS — FeinCMS v1.0.4 documentation</title>
+    <dc:date>2009-11-12T20:47:42Z</dc:date>
+    <link>http://spinlock.ch/pub/feincms/html/</link>
+    <dc:creator>veselosky</dc:creator>
+    <dc:subject>django cms python</dc:subject>
+    <taxo:topics>
+      <rdf:Bag>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/django"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/cms"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/python"/>
+      </rdf:Bag>
+    </taxo:topics>
+  </item>
+  <item rdf:about="http://slott-softwarearchitect.blogspot.com/2009/10/breaking-into-agile.html">
+    <title>Breaking into Agile: Real World vs. Management Fantasyland</title>
+    <dc:date>2009-11-07T10:40:07Z</dc:date>
+    <link>http://slott-softwarearchitect.blogspot.com/2009/10/breaking-into-agile.html</link>
+    <dc:creator>veselosky</dc:creator>
+    <description>Do &amp;quot;enterprises&amp;quot; adopt agile methods, or do they *adapt* agile methods to their warped corporate view of reality? Here&amp;#039;s a great description of why process Nazis in agile methodologies are oxymoronic. It&amp;#039;s not about process, it&amp;#039;s about people and their problems. The whole point of &amp;quot;agile&amp;quot; is not to let process get in the way of problem solving.</description>
+    <dc:subject>agile development methodology webdev</dc:subject>
+    <taxo:topics>
+      <rdf:Bag>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/agile"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/development"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/methodology"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/webdev"/>
+      </rdf:Bag>
+    </taxo:topics>
+  </item>
+  <item rdf:about="http://scie.nti.st/2007/11/14/hosting-git-repositories-the-easy-and-secure-way">
+    <title>Hosting Git repositories, The Easy (and Secure) Way</title>
+    <dc:date>2009-11-05T21:11:50Z</dc:date>
+    <link>http://scie.nti.st/2007/11/14/hosting-git-repositories-the-easy-and-secure-way</link>
+    <dc:creator>veselosky</dc:creator>
+    <description>A fancier and better(?) method of managing your git repositories.</description>
+    <dc:subject>git hosting server versioncontrol development</dc:subject>
+    <taxo:topics>
+      <rdf:Bag>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/git"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/hosting"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/server"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/versioncontrol"/>
+        <rdf:li rdf:resource="http://delicious.com/veselosky/development"/>
+      </rdf:Bag>
+    </taxo:topics>
+  </item>
+</rdf:RDF>

@@ -1,0 +1,19 @@
+NAME
+
+  Font::FNT - Load, manipulate and save Windows raster fonts
+
+DESCRIPTION
+
+  This module provides basic load, manipulate and save functionality for
+  Windows raster fonts (.FNT files).
+
+AUTHOR
+
+  Steffen Goeldner <sgoeldner@cpan.org>
+
+COPYRIGHT
+
+  Copyright (c) 2004 Steffen Goeldner. All rights reserved.
+
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.

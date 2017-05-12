@@ -1,0 +1,22 @@
+Revision history for Perl extension Filesys::Virtual::Plain.
+
+0.10 Sun Jul 30 2006
+    - updated license
+
+0.09 Sun Jul 30 2006
+    - fixed ticket #17076, Unititialized cwd value
+
+0.08 Fri Aug 12 2005
+	- changed quoting in Makefile.PL
+
+0.07 Mon Apr 25 2005
+	- fixed test bug
+
+0.06 Fri Apr 15 2005
+	- fixed docs for stat()
+	- cleaned up some code
+
+0.05 Fri Jan 21 2005
+	- seperated this module from Filesys::Virtual
+	- documented everything
+	- added utime

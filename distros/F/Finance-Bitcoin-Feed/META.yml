@@ -1,0 +1,44 @@
+---
+abstract: "Collect bitcoin real-time price from many sites' streaming data source"
+author:
+  - 'Chylli  C<< <chylli@binary.com> >>'
+build_requires:
+  Test::MockModule: '0'
+  Test::MockObject: '0'
+  Test::More: '0.96'
+  Test::Perl::Critic: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Bitcoin-Feed
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  AnyEvent: '0'
+  Carp: '0'
+  EV: '0'
+  JSON: '0'
+  Mojolicious: '0'
+  Protocol::WebSocket: '0'
+  Scalar::Util: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Finance-Bitcoin-Feed/issues
+  homepage: https://github.com/binary-com/perl-Finance-Bitcoin-Feed
+  repository: https://github.com/binary-com/perl-Finance-Bitcoin-Feed.git
+version: '0.05'
+x_contributors:
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'

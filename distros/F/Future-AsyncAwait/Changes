@@ -1,0 +1,16 @@
+Revision history for Future-AsyncAwait
+
+0.03    2017/05/08 21:33:46
+        [CHANGES]
+         * Handle the value and mark stacks around suspend/await, allowing
+           some stack temporaries to be preserved
+         * Avoid naming internal functions "Perl_..."
+
+        [BUGFIXES]
+         * Ensure that die after await is still caught
+         * Avoid C++-style comments and C99-style for() loop variable declarations
+           (RT121569)
+
+0.02    2017/05/08 16:55:38
+        [CHANGES]
+         * Initial tiny implementation of actual suspend/resume on 'await'

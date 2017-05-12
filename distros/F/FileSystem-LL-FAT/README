@@ -1,0 +1,35 @@
+FileSystem-LL-FAT version 0.01
+==============================
+
+With recent prolifiration of standalone devices which understand only FAT,
+and (unreliably) write to it, it is crucial to have flexibility to
+have cheap low-level backups of the most fragile part of FAT: the
+service area.
+
+The target of this module is to have machinery in place to extract
+information from broken FAT volume.  All one needs is a backup of
+the bootsector, of file allocation tables, and listing of files
+with starting clusters.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Ilya Zakharevich <ilyaz@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

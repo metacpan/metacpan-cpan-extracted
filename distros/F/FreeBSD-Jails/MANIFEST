@@ -1,0 +1,10 @@
+arch/jls.xs
+Build.PL
+lib/FreeBSD/Jails.pm
+lib/FreeBSD/Jails.xs
+MANIFEST			This list of files
+README.md
+t/test.t
+Makefile.PL
+META.yml
+META.json

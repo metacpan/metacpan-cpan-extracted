@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>FLAP - Flash Remoting in Perl</title>
+  <style>
+body {  
+	scrollbar-3d-light-color:		#000000; 
+	scrollbar-arrow-color:			#000066; 
+	scrollbar-base-color:			#003366; 
+	scrollbar-dark-shadow-color:	#FFFFFF; 
+	scrollbar-face-color:			#003366; 
+	scrollbar-highlight-color:		#FFFFFF; 
+	scrollbar-shadow-color:			#000000;
+	color: 							#000000;
+	font-family: 					verdana, arial, helvetica, sans-serif;
+	font-size: 						12px;
+	margin:							0px; 
+}
+
+span.text {
+	font-family: 	verdana, arial, helvetica, sans-serif;
+	font-size: 		12px;
+	color: 			#003366;
+}
+
+span.red {
+	font-family: 	verdana, arial, helvetica, sans-serif;
+	font-size: 		12px;
+	font-weight: 	bold;
+	color: 			#990000;
+}
+
+div.notes {
+	background: 	#dddddd;
+	font-family: 	Verdana, Arial, helvetica, sans-serif; 
+	font-size: 		12px; 
+	margin-left: 	10px; 
+	margin-right: 	10px; 
+	padding: 		5px; 
+	border-color: 	#000000;
+}
+
+div.tableSub {
+	background: 	#CCCCFF;
+	font-family: 	Verdana, Arial, helvetica, sans-serif;  
+	font-size: 		13px; 
+	color: 			#003366;
+	margin-left: 	0px; 
+	margin-right: 	0px; 
+	padding: 		2px; 
+	border-color: 	#000099;
+	border-size: 	2px;
+}
+	
+pre {
+	color: 			#3366CC; 
+	margin-left: 	40px; 
+	margin-right: 	40px; 
+	padding: 		10px; 
+	font-size: 		12px;
+}
+
+P {
+	font-family: 	Verdana, Arial, helvetica, sans-serif; 
+	font-size: 		11px;
+	color: 			#000000;
+}
+
+A:link    { color: #3366AA; text-decoration: none; }
+A:visited { color: #3366CC; text-decoration: none; }
+A:active  { color: #00CC99; text-decoration: none; }
+A:hover   { color: #FFFFFF; text-decoration: none; background-color: #6699CC; }
+
+A.noDec:link    { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:visited { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:active  { color: #000099; font-weight: bold; text-decoration: none; }
+A.noDec:hover   { color: #3366AA; font-weight: bold; text-decoration: underline; background-color: transparent; }
+
+A.plain:link    { color: #000033;  text-decoration: none; }
+A.plain:visited { color: #000033;  text-decoration: none; }
+A.plain:active  { color: #000033;  text-decoration: none; }
+A.plain:hover   { color: #3366AA;  text-decoration: none; background-color: transparent; }
+
+h2 {
+	color: 			#333333; 
+	font-size: 		20 px; 
+	font-weight: 	bold; 
+}
+
+h3 {
+	color: 			#333333; 
+	font-size: 		18 px; 
+	font-weight: 	bold; 
+}
+
+h4 {
+	color: 			#0066CC; 
+	font-size: 		14px; 
+	font-weight: 	bold;
+}	
+
+  </style>
+</head>
+<body
+ style="background-image: url(orn5.gif);">
+<div style="position: absolute; left: 20px;">
+<h1>FLAP - Flash Remoting in Perl<br>
+</h1>
+<table cellpadding="2" cellspacing="2" border="0"
+ style="text-align: left; width: 600px;">
+  <tbody>
+	<tr><td>
+      <h2><a href="http://www.simonf.com/flap">FLAP</a> update history</h2>
+		Mar 13, 2004. Version 0.09 uploaded. Fixed a couple of "uninitialized" warnings, accepted patches for POD documentation, smarter detection of numbers and dates in Serializer and text encoding.<br><br>
+
+		Aug 3, 2003. Version 0.08 uploaded. Petstore example implemented!!! Also, rewrote Flash::FLAP::new() to accept both Flash::FLAP->new and $flap->new.<br><br>
+
+		Jul 26, 2003. Version 0.07 uploaded. Fixed a bug that would wrongly detect end-of-file in the input data on Windows and replaced the "our" keyword that is not backwards-compatible. Created pseudo_query() in Util::Object that encapsulates the recordset format.<br><br>
+
+		Jun 22, 2003. Version 0.06 uploaded. Added an example that talks to a database on the server side. This is implemented via Flash::FLAP::Sql::MysqlRecordSet.pm. Got rid of a couple of "uninitialized" warnings.<br><br>
+
+		Apr 29, 2003. Version 0.05 uploaded. It supports Windows and mod_perl 1.<br><br>
+
+        Apr 14, 2003 - FLAP renamed to Flash::FLAP. Version 0.03 uploaded. Added ser
+vice discovery - now you can register a directory and put Perl packages in it. Every
+ package will be considered a service. Macromedia Service Browser support added.
+
+<br>
+<br>
+	Mar 11, 2003 - FLAP-0.02 uploaded. Verified trasfer of basic data types from Flash to Perl. Parameters are now sent to Perl functions as an array, not an array ref.
+    </tr>
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+</body>
+</html>

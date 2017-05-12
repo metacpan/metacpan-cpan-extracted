@@ -1,0 +1,25 @@
+---
+abstract: 'Find and use a file/dir from a directory above your script file'
+author:
+  - 'Tye McQueen'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-FindLib
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  strict: '0'
+  vars: '0'
+version: '0.001004'

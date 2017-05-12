@@ -1,0 +1,84 @@
+NAME
+    FreeMind::Document - representation of a FreeMind-style mind map document
+
+SYNOPSIS
+     my $document = "FreeMind::Document"->load(location => "todo.mm");
+ 
+     my ($node) = $document->findnodes(q{//node[@ID="foo"]});
+ 
+     print $node->toText, "\n";
+
+DESCRIPTION
+    This is a subclass of XML::LibXML::Document providing the following
+    additional methods:
+
+    `load($type, $source)`
+        Constructor. If $type is "IO" then $source should be a filehandle. If
+        $type is "location" then $source should be a file name or URL. If If
+        $type is "string" then $source should be a scalar string containing
+        XML.
+
+        If the XML being loaded is a FreeMind mind map document, returns an
+        instance of FreeMind::Document. Otherwise returns an instance of
+        XML::LibXML::Document.
+
+    `root`
+        Returns the centre-most node of the mind map as a FreeMind::Node.
+
+    `toHash`
+        `$document->toHash` is a shortcut for `$document->root->toHash`.
+
+    `toText($indent, $width)`
+        `$document->toText` is a shortcut for `$document->root->toText`.
+
+    As this is an XML::LibXML::Document, you have all the standard methods for
+    traversing the document such as `findnodes` and `getElementsByTagName`,
+    but the elements returned by these methods will be FreeMind::Map,
+    FreeMind::Node, etc objects rather than XML::LibXML::Element objects.
+
+    The XML elements provide accessors for XML attributes. For example, given
+    this XML element:
+
+       <node
+          CREATED="1365159476220"
+          ID="ID_326312292"
+          MODIFIED="1365441636185"
+          POSITION="right"
+          TEXT="documentation" />
+
+    You can call `$element->created` to get the element's creation date as an
+    integer. Call it with an argument to write to the attribute:
+
+       $element->created($some_time);
+
+    To remove the attribute, pass an explicit `undef` as an argument. These
+    attribute accessors perform a limited amount of validation. The standard
+    XML::LibXML::Element `getAttribute`, `setAttribute` and `removeAttribute`,
+    but these will perform no validation.
+
+    (Incidentally, FreeMind dates are milliseconds since the Unix epoch. The
+    setters will happily coerce from DateTime objects though.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=FreeMind-Document>.
+
+SEE ALSO
+    <http://freemind.sourceforge.net/wiki/index.php/Main_Page>.
+
+    FreeMind::Map, FreeMind::Node.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

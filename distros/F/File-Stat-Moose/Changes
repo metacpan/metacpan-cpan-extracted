@@ -1,0 +1,129 @@
+------------------------------------------------------------------------
+0.06 | Piotr Roszatycki <dexter@debian.org> | 2009-01-29
+
+Changes:
+
+* Use accessors everywhere if attribute "strict_accessors" is true value.
+* Use "CORE::stat" instead "CORE::lstat" if file is GLOB reference.
+
+------------------------------------------------------------------------
+0.0501 | Piotr Roszatycki <dexter@debian.org> | 2009-01-25
+
+Changes:
+
+* Fixed test units: on Solaris rdev can be -1.
+
+------------------------------------------------------------------------
+0.05 | Piotr Roszatycki <dexter@debian.org> | 2009-01-12
+
+Changes:
+
+* File::Stat::Moose:
+  * Method "stat" handles "CORE::stat" and "CORE::lstat" depends on "follow"
+    attribute.
+  * Method "lstat" are deprecared.
+  * Attribute "file" is required.
+  * All attributes are "ro".
+  * Attributes "atime", "ctime" and "mtime" returns undef if stat was not
+    called.
+* MooseX::Types::*:
+  * Fix description of modules.
+
+------------------------------------------------------------------------
+0.04 | Piotr Roszatycki <dexter@debian.org> | 2008-12-30
+
+Changes:
+
+* New attribute "sloppy" for Win32.
+* Static methods "stat" and "lstat" was removed.
+* If some attributes have no meaning on platform, they contain undefined
+  value.
+* Exception::IO was moved to separate package.
+* Requires constant::boolean, Exception::Argument.
+* Build requires parent.
+
+Fixes:
+
+* Fixed incompatibility for Win32 in test units.
+
+------------------------------------------------------------------------
+0.03 | Piotr Roszatycki <dexter@debian.org> | 2008-12-08
+
+Changes:
+
+* Accessors "mtime", "atime" and "ctime" return DateTime object.
+* File is an argument for "stat" and "lstat" static methods only.
+* Attribute "file" is not weaken anymore.
+* Constraints are moved to MooseX::Types::* packages.
+* Requires Sub::Exporter, DateTime and newer Exception::* classes.
+* Build requires Test::Assert.
+
+------------------------------------------------------------------------
+0.0201 | Piotr Roszatycki <dexter@debian.org> | 2008-09-29
+
+Fixes:
+
+* Constraints now work with "use warnings". Closes bug #39653.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@debian.org> | 2008-05-07
+
+Changes:
+
+* Renamed constraint type IO to OpenHandle.
+* Renamed _deref_array to __deref_array.
+* Requires Exception::Base >= 0.16, Exception::System >= 0.09,
+  Exception::Died, Exception::Warning.
+
+------------------------------------------------------------------------
+0.0106 | Piotr Roszatycki <dexter@debian.org> | 2008-04-19
+
+Changes:
+
+* Remove indirect notation from POD and code.
+
+------------------------------------------------------------------------
+0.0105 | Piotr Roszatycki <dexter@debian.org> | 2008-04-13
+
+Changes:
+
+* Requires Exception::Base => 0.14, Exception::System => 0.0801.
+
+------------------------------------------------------------------------
+0.0104 | Piotr Roszatycki <dexter@debian.org> | 2007-11-05
+
+Fixes:
+
+* Skip some test units if symlink call is not available.
+
+------------------------------------------------------------------------
+0.0103 | Piotr Roszatycki <dexter@debian.org> | 2007-10-30
+
+Changes:
+
+* Throw Exception::Argument if bad argument for method is used.
+* Ignore this package for thrown exceptions.
+* Requires Exception::Base >= 0.12, Exception::System >= 0.07.
+* Build requires Test::Unit::Lite >= 0.07.
+
+------------------------------------------------------------------------
+0.0102 | Piotr Roszatycki <dexter@debian.org> | 2007-09-27
+
+Fixes:
+
+* Fix incompatibility with Perl 5.010 (warning for bad syntax
+  @{%$self}{qw<...>}).
+
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@debian.org> | 2007-09-23
+
+Fixes:
+
+* Fix incompatibility with Perl 5.006 (Exporter).
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@debian.org> | 2007-09-20
+
+* First CPAN release.
+
+------------------------------------------------------------------------

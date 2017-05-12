@@ -1,0 +1,9 @@
+.*\.old$
+.*\.bak$
+Makefile
+~$
+blib.*?$
+.*#$
+.*temp.*
+.*Untitled.*
+Form/Sensible/Field.*

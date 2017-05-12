@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Filter-CBC.t
+lib/Filter/CBC.pm
+examples/cbc2code.pl
+examples/autofilter.pl
+examples/blowfish.pl
+examples/defaults.pl
+examples/des_ede3.pl
+examples/des.pl
+examples/gost.pl
+examples/idea.pl
+examples/null.pl
+examples/rc6.pl
+examples/rijndael.pl
+examples/tea.pl
+examples/twofish.pl
+META.yml                                 Module meta-data (added by MakeMaker)

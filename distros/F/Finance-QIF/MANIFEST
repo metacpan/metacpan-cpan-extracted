@@ -1,0 +1,12 @@
+Changes
+examples/qifdumper
+examples/readwrite
+lib/Finance/QIF.pm
+Makefile.PL
+MANIFEST
+README
+t/Finance-QIF.t
+t/pod-coverage.t
+t/pod.t
+t/test.qif
+META.yml                                 Module meta-data (added by MakeMaker)

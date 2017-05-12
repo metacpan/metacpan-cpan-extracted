@@ -1,0 +1,11 @@
+Sysop sysop
+AKA 1:120/544@fidonet
+AKA 111:4150/402@stn
+Baud 115200
+Time -1
+RequestList /var/spool/ftnpl/pin/61c626e8.req
+ResponseList /var/spool/ftnpl/out/00780220.rsp
+RemoteStatus PROTECTED
+SystemStatus LISTED
+CallerID localhost
+SessionType OTHER

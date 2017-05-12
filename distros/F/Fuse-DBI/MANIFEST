@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+DBI.pm
+t/01load.t
+t/02sqlite.t
+t/03pgsql.t
+t/99pod.t
+examples/webgui.pl
+fuse-perl-patch/cvs-api_fix.diff
+fuse-perl-patch/cvs-blocks_fix.diff
+META.yml                                 Module meta-data (added by MakeMaker)
+examples/strix-multi_static.pl
+examples/strix-static3.pl

@@ -1,0 +1,49 @@
+NAME
+    Foorum - forum system based on Catalyst
+
+DESCRIPTION
+    nothing for now.
+
+LIVE DEMO
+    <http://www.foorumbbs.com/>
+
+FEATURES
+    open source
+        u can FETCH all code from <http://github.com/fayland/foorum/tree>
+        any time any where.
+
+    Win32 compatibility
+        Linux/Unix/Win32 both OK.
+
+    templates
+        use Template for UI.
+
+    built-in cache
+        use Cache::Memcached or use Cache::FileCache or others;
+
+    reliable job queue
+        use TheSchwartz::Moosified
+
+    Multi Formatter
+        HTML::BBCode, Text::Textile, Pod::Xhtml, Text::GooglewikiFormat
+
+    Captcha
+        To keep robot out.
+
+JOIN US
+    Welcome to fork it in <http://github.com/fayland/foorum/tree> and pull
+    requests back.
+
+TODO
+    <http://code.google.com/p/foorum/issues/list>
+
+SEE ALSO
+    Catalyst, DBIx::Class, Template
+
+AUTHOR
+    Fayland Lam, "<fayland at gmail.com>"
+
+COPYRIGHT & LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

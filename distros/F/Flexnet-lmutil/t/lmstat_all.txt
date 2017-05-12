@@ -1,0 +1,98 @@
+lmstat - Copyright (c) 1989-2014 Flexera Software LLC. All Rights Reserved.
+Flexible License Manager status on Thu 8/20/2015 09:54
+
+License server status: 27000@dabu.uni-paderborn.de
+    License file(s) on dabu.uni-paderborn.de: /etc/flexnet/AutoForm.lic:/etc/flexnet/INTEL-2011.lic:/etc/flexnet/INTEL.lic:/etc/flexnet/LMCOMSOL.lic:/etc/flexnet/MLM-RF_Toolbox.lic:/etc/flexnet/MLM.lic:/etc/flexnet/MLM_Excel_Link.lic:/etc/flexnet/MLM_MATLAB_Distrib_Comp_Engine.lic:/etc/flexnet/adskflex-2016.lic:/etc/flexnet/adskflex-inventor.lic:/etc/flexnet/adskflex.lic:/etc/flexnet/cstd.lic:/etc/flexnet/dynasim.lic:/etc/flexnet/ibmratl.lic:/etc/flexnet/idl_lmgrd.lic:/etc/flexnet/maplelmg.lic:/etc/flexnet/modelon.lic:/etc/flexnet/orglab.lic:/etc/flexnet/pgroupd.lic:/etc/flexnet/rational.lic:
+
+dabu.uni-paderborn.de: license server UP (MASTER) v11.12.1
+
+Vendor daemon status (on dabu.uni-paderborn.de):
+
+     aflmd: UP v10.8
+Feature usage info:
+
+Users of AF_CADPartExchange:  (Total of 11 licenses issued;  Total of 0 licenses in use)
+
+Users of AF_CatiaV5Interface:  (Total of 11 licenses issued;  Total of 0 licenses in use)
+
+Users of AF_CostCalculator_cu:  (Total of 11 licenses issued;  Total of 0 licenses in use)
+
+     CTLMD: UP v9.2
+Feature usage info:
+
+Users of Af_x:  (Total of 11 licenses issued;  Total of 0 licenses in use)
+
+Users of CTKERNEL:  (Total of 11 licenses issued;  Total of 0 licenses in use)
+
+       MLM: UP v11.11
+Feature usage info:
+
+Users of RF_Toolbox:  (Total of 2 licenses issued;  Total of 0 licenses in use)
+
+Users of Communication_Blocks:  (Total of 2 licenses issued;  Total of 0 licenses in use)
+
+Users of Communication_Toolbox:  (Total of 12 licenses issued;  Total of 1 license in use)
+
+  "Communication_Toolbox" v33, vendor: MLM, expiry: 01-jan-0000
+  floating license
+
+    mstrop mstrop_Laptop mstrop_Laptop (v28) (dabu.uni-paderborn.de/27000 13910), start Thu 8/20 7:45
+
+Users of Data_Acq_Toolbox:  (Total of 1 license issued;  Total of 1 license in use)
+
+  "Data_Acq_Toolbox" v33, vendor: MLM, expiry: 01-jan-0000
+  floating license
+
+	1 RESERVATION for HOST_GROUP robrecht-pc (dabu.uni-paderborn.de/27000)
+
+Users of Image_Toolbox:  (Total of 8 licenses issued;  Total of 4 licenses in use)
+
+  "Image_Toolbox" v33, vendor: MLM, expiry: 01-jan-0000
+  floating license
+
+	1 RESERVATION for HOST_GROUP fvt (dabu.uni-paderborn.de/27000)
+	3 RESERVATIONs for HOST_GROUP sst (dabu.uni-paderborn.de/27000)
+
+Users of MATLAB:  (Total of 115 licenses issued;  Total of 36 licenses in use)
+
+  "MATLAB" v33, vendor: MLM, expiry: 01-jan-0000
+  floating license
+
+    hangmann bessel bessel (v30) (dabu.uni-paderborn.de/27000 4401), start Wed 8/12 17:18
+    schulte lea-fem02 LEAWORK18 (v28) (dabu.uni-paderborn.de/27000 4801), start Wed 8/12 17:19
+    akshara gatorade :1162.0 Spectre L (v10.100) (elba.uni-paderborn.de/27000 574), start Wed 8/19 12:14
+    rizwan gatorade :1175.0 Spectre XL - RF (v10.100) (elba.uni-paderborn.de/27000 3094), start Thu 8/20 17:09
+    sinaob Sina-MacBook (v31) (dabu.uni-paderborn.de/27000 20842), start Wed 8/26 7:22
+    Kurt Eschebach escher-pc escher-pc (v30) (dabu.uni-paderborn.de/27000 4401), start Wed 8/12 17:18
+    mahmoud getpc34 /dev/pts/15 (v32) (dabu.uni-paderborn.de/27000 44640), start Tue 8/25 13:25
+    arjaved gatorade :1159.0 VLS_GXL (v6.160) (dabu.uni-paderborn.de/27000 1828), start Wed 8/19 16:46, 4 licenses
+    pbiemelt rtm-achse rtm-achse (v33) (dabu.uni-paderborn.de/27000 4623), start Thu 8/20 8:26
+    nano nano-PC nano-PC (v33) (dabu.uni-paderborn.de/27000 29612), start Thu 8/20 8:27
+    Brückner Brueckner-PC Brueckner-PC (v28) (dabu.uni-paderborn.de/27000 20313), start Thu 8/20 8:28
+    webem emtpc115 emtpc115 (v32) (dabu.uni-paderborn.de/27000 35925), start Thu 8/20 8:36
+    Beam Beam-PC Beam-PC (v31) (dabu.uni-paderborn.de/27000 21515), start Thu 8/20 8:37
+    buchholz lea-seminar8 lea-seminar8 (v24) (dabu.uni-paderborn.de/27000 41417), start Thu 8/20 8:43
+    fb90 rtm-pool11 rtm-pool11 (v30) (dabu.uni-paderborn.de/27000 13717), start Thu 8/20 8:40
+    shuowang rtm-wang-lt rtm-wang-lt (v32) (dabu.uni-paderborn.de/27000 36414), start Thu 8/20 8:40
+    dammann ltm-pc-38 /dev/pts/1 (v31) (dabu.uni-paderborn.de/27000 15423), start Thu 8/20 8:42
+    vjust rtm-vjust-lt rtm-vjust-lt (v31) (dabu.uni-paderborn.de/27000 28115), start Thu 8/20 8:53
+    vasmer Fermi Fermi (v33) (dabu.uni-paderborn.de/27000 47220), start Thu 8/20 8:53
+    kgr-jd IEM-N-0007 IEM-N-0007 (v32) (dabu.uni-paderborn.de/27000 33713), start Thu 8/20 8:54
+    torbenk Jelly Jelly (v30) (dabu.uni-paderborn.de/27000 16620), start Thu 8/20 9:00
+    bzk IEM-N-0008 IEM-N-0008 (v28) (dabu.uni-paderborn.de/27000 46524), start Thu 8/20 9:04
+    Koch ont-pc-25 ONT-PC-45 (v31) (dabu.uni-paderborn.de/27000 17118), start Thu 8/20 9:12
+    srao dhcp-n3physik-64.uni-paderborn.de (v24) (dabu.uni-paderborn.de/27000 1215), start Thu 8/20 9:12
+    josa emtpc97 emtpc97 (v30) (dabu.uni-paderborn.de/27000 13822), start Thu 8/20 9:17
+    mahmoud getpc34 /dev/pts/15 (v32) (dabu.uni-paderborn.de/27000 34222), start Thu 8/20 9:22
+    xy nb-dscw503537 nb-dscw503537 (v33) (dabu.uni-paderborn.de/27000 46414), start Thu 8/20 9:26
+    kgr-sc IEM-D-0017 IEM-D-0017 (v32) (dabu.uni-paderborn.de/27000 45821), start Thu 8/20 9:36
+    bredderm sem (v31) (dabu.uni-paderborn.de/27000 50018), start Thu 8/20 9:38
+    duesing ltm-pc-33 /dev/tty (v31) (dabu.uni-paderborn.de/27000 24118), start Thu 8/20 9:39
+    entime Beckhoff_PC1 Beckhoff_PC1 (v24) (dabu.uni-paderborn.de/27000 15320), start Thu 8/20 9:39
+    brother EMTPC156 EMTPC156 (v28) (dabu.uni-paderborn.de/27000 16321), start Thu 8/20 9:45
+    gns-st IEM-N-0022 IEM-N-0022 (v30) (dabu.uni-paderborn.de/27000 19321), start Thu 8/20 9:46
+    yangsong song-imac (v32) (dabu.uni-paderborn.de/27000 35214), start Thu 8/20 9:47
+    krp IEM-N-0067 IEM-N-0067 (v32) (dabu.uni-paderborn.de/27000 12618), start Thu 8/20 9:52
+	1 RESERVATION for HOST_GROUP etechnik-labor (dabu.uni-paderborn.de/27000)
+
+

@@ -1,0 +1,10 @@
+#fsdb name uid
+John	2274
+Heidemann	2274
+Greg	2275
+Johnson	2275
+Root	0
+# this is a simple database
+#  | dbcol fullname uid
+#  | dbcolrename fullname name
+#   | dbcolsplittorows name

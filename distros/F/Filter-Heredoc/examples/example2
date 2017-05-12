@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use Filter::Heredoc qw( hd_getstate hd_labels );
+
+my %label = hd_labels();  # get the default labels
+my %state;
+while ( defined (my $line = <DATA> )) {
+    %state= hd_getstate( $line );
+        chomp $line;
+        if ( $state{statemarker} eq $label{heredoc}) {
+            print "The here document line: '$line'\n";
+        }
+} 
+__DATA__
+#!/bin/bash --posix
+cat <<eof1; cat <<eof2
+Hi,
+eof1
+Helene.
+eof2

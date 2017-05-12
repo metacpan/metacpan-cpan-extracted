@@ -1,0 +1,80 @@
+---
+file_add:
+  - lib\File\List\Object.pm
+files_add: []
+module_name: File::List::Object
+module_version_from: lib\File\List\Object.pm
+perltidy_cfg: t\settings\perltidy.txt
+site_name: csjewell.comyr.com
+site_user_name: a3922569
+top_dir_local: lib\File\List
+top_dir_remote: /public_html/perl/File-List-Object
+build_file: Build.PL
+url: http://csjewell.comyr.com/perl
+---
+-
+  - '<link rev="made" href="mailto:" />'
+  - '<link rev="made" href="mailto:csjewell@cpan.org" />'
+-
+  - '<a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-List-Object">http://rt.cpan.org/NoAuth/ReportBug.html</a>'
+  - '<a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-List-Object" target="_top">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-List-Object</a>'
+-
+  - '<a href="mailto:mailto:bug-File-List-Object@rt.cpan.org">'
+  - '<a href="mailto:bug-File-List-Object@rt.cpan.org">'
+-
+  - '<em>Moose</em>'
+  - '<a href="http://search.cpan.org/perldoc?Moose" target="_top">Moose</a>'
+-
+  - '<em>perlartistic</em>'
+  - '<a href="http://perldoc.perl.org/perlartistic.html" target="_top">perlartistic</a>'
+-
+  - '<em>perlgpl</em>'
+  - '<a href="http://perldoc.perl.org/perlgpl.html" target="_top">perlgpl</a>'
+-
+  - '<a href="http://csjewell.comyr.com/perl/">http://csjewell.comyr.com/perl/</a>'
+  - '<a href="http://csjewell.comyr.com/perl/" target="_top">http://csjewell.comyr.com/perl/</a>'
+-
+  - '<link rel="stylesheet" href="code.css" type="text/css" />'
+  - ''
+-
+  - '<body style="background-color: white">'
+  - '<body>'
+-
+  - '</head>'
+  - "<link rel=\"stylesheet\" href=\"http://csjewell.comyr.com/css/code.css\" type=\"text/css\" />\n</head>"
+-
+  - "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \n   \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+  - ''
+-
+  - "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+  - ''
+-
+  - "<?xml version=\"1.0\" ?>\n"
+  - ''
+-
+  - '<html xmlns="http://www.w3.org/1999/xhtml">'
+  - '<html>'
+-
+  - '>Object.pm<'
+  - '>File::List::Object<'
+-
+  - '.pm</title>'
+  - '</title>'
+-
+  - '.pm</h1>'
+  - '</h1>'
+-
+  - '<a href="/Exception/Class.html">'
+  - '<a href="http://search.cpan.org/perldoc/Exception%3A%3AClass" target="_top">'
+-
+  - '<a href="/Exception/Class/Base.html">'
+  - '<a href="http://search.cpan.org/perldoc/Exception%3A%3AClass%3A%3ABase" target="_top">'
+-
+  - '<a href="/Params/Util.html">'
+  - '<a href="http://search.cpan.org/perldoc/Params%3A%3AUtil" target="_top">'
+-
+  - '<a href="/MooseX/AttributeHelpers.html">'
+  - '<a href="http://search.cpan.org/perldoc/MooseX%3A%3AAttributeHelpers" target="_top">'
+-
+  - '<a href="#version">version.pm'
+  - '<a href="http://search.cpan.org/perldoc/version" target="_top">version.pm'

@@ -1,0 +1,31 @@
+NAME
+    FBP::Demo - FBP::Perl Demonstration Application
+
+DESCRIPTION
+    FBP::Demo is a Perl distribution which represents the target output of
+    the code generation functionality in FBP::Perl.
+
+    It has been completed (or at least initially aims to be) generated from
+    a wxFormBuilder project file, and represents approximately what your own
+    own generated distribution should look like when you use a front end
+    such as Padre::Plugin::FormBuilder to generate a Perl distributions.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FBP-Demo>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

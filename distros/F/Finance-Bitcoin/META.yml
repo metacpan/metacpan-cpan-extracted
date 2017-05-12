@@ -1,0 +1,59 @@
+---
+abstract: 'manage a bitcoin instance'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.014, CPAN::Meta::Converter version 2.120921'
+keywords:
+  - Bitcoin
+  - Commerce
+  - Currancy
+  - Currency
+  - Finance
+  - JSON-RPC
+  - JSONRPC
+  - Micropayment
+  - Micropayments
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Finance-Bitcoin
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Finance::Bitcoin:
+    file: lib/Finance/Bitcoin.pm
+    version: 0.902
+  Finance::Bitcoin::API:
+    file: lib/Finance/Bitcoin/API.pm
+    version: 0.902
+  Finance::Bitcoin::Address:
+    file: lib/Finance/Bitcoin/Address.pm
+    version: 0.902
+  Finance::Bitcoin::Role::HasAPI:
+    file: lib/Finance/Bitcoin/Role/HasAPI.pm
+    version: 0.902
+  Finance::Bitcoin::Wallet:
+    file: lib/Finance/Bitcoin/Wallet.pm
+    version: 0.902
+requires:
+  JSON::RPC::Legacy::Client: 0.93
+  Moo: 0
+  perl: 5.010000
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Finance-Bitcoin/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Finance-Bitcoin
+  homepage: https://metacpan.org/release/Finance-Bitcoin
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-finance-bitcoin
+version: 0.902

@@ -1,0 +1,33 @@
+0.91  2013-08-28
+    - get(): returns '502' response headers when none was received
+
+0.90  2013-08-27
+    - get() function added
+    - retries connection on signal interruption
+    - SSL_verify_mode explicitely set to SSL_VERIFY_NONE in
+      IO::Socket::SSL constructor arguments
+    - $MAX_LENGTH_SKIP default value reduced from 128KB to 16KB
+
+0.89  2012-10-22
+    - update to Module::Install 1.06 following Tatsuhiko
+      Miyagawafor's recommandation for perl 5.16 compatibility:
+      http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
+
+0.88  2012-03-21
+    - protocol redirection handling
+    - minor POD clarifications
+
+0.872 2012-02-16
+    - forgot to actually _save_ the new makefile...
+    - some more fixes in POD
+
+0.871 2012-02-16
+    - requires constant 1.03 (multiple constant definition,
+      form perl 5.7.2)
+    - minor POD fixes (still much to be done, sorry for that
+      poor doc and tests...)
+    - recommands IO::Socket::SSL and Time::y2038 in makefile
+
+0.87  2012-02-14
+    - First release on CPAN, but the module already
+      has more than 3 years of evolution

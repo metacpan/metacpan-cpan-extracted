@@ -1,0 +1,44 @@
+File::Find::Rule::Age
+
+I've finally grown tired of touching a file somewhere and then run a find -newer every time I wanted to do something like log archival or clean-up.
+
+I've been using File::Find::Rule for all my file-finding needs for a while, so it seemed natural to extend it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Find::Rule::Age
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Find-Rule-Age
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-Find-Rule-Age
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-Find-Rule-Age
+
+    Search CPAN
+        http://search.cpan.org/dist/File-Find-Rule-Age
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Sky Network Services
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

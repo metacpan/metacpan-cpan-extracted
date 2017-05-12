@@ -1,0 +1,8 @@
+Revision history for File-Queue
+
+1.01    2008-12-22
+        Fixed bug in the enq() function, and in the sample code.
+
+1.00    2008-05-27
+        First version, released on an unsuspecting world.
+

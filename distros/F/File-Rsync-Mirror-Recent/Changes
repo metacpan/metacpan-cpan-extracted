@@ -1,0 +1,187 @@
+2016-06-11  k  <andk@cpan.org>
+
+	* release 0.4.3
+
+	* remove nonsensical private INC path in all binaries; no functional
+	change
+
+2016-02-16  k  <andk@cpan.org>
+
+	* release 0.4.2
+
+	* add missing dependency Pod::Usage; discovered by my own smoker
+
+2015-09-10  k  <andk@cpan.org>
+
+	* release 0.4.1
+
+	* documentation clarification, inspired by Henk Penning 2013, never made
+	it into a release so far; release 0.4.0 missed to include it, so let me
+	make another release immediately after it
+
+	* release 0.4.0
+
+	* support rsync_options as a hashref or as an arrayref; this change
+	deals with upstram changes between File-Rsync 0.45 and 0.46;
+	rsync_options are rewritten such that F:R:M:R works with old and new
+	versions of File::Rsync; see also
+	https://rt.cpan.org/Ticket/Display.html?id=106942
+
+2013-01-05  k  <k@k83.linux.bogus>
+
+	* release 0.3.4
+
+	* release 0.3.3
+
+	* no functional change, just bump the version number. Just the
+	Makefile.PL to remind me of checking in, tagging and uploading in the
+	correct order.
+
+2012-12-31  k  <andk@cpan.org>
+
+	* release 0.3.2
+
+	* documentation improvement: offer a shorter version of the mirror
+	script in the HOWTO
+
+	* minor bugfix: fix the shebang in rrr-client
+
+2011-12-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 0.3.1
+
+	* documentation improvements and a new author-test aurora.t, no
+	functional changes; thanks to Henk P. Penning for writing iim
+	(http://ftp.cs.uu.nl/pub/PERL/iim) and asking questions of vital
+	importance for 'rrr'
+
+2011-08-19  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.3.0
+
+	* rrr-client: runstatusfile now completely optional, not defaulting to a
+	file in the current directory which prevented a sane behaviour during
+	system startup (Moritz Onken)
+
+2011-06-04  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.2.1
+
+	* rrr-client: fix delete events on dangling symlinks (spotted by Henk P.
+	Penning)
+
+	* improve diagnostics when encountering a lock directory
+
+	* address #68440: wrong documentation in rrr-client (Slaven Rezić)
+
+	* address #67668: add verboselog (Mitry Matyushkov)
+
+2011-05-17  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.2.0
+
+	* rrr-client new options --verbose and --skip-deletes
+
+	* address #68220: wrong closing brace position in
+	_rmirror_endofloop_sleep (Mitry Matyushkov)
+
+2011-03-20  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.1.1 (MANIFEST fixes)
+
+	* release 0.1.0
+
+	* rrr-client contributed by Ask Bjørn Hansen
+
+	* rrr-server based on Linux::Inotify2
+
+	* support for symlinks added
+
+	* all pre-alpha and alpha warnings removed; I'm sure there are bugs
+	lurking but I see no dominating showstoppers at the moment
+
+2010-10-29  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.8-TRIAL
+
+	* Client is now forking: children write their state into a YAML file.
+	Parent stays at constant memory.
+
+2009-05-03  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.7
+
+	* bugfix: state of ignore_link_stat_errors was lost during cloning
+
+	* make ignore_link_stat_errors true per default
+
+	* set $ENV{LANG} before exec of rsync
+
+	* overhaul the bin/ directory with rrr-update and rrr-fsck
+
+	* adjust verbosity of delete events
+
+2009-04-25  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.6
+
+	* bugfix: Done.pm failing to merge two intervals into one when a third
+	is present
+
+2009-04-16  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.5
+
+	* focus on "delete" events that were neglected so far
+
+2009-04-13  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.4
+
+	* new accessor C<tempdir> (suggested by Ask Bjørn Hansen)
+
+	* new accessor C<verboselog> (suggested by Barbie)
+
+	* bugfix: not all tempfiles were cleaned up correctly
+
+	* bugfix: fixed a panic 'Could not find an interval position ...' in the Done code
+
+	* bugfix: changes of the dirtymark were insufficiently discovered on the slave
+
+	* bugfix: Recentfile::recent_events now honours the C<contains> option
+	correctly
+
+	* changed several internal method and variable names
+
+2009-03-30  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.3
+
+	* Bugfix: pod coverage test failed due to a wrong head directive;
+
+	* updated HOWTO
+
+2009-03-29  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.2
+
+	* Bugfix: reflecting in the test that when JSON is not installed
+	Data::Serializer::JSON won't work
+
+	* convenience: verbose(X) on a Recent object now calls verbose(X) on all
+	associated Recentfile objects.
+
+2009-03-25  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 0.0.1
+
+	First version, released on an unsuspecting world.
+
+
+	Local Variables:
+	coding: utf-8
+	mode: change-log
+	change-log-default-name: "Changes"
+	tab-width: 2
+	left-margin: 2
+	End:

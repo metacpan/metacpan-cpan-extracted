@@ -1,0 +1,58 @@
+Revision history for Flickr-Tools
+
+
+1.22 28 November 2015
+ * go ahead and release
+
+1.21_04 28 November 2015
+ * Add fix for RT 109758
+ * Add version dependency for Flickr::API
+ * Added in a reflection tool
+
+1.21_03 26 November 2015
+ * Added caching to Cameras.pm
+ * added cache as a role for cameras, et. al.
+ * add some cache tests into the t/03-cameras.t 
+ * Add fix for RT109558 missing dependency
+ * close out some of the ancient now obviated RT bugs from years ago.
+
+
+1.21_02 15 November 2015
+ * Got a role working as desired, Permissions.pm
+ * Make the tests more to the point
+ * Add subclass and test for Reflection.pm
+
+
+1.21_01 12 October 2015
+ * Move Types.pm to a directory filled with Types/module.pm
+ * Now with Roles!
+
+1.21    05 October 2015
+ * Fix embarrassing version number goof
+
+1.20    05 October 2015
+ * Realizing that there is benefit to keeping Flickr::API as close to
+   perl core as practical and letting Flickr::Tools use Moo and more
+   abstraction, stopped moving all of Flickr::Tools into Flickr::API.
+ * Started process of getting the Flickr::Tools namespace ready for
+   the future. This means breaking a lot of what once was, but now isn't.
+
+1.19    Mistake
+
+0.04    17 September 2015
+ * Continue process of migrating these modules to Cal Henderson's Flickr::API
+   People and Person moving over
+
+0.03    08 August 2015
+ * Begin the process of migrating these modules to Cal Henderson's Flickr::API
+
+0.02    17 June 2005
+ * Solved a minor bug in the documentation of the Flickr::API::Photosets module;
+ * Added the 'photos' method to the Flickr::Photoset class;
+ * Added the 'photosets' method to the Flickr::Person class;
+ * Added pre_loading of data during object initialization to the Flickr::Photo class.
+
+
+0.01    16 June 2005
+ * First version, released on an unsuspecting world.
+

@@ -1,0 +1,42 @@
+---
+abstract: 'Ad hoc denormalized querying'
+author:
+  - Binary.com
+build_requires:
+  Devel::Cover: '1.23'
+  Devel::Cover::Report::Codecov: '0.14'
+  Test::FailWarnings: '0.008'
+  Test::Most: '0.34'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FlyBy
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Moo: '1.006001'
+  Parse::Lex: '2.21'
+  Set::Scalar: '1.29'
+  Try::Tiny: '0.19'
+  perl: '5.001000'
+resources:
+  bugtracker: https://github.com/binary-com/perl-FlyBy/issues
+  homepage: https://github.com/binary-com/perl-FlyBy
+  repository: https://github.com/binary-com/perl-FlyBy.git
+version: '0.095'
+x_contributors:
+  - 'Chylli <chylli@binary.com>'
+  - 'Jun Bon <junbon@binary.com>'
+  - 'Matt Miller <matt@binary.com>'
+  - 'Torsten Förtsch <torsten@binary.com>'

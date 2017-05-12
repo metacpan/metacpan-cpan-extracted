@@ -1,0 +1,174 @@
+FAREWELL NOTE
+
+  I believe that after epic BSD-battle I leave F::AF in good shape. 
+  What you see on cpan-testers (well, before this release) is
+  manifestation of APT-methods changing underground.  At the time I
+  believed that I absolutely must know what's happening on other end of
+  the pipe (and I still hold to this belief).  So the test-suite is
+  doing all terrible things I can implement (admitedly, it's "copy" and
+  "file" only, everything else is networking).  Then APT-methods have
+  changed.
+
+  Updating the test-suite (that's what's de-synchronized) is easy, I
+  just have to upgrade to something more current.  And here comes the
+  problem.  I have no resources to build RedHat for third time (I did it
+  twice already).  And I have to move on.  And I won't see Debian for
+  any foreseeable future.  Here we are.
+
+OVERVIEW
+
+  File::AptFetch provides API for APT (Advanced Package Tool, that's the
+  Debian package management system) methods.  APT methods aren't
+  libraries, they are executables (placed, by default, in
+  /var/lib/apt/methods).  So it's not XS (and can't be), F::AF forks. 
+  However one doesn't need fork for each file or session.  The IPC is
+  pipe (and can't be anything else).  As you can see there's a limit of
+  number of methods available simultaneously posed by the maximum number
+  of open filehandles (APT methods aren't that numerous anyway).
+
+  The module is named File::AptFetch because it always fetches.  I think
+  that's possible to develop a method that would bring away files, but,
+  at present, there's none.  And I doubt there would be any.
+
+  Further reading:
+
+  File::AptFetch
+      POD of the module.  Covers API and provides examples of intended
+      usage.  It's development is kind of dead (unless APT methods API
+      would change dramatically) -- any additions are in support for
+      File::AptFetch::Simple.
+
+  File::AptFetch::Cookbook
+      Provides some useful, I believe, findings on each method behaviour
+      and an overview, of my understanding, how that stuff works.  Look,
+      APT methods API documentation is quite outdated.  Each method is
+      undocumented completely.  (bug) My knowledge of APT methods is
+      very irregular, so is F::AF::C.
+
+  File::AptFetch::Simple
+      That's what you should look into for doing all kinds of stuff. 
+      (bug) It still lacks some functionality.
+
+RUN-TIME REQUIREMENTS
+
+  Perl
+      *v5.8.0* or later.  Look, *v5.6.2* is "woody", 20031114.  You must
+      be kidding.
+
+  base
+  Carp
+  Cwd Any version.  Distributed with Perl itself.
+
+  IO::Pipe
+      Any version.  It's distributed with Perl itself too.  In core
+      since *v5.3.7*, predates debian, BTW.
+
+  List::Util
+      Required by File::AptFetch::Simple for doing some gibberish. 
+      *v1.03* shall be enough.  Distributed with Perl itself.
+
+  String::Truncate
+      Required by File::AptFetch::Simple.  *v0.5* looks OK.
+
+  version
+      *v0.77*.  CPAN doesn't remember when *v0.50* has been released. 
+      Required version has been upgraded in fruitles attempt to fix some
+      FTBFSes.  Introduced more breakage.  Stayed.
+
+BUILD-TIME REQUIREMENTS
+
+  File::Temp
+  POSIX
+  Test::More
+      Any version.  Should be distributed with Perl itself.
+
+BUILD-TIME CONFIGURATION
+
+  *lib_method*
+      That sets location of APT methods.  It's unrequired, it will be
+      set any time APT configuration is sourced. 
+      "_cache_configuration()" in File::AptFetch and
+      "_uncache_configuration()" in File::AptFetch have more.
+
+  *config_source*
+      Required.  "ARRAY" ref that will be execed. 
+      "_cache_configuration()" in File::AptFetch has more.
+
+  *signal*
+      Required.  Names a signal that will be sent to method.  "DESTROY"
+      in File::AptFetch has more.
+
+  *timeout*
+  *tick*
+      *(v0.0.8)* Required.  I've believed, that could stay hardcoded.  I
+      was wrong.  "_read()" in File::AptFetch has more.
+
+      *(v0.1.6)* These are closely related.  From now on, *timeout*
+      keeps the same semantics as before (it's time to cut-off) but is
+      handled differently.  F::AF object sleeped (literally) for time
+      set.  Now it selects (with magic) in *tick*s.  (It's introduced
+      for sake of F::AF::S.)
+
+      Also.  Both must be naturals; They're in seconds; *tick* is
+      supposed to be couple of seconds (default: 5sec); While *timeout*
+      is supposed to be large enough (default: 2min) in respect to
+      network introduced delays.
+
+  *beat*
+  *wink*
+      *(v0.1.9)* *(F::AF::S -- v0.1.4)* Those two are for
+      File::AptFetch::Simple (what has more) -- control progress
+      indication.
+
+TEST-SUITE
+
+  Two things should be tested in regard with F::AF:
+
+  methods and structures
+      I wouldn't say I'm happy with this part (t/void/*.t).  It's mostly
+      a crash-type testing.  And a problem here is that I'm not
+      completely sure what an input (from methods side) here could be.
+
+  APT methods itself
+      Only local methods are tested.  And *cdrom* method, among them, is
+      no way touched.  Remote methods are missing from the test-suite. 
+      This problem is easily fixable -- some kind Perlist could upload
+      on CPAN some modules, in Test namespace, what would provide fake
+      servers of http://, ftp://, rsh:// etc protocols.  Anyone?
+
+  And one note.  F::AF is absolutely useles outside APT based world (I'm
+  not about *.deb, I'm about APT).  Then t/file/*.t and t/copy/*.t skip
+  completely.  Meanwhile t/void/*.t enables some cute workaround, that
+  would provide all needed "apt-config(1)" functionality without that
+  executable itself.  (Just in case on that platform there will be
+  Debian some day.) But we still stay within POSIX world -- no future
+  outside.
+
+AVAILABILITY
+
+  pure distribution
+      <http://search.cpan.org/dist/File-AptFetch/>
+
+  and debianization stuff too
+      # TODO
+
+  subversion (root)
+      # TODO
+
+BUGS
+
+  please report here
+      <http://rt.cpan.org/Public/Dist/Display.html?Name=File-AptFetch/>
+
+  please don't report there
+      # TODO
+
+COPYRIGHT AND LICENSING
+
+  *   Copyright 2009, 2010, 2014 by Eric Pozharski <whynot@cpan.org>
+
+  *   AS-IS, NO-WARRANTY, HOPE-TO-BE-USEFUL
+
+  *   GNU Lesser General Public License v3
+      <http://www.gnu.org/licenses/lgpl.txt>
+

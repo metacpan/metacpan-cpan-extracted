@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+config.ini
+flickr.pl
+t/Flickr-Simple2.t
+lib/Flickr/Simple2.pm
+META.yml                                 Module meta-data (added by MakeMaker)

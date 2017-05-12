@@ -1,0 +1,63 @@
+Finance-InteractiveBrokers-TWS 
+
+This module lets you communicate with InteractiveBroker's (IB) Trader's Work 
+Station (TWS), using Perl.  This is accomplished by wrapping the Java API that
+IB provides in Perl using Inline::Java.  Since we are using the Java API 
+provided by IB, all functionality is available.
+
+IB uses an event based model for communicating with the TWS, that is once 
+you've connected TWS will send messages (events) that you need to handle in 
+your code.
+
+PREREQUISTES
+
+    * TWS installed and running somewhere upon your network
+    
+    * Java JDK/JRE version >= 1.5 installed locally - if you have less 
+      there is a workaround.
+    
+    * TWS Java API provided by IB installed locally 
+      (see: http://www.interactivebrokers.com/cgi-pub/unix_standalone_api.pl)
+      
+    * You must compile the Java source files in the API to Java class files
+    
+        $ cd /the/location/of/IBJts/java/com/ib/client/
+        $ javac *.java
+
+    * Inline::Java installed 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+    TWS Gui
+    TWS Java API
+    Inline
+    Inline::Java
+    Class::InsideOut
+    File::Spec
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Jay Strauss
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

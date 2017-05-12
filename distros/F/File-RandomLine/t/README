@@ -1,0 +1,19 @@
+TEST FILES README
+
+File::RandomLine test files and data:
+
+01-fast-algorithm.t -- complete test of default algorithm and error handling
+02-uniform-algorithm.t -- shorter tests of slow, uniform algorithm
+testdata.txt -- sample data file with 4 lines for fast test
+testdata2.txt -- sample data file with 4 very uneven lines for uniform test
+not_readable.txt    -- empty file used for testing unreadable file failure
+
+Two additional files are present -- these were alternate test scripts
+used in writing an article about Test::MockRandom.  They are redundant with
+File_RandomLine.t, but are included here for reference and because I was
+testing to make sure they worked as promised.  Their extensions are 
+changed to avoid being picked up by the standard "Build test" cycle.
+
+minimal_test.pt     -- stub test with only 2 cases
+longer_test.pt      -- tests single lines only, no error checking
+

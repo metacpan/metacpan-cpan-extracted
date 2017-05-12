@@ -1,0 +1,223 @@
+=head1 NAME
+
+Finance::Bank::Bundesschatz - check your Bundesschatz accounts from Perl
+
+=head1 SYNOPSIS
+
+  # look for this script in the examples directory of the
+  # tar ball (balance.pl).
+  use Finance::Bank::Bundesschatz;
+  
+  use strict;
+  use warnings;
+  
+  my $agent = Finance::Bank::Bundesschatz->new(
+          account       => 'XXX',
+          pass          => 'XXX',
+          return_floats => 1,
+  );
+  
+  my $balance  = $agent->check_balance;
+  my $details  = $agent->get_details;
+  
+  printf("%11s: %25s\n", 'Kontonummer', $agent->account);
+  printf("%11s: %25s\n", $_->[0], $balance->{$_->[1]})
+  	for(( [ qw/ Kontostand balance / ],
+  	      [ qw/ Verzinsung interest / ],
+  ));
+  print "\n";
+  
+  foreach my $detail (@$details) {
+  	printf("%11s: %25s\n", $_->[0], $detail->{$_->[1]})
+  		for(( [ qw/ Produkt product / ],
+  		      [ qw/ Von from / ],
+  		      [ qw/ Bis to / ],
+  		      [ qw/ Verzinsung interest / ],
+  		      [ qw/ Betrag amount / ],
+  		      [ qw/ Zinsen interest_amount / ],
+  		      [ qw/ KESt tax / ],
+  		      [ qw/ Gesamt amount_after_tax / ],
+  	));
+  	print "\n";
+  }
+
+=head1 DESCRIPTION
+
+This module provides a basic interface to the online banking system of
+Bundeschatz.at at C<http://www.bundesschatz.at>.
+
+Please note, that you will need either C<Crypt::SSLeay> or C<IO::Socket::SSL>
+installed for working HTTPS support of C<LWP>.
+
+=head1 METHODS
+
+=over
+
+=item check_balance
+
+Queries the accounts and extracts various informations about the account
+status and returns it as a hashref:
+
+  $VAR1 = {
+          'balance'  => account balance
+          'interest' => the interest average
+          };
+
+=item get_details
+
+Queries and parses the 'Kontodetails' page of the account.
+
+Returns an arrayref of hashrefs containing all fetched information:
+
+  $VAR1 = [
+            {
+              'from'             => begin of booking
+                                    (format: DD.MM.YYYY)
+              'to'               => end of booking
+                                    (format: DD.MM.YYYY)
+              'currency'         => currency
+              'amount'           => amount
+              'interest'         => interest
+              'amount_after_tax' => amount minus tax
+              'tax'              => tax
+              'interest_amount'  => amount of interest
+            },
+          ];
+
+=item get_interest
+
+Queries and parses the 'Zinsentwicklung' page and returns the results
+as arrayref of hashrefs:
+
+  $VAR1 = [
+            {
+              'published'    => publishing date
+                                (format: DD.MM.YYYY)
+              'valid_on'     => date the interest where valid
+                                (format: DD.MM.YYYY)
+              'interest_bs1' => interest for fiscal period
+              'interest_bs2' => interest for fiscal period
+              'interest_bs3' => interest for fiscal period
+            },
+          ];
+
+=back
+
+=head1 ATTRIBUTES
+
+All attributes are implemented by C<Class::MethodMaker>, so please take a
+look at its man page for further information about the created accessor
+methods.
+
+=over
+
+=item account
+
+Account to connect with (Kontonummer).
+
+=item coowner
+
+Co-Owner to connect with (Mitinhaber).
+
+=item pass
+
+Password to connect with (Passwort).
+
+=item return_floats
+
+Boolean value defining wether the module returns the balance as signed
+float or just as it gets it from the online banking system (default:
+false).
+
+=back
+
+=head1 EXAMPLES
+
+In the C<examples> directory of the distribution are two example scripts
+which show the usage of this module. Both scripts can be used out of
+the box and should represent a good starting point for a solution which
+fits your particular needs (I use a copy of C<balance-gpg.pl> on a daily
+basis).
+
+=over
+
+=item balance.pl
+
+The very same script as seen in the C<SYNOPSIS>. Shows the basic usage,
+defines all authentication settings directly in the script.
+
+The main problem with this approach is of course the fact, that the
+sensible authentication data is stored in clear text in the script
+itself. Not a good thing at all if you're using it in an multiuser
+environment or on a mobile computer.
+
+But do not fear - help in form of GPG is on the way (see C<balance-gpg.pl>).
+
+=item balance-gpg.pl
+
+This script does the same thing as C<balance.pl> but gets all the
+configuration settings from an C<GPG> encrypted file which is decrypted
+on the fly at startup, C<GPG> will interactive ask for your passphrase.
+
+To use this example script you need to set up C<GPG> and install
+C<GnuPG::Interface>, C<IO::File>, C<IO::Handle> and C<YAML> on your
+machine.
+
+The encrypted file should have the following structure (in case of C<YAML>):
+
+  account:       XXX
+  pass:          XXX
+  return_floats: 1
+
+The layout may differ, depending on the module you are using for
+serialization.
+
+=back
+
+=head1 WARNING
+
+This is code for B<online banking>, and that means B<your money>, and that
+means B<BE CAREFUL>. You are encouraged, nay, expected, to audit the source 
+of this module yourself to reassure yourself that I am not doing anything 
+untoward with your banking data. This software is useful to me, but is 
+provided under B<NO GUARANTEE>, explicit or implied.
+
+=head1 CAVEATS
+
+I didn't had the chance of testing this module against an account mapped
+to only one bank account.
+
+It would be very nice if someone with only one bank account could test
+this module and drop me note about the results.
+
+Also take note that this module can break easily if Bundesschatz.at
+changes the layout of the online banking system.
+
+=head1 THANKS
+
+Simon Cozens <simon@cpan.org> for C<Finance::Bank::LloydsTSB> from which I've
+borrowed the warning message.
+
+Chris Ball <chris@cpan.org> for his article about screen-scraping with
+C<WWW::Mechanize> at C<http://www.perl.com/pub/a/2003/01/22/mechanize.html>.
+
+=head1 AUTHOR
+
+Florian Helmberger <fh@laudatio.com>
+
+=head1 VERSION
+
+$Id: Bundesschatz.pod,v 1.3 2003/10/12 12:03:43 florian Exp $
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Florian Helmberger
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<WWW::Mechanize>, L<HTML::TokeParser>, L<Class::MethodMaker>.
+
+=cut

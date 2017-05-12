@@ -1,0 +1,53 @@
+FrameNet-WordNet-Detour
+
+VERSION 0.99d
+
+DESCRIPTION
+
+The FrameNet-WordNet-Detour takes one or more synsets as input and
+maps each of them to a set of weighted frames.
+
+PREREQUISITS
+
+CPAN-Modules:
+- WordNet::QueryData (>= 1.37)
+- WordNet::Similarity::path (>=0.10)
+- XML::TreeBuilder (>=3.09)
+- Getopt::Long (>= 2.34)
+- Pod::Usage (>=1.00)
+- File::Spec (>=0.86)
+- Test::More
+
+Additionally:
+- WordNet (needed also for the WordNet::* modules)
+- FrameNet (>= 1.1, we tested on 1.1 and 1.2)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+With 
+
+    perl Makefile.pl PREFIX=/some/directory
+
+you can target the installation in any directory you want.
+
+The testing code makes use of the two environment variables $FNHOME
+and $WNHOME, which should be set to the FrameNet resp. WordNet
+directory. The testing code will not work without these variables,
+even though it is possible to use the module later on without them.
+
+As a workaround, we propose to temporarly set the variables (or to
+skip the tests, but that probably not a good advice ... )
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Aljoscha Burchardt, Nils Reiter
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

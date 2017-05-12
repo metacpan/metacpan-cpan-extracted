@@ -1,0 +1,79 @@
+---
+abstract: "Ftree - family tree generator\r"
+author:
+  - "Dr. Ferenc Bodon and Simon Ward and Nikolay Mishin\r"
+build_requires:
+  Test::More: '0'
+  Test::Pod: '1.48'
+  Test::Run: '0'
+  Test::Run::CmdLine: '0'
+  Test::Trap: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FamilyTreeInfo
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CGI::Compile: '0.19'
+  CGI::Emulate::PSGI: '0.21'
+  Class::Std: '0.013'
+  Class::Std::Fast::Storable: v0.0.8
+  Config::General: '2.58'
+  DBI: '0'
+  DateTime: '0'
+  Digest::MD4: '0'
+  Digest::MD5: '0'
+  Digest::Perl::MD4: '0'
+  Encode: '0'
+  Excel::Writer::XLSX: '0'
+  File::Temp: '0'
+  Gedcom: '1.15'
+  Gedcom::Comparison: '1.15'
+  Gedcom::Event: '1.15'
+  Gedcom::Family: '1.15'
+  Gedcom::Grammar: '1.15'
+  Gedcom::Individual: '1.15'
+  Gedcom::Item: '1.15'
+  Gedcom::Record: '1.15'
+  IO::Stringy: '2.110'
+  Jcode: '0'
+  List::MoreUtils: '0.413'
+  List::Util: '0'
+  Log::Log4perl: '1.46'
+  OLE::Storage_Lite: '0.19'
+  PadWalker: '2.1'
+  Params::Validate: '0'
+  Parse::RecDescent: '0'
+  Plack: '1.0039'
+  Scalar::Util: '0'
+  Set::Scalar: '1.29'
+  Spreadsheet::ParseExcel: '0'
+  Spreadsheet::Read: '0.62'
+  Spreadsheet::WriteExcel: '0'
+  Spreadsheet::XLSX: '0.13'
+  Sub::Exporter: '0.987'
+  Time::Local: '0'
+  Unicode::Map: '0'
+  experimental: '0.016'
+  perl: '5.008005'
+  version: '0.9912'
+resources:
+  bugtracker: https://github.com/mishin/Ftree-cpan/issues
+  homepage: https://github.com/mishin/Ftree-cpan
+  repository: https://github.com/mishin/Ftree-cpan.git
+version: 2.3.41
+x_contributors:
+  - 'Nikolay Mishin <mi@ya.ru>'
+  - 'Nikolay Mishin <nmishin@masterdm.ru>'

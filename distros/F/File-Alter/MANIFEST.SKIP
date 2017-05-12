@@ -1,0 +1,5 @@
+^tmp/
+blib
+bak$
+gz$
+^Makefile$

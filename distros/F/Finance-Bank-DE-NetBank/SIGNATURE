@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a0d8a926c19c5fe51eb2acfa838472e8a8a04600 Changes
+SHA1 8fef220a428b4f777325b897fbc357611afdf0d1 LICENSE
+SHA1 b69e4ac2d8b82d31721fca4c72f1a3656f5de3f5 MANIFEST
+SHA1 dcd5a2e5e83f02e172b5bcee8407354097eff390 MANIFEST.SKIP
+SHA1 40ef622816e450d3e7f8f29a0f80884e6e81649c META.yml
+SHA1 548ff68040850c069cc8621ad293858e984ad1fd Makefile.PL
+SHA1 c816d8943b91a152cea36563a6c76e5173371124 README
+SHA1 7c17a5d37afee1dd369c298dcc57ce63e1e2f276 README.html
+SHA1 c816d8943b91a152cea36563a6c76e5173371124 README.txt
+SHA1 67a78a5311bd92c54d1ae7ba8212552cc94522d1 Todo
+SHA1 b2747d3f62c672e6f47ca2179d730fd73340b405 lib/Finance/Bank/DE/NetBank.pm
+SHA1 6c3367df732372c59c6a7b0201de5f0dca3ee177 rmoriz.pub
+SHA1 6731157b6c214d7ca4269933b8f3207439e23778 t/00signature.t
+SHA1 775b5300d98774b1de892f8fbd51ef4f70cf8a52 t/01load.t
+SHA1 86d255a7c9f065a13049108362c949b3e35a4c24 t/02pod.t
+SHA1 355e5eab727edf15b7c8e2d0716830b9a232a2f4 t/general.t
+SHA1 1f682ceaa44a460e21a1e7f0077dc3270cea47a3 t/methods/Debug.t
+SHA1 fb369e801fa354b60055e67917b5324536df560e t/methods/Version.t
+SHA1 c7591b1a75dc8de61f87d2ae73b845e10d6c23af t/methods/live/login.t
+SHA1 c3aefb5e3ccd8a13df5d9df89067531ab2c3046a t/methods/live/saldo.t
+SHA1 639965c87337ee0245906b0b6b587f29f1ac6b1d t/methods/live/statement.t
+SHA1 88b36bdd23e48527992c3ababc33eb617c1cdbfc t/methods/live/transfer.t
+SHA1 37b2ce5b3c068bc0eebeb615c76114becb818fa3 t/methods/new.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+
+iD8DBQFEpoSEHkigiUjSNxsRArWTAJ42OPPxpDJ+IF6jgZ0m70UBLH4WIACfWktp
+3/pnYIPmPQzguFbW1om3QtM=
+=8g/v
+-----END PGP SIGNATURE-----

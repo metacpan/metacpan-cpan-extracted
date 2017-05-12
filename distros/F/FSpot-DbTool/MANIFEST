@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/FSpot/DbTool.pm
+lib/FSpot/DbTools/Paths.pm
+lib/FSpot/DbTools/Tags.pm
+lib/FSpot/DbTools/Test.pm
+bin/fspot-tool
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

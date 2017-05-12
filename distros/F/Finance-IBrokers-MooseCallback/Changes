@@ -1,0 +1,8 @@
+Revision history for Finance-IBrokers-MooseCallback
+
+0.01    Date/time
+        First version, Many of the TWS callback methods are included, along with parameters that they are passed.
+
+0.02    Date/time
+        Updated POD documentation. Minor tweaks to methods. 
+

@@ -1,0 +1,144 @@
+NAME
+    File::KeePass::Agent - Application agent for working with File::KeePass
+    objects
+
+SYNOPSIS
+       use File::KeePass::Agent;
+       File::KeePass::Agent->new->run($file, $pass);
+
+
+       File::KeePass::Agent->new->run;  # will read from @ARGV or prompt
+
+
+       File::KeePass::Agent::run();  # will read from @ARGV or prompt
+
+
+       File::KeePass::Agent::run(\%files);  # file/pass pairs
+
+
+       File::KeePass::Agent::run(\@files);
+
+       File::KeePass::Agent::run(\@files, \@passes);  # parallel arrays
+
+    You may pass the name of the keepass filename that you would like to
+    open. Otherwise you are prompted for the file to open.
+
+    You are then prompted for the password and/or the keyfile that will be
+    used to open the file.
+
+    See File::KeePass for a listing of what KeyPass database features are
+    currently handled.
+
+OS
+    File::KeePass::Agent (FKPA) will try to load a module based on the OS
+    returned by the $^O variable. OS support during the initial releases is
+    very sparse.
+
+FKPA OS API
+    The unix module variant contains documentation about what methods are
+    necessary to support the FKPA api.
+
+    See "FKPA METHODS" in File::KeePass::Agent::unix.
+
+METHODS
+    "new"
+        Returns an object blessed into the FKPA class.
+
+    "run"
+        Reads the file, password, prints out a summary of the database, and
+        binds any shortcut keys. Eventually, this will most likely support
+        more maintenance features.
+
+    "keepass"
+        Returns an arrayref of arrayrefs continaing file and File::KeePass
+        object pairs.
+
+    "shortcut_name"
+        Returns a human readable name from a shortcut hashref.
+
+    "active_entries"
+        Finds current active entries from any of the open databases.
+
+    "active_searches"
+        Parses the active searches and returns a listing of qr
+        matches/auto-type string/entry records.
+
+    "search_auto_type"
+        Takes an window title and compares it against the current active
+        searches.
+
+    "do_no_match"
+        Called if search_auto_type didn't find a matching window.
+
+    "do_auto_type"
+        Called if search_auto_type found a single match.
+
+    "do_auto_type_mult"
+        Called if search_auto_type found multiple matching windows.
+
+    "do_auto_type_unsupported"
+        Called when FKPA doesn't support an auto-type directive.
+
+GLOBAL SHORTCUTS
+    FKPA will read for the current global shortcut listed in the keepassx
+    configuration file. At the moment this must first be configured using
+    keepassx itself. Future support will allow for configuring this through
+    FKPA itself.
+
+    If this global shortcut is defined, when pressed it will call
+    search_auto_type to find entries matching against the current window
+    title. If found, it will auto-type the matching entry.
+
+    Additionally, custom global shortcuts may defined in the comments
+    section of the FKP database entries. They have the form:
+
+       Custom-Global-Shortcut: Ctrl-Alt-Shift w
+
+    This allows for individual entry auto-typing to be called directly.
+
+AUTOTYPE SUPPORT
+    Version 2 databases natively support auto-type entries. Comment sections
+    of version 1 database entries may contain Auto-type entries in the
+    following form:
+
+        Auto-Type-Window: Admin Login*
+        Auto-Type-Window: Login*
+        Auto-Type: {USERNAME}{TAB}{PASSWORD}{ENTER}
+
+    The Auto-Type-Window items are used to match against window titles. You
+    may put a leading * and/or a trailing * on the item to allow for
+    wildcard matching.
+
+    If a window matches an Auto-Type-Window entry the corresponding
+    Auto-Type item will be processed and "auto-typed" to the current window.
+
+    Currently the following auto-type directives are supported:
+
+    "USERNAME"
+        The username for the entry.
+
+    "PASSWORD"
+        The password for the entry.
+
+    "URL"
+        The URL for the entry.
+
+    "..."
+        All properties of the entry may be accessed.
+
+    "TAB"
+        The tab character.
+
+    "ENTER"
+        The enter character.
+
+STATUS
+    This module and program are proof of concept. They work, but are limited
+    in their feature set. There currently are no managment capabilities.
+
+AUTHOR
+    Paul Seamons <paul at seamons dot com>
+
+LICENSE
+    This module may be distributed under the same terms as Perl itself.
+

@@ -1,0 +1,122 @@
+Revision history for Perl extension Finance-Robinhood
+
+0.19 2017-03-29T16:26:33Z
+
+    - Robinhood Instant/Gold features:
+        - extended_hours value in ::Order
+        - override_day_trade_checks value in ::Order
+        - override_day_trade_checks value in ::Order
+    - Gather orders after a certain time with ::Robinhood::list_orders({since => $timestamp})
+
+0.18 2017-03-05T17:28:26Z
+
+    - Add ::Robinhood::fundamentals(...) function/->fundamentals(...) method
+
+0.17 2017-03-05T02:07:57Z
+
+    - Lazy load ::Quote data
+    - Expose source of quote (consolidated tape, nasdaq live, etc.)
+
+0.16 2017-02-11T21:13:47Z
+
+    - Add ::Instrument::Fundamentals class
+    - Add support for bound historical data (...see docs)
+    - Lazy load ::Market data
+    - More lazy load stuff
+
+0.15 2016-12-29T16:42:12Z
+
+    - 'next' and 'previous' keys were getting messed up in paginated results
+    - Various minor, nondescript fixes
+
+0.14 2016-12-28T04:08:26Z
+
+    - Lazy load ::Instrument data (save the API server on watchlist calls)
+    - Expose day_trade_ratio, min_tick_size, country, and margin_initial_ratio in ::Instrument objects
+    - ::Instrument->quote() returns a single quote object
+    - Use Time::Piece if loaded (fallback to DateTime)
+    - Rollback 0.12 now that the API is fixed
+
+0.13 2016-12-25T19:41:16Z
+
+	- Fix adding single instrument to watchlist
+
+0.12 2016-12-02T21:42:01Z
+
+    - Update eg/buy.pl for minor API change
+
+0.11 2016-10-10T16:41:23Z
+
+    - RH's API server stopped updating the /markets/ endpoint on July 30th.
+    - ::Market::Hours now exposes extended trading hours
+
+0.10 2016-08-27T16:37:13Z
+
+    - New Finance::Robinhood::Portfolio class for current and historical info
+    - New ::Robinhood->portfolios() method to get paginated list of portfolios
+    - New ::Robinhood->markets() method to get a paginated list of supported
+        markets as Finance::Robinhood::Market objects
+    - New ::Robinhood::Market->new(...) constructor to get an object representing a
+        specific exchange. Use the ISO 10383 MIC. ...see the docs for more.
+    - New ::Order->refresh() method
+    - Fix: Coerced dates are now parsed correctly
+    - Fix: JSON decoder is now wrapped by Try::Tiny
+
+0.09 2016-08-12T01:24:57Z
+
+    - Breaking change: Finance::Robinhood::quote(...) always returns paginated list
+
+0.08 2016-06-27T19:49:09Z
+
+    - Updating several examples due to API changes and (mostly) lazy bugs
+    - Though meaningless for market orders, the 'price' value is now required by the API
+        If it's missing in your call to ::Order->new(...), quote data is requested for
+        the instrument and the current bid price is used.
+
+0.07 2016-05-29T20:46:30Z
+
+	- Historical quotes correctly request a defined span
+	- Example script found at eg/export_orders.pl only exports executed orders by default
+	    - Override this with --all
+
+0.06 2016-04-29T22:05:28Z
+
+    - ::Order->executions() was dropping all but timestamp and settlement_date
+    - Next and previous cursor information was leaking in paginated data
+    - New demo script: eg/export_orders.pl
+        - Grabs entire order history and writes it to a file or STDOUT as CSV
+
+0.05 2016-04-04T01:53:58Z
+
+    - Get watchlist by name with ::Robinhood->watchlist(...)
+    - ::Robinhood->delete_watchlist(...) can now delete watchlist by name or with object
+    - Fix: API to bulk add symbols to watchlist supports 32 max per call
+
+0.04 2016-04-02T16:21:13Z
+
+    - Test making a buy order in t/05_buy.t
+    - Fix bug randomly preventing ::Order re-creation
+
+0.03 2016-04-01T21:55:25Z
+
+    - Major documentation update
+    - Order type cheat sheet in Finance::Robinhood::Order
+    - Gather historical data on a security with Finance::Robinhood::historicals(...) or with ::Instrument->historicals(...)
+    - Access current and historical portfolio data for ::Account objects
+
+0.02 2016-03-31T19:26:04Z
+
+    - New demo script: eg/buy.pl
+    - Buy and Sell orders are now made by directly calling Finance::Robinhood::Order->new(...)
+    - Orders are cancelled with $order->cancel()
+    - Support for initiating and completing a password reset request
+    - Loads of user information methods
+    - Document Finance::Robinhod::Instrument
+    - Gather stock's fundamentals with aptly named ::Instrument->fundamentals()
+    - Require IO::Socket::SSL and perl 5.12+
+    - Note: I'm narrowing it down but the API will still be subject to change!
+
+0.01 2016-03-26T23:35:04Z
+
+    - First public release
+    - This is an alpha dist. The API will be subject to change!

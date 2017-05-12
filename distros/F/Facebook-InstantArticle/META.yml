@@ -1,0 +1,29 @@
+---
+abstract: 'Helper class for generating Facebook Instant Article markup.'
+author:
+  - 'Tore Aursand <toreau@gmail.com>'
+build_requires:
+  DateTime: '1.36'
+  DateTime::Locale: '1.05'
+  DateTime::TimeZone: '2.01'
+  ExtUtils::MakeMaker: '7.18'
+  Test::More: '1.302037'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Facebook-InstantArticle
+requires:
+  Mojolicious: '7.06'
+  Moose: '2.1804'
+  XML::Generator: '1.04'
+  namespace::autoclean: '0.28'
+resources:
+  bugtracker: https://github.com/toreau/Facebook-InstantArticle/issues
+  repository: https://github.com/toreau/Facebook-InstantArticle
+version: '0.12'
+x_serialization_backend: 'YAML::Tiny version 1.69'

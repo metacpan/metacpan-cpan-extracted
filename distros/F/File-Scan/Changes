@@ -1,0 +1,687 @@
+Revision history for Perl extension File::Scan.
+
+1.43  Wed May  4 17:07:43 WEST 2005
+	- a new word has been added to suspicious.txt file.
+	- minor feature enhancements in Makefile.PL.
+	- added two new virus signatures (W32/Sober.p@MM and
+	  W32/Mytob.gen@MM).
+	- the W32/Bagle.ai@MM virus signature has been updated again to
+	  detect W32/Bagle.bb@MM variant.
+
+1.42  Mon Mar  7 18:14:52 WET 2005
+	- added three new virus signatures (Downloader-PH,
+	  PWS-Banker.k.gen and W32_Mydoom.ba_MM).
+	- the W32/MyWife.b@MM, W32/Sober.j@MM and W32/Bagle.ai@MM virus
+	  signatures hash also been updated to detect W32/MyWife.c@MM,
+	  W32/Sober.I@MM and W32/Bagle.dldr.gen variants.
+
+1.41  Sat Feb 19 17:57:40 WET 2005
+	- added W32/Mydoom.bb@MM virus signature.
+
+1.40  Sat Feb 12 19:28:36 WET 2005
+	- added W32/MyWife.b@MM virus signature.
+
+1.39  Tue Dec 21 18:38:04 WET 2004
+	- added two new virus signatures (W32/Netsky.z@MM and
+	  W32/Zafi.d@MM).
+	- added '4d5a000000' new application signature to Makefile.PL
+
+1.38  Mon Nov 22 19:51:18 WET 2004
+	- added three new virus signatures (W32/Lovgate.af@MM,
+	  W32/Lovgate.q@MM and W32/Sober.j@MM).
+
+1.37  Sat Nov  6 16:59:30 WET 2004
+	- added three new virus signatures (VBS/Inor.encoded,
+	  W32/Netsky.ab@MM and W32/Bagz.f@MM).
+
+1.36  Sat Oct 30 19:03:30 WEST 2004
+	- added Generic PWS.f virus signature.
+	- the W32/Bagle.ai@MM virus signature has been updated to detect
+	  W32/Bagle.bb@MM variant.
+
+1.35  Mon Oct 18 14:14:10 WEST 2004
+	- added W32/Korgo.worm.aa virus signature.
+	- the following virus signatures has been commented Ginger.mp,
+	  ARCV.Anna.742 and W32/HLLP.32767.a because in the last two years
+	  I didn't find any occurrences
+
+1.34  Fri Oct 15 16:17:49 WEST 2004
+	- the W32/Darby@MM virus signature has been updated.
+	- added W32/Netsky.ag@MM virus signature.
+
+1.33  Tue Oct 12 13:45:27 WEST 2004
+	- the W32/Mabutu.b@MM virus signature has been updated.
+
+1.32  Thu Oct  7 14:50:08 WEST 2004
+	- the W32/Lovgate.x@MM virus signature has been updated.
+
+1.31  Wed Oct  6 16:56:40 WEST 2004
+	- the W32/Mydoom.o@MM virus signature has been updated to
+          detect W32/Mydoom.n@MM and W32/Mydoom.f@MM variants.
+	- added W32/Lovgate.r@MM virus signature.
+
+1.30  Sat Sep 18 19:06:46 WEST 2004
+	- the W32/Bagle.aa@MM virus signature has been updated.
+	- added MultiDropper-KR virus signature.
+
+1.29  Wed Sep 15 15:24:08 WEST 2004
+	- added W32/Bagle.aa@MM virus signature.
+
+1.28  Sat Sep 11 17:47:30 WEST 2004
+	- the W32/Mydoom.o@MM virus signature has been updated.
+	- added three new virus signatures (W32/Bagle.dll.dr,
+	  W32/Lovgate.ai@MM and W32/Mabutu.a@MM).
+
+1.27  Tue Aug 17 14:30:00 WEST 2004
+	- the W32/Mydoom.o@MM and W32/Netsky.p@MM virus signatures were
+	  updated.
+	- added JS_IllWill virus signature.
+
+1.26  Tue Jul 27 14:01:13 WEST 2004
+	- added W32/Mydoom.o@MM virus signature.
+
+1.25  Wed Jul 21 14:46:25 WEST 2004
+	- the W32/Bagle.ai@MM virus signature has been updated.
+
+1.24  Wed Jul 21 13:38:17 WEST 2004
+	- added two new virus signatures (W32/Netsky.ac@MM and
+	  W32/Bagle.ai@MM).
+
+1.23  Sat Jul 17 17:14:05 WEST 2004
+	- added W32/Bagle.af@MM virus signature.
+
+1.22  Sat Jul 10 16:42:02 WEST 2004
+	- added W32/Bagle.dll.gen virus signature.
+
+1.21  Tue Jul  6 14:12:28 WEST 2004
+	- added two new virus signatures (W32/Lovgate.ac@MM and
+	  W32/Bagle.ab@MM!hta).
+
+1.20  Sat Jul  3 19:23:32 WEST 2004
+	- added W32/Netsky.w@MM virus signature.
+	- the W95/Elkern.cav.c virus signature has been commented.
+
+1.19  Mon Jun 28 12:19:52 WEST 2004
+	- the W32/Magistr.a@MM and W32/Netsky.c@MM virus signatures were
+	  updated.
+	- added W32/Netsky.f@MM virus signature.
+
+1.18  Sat Jun 19 20:00:25 WEST 2004
+	- the W32/Bagle.j@MM virus signature has been updated.
+
+1.17  Mon Jun 14 13:49:07 WEST 2004
+	- added W32/Zafi.b@MM virus signature.
+
+1.16  Sat Jun 12 15:38:52 WEST 2004
+	- the W32/Bagle.j@MM and W32/Netsky.c@MM virus signatures had been
+	  updated to detect W32/Bagle.aa@MM and W32/Netsky.f@MM variants.
+
+1.15  Sat May 29 17:01:23 WEST 2004
+	- the W32/Mydoom@MM virus signature has been updated to detect
+	  W32/Mydoom.g@MM variant.
+
+1.14  Sat May 22 18:10:47 WEST 2004
+	- the W32/Netsky@MM virus signature has been updated.
+
+1.13  Wed May 19 14:31:56 WEST 2004
+	- added W32/Bobax.worm.c virus signature.
+	- the W32/Netsky.p@MM virus signature has been updated.
+
+1.12  Mon May 17 15:02:37 WEST 2004
+	- the W32/Sober@MM virus signature has been updated.
+
+1.11  Fri May  7 14:55:02 WEST 2004
+	- the W32/Mydoom@MM virus signature has been updated to detect
+	  W32/Mydoom.h@MM variant.
+
+1.10  Wed May  5 14:39:48 WEST 2004
+	- added W32/Netsky.n@MM virus signature.
+
+1.09  Mon May  3 13:56:53 WEST 2004
+	- the W32/Bagle.j@MM virus signature has been updated again
+
+1.08  Fri Apr 30 19:53:10 WEST 2004
+	- the W32/Bagle.j@MM virus signature was updated.
+
+1.07  Wed Apr 28 19:51:56 WEST 2004
+	- the W32/Netsky@MM virus signature has been updated to detect
+	  W32/Netsky.ab@MM variant.
+
+1.06  Wed Apr 28 18:54:42 WEST 2004
+	- added two new virus signatures (W32/Bagle.aa@MM!vbs and
+	  W32/Bagle.aa@MM!hta).
+	- the W32/Bagle.j@MM virus signature has been updated to detect
+	  W32/Bagle.aa@MM variant.
+
+1.05  Tue Apr 27 16:14:29 WEST 2004
+	- the following virus signatures has been commented
+	  W32/Borges.cmp, W95/Puma, W95/Rekoj.GR, W95/Miam.dr,
+	  W32/Enviar.gen@M and W32/Javel.512 because in the two last years
+	  there hasn't been any occurrences.
+	- minor feature enhancements in Makefile.PL.
+	- added W32/Netsky.x@MM virus signature.
+	- the New Malware.b signature has been removed because it is the 
+	  W32/Mydoom.j@MM virus.
+	- the W32/Mydoom@MM virus signature has been updated to detect
+	  W32/Mydoom.j@MM variant.
+	- the W32/Netsky@MM virus signature has been updated to detect
+	  W32/Netsky.m@MM, W32/Netsky.w@MM and W32/Netsky.z@MM variant.
+	- the W32/Netsky.c@MM virus signature has been updated to detect
+	  W32/Netsky.d@MM (Petite packed) variant.
+	- examples/scan.pl: the version was updated to 0.17.
+	- examples/scan.pl: the report now show the File::Scan module
+	  version.
+
+1.04  Mon Apr 26 20:43:05 WEST 2004
+	- added W32/Torvil@MM virus signature
+	- the W32/Bagle.j@MM virus signature has been updated to detect
+	  W32/Bagle.z@MM variant
+
+1.03  Thu Apr 22 17:55:53 WEST 2004
+	- added two new virus signatures (Exploit-DcomRpc.gen New 
+	  Malware.b).
+	- the W32/Netsky@MM virus signature has been updated
+
+1.02  Wed Apr 14 19:52:42 WEST 2004
+	- added W32/Lovgate.x@MM virus signature
+	- the W32/Netsky.p@MM virus signature has been updated to detect
+	  W32/Netsky.r@MM variant
+
+1.01  Mon Apr  5 15:33:00 WEST 2004
+	- the W32/Sober@MM virus signature has been updated to detect
+	  W32/Sober.f@MM variant
+
+1.00  Fri Apr  2 16:16:45 WEST 2004
+	- the W32/Bagle.u@MM virus signature has been updated
+
+0.99  Fri Mar 26 15:25:19 WET 2004
+	- added W32/Bagle.u@MM virus signature
+
+0.98  Tue Mar 23 14:13:33 WET 2004
+	- added W32/Netsky.p@MM virus signature
+
+0.97  Mon Mar 22 15:14:43 WET 2004
+	- the W32/Netsky.c@MM virus signature has been updated again to
+	  detect W32/Netsky.d@MM (Petite packed) variant
+
+0.96  Fri Mar 19 16:01:22 WET 2004
+	- the W32/Netsky.c@MM virus signature has been updated to detect
+	  W32/Netsky.c@MM (Petite packed), W32/Netsky.c@MM (UPX packed)
+	  and W32/Netsky.d@MM variant
+	- the W32/Bagle.j@MM virus signature has been updated to detect
+	  W32/Bagle.n@MM and W32/Bagle.p@MM variants
+
+0.95  Thu Mar 18 13:16:37 WET 2004
+	- the W32/Netsky.c@MM, W32/Bagle.e@MM and W32/Bagle.j@MM virus
+	  signatures were updated.
+
+0.94  Thu Mar 11 17:43:13 WET 2004
+	- added Proxy-Cidra virus signature
+	  Thanks to Michal Jankowski <Michal.Jankowski@fuw.edu.pl>
+
+0.93  Tue Mar  9 16:27:05 WET 2004
+	- added W32/Netsky.j@MM virus signature
+
+0.92  Mon Mar  8 15:59:22 WET 2004
+	- the W32/Sober@MM virus signature has been updated to detect
+	  W32/Sober.d@MM variant
+	- the virus W32/Bagle.k@MM is detected as W32/Bagle.j@MM
+
+0.91  Wed Mar  3 20:27:26 WET 2004
+	- the W32/Netsky.c@MM virus signature has been updated to detect
+	  detect correctly W32/Netsky.d@MM variant
+
+0.90  Wed Mar  3 13:36:02 WET 2004
+	- added '4d5a000001' new application signature to Makefile.PL
+	- added W32/Bagle.j@MM virus signature
+
+0.89  Tue Mar  2 19:30:53 WET 2004
+	- the W32/Bagle.e@MM virus signature has been updated to detect
+	  also W32/Bagle.h@MM virus variant
+	- the W32/Netsky.c virus signature has been updated in previous
+	  version to detect W32/Netsky.d variant
+
+0.88  Mon Mar  1 15:34:03 WET 2004
+	- added W32/Bagle.e@MM virus signature
+	- the W32/Netsky.c@MM virus signature has been updated
+
+0.87  Sun Feb 29 19:13:23 WET 2004
+	- the W32/Bagle@MM virus signature has been updated to detect
+	  W32/Bagle.c@MM variant
+
+0.86  Thu Feb 26 13:47:02 WET 2004
+	- added W32/Netsky.c@MM virus signature
+	- the W32/Mimail@MM virus signature has been updated to detect
+	  W32/Mimail.h@MM variant
+
+0.85  Wed Feb 25 15:25:30 WET 2004
+	- the W32/Mydoom@MM virus signature has been updated to detect
+	  W32/Mydoom.f@MM variant
+
+0.84  Wed Feb 18 14:13:02 WET 2004
+	- added W32/Netsky@MM virus signature.
+
+0.83  Tue Feb 17 17:07:49 WET 2004
+	- the W32/Bagle@MM virus signature has been updated to detect
+	  W32/Bagle.b@MM variant
+
+0.82  Tue Feb 10 19:14:04 WET 2004
+	- the W32/Mimail@MM and W32/Mydoom@MM virus signatures have been
+	  updated to detect W32/Mimail.s@MM and W32/Mydoom.b@MM variants
+
+0.81  Fri Jan 30 11:33:15 WET 2004
+	- the W32/Dumaru@MM virus signature has been updated to detect
+	  W32/Dumaru.y@MM variant
+
+0.80  Tue Jan 27 15:30:19 WET 2004
+	- added three new virus signatures (W32/Mydoom@MM, W32_Darby@MM
+	  and VBS/Inor)
+	- the W32/Dumaru@MM virus signature has been updated to detect
+	  W32/Dumaru.z@MM variant
+
+0.79  Mon Jan 19 14:37:41 WET 2004
+	- added W32/Bagle@MM and Downloader-GN virus signatures.
+	- the W32/Mimail@MM virus signature has been updated to detect
+	  W32/Mimail.p@MM variant
+
+0.78  Tue Jan  6 15:30:38 WET 2004
+	- the W32/Sober@MM virus signature has been updated to detect
+	  W32/Sober.c@MM variant
+
+0.77  Mon Dec 22 15:20:26 WET 2003
+	- added BackDoor-CAG virus signature
+	- the W32/Mimail@MM virus signature has been updated to detect
+	  W32/Mimail.m@MM variant
+
+0.76  Fri Nov 28 14:18:15 WET 2003
+	- added W32/Dumaru.gen@MM virus signature
+	- a new example script (examples/vscan.pl) has also been added
+	  Thanks to Peter Sergeant <pete@clueball.com>
+
+0.75  Wed Nov 19 11:50:01 WET 2003
+	- the W32/Mimail@MM virus signature has been updated to detect
+	  W32/Mimail.j@MM variant
+
+0.74  Sat Nov 15 18:47:00 WET 2003
+	- added PWS-Mob.dr virus signature
+	- the W32/Mimail@MM virus signature has been updated to detect 
+	  W32/Mimail.g@MM and W32/Mimail.i@MM variants
+	- examples/scan.pl: the version was updated to 0.16
+	- examples/scan.pl: a bug has been fixed in function to check
+	  Base64 files
+	- examples/procmail/scanvirus.pl: the version was updated to 0.06
+	- examples/procmail/scanvirus.pl: a bug has been fixed in function 
+	  to check Base64 files
+
+0.73  Tue Nov  4 18:22:14 WET 2003
+	- added callback functionality to scan_text
+	- examples/scan.pl: the version was updated to 0.15
+	- examples/scan.pl: function to check Base64 files has been added
+	- examples/procmail/scanvirus.pl: the version was updated to 0.05
+	- examples/procmail/scanvirus.pl: function to check Base64 files
+	  has been added
+
+0.72  Tue Nov  4 11:36:56 WET 2003
+	- the W32/Mimail@MM virus signature has been updated again
+
+0.71  Mon Nov  3 15:16:42 WET 2003
+	- the W32/Mimail@MM virus signature was updated
+
+0.70  Mon Nov  3 11:59:01 WET 2003
+	- added W32/Sober@MM virus signature
+
+0.69  Fri Oct 10 15:06:36 WEST 2003
+	- the W32/Swen@MM virus signature was updated
+
+0.68  Tue Sep 30 11:27:18 WEST 2003
+	- examples/procmail/scanvirus.pl: the version was updated to 0.04
+	- examples/procmail/scanvirus.pl: the problem with "die" in
+	  "unzip_file" function was fixed
+
+0.67  Mon Sep 29 17:47:24 WEST 2003
+	- examples/procmail/scanvirus.pl: the version was updated to 0.03
+	- examples/procmail/scanvirus.pl: unsafe execution of unzip
+	  command was fixed
+	- examples/scan.pl: the version was updated to 0.15
+	- examples/scan.pl: the "--quiet" option has been added
+	  Thanks to Pacman <pacman@manson.clss.net>
+	- examples/scan.pl: unsafe execution of unzip command was fixed
+	  Thanks to Pacman <pacman@manson.clss.net>
+
+0.66  Fri Sep 19 10:52:10 WEST 2003
+	- added W32/Swen@MM virus signature
+
+0.65  Tue Sep  9 16:34:23 WEST 2003
+	- added W32/Pate.b virus signature
+
+0.64  Tue Sep  2 15:43:27 WEST 2003
+	- the VBS/Haptime.gen@MM and W32/Sobig.f@MM virus signatures had
+	  been updated.
+	- minor bug fix in Makefile.PL
+
+0.63  Tue Aug 19 23:08:06 WEST 2003
+	- added W32/Sobig.f@MM virus signature
+          (from Clam AntiVirus database)
+
+0.62  Sat Aug  9 19:09:07 WEST 2003
+	- several documentation updates have been made.
+	- examples/scan.pl: the version was updated to 0.14
+	- examples/scan.pl: minor bug fix
+	- examples/procmail/scanvirus.pl: the version was updated to 0.02
+	- examples/procmail/scanvirus.pl: the scanner has been rewritten
+
+0.61  Mon Aug  4 20:10:14 WEST 2003
+	- added W32/Mimail@MM virus signature.
+	- examples/scan.pl: the version was updated to 0.13
+	- examples/scan.pl: check MHTML exploit function has been added
+
+0.60  Mon Jul 28 15:05:22 WEST 2003
+	- added W32/Yaha.u@MM virus signature.
+	  Thanks to Jacky Hui Chun Kit <ckhui@school.net.hk>
+
+0.59  Tue Jul  1 14:15:24 WEST 2003
+	- added W32/Lovelorn@MM virus signature.
+	- added set_callback method to provide extra information and
+	  functionalities.
+	- added callback argument to the constructor
+	- updated the documentation
+	- examples/scan.pl: the version was updated to 0.12
+	- examples/scan.pl: added support to zip compressed files
+
+0.58  Thu Jun 26 16:56:58 WEST 2003
+	- added W32/Sobig.e@MM virus signature.
+
+0.57  Fri Jun 20 12:11:16 WEST 2003
+	- added BAT/Mumu.worm virus signature.
+	  Thanks to Anita Dias <anafonso@mail.esb.ucp.pt>
+	- cleans up the code in a number of places.
+
+0.56  Thu Jun  5 14:22:14 WEST 2003
+	- added W32/Bugbear.b@MM virus signature.
+
+0.55  Mon Jun  2 18:25:14 WEST 2003
+	- added two new virus signatures (W32/Sobig.c@MM and
+	  W32/Ganda@MM).
+
+0.54  Tue May 20 14:04:25 WEST 2003
+	- added W32/Palyh@MM virus signature.
+	- BackDoor-ARG.dr virus signatures was updated.	
+
+0.53  Fri May 16 14:07:36 WEST 2003
+	- added BackDoor-AQJ virus signature.
+	- Fixed a typo in POD.
+	  Thanks to Kevin C. Krinke <kckrinke@opendoorsoftware.com>
+
+0.52  Wed May 14 18:14:48 WEST 2003
+	- added two new virus signatures (W32/Fizzer.gen@MM and
+	  W32/Fizzer.dll).
+
+0.51  Sat Apr 26 19:04:21 WEST 2003
+	- added W32/Lovgate.g@M virus signature.
+	  Thanks to Anita Dias <anafonso@mail.esb.ucp.pt>
+
+0.50  Wed Apr 23 15:12:58 WEST 2003
+	- added two new virus signatures (BackDoor-ARG and
+	  BackDoor-ARG.dr).
+
+0.49  Tue Apr 22 16:09:11 WEST 2003
+	- examples/scan.pl: the version was updated to 0.11
+	- examples/scan.pl: fixed scan directory problem when the path is
+	  equal a "/".
+
+0.48  Fri Apr 11 12:34:21 WEST 2003
+	- added W32/Oror.aa@MM virus signature.
+	  Thanks to Emil Yakimov <emo@iservice.bg>
+
+0.47  Wed Apr  9 15:16:24 WEST 2003
+	- W32/Gibe.b@MM virus signatures was updated.
+
+0.46  Tue Apr  8 14:59:15 WEST 2003
+	- added W32/Gibe.b@MM virus signature.
+	- W32/Gibe@MM virus signatures was updated.
+
+0.45  Sat Mar 29 18:37:28 WET 2003
+	- the problems with open function have been fixed. In perl version 
+	  5.6 or greater, now open function has three argument. In other
+	  versions the sysopen function is used.
+
+0.44  Sat Mar 15 16:08:24 WET 2003
+	- added VBS/Fourcourse virus signature.
+
+0.43  Mon Jan 13 12:22:16 WET 2003
+	- added W32/Sobig@MM virus signature.
+	- added new question/answer to FAQ.
+
+0.42  Fri Jan 10 15:34:57 WET 2003
+	- rename W32/Lirva.a@MM virus signature to W32/Lirva.gen@MM
+	- W32/Lirva.a@MM virus signatures was updated.
+
+0.41  Thu Jan  9 14:38:38 WET 2003
+	- added W32/Lirva.a@MM virus signature.
+
+0.40  Sat Jan  4 16:45:32 WET 2003
+	- added W32/Yaha.k virus signature.
+
+0.39  Sat Dec 28 19:47:47 WET 2002
+	- added W32/Merkur@MM virus signature.
+	- my email address has changed to hdias@aesbuc.pt.
+
+0.38  Tue Nov 12 16:55:02 WET 2002
+	- added W32/Braid@MM virus signature.
+	- spec-files directory was added.
+	- fixed a small 'bug' in SuSE spec-file.
+	  Thanks to Pascal Bleser <guru@unixtech.be>
+
+0.37  Wed Oct  2 12:06:57 WEST 2002
+	- the README file was updated
+	- the spec-file was changed to work with SuSE distribution
+	  Thanks to Pascal Bleser <pascal.bleser@atosorigin.com>.
+	- added FAQ file
+	- added three new virus signatures (W32/Bugbear@MM,
+	  Linux/Slapper.worm and W32/Sachiel.worm).
+
+0.36  Thu Sep 12 13:01:48 WEST 2002
+	- added four new virus signatures (W32/Blinkom, W32/ProLin@MM,
+	  W97M/Thus.gen and Linux.Osf.8759).
+
+0.35  Fri Aug 30 12:19:17 WEST 2002
+	- added seven new virus signatures (BackDoor-AJH, W32/Stopin.b@MM,
+	  W32/Cecile.dr, W32/Bika.gen, VBS/Hatred.gen, W32/EnerKaz.worm.a
+	  and W32/Hokilo.worm).
+
+0.34  Mon Jul 22 12:23:16 WEST 2002
+	- added new application signature to Makefile.PL
+	- added four new virus signatures (W32/Sentral.dr, VBS/Funtime,
+	  W32/Idele, JS/Germinal) and W32/Plex@MM, W32/Yaha.gen@MM and
+	  W32/Chiton.ab.dr virus signatures was updated.
+
+0.33  Mon Jul 15 11:26:24 GMT 2002
+	- rename W32/Frethem.f@MM virus signature to W32/Frethem.fl@MM
+	- added two new virus signatures (W32/Duni.worm.b and W32/Plex@MM) 
+	  and W32/Frethem.f@MM virus signature was updated
+
+0.32  Mon Jul  8 11:52:39 WEST 2002
+	- added five new virus signatures (JS/Kak@M, W97M/Gorum,
+	  W32/Gorum.gen@MM, BSD/Scalper.worm and W97M/VMPCK.dd) and
+	  W32/SirCam@MM virus signature was updated
+	- minor feature enhancements in Makefile.PL
+	- Thanks to Teguh Kurniawan <wijaya99@plasa.com> for provide
+	  JS/Kak@M virus
+
+0.31  Tue Jun 25 11:10:58 WEST 2002
+	- added four new virus signatures (W32/Yaha.gen@MM, W32/Perrun,
+	  VBS/Chick.e@M and W32/Higuy@MM)
+
+0.30  Mon Jun 17 11:44:33 WEST 2002
+	- rename W32/Trilisa@MM virus signature to W32/Trilisa.gen@MM
+	- added two new virus signatures (W32/Frethem.f@MM and
+	  X97M/Generic) and W32/Trilisa.gen@MM virus signature was updated
+	- examples/scan.pl: the version was updated to 0.10
+	- examples/scan.pl: fixed scan directory problem when the name 
+	  start with "."
+
+0.29  Mon Jun  3 12:05:25 WEST 2002
+	- removed the VBS/Chick.c@M virus signature
+	- added three new virus signatures (VBS/Chick.bc@M,
+	  W32/Navidad.gen@M and W32/Ska@M).
+	  Thanks to Philipp W. <philipp@diewebdesigner.com> for provide
+	  W32/Ska@M virus
+
+0.28  Mon May 27 12:11:14 WEST 2002
+	- added three new virus signatures (W32/GOP@MM, JS/SQL.Spida.worm.b
+	  and W32/Benjamin.worm)
+
+0.27  Mon May 20 12:24:41 WEST 2002
+	- added two new virus signatures (VBS/Chick.d@M and W32/Choke.c.worm)
+	- changed the VBS/BritneyPic@MM virus name to VBS/Chick.a@M
+	  and signature was updated
+	- the perl-File-Scan.spec file was updated
+
+0.26  Tue May 14 11:29:26 WEST 2002
+	- added four new virus signatures (W32/Trilisa@MM, 
+	  IRC/Theme.worm.dr, W32/Haiku@MM and W32/Zhangpo)
+	- procmail recipe example for scan incoming mail was added
+	- provide perl-File-Scan.spec to build .rpm for RedHat 7.2.
+	  Thanks to Michael McLagan <michael.mcLagan@linux.org>
+
+0.25  Sat May  4 19:41:19 WEST 2002
+	- added two new virus signatures
+	- the README file was updated
+
+0.24  Sat Apr 27 19:13:28 WEST 2002
+	- added "latest.pl" script to get the most recent version
+	  of File::Scan module from CPAN
+	- added three new virus signatures
+
+0.23  Mon Apr 22 12:29:50 WEST 2002
+	- the Makefile.PL was changed, the code has been optimized
+	- added six new application signatures
+	- added new virus signatures and others have been updated.
+	  Thanks to Risko Gergely <risko@debian.fsn.hu> and
+	  Nels Lindquist <nels@maei.ca>
+	- added url to the README file of the SuSE Linux RPM package.
+	  Thanks to Pascal Bleser <pascal.bleser@atosorigin.com>
+
+0.22  Mon Apr 15 13:48:36 WEST 2002
+	- added two new virus signatures
+
+0.21  Sat Apr 13 18:36:08 WEST 2002
+	- added new virus signatures and one have been updated
+
+0.20  Fri Apr  5 12:25:52 WEST 2002
+	- added new virus signatures
+	- added new word to suspicious file
+	- the problems resulting from running with the Perl warning
+	  flag "on" (perl -w) was resolved.
+	  Thanks to Hilko Bengen <bengen@vdst-ka.inka.de>
+	- examples/scan.pl: the version was updated to 0.09
+	- examples/scan.pl: added the Perl warning flag (-w) to script to
+	  turn warnings 'on'
+
+0.19  Thu Apr  4 12:04:53 WEST 2002
+	- added new virus signatures and Magistr virus signature
+	  was updated again
+
+0.18  Wed Apr  3 12:00:17 WEST 2002
+	- added new virus signatures and others have been updated
+
+0.17  Thu Mar 28 12:42:20 WET 2002
+	- added new virus signatures and Magistr virus signature
+	  was updated
+	- minor feature enhancements in Makefile.PL
+
+0.16  Sat Mar 23 18:21:13 WET 2002
+	- added more three new virus signatures
+	- improved the speed
+	- all suspicious words was changed to lowercase
+	- minor bugfixes
+
+0.15  Sat Mar 23 10:11:29 WET 2002
+	- added new virus signatures and PetTick virus signature
+	  was updated 
+	- added suspicious() method to test if the file is suspicious
+	- suspicious.txt file was added to files directory
+	- the Makefile.PL was changed
+	- examples/scan.pl: minor feature enhancements
+	- examples/scan.pl: the version was updated to 0.08
+	- documentation updates
+
+0.14  Tue Mar 19 14:01:57 WET 2002
+	- added new virus signature and LoveLetter virus signature
+	  was updated
+	- minor bugfixes in scan_text method
+	- the Makefile.PL was changed
+
+0.13  Sat Mar 16 17:08:08 WET 2002
+	- added more three new virus signatures
+        - minor bugfixes
+
+0.12  Mon Mar 11 10:56:36 WET 2002
+	- added three new virus signatures
+	- added new type 
+
+0.11  Sat Mar  9 17:30:07 WET 2002
+	- added new virus signatures
+
+0.10  Tue Mar  5 09:51:15 WET 2002
+	- added new signatures
+	- the text signatures was changed to hex	
+
+0.09  Sat Mar  2 18:01:25 WET 2002
+	- added new signatures and updated text signatures
+	- added the signature for EICAR-Test-File
+	- the scan_text function was rewritten again
+	- fixed the problem whith pdf files. now the pdf files are skipped
+	- a few code style changes
+	- the method 'skipped' now return code numbers
+	- examples/scan.pl: it display a message when the file is skipped
+	- examples/scan.pl: the version was updated to 0.07
+	- documentation updates
+
+0.08  Wed Feb 27 13:12:32 WET 2002
+	- added new signatures
+	- the value of mkdir argument was changed
+	- fixed a 'bug' in scan_binary function
+	- removed '%filetypes' from Makefile.PL, is not necessary
+	- examples/scan.pl: the value of option mkdir was changed to octal
+	- updated the documentation
+
+0.07  Tue Feb 26 10:06:06 WET 2002
+	- test file was moved to test directory
+	- added new signatures
+	- added mkdir argument to the constructor
+	- examples/scan.pl: fixed a 'bug' in options
+	- examples/scan.pl: new option were added
+
+0.06  Fri Feb 22 11:26:43 WET 2002
+	- added new signatures and updated others
+	- added max_txt_size and max_bin_size arguments to the constructor
+	- added skipped() method to test if file was skipped
+	- updated the documentation
+	- examples/scan.pl: new features were added
+
+0.05  Thu Feb 21 12:04:17 WET 2002
+	- added new signatures and updated others
+	- changed the file types and the signatures of text files
+	- scan_text function has changed
+	- updated the documentation
+
+0.04  Sat Feb 16 17:25:32 WET 2002
+	- added docs directory for specific documentation and file 
+	  write_sign_bin.txt
+	- added new signatures
+	- examples/scan.pl: add --version and --follow options
+
+0.03  Fri Feb 15 13:28:34 WET 2002
+	- improved the speed of scan_text function in 24%
+	- examples/scan.pl: fixed the problem with symbolic links in
+	  dir_handle function
+	- examples/scan.pl: changed the report section to use Benchmark 
+	  module
+
+0.02  Thu Feb 14 13:24:19 2002
+	- fixed a 'bug' in scan_text function
+
+0.01  Mon Feb 11 15:32:08 2002
+	- original version; created by h2xs 1.20 with options
+		-A -X -n File::Scan

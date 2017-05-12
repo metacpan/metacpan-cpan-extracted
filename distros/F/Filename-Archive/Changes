@@ -1,0 +1,14 @@
+Revision history for Filename-Archive
+
+0.02    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.01    2015-01-01 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/File/HashCache.pm
+lib/File/HashCache/JavaScript.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+README.md
+t/basic.t
+t/function.t
+t/javascript.t
+META.json

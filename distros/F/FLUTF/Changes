@@ -1,0 +1,50 @@
+1.001 (1.1)
+
+Cleaned up docs.
+Added Meta.YML
+Added warnings
+Added examples
+Fixed annoying v-string not portable from Tie::InsertOrderHash
+
+1.0
+
+(no CPAN)
+Tried new concept, but it didn't work
+
+0.9 
+
+First CPAN version
+Added tests.
+
+0.8 
+
+Fixed minor parser bugs
+
+0.7
+
+Switched to Tie::InsertOrderHash
+
+0.6
+
+Now parses also some buggy files I found in a mod, (had a recursion in them)
+
+0.5
+
+pack() is way better than my own solution.. :)
+
+0.4
+
+Some more minor parser errors fixed.
+First version to read most if not all vanilla Freelancer files
+
+0.3
+
+Fixed DATALIB/STRINGLIB mixups (they are in fact different things)
+
+0.2
+
+Found out some more uses for some fields.
+
+0.1
+
+First working parser

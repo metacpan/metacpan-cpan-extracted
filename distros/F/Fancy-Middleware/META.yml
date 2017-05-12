@@ -1,0 +1,22 @@
+---
+abstract: 'Provides alternate implementation of Plack::Middleware in a Moose Role'
+author:
+  - 'Nicholas R. Perez <nperez@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101582, CPAN::Meta::Converter version 2.101600'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fancy-Middleware
+requires:
+  MooseX::Declare: 0
+  MooseX::Types::Moose: 0
+  POEx::Types::PSGIServer: 0
+resources:
+  repository: git://github.com/nperez/fancy-middleware.git
+version: 1.101680

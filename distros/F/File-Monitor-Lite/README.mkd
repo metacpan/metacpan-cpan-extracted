@@ -1,0 +1,54 @@
+
+# File::Monitor::Lite
+
+File::Monitor::Lite is a perl module for observing file creation, deletion, and modification.
+
+
+# INSTALLATION
+
+To install this module, simply type:
+
+    cpanm -v File::Monitor::Lite
+
+If you don't have cpanm, just do the following:
+
+    curl -LO http://bit.ly/cpanm
+    chmod +x cpanm
+    sudo cp cpanm /usr/local/bin
+
+# USAGE
+
+    use File::Monitor::Lite;
+    
+    my $monitor = File::Monitor::Lite->new (
+        in => '.',
+        name => '*.html',
+    );
+  
+    while ($monitor->check() and sleep 1){
+        my @deleted_files = $monitor->deleted;
+        my @modified_files = $monitor->modified;
+        my @created_files = $monitor->created;
+        my @observing_files = $monitor->observed;
+    }
+
+
+# DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    File::Monitor
+    File::Find::Rule
+    Cwd
+
+But cpanm will help you solve dependency problems.
+
+# COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by dryman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

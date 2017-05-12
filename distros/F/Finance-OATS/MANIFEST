@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-OATS.t
+lib/Finance/OATS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

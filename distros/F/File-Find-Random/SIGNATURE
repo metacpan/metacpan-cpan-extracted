@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.22.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3e7645577ae6c52a220ed10619550748b62ce0b3 Build.PL
+SHA1 db18333afc65527304889797804619c2c863650b Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 de1478568e96b764b35dc7945817cb018af7d3a0 MANIFEST
+SHA1 20f00df9975c58ccf80a6c6fec89b0ad7e6f55d9 META.yml
+SHA1 e86245b6a930636e230cc7607c02cdabe7d1e2fc Makefile.PL
+SHA1 ce6014572eedbfc1090bf8aaf2b4510bf35746ea README
+SHA1 07900dbdea57074b0c0b7d2a257e5c0b5b1531ca Todo
+SHA1 285b789ca90ac7dd37f1ebfafc2419ff447679fa lib/File/Find/Random.pm
+SHA1 fd616550cada48ce34565404683b40a77a8ef54d t/001_load.t
+SHA1 2be5be7ecf28eb9fc2f51b38c856718bff810bd9 t/002_create_filesystem.t
+SHA1 71b9b62748adb8a8f130a7620a78c19bfbc309ae t/003_find_file.t
+SHA1 59999463208905df2d957bcd12b3b969eed8e44d t/004_rand_test.t
+SHA1 9059fb061356f12fd69ad616f034fa0bf65467fc t/005_pod.t
+SHA1 74192a2adc443b01a314cf7eabc097eec16a76a2 t/006_error_test.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQE/fBz/3rfT7xAQCIQRAhqPAJwMzb0Iy3Rx2HdEgJx5nGgOGQmauQCgn6wq
+HcRdn9oOshTwksayg6Oquks=
+=viDc
+-----END PGP SIGNATURE-----

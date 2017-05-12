@@ -1,0 +1,27 @@
+[% PROCESS sub/date.html %]
+<html>
+    <head>
+        <title>[% topic.title %]</title>
+    </head>
+    <body>
+
+<h1>[% topic.title %]</h1>
+
+[% FOREACH comment IN comments %]
+<hr />
+
+<h2>[% comment.title %]</h2>
+<p>
+Post by [% comment.author.nickname %] on [% date_format(comment.post_on) %]
+</p>
+<p>
+[% IF comment.author.status == 'banned' %]
+ The author is banned.
+[% ELSE %]
+  [% comment.text %]
+[% END %]
+</p>
+[% END %]
+
+    </body>
+</html>

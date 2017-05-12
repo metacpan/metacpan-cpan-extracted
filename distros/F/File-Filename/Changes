@@ -1,0 +1,19 @@
+2009-10-23 10:57  cvs
+
+	* lib/File/Filename.pm, lib/File/Filename/Convention.pm, t/0.t:
+	  made to not use DEBUG subs, slow
+
+2008-04-07 13:49  cvs
+
+	* lib/File/Filename/Convention.pm: cleaned up convention
+
+2007-10-22 10:04  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/Filename.pm,
+	  lib/File/Filename/Convention.pm, t/0.t: Initial revision
+
+2007-10-22 10:04  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/Filename.pm,
+	  lib/File/Filename/Convention.pm, t/0.t: init
+

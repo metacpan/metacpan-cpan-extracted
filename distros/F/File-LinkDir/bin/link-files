@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw<:config auto_help bundling>;
+use Pod::Find;
+use Pod::Usage;
+use File::LinkDir;
+
+my $FLD = File::LinkDir->new( 'skipinit' );
+
+my ($dry_run, $source, $dest, $recursive, $force, $hard, @addignore) = ( 0, '', '', 0, 0, 0 );
+my $ignore = '(?:.*/)?.(?:git.*|svn)(?:/.*)?$';
+
+GetOptions(
+    'n|dry-run'      => \$dry_run,
+    's|source=s'     => \$source,
+    'd|dest=s'       => \$dest,
+    'r|recursive'    => \$recursive,
+    'i|ignore=s'     => \$ignore,
+    'a|add-ignore=s' => \@addignore,
+    'f|force'        => \$force,
+    'h|hard'         => \$hard,
+    'v|version'      => sub {
+        my $version = $FLD->{version};
+        print "link-files version $version\n";
+        exit;
+    },
+) or pod2usage(
+    -input => pod_where( 
+        { -inc => 1 }, 
+        'link-files'
+    )
+);
+
+$FLD->init(
+    dryrun    => $dry_run,
+    source    => $source,
+    dest      => $dest,
+    recursive => $recursive,
+    ignore    => $ignore,
+    addignore => \@addignore,
+    force     => $force,
+    hard      => $hard,
+);
+
+$FLD->run();
+
+=encoding utf8
+
+=head1 NAME
+
+link-files - Create symlinks in one directory for files in another
+
+=head1 SYNOPSIS
+
+B<link-files> <options>
+
+ Options:
+  -n, --dry-run             Don't actually do anything
+  -s DIR, --source=DIR      The source directory
+  -d DIR, --dest=DIR        The destination directory
+  -r, --recursive           Recurse into subdirectories (see below)
+  -i RX, --ignore=RX        A regex matching files to ignore (see below)
+  -a RX, --add-ignore=RX    Like -i but doesn't replace the default
+  -f, --force               Overwrite existing files/dirs
+  -h, --hard                Use hard links instead of symlinks
+  -?, --help                Display this help message
+  -v, --version             Display version information
+
+By default, B<link-files> will create symlinks in the destination directory for
+all top-level files, directories or symlinks found in the source directory.
+This is very useful for keeping the dot files in your C<$HOME> under version
+control. A typical use case:
+
+ cd ~/src/dotfiles
+ # update or add files, commit to repository
+ link-files --source . --dest ~
+
+With C<--recursive>, B<link-files> will not create symlinks to subdirectories
+found in the source directory. It will instead recurse into them and create
+symlinks for any files or symlinks it finds. Any subdirectories not found in
+the destination directory will be created. This approach is useful for
+destination directories where programs or users other than yourself might add
+things to subdirectories which you don't want ending up in your working tree
+implicitly. F</etc> is a good example.
+
+In both cases, symlinks from the source directory will be copied as-is. This
+makes sense because the symlinks might be relative.
+
+If C<--ignore> is not specified, it defaults to ignoring F<.git> and F<.svn>
+directories and their contents.
+
+See L<File::LinkDir> for complete details.
+
+=head1 AUTHOR
+
+Hinrik E<Ouml>rn SigurE<eth>sson, <hinrik.sig@gmail.com>
+Matthew Musgrove, <mr.muskrat@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009-2010 the File::LinkDir L</AUTHOR> as listed above.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+

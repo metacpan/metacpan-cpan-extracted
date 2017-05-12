@@ -1,0 +1,9 @@
+Revision history for Perl extension File::Findgrep
+                                        Time-stamp: "2004-12-29 19:54:43 AST"
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+	* Release 0.02 -- just rebundling
+	
+2001-05-25  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.01 -- first public release.

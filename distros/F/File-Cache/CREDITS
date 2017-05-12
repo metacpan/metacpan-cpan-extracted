@@ -1,0 +1,44 @@
+- David Coppit <david@coppit.org> added: max_size, auto_purge,
+  get_stale(), reduce_size(), username, and filemode, fixed a bug that
+  prevented expired cache items from being unlinked by purge(), and
+  added the get_creation_time() and get_expiration_time() routines. (a
+  big thanks David!)  Also, David added the Data::Dumper persistence 
+  format for cross-OS operability and greatly improved the documentation,
+  and many many other things
+
+- Larry Moore <ljmoore@freespace.net>, a cpan tester, noticed that
+  version 0.04 failed to compile on MacOS (thanks Larry!)
+
+- Frey Kuo <frey@engineer.com> pointed out that the example in the
+  README was rather buggy.  (thanks Frey!)
+
+- Doug Steinwand <dsteinwand@etoys.com> found that on FreeBSD, the
+  _purge routine failed due to an issue with File::Find and even
+  provided a fix.  (thanks Doug!)
+
+- Chris Winters <cwinters@intes.net> needed the cache_depth code, so I
+  added it, and he was gracious enough to help test it
+
+- Jessica Mintz provided valuable debugging information that tracked
+  down the unlink file race
+
+- Jeremy Howard (jhoward@fastmail.fm) added two great patches that
+  made File::Cache taint safe, plus he's using it at fastmail.fm!
+
+- Randal L. Schwartz (merlyn@stonehenge.com) caught a version dependency
+  on the File::Path, which led to some major changes to the entire
+  library finally passing taint checking.  Also, he suggested the
+  temp->rename change to _WRITE_FILE. (Thanks Randal!)
+
+- Michael Blakeley (mike@blakeley.com) caught the bug with
+  .description files not being readable when the umask is restrictive and 
+  offered a patch.  He also offered a patch to allow $sEXPIRES_NEVER to 
+  be passed as the $expires_in parameter to set. (Thanks Mike!)
+
+- Neil Conway (nconway@klamath.dyndns.org) suggested documenting the 
+  optional dependency on Storable, adding a dependency for File::Spec
+  0.82, and removing the "use Data::Dumper" line.  (Thanks Neil!)
+
+- Jost Krieger <Jost.Krieger@ruhr-uni-bochum.de> and <a.calpini@alos.it>
+  both pointed out that the tests would fail on machines with the
+  perl binary not in "/usr/bin/perl". 

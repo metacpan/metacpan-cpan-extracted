@@ -1,0 +1,98 @@
+NAME
+
+    Filter::Crypto - Create runnable Perl files encrypted with OpenSSL libcrypto
+
+SYNOPSIS
+
+    # Encrypt a Perl script using the crypt_file script. Run it as usual:
+    $ crypt_file --in-place hello.pl
+    $ hello.pl
+
+    # Create a PAR archive containing an encrypted Perl script. Run it as usual:
+    # (This example assumes that you also have PAR installed.)
+    $ pp -f Crypto -M Filter::Crypto::Decrypt -o hello hello.pl
+    $ hello
+
+DESCRIPTION
+
+    This distribution provides the means to convert your Perl files into an
+    encrypted, yet still runnable, format to hide the source code from casual
+    prying eyes.
+
+    This is achieved using a Perl source code filter.  The encrypted files,
+    produced using the Filter::Crypto::CryptFile module, automatically have one
+    (unencrypted) line added to the start of them that loads the
+    Filter::Crypto::Decrypt module.  The latter is a Perl source code filter
+    that decrypts the remaining (encrypted) part of the Perl file on-the-fly
+    when it is run.
+
+    These two modules can be built and installed separately, so it is possible
+    to set-up two separate Perl installations: one containing the
+    Filter::Crypto::CryptFile module to be used for encrypting your Perl files,
+    and another containing only the Filter::Crypto::Decrypt module for
+    distributing with your encrypted Perl files so that they can be run but not
+    easily decrypted.  (Well, not very easily, anyway.  Please see the WARNING
+    below.)
+
+    Encrypted files can also be produced more conveniently using the crypt_file
+    script, or (if you also have the PAR module available) using the
+    PAR::Filter::Crypto module.  The latter can be utilized by the standard PAR
+    tools to produce PAR archives in which your Perl files are encrypted.  The
+    Filter::Crypto::Decrypt module (only) can also be automatically included in
+    these PAR archives, so this is perhaps the easiest way to produce
+    redistributable, encrypted Perl files.
+
+    The actual encryption and decryption is performed using one of the symmetric
+    cipher algorithms provided by the OpenSSL libcrypto library.
+
+WARNING
+
+    Please see the WARNING in the Filter::Crypto manpage regarding the level of
+    security provided for your source code by this software.
+
+    Please also note that the LICENCE terms disclaim any express or implied
+    warranty and that the author shall not be liable for any direct or indirect
+    damages or loss of data arising from the use of this software.
+
+    In short:
+
+    - Other people may be able to unencrypt your encrypted files;
+
+    - You may not be able to unencrypt your own encrypted files.
+
+    Do keep a copy of the configuration options chosen when building these
+    modules, and most importantly make sure you KEEP A BACKUP COPY OF YOUR
+    ORIGINAL UNENCRYPTED FILES.
+
+COMPATIBILITY
+
+    Before version 2.00 of this distribution, encrypted source code was simply
+    the raw output of the chosen encryption algorithm, which is typically
+    "binary" data and therefore susceptible to breakage caused by perl reading
+    source files in "text" mode, which has become the default on Windows since
+    Perl 5.13.11 (specifically, Perl core commit #270ca148cf).
+
+    As of version 2.00 of this distribution, each byte of encrypted source code
+    is now output as a pair of hexadecimal digits and therefore no longer
+    susceptible to such breakage.
+
+    THIS IS AN INCOMPATIBLE CHANGE.  CURRENT VERSIONS OF THESE MODULES WILL NOT
+    BE ABLE TO DECRYPT FILES ENCRYPTED WITH VERSIONS OF THESE MODULES PRIOR TO
+    VERSION 2.00 OF THIS DISTRIBUTION, EVEN WHEN BUILT WITH THE SAME
+    CONFIGURATION OPTIONS.  EXISTING ENCRYPTED FILES WILL NEED TO BE
+    RE-ENCRYPTED.
+
+INSTALLATION
+
+    See the INSTALL file.
+
+COPYRIGHT
+
+    Copyright (C) 2004-2010, 2012-2015 Steve Hay.  All rights reserved.
+
+LICENCE
+
+    This distribution is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e. under the terms of either the GNU
+    General Public License or the Artistic License, as specified in the LICENCE
+    file.

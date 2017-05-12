@@ -1,0 +1,47 @@
+Finance-PaycheckRecords-Fetcher version 1.000, released July 12, 2014
+
+
+This module can download paystubs from PaycheckRecords.com, so you can
+save them for your records.  You can use Finance::PaycheckRecords
+(available separately) to extract information from the stored paystubs.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package         Minimum Version
+  --------------- ---------------
+  perl             5.10.0
+  Carp             
+  File::Slurp      
+  LWP::UserAgent   6
+  URI              
+  WWW::Mechanize   1.50
+
+
+
+CHANGES
+    Here's what's new in version 1.000 of Finance-PaycheckRecords-Fetcher:
+    (See the file "Changes" for the full revision history.)
+
+	- Add example script
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

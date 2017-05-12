@@ -1,0 +1,30 @@
+[% PROCESS sub/date.html %]
+
+[% WRAPPER 'admin/bar.html' %]
+
+<div class='one'>
+<table align='center'>
+<tr class='misc1'><td colspan='6'>[% INCLUDE 'sub/pager.html' %]</td></tr>
+<tr class='title'>
+    <td>User ID</td>
+    <td>Path</td>
+    <td>Get</td>
+    <td width='220'>Post</td>
+    <td>Time</td>
+    <td>Load Time</td>
+</tr>
+[% FOREACH path IN paths %]
+<tr class='misc[% IF loop.count mod 2;'2';ELSE;'1';END; %]'>
+    <td>[% path.user_id %]</td>
+    <td>[% path.path %]</td>
+    <td>[% path.get %]</td>
+    <td><textarea cols='30'>[% path.post %]</textarea></td>
+    <td>[% date_format(path.time) %]</td>
+    <td>[% path.loadtime %]</td>
+</tr>
+[% END %]
+<tr class='misc1'><td colspan='6'>[% INCLUDE 'sub/pager.html' %]</td></tr>
+</table>
+</div>
+
+[% END %]

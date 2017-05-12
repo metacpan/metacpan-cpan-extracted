@@ -1,0 +1,80 @@
+NAME
+    Finance::Bank::Kraken - api.kraken.com connector
+
+VERSION
+    0.3
+
+SYNOPSIS
+     require Finance::Bank::Kraken;
+     $api = new Finance::Bank::Kraken;
+     $api->key($mykrakenkey);
+     $api->secret($mykrakensecret);
+     $result = $api->call(Private, $method, [$arg1, $arg2, ..]);
+
+DESCRIPTION
+    This module allows to connect to the api of the bitcoin market Kraken.
+
+    Please see the Kraken API documentation
+    <https://www.kraken.com/help/api> for a catalog of api methods.
+
+METHODS
+    $api = new Finance::Bank::Kraken
+        The constructor. Returns a "Finance::Bank::Kraken" object.
+
+    $api->key($key)
+        Sets or gets the API key.
+
+    $api->secret($secret)
+        Sets the API secret to $secret or returns the API secret base64
+        decoded.
+
+    $result = $api->call(Public, $method)
+    $result = $api->call(Private, $method)
+    $result = $api->call(Private, $method, [$param1, $param2, ..])
+        Calls the "Public" or "Private" API method $method (with the given
+        $params, where applicable) and returns either the JSON encoded
+        result string or an error message ("code" "message").
+
+DEPENDENCIES
+    HTTP::Request
+    LWP::UserAgent
+    MIME::Base64
+    Digest::SHA
+
+EXAMPLES
+  get current XLTC market price in EUR
+     use Finance::Bank::Kraken;
+     use JSON;
+ 
+     my $kraken = new Finance::Bank::Kraken;
+     my $res = $kraken->call(Public, 'Ticker', ['pair=XLTCZEUR,XXBTZEUR']);
+     printf "1 XLTC is %f EUR\n",
+             from_json($res)->{'result'}->{'XLTCZEUR'}->{'c'}[0]
+             unless $res =~ /^5/;
+
+  get XLTC account balance
+     use Finance::Bank::Kraken;
+     use JSON;
+ 
+     my $kraken = new Finance::Bank::Kraken;
+     $kraken->key("mysupersecretkey");
+     $kraken->secret("mysupersecretsecret");
+     my $res = $kraken->call(Private, 'Balance');
+     printf "balance: %f XLTC\n",
+            from_json($res)->{'result'}->{'XLTC'} unless $res =~ /^5/;
+
+Q&A
+    Why does "call" return a 404?
+            Probably you misspelled the method. Please check the API
+            documentation and keep in mind the methods are case sensitive.
+
+    Why does "call" return a 500?
+            Maybe there's a problem with the ssl chain of trust. Either
+            install Mozilla::CA or set (one of) the following environment
+            variables "PERL_LWP_SSL_CA_FILE", "HTTPS_CA_FILE",
+            "PERL_LWP_SSL_CA_PATH", "HTTPS_CA_DIR". See LWP::UserAgent for
+            details.
+
+AUTHOR and COPYRIGHT
+    Copyright Philippe Kueck <projects at unixadm dot org>
+

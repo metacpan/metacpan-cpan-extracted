@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - 'Geoff Richards <qef@laxan.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '6.64'
+  File::Which: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Font-FreeType
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008001'
+resources:
+  repository: https://github.com/zmughal/p5-Font-FreeType
+version: '0.07'

@@ -1,0 +1,45 @@
+Function/ID version 0.02
+========================
+
+DESCRIPTION
+
+This module provides two variables, $this_fn and $this_function,
+which report the name of the function currently running.  For
+example:
+
+    package Your::Module;
+    use Function::ID;
+
+    sub somefunc
+    {
+        print "Long form: $this_function\n";
+        print "Short form: $this_fn\n";
+    }
+
+when invoked, somefunc will print the following:
+
+    Long form: Your::Module::somefunc
+    Short form: somefunc
+
+This may be useful for log file messages, errors, debugging, etc.
+
+INSTALLATION
+
+To install this module, do the standard Perl module four-step:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None?
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode,  roode@cpan.org
+
+Copyright (c) 2003 by Eric J. Roode. All Rights Reserved.  This module
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

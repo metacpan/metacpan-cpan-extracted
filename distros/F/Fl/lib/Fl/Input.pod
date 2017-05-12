@@ -1,0 +1,730 @@
+class 'Fl::Input';
+isa 'Fl::Widget';
+include 'FL/Fl_Input.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Input - Text Input Widget
+
+=head1 Synopsis
+
+    use Fl;
+    my $input = Fl::Input->new(0, 0, 100, 200, 'Hello, World!');
+
+=head1 Description
+
+The Fl::Input class represents a widget that displays a single line of text
+and lets the user edit it.
+
+Normally it is drawn with an inset box and a white background. The text may
+contain any characters, and will correctly display any UTF text, using ^X
+notation for unprintable control characters. It assumes the font can draw any
+characters of the used scripts, which is true for standard fonts under
+MSWindows and Mac OS X. Characters can be input using the keyboard or the
+character palette/map. Character composition is done using dead keys and/or a
+compose key as defined by the operating system.
+
+=begin html
+
+=head2 Keyboard and Mouse Bindings
+
+<table  width="90%" border="1" summary="Fl::Input keyboard and mouse bindings.">
+<tr>
+<td nowrap="NOWRAP" width="1%"><b>Mouse button 1</b> </td><td>Moves the cursor to this point. Drag selects characters. Double click selects words. Triple click selects all line. Shift+click extends the selection. When you select text it is automatically copied to the selection buffer. </td></tr>
+<tr>
+<td nowrap="NOWRAP"><b>Mouse button 2</b> </td><td>Insert the selection buffer at the point clicked. You can also select a region and replace it with the selection buffer by selecting the region with mouse button 2. </td></tr>
+<tr>
+<td nowrap="NOWRAP"><b>Mouse button 3</b> </td><td>Currently acts like button 1. </td></tr>
+<tr>
+<td nowrap="NOWRAP"><b>Backspace</b> </td><td>Deletes one character to the left, or deletes the selected region. </td></tr>
+<tr>
+<td nowrap="NOWRAP"><b>Delete</b> </td><td>Deletes one character to the right, or deletes the selected region. Combine with Shift for equivalent of ^X (copy+cut). </td></tr>
+<tr>
+<td nowrap="NOWRAP"><b>Enter</b> </td><td>May cause the callback, see <a class="el" href="classFl__Widget.html#ab194069add839e0aecbc541017c8d383" title="Returns the conditions under which the callback is called. ">when()</a>. </td></tr>
+</table>
+<table  width="90%" border="1" summary="Fl::Input platform specific keyboard bindings.">
+<tr>
+<td nowrap="NOWRAP" width="1%"><b> Windows/Linux </b> </td><td nowrap="NOWRAP" width="1%"><b> Mac </b> </td><td nowrap="NOWRAP"><p class="starttd"><b> Function </b></p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^A </b> </td><td nowrap="NOWRAP"><b> Command-A </b> </td><td><p class="starttd"><b>Selects all text in the widget.</b></p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^C </b> </td><td nowrap="NOWRAP"><b> Command-C </b> </td><td><p class="starttd"><b>Copy the current selection to the clipboard.</b></p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^I </b> </td><td nowrap="NOWRAP"><b> ^I </b> </td><td><p class="starttd"><b>Insert a tab.</b></p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^J </b> </td><td nowrap="NOWRAP"><b> ^J </b> </td><td><p class="starttd"><b>Insert a Line Feed.</b> <br/>
+ (Similar to literal 'Enter' character)</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^L </b> </td><td nowrap="NOWRAP"><b> ^L </b> </td><td><p class="starttd"><b>Insert a Form Feed.</b></p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^M </b> </td><td nowrap="NOWRAP"><b> ^M </b> </td><td><p class="starttd"><b>Insert a Carriage Return.</b></p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^V,<br/>
+Shift-Insert </b> </td><td nowrap="NOWRAP"><b> Command-V </b> </td><td><p class="starttd"><b>Paste the clipboard.</b> <br/>
+ (Macs keyboards don't have "Insert" keys, but if they did, Shift-Insert would work)</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^X,<br/>
+Shift-Delete </b> </td><td nowrap="NOWRAP"><b> Command-X,<br/>
+Shift-Delete </b> </td><td><p class="starttd"><b>Cut.</b> <br/>
+ Copy the selection to the clipboard and delete it. (If there's no selection, Shift-Delete acts like Delete)</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> ^Z </b> </td><td nowrap="NOWRAP"><b> Command-Z </b> </td><td><p class="starttd"><b>Undo.</b> <br/>
+ This is a single-level undo mechanism, but all adjacent deletions and insertions are concatenated into a single "undo". Often this will undo a lot more than you expected.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Shift-^Z </b> </td><td nowrap="NOWRAP"><b> Shift-Command-Z </b> </td><td><p class="starttd"><b>Redo.</b> <br/>
+ Currently same behavior as ^Z. Reserved for future multilevel undo/redo.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Arrow Keys </b> </td><td nowrap="NOWRAP"><b> Arrow Keys </b> </td><td><p class="starttd"><b>Standard cursor movement.</b> <br/>
+ Can be combined with Shift to extend selection.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Home </b> </td><td nowrap="NOWRAP"><b> Command-Up,<br/>
+Command-Left </b> </td><td><p class="starttd"><b>Move to start of line.</b> <br/>
+ Can be combined with Shift to extend selection.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> End </b> </td><td nowrap="NOWRAP"><b> Command-Down,<br/>
+Command-Right </b> </td><td><p class="starttd"><b>Move to end of line.</b> <br/>
+ Can be combined with Shift to extend selection.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b>Ctrl-Home</b> </td><td nowrap="NOWRAP"><b>Command-Up,<br/>
+Command-PgUp,<br/>
+Ctrl-Left</b> </td><td><p class="starttd"><b>Move to top of document/field.</b> <br/>
+ In single line input, moves to start of line. In multiline input, moves to start of top line. Can be combined with Shift to extend selection.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Ctrl-End </b> </td><td nowrap="NOWRAP"><b> Command-End,<br/>
+Command-PgDn,<br/>
+Ctrl-Right</b> </td><td><p class="starttd"><b>Move to bottom of document/field.</b> <br/>
+ In single line input, moves to end of line. In multiline input, moves to end of last line. Can be combined with Shift to extend selection.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Ctrl-Left </b> </td><td nowrap="NOWRAP"><b> Alt-Left </b> </td><td><p class="starttd"><b>Word left.</b> <br/>
+ Can be combined with Shift to extend selection.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Ctrl-Right </b> </td><td nowrap="NOWRAP"><b> Alt-Right </b> </td><td><p class="starttd"><b>Word right.</b> <br/>
+ Can be combined with Shift to extend selection.</p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Ctrl-Backspace </b> </td><td nowrap="NOWRAP"><b> Alt-Backspace </b> </td><td><p class="starttd"><b>Delete word left.</b></p>
+<p class="endtd"></p>
+</td></tr>
+<tr>
+<td nowrap="NOWRAP"><b> Ctrl-Delete </b> </td><td nowrap="NOWRAP"><b> Alt-Delete </b> </td><td><p class="starttd"><b>Delete word right.</b></p>
+<p class="endtd"></p>
+</td></tr>
+</table>
+
+=end html
+
+=head1 Methods
+
+Fl::Input inherits from Fl::Widget. On top of that, it exposes the following
+methods...
+
+=head2 new(...)
+
+    my $text_a = Fl::Input->new(0, 0, 250, 500, 'Important Stuff');
+    my $text_b = Fl::Input->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The widget's boxtype is FL_DOWN_BOX by default.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Input *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head2 copy(...)
+
+Put the current selection into the clipboard.
+
+    my $ok = $input->copy(1); # into clipboard #1
+
+This function copies the current selection between C<mark()> and C<position()>
+into the specified clipboard. This does not replace the old clipcoard contents
+if C<position()> and C<mark()> are equal.
+
+Clipboard C<0> maps to the current text selection and clipboard C<1> maps to
+the OS's cut/paste clipboard.
+
+Returns a true value if the selection was copied sucessfully.
+
+See also C<Fl::copy(...)>.
+
+=cut
+
+xs {name        => 'copy',
+    definitions => [{required => [[qw[int clipboard]]],
+                     returns  => 'int'
+                    }
+    ]
+};
+
+=pod
+
+=head2 copy_cuts()
+
+Copys the I<yank> buffer to the clipboard.
+
+    $input->copy_cuts();
+
+This method copies all the previous contiguous cuts from the undo information
+to the clipboard. This functions implements the ^K shortcut key.
+
+Returns a false value if the clipboard is unchanged.
+
+=cut
+
+xs {name        => 'copy_cuts',
+    definitions => [{returns => 'int'}]
+};
+
+=pod
+
+=head2 cursor_color(...)
+
+Gets or sets the color of hte cursor.
+
+    my $color = $input->cursor_color();
+    $input->cursor_color(FL_RED);
+
+The default color is FL_BLACK.
+
+=cut
+
+xs {name        => 'cursor_color',
+    definitions => [{required => [['Fl_Color', 'color']],
+                     returns  => 'void'
+                    },
+                    {returns => 'Fl_Color'}
+    ]
+};
+
+=pod
+
+=head2 cut(...)
+
+Deletes text from the widget I<without> storing it in the clipboard.
+
+    $input->cut();
+
+Deletes the current selection.
+
+    $input->cut(24);
+
+Deletes the next I<N> bytes (here, 24) rounded to characters before or after
+the cursor. Negative numbers will cut characters to the left of the cursor.
+
+    $input->cut(20, 25);
+
+Deletes all characters between indexs C<$a> and C<$b> (here, 20 and 25).
+
+To use the clipboard, you may call C<copy()> first or C<copy_cuts()> after
+this call.
+
+Returns 0 if no data was cut.
+
+=cut
+
+xs {name        => 'cut',
+    definitions => [{returns => 'int'},
+                    {required => [['int', 'bytes']],
+                     returns  => 'int'
+                    },
+                    {required => [['int', 'a'], ['int', 'b']],
+                     returns => 'int'
+                    }
+    ]
+};
+
+=pod
+
+=head2 index(...)
+
+Returns the character at index <$i>.
+
+    my $chr = $input->index(10);
+
+Returns the UTF-8 character at C<$i> as a UTF-32/UCS-4 character code.
+
+=cut
+
+xs {name        => 'index',
+    definitions => [{required => [['int', 'index']],
+                     returns  => 'Fl_Char'
+                    }
+    ]
+};
+
+=pod
+
+=head2 input_type(...)
+
+Gets or sets the input field's type.
+
+    my $type = $input->input_type();
+    $input->input_type($type);
+
+=cut
+
+xs {name        => 'input_type',
+    definitions => [{returns => 'int'},
+                    {required => [['int', 'type']],
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 Cinsert(...)>
+
+Inserts text at the cursor position.
+
+    $input->insert("new text!");
+
+This function inserts the string at the cursor C<position()> and moves the new
+position mark to the end of the inserted text.
+
+=cut
+
+xs {name        => 'insert',
+    definitions => [{required => [['const char *', 'text']],
+                     optional => [['int',          'length', ' 0']],
+                     returns => 'int'
+                    }
+    ]
+};
+
+=pod
+
+=head2 mark(...)
+
+Gets or sets the current selection mark.
+
+    my $m = $input->mark();
+    $input->input_type($m);
+
+When a value is provided, this behaves the same as setting C<position()>...
+
+    $input->mark(3);
+    $input->position($input->position(), 3);
+
+...so the two above lines should have the same effect.
+
+=cut
+
+xs {name        => 'mark',
+    definitions => [{returns => 'int'},
+                    {required => [['int', 'mark']],
+                     returns  => 'int'
+                    }
+    ]
+};
+
+=pod
+
+=head2 maximum_size(...)
+
+Gets or sets the maximum length of the input field in characters.
+
+    $input->maximum_size(256);
+
+This is different than the buffer size since one character can be more than a
+single byte in UTF-8 encoding.
+
+=cut
+
+xs {name        => 'maximum_size',
+    definitions => [{returns => 'int'},
+                    {required => [['int', 'max']],
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 position(...)
+
+    my $p = $input->posiiton();
+
+Returns the position of the text cursor as an index in the range 0..C<size()>.
+
+    $input->position($p + 2);
+
+Sets the curosr position and mark.
+
+The above example is the same as callingC<position($p + 2, $p + 2)>.
+
+    $input->position($p + 2, 10);
+
+Sets the index for both the cursor and mark.
+
+The input widget maintains two pointers into the string. The position is where
+the cursor is. The mark is the other end of the selected text. If they are
+equal then there is no selection. Changing this does not affect the clipboard.
+Use C<copy()> to do that.
+
+The return value is zero if no positions were changed.
+
+=cut
+
+xs {name        => 'position',
+    definitions => [{returns => 'int'},
+                    {required => [['int', 'position']],
+                     returns  => 'int'
+                    },
+                    {required => [['int', 'position'], ['int', 'mark']],
+                     returns => 'int'
+                    }
+    ]
+};
+
+=pod
+
+=head2 readonly(...)
+
+Gets or sets the read-only state of the input field.
+
+    my $mod = $input->readonly();
+    $input->readonly(1);
+
+=cut
+
+xs {name        => 'readonly',
+    definitions => [{returns => 'int'},
+                    {required => [['int', 'immutable']],
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 replace(...)
+
+    $input->replace($b, $e, $text);
+
+Deletes text from C<$b> to C<$e> and inserts the new string C<$text>.
+
+All changes to the text buffer go through this function. It deletes the region
+between C<$b> and C<$e> (either one may be less or equal to the other), and
+then inserts the string text at that point and moves the C<mark()> and
+C<position()> to the end of the insertion. Does the callback if
+C<when() & FL_WHEN_CHANGED> and there is a change.
+
+Set C<$b> and C<$e> equal to not delete anything. Set text to C<undef> to not
+insert anything.
+
+    $input->replace($b, $e, $text, $len);
+
+C<$len> can be zero but defaults to the length of C<$text>. Or you can be use
+it to insert a portion of a string. If C<$len> is zero, C<length($text)> is
+used instead.
+
+C<$b> and C<$e> are clamped to the C<0..size()> range, so it is safe to pass
+any values. C<$b>, C<$e>, and C<$len> are used as numbers of bytes (not
+characters), where C<$b> and C<$e> count from 0 to C<size()> (end of buffer).
+
+If C<$b> and/or C<$e> don't point to a valid UTF-8 character boundary, they
+are adjusted to the previous (C<$b>) or the next ($C<e>) valid UTF-8 character
+boundary.
+
+If the current number of characters in the buffer minus deleted characters
+plus inserted characters in text would overflow the number of allowed
+characters (C<maximum_size()>), then only the first characters of the string
+are inserted, so that C<maximum_size()> is not exceeded.
+
+C<cut()> and C<insert()> are just inline functions that call C<replace()>.
+
+=cut
+
+xs {name        => 'replace',
+    definitions => [
+         {required => [['int', 'b'], ['int', 'e'], ['const char *', 'text'],],
+          optional => [['int', 'ilen', ' 0']],
+          returns  => 'int'
+         }
+    ]
+};
+
+=pod
+
+=head2 shortcut(...)
+
+Gets or sets the shortcut related to this widget.
+
+=cut
+
+xs {name        => 'shortcut',
+    definitions => [{returns => 'int'},
+                    {required => [['int', 's']],
+                     returns  => 'void'
+                    }
+    ]
+};
+
+=pod
+
+=head2 size()
+
+Returns the number of bytes in C<value()>.
+
+    my $len = $input->size();
+
+=head2 size(...)
+
+Sets the width and height of this widget.
+
+    $input->size(250, 300);
+
+=cut
+
+xs {name        => 'size',
+    definitions => [{required => [['int', 'w'], ['int', 'h']],
+                     returns => 'void'
+                    },
+                    {returns => 'int'}
+    ]
+};
+
+=for TODO static_value(...) would go here...
+
+=pod
+
+=head2 tab_nav(...)
+
+Sets whether the Tab key does focus navigation, or inserts tab characters into
+Fl::MultilineInput.
+
+    $input->tab_nav(!!1);
+
+By default this flag is enabled to provide the 'normal' behavior most users
+expect; Tab navigates focus to the next widget. To inserting an actual Tab
+character, users can use Ctrl-I or copy/paste.
+
+Disabling this flag gives the behavior where Tab inserts a tab character into
+the text field, in which case only the mouse can be used to navigate to the
+next field.
+
+=head2 tab_nav()
+
+Gets whether the Tab key causes focus navigation in multiline input fields or
+not.
+
+    my $tab_next = $input->tab_nav();
+
+If enabled (default), hitting Tab causes focus navigation to the next widget.
+
+If disabled, hitting Tab inserts a tab character into the text field.
+
+=cut
+
+xs {name        => 'tab_nav',
+    definitions => [{required => [['int', 'value']],
+                     returns  => 'void'
+                    },
+                    {returns => 'int'}
+    ]
+};
+
+=pod
+
+=head2 textcolor(...)
+
+    $input->textcolor(FL_BLACK);
+    my $color = $input->textcolor();
+
+Gets or sets the input's text color.
+
+=cut
+
+xs {name        => 'textcolor',
+    definitions => [{required => [['Fl_Color', 'color']],
+                     returns  => 'void'
+                    },
+                    {returns => 'Fl_Color'}
+    ]
+};
+
+=pod
+
+=head2 textfont(...)
+
+    $input->textfont(FL_COURIER_BOLD);
+    my $font = $input->textfont();
+
+Gets or sets the input's font.
+
+=cut
+
+xs {name        => 'textfont',
+    definitions => [{required => [['Fl_Font', 'font']],
+                     returns  => 'void'
+                    },
+                    {returns => 'Fl_Font'}
+    ]
+};
+
+=pod
+
+=head2 textsize(...)
+
+    $input->textsize(100);
+    $input->textsize(FL_NORMAL_SIZE);
+
+Sets the input's text size.
+
+=cut
+
+xs {name        => 'textsize',
+    definitions => [{required => [['Fl_Fontsize', 'size']],
+                     returns  => 'void'
+                    },
+                    {returns => 'Fl_Fontsize'}
+    ]
+};
+
+=pod
+
+=head2 undo()
+
+    $input->undo();
+
+Undoes previous changes to the text buffer.
+
+This call undoes a number of previous calls to C<replace(...)>.
+
+Returns a true value if any changes were made.
+
+=cut
+
+xs {name        => 'undo',
+    definitions => [{returns => 'int'}]
+};
+
+=pod
+
+=head2 value(...)
+
+Gets or sets the widget's text.
+
+    $input->value("Update!");
+    my $text = $input->value();
+    $input->value('Just part of this', 9);
+
+This function changes the text and sets the mark and the point to the end of
+it. The string is copied to the internal buffer. Passing C<undef> is the same
+as "".
+
+You can use the length parameter to directly set the length if you know it
+already or want to put null characters in the text.
+
+=cut
+
+xs {name        => 'value',
+    definitions => [{required =>
+                         [['const char *', 'string'], ['int', 'length']],
+                     returns => 'int'
+                    },
+                    {required => [['const char *', 'string']],
+                     returns  => 'int'
+                    },
+                    {returns => 'const char *'}
+    ]
+};
+
+=pod
+
+=head2 wrap(...)
+
+    $input->wrap(1);
+    my $wraps = $input->wrap();
+
+Sets or gets word wrapping state of the input field.
+
+Word wrap is only functional with multi-line input fields such as
+Fl::MultilineInput.
+
+=cut
+
+xs {name        => 'wrap',
+    definitions => [{required => [['int', 'b']],
+                     returns  => 'void'
+                    },
+                    {returns => 'int'}
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

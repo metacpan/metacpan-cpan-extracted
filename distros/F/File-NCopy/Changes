@@ -1,0 +1,62 @@
+Revision history for Perl extension File::NCopy.
+
+0.36 Nov 26 2007 by Alexandr Ciornii
+    - perl 5.5 compatibility in tests
+
+0.35 Apr 14 2007 by Alexandr Ciornii
+    - Marked distribution as deprecated
+    - Added Readme
+
+0.34_01 Apr 01 2007 by Alexandr Ciornii
+    - better distribution
+    - some small fixes
+    - Added file 'Contributing.txt'
+    - Request in Makefile.PL
+    - test moved to t/, use strict
+    - pod.t
+
+0.34 Thu Apr 24 15:33:00 2003 by MZSANFORD
+    - Added more File::Spec usage
+    - Added a note in BUGS from Ken Healy
+    - Fixed "preserve" option (thanks again Ken)
+
+0.33 Mon May 20 00:00:00 2002 by MZSANFORD
+    - Added version that uses File::Spec to make portable.
+    - Added some basic tests
+    - Added additional debug statements
+    - tested code on Win32
+
+0.32 Thu Jun 25 17:45:04 1998
+    - Added force-write option.  Fixed a bug which kept the module
+      working when not used in OO mode.  Fixed lack of directory
+      creation when encountering an empty directory.  Added debug option
+      and more debugging info printed.
+
+0.31 Fri May 15 17:08:23 1998
+    - Changed the POSIX module to Cwd since it's more portable to
+      non-Unix systems.
+
+0.30 Fri Apr 18 23:13:47 1998
+    - Added the follow_links attribute so that links are now followed if
+      the attribute is set.  I also fixed the way symlinks are set, the
+      previous behaviour wasn't the most desirable.
+
+0.20 Tue Apr 15 23:30:24 1998
+    - Quite a few new features.  You can now use it as an object
+      oriented module with a few new attributes.  Also it the first
+      argument is a scalar reference and it's used as a straight forward
+      module the scalar will be the value of the recursive flag.  If
+      copying a directory with the recursive flag non-zero then the
+      directory is recursively copied over.  There are several other new
+      features.
+
+0.12 Tue Apr 14 15:49:40 1998
+    - Set the file permissons and directory permissions to the same as
+      we are copying from.
+
+0.11 Mon Apr 13 16:37:30 1998
+    - Changed the return values to successes rather than failures since
+      it makes more sense.
+
+0.10  Fri Apr 10 22:29:41 1998
+    - original version

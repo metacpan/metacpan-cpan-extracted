@@ -1,0 +1,31 @@
+---
+abstract: 'cache file handles opened for appending'
+author:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::FailWarnings: 0
+  Test::Most: 0.22
+configure_requires:
+  ExtUtils::MakeMaker: 6.64
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FileCache-Appender
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - README.pod
+requires:
+  Path::Tiny: 0.012
+resources:
+  bugtracker: https://github.com/trinitum/perl-FileCache-Appender/issues
+  homepage: https://github.com/trinitum/perl-FileCache-Appender
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trinitum/perl-FileCache-Appender
+version: 0.03

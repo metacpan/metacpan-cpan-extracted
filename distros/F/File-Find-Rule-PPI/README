@@ -1,0 +1,62 @@
+NAME
+    File::Find::Rule::PPI - Add support for PPI queries to File::Find::Rule
+
+SYNOPSIS
+      use File::Find::Rule      ();
+      use File::Find::Rule::PPI ();
+
+      # Find all perl modules that use here-docs
+      my $Find = File::Find::Rule->file
+                                 ->name('*.pm')
+                                 ->ppi_find_any('Token::HereDoc');
+      my @heredoc = $Find->in( $dir );
+
+DESCRIPTION
+    File::Find::Rule::PPI allows you to integrate PPI content queries into
+    your File::Find::Rule searches.
+
+    Initially, it provides the one additional method "ppi_find_any", which
+    takes an argument identical to the PPI::Node method "find_any" and
+    checks each file as a perl document to see if matches the query.
+
+METHODS
+  ppi_find_any $condition | $PPI::Find
+    The "ppi_find_any" method causes a query identical to (and implemented
+    using) PPI::Node's "find_any" method.
+
+    It takes as argument any condition that would also be valid for the
+    above method.
+
+    In addition, it can also take as argument an instantiated PPI::Find
+    object, and will use that object's "any_matches" method to achieve the
+    same effect.
+
+    If you provide no or an illegal condition to ppi_find_any, the check
+    will always fail, and no files will be returned when you execute the
+    search.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Find-Rule-PPI>
+
+    For other issues, contact the maintainer
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+ACKNOWLEDGMENTS
+    Funding provided by The Perl Foundation
+
+SEE ALSO
+    <http://ali.as/>, File::Find::Rule, PPI
+
+COPYRIGHT
+    Copyright 2005 - 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

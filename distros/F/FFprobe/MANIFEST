@@ -1,0 +1,12 @@
+Build.PL
+lib/FFprobe.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-probe_file.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test.ogg

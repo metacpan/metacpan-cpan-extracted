@@ -1,0 +1,87 @@
+class 'Fl::Output';
+isa 'Fl::Input';
+include 'FL/Fl_Output.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Output - Text Display Widget
+
+=head1 Synopsis
+
+    use Fl;
+    my $output = Fl::Output->new(0, 0, 100, 200, 'Hello, World!');
+
+=head1 Description
+
+The Fl::Output class represents a widget that displays a single line of text.
+
+When you set the value() , Fl::Output does a strcpy() to its own storage,
+which is useful for program-generated values. The user may select portions of
+the text using the mouse and paste the contents into other fields or programs.
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/text.png" /></center>
+
+There is a single subclass, Fl::MultilineOutput, which allows you to display
+multiple lines of text. Fl::Multiline::Output does not provide scroll bars.
+If a more complete text editing widget is needed, use Fl::TextDisplay instead.
+
+The text may contain any characters except C<\0>, and will correctly display
+anything, using C<^X> notation for unprintable control characters and C<\nnn>
+notation for unprintable characters with the high bit set. It assumes the font
+can draw any characters in the ISO-Latin1 character set.
+
+=head1 Methods
+
+Fl::Output inherits from Fl::Input and Fl::Widget. On top of that, it exposes
+the following methods...
+
+=head2 new(...)
+
+    my $text_a = Fl::Output->new(0, 0, 250, 500, 'Important Stuff');
+    my $text_b = Fl::Output->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The widget's boxtype is FL_DOWN_BOX by default.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Output *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

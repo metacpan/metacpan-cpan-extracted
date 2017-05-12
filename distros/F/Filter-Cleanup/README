@@ -1,0 +1,178 @@
+Filter::Cleanup
+
+Filter::Cleanup provides a simple way to deal with cleaning up after multiple
+error conditions modeled after the D programming language's scope(exit)
+mechanism.
+
+Each cleanup block operates in essentially the same manner as a finally
+block in languages supporting try/catch/finally style error handling.
+
+cleanup blocks may be placed anywhere in a scope. All statements lexically
+scoped after the cleanup block will be wrapped in an eval. Should an error
+be triggered within the block, the cleanup statement will be called before
+any error is rethrown (using croak).
+
+Within the cleanup block, the status of $@ may be inspected normally.
+
+Multiple cleanup blocks stack, and each MUST be followed by a semi-colon
+to ensure proper organization of the outputted code. cleanups are executed
+in reverse order (it's a stack, see?) and may be nested, although this defeats
+the purpose. The reason for reverse execution is that each cleanup represents
+another nested level of evals and clean-up code.
+
+Take the following code:
+
+    use Filter::Cleanup;
+    
+    sub example {
+        cleanup { print "FOO" };
+        print "BAR";
+        return 1;
+    }
+
+This is roughly the output of the source filter:
+
+    sub example {
+        my $result = eval {
+            print "BAR";
+            return 1;
+        };
+        
+        my $error = $@;
+        
+        print "FOO";
+        
+        if ($error) {
+            croak $error;
+        } else {
+            $result; # returns 1
+        }
+    }
+
+Now with multiple cleanups:
+
+    use Filter::Cleanup;
+    
+    sub example {
+        cleanup { print "FOO" };
+        cleanup { print "BAZ" };
+        print "BAR";
+        return 1;
+    }
+    
+The following code would be generated:
+
+    sub example {
+        my $result = eval {
+            my $result = eval {
+                print "BAR";
+                return 1;
+            };
+            
+            my $error = $@;
+            
+            print "BAZ";
+            
+            if ($error) {
+                croak $error;
+            } else {
+                $result;
+            }
+        };
+        
+        my $error = $@;
+        
+        print "FOO";
+        
+        if ($error) {
+            croak $error;
+        } else {
+            $result; # returns 1
+        }
+    }
+
+Internally, PPI is used to parse the module and generate the new code. This is
+because there are so many different forms which could proceed a cleanup block
+that there is no more efficient way to ensure that valid code is emitted. PPI
+has proven to be stable, robust, and very reasonably efficient.
+
+
+MODIFYING RETURN VARIABLES WITHIN A CLEANUP BLOCK
+
+This can sometimes have surprising results due to the manner in which cleanup
+blocks are evaluated. By the time the cleanup block executes, the result of
+evaluating the protected code has already been determined and stored. Cleanup
+blocks are then processed, and their results are discarded after being inspected
+for errors. Therefore, something like this:
+
+    sub test {
+        my @words = ('foo');
+        
+        cleanup { push @words, 'bat' };
+        cleanup { push @words, 'baz' };
+        cleanup { push @words, 'bar' };
+        
+        return @words;
+    }
+
+...will cause 'foo' to be returned, because @words has not been modified by the
+time the return value is calculated.
+
+In order to effect changes in return values in cleanup (a questionable
+practice, but hey, I don't judge), a reference is required:
+
+    sub test {
+        my $words = ['foo'];
+        
+        cleanup { push @$words, 'bat' };
+        cleanup { push @$words, 'baz' };
+        cleanup { push @$words, 'bar' };
+        
+        return $words;
+    }
+    
+The above code will return ['foo', 'bar', 'baz', 'bat'].
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Filter::Cleanup
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filter-Cleanup
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Filter-Cleanup
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Filter-Cleanup
+
+    Search CPAN
+        http://search.cpan.org/dist/Filter-Cleanup/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 "Jeff Ober"
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

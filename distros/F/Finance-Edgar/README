@@ -1,0 +1,7 @@
+Finance::Edget 0.01
+By Tariq Dennison
+
+This is the beginning of a module that automates the searching, indexing, selecting, and eventually, parsing and analyzing of filings from the U.S. SEC's Edgar site.
+
+v. 0.01
+It works; from searching by name, to downloading a selected filing.  The easiest test is to run the 'cli' (Command line interface) function, which is a bit of a guide to how the others fit together.

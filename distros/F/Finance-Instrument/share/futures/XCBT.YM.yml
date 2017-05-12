@@ -1,0 +1,59 @@
+--- 
+type: Futures
+name: YM
+code: YM
+exchange: XCBT
+time_zone: America/Chicago
+month_cycle: HMUZ
+currency: USD
+tick_size: 1
+multiplier: 5
+session:
+  -
+    - -510
+    - -450
+  -
+    - -420
+    - 915
+override_dow:
+  1:
+    session:
+      -
+        - -420
+        - 915
+last_trading_day_close: 510
+attributes:
+  cme_path: equity-index/us-index/e-mini-dow
+contract_calendar: 
+  200903: 
+    last_trading_day: 2009-03-20
+  200906: 
+    last_trading_day: 2009-06-19
+  200909:
+    last_trading_day: 2009-09-18
+  200912: 
+    last_trading_day: 2009-12-18
+  201003: 
+    last_trading_day: 2010-03-19
+  201006: 
+    last_trading_day: 2010-06-18
+  201009: 
+    last_trading_day: 2010-09-17
+  201012: 
+    last_trading_day: 2010-12-17
+  201103: 
+    last_trading_day: 2011-03-18
+  201106: 
+    last_trading_day: 2011-06-17
+  201109: 
+    last_trading_day: 2011-09-16
+  201112: 
+    last_trading_day: 2011-12-16
+  201203: 
+    last_trading_day: 2012-03-16
+  201206: 
+    last_trading_day: 2012-06-15
+  201209: 
+    last_trading_day: 2012-09-21
+  201212: 
+    last_trading_day: 2012-12-21

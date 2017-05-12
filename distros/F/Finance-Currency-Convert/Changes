@@ -1,0 +1,37 @@
+Revision history for Perl extension Finance::Currency::Convert.
+
+0.01  Tue Nov 28 17:31:29 2000
+	- original version; created by h2xs 1.19
+
+1.00  Wed May 30 19:58:27 CEST 2001
+	- only the direct conversion rates to and from EUR are stored,
+	  but with higher accuracy
+	- some debug code removed
+
+1.01  Thu Aug 16 15:49:25 CEST 2001
+	- fixed $_ trashing in while(<RATES>) (bkr)
+
+1.02  Sun Sep  9 19:58:52 CEST 2001
+	- fixed archive for Windows users
+
+1.03  Mon Oct  8 20:20:18 CEST 2001
+	- new function updateRate() to set a single currency rate
+	  via Finance::Quote
+
+1.04  Wed Mar 18 00:30:00 CEST 2004
+	- fix small errors in the Perldoc
+
+1.05  Wed Jan 2 14:30:00 CEST 2008
+	- add fixed Euro conversion rates for CYP, MTL and SIT
+	- improved test cases
+
+1.06  Fri Mar 7 14:00:00 CEST 2008
+	- fix test case with floating point comparison
+
+1.07  Mon Jan 13 16:00:00 CEST 2009
+	- add fixed Euro conversion rates for SKK
+	- warn if updateRates() is used, but Finance::Quote is not installed
+
+1.08  Sat Jan 1 10:00:00 CEST 2011
+	- add fixed Euro conversion rates for EEK
+

@@ -1,0 +1,13 @@
+- name
+- email
+- albums:
+    limit: 5
+    fields: 
+      - name
+      - photos:
+          limit: 3
+          fields:
+            - name
+            - picture
+            - tags:
+                limit: 2

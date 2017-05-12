@@ -1,0 +1,18 @@
+anvl
+Changes
+erc
+lib/File/ANVL.pm
+lib/File/ERC.pm
+lib/File/OM.pm
+Makefile.PL
+MANIFEST
+README
+t/anvl.t
+t/code.t
+t/convert.t
+t/om.t
+t/erc.t
+t/values.t
+VERSION
+xml2anvl.xsl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,53 @@
+NAME
+    File::umask - Get/set umask via (localizeable) variable
+
+VERSION
+    This document describes version 0.01 of File::umask (from Perl
+    distribution File-umask), released on 2014-05-14.
+
+SYNOPSIS
+     use File::umask;
+     printf "Current umask is %03o", $UMASK; # -> 022
+     {
+         local $UMASK = 0;
+         open my($fh), ">", "/tmp/foo"; # file created with 666 permission mode
+     }
+     open my($fh), ">", "/tmp/two"; # file created with normal 644 permission mode
+
+DESCRIPTION
+    This module is inspired by File::chdir, using a tied scalar variable to
+    get/set stuffs. One benefit of this is being able to use Perl's "local"
+    with it, effectively setting something locally.
+
+EXPORTS
+  $UMASK (exported by default)
+SEE ALSO
+    Perl's umask builtin.
+
+    Umask::Local.
+
+    Other modules with the same concept: File::chdir, Locale::Tie.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-umask>.
+
+SOURCE
+    Source repository is at <https://github.com/sharyanto/perl-File-umask>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-umask>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

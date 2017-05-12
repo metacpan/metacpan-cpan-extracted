@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+Sort.pm
+Sort.pm_rsorted.txt
+Sort.pm_sorted.txt
+eg/sort.pudge.PL
+test.pl

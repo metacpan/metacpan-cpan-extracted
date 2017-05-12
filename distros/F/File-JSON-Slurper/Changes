@@ -1,0 +1,9 @@
+Revision history for Perl module File::JSON::Slurper
+
+0.02 2016-11-26 NEILB
+    - Corrected the function name in JSON::Parse, in the SEE ALSO section.
+      Thanks to Ben Bullock for pointing out my error.
+
+0.01 2016-10-02 NEILB
+    - First release to CPAN
+

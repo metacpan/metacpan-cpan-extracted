@@ -1,0 +1,31 @@
+Revision history for Perl extension Finance::QuoteTW.
+
+0.09 2008年09月01日 23時13分29秒 CST
+    - delete useless Cathay.pm
+    - use HTML::Encoding instead of LWP::Charset 
+
+0.08  Fri Jun 15 00:52:06 CST 2007
+	- add sign=> 1 in Build.PL
+
+0.07  Thu Jun 14 21:27:40 CST 2007
+	- ./Build dist with Module::Build
+	- add SIGNATURE
+
+0.06  Tue Apr 4  00:08:03 2007
+        - Paradigm was modified
+
+0.05  Tue Apr 3  23:26:30 2007
+        - Paradigm & Allianz were added
+
+0.04  Sun Feb 18 15:22:05 2007
+	- make it work with pp
+
+0.03  Sat Feb 17 23:56:58 2007
+	- rename Jfrich.pm to Jpmrich.pm
+	- modify fetching algorithm of Iit.pm
+
+0.02  Mon Jan 29 00:27:58 2007
+	- modify Franklin.pm to make it work correctly
+
+0.01  Thu Jan 18 21:43:58 2007
+	- original version

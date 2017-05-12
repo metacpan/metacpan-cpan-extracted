@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+
+# This is an *very* simple ls command for SamFS.
+# It gets all the file attributes for it's arguments and dumps them out.
+
+use Filesys::SamFS;
+
+@names = ('dev', 'ino', 'mode', 'nlink', 'uid', 'gid', 'rdev', 'size',
+	  'atime', 'mtime', 'ctime', '', '', 'attr','attribute_time',
+	  'creation_time', 'residence_time', 'cs_algo', 'flags', 'gen',
+	  'partial_size');
+@copynames = ('flags', 'n_vsns', 'creation_time', 'position', 'offset', 
+	      'media', 'vsn');
+
+$maxnamelen = 0;
+foreach $name (@names) {
+  $maxnamelen = length($name) if length($name) > $maxnamelen;
+}
+
+while (scalar @ARGV) {
+  $filename = shift;
+  print "$filename:";
+  @list = Filesys::SamFS::stat($filename);
+  unless (scalar(@list)) {
+    print " $!\n";
+    next;
+  }
+  print "\n";
+  foreach $name (@names) {
+    dump_value("\t", $name, shift(@list));
+  }
+  $i = 0;
+  foreach $copyref (@list) {
+    $i++;
+    @list2 = @$copyref;
+    next unless $list2[1];
+    printf "\tCopy %d:\n", $i;
+    foreach $name (@copynames) {
+      dump_value("\t\t", $name, shift(@list2));
+    }
+  }
+  print "\n" if scalar @ARGV;
+};
+
+sub dump_value {
+  my ($tab, $name, $value) = @_;
+
+  return unless length $name;
+  $value = localtime($value) if $name =~ /time$/;
+  $value = sprintf("%o", $value) if $name eq 'mode';
+  $value = sprintf("0x%x", $value) if $name eq 'flags';
+  $value = Filesys::SamFS::attrtoa($value) if $name eq 'attr';
+  printf "$tab%${maxnamelen}s %s\n", $name, $value;
+}

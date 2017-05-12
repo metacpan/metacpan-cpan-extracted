@@ -1,0 +1,68 @@
+class 'Fl::Roller';
+isa 'Fl::Dial';
+include 'FL/Fl_Roller.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Roller - Circular Dial to Control a Single Floating Point Value
+
+=head1 Description
+
+The Fl::Roller widget proides a a "dolly" control commonly used to move 3D
+objects
+
+=for html <center><img src="http://www.fltk.org/doc-1.3/Fl_Roller.png" /></center>
+
+=head1 Methods
+
+Fl::Roller inherits from Fl::Valuator and Fl::Widget. On top of that, it
+exposes the following methods...
+
+=head2 new(...)
+
+    my $dial_a = Fl::Roller->new(0, 0, 250, 500, 'Important Stuff');
+    my $dial_b = Fl::Roller->new(0, 0, 250, 500);
+
+The constructor creates a new widget using the given position, size, and
+label.
+
+The destructor removes the widget.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int x]], [qw[int y]], [qw[int w]], [qw[int h]]],
+             optional => [['const char *', 'label', ' 0']],
+             returns  => 'Fl_Roller *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

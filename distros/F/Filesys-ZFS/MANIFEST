@@ -1,0 +1,13 @@
+ChangeLog               Change log 
+README			A readme file
+MANIFEST                This file
+Makefile.PL             Makefile maker
+zfstat.pl               A simple example of how to use Filesys::ZFS
+lib/Filesys/ZFS.pm	The primary module for interaction with zfs and zpools commands
+LICENSE                 This modules LICENSE policy
+test/zpool_fake.pl	A simple zpool status generator for tests
+test/zfs_fake.pl	A simple zfs status generator for tests
+t/00basic.t             A simple test
+t/01object.t		More simple tests
+META.yml                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

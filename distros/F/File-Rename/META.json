@@ -1,0 +1,58 @@
+{
+   "abstract" : "Perl extension for renaming multiple files",
+   "author" : [
+      "Robin Barker <RMBarker@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-Rename",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "File::Spec" : "0.82",
+            "Getopt::Long" : "2.24",
+            "Test::Pod" : 0,
+            "Test::Pod::Coverage" : 0
+         },
+         "requires" : {
+            "Getopt::Long" : 0,
+            "perl" : "5"
+         }
+      }
+   },
+   "provides" : {
+      "File::Rename" : {
+         "file" : "lib/File/Rename.pm",
+         "version" : "0.20"
+      },
+      "File::Rename::Options" : {
+         "file" : "lib/File/Rename.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.20"
+}

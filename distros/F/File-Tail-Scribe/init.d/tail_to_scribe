@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# Init file for tail_to_scribe
+#
+# chkconfig: - 85 12
+# description: tail httpd log files to scribe
+#
+# processname: tail_to_scribe.pl
+# config: /etc/sysconfig/tail_to_scribe
+# config: /etc/tail_to_scribe.conf
+
+source /etc/rc.d/init.d/functions
+
+prog="tail_to_scribe.pl"
+desc="tail_to_scribe"
+CONF=/etc/tail_to_scribe.conf
+fullprog=$prog
+SYSCONFIG="/etc/sysconfig/tail_to_scribe"
+STATEDIR="/var/run/tail_to_scribe"
+PIDFILE="$STATEDIR/pid"
+RUNASUSER=scribe
+PASSENV=
+OPTIONS="--config=$CONF --daemon --state-file-name=$STATEDIR/.tailtoscribe --pidfile=$PIDFILE"
+
+### Read configuration
+[ -r "$SYSCONFIG" ] && source "$SYSCONFIG"
+
+if [ ! -d $STATEDIR ]; then
+  mkdir -p $STATEDIR
+fi
+chown -R $RUNASUSER $STATEDIR
+
+USERDIR=`eval echo ~$RUNASUSER`
+[ -d $USERDIR ] || mkdir -p $USERDIR
+
+RETVAL=0
+
+start() {
+	echo -n $"Starting $desc ($prog): "
+	if [ ! -z "$RUNASUSER" ]; then
+	    daemon --user $RUNASUSER $PASSENV $fullprog $OPTIONS
+	else
+	    daemon $fullprog $OPTIONS
+	fi
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Shutting down $desc ($prog): "
+	killproc $prog
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
+	return $RETVAL
+}
+
+restart() {
+	stop
+	start
+}
+
+reload() {
+	echo -n $"Reloading $desc ($prog): "
+	killproc $prog -HUP
+	RETVAL=$?
+	echo
+	return $RETVAL
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart)
+	restart
+	;;
+  condrestart)
+	[ -e /var/lock/subsys/$prog ] && restart
+	RETVAL=$?
+	;;
+  reload)
+	reload
+	;;
+  status)
+	status $prog
+	RETVAL=$?
+	;;
+   *)
+	echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+	RETVAL=1
+esac
+
+exit $RETVAL

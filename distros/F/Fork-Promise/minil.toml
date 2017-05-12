@@ -1,0 +1,6 @@
+name = "Fork-Promise"
+badges = ["travis"]
+authority="cpan:TYNOVSKY"
+
+module_maker="ModuleBuildTiny"
+

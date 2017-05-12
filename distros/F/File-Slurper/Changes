@@ -1,0 +1,35 @@
+Revision history for File-Slurper
+
+0.009     2016-08-05 18:26:58+02:00 Europe/Amsterdam
+          Load PerlIO::encoding before localizing $PerlIO::encoding::fallback
+
+0.008     2015-08-31 12:43:05+02:00 Europe/Amsterdam
+          Impose scalar context on do/eval/require
+
+0.007     2015-08-23 09:52:45+02:00 Europe/Amsterdam
+          Added more items to a SEE ALSO
+          Fixed up benchmarks
+
+0.006     2015-07-02 02:02:00+02:00 Europe/Amsterdam
+          Unmark experimental status
+          Always croak on encoding error
+
+0.005     2015-04-18 21:56:35+02:00 Europe/Amsterdam
+          Get rid of singular named options
+
+0.004     2015-02-06 17:08:01+01:00 Europe/Amsterdam
+          Work around PerlIO encoding bug
+          Add Rationale and Dependency sections to documentation
+
+0.003     2015-02-05 20:42:26+01:00 Europe/Amsterdam
+          Implement writer functions
+          Default to crlf=off, add auto option for old behavior
+          Make PerlIO::utf8_strict an optional dependency
+
+0.002     2014-10-21 19:03:44+02:00 Europe/Amsterdam
+          rename File::Slurp::Sane to File::Slurper
+          Accept UTF-8 as encoding case-insensitively
+          Fix performance issue on 5.20.0
+
+0.001     2014-05-24 18:16:48CEST+0200 Europe/Amsterdam
+          Initial release to an unsuspecting world

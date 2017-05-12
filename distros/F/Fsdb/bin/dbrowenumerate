@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+#
+# dbrowenumerate.pm
+# Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+# $Id$
+#
+# This program is distributed under terms of the GNU general
+# public license, version 2.  See the file COPYING
+# in $dblibdir for details.
+#
+
+=head1 NAME
+
+dbrowenumerate - enumerate rows, starting from zero
+
+=head1 SYNOPSIS
+
+dbrowenumerate
+
+=head1 DESCRIPTION
+
+Add a new column ``count'', incremented for each row of data,
+starting with zero.
+Use L<dbrowaccumulate> for control over initial value
+or increment;
+this module is just a wrapper around that.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-N> or B<--new-name> N
+
+Name the new column N.
+Defaults to C<count>.
+
+=back
+
+=for comment
+begin_standard_jdb_options
+
+This module also supports the standard jdb options:
+
+=over
+
+=item B<-d>
+
+Enable debugging output.
+
+=item B<-i> or B<--input> InputSource
+
+Read from InputSource, typically a file name, or C<-> for standard input,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<-o> or B<--output> OutputDestination
+
+Write to OutputDestination, typically a file name, or C<-> for standard output,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<--autorun> or B<--noautorun>
+
+By default, programs process automatically,
+but Fsdb::Filter objects in Perl do not run until you invoke
+the run() method.
+The C<--(no)autorun> option controls that behavior within Perl.
+
+=item B<--help>
+
+Show help.
+
+=item B<--man>
+
+Show full manual.
+
+=back
+
+=for comment
+end_standard_jdb_options
+
+
+=head1 SAMPLE USAGE
+
+=head2 Input:
+
+    #h account passwd uid gid fullname homedir shell
+    johnh * 2274 134 John_Heidemann /home/johnh /bin/bash
+    greg * 2275 134 Greg_Johnson /home/greg /bin/bash
+    root * 0 0 Root /root /bin/bash
+    # this is a simple database
+
+=head2 Command:
+
+    cat DATA/passwd.jdb | dbrowenumerate
+
+=head2 Output:
+
+    #h account passwd uid  gid fullname       homedir     shell     count 
+    johnh      *      2274 134 John_Heidemann /home/johnh /bin/bash 0     
+    greg       *      2275 134 Greg_Johnson   /home/greg  /bin/bash 1     
+    root       *      0    0   Root           /root       /bin/bash 2     
+    # this is a simple database
+    #  | /home/johnh/BIN/DB/dbrowenumerate 
+
+=head1 SEE ALSO
+
+L<Fsdb>,
+L<dbrowaccumulate>.
+
+
+=head1 CLASS FUNCTIONS
+
+=cut
+
+use Fsdb::Filter::dbrowaccumulate;
+my(@dbrowaccumulate_args) = qw(-N count -I -1 -C 1);
+push(@dbrowaccumulate_args, @ARGV);
+my $f = new Fsdb::Filter::dbrowaccumulate(@dbrowaccumulate_args);
+$f->setup_run_finish;  # or could just --autorun
+exit 0;

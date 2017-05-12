@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/File/Path/Tiny.pm
+lib/File/Path/Tiny.pod
+t/00.load.t
+t/perlcritic.t
+t/perltidy.t
+t/pkg-changes.t
+t/pkg-readme.t
+t/pod-coverage.t
+t/pod-spelling.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,20 @@
+---
+abstract: 'Read a file within a block scope'
+author:
+  - 'Jeffrey Goff <drforr@pobox.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Macro
+requires:
+  Exporter: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.001'

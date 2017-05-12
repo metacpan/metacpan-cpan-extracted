@@ -1,0 +1,95 @@
+File-MultipleDiff
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it to get an idea of the module's uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+File::MultipleDiff  compares many files with one another and creates
+a matrix, whose elements are amounts of differences between every paar
+of compared files.
+
+Example of comparison of files   file1, file2, ... file5
+---------------------------
+      |  f   f   f   f   f
+      |  i   i   i   i   i
+      |  l   l   l   l   l
+      |  e   e   e   e   e
+      |  1   2   3   4   5
+---------------------------
+file1 |  0   1   2   0   3
+file2 |  -   0   3   1   4
+file3 |  -   -   0   2   5
+file4 |  -   -   -   0   3
+file5 |  -   -   -   -   0
+
+Here file1 is identical with file4,
+     file2 has 4 differences from file5.
+
+In other words, this module makes vizualization of metric (quasimetric)
+or distance function for every pair of file group.
+
+Tasks for solution using this module are:
+ - find out most or least matching files/sets to a reference file/set,
+ - measure level of chaos in files/sets, that must be identical ("chaosmeter" mode),
+ - find steps, that should be executed to unify not identical files/sets.
+
+Possible implementations are in areas, where many files/sets should be
+compared with one another, e.g.
+ - administration of many computers or databases,
+ - biology, genetics (mutations analysis),
+ - criminalistics (fingerprint, face recognition)
+ - marriage agency (search matching pairs),
+ - lingvistics, ...
+
+Amounts of differences are stated by the module Algorithm::Diff.
+
+As a cosmetic sugar this matrix might be highlighted using colours for
+terminals, that support ANSI escape sequences.
+
+INSTALLATION
+
+Required following non core Perl modules:
+   Algorithm::Diff
+   Term::ANSIColor
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::MultipleDiff
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-MultipleDiff
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-MultipleDiff
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-MultipleDiff
+
+    Search CPAN
+        http://search.cpan.org/dist/File-MultipleDiff/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Mart E. Rivilis
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0).

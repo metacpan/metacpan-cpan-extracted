@@ -1,0 +1,6 @@
+#fsdb -F s a    b
+# should show that the b column of the next line is not directly under the header
+longlonglonglonglonglong 1
+# but the 2 is under the b label
+short           2
+#   | dbcolneaten a<=15

@@ -1,0 +1,46 @@
+{
+   "abstract" : "probes information from multimedia files using C<ffprobe>",
+   "author" : [
+      "Diogo Franco (Kovensky) <diogomfranco@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FFprobe",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "common::sense" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Encode" : 0,
+            "common::sense" : 0,
+            "perl" : "v5.10.0",
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "FFprobe" : {
+         "file" : "lib/FFprobe.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.3"
+}

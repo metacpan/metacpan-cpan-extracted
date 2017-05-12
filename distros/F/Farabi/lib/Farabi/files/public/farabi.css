@@ -1,0 +1,193 @@
+/* Prevent user selection */
+body {
+	-webkit-touch-callout : none;
+	-webkit-user-select   : none;
+	-khtml-user-select    : none;
+	/*
+		TODO Enable once '-moz-user-select Firefox Copy/Paste bug' is fixed
+		https://github.com/marijnh/CodeMirror/issues/1250
+
+	-moz-user-select      : none;
+	*/
+	-ms-user-select       : none;
+	user-select           : none;
+}
+
+.CodeMirror {
+	min-height: 550px;
+}
+
+.CodeMirror-scroll {
+	min-height: 550px;
+}
+
+.CodeMirror-focused .cm-matchhighlight {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVQI12NgYGBgkKzc8x9CMDAwAAAmhwSbidEoSQAAAABJRU5ErkJggg==);
+	background-position: bottom;
+	background-repeat: repeat-x;
+}
+
+.farabi-bordered {
+	border: 1px solid #DDD !important;
+}
+
+#help_search_dialog .preview {
+	width: 100%;
+	height: 300px;
+	overflow: auto;
+}
+
+#perl_critic_dialog .results {
+	width: 100%;
+	height: 300px;
+	overflow: auto;
+}
+
+.typeahead {
+	z-index: 1051;
+}
+
+.farabi-centered {
+	text-align: center;
+}
+
+/** Smaller <h1>..<h6> font size inside the POD tab */
+#pod {
+	width: 100%;
+	height: 550px;
+	overflow: auto;
+	border: none;
+}
+
+#pod h1 {
+	font-size: 24px;
+}
+
+#pod h2 {
+	font-size: 20px;
+}
+
+#pod h3 {
+	font-size: 18px;
+}
+
+#pod h4 {
+	font-size: 16px;
+}
+
+#pod h5 {
+	font-size: 14px;
+}
+
+#pod h6 {
+	font-size: 12px;
+}
+
+.farabi-error {
+	font-family: arial; 
+	font-size: 70%; 
+	background-color: #ffa; 
+	color: #a00; 
+	padding: 2px 5px 3px; 
+	cursor: help;
+}
+
+.farabi-error-icon {
+	color: white; 
+	background-color: red; 
+	font-weight: bold; 
+	border-radius: 50%; 
+	padding: 0 3px; 
+	margin-right: 7px;
+}
+
+.modal-backdrop, .modal-backdrop.fade.in {
+	opacity: .1;
+	filter: alpha(opacity=10);
+}
+
+.farabi-icon-selected {
+	box-shadow: 0px 0px 2px gray;
+}
+
+#myTab > li > a {
+	padding-top: 5px;
+	padding-bottom: 0px;
+}
+
+#myTab {
+	margin-bottom: 0px;
+}
+
+#rightTab > li > a {
+	padding-top: 5px;
+	padding-bottom: 0px;
+}
+
+#rightTab {
+	margin-bottom: 0px;
+}
+
+.farabi-add-tab {
+	padding-top: 5px;
+}
+
+#action_button_div {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.container-fluid {
+	padding-left:  10px;
+	padding-right: 10px;
+}
+
+.editor-stats {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+#problems {
+	padding: 5px;
+}
+
+#problems >  table > tbody > tr {
+	cursor: pointer;
+}
+
+#problems-button {
+	cursor: pointer;
+}
+
+#problems-tab > div {
+	height: 550px;
+	overflow: auto;
+}
+
+.cm-whitespace-space {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAAxJREFUGFdjYGBgAAAABAABXM3/aQAAAABJRU5ErkJggg==);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+.cm-whitespace-tab {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+	background-position: right;
+	background-repeat: no-repeat;
+}
+
+#doc {
+	width: 100%;
+	height: 550px;
+	overflow: auto;
+	border: none;
+}
+
+#diff {
+	height: 550px;
+	overflow: auto;
+}
+
+#search {
+	height: 550px;
+	overflow: auto;
+}

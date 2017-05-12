@@ -1,0 +1,8 @@
+Revision history for File-lchown
+
+0.02    CHANGES:
+         * Optionally support lutimes(); don't fail outright if it doesn't
+           exist
+
+0.01    First version, released on an unsuspecting world.
+

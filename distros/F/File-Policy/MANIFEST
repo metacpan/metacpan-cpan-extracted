@@ -1,0 +1,17 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/File/Policy.pm
+lib/File/Policy/Default.pm
+lib/File/Slurp/WithinPolicy.pm
+t/lib/File/Policy/Config.pm
+t/file_policy.t
+t/file_slurp_withinpolicy.t
+samples/lib/File/Policy/Simple.pm
+
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

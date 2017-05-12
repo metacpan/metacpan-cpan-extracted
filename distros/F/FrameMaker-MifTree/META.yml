@@ -1,0 +1,19 @@
+abstract: A MIF Parser
+author: 'Roel van der Steen <roel-perl@st2x.net>'
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: FrameMaker-MifTree
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Temp: 0
+  IO::Scalar: 0
+  IO::Tokenized: 0
+  IO::Tokenized::File: 0
+  Test::More: 0
+  Tree::DAG_Node: 0
+  perl: 5.8.1
+version: 0.075

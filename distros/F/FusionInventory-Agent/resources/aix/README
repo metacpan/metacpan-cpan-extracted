@@ -1,0 +1,56 @@
+AIX specific command and file samples
+
+Data origin:
+- aix-4.3.1, aix-4.3.2, aix-5.3b samples: Sébastien Chapelant <schap2@hotmail.com>
+- aix-5.3a samples: Eric Meygret <eric.meygret@ladb.fr>
+- aix-5.3c and aix-6.1b samples: Philippe Camelio <pcamelio@opca2.com>
+- aix-6.1a samples: Pablo Nicola <pablo1776@gmail.com>
+- aix-6.1 samples: Sameer Reddy <sameerreddyp@gmail.com>
+
+lscfg: lscfg command
+- aix-*-en: lscfg -v -l en*
+- aix-*-sysplanar0: lscfg -vpl sysplanar0
+- aix-*-disk0: lscfg -p -v -s -l hdisk0
+- aix-*-disk1: lscfg -p -v -s -l hdisk1
+- aix-*-disk3: lscfg -p -v -s -l hdisk3
+
+lsdev: lsdev command
+- aix-*-adapter: lsdev -Cc adapter -F "name:type:description"
+- aix-*-bus: lsdev -Cc bus -F "name:description"
+- aix-*-disk-scsi: lsdev -Cc disk -s scsi -F "name:description"
+- aix-*-disk-fcp: lsdev -Cc disk -s fcp -F "name:description"
+- aix-*-disk-vscsi: lsdev -Cc disk -s vscsi -F "name:description"
+- aix-*-processor: lsdev -Cc processor -F name
+- aix-*-memory: lsdev -Cc memory -F name -t totmem
+- aix-*-tape: lsdev -Cc tape -s scsi -F "name:description:status"
+
+lslpp: lslpp command
+- aix-*: lslpp -c -l
+
+lsps: lsps command
+- aix-*: lsps
+
+lsvpd: lsvpd command
+- aix-*: lsvpd
+
+lsfs: lsfs command
+- aix-*: lsfs -c
+
+lsattr: lsattr command
+- aix-*-mem0: lsattr -EOl mem0
+- aix-*-hdisk0: lsattr -EOl hdisk0 -a 'size_in_mb'
+- aix-*-hdisk1: lsattr -EOl hdisk1 -a 'size_in_mb'
+- aix-*-proc0: lsattr -EOl proc0 -a 'type:frequency:smt_threads'
+- aix-*-proc4: lsattr -EOl proc4 -a 'type:frequency:smt_threads'
+- aix-*-en0: lsattr -E -l en0
+- aix-*-lo0: lsattr -E -l lo0
+
+lsvg: lsvg command
+- aix-*-X: lsvg X
+- aix-*-l_X: lsvg -l X
+
+lspv: lspv command
+- aix-*-X: lspv X
+
+lslv: lslv command
+- aix-*-X: lslv X

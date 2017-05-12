@@ -1,0 +1,58 @@
+Finance-Bitcoin
+===============
+
+Created:      2010-07-26
+Home page:    <https://metacpan.org/release/Finance-Bitcoin>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Finance-Bitcoin>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.902	2014-03-10
+
+ [ Documentation ]
+ - Mention string/number encoding caveat for JSON-RPC.
+   Fixes RT#93524.
+   <https://rt.cpan.org/Ticket/Display.html?id=93524>
+
+ [ Packaging ]
+ - Fix link to repo - I haven't used that subversion repo in years.
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Don't use Object::AUTHORITY.
+
+0.901	2013-06-16
+
+ [ Bug Fixes ]
+ - JSON::RPC::Client -> JSON::RPC::Legacy::Client.
+   Fixes RT#86193.
+   Rene Schickbauer++
+   <https://rt.cpan.org/Ticket/Display.html?id=86193>
+
+0.900	2013-03-18
+
+ - General tidy up.
+ - Updated: Swap from Any::Moose to Moo.
+
+0.004	2011-12-05
+
+ - Added: use Object::AUTHORITY
+ - Remove stub subs in BEGIN section. (They were only there for the benefit
+   of Test::Pod::Coverage, but were causing problems.)
+ - Swap from Class::Accessor to Any::Moose.
+
+0.003	2011-10-11
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Added: Include examples in distribution.
+ - use 5.010
+ - use common::sense
+
+0.002	2010-11-21
+
+ - Added: Add $minconf parameter to Finance::Bitcoin::Account::received
+   (patch from Pavel Karoukin).
+
+0.001	2010-07-26	Original version

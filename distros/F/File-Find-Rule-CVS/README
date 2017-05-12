@@ -1,0 +1,55 @@
+README for File::Find::Rule::CVS 0.01
+
+=head1 NAME
+
+File::Find::Rule::CVS - find files based on CVS metadata
+
+=head1 SYNOPSIS
+
+ use File::Find::Rule::CVS;
+ my @modified = find( cvs_modified => in => 'sandbox' );
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ File::Find::Rule	0.2
+ Parse::CVSEntries	0.03
+ version
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.01	Thursday 11th September, 2003
+
+	initial CPAN release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Parse::CVSEntries>, L<File::Find::Rule>
+

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/File/CheckTree.pm
+t/CheckTree.t
+t/release-eol.t
+t/release-pod-syntax.t

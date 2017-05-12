@@ -1,0 +1,194 @@
+2009-11-24 10:35  cvs
+
+	* lib/File/PathInfo/Ext.pm, lib/File/PathInfo/Ext.pod, t/0.t,
+	  t/1.t: removed LEOCHARRE::Debug dependency
+
+2009-11-14 14:40  cvs
+
+	* MANIFEST, META.yml, Makefile.PL, lib/File/PathInfo/Ext.pm, t/0.t,
+	  t/1.t, t/2_move.t, t/5_copy.t: made move act more like
+	  File::Copy::move() Improved meta.
+
+2008-10-11 22:24  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/99_cleanup.t: added copy(), and
+	  tests.  added t/99_cleanup.t
+
+2008-07-03 20:12  cvs
+
+	* Changes, MANIFEST: added Changes file
+
+2008-07-03 20:11  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/0.t: changed test so it checks for
+	  gnu linux before testing stat methods
+
+2008-06-12 15:43  cvs
+
+	* Makefile.PL, lib/File/PathInfo/Ext.pm, t/0.t: added some testing
+	  details
+
+2008-06-10 10:58  cvs
+
+	* Makefile.PL, lib/File/PathInfo/Ext.pm: updated makefile
+
+2008-06-08 19:12  cvs
+
+	* lib/File/PathInfo/Ext.pm: refined testing, cleaned up some module
+	  code
+
+2008-06-08 14:50  cvs
+
+	* Makefile.PL, lib/File/PathInfo/Ext.pm, t/0.t: added some details
+	  to tests added unsupported os for Makefile.PL
+
+2008-05-23 14:21  cvs
+
+	* lib/File/PathInfo/Ext.pm: need to work on getting mime type
+	  properly
+
+2007-06-14 09:45  cvs
+
+	* File-PathInfo-Ext-1.16.tar.gz, MANIFEST: added dist with better
+	  md5sum
+
+2007-06-14 09:44  cvs
+
+	* Makefile.PL: updated
+
+2007-06-14 09:43  cvs
+
+	* lib/File/PathInfo/Ext.pm: changed to use Digest::MD5 instead of
+	  Digest::MD5::File which took 60x longer
+
+2007-06-07 18:53  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/2_move.t: more careful move and
+	  updated move test
+
+2007-06-05 13:23  cvs
+
+	* File-PathInfo-Ext-1.14.tar.gz: added dist
+
+2007-06-05 13:23  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/3.t: made rename() safe, will NOT
+	  override existing destination
+
+2007-05-24 17:29  cvs
+
+	* File-PathInfo-Ext-1.13.tar.gz: added dist
+
+2007-05-24 17:29  cvs
+
+	* lib/File/PathInfo/Ext.pm: made move() return abs path of where it
+	  went
+
+2007-05-18 10:04  cvs
+
+	* MANIFEST, lib/File/PathInfo/Ext.pm, t/0.t,
+	  t/public_html/seven.pdf:  added m5
+
+2007-04-28 13:22  cvs
+
+	* lib/File/PathInfo/Ext.pm: added ls_count, lsd_count, and
+	  lsf_count
+
+2007-04-25 16:10  cvs
+
+	* File-PathInfo-Ext-1.10.tar.gz: addded
+
+2007-04-25 16:09  cvs
+
+	* lib/File/PathInfo/Ext.pm: made updates
+
+2007-04-17 10:55  cvs
+
+	* File-PathInfo-Ext-1.09.tar.gz: added dist
+
+2007-04-17 10:54  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/0.t: tweaking move
+
+2007-04-17 10:54  cvs
+
+	* t/2_move.t: tweaking up move
+
+2007-04-17 10:24  cvs
+
+	* t/public_html/Test Me Please.txt: added file
+
+2007-04-11 20:14  cvs
+
+	* File-PathInfo-Ext-1.08.tar.gz: added dist
+
+2007-04-11 20:13  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/0.t: fixed problem with move
+	  redefined etc
+
+2007-04-11 12:35  cvs
+
+	* File-PathInfo-Ext-1.07.tar.gz: added dist
+
+2007-04-11 12:32  cvs
+
+	* Makefile.PL, lib/File/PathInfo/Ext.pm, t/0.t, t/1.t: added 'move'
+	  action
+
+2007-04-06 18:34  cvs
+
+	* File-PathInfo-Ext-1.06.tar.gz: working
+
+2007-04-06 18:34  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/1.t: changes
+
+2007-04-05 11:15  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/1.t: added ls lsa lsf lsd etc to
+	  methods
+
+2007-03-27 18:03  cvs
+
+	* File-PathInfo-Ext-1.03.tar.gz: added dist
+
+2007-03-27 18:03  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/0.t: changes
+
+2007-03-27 15:13  cvs
+
+	* Makefile.PL: changed
+
+2007-03-27 15:12  cvs
+
+	* MANIFEST, t/1.t: working
+
+2007-03-27 15:09  cvs
+
+	* Makefile.PL, lib/File/PathInfo/Ext.pm, t/.0.t.swp, t/0.t: rename
+	  added , also meta
+
+2007-03-26 10:12  cvs
+
+	* Makefile.PL: added makefile
+
+2007-03-26 10:11  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/0.t, t/2.t: working
+
+2007-03-22 18:00  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/.0.t.swp, t/0.t, t/2.t,
+	  t/public_html/.hidden_file.txt, t/public_html/house.txt,
+	  t/public_html/oake.jpg, t/public_html/demo/civil.txt,
+	  t/public_html/demo/hellokitty.gif: Initial revision
+
+2007-03-22 18:00  cvs
+
+	* lib/File/PathInfo/Ext.pm, t/.0.t.swp, t/0.t, t/2.t,
+	  t/public_html/.hidden_file.txt, t/public_html/house.txt,
+	  t/public_html/oake.jpg, t/public_html/demo/civil.txt,
+	  t/public_html/demo/hellokitty.gif: initial
+

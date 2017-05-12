@@ -1,0 +1,43 @@
+This is the Perl distribution FFI-Platypus-Type-StringArray.
+
+Installing FFI-Platypus-Type-StringArray is straightforward.
+
+## Installation with cpanm
+
+If you have cpanm, you only need one line:
+
+    % cpanm FFI::Platypus::Type::StringArray
+
+If you are installing into a system-wide directory, you may need to pass the
+"-S" flag to cpanm, which uses sudo to install the module:
+
+    % cpanm -S FFI::Platypus::Type::StringArray
+
+## Installing with the CPAN shell
+
+Alternatively, if your CPAN shell is set up, you should just be able to do:
+
+    % cpan FFI::Platypus::Type::StringArray
+
+## Manual installation
+
+As a last resort, you can manually install it. Download the tarball, untar it,
+then build it:
+
+    % perl Build.PL
+    % ./Build && ./Build test
+
+Then install it:
+
+    % ./Build install
+
+If you are installing into a system-wide directory, you may need to run:
+
+    % sudo ./Build install
+
+## Documentation
+
+FFI-Platypus-Type-StringArray documentation is available as POD.
+You can run perldoc from a shell to read the documentation:
+
+    % perldoc FFI::Platypus::Type::StringArray

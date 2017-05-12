@@ -1,0 +1,168 @@
+{
+	"accept": {
+		"expect": {
+			"default": {
+				"final": 0,
+				"matching": "prompt"
+			}
+		},
+		"not_matching": "accept",
+		"not_matching0": "close",
+		"not_matching_info_last": "% Bad passwords\n",
+		"output": "Password: ",
+		"repeat": 2
+	},
+	"close": {
+		"final": 1,
+		"output": "__PROMPT__"
+	},
+	"in_enable": {
+		"expect": {
+			"cat": {
+				"exec": "echo 'hello world'"
+			},
+			"end": {
+				"matching": "prompt"
+			},
+			"exit": {
+				"matching": "close"
+			},
+			"h(elp)?|\\?": {
+				"output": "cat\nifconfig\nping\nexit\nend\nshutdown\n__ENPROMPT__"
+			},
+			"ifconfig": {
+				"exec": "/sbin/ifconfig"
+			},
+			"not_matching": "in_enable",
+			"ping": {
+				"matching": "ping_proto",
+				"output": "ping [IP] "
+			},
+			"shutdown": {
+				"matching": "shutdown"
+			}
+		},
+		"not_matching_info": "% Unknown command or computer name, or unable to find computer address",
+		"output": "__ENPROMPT__"
+	},
+	"ping_count": {
+		"expect": {
+			"(?^:\\d+)": {
+				"cmd": "-c $in",
+				"matching": "ping_datagram",
+				"output": "Datagram size [100]: "
+			},
+			"end": {
+				"matching": "in_enable"
+			}
+		},
+		"not_matching": "ping_count",
+		"not_matching_info": "% not a number",
+		"output": "Repeat count [5]:"
+	},
+	"ping_datagram": {
+		"expect": {
+			"(?^:\\d+)": {
+				"cmd": "-s $in ",
+				"matching": "ping_timeout",
+				"output": "Timeout in seconds [2]: "
+			},
+			"end": {
+				"matching": "in_enable"
+			}
+		},
+		"not_matching_info": "% not anumber",
+		"output": "Datagram size [100]: "
+	},
+	"ping_proto": {
+		"default_inAA": "ip",
+		"expect": {
+			"(?^i:ip)": {
+				"cmd": "ping  ",
+				"matching": "ping_target",
+				"output": "Target IP address: "
+			},
+			"end": {
+				"matching": "in_enable"
+			}
+		},
+		"not_matching_info": "% not a protocol",
+		"output": "ping [IP]:  ***"
+	},
+	"ping_target": {
+		"expect": {
+			"(?^:.*)": {
+				"cmd": "$in ",
+				"matching": "ping_count",
+				"output": "Repeat count [5]:"
+			},
+			"end": {
+				"matching": "in_enable"
+			}
+		},
+		"not_matching_info": "% not an ip",
+		"output": "Target IP address: "
+	},
+	"ping_timeout": {
+		"expect": {
+			"(?^:\\d+)": {
+				"cmd": "-W $in",
+				"cmd_exec": 1,
+				"matching": "ping_timeout",
+				"output": "__ENPROMPT__"
+			},
+			"end": {
+				"matching": "in_enable"
+			}
+		},
+		"not_matching_info": "% not a number",
+		"output": "Repeat count [5]: "
+	},
+	"shutdown": {
+		"final": 2
+	},
+	"prompt": {
+		"expect": {
+			"(?^:(?^:^en((a)|(ab)|(abl)|(able))?$))": {
+				"final": 0,
+				"matching": "prompt_enable"
+			},
+			"mem": {
+				"do": "my ( $tot,$avail) = (split /\n/ ,do { local( @ARGV, $/ ) = \"/proc/meminfo\" ; <> })[0,2];$tot =~ s/\\D*//g; $avail =~ s/\\D*//g; sprintf \"%0.2f%%\\n\",(100*($tot-$avail)/$tot);"
+			},
+			"mem1": {
+				"exec": "/usr/bin/perl -E 'my ( $tot,$avail) = (split /\\n/ ,do { local( @ARGV, $/ ) = \"/proc/meminfo\" ; <> })[0,2];$tot =~ s/\\D*//g; $avail =~ s/\\D*//g; printf \"%0.2f%%\\n\",(100*($tot-$avail)/$tot);'"
+			},
+			"df": {
+				"exec": "/bin/df"
+			},
+			"exit": {
+				"final": 0,
+				"matching": "close"
+			},
+			"h(elp)?|\\?": {
+				"output": "enable\nexit\nmeminfo\ndf\n__PROMPT__"
+			},
+			"meminfo": {
+				"do": "do { local( @ARGV, $/ ) = \"/proc/meminfo\" ; <> }"
+			}
+		},
+		"not_matching": "prompt",
+		"not_matching_info": "% Unknown command or computer name, or unable to find computer address",
+		"output": "__PROMPT__"
+	},
+	"prompt_enable": {
+		"expect": {
+			"default": {
+				"final": 0,
+				"matching": "in_enable",
+				"output": "__ENPROMPT__"
+			}
+		},
+		"not_matching": "prompt_enable",
+		"not_matching0": "prompt",
+		"not_matching_info_last": "% Bad secrets\n",
+		"output": "Password: ",
+		"repeat": 2
+	}
+}

@@ -1,0 +1,33 @@
+File::Finder - nice wrapper for File::Find ala find(1)
+
+SYNOPSIS
+
+  use File::Finder;
+  ## simulate "-type f"
+  my $all_files = File::Finder->type('f');
+
+  ## any rule can be extended:
+  my $all_files_printer = $all_files->print;
+
+  ## traditional use: generating "wanted" subroutines:
+  use File::Find;
+  find($all_files_printer, @starting_points);  
+
+  ## or, we can gather up the results immediately:
+  my @results = $all_files->in(@starting_points);
+
+  ## -depth and -follow are noted, but need a bit of help for find:
+  my $deep_dirs = File::Finder->depth->type('d')->ls->exec('rmdir','{}');
+  find($deep_dirs->as_options, @places);
+
+DESCRIPTION
+
+File::Find is great, but constructing the wanted routine can
+sometimes be a pain.  This module provides a wanted-writer, using
+syntax that is directly mappable to the find command's syntax.
+
+Also, I find myself (heh) frequently just wanting the list of names
+that match.  With File::Find, I have to write a little accumulator,
+and then access that from a closure.  But with File::Finder, I can
+turn the problem inside out.
+

@@ -1,0 +1,6 @@
+{
+   "globals" : {
+      "id" : "test",
+      "text" : "üé"
+   }
+}

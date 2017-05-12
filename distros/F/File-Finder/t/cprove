@@ -1,0 +1,4 @@
+#!/bin/sh
+cover -delete
+PERL5OPT=-MDevel::Cover=+inc,/Volumes/UFS prove -v -I../lib "$@" &&
+cover

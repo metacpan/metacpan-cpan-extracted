@@ -1,0 +1,227 @@
+#!/usr/local/bin/perl -w
+
+package UniProtAccessor;  # this should be the same as your filename!
+use FindBin;                # where was script installed?
+use lib "$FindBin::Bin";      # use that dir for libs, too
+use strict;
+use warnings;
+use JSON;
+use FAIR::Accessor::Distribution;
+use FAIR::Accessor::Container;
+use FAIR::Accessor::MetaRecord;
+
+
+#-----------------------------------------------------------------
+# Configuration and Daemon
+#-----------------------------------------------------------------
+
+use base 'FAIR::Accessor';
+
+my $config = {
+   title => 'UniProt Slice FAIR Accessor - Aspergillus RNA Processing proteins',
+   serviceTextualDescription => 'Takes a SAPRQL query of the UniProt database specific to proteins and their GO annotations related to RNA Procssing proteins in Aspergillus and makes it a FAIR Accessor source',
+   textualAccessibilityInfo => "The information from this server requries no authentication; HTTP GET is sufficient",  # this could also be a $URI describing the accessibiltiy
+   mechanizedAccessibilityInfo => "",  # this must be a URI to an RDF document
+   textualLicenseInfo => "CC-BY-ND 4.0",  # this could also be a URI to the license info
+   mechanizedLicenseInfo =>  "https://creativecommons.org/licenses/by-nd/4.0/", # this must be a URI to an RDF document
+   ETAG_Base => "TopLevelMetadata_Accessor_For_UniProtAnidulansRNAProcessing", # this is a unique identificaiton string for the service (required by the LDP specification)
+   localNamespaces => {
+	pfund => 'http://vocab.ox.ac.uk/projectfunding#term_',
+	up => 'http://uniprot.org/ontology/core#', 
+	},  # add a few new namespaces to the list of known namespaces....
+   basePATH => '/Accessors/UniProtAccessor', # REQUIRED regexp to match the RESTful PATH part of the URL, before the ID number
+
+};
+
+my $SPARQL = '
+            PREFIX up:<http://purl.uniprot.org/core/>
+            PREFIX taxon:<http://purl.uniprot.org/taxonomy/>
+            PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+            SELECT distinct ?id
+            
+            WHERE
+            {
+                ?protein a up:Protein .
+                ?protein up:organism ?organism .
+                ?organism rdfs:subClassOf taxon:162425 .
+                ?protein up:classifiedWith ?go .
+                ?go rdfs:subClassOf* <http://purl.obolibrary.org/obo/GO_0006396> .
+              
+                bind(replace(str(?protein), "http://purl.uniprot.org/uniprot/", "", "i") as ?id)
+            }
+            ';
+            
+my $service = UniProtAccessor->new(%$config);
+
+# start daemon
+$service->handle_requests;
+
+
+#-----------------------------------------------------------------
+# Accessor Implementation
+#-----------------------------------------------------------------
+
+
+#------------- Container Resource --------------
+
+sub Container {
+
+   my ($self, %ARGS) = @_;
+   
+   my $Container = FAIR::Accessor::Container->new(NS => $self->Configuration->Namespaces);
+ 
+   $self->fillContainerMetadata($Container);
+   
+   my $BASE_URL = "http://" . $ENV{'SERVER_NAME'} . $ENV{'REQUEST_URI'};
+
+   use RDF::Query::Client;
+   my $query = RDF::Query::Client->new($SPARQL);   
+
+   my $iterator = $query->execute('http://sparql.uniprot.org/sparql/');
+   my @records;
+   while (my $row = $iterator->next) {
+      my $ID = $row->{id}->value;
+      push @records, "$BASE_URL/$ID";   # need to make a URL for each of the meta-records, based on the ID of the PHIBase record, push it onto a list
+   }
+  
+   $Container->addRecords(\@records); # the listref of record ids
+
+   return $Container;
+}
+
+# --------------------MetaRecord Resource ---------------
+
+sub MetaRecord {
+   my ($self, %ARGS) = @_;
+
+   my $ID = $ARGS{'ID'};
+
+   my $MetaRecord = FAIR::Accessor::MetaRecord->new(ID => $ID,
+                                                    NS => $self->Configuration->Namespaces);
+   $self->fillMetaRecordMetadata($MetaRecord);
+   
+   $MetaRecord->addDistribution(availableformats => ['text/html'],
+                                downloadURL => "http://www.uniprot.org/uniprot/$ID.html");
+   $MetaRecord->addDistribution(availableformats => ['application/rdf+xml'],
+                                downloadURL => "http://www.uniprot.org/uniprot/$ID.rdf");
+
+my $desc = $self->getDesc($ID);
+$MetaRecord->addMetadata({
+        'dcat:description' => $desc});
+
+   
+   my $encodedsubject = urlencode("http://identifiers.org/uniprot/$ID");
+   my $encodedpredicate = urlencode("http://purl.uniprot.org/core/organism");
+   my $TPF = "http://linkeddata.systems:3001/fragments?subject=$encodedsubject&predicate=$encodedpredicate";  
+   $MetaRecord->addDistribution(availableformats => ["application/x-turtle", "application/rdf+xml", "text/html"],
+                                downloadURL => $TPF,
+                                source => "http://identifiers.org/uniprot/$ID",
+                                subjecttemplate =>  "http://identifiers.org/uniprot/{ID}",
+                                subjecttype => "http://purl.uniprot.org/core/organism",
+                                predicate => "http://purl.uniprot.org/core/organism",
+                                objecttemplate => "http://identifiers.org/taxon/{TAX}",
+                                objecttype => "http://edamontology.org/data_1179",      
+   );
+   
+   
+   $encodedpredicate = urlencode("http://purl.uniprot.org/core/classifiedWith");
+   $TPF = "http://linkeddata.systems:3001/fragments?subject=$encodedsubject&predicate=$encodedpredicate";
+   $MetaRecord->addDistribution(availableformats => ["application/x-turtle", "application/rdf+xml", "text/html"],
+                                 downloadURL => $TPF,
+                                source => "http://identifiers.org/uniprot/$ID",
+                                subjecttemplate =>  "http://identifiers.org/uniprot/{ID}",
+                                subjecttype => "http://edamontology.org/data_0896",
+                                predicate => "http://purl.uniprot.org/core/classifiedWith",
+                                objecttemplate => "http://purl.obolibrary.org/obo/{GO}",
+                                objecttype => "http://edamontology.org/data_1176",      
+   );
+
+   return $MetaRecord;
+
+}
+
+sub fillContainerMetadata {
+   my ($self, $Container) = @_;
+   $Container->addMetadata({
+                           'dc:title' => "UniProt Slice FAIR Accessor - Aspergillus RNA Processing proteins",
+                           'dcat:description' => "Takes a SPARQL query of the UniProt database specific to proteins and their GO annotations related to RNA Procssing proteins in Aspergillus and makes it a FAIR Accessor source.  The precise query is:\n\n$SPARQL                        ",
+                           'dcat:identifier' => "http://linkeddata.systems/cgi-bin/Accessors/UniProtAccessor",
+                           'dcat:keyword' => ["Aspergillus", "Aspergillus nidulans", "RNA Processing", "Proteins"],
+                           'dcat:landingPage' => 'http://uniprot.org',
+                           'foaf:page' => ['http://sparql.uniprot.org/sparql','http://uniprot.org/'],
+                           'dcat:language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
+                           'dc:language' => 'http://lexvo.org/id/iso639-3/eng', 
+                           'dcat:publisher' => ['http://wilkinsonlab.info'],
+                           'dcat:theme'  => 'http://linkeddata.systems/ConceptSchemes/RNA_Processing_conceptscheme.rdf',  # this is the URI to a SKOS Concept Scheme
+                          'pfund:hasPrincipalInvestigator' => ["Dr. Mark Wilkinson"],
+                          'dc:creator' => 'http://wilkinsonlab.info',
+                          'pav:authoredBy' => ['http://orcid.org/0000-0002-9699-485X'],
+                          'pav:version' => 'UniProt release 2016_09',
+                          'dcat:contactPoint' => 'http://biordf.org/DataFairPort/MiscRDF/Wilkinson.rdf',
+                          'dc:license' => 'https://creativecommons.org/licenses/by-nd/4.0/',
+                          'rdf:type' => ['prov:Collection', 'dctypes:Dataset'],
+   });
+}
+
+sub fillMetaRecordMetadata {
+  my ($self, $MetaRecord) = @_;
+  my $ID = $MetaRecord->ID;
+  $MetaRecord->addMetadata({
+	'foaf:primaryTopic' => "http://identifiers.org/uniprot/$ID",
+      'dc:title' => "UniProt Protein $ID",
+      'dcat:identifier' => "http://uniprot.org/$ID",
+      'dcat:keyword' => ["Aspergillus", "Aspergillus nidulans", "RNA Processing", "Proteins", "Annotation", "Functinal Annotation", "Gene Ontology", "GO"],
+      'dcat:landingPage' => 'http://uniprot.org',
+      'foaf:page' => ['http://sparql.uniprot.org/sparql','http://uniprot.org/'],
+      'dcat:language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
+      'pav:version' => 'UniProt release 2016_09',
+      'dc:language' => 'http://lexvo.org/id/iso639-3/eng', 
+      'dcat:publisher' => ['http://uniprot.org'],
+      'dcat:language' => 'http://id.loc.gov/vocabulary/iso639-1/en',
+      'dc:creator' => 'UniProt Consortium',
+      'dc:bibliographicCitation' => "The UniProt Consortium (2015). UniProt: a hub for protein information. Nucleic Acids Res. 43: D204-D212",
+      'dcat:contactPoint' => 'http://www.uniprot.org/contact',
+      'void:inDataset' => 'http://linkeddata.systems/cgi-bin/Accessors/UniProtAccessor/',
+      'dc:license' => 'https://creativecommons.org/licenses/by-nd/3.0/',
+	});
+ 
+}
+
+
+
+sub urlencode {
+    my $s = shift;
+    $s =~ s/ /+/g;
+    $s =~ s/([^A-Za-z0-9\+-])/sprintf("%%%02X", ord($1))/seg;
+    return $s;
+}
+
+
+sub getDesc {
+my ($self, $ID) = @_;
+use LWP::Simple;
+use RDF::Query;
+use RDF::Trine;
+  
+  my $store = RDF::Trine::Store::Memory->new();
+  my $model = RDF::Trine::Model->new($store);
+  
+  RDF::Trine::Parser->parse_url_into_model( "http://uniprot.org/uniprot/$ID.rdf", $model );
+ my $query = RDF::Query->new( 'PREFIX core: <http://purl.uniprot.org/core/> 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+select ?desc where 
+{
+?x a core:Structured_Name .
+?x core:fullName ?desc .
+}
+' );
+
+my $desc;
+my $iterator = $query->execute( $model );
+while (my $row = $iterator->next) {
+   # $row is a HASHref containing variable name -> RDF Term bindings
+   $desc .= ($row->{ 'desc' }->value). "\n";
+}
+return $desc
+}

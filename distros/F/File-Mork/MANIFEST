@@ -1,0 +1,13 @@
+bin/mork
+examples/history.dat
+lib/File/Mork.pm
+Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/01use.t
+t/02simple.t 
+t/03error.t 
+Build.PL
+Makefile.PL
+META.json

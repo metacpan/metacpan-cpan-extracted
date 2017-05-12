@@ -1,0 +1,24 @@
+---
+abstract: 'Snapshot files in a git repository'
+author:
+  - 'Robert Sedlacek <r.sedlacek@shadowcat.co.uk>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Tree-Snapshot
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: 0
+  File::Path: 0
+  Moo: 0.009013
+version: 0.000001

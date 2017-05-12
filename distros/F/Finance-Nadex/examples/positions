@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Finance::Nadex;
+
+if (! $ENV{NADEXUSERNAME} || ! $ENV{NADEXPASSWORD}) {
+    die "to use this program, you must set NADEXUSERNAME and NADEXPASSWORD in your environment with your Nadex username and password\n";
+}
+
+# connects to the live platform; alternatively, connect to demo with my $client = Finance::Nadex->new(platform => 'demo');
+my $client = Finance::Nadex->new();
+$client->login(username => $ENV{NADEXUSERNAME}, password => $ENV{NADEXPASSWORD});
+
+my @positions = $client->retrieve_positions();
+
+exit unless scalar @positions;
+
+print join(" ", $positions[0]->id, $positions[0]->direction, $positions[0]->size, $positions[0]->contract, $positions[0]->price, $positions[0]->bid), "\n";
+

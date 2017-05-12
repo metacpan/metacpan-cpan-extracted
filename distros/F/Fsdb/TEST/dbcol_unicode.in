@@ -1,0 +1,12 @@
+#fsdb -F S row desc example
+1  simple ascii  foo
+2  latin-1  Réno
+3  cyrillic  Кириллица
+4  greek  Ελληνικό αλφάβητο
+5  katakana  カタカナ
+6  korean  한글
+7  chinese  中文
+8  traditional chinese  正體字
+8  hebrew  אָלֶף־בֵּית עִבְרִי
+9  arabic  أَبْجَدِيَّة عَرَبِيَّة‎
+10  devanagari  देवनागरी

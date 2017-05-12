@@ -1,0 +1,6 @@
+./passwords.txt is a list of common passwords.  These should be UTF-8 encoded.
+
+This list is from https://github.com/danielmiessler/SecLists.
+
+If you set a min length of the password then there's no need to store shorter passwords in this file.
+

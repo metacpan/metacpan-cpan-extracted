@@ -1,0 +1,9 @@
+#h sid cid
+1 10
+2 11
+1 12
+2 12
+#h cid cname
+10 pascal
+11 numanal
+12 os

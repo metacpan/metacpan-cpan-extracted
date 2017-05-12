@@ -1,0 +1,22 @@
+Revision history for Perl extension File::TinyLock.
+
+1.20  Fri Oct  3 22:15:41 EDT 2014
+    - more fixup for ps in path
+    - revamp test plan
+
+1.11  Fri Sep 12 20:15:33 EDT 2014
+    - fixup for ps not being in path
+
+1.10  Thu Jan 21 14:44:16 EST 2010
+	- changed stale processing detection
+	- fixed up test.pl
+
+1.00  Fri Oct  5 08:40:24 EDT 2009
+	- complete rewrite - more perlish, better explenations
+
+0.12  Sat Jun 23 03:17:29 EDT 2007
+	- fixed possible name space collisions
+
+0.11  Thu Apr  6 16:51:35 EDT 2006
+	- original version; created by h2xs 1.21 with options
+	-AX File::TinyLock

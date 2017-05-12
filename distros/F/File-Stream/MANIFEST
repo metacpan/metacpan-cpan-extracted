@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/File/Stream.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+SIGNATURE    Added here by Module::Build

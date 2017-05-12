@@ -1,0 +1,34 @@
+Build.PL
+Changes
+eg/stat.pl
+Incompatibilities
+lib/Exception/IO.pm
+lib/File/Stat/Moose.pm
+lib/MooseX/Types/CacheFileHandle.pm
+lib/MooseX/Types/OpenHandle.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/all_tests.t
+t/test.pl
+t/tlib/File/Stat/MooseFunctionTest.pm
+t/tlib/File/Stat/MooseTest.pm
+xt/benchmark.pl
+xt/consistent_version_numbers.t
+xt/copyright.t
+xt/cover.pl
+xt/distribution.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+xt/pod_spell.xt
+xt/pod_syntax.t
+xt/profile.pl
+xt/trace.pl
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

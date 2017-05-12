@@ -1,0 +1,16 @@
+Changes
+examples/dump_all.pl
+examples/dump_all_industries.pl
+examples/dump_industries.pl
+examples/dump_industry.pl
+examples/dump_names.pl
+lib/Finance/TickerSymbols.pm
+Makefile.PL
+MANIFEST
+README
+t/Finance-TickerSymbols.t
+t/Industries.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

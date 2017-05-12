@@ -1,0 +1,15 @@
+ChangeLog
+flickr_upload
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/async.t
+t/failupload.t
+t/progress.t
+t/progress_request.t
+t/request.t
+t/testimage.jpg
+t/upload.t
+lib/Flickr/Upload.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

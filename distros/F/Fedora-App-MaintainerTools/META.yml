@@ -1,0 +1,106 @@
+---
+abstract: 'Main application class'
+author:
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fedora-App-MaintainerTools
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  CPAN::MetaMuncher:
+    file: lib/CPAN/MetaMuncher.pm
+    version: 0.006
+  Fedora::App::MaintainerTools:
+    file: lib/Fedora/App/MaintainerTools.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Command::ftbfs:
+    file: lib/Fedora/App/MaintainerTools/Command/ftbfs.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Command::newspec:
+    file: lib/Fedora/App/MaintainerTools/Command/newspec.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Command::privaterepo:
+    file: lib/Fedora/App/MaintainerTools/Command/privaterepo.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Command::updates:
+    file: lib/Fedora/App/MaintainerTools/Command/updates.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Command::updatespec:
+    file: lib/Fedora/App/MaintainerTools/Command/updatespec.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::LocalRepo:
+    file: lib/Fedora/App/MaintainerTools/LocalRepo.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Role::Bugzilla:
+    file: lib/Fedora/App/MaintainerTools/Role/Bugzilla.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Role::Logger:
+    file: lib/Fedora/App/MaintainerTools/Role/Logger.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Role::SpecUtils:
+    file: lib/Fedora/App/MaintainerTools/Role/SpecUtils.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::Role::Template:
+    file: lib/Fedora/App/MaintainerTools/Role/Template.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::SpecData:
+    file: lib/Fedora/App/MaintainerTools/SpecData.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::SpecData::New:
+    file: lib/Fedora/App/MaintainerTools/SpecData/New.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::SpecData::Update:
+    file: lib/Fedora/App/MaintainerTools/SpecData/Update.pm
+    version: 0.006
+  Fedora::App::MaintainerTools::SpecData::Update::Traits::NixPerlInstallRoot:
+    file: lib/Fedora/App/MaintainerTools/SpecData/Update/Traits/NixPerlInstallRoot.pm
+  Fedora::App::MaintainerTools::Types:
+    file: lib/Fedora/App/MaintainerTools/Types.pm
+    version: 0.006
+requires:
+  CPANPLUS::Backend: 0
+  Data::TreeDumper: 0
+  DateTime: 0
+  Fedora::Bugzilla: 0.13
+  File::Copy: 0
+  File::Slurp: 0
+  IPC::System::Simple: 0
+  JSON: 0
+  List::MoreUtils: 0
+  Module::CoreList: 0
+  Moose: 0.90
+  MooseX::App::Cmd: 0
+  MooseX::AttributeHelpers: 0
+  MooseX::Log::Log4perl: 0
+  MooseX::Traits: 0.08
+  MooseX::Types: 0
+  MooseX::Types::Path::Class: 0
+  MooseX::Types::URI: 0
+  Path::Class: 0
+  Pod::POM: 0
+  Pod::POM::View::Text: 0
+  RPM::Spec: 0.04
+  RPM::VersionSort: 1.00
+  Software::LicenseUtils: 0
+  YAML::Tiny: 0
+  autodie: 0
+  namespace::clean: 0
+resources:
+  homepage: http://github.com/RsrchBoy/fedora-app-maintainertools/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/RsrchBoy/fedora-app-maintainertools.git
+version: 0.006

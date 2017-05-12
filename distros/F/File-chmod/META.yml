@@ -1,0 +1,49 @@
+---
+abstract: 'Implements symbolic and ls chmod modes'
+author:
+  - 'Jeff Pinyan <japhy.734+CPAN@gmail.com>'
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  English: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  autodie: '0'
+  perl: '5.006'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-chmod
+no_index:
+  file:
+    - perlcritic.rc
+provides:
+  File::chmod:
+    file: lib/File/chmod.pm
+    version: '0.42'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  base: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/xenoterracide/file-chmod/issues
+  homepage: https://metacpan.org/dist/File-chmod
+  repository: git://github.com/xenoterracide/file-chmod.git
+version: '0.42'
+x_contributors:
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Slaven Rezic <slaven@rezic.de>'
+  - 'Steve Throckmorton <arrestee@gmail.com>'
+  - 'Tim <oylenshpeegul@gmail.com>'

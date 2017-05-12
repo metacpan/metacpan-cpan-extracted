@@ -1,0 +1,29 @@
+#!perl
+
+use strict;
+use warnings;
+use File::Spec::Link ();
+my $VERSION = $File::Spec::Link::VERSION;
+
+for my $link (@ARGV) {
+    local $\ = "\n";
+    print "$link linked to ",   File::Spec::Link->linked($link);
+    print "$link resolves to ", File::Spec::Link->resolve($link);
+    print "$link directory ",   File::Spec::Link->chopfile($link);
+    print "$link relative to . ",
+        File::Spec::Link->relative_to_file(File::Spec->curdir, $link);
+
+    # use Cwd::abs_path()
+    print "$link path resolved: ",
+        File::Spec::Link->resolve_path($link);
+
+    # tries to use Cwd::abs_path()
+    print "$link fully resolved: ",
+        File::Spec::Link->full_resolve($link);
+
+    # without using Cwd
+    print "$link all resolved: ",
+        File::Spec::Link->resolve_all($link);
+}
+
+# $Id: filespec 219 2008-06-12 12:31:18Z rmb1 $

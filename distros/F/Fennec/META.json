@@ -1,0 +1,102 @@
+{
+   "abstract" : "A testers toolbox, and best friend",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Fennec",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Fennec::Declare" : "1.001"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Child" : "0.010",
+            "Exporter::Declare" : "0",
+            "List::Util" : "0",
+            "Mock::Quick" : "1.106",
+            "Parallel::Runner" : "0.013",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0.29",
+            "Test::Simple" : "0.88",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Fennec" : {
+         "file" : "lib/Fennec.pm",
+         "version" : "2.017"
+      },
+      "Fennec::Collector" : {
+         "file" : "lib/Fennec/Collector.pm"
+      },
+      "Fennec::Collector::TB" : {
+         "file" : "lib/Fennec/Collector/TB.pm"
+      },
+      "Fennec::Collector::TB::TempFiles" : {
+         "file" : "lib/Fennec/Collector/TB/TempFiles.pm"
+      },
+      "Fennec::EndRunner" : {
+         "file" : "lib/Fennec/EndRunner.pm"
+      },
+      "Fennec::Finder" : {
+         "file" : "lib/Fennec/Finder.pm"
+      },
+      "Fennec::Meta" : {
+         "file" : "lib/Fennec/Meta.pm"
+      },
+      "Fennec::Runner" : {
+         "file" : "lib/Fennec/Runner.pm"
+      },
+      "Fennec::Test" : {
+         "file" : "lib/Fennec/Test.pm"
+      },
+      "Fennec::Util" : {
+         "file" : "lib/Fennec/Util.pm"
+      },
+      "Test::Workflow" : {
+         "file" : "lib/Test/Workflow.pm"
+      },
+      "Test::Workflow::Block" : {
+         "file" : "lib/Test/Workflow/Block.pm"
+      },
+      "Test::Workflow::Layer" : {
+         "file" : "lib/Test/Workflow/Layer.pm"
+      },
+      "Test::Workflow::Meta" : {
+         "file" : "lib/Test/Workflow/Meta.pm"
+      },
+      "Test::Workflow::Test" : {
+         "file" : "lib/Test/Workflow/Test.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Fennec/issues"
+      },
+      "homepage" : "http://exodist.github.io/Fennec/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Fennec"
+      }
+   },
+   "version" : "2.017"
+}

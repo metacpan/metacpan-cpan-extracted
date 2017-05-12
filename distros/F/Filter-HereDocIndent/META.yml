@@ -1,0 +1,14 @@
+---
+abstract: 'Filter::HereDocIndent - Indent here documents'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Filter-HereDocIndent
+provides:
+    Filter::HereDocIndent:
+        file: lib/Filter/HereDocIndent.pm
+        version: 1.01
+requires:
+    perl: 5.003
+version: 1.01

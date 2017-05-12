@@ -1,0 +1,14 @@
+#fsdb reading spelling
+3 11
+7 1
+2 19
+9 5
+8 17
+4 3
+1 15
+10 9
+6 15
+5 8
+# data from http://www.mnstate.edu/wasson/ed602pearsoncorr.htm
+# note that while they designate what they compute as r,
+# the actually compute the population correlation, not the sample correlation.

@@ -1,0 +1,13 @@
+
+File::BasicFlock is a wrapper around the flock() call.  
+
+To install File::Flock use the following:
+
+	perl Makefile.PL
+	make 
+	make test
+	make install
+
+Under perl5.002, the make test will emit some warnings about "9" and
+"99" not being numeric values.  I believe this is a bug in perl.
+

@@ -1,0 +1,63 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: FreeMind-Document
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/FreeMind-Document
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/FreeMind/ArrowLink.pm
+ lib/FreeMind/Cloud.pm
+ lib/FreeMind/Edge.pm
+ lib/FreeMind/Font.pm
+ lib/FreeMind/Icon.pm
+ lib/FreeMind/RichContent.pm
+ lib/FreeMind/Text.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ TODO
+ TODO.mm
+ examples/tttodo-to-text.pl
+ examples/tttodo.mm
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/FreeMind/Document.pm
+ lib/FreeMind/Map.pm
+ lib/FreeMind/Node.pm
+ t/01basic.t
+ t/02totext.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+ bin/mm2txt
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

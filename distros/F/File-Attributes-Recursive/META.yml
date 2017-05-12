@@ -1,0 +1,19 @@
+abstract: Inherit file attributes from parent
+author: Jonathan Rockway <jrockway@cpan.org
+build_requires: 
+  Directory::Scratch: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: Perl
+name: File-Attributes-Recursive
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Cwd: 0
+  Exporter: 0
+  File::Attributes: 0
+  Path::Class: 0
+version: 0.02

@@ -1,0 +1,6 @@
+/etc/logrotate.d/fwctl
+/etc/fwctl/aliases
+/etc/fwctl/rules
+/etc/fwctl/interfaces
+/etc/init.d/fwctl
+/etc/cron.d/fwctl

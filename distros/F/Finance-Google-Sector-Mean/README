@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Finance-Google-Sector-Mean,
+version 0.08:
+
+  Perl extension shows you the finance.google.com sectors and there realtime quote+performance grouped in [negative,positive,above average performance]
+
+This software is copyright (c) 2013 by hagen geissler santex@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

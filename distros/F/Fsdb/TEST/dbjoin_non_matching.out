@@ -1,0 +1,10 @@
+#fsdb cid sid cname
+9	-	spreadsheets
+10	1	-
+11	2	pascal
+12	1	os
+12	2	os
+13	1	-
+14	-	databases
+#  | dbsort -n cid
+#   | dbjoin -S -e - -a --input TEST/dbjoin_non_matching.in-2 -n cid

@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: File-SortedSeek
+version: 0.015
+abstract: A Perl module providing fast access to large files
+license: artistic_2
+generated_by: ExtUtils::MakeMaker version 6.3201
+distribution_type: module
+requires:     
+  Time::Local: 0
+  perl: 5.0
+provides:
+  File::SortedSeek:
+    file: lib/File/SortedSeek.pm
+    version: 0.015
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+author:
+  - Dr James Freeman

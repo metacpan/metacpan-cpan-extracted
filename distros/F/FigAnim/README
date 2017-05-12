@@ -1,0 +1,50 @@
+FigAnim version 0.1
+====================
+
+FigAnim - A XFig file animator module
+
+FigAnim is a package which takes an existing FIG file
+(made by the XFig vector drawing program for example)
+and generates animations in animated GIF format and/or in SVG+SMIL format.
+
+For help:
+
+   perldoc FigAnim
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+
+To add the FigAnim module to your standard perl-lib directory:
+
+   su root
+   make install
+
+DEPENDENCIES
+
+This module requires these softwares:
+
+* ImageMagick version 5.4.3, if you want to generate GIF animations:
+  http://www.imagemagick.org/
+
+* XFig 3.2 and TransFig 3.2, for creating and converting FIG files.
+  http://www.xfig.org/
+
+* Adobe SVG Viewer 3.0, a plugin for viewing SVG+SMIL animations in your internet browser
+  http://www.adobe.com/svg/viewer/install/main.html
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 K. Imakita, Q. Lamerand, F. Perrin
+
+K. Imakita, kzu@wanadoo.fr
+Q. Lamerand, bret.zel@wanadoo.fr
+F. Perrin, fred.per1@free.fr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

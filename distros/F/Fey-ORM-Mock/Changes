@@ -1,0 +1,30 @@
+0.06   2013-12-22
+
+- Removed used of deprecated Class::MOP::load_class().
+
+
+0.05    2010-12-12
+
+- Fix a test that failed with Fey::ORM 0.33+.
+
+
+0.04    2009-03-29
+
+- Use native traits rather than MooseX::AttributeHelpers.
+
+
+0.03    2009-03-27
+
+- Fixes to work with Moose 0.72_01+, but it still works with earlier
+  Moose as well.
+
+
+0.02    2009-01-18
+
+- Small fix to shut up a warning when used with recent versions of
+  Moose.
+
+
+0.01    2008-11-08
+
+- First version, released on an unsuspecting world.

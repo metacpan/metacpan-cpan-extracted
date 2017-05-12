@@ -1,0 +1,18 @@
+#fsdb -R C absdiff
+absdiff: 0
+
+absdiff: 0.046953
+
+absdiff: 0.072074
+
+absdiff: 0.075413
+
+absdiff: 0.094088
+
+absdiff: 0.096602
+
+#  | /home/johnh/BIN/DB/dbrow 
+#  | /home/johnh/BIN/DB/dbcol event clock
+#  | dbrowdiff clock
+#  | /home/johnh/BIN/DB/dbcol absdiff
+#   | dbfilealter -R C

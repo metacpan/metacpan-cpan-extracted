@@ -1,0 +1,15 @@
+params:
+  name:
+    name: '名前'
+    validators:
+      - Blank#not_blank
+      - String#max_length:
+          max: 50
+  mail:
+    name: 'メールアドレス'
+    validators:
+      - Blank#not_blank
+      - Email#email
+      - String#max_length:
+          max: 100
+

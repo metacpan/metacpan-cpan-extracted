@@ -1,0 +1,21 @@
+Build.PL
+Changes
+examples/fetch_test.pl
+lib/Finance/QuoteTW.pm
+lib/Finance/QuoteTW/Allianz.pm
+lib/Finance/QuoteTW/Blackrock.pm
+lib/Finance/QuoteTW/Capital.pm
+lib/Finance/QuoteTW/Franklin.pm
+lib/Finance/QuoteTW/Iit.pm
+lib/Finance/QuoteTW/Jpmrich.pm
+lib/Finance/QuoteTW/Paradigm.pm
+lib/Finance/QuoteTW/Schroders.pm
+lib/Finance/QuoteTW/Tisc.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

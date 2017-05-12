@@ -1,0 +1,66 @@
+{
+   "abstract" : "Build simple rules-based state machines in Perl",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FSA-Rules",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.2701",
+            "Test::More" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "B::Deparse" : "0.61",
+            "GraphViz" : "2.00",
+            "Storable" : "2.05",
+            "Test::Pod" : "1.41",
+            "Text::Wrap" : "0"
+         },
+         "requires" : {
+            "Scalar::Util" : "1.01",
+            "perl" : "5.006002"
+         }
+      }
+   },
+   "provides" : {
+      "FSA::Rules" : {
+         "file" : "lib/FSA/Rules.pm",
+         "version" : "0.35"
+      },
+      "FSA::State" : {
+         "file" : "lib/FSA/Rules.pm",
+         "version" : "0.35"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/theory/fsa-rules/issues/"
+      },
+      "homepage" : "http://search.cpan.org/dist/FSA-Rules/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/theory/fsa-rules/"
+      }
+   },
+   "version" : "0.35"
+}

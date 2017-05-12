@@ -1,0 +1,10 @@
+Revision history for File-Random-Pick
+
+0.02    2015-11-23 (PERLANCAR)
+
+	- [ux] Also accept filehandle instead of filename.
+
+
+0.01    2015-11-22 (PERLANCAR)
+
+        - First version.

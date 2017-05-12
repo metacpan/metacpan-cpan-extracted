@@ -1,0 +1,6 @@
+/var/log/fwctl_acct {
+        rotate 12
+        weekly
+        compress
+        missingok
+}

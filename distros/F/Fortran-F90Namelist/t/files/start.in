@@ -1,0 +1,38 @@
+!  -*-f90-*-  (for Emacs)    vim:set filetype=fortran:  (for vim)
+!
+!  test4a.nml -- Sample namelist file copied from
+!                pencil-code/samples/mdwarf/start.in
+!  $Id: test4a.nml,v 1.1 2006/12/18 23:14:12 dobler Exp $
+!
+
+!
+!  Initialisation parameters
+!
+&init_pars
+  cvsid='@Id: start.in,v 1.5 2004/05/29 14:06:15 mee Exp @',! Replaced dollar signs by ampersands so CVS doesn't modify value
+
+  ip=14,                        ! debugging parameter
+  xyz0  = -1.5,-1.5,-1.5,       ! first corner of box
+  Lxyz  =  3. , 3. , 3.,        ! box size
+  lperi =  F  , F  , F,         ! periodic direction?
+  random_gen='nr_f90'
+  r_ext = 1.
+/
+&hydro_init_pars
+ inituu='gaussian-noise-rprof',
+  ampluu=3e-2
+/
+&density_init_pars
+  initlnrho='isentropic-star',
+  cs0=1.5, rho0=1.,             ! values at r=0
+/
+&grav_init_pars
+  ipotential='M5-dwarf'
+/
+&entropy_init_pars
+  initss='isentropic-star'
+/
+&magnetic_init_pars
+  initaa='gaussian-noise-rprof'
+  amplaa=1.e-6
+/

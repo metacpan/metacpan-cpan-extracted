@@ -1,0 +1,81 @@
+#! perl
+
+use warnings;
+use strict;
+
+for (qw( PPI File::Find::Rule PPI::Dumper )) {
+  eval "use $_";
+  if ($@) { warn "$0 needs $_ installed: $@"; exit 1 }
+}
+
+use YAML::Syck;
+ 
+my @files = File::Find::Rule->or(
+                  File::Find::Rule->directory->name('blib')->prune->discard,
+                  File::Find::Rule->file()->name('*.pm'))->in(@ARGV);
+
+my %all_errors;
+for my $file (@files) {
+  my $doc = PPI::Document->new($file);
+  $doc->index_locations;
+  my ($api, $namespace) = ('','');
+  my $implements = $doc->find_first( sub {
+    $_[1]->isa("PPI::Statement::Sub") and $_[1]->name eq 'implements'
+  });
+  my $errors;
+  if ($implements) {
+    my $quotes = $implements->find( 'Token::Quote' );
+    ($api, $namespace) = map { s/['"]//g; $_ } 
+                         map { $_->content } @$quotes;
+    $errors->{api} = $api;
+    $errors->{namespace} = $namespace;
+  }
+
+  my $subs = $doc->find(
+    sub { $_[1]->isa("PPI::Statement::Sub") and $_[1]->name }
+  );
+  next unless $subs;
+  
+  for my $sub (@$subs) {
+  #  warn PPI::Dumper->new( $sub, whitespace => 0, comments => 0 )->string;
+    for my $match (@{ $sub->find( \&find_froody_error ) || [] }) {
+      my $name = $match->next_sibling
+                       ->next_sibling
+                       ->next_sibling
+                       ->schild(0)->schild(0)->content;
+      $name =~ s/['"]//g;                 
+      unless (grep { m/\Q$name\E/ } 
+                   @{$errors->{subs}{ $sub->name }} 
+      ) {
+        push @{ $errors->{subs}{ $sub->name} }, [ $name, $match->location->[0] ];
+      }
+    }
+    for my $death (@{ $sub->find( sub { $_[1]->isa('PPI::Token::Word') 
+                                        and $_[1]->content =~ m/die|croak|carp|confess|cluck/g; 
+                                      } ) || [] }) { 
+      
+      my $exit = $death->content;
+      my $message = $death->snext_sibling;
+      if (!$message->isa('PPI::Token::Magic')) {
+        push @{ $errors->{deaths}{$exit}}, [ as_text($message), $message->location->[0] ];
+      }
+#      warn PPI::Dumper->new($death->snext_sibling)->string;
+#      warn PPI::Dumper->new($death->statement, whitespace => 0, comments => 0) ->string
+    }
+  }
+  $all_errors{$file} = $errors
+    if (defined $errors->{subs} || defined $errors->{deaths}); 
+}
+print Dump(\%all_errors);  
+
+sub as_text {
+  my ($node) = @_;
+
+  $node->isa('PPI::Token::Quote') ? $node->string
+                                  : $node->content
+}
+
+sub find_froody_error {
+  $_[1]->content eq "Froody::Error"  
+}
+

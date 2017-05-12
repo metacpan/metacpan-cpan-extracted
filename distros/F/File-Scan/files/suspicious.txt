@@ -1,0 +1,8 @@
+worm::776f726d
+virus[^p]::7669727573[^70]
+trojan::74726f6a616e
+[text] by text::5b[^5d]+5d20627920\w+
+backdoor::6261636b646f6f72
+parasite::7061726173697465
+text coded by text::\w+20636f64656420627920\w+
+fuck::6675636b

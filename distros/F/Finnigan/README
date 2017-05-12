@@ -1,0 +1,78 @@
+Finnigan version 0.02
+=====================
+
+This module is part of the Unfinnigan project aimed at decoding
+the proprietary data files used to acquire data from Thermo mass
+spectrometers. These are are known as "raw" files and they were
+intended to be read with proprietary software (Xcalibur) running
+on the Windows operating system.
+
+This module allows complete access to scan data without the need
+to install any vendor software.
+
+It can decode several recent file formats (versions 57, 62 and 63)
+and it comes with a suite of command-line tools that can be used
+to examine various elements of the data. One of the tools, uf-mzxml,
+replaces ReAdW in the task of converting the Finnigan data to mzXML.
+
+The module and the tools have been tested in an ongoing SILAC
+proteomics project, where users are writing their own data analysis
+scripts.
+
+For more details, go to
+
+  http://code.google.com/p/unfinnigan/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install in user-space (without requiring root permissions),
+run Makefile.PL like this:
+
+   perl Makefile.PL PREFIX=/<your-home-dir>
+
+Everything will work if your environment includes your home directory
+in these variables:
+
+PERL5LIB=...:<your-home-dir>/lib/perl5/site_perl
+PATH=<your-home-dir>/bin:...
+MANPATH=<your-home-dir>/man:...
+
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+   Data::Hexdumper
+   DateTime::Format::WindowsFileTime
+   Encode
+   Getopt::Declare
+   Getopt::Long
+   MIME::Base64 (in uf-mzxml and mzxml-unpack)
+   Module::Find (not essential)
+   XML::Generator (in uf-mzml and uf-mzxml)
+   Tie::IxHash (in uf-mzml and uf-mzxml)
+
+The non-essential dependencies can be removed by commenting out
+the corresponding lines in the code. If you are not going to use
+uf-mzxml, further dependencies can be removed by commenting them
+out in Makefile.PL
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Gene Selkov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

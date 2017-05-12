@@ -1,0 +1,8 @@
+README				README file
+Changes				history of the package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+Sporo.pm			The SporoPay module
+t/00load.t			test sample
+examples/makeform.pl		simple example
+examples/makelink.pl		simple example

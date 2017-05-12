@@ -1,0 +1,44 @@
+Form-Processor-Model-DOD version 0.01
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Form::Processor
+  Data::ObjectDriver
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Form::Processor::Model::DOD
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Form-Processor-Model-DOD
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Form-Processor-Model-DOD
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Form-Processor-Model-DOD
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Form-Processor-Model-DOD
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Yann Kerherve
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

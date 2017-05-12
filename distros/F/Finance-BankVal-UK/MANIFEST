@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-BankVal-UK.t
+lib/Finance/BankVal/UK.pm
+LoginConfig.txt

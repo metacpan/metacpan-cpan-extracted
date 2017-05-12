@@ -1,0 +1,136 @@
+--- 
+type: Futures
+name: CL
+code: CL
+exchange: XNYM
+time_zone: America/New_York
+month_cycle: FGHJKMNQUVXZ
+currency: USD
+tick_size: 0.01
+multiplier: 1000
+session:
+  -
+    - -360
+    - 1035
+attributes:
+  cme_path: energy/crude-oil/light-sweet-crude
+contract_calendar: 
+  201001: 
+    last_trading_day: 2009-12-20
+  201002: 
+    last_trading_day: 2010-01-19
+  201003: 
+    last_trading_day: 2010-02-21
+  201004: 
+    last_trading_day: 2010-03-21
+  201005: 
+    last_trading_day: 2010-04-19
+  201006: 
+    last_trading_day: 2010-05-19
+  201007: 
+    last_trading_day: 2010-06-21
+  201008: 
+    last_trading_day: 2010-07-19
+  201009: 
+    last_trading_day: 2010-08-21
+  201010: 
+    last_trading_day: 2010-09-21
+  201011: 
+    last_trading_day: 2010-10-19
+  201012: 
+    last_trading_day: 2010-11-19
+  201101: 
+    last_trading_day: 2010-12-20
+  201102: 
+    last_trading_day: 2011-01-20
+  201103: 
+    last_trading_day: 2011-02-22
+  201104: 
+    last_trading_day: 2011-03-22
+  201105: 
+    last_trading_day: 2011-04-19
+  201106: 
+    last_trading_day: 2011-05-20
+  201107: 
+    last_trading_day: 2011-06-21
+  201108: 
+    last_trading_day: 2011-07-20
+  201109: 
+    last_trading_day: 2011-08-22
+  201110: 
+    last_trading_day: 2011-09-20
+  201111: 
+    last_trading_day: 2011-10-20
+  201112: 
+    last_trading_day: 2011-11-18
+  201201: 
+    last_trading_day: 2011-12-20
+  201202: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-01-20
+  201203: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-02-21
+  201204: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-03-20
+  201205: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-04-20
+  201206: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-05-22
+  201207: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-06-20
+  201208: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-07-20
+  201209: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-08-21
+  201210: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-09-20
+  201211: 
+    first_trading_day: 2006-11-20
+    last_trading_day: 2012-10-22
+  201212: 
+    first_trading_day: 2005-11-21
+    last_trading_day: 2012-11-16
+  201301: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2012-12-19
+  201302: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-01-22
+  201303: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-02-20
+  201304: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-03-20
+  201305: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-04-22
+  201306: 
+    first_trading_day: 2007-04-16
+    last_trading_day: 2013-05-21
+  201307: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-06-20
+  201308: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-07-22
+  201309: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-08-20
+  201310: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-09-20
+  201311: 
+    first_trading_day: 2007-11-19
+    last_trading_day: 2013-10-22
+  201312: 
+    first_trading_day: 2007-04-16
+    last_trading_day: 2013-11-20

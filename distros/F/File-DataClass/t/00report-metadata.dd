@@ -1,0 +1,56 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.4004',
+                                    'version' => '0.88'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.4004',
+                                        'version' => '0.88'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Cache::FastMmap' => '1.40',
+                                      'Class::Null' => '2.110730',
+                                      'File::Path' => '2.09',
+                                      'File::ReadBackwards' => '1.05',
+                                      'Hash::Merge' => '0.200',
+                                      'JSON::MaybeXS' => '1.003',
+                                      'Module::Pluggable' => '5.1',
+                                      'Module::Runtime' => '0.014',
+                                      'Moo' => '2.000001',
+                                      'Sub::Install' => '0.928',
+                                      'Subclass::Of' => '0.003',
+                                      'Try::Tiny' => '0.22',
+                                      'Type::Tiny' => '1.000002',
+                                      'Unexpected' => 'v0.39.0',
+                                      'boolean' => '0.45',
+                                      'namespace::autoclean' => '0.26',
+                                      'namespace::clean' => '0.25',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0.30',
+                                   'File::Spec' => '0',
+                                   'File::pushd' => '1.00',
+                                   'Module::Build' => '0.4004',
+                                   'Module::Metadata' => '0',
+                                   'Path::Tiny' => '0.013',
+                                   'Sys::Hostname' => '0',
+                                   'Test::Deep' => '0.117',
+                                   'Test::Requires' => '0.06',
+                                   'Text::Diff' => '1.37',
+                                   'version' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

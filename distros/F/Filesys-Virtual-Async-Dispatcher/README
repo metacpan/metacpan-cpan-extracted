@@ -1,0 +1,207 @@
+NAME
+    Filesys::Virtual::Async::Dispatcher - Multiple filesystems mounted on a
+    single filesystem
+
+SYNOPSIS
+            #!/usr/bin/perl
+            use strict; use warnings;
+            use Fcntl qw( :DEFAULT :mode ); # S_IFREG S_IFDIR, O_SYNC O_LARGEFILE etc
+
+            # uncomment this to enable debugging
+            #sub Filesys::Virtual::Async::Dispatcher::DEBUG { 1 }
+
+            use Filesys::Virtual::Async::Plain;
+            use Filesys::Virtual::Async::Dispatcher;
+
+            # create the root filesystem
+            my $rootfs = Filesys::Virtual::Async::Plain->new( 'root' => $ENV{'PWD'} );
+
+            # create the extra filesystems
+            my $tmpfs = Filesys::Virtual::Async::Plain->new( 'root' => '/tmp' );
+            my $procfs = Filesys::Virtual::Async::Plain->new( 'root' => '/proc' );
+
+            # put it all together
+            my $vfs = Filesys::Virtual::Async::Dispatcher->new( 'rootfs' => $rootfs );
+            $vfs->mount( '/tmp', $tmpfs );
+            $vfs->mount( '/tmp/proc', $procfs );
+
+            # use $vfs as you wish!
+            $vfs->readdir( '/tmp/proc', sub {       # should access the $procfs object
+                    my $data = shift;
+                    if ( defined $data ) {
+                            foreach my $e ( @$data ) {
+                                    print "entry in /tmp/proc -> $e\n";
+                            }
+                            print "end of listing for /tmp/proc\n";
+                    } else {
+                            print "error reading /tmp/proc\n";
+                    }
+            } );
+
+ABSTRACT
+    Using this module will enable you to "mount" objects onto a filesystem
+    and properly map methods to them.
+
+DESCRIPTION
+    This module allows you to have arbitrary combinations of
+    Filesys::Virtual::Async objects mounted and expose a single filesystem.
+    The dispatcher will correctly map methods to the proper object based on
+    their path in the filesystem. This works similar to the way linux
+    manages mounts in a single "visible" filesystem.
+
+    It might be a bit confusing on how the paths work at first. I'm sure
+    with a bit of experimentation and looking at the documentation for the
+    Filesys::Virtual::Async::XYZ subclass, you'll get it!
+
+    This module makes extensive use of the functions in File::Spec to be
+    portable, so it might trip you up if you are developing on a linux box
+    and trying to mount '/foo' on a win32 box :)
+
+  Initializing the dispatcher
+    This constructor accepts either a hashref or a hash, valid options are:
+
+   rootfs
+    This sets the Filesys::Virtual::Async object that will manage the "root"
+    filesystem.
+
+    If this argument is undefined or not a proper subclass of
+    Filesys::Virtual::Async new() will die.
+
+  Methods
+    There is only two methods you can use, because this module does nothing
+    except dispatch method calls to the proper object.
+
+   mount
+    Mounts a new Filesys::Virtual::Async object on the rootfs. Takes two
+    arguments: the path and the object.
+
+    Returns true on success, false on failure.
+
+    Possible failure reasons:
+
+    undefined path
+    undefined object or not proper subclass of Filesys::Virtual::Async
+    another object already mounted on path
+
+    NOTE: This module is currently a bit stupid. It will allow mounts on
+    non-existent directories! This could cause weirdness when trying to do
+    operations on the parent directory. This will be rectified in a future
+    version, once I get my head around the callbacks and figure out a new
+    API to mount with a callback...
+
+   umount
+    Unmounts a mounted Filesys::Virtual::Async object. Takes one argument:
+    the path.
+
+    Returns true on success, false on failure.
+
+  Special Cases
+    Currently, this module does a pretty good job of dispatching methods to
+    the proper object. However, there are some methods which have exceptions
+    to this rule.
+
+   root
+    Unimplemented, please do it directly on the object you are mounting onto
+    the dispatcher.
+
+   stat/lstat
+    Array mode not supported because it would require extra munging on my
+    part to get the paths right.
+
+   link/symlink
+    Linking across mounts is not supported because it would be crazy to keep
+    the mapping in the dispatcher.
+
+   rename/copy/move
+    Doing these operations across mounts is not supported. Theoretically I
+    could implement this in the dispatcher but it would have to happen in a
+    future version :)
+
+   rmtree
+    Deleting a directory which contains another mount in it is not
+    supported. This could be done but we would have to dig into the AIO code
+    to make sure it stops deleting when it encounters the submount...
+
+  Debugging
+    You can enable debug mode which prints out some information ( and
+    especially error messages ) by doing this:
+
+            sub Filesys::Virtual::Async::Dispatcher::DEBUG () { 1 }
+            use Filesys::Virtual::Async::Dispatcher;
+
+EXPORT
+    None.
+
+SEE ALSO
+    Filesys::Virtual::Async
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Filesys::Virtual::Async::Dispatcher
+
+  Websites
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Filesys-Virtual-Async-Dispatcher>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Filesys-Virtual-Async-Dispatcher>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Filesys-Virtual-Async-Dispatcher>
+
+    *   CPAN Forum
+
+        <http://cpanforum.com/dist/Filesys-Virtual-Async-Dispatcher>
+
+    *   RT: CPAN's Request Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filesys-Virtual-Async-Disp
+        atcher>
+
+    *   CPANTS Kwalitee
+
+        <http://cpants.perl.org/dist/overview/Filesys-Virtual-Async-Dispatch
+        er>
+
+    *   CPAN Testers Results
+
+        <http://cpantesters.org/distro/F/Filesys-Virtual-Async-Dispatcher.ht
+        ml>
+
+    *   CPAN Testers Matrix
+
+        <http://matrix.cpantesters.org/?dist=Filesys-Virtual-Async-Dispatche
+        r>
+
+    *   Git Source Code Repository
+
+        This code is currently hosted on github.com under the account
+        "apocalypse". Please feel free to browse it and pull from it, or
+        whatever. If you want to contribute patches, please send me a diff
+        or prod me to pull from your repository :)
+
+        <http://github.com/apocalypse/perl-filesys-virtual-async-dispatcher>
+
+  Bugs
+    Please report any bugs or feature requests to
+    "bug-filesys-virtual-async-dispatcher at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Filesys-Virtual-Async-Di
+    spatcher>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+AUTHOR
+    Apocalypse <apocal@cpan.org>
+
+    Props goes to xantus who got me motivated to write this :)
+
+COPYRIGHT AND LICENSE
+    Copyright 2010 by Apocalypse
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

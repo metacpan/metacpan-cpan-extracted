@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+SetSize.pm
+test.pl
+eg/example01.pl
+eg/blar.txt

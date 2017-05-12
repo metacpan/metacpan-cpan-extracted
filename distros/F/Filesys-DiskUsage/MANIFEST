@@ -1,0 +1,26 @@
+.travis.yml
+Changes
+fdu
+lib/Filesys/DiskUsage.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/01.basic.t
+t/02.warnings.t
+t/03.rmtree.t
+t/71-version_numbers_are_the_same.t
+t/pod-coverage.t
+t/pod.t
+t/samples/1
+t/samples/2
+t/samples/3
+t/samples/4
+t/samples/5
+t/samples/6
+t/samples/7
+t/samples/8
+t/samples/a/9
+t/samples/a_b/9
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

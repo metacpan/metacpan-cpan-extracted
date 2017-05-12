@@ -1,0 +1,44 @@
+NAME
+    FileCache::Handle - A FileCache using IO::Handle instances
+
+SYNOPSIS
+      use FileCache::Handle;
+
+      $FileCache::Handle::MAX = 16;
+
+      my @a;
+      for (my $i = 0 ; $i < 100 ; $i++) {
+        my $o = new FileCache::Handle("/tmp/$i");
+
+        binmode($o, ':utf8');
+        push @a, $o;
+      }
+
+      for (my $i = 0 ; $i < 3 ; $i++) {
+        foreach my $o (@a) {
+          print $o "Output ",$o," $i\n";
+        }
+      }
+
+DESCRIPTION
+    FileCache::Handle, like FileCache, avoids OS-imposed limits on the
+    number of simultaneously open files. Instances behave like file handles
+    and, behind the scenes, real files are opened and closed as necessary.
+    FileCache::Handle uses instances of IO::Handle, and so works well with
+    'use strict'.
+
+NOTES
+    The only operations supported are 'print' and 'binmode'. To add more,
+    create a glue method that delegates the call to the handle returned by
+    '_allocate()'.
+
+    Unless MAX is set, this class will open as many files as possible before
+    closing any. As such, it will monopolise available files, so you should
+    open any other files beforehand.
+
+AUTHOR
+    Joseph Walton <joe@kafsemo.org>
+
+COPYRIGHT
+    Copyright (c) 2005 Joseph Walton
+

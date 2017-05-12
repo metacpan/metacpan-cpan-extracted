@@ -1,0 +1,7 @@
+#h      size    mean    stddev  pct_rsd
+1024    1.4962e+06      2.8497e+05      19.047
+10240   5.0286e+06      6.0103e+05      11.952
+102400  4.9216e+06      3.0939e+05      6.2863
+#  | dbsetheader size bw
+#  | /home/johnh/BIN/DB/dbmultistats size bw
+#  | /home/johnh/BIN/DB/dbcol size mean stddev pct_rsd

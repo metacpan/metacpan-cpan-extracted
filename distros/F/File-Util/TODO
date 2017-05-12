@@ -1,0 +1,89 @@
+TODO List for File::Util
+
+Not necessarily listed in order of priority:
+
+1)  [DONE] Set up formal (not just private) GIT repository
+
+2)  [DONE] Separate documenation examples into a cookbook (POD)
+
+3)  [DONE] Gradually transform methods to accept input parameters in a
+    *::Class-like style (hashrefs, etc) while preserving backward compatibility
+
+4)  [DONE] Unicode support for reading/writing files, which just hasn't been
+    requested but is now there for completeness.  This item has become an all-out
+    quest to introduce full unicode support for both file/directory names and
+    file encodings (on platforms where it is supported), but given the great
+    minefield of problems with unicode on windows regarding file names, and
+    directories, that may never become a reality until Perl itself "fixes" the
+    problem.
+
+5)  [DONE] Transform (where useful) various methods to accept callbacks.
+    File::Util::list_dir() is the primary target
+
+6)  [DONE] Set up File::Util::list_dir() to take a listref of regexes
+
+7)  [DONE] Continue improving the distribution so as to make it compliant
+    with Fedora packaging standards; it is already a maintained package for
+    Ubuntu and ActiveState.
+
+8)  [DONE] Code clean up in POD documentation examples.
+
+9)  [DONE] Improve and simplify code examples in POD documentation.
+
+10) [IN PROGRESS] Constantly improve test suite until Devel::Cover
+    scores are something to be proud of.  We're doing much better
+    than we used to only less than 1 month ago
+
+11) [DONE] Remove all traces of old invocation syntax from the POD
+
+12) [DONE] Now that documentation has been divided into the ::Manual and
+    the ::Cookbook, I want to add more content to them.  More examples,
+    More fully-functional programs (recipes).
+
+13) [DONE] Create a less-verbose Exception class (right now we only have
+    Exception::Diagnostic, which is overkill for power users and "experts" who
+    just want a quick, clean error message instead of a full-page printout of
+    what went wrong, how to fix it, and whose fault it was -- followed by a
+    callstack.  We need the less verbose alternative now.
+
+14) [DONE WITH CAVEATS*] Create a benchmark suite, plot and publish metrics as
+    part of the documentation.
+
+    *Turns out it wasn't a completely good idea, given that benchmarking is of
+    little use without context, and that means comparing the performance of
+    File::Util to other distributions out there that do similar things.  This
+    has two problems, the first is that distributions are constantly evolving
+    and benchmarks recorded on one day are inaccurate the next.  The second
+    is that some of the numbers are NOT flattering.  In some test scenarios
+    File::Util has out-performed File::Find::** by 400%.
+
+    Publishing things that are potentially embarrassing is rude and I won't
+    do it in the tone of tooting my own horn.  Mentions made to the increased
+    performance of File::Util however are not out-of-bounds and so will be
+    included in the formal documentation in defense of any claims that it is
+    "slow" due to its perceived size and file modularity.
+
+    One of the best things to come out of this was that I was able to increase
+    the performance of list_dir() by about 400% with the help of Devel::NYTProf
+    and also identify other bugs that I wouldn't have otherwise discovered.
+
+15) [DONE] Memo-ize pattern "gathering" for recursive list_dir() calls for
+    greater efficiency.  Right now there's a gather op for ever recursion, and
+    that just isn't necessary.  That can be optimized out.
+
+16) Provide an option to follow symlinks in list_dir(),
+
+17) [DONE] keep track of inodes seen while traversing directories to avoid
+    filesystem loops
+
+18) [DONE] Write even more unicode tests
+
+19) Create option to allow user to specify that atomic file operations should
+    be performed instead of regular IO.  It's a handy feature that will be
+    added in soon
+
+20) [DONE] Allow users to specify custom IO layers for reads/writes/opens
+
+21) Revisit documentation structure to see if improvements can't be made
+
+22) Create convenience methods for UTF8 reads/writes/opens

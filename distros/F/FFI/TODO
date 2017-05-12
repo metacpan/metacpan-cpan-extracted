@@ -1,0 +1,17 @@
+1. Rationalise the test suite.
+   - Extend it. ..Some
+   - Non-Win32 cases (notably, how to find the C library for tests!). ...OK
+   - Split into multiple files. ...OK
+2. Signatures
+   - Returning pointers to structures/arrays
+   - Passing "out" and "in/out" style pointers to basic types
+   - Memory management issues for returned values
+3. Makefile
+   - Better handling of the ffcall library (maybe automate the build?)
+4. Functionality
+   - Add support for structure passing/return (eg, div() function).
+   - Add support for passing characters as "s" (eg, toupper() function).
+   - Add tests for these.
+5. Bugs
+   - Consider FFI::call($atoi, 'cIp', "-97") (note the 'I' (unsigned) return
+     type). This returns -97 (note the negative value!). Why?

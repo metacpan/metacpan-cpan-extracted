@@ -1,0 +1,68 @@
+NAME
+    Finance::Currency::Convert::WebserviceX - Lightweight currency
+    conversion using WebserviceX.NET
+
+SYNOPSIS
+        use Finance::Currency::Convert::WebserviceX;
+        my $cc = Finance::Currency::Convert::WebserviceX->new;
+        my $result = $cc->convert(1.95, 'USD', 'JPY');
+
+DESCRIPTION
+    This is a lightweight module to do currency conversion using the
+    Currency Converter web service at http://www.webservicex.net/.
+
+    The motivation for this module was many fold. First,
+    Finance::Currency::Convert with Finance::Quote was a little too bulky
+    for my needs, esp the need to download or maintain conversion tables.
+    Finance::Currency::Convert::Yahoo seemed to be based on screen scraping.
+    Way to fragile for my taste. Finance::Currency::Convert::XE has usage
+    restrictions from XE.com. [No offense intended to any of the authors
+    above]
+
+CONSTRUCTOR
+    You know the routine. "new" is your friend.
+
+        use Finance::Currency::Convert::WebserviceX;
+        my $cc = Finance::Currency::Convert::WebserviceX->new;
+
+METHODS
+  convert($value, $from, $to)
+    Converts a number value from one currency to another and returns the
+    result.
+
+        my $result = $cc->convert(1.95, 'USD', 'JPY');
+
+    If an error occurs, no value is given, or the from/to aren't 3 letter
+    currency codes, "convert" returns "undef".
+
+    For now, you can access the request response after calling C>convert>:
+
+        my $response = $self->{'response'};
+
+    This returns a HTTP::Response object that can be used to inspect any
+    remote web service errors. $self->response{'request'} is reset at the
+    beginning of every call to "convert" and returns "undef" otherwise.
+
+    value
+        The number or price to be converted.
+
+    from
+        The three letter ISO currency code for the currency amount specified
+        in "value". See Locale::Currency for the available currency codes.
+
+    to  The three letter ISO currency code for the currency you want the
+        "value" to be converted to. See Locale::Currency for the available
+        currency codes.
+
+  cache
+    Gets the reference to the cache hash.
+
+SEE ALSO
+    Locale::Currency, Finance::Currency::Format, Memoize::Expire
+
+AUTHOR
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+

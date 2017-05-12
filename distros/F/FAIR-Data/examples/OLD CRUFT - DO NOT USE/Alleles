@@ -1,0 +1,178 @@
+#!/usr/bin/perl -w
+
+
+#  this is an example of a FAIR Linked Data Platform server
+# providing the Alleles portion of the DragonDB Database
+
+use strict;
+use URI::Escape;
+use RDF::Trine;
+use RDF::Trine::Node::Resource;
+use RDF::Trine::Node::Literal;
+use RDF::Trine::Statement;
+use RDF::NS '20131205';              # check at compile time
+
+use Ace;
+
+unless ($ENV{REQUEST_METHOD}){  # if running from command line
+        $ENV{REQUEST_METHOD} = "GET";
+        $ENV{'REQUEST_URI'} = "/this/thing";
+        $ENV{'SERVER_NAME'} = "antirrhinum.net";
+        #$ENV{'PATH_INFO'} = "/cho";
+}
+
+
+if ($ENV{REQUEST_METHOD} eq "HEAD") {
+    manageHEAD();
+} elsif ($ENV{REQUEST_METHOD} eq "GET") {
+    manageGET();
+} elsif ($ENV{REQUEST_METHOD} eq "OPTIONS"){
+    manageHEAD();
+} else {
+    print "Status: 405 Method Not Allowed\n"; 
+    print "Content-type: text/plain\n\nYou can only request HEAD, OPTIONS or GET from this LD Platform Server\n\n";
+    exit 0;
+}
+
+
+sub manageGET{
+
+    my $URL = "http://" . $ENV{'SERVER_NAME'} . $ENV{'REQUEST_URI'} ; 
+
+    if ($ENV{'PATH_INFO'}) {
+        printResourceHeader($URL);
+        manageResourceGET($URL);
+    } else {
+        printContainerHeader($URL);
+        manageContainerGET($URL);
+    }
+    exit 1;
+}
+
+sub manageContainerGET {
+    my $URL = shift;
+    my $store = RDF::Trine::Store::Memory->new();
+    my $model = RDF::Trine::Model->new($store);
+    my $ns = RDF::NS->new('20131205');   # check at runtime
+    die "can't set namespace $!\n" unless ($ns->SET(ldp => 'http://www.w3.org/ns/ldp#'));
+    
+    my $statement = &statement($URL, $ns->rdf("type"), $ns->ldp("BasicContainer")); 
+    $model->add_statement($statement); 
+    $statement = &statement($URL, $ns->dc("title"), "A container for all mutant phenotype records in DragonDB"); 
+    $model->add_statement($statement); 
+    
+    my $q= qq{select all from class Allele};
+    my $db = Ace->connect(-host => 'antirrhinum.net', -port => 23100, -user => 'guest', -pass => 'guestguest');
+    my @res = $db->aql($q);
+    
+    foreach (@res){
+        #print "doing $_\n";
+        my $pic = shift @{$_};
+        my $name = $pic->name;
+        my $statement = statement($URL, $ns->ldp("contains"), $URL."/".uri_escape($name)); 
+        $model->add_statement($statement);         
+    }                
+    
+    serializeThis($model);
+
+}
+
+sub manageResourceGET {
+    my $URL = shift;
+    my $allele = $ENV{'PATH_INFO'};
+    $allele =~ s/^\///;
+    $allele = uri_escape($allele);
+    my $store = RDF::Trine::Store::Memory->new();
+    my $model = RDF::Trine::Model->new($store);
+    my $ns = RDF::NS->new('20131205');   # check at runtime
+    die "can't set namespace $!\n" unless ($ns->SET(ldp => 'http://www.w3.org/ns/ldp#'));
+    die "can't set namespace $!\n" unless ($ns->SET(dcat => 'http://www.w3.org/ns/dcat#'));
+    
+    my $statement = statement($URL, $ns->rdf("type"), "http://antirrhinum.net/cgi-bin/ace/generic/model/DragonDB?name=$allele;class=Allele"); 
+    $model->add_statement($statement); 
+    $statement = statement($URL, $ns->dcat("distribution"), "http://antirrhinum.net/cgi-bin/ace/generic/xml/DragonDB?name=$allele;class=Allele"); 
+    $model->add_statement($statement); 
+    $statement = statement($URL, $ns->dcat("distribution"), "http://antirrhinum.net/cgi-bin/ace/generic/tree/DragonDB?name=$allele;class=Allele"); 
+    $model->add_statement($statement); 
+
+    $statement = statement("http://antirrhinum.net/cgi-bin/ace/generic/xml/DragonDB?name=$allele;class=Allele",  $ns->rdf("type"), $ns->dcat('Distribution')); 
+    $model->add_statement($statement); 
+    $statement = statement("http://antirrhinum.net/cgi-bin/ace/generic/xml/DragonDB?name=$allele;class=Allele",  $ns->dc("format"), "application/xml"); 
+    $model->add_statement($statement); 
+    $statement = statement("http://antirrhinum.net/cgi-bin/ace/generic/xml/DragonDB?name=$allele;class=Allele",  $ns->dcat("downloadURL"), "http://antirrhinum.net/cgi-bin/ace/generic/xml/DragonDB?name=$allele;class=Allele"); 
+    $model->add_statement($statement); 
+
+
+    $statement = statement("http://antirrhinum.net/cgi-bin/ace/generic/tree/DragonDB?name=$allele;class=Allele",  $ns->rdf("type"), $ns->dcat('Distribution')); 
+    $model->add_statement($statement); 
+    $statement = statement("http://antirrhinum.net/cgi-bin/ace/generic/tree/DragonDB?name=$allele;class=Allele",  $ns->dc("format"), "text/html"); 
+    $model->add_statement($statement); 
+    $statement = statement("http://antirrhinum.net/cgi-bin/ace/generic/tree/DragonDB?name=$allele;class=Allele",  $ns->dcat("downloadURL"), "http://antirrhinum.net/cgi-bin/ace/generic/xml/DragonDB?name=$allele;class=Allele"); 
+    $model->add_statement($statement); 
+    
+    serializeThis($model);
+}
+
+    
+sub statement {
+	my ($s, $p, $o) = @_;
+	unless (ref($s) =~ /Trine/){
+		$s =~ s/[\<\>]//g;
+		$s = RDF::Trine::Node::Resource->new($s);
+	}
+	unless (ref($p) =~ /Trine/){
+		$p =~ s/[\<\>]//g;
+		$p = RDF::Trine::Node::Resource->new($p);
+	}
+	unless (ref($o) =~ /Trine/){
+
+		if ($o =~ /^http\:\/\//){
+			$o = RDF::Trine::Node::Resource->new($o);
+		} elsif ($o =~ /^<http\:\/\//){
+			$o =~ s/[\<\>]//g;
+			$o = RDF::Trine::Node::Resource->new($o);
+		} elsif ($o =~ /"(.*?)"\^\^\<http\:/) {
+			$o = RDF::Trine::Node::Literal->new($1);
+		} else {
+			$o = RDF::Trine::Node::Literal->new($o);				
+		}
+	}
+	my $statement = RDF::Trine::Statement->new($s, $p, $o);
+	return $statement;
+}
+
+sub printResourceHeader {
+    my $allele = $ENV{'PATH_INFO'};
+    $allele =~ s/^\///;
+    print "Content-Type: text/turtle\n";
+    print "ETag: \"MarksDemoLDPServerAntirrhinumAlleleServer_$allele\"\n";
+    print "Allow: GET,OPTIONS,HEAD\n";
+    print 'Link: <http://www.w3.org/ns/ldp#Resource>; rel="type"'."\n\n";
+
+}
+
+sub printContainerHeader {
+    print "Content-Type: text/turtle\n";
+    print 'ETag: "MarksDemoLDPServerAntirrhinumImageServerXXXXXX"'."\n";
+    print "Allow: GET,OPTIONS,HEAD\n";
+    print 'Link: <http://www.w3.org/ns/ldp#BasicContainer>; rel="type",'."\n";
+    print '      <http://www.w3.org/ns/ldp#Resource>; rel="type"'."\n\n";
+#    print "Transfer-Encoding: chunked\n\n";
+
+}
+
+sub manageHEAD {
+
+    print "Content-Type: text/turtle\n";
+    print 'ETag: "MarksDemoLDPServerAntirrhinumImageServerXXXXXX"'."\n";
+    print "Allow: GET,OPTIONS,HEAD\n\n";
+    print 'Link: <http://www.w3.org/ns/ldp#BasicContainer>; rel="type",'."\n";
+    print '      <http://www.w3.org/ns/ldp#Resource>; rel="type"'."\n\n";
+    
+}
+
+sub serializeThis{
+    my $model = shift;
+    my $serializer = RDF::Trine::Serializer->new('turtle');
+    print $serializer->serialize_model_to_string($model);
+}

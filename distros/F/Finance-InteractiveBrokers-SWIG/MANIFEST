@@ -1,0 +1,33 @@
+Changes
+examples/MyEventHandler.pm
+examples/api-demo.pl
+examples/show-events.pl
+examples/show-methods.pl
+ezembed.c
+ezembed.h
+IBAPI.cxx
+IBAPI.h
+IBAPI.i
+ignore.txt
+lib/Finance/InteractiveBrokers/SWIG.pm
+lib/Finance/InteractiveBrokers/SWIG/EventHandler.pm
+Makefile.PL
+Makefile.swig
+MANIFEST
+LICENSE
+README
+t/00-load.t
+t/79-Finance-InteractiveBrokers-SWIG-IBAPI.t
+t/88-Finance-InteractiveBrokers-SWIG-EventHandler.t
+t/89-Finance-InteractiveBrokers-SWIG.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/regression/001-fibswig-resolve_host.t
+t/regression/002-fibswig-typedef-ibstring.t
+t/regression/003-fibswig-timeout.t
+t/inc/TestEventHandler.pm
+t/inc/TestUtil.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

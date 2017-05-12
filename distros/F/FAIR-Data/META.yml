@@ -1,0 +1,34 @@
+---
+abstract: 'a set of packages that assist with creating infrastructures that conform to the FAIR Data Principles'
+author:
+  - 'Mark Denis Wilkinson (markw [at] illuminae [dot] com)'
+build_requires:
+  File::Slurp: '0'
+  IO::String: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FAIR-Data
+requires:
+  JSON: '0'
+  LWP::Simple: '0'
+  Log::Log4perl: '0'
+  Moose: '0'
+  RDF::NS: '0'
+  RDF::Query: '0'
+  RDF::Trine::Model: '0'
+  RDF::Trine::Node::Literal: '0'
+  RDF::Trine::Node::Resource: '0'
+  RDF::Trine::Parser: '0'
+  RDF::Trine::Serializer: '0'
+  RDF::Trine::Store::Memory: '0'
+  Scalar::Util: '0'
+  URI::Escape: '0'
+  UUID::Generator::PurePerl: '0'
+version: '1.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,62 @@
+Flickr-Tools to-dos and ideas for future developments.
+
+
+As of 1.22:
+
+Short term: 
+
+* integrate closely with Flickr::API distribution
+* Split out the Flickr::API::* classes and move to Flickr::API
+* move codebase to Moo 
+* Re-vivify Flickr::Tools
+* more tests
+  - look into Test::API
+  - look into Test::RequiresInternet and/or Test::Internet
+  - look into Test::Plan
+
+
+Long Term: 
+
+* Go through older To-Dos and either do or drop them.
+* build in all of the flickr api, and, perhaps, automate building some of these
+  with flickr.reflection.* methods.
+* some examples
+
+
+
+As of release 0.02:
+
+- No new To-Dos added for this version.
+
+As of release 0.01:
+
+- Add the methods that are still lacking from the Flickr API to the 
+  lower-level Flickr::API::* classes;
+
+- Change the tests in order to use live data when there is an active 
+  net connection and only use the Mock objects when there isn't one (?);
+- Convert all the dates to something more homogeneous. Messing with 
+  dates is never pretty and I am not really inclined to use something 
+  like Date::Manip, which is overkill, but I must decide on a format 
+  and translate every date into it;
+
+
+- Flickr::Photo::is_favorite should probably check if you are authenticated 
+  and if you are not give some indication to the effect that the request 
+  makes no sense;
+- In Flickr::Photo perm_comment and perm_add_meta should only work if we 
+  are authenticated and the owner of the photo. Must check that;
+- In Flickr::Photo notes and tags should be first-class objects and not
+  just an array passed around;
+- Flickr::Photo::secret should be a bit more inteligent and check wether 
+  we should even have acccess to the photo's secret before trying to get it;
+- Extend the Flickr::Photo::[next|previous]_photo_info methods to receive 
+  an extra parameter that indicates the photoset in which we are looking 
+  for the previous and next photos (optional, if not present look for it 
+  on the photostream as it does now);
+- Obvious methods to implement on Flickr::Photo:
+  - photosets (I belong to)
+
+
+- Obvious methods to implement on Flickr::Person:
+  - photos (I own)

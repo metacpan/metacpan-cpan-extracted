@@ -1,0 +1,23 @@
+Revision history for Perl extension File::Find::Rule::PPI
+
+1.06 Wed  6 Oct 2010
+	- Moving to a production version
+	- Upgrading to Module::Install::DSL 1.00
+	- Removing evil use UNIVERSAL
+
+0.05 Sun 10 Sep 2006
+	- Correcting the tests to use Unix paths since FFR doesn't return localised
+
+0.04 Mon  4 Sep 2006
+	- Upgrading to Module::Install 0.64
+
+0.03 Sat 22 Apr 2006
+	- No functional changes
+	- Moved from SourceForge CVS to new SVN repository
+	- Upgraded to Module::Install 0.62
+
+0.02 Wed May 25 2005
+	- Updated to handle API change at PPI 0.990
+
+0.01 Sun Jan 16 2005
+	- Created the initial version of the module

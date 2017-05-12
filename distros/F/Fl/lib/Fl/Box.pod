@@ -1,0 +1,85 @@
+class 'Fl::Box';
+isa 'Fl::Widget';
+include 'FL/Fl_Box.H';
+
+=pod
+
+=head1 NAME
+
+Fl::Box - Simple Box and Label Widget
+
+=head1 Synopsis
+
+    my $box = Fl::Box->new(0, 0, 100, 200, 'Hello, World!');
+
+=head1 Description
+
+This widget simply draws its box, and possibly its label.
+
+Putting it before some other widgets and making it big enough to surround them
+will let you draw a frame around them.
+
+=head1 Methods
+
+Fl::Box inherits from Fl::Widget and exposes the following methods...
+
+=head2 new(...)
+
+    my $box_a = Fl::Box->new(0, 0, 250, 500);
+    my $box_b = Fl::Box->new(0, 0, 250, 500, 'Important Stuff');
+    my $box_c = Fl::Box->new(FL_UP_BOX, 0, 0, 250, 500, 'Important Stuff');
+
+The first two constructors set C<box()> to C<FL_NO_BOX> which means it is
+invisible. However such widgets are useful as placeholders or
+Fl::Group->resizable() values. To change the box to something visible, use
+C<box($type)>.
+
+The third form of the constroctor sets the box to the specified box type.
+
+The destructor removes the box.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [{required =>
+                         [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+                     optional => [['const char *', 'label', '""']],
+                     returns  => 'Fl_Box *'
+                    },
+                    {required => [['Fl_Boxtype', 'type'],
+                                  [qw[int w]],
+                                  [qw[int h]],
+                                  [qw[int x]],
+                                  [qw[int y]],
+                                  ['const char *', 'label']
+                     ],
+                     returns => 'Fl_Box *'
+                    }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

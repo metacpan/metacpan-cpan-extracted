@@ -1,0 +1,56 @@
+NAME
+    Finance::PremiumBonds - Perl extension to check Premium Bond holder's
+    numbers
+
+SYNOPSIS
+      use Finance::PremiumBonds;
+  
+      if (defined(my $won = Finance::PremiumBonds::has_won($holder_number))) 
+      {
+          print "Looks like you " . ($won)? 'may have won' : 'have not won';
+      } else {
+          warn "An error occurred.";
+      }
+  
+DESCRIPTION
+    Quick way to look up a Premium Bond holder's number on the National
+    Savings and Investments website to determine whether the holder has won
+    any prizes recently.
+
+    Now uses the AJAX interface the NS&I site uses, which returns some JSON
+    so we don't have to screen-scrape.
+
+    I've never won anything, so I don't know what the win response looks
+    like (if you have, please do help me by letting me know!), so it treats
+    the absence of the no_win status in the response as a win - this means
+    it's possible that it could falsely report positive if there are other
+    statuses, e.g. "failed to check" or similar.
+
+FUNCTIONS
+    has_won($holder_number, $period)
+        Checks whether $holder_number has won any prizes in the specified
+        period. Returns 1 if it looks like you've won, 0 if you haven't, or
+        undef if it failed to check.
+
+        The period is any period recognised by the NS&I site - at the time
+        of writing, that's `this_month', `last_six_month',
+        `unclaimed_prize'. If it's not given, then `this_month' is used as a
+        sensible default.
+
+AUTHOR
+    David Precious, <davidp@preshweb.co.uk>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2016 by David Precious
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+
+LIMITATIONS
+    Currently, the module detects lack of a recognised "losing" response
+    rather than the presence of a winning response; without a holder's
+    number which has won something, I can't see what the winning responses
+    look like. Maybe my meagre Premium Bonds investment will win something
+    one day, then I can update this module :)
+

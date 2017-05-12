@@ -1,0 +1,74 @@
+NAME
+    File::Stat::ModeString - conversion file stat(2) mode to/from string
+    representation.
+
+SYNOPSIS
+     use File::Stat::ModeString;
+
+     $string  = mode_to_string  ( $st_mode );
+     $st_mode = string_to_mode  ( $string  );
+     $type    = mode_to_typechar( $st_mode );
+
+     $record = <IN>; chomp $record;
+     $record =~ m/^some_prefix\s+$MODE_STRING_RE\s+some_suffix$/o
+            or die "invalid record format";
+
+     die "Invalid mode in $string"
+            if is_mode_string_valid( $string );
+
+DESCRIPTION
+    This module provides a few functions for conversion between binary and
+    literal representations of file mode bits, including file type.
+
+    All of them use only symbolic constants for mode bits from
+    File::Stat::Bits.
+
+CONSTANTS
+  $MODE_STRING_RE
+    Regular expression to match mode string (without ^$).
+
+FUNCTIONS
+  
+    is_mode_string_valid( $string )
+
+    Returns true if argument matches mode string pattern.
+
+  
+    $type = mode_to_typechar( $mode )
+
+    Returns file type character of binary mode, '?' on unknown file type.
+
+  
+    $string = mode_to_string( $mode )
+
+    Converts binary mode value to string representation. '?' in file type
+    field on unknown file type.
+
+  
+    $mode = string_to_mode( $string )
+
+    Converts string representation of file mode to binary one.
+
+SEE ALSO
+    stat(2);
+
+    File::Stat::Bits(3);
+
+    Stat::lsMode(3);
+
+AUTHOR
+    Dmitry Fedorov <dm.fedorov@gmail.com>
+
+COPYRIGHT
+    Copyright (C) 2003 Dmitry Fedorov <dm.fedorov@gmail.com>
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+DISCLAIMER
+    The author disclaims any responsibility for any mangling of your system
+    etc, that this script may cause.
+

@@ -1,0 +1,5 @@
+FindByRegex.pm
+MANIFEST
+Makefile.PL
+README
+t/simple1.t

@@ -1,0 +1,49 @@
+If you HATE Dist::Zilla, fear not, you can pretty easily hack at make 
+pull requests for FFI::TinyCC without installing dzil and pulling down 
+half of CPAN!
+
+If you Love Dist::Zilla, or if you work with it anyway, then you know 
+what to do and can skip reading this.
+
+You will need to install these CPAN dists to work on this dist:
+
+ . perl 5.8.1 or better (required for FFI::Platypus)
+ . autodie
+ . Alien::TinyCC
+ . Archive::Ar 2.02 or better
+ . File::chdir
+ . Path::Class
+ . IPC::System::Simple
+ . FFI::Platypus
+ . FFI::Platypus::Type::StringArray
+
+(sorry there is no cpanfile)
+
+You will also need a shared or dll version of libtcc for your platform.  
+Unfortunately, Alien::TinyCC comes with a static library only on most 
+(all?) Unix platforms.  This normally gets built and put in the share 
+directory by Module::Build when you install, but of course since you 
+don't want to run dzil that isn't an option.  It is okay, you can build 
+it from the checked out git repository like this:
+
+ % perl -Iinc -MMy::DLL -e tcc_build
+
+Take a look at the share directory you should have a libtcc.so or 
+libtcc.dll now.  If you have to switch architectures with the same 
+repository, you can clean up with this incantation:
+
+ % perl -Iinc -MMy::DLL -e tcc_clean
+
+Now that you have the dynamic library that FFI::TinyCC needs, you can 
+run the test suite by using prove and its -l option:
+
+ % prove -l
+
+If you need to run a one-liner or whole program with your checked out 
+git version of FFI::TinyCC, you can set PERL5LIB to the lib directory in 
+this repository and it should just work.  If it doesn't, then please let 
+me know.  I like to use Dist::Zilla because it saves me time, but I am 
+happy to make an effort to make it easier for you to contribute.
+
+Thanks!
+Graham <plicease@cpan.org>

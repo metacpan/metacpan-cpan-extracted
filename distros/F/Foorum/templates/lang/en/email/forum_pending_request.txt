@@ -1,0 +1,13 @@
+#########[[% config.name %]] [% from.nickname %] wants to join [% forum.name %]#########
+Dear [% rept.nickname %],
+
+
+[% from.nickname %] wants to join [% forum.name %]. Please click below to approval or reject:
+
+
+[% config.site.domain %]forum/[% forum.forum_id %]/members/pending
+
+Thanks.
+
+Best Regards,
+Yours, [% config.name %]

@@ -1,0 +1,254 @@
+NAME
+    Filesys::Virtual::Async::inMemory - Mount filesystems that reside in
+    memory ( sort of ramfs )
+
+SYNOPSIS
+            #!/usr/bin/perl
+            use strict; use warnings;
+            use Fcntl qw( :DEFAULT :mode ); # S_IFREG S_IFDIR, O_SYNC O_LARGEFILE etc
+
+            # uncomment this to enable debugging
+            #sub Filesys::Virtual::Async::inMemory::DEBUG { 1 }
+
+            use Filesys::Virtual::Async::inMemory;
+
+            # create the filesystem
+            my $vfs = Filesys::Virtual::Async::inMemory->new(
+                    'filesystem'    => {
+                            '/'     => {
+                                    mode => oct( '040755' ),
+                                    ctime => time(),
+                            },
+                    },
+            );
+
+            # use $vfs as you wish!
+            $vfs->readdir( '/', sub {       # should print out nothing
+                    my $data = shift;
+                    if ( defined $data ) {
+                            foreach my $e ( @$data ) {
+                                    print "entry in / -> $e\n";
+                            }
+                            print "end of listing for /\n";
+                    } else {
+                            print "error reading /\n";
+                    }
+                    do_file_io();
+            } );
+
+            my $fh;
+            sub do_file_io {
+                    $vfs->mknod( '/bar', oct( '100644' ), 0, \&did_mknod );
+            }
+            sub did_mknod {
+                    if ( $_[0] == 0 ) {
+                            # write to it!
+                            $vfs->open( '/bar', O_RDWR, 0, \&did_open );
+                    } else {
+                            print "error mknod /bar\n";
+                    }
+            }
+            sub did_open {
+                    $fh = shift;
+                    if ( defined $fh ) {
+                            my $buf = "foobar";
+                            $vfs->write( $fh, 0, length( $buf ), $buf, 0, \&did_write );
+                    } else {
+                            print "error opening /bar\n";
+                    }
+            }
+            sub did_write {
+                    my $wrote = shift;
+                    if ( $wrote ) {
+                            print "successfully wrote to /bar\n";
+                            $vfs->close( $fh, \&did_close );
+                    } else {
+                            print "error writing to /bar\n";
+                    }
+            }
+            sub did_close {
+                    my $status = shift;
+                    if ( $status == 0 ) {
+                            print "successfuly closed fh\n";
+                    } else {
+                            print "error in closing fh\n";
+                    }
+            }
+
+ABSTRACT
+    Using this module will enable you to have "ramfs" filesystems in the
+    Filesys::Virtual::Async API.
+
+DESCRIPTION
+    This module lets you run the Filesys::Virtual::Async API entirely in
+    memory. Nothing special here, really :)
+
+    This module makes extensive use of the functions in File::Spec to be
+    portable, so it might trip you up if you are developing on a linux box
+    and trying to play with '/foo' on a win32 box :)
+
+  Initializing the vfs
+    This constructor accepts either a hashref or a hash, valid options are:
+
+   filesystem
+    This sets the "filesystem" that we will have in memory. It needs to be a
+    particular structure!
+
+    If this argument is missing, we will create an empty filesystem.
+
+   readonly
+    This enables readonly mode, which will prohibit any changes to the
+    filesystem.
+
+    The default is: false
+
+   cwd
+    This sets the "current working directory" in the filesystem.
+
+    The default is: File::Spec->rootdir()
+
+  METHODS
+   readonly
+    Enables/disables readonly mode. This is also an accessor.
+
+  Special Cases
+    This module does a good job of covering the entire ::Async API, but
+    there are some areas that needs mentioning.
+
+   root
+    Unimplemented, No sense in changing the root during run-time...
+
+   stat
+    Array mode not supported because it would require extra munging on my
+    part to get the paths right.
+
+   link/symlink/lstat
+    Links are not supported at this time because of the complexity involved.
+
+   readahead/fsync/fdatasync
+    Always returns success ( 0 ), because they are useless to us
+
+  Subclassing this module
+    If you want to subclass this module, please read on! The primary reason
+    for subclassing is so you have true "callbacks" whenever the API is
+    called, instead of providing a static filesystem structure. This module
+    tries to do it's best to reduce the pain, but you would need to be aware
+    of some things.
+
+    The way this module implements subclassing is to call a private method
+    whenever it detects a subclass using this module as a superclass. Please
+    don't override the ::Async API! What you need to do is define your own
+    _method subs for the ones you want to override. All other methods that
+    aren't defined will return ENOSYS to the ::Async API.
+
+    Available methods to implement: _rmtree, _scandir, _move, _copy, _load,
+    _readdir, _rmdir, _mkdir, _rename, _mknod, _unlink, _chmod, _truncate,
+    _chown, _utime, _stat, _write, _open.
+
+    Again, please look at the source for this module to see how it interacts
+    with the subclass. Some of the methods have been "simplified" to reduce
+    the pain of managing the data. Be sure to let this module create the
+    object, because we need the "readonly" attribute to be present in the
+    hash! If "readonly" is set, this module will take over the logic for
+    certain methods and not call your method if there's a readonly violation
+    ( write(), for example ).
+
+  Debugging
+    You can enable debug mode which prints out some information ( and
+    especially error messages ) by doing this:
+
+            sub Filesys::Virtual::Async::inMemory::DEBUG () { 1 }
+            use Filesys::Virtual::Async::inMemory;
+
+  TODO
+    *   automatically overriding CORE::* methods
+
+                #poe@magnet
+
+                <buu> Apocalypse: Hey, while you're at it, can you make it so all file access operators in perl operate on virtual directories?
+                <Apocalypse> buu: hm you mean overriding readdir(), stat()?
+                <buu> Yes.
+                <Apocalypse> as of now you would have to explicitly use the filesys::virtual::async::inmemory object and do operations on it -> $fsv->readdir(), $fsv->open(), etc
+                <buu> But I don't want to!
+                <buu> =]
+                <Apocalypse> but that would be a fun side project to try and figure out how to hijack CORE:: stuff
+                <buu> Yes!
+                <Apocalypse> hmm you could locally scope the hijack, pass a $fsv object to the module init, and have it transparently replace all file operations in the scope with $fsv->method calls
+                <Apocalypse> why would you want it? pure laziness? haha
+                <buu> Apocalypse: For buubot..
+                <Apocalypse> mmm for now you can just use fsv::inmemory until somebody with enough wizardry does the overrides :)
+                <Apocalypse> I'll file that away in my TODO and see if I will return to it someday hah
+                <buu> Exccelent.
+
+SEE ALSO
+    Filesys::Virtual::Async
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Filesys::Virtual::Async::inMemory
+
+  Websites
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Filesys-Virtual-Async-inMemory>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Filesys-Virtual-Async-inMemory>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Filesys-Virtual-Async-inMemory>
+
+    *   CPAN Forum
+
+        <http://cpanforum.com/dist/Filesys-Virtual-Async-inMemory>
+
+    *   RT: CPAN's Request Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Filesys-Virtual-Async-inMe
+        mory>
+
+    *   CPANTS Kwalitee
+
+        <http://cpants.perl.org/dist/overview/Filesys-Virtual-Async-inMemory
+        >
+
+    *   CPAN Testers Results
+
+        <http://cpantesters.org/distro/F/Filesys-Virtual-Async-inMemory.html
+        >
+
+    *   CPAN Testers Matrix
+
+        <http://matrix.cpantesters.org/?dist=Filesys-Virtual-Async-inMemory>
+
+    *   Git Source Code Repository
+
+        This code is currently hosted on github.com under the account
+        "apocalypse". Please feel free to browse it and pull from it, or
+        whatever. If you want to contribute patches, please send me a diff
+        or prod me to pull from your repository :)
+
+        <http://github.com/apocalypse/perl-filesys-virtual-async-inmemory>
+
+  Bugs
+    Please report any bugs or feature requests to
+    "bug-filesys-virtual-async-inmemory at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Filesys-Virtual-Async-in
+    Memory>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+AUTHOR
+    Apocalypse <apocal@cpan.org>
+
+    Props goes to xantus who got me motivated to write this :)
+
+COPYRIGHT AND LICENSE
+    Copyright 2010 by Apocalypse
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

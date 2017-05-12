@@ -1,0 +1,113 @@
+[% USE FillInForm %]
+[% UNLESS c.req.method == 'POST';
+    data = {
+        homepage  => user_details.homepage,
+        nickname  => c.user.nickname,
+        gender    => c.user.gender,
+        lang      => c.req.param('lang') || c.user.lang || lang,
+        year      => year, month => month, day => day,
+        country   => c.user.country || 'cn',
+        qq   => user_details.qq,
+        msn  => user_details.msn,
+        gtalk  => user_details.gtalk,
+        yahoo  => user_details.yahoo,
+        skype  => user_details.skype,
+    };
+END; %]
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li selected="selected"><a href='javascript:void(0);'><span>[% c.loc('Edit Profile') %]</span></a></li>
+        <li><a href='/profile/change_username'><span>Change Username</span></a></li>
+        <li><a href='/profile/change_password'><span>Change Password</span></a></li>
+        <li><a href='/profile/change_email'><span>Change Email</span></a></li>
+        <li><a href='/profile/profile_photo'><span>Profile Photo</span></a></li>
+    </ul>
+    <div>
+
+[% FILTER fillinform fdat => data || c.req.params %]
+<div class='one'>
+<form method='post'>
+<table align='center'>
+	<tbody>
+    <tr class='misc1'><td align='right'>[% c.loc('Nickname') %]</td><td><input type='text' name='nickname' size='24' />
+	[% IF c.form.error('nickname') %]
+	the length of nickname should be more than 4 and less than 20
+	[% END %]
+	</td>
+	</tr>
+	<tr class='misc2'><td align='right'>Preferable Language:</td><td><select name='lang'><option value='en'>English</option><option value='cn'>简体中文</option><option value='tw'>繁體中文</option>
+    </select>
+	[% IF c.form.error('lang') %]
+	    [% c.loc("Illegal Request.") %]
+	[% END %]
+	</td></tr>
+    <tr class='misc1'><td align='right'>[% c.loc('Gender') %]</td><td><select name='gender'><option value=''>Secret</option><option value='M'>Male</option><option value='F'>Female</option>
+    </select>
+	[% IF c.form.error('gender') %]
+	    Please select your gender.
+	[% END %]
+	</td></tr>
+	<tr class='misc2'><td align='right'>[% c.loc('Birthday') %]</td><td><input type='text' name='year' size='4' maxlength='4' /> / <input type='text' name='month' size='2' maxlength='2' /> / <input type='text' name='day' size='2' maxlength='2' />
+	[% IF c.form.error('birthday') %]
+	Please type in a valid birthday.
+	[% END %]
+	Format: 1984/2/6
+	</td></tr>
+	<tr class='misc1'><td align='right'>[% c.loc('Homepage') %]</td><td><input type='text' name='homepage' size='24' class="{url:true}" />
+	[% IF c.form.error('homepage') %]
+	Please type a valid homepage URL.
+	[% END %]
+	Format: http://www.fayland.org/
+	</td></tr>
+	<tr class='title'><td colspan='2'>[% c.loc('Location Information') %]</td></tr>
+	<tr class='misc1'><td align='right'>[% c.loc('Country/Territory') %]</td><td>
+	    <select name='country'>
+	    [% FOREACH country IN countries.keys.sort %]
+	    <option value='[% country %]'>[% country %]:[% countries.$country %]</option>
+	    [% END %]
+	    </select>
+	</td></tr>
+	<tr class='title'><td colspan='2'>[% c.loc('Contact Information') %]</td></tr>
+	<tr class='misc1'><td align='right'>QQ:</td><td><input type='text' name='qq' size='24' />
+	[% IF c.form.error('qq') %]
+	Please type a valid QQ Number.
+	[% END %]
+	</td></tr>
+	<tr class='misc2'><td align='right'>MSN:</td><td><input type='text' name='msn' size='24' />
+	[% IF c.form.error('msn') %]
+	Please type a valid MSN.
+	[% END %]
+	</td></tr>
+	<tr class='misc1'><td align='right'>Gtalk:</td><td><input type='text' name='gtalk' size='24' />
+	[% IF c.form.error('gtalk') %]
+	Please type a valid GTalk.
+	[% END %]
+	</td></tr>
+	<tr class='misc2'><td align='right'>Yahoo! ID:</td><td><input type='text' name='yahoo' size='24' />
+	[% IF c.form.error('yahoo') %]
+	Please type a valid Yahoo! ID.
+	[% END %]
+	</td></tr>
+	<tr class='misc1'><td align='right'>Skype:</td><td><input type='text' name='skype' size='24' />
+	[% IF c.form.error('skype') %]
+	Please type a valid Skype account.
+	[% END %]
+	</td></tr>
+	<tr class='misc2'><td></td><td><input type='submit' /></td></tr>
+	</tbody>
+</table>
+</form>
+</div>
+[% END %]
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

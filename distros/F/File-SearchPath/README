@@ -1,0 +1,64 @@
+File::SearchPath - Search for a file in a PATH-like environment variable
+
+This module can be used to search for files (which do not have to be
+executable) in a set of directories specified in a PATH-like
+environment variable such as $PATH, $LD_LIBRARY_PATH (or any
+environment variable).
+
+INSTALLATION
+
+ % perl Makefile.PL
+ % make
+ % make test
+ % make install
+
+REQUIREMENTS
+
+Should work on any perl. Can use the Env::Path module if it is
+present, else colon-separated path variables are assumed.
+
+SEE ALSO
+
+File::Which, File::Where.
+
+AUTHOR
+
+Tim Jenness E<lt>tjenness@cpan.orgE<gt>
+
+Copyright 2005,2006,2008 Particle Physics and Astronomy Research Council.
+Copyright (C) 2009-2010 Science and Technology Facilities Council.
+Copyright (C) 2015 Tim Jenness
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+CHANGES
+
+v0.06  RT #85529 fixed by Jonathon Scott Duff
+       Minor documentation clean up by Jonathan Scott Duff
+
+v0.06  Fix path separator problem on VMS (thanks to Peter Edwards)
+       Use Module::Build
+
+v0.05  Fix test for CPAN testers.
+
+v0.03  Fix volume handling (thanks to David Golden).
+
+v0.02   + Add compatibility with Robert Spier's File::SearchPath
+          module (that was no longer on CPAN)
+        + If an absolute filename is given, test it and return
+          it if it passes those tests (else return undef)
+        + Document returning of undef if no files are found.
+
+V0.001  First version.

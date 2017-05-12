@@ -1,0 +1,146 @@
+Revision history for Perl extension Feersum
+
+1.404 Tue Nov  1 22:52:42 2016 +0800
+        Features
+        - Unix socket support (hoytech++)
+
+1.403 Wed Aug 12 19:19:57 2015 +0800
+        Features
+        - Add OPTIONS method support (mgreter++)
+
+1.402 Fri Jul 31 12:02:30 2015 +0800
+        Bugfixes
+        - memeory leak if request method is POST (fangyousong++)
+
+1.401 Wed Nov  6 21:53:25 2013 +0800
+        Bugfixes
+        - Fix tests for newer Plack::Test (@gfx++)
+        - Suppress compilation warnings under clang. (@gfx++)
+
+1.400 Wed Sep  7 20:00:00 2011 -0700
+        Features
+        - Add flash socket policy support (au++)
+        Bugfixes
+        - mortal scalar leak (thanks bfg)
+        - 400s on incremental request parsing (GH#12 thanks danmcc)
+        Docs
+        - policy support and other tunables
+        - add some missed API
+        - mark the --pre-fork option as Experimental
+        Tests
+        - a bunch of author tests
+        - reduce the amount of parallelism in tests (makes them faster)
+
+1.202 Thu Jun 30 00:45:00 2011 -0700
+        Fix double-plan test failures when Test::LeakTrace missing (au++)
+
+1.201 Wed Jun 29 11:00:00 2011 -0700
+        Fix sockaddr memory leak (thanks bfg)
+
+1.200 Fri Apr 15 12:00:00 2011 -0700
+        Fix major defect: corrupted large static files (thanks leedo)
+
+1.101 Wed Apr 13 12:00:00 2011 -0700
+        Fix 62-plack-runner.t again (thanks cpantesters)
+
+1.100 Mon Apr 11 12:40:00 2011 -0700
+        Fix major defect: truncated writes (fbb3664)
+        Finish Solaris compatibility (thanks konobi)
+        Fix t/11-runner.t failing when JSON::XS missing
+
+1.002 Sat Apr  9 16:15:00 2011 -0700
+        Try to fix persistent failing of 62-plack-runner.t
+        Update picohttpparser from upstream
+        Fix printf warnings on Lucid
+
+1.001 Mon Jan 31 10:00:00 2011 -0800
+        Address RT#65239 by making Plack a true dep. if present.
+        Test::TCP is now a hard build dependency.
+        Use Test::Fatal instead of Test::Exception.
+
+1.000 Mon Nov 22 12:00:00 2010 -0800
+        Socialtext now runs Feersum in production, hence 1.000
+        Add write_array() to Writer handle (undoc'd Feersum extension)
+        Be explicit about the EU::MM requirement (thanks au)
+        Formally support PSGI 1.1 (thanks miyagawa)
+
+0.986 Mon Oct 26 09:16:00 2010 -0700
+        Fix compilation for EV 4.00 (thanks au)
+
+0.985 Mon Oct 25 16:18:00 2010 -0700
+        Require EV 4.00.
+        Make two example scripts emit a constant Content-Length for ab.
+        Code reworking and optimization.
+
+0.984 Fri Oct 15 10:45:00 2010 -0700
+        Fix a misspelling of SvREFCNT_dec
+
+0.983 Thu Oct 14 17:45:00 2010 -0700
+        Add a response_guard() method and psgix.output.guard
+
+0.982 Tue Oct 12 10:55:00 2010 -0700
+        Initial pre-forking support via Feersum::Runner & Plack::Runner
+        Fix: resource leak induced by header-read errors
+        Fix: compilation on BSD & Solaris re: SOL_TCP
+
+0.981 Wed Oct  9 04:30:00 2010 -0700
+        Support Web::Hippie (and psgix.io)
+        Add missing JSON::XS test-dep.
+        Fix: write() prototype was incorrect.
+        Fix: writer not flushing on DESTROY.
+        Fix: IO::Handle in PSGI streaming response.
+        Fix: `use overload` PSGI callbacks in perl 5.8.x
+
+0.971 Wed Oct  6 16:21:00 2010 -0700
+        Fix the feersum script.
+
+0.97  Wed Oct  6 15:00:00 2010 -0700
+        Full Plack::Test::Suite compliance!
+        Handle 304 responses properly.
+        Don't manually steal TEMP vars.
+
+0.961 Wed Oct  6 08:40:00 2010 -0700
+        Fix building under threaded perls.
+        Work around a bug (?) in 5.12.1 when declaring -DDEBUGGING.
+
+0.96  Fri Oct  1 15:30:00 2010 -0700
+        Support Tatsumaki running under Feersum.
+        Content-Type is now in the CONTENT_TYPE env.
+
+0.95  Fri Oct  1 13:45:00 2010 -0700
+        Specify Plack >= 0.995 version for testing & recommending
+        Experiment with close() rather than shutdown() for ending connections.
+        Actually install bin/feersum as a script
+        Fix coredumps/hangs due to improper refcounting.
+        Fix examples, Add a chat app example.
+
+0.94  Thu Sep 30 22:45:00 2010 -0700
+        Major documentation rewrite.
+        Deprecated the "delayed response" part of the Feersum API in favor of the "streamed response" API.
+        Allow for tied variables in the response.
+        Move the IO::Handle response reading code into XS.
+
+0.93  Tue Sep 29 01:30:00 2010 -0700
+        First CPAN release.
+        Redo PSGI streaming responses (mostly for code clarity).
+        Fixes for Perl 5.8.x
+
+0.92  Tue Sep 28 22:18:01 2010 -0700
+        Support "Connection:close" style streaming for 1.0 clients.
+        Support IO::Handle-like responses for PSGI handlers.
+        Add REMOTE_ADDR and REMOTE_PORT to env.
+
+0.91  Sun Sep 19 15:33:39 2010 -0700
+        Support running Feersum under plackup.
+        Remove AnyEvent::HTTP dependency.
+        Make $r->env() calls faster.
+
+0.90  Mon Sep  6 16:35:00 2010
+        Initial PSGI 1.03 support (except for IO::Handle-like responses)
+
+0.02  Fri Apr 23 10:55:54 2010
+        Renamed a good chunk of the functions & classes.
+        Made psgi.input and stream-writer objects separate from the main connection class.
+
+0.01  Fri Apr 23 10:55:54 2010
+        Started project.

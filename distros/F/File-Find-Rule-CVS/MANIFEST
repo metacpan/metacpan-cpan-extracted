@@ -1,0 +1,8 @@
+Build.PL
+Makefile.PL
+META.yml
+Changes
+README
+MANIFEST
+lib/File/Find/Rule/CVS.pm
+t/cvs.t

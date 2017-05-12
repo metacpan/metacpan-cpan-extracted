@@ -1,0 +1,22 @@
+---
+pod_spelling_system:
+  stopwords:
+    - ftpparse
+    - ftpcopy
+    - Bernsteins
+    - CMS
+    - EPLF
+    - GPL
+    - NetPresenz
+    - NetWare
+    - Ohse
+    - Uwe
+    - VMS
+    - flagtrycwd
+    - flagtryretr
+    - mtimetype
+    - sizetype
+    - unparseable
+
+pod_coverage:
+  private: []

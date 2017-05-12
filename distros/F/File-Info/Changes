@@ -1,0 +1,14 @@
+Revision history for Perl extension foofoo.
+
+1.02  Mon Jan 13  6:04 PM GMT 2003
+	- Try again to remove subr redefine warnings
+
+1.01  Wed Jul 31 11:58 PM GMT 2002
+	- Evade unfortunate mandatory subr redefine warnings in perl 5.6.1
+
+1.00  Mon Apr 22  9:02 PM GMT 2002
+	- original version
+	- handles MD5 signatures (with Digest::MD5)
+	- handles simple par info (with Archive::Par)
+	- permits local & global overrides
+	- very limited 'type' capability

@@ -1,0 +1,21 @@
+TYPEMAP
+EXTRACTOR_ExtractorList *	T_EXTRACTOR_ExtractorList
+EXTRACTOR_ExtractorList_or_null *	T_EXTRACTOR_ExtractorList_OR_NULL
+
+OUTPUT
+
+T_EXTRACTOR_ExtractorList
+	$arg = perl_extractor_new_sv_from_ptr ($var, \"File::Extractor\");
+
+INPUT
+
+T_EXTRACTOR_ExtractorList
+	$var = ($type)perl_extractor_get_ptr_from_sv ($arg, \"File::Extractor\");
+
+T_EXTRACTOR_ExtractorList_OR_NULL
+	if (!sv_isobject ($arg)) {
+		$var = ($type)NULL;
+	}
+	else {
+		$var = ($type)perl_extractor_get_ptr_from_sv ($arg, \"File::Extractor\");
+	}

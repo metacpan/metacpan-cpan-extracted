@@ -1,0 +1,4 @@
+#fsdb experiment key
+-	--x
+# test trailing comment
+#   | dbmapreduce --nowarnings --prepend-key -K -k experiment perl TEST/dbmapreduce_external_with_key.pl

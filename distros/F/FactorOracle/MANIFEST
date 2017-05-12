@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/FactorOracle.t
+lib/FactorOracle.pm
+META.yml                                 Module meta-data (added by MakeMaker)

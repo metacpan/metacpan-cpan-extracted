@@ -1,0 +1,126 @@
+DESCRIPTION
+
+File::Find::Node is an object oriented module that works similarly
+to the File::Find module.  It recursively traverses a directory tree
+and processes each item using callback functions supplied by the user.
+
+use File::Find::Node;
+my $f = File::Find::Node->new("path");
+$f->process(\&func);
+$f->find;
+
+The new() constructor creates a top level File::Find::Node object.  The
+$f->process() method takes a code reference to a callback function.  The
+$f->find method traverses the directory tree.  It creates a
+File::Find::Node object for each item and passes it to the callback
+function.
+
+The top level object has methods that do the following:
+
+o specify a callback function that is called for each item.
+  If a directory, the function is called before traversing it.
+
+o specify a callback function that is called for each directory
+  after traversing it.
+
+o specify a function to filter file names before traversing a directory.
+  This function may sort and/or remove file names.
+
+o specify a function to be called if there is an error.
+
+o enable/disable following symbolic links.
+
+Objects passed to callback functions have methods that provide
+information about the current item including:
+
+o path name of the item,
+
+o file name (base name),
+
+o stat() information using methods similar to File::stat and the Unix
+  find command,
+
+o depth level of the item,
+
+o test if a file or directory is empty.
+
+Other methods do the following:
+
+o access the parent directory object;
+
+o store arbitrary data in the object (flags, counters, totals or other
+  state information);
+
+o skip parts of the traversal (prune a directory);
+
+o terminate the traversal;
+
+o traverse a directory tree with a concurrent sub process;
+
+o refresh saved stat() information.
+
+UNIQUE FEATURES
+
+o Object oriented interface, no exported symbols, no global variables.
+
+o Passes objects to callback functions.
+
+  Simplifies coding callbacks because object methods provide easy access
+  to file information.
+
+o Can store arbitrary data in an object.
+
+  Easy to accumulate counters or totals per directory.  Can save state
+  information between calls to callbacks.
+
+o Provides access to the parent directory object.
+
+  Decisions can be based on the current object and its parent directory.
+
+o Can easily prune directories or stop traversal entirely.
+
+o Can traverse two or more directory trees concurrently.
+
+o Space and time efficient.
+
+  Only the current object and the linear chain of parent objects require
+  memory.  Stat() information is saved in the object, which eliminates
+  extra calls to stat() and/or lstat().
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Find::Node
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Find-Node
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-Find-Node
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-Find-Node
+
+    Search CPAN
+        http://search.cpan.org/dist/File-Find-Node
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 Stephen C. Losen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

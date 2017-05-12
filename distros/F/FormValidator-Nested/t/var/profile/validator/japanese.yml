@@ -1,0 +1,10 @@
+params:
+  name:
+    name: '名前'
+    validators:
+      - Japanese#hiragana
+  name_k:
+    name: '名前_k'
+    validators:
+      - Japanese#katakana
+

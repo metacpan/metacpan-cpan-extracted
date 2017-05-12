@@ -1,0 +1,67 @@
+NAME
+
+  Fake Encode module for compatible scripting
+
+SYNOPSIS
+
+  use Fake::Encode;
+
+DESCRIPTION
+
+  Fake::Encode provides a scripting environment with long life by dummy
+  subroutines Encode::encode() and Encode::decode().
+
+INSTALLATION
+
+  1. Copy Fake/Encode.pm to @INC directory.
+
+SEE ALSO
+
+  Encode - CPAN
+  http://search.cpan.org/dist/Encode/
+
+  Encode561.pm - Encode::from_to compatible for Perl 5.6.x and 5.005 - www.kawa.net
+  http://www.kawa.net/works/perl/i18n-emoji/Encode561.pm.html
+
+  Encode::compat - CPAN
+  http://search.cpan.org/dist/Encode-compat/
+
+  Porting code from perl-5.6.X - perldoc
+  http://perldoc.perl.org/perlunicode.html#Porting-code-from-perl-5.6.X
+
+  Perl 5.6+: Unicode-processing issues and how to cope with it. - ahinea.com
+  http://ahinea.com/en/tech/perl-5.6-unicode-struggle.html
+
+  Correct processing method of the UTF-8 flag
+  http://blog.livedoor.jp/dankogai/archives/50116398.html
+
+  perl - utf8::is_utf8("\x{ff}") == 0
+  http://blog.livedoor.jp/dankogai/archives/51004472.html
+
+  To the person who fights against UTF-8 flag
+  http://blog.livedoor.jp/nipotan/archives/50228106.html
+
+  utf8::is_utf8 considered harmful
+  https://subtech.g.hatena.ne.jp/miyagawa/20080218/1203312527
+
+  Migrating scripts back to Perl 5.005_03
+  http://www.perlmonks.org/?node_id=289351
+
+  Goodnight, Perl 5.005
+  http://www.oreillynet.com/onlamp/blog/2007/11/goodnight_perl_5005.html
+
+  Perl 5.005_03 binaries
+  http://guest.engelschall.com/~sb/download/win32/
+
+  Welcome to CP5.5.3AN
+  http://cp5.5.3an.barnyard.co.uk/
+
+  japerl - CPAN
+  http://search.cpan.org/dist/japerl/
+
+  ina - CPAN
+  http://search.cpan.org/~ina/
+
+  A Complete History of CPAN - The BackPAN
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

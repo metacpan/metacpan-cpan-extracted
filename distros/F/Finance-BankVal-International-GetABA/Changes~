@@ -1,0 +1,9 @@
+Revision history for Perl extension Finance::BankVal::International::GetABA.
+
+0.01  Mon Jul 12 09:08:55 2010
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.8.0 Finance::BankVal::International::GetABA
+0.02  Mon Aug 2 10:03:00 2010
+	- Updated dependencies, readme & perldoc to account for Crypt::SSLeay
+0.04  Sun Aug 8 20:03:00 2010
+	- Altered permissions

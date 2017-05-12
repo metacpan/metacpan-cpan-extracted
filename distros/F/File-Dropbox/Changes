@@ -1,0 +1,21 @@
+0.7 2016-08-22
+  - Removed experimental code
+
+0.6 2014-02-03
+  - File operations
+  - Minor fixes
+
+0.5 2013-08-14
+  - Quota error handling fixed
+  - OAuth 2.0 support added
+
+0.4 2013-08-04
+  - Net::Curl replaced with Furl
+  - Perl 5.10 support added
+
+0.3 2013-08-03
+  - WWW::Curl replaced with Net::Curl
+  - Fixed API error handling logic
+
+0.2 2013-05-25
+  - First release

@@ -1,0 +1,5 @@
+[%- FILTER collapse %]
+    [% col.name %]
+    [% IF col.label %]([% col.label %])[% END %]
+[% END -%]
+[%# $Id$ #%]

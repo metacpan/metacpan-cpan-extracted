@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/FTN/Packet.pm
+lib/FTN/Packet/Examples.pod
+lib/FTN/Packet/ToDo.pod
+README
+t/46926700.pkt
+t/46984d00.pkt
+t/00-load.t
+t/01-read_netmail.t
+t/02-read_echomail.t
+t/03-write_packet.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

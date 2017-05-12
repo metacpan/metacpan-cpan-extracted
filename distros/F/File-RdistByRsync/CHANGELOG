@@ -1,0 +1,24 @@
+    Version 0.3, Feb 1, 2002
+
+Some command line flags were parsed and then ignored.  For
+example, '-m'.
+
+Turns out that rsync has a major bug.  Symbolic links on the
+destination are not respected when they are part of a relative
+path.  For example, if on the destination /var is a link and
+you try to dist over /var/db/pkg, rsync will delete the /var
+link and replace it with a directory containing just /var/db...
+Not good.  The code now works around this when you dist a 
+single thing with an rsync invocation. 
+
+    Version 0.2, Jan 31, 2002
+
+Slaven Rezic <rezic@onlineoffice.de> noticed that the 
+command wrapper (rdist2rsync) used the old name of the
+module (and thus didn't work).  Also the "require 5.6.1"
+was moved to Makefile.PL and documented.
+
+    Version 0.1, Jan 08, 2002
+
+Initial release.
+

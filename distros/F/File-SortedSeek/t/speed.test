@@ -1,0 +1,43 @@
+use strict;
+use Test;
+
+BEGIN { plan tests => 2 }
+
+use lib '../lib';
+use File::SortedSeek;
+
+my $file = './test.file';
+my ( $tell, $begin, $finish, $line, $got, $want, @data, @lines, @between );
+File::SortedSeek::set_silent;
+
+#################### speed test just for the hell of it ####################
+
+# write a million line file
+print "Writing a million line test file, may take a few seconds....\n";
+open TEST, ">$file" or die "Can't write test file $!\n";
+print TEST "$_\n" for ( 0 .. 1000000 );
+close TEST;
+
+open TEST, "<$file" or die "Can't open test file $!\n";
+
+print "Starting seek on million line file\n";
+
+$begin = time();
+$tell = File::SortedSeek::numeric( *TEST, 999999 );
+$finish = time();
+chomp ( $line = <TEST> );
+ok( $line, 999999 );
+
+close TEST;
+
+ok( unlink $file );
+
+printf "Total seek time %d seconds\n", ($finish - $begin);
+
+# write the test file with the data supplied in an array
+# we use the default system line ending.
+sub write_file {
+    open TEST, ">$file" or die "Can't write test file $!\n";
+    print TEST "$_\n" for @_;
+    close TEST;
+}

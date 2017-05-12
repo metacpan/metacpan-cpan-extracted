@@ -1,0 +1,86 @@
+NAME
+    Find::File::Iterator - Iterator interface for search files
+
+SYNOPSIS
+      use File::Find::Iterator;
+      my $find = File::Find::Iterator->create(dir => ["/home", "/var"],
+                                              filter => \&isdir);
+      sub isdir { -d }
+
+      while (my $f = $find->next) { print "file : $f\n" }
+  
+      #reread with different filter 
+      $find->filter(\&ishtml);
+      $find->first;
+      while (my $f = $find->next) { print "file : $f\n" }
+
+      sub ishtml { /\.html?$/ }
+
+      # using file for storing state
+      $find->statefile($statefile);
+      $find->first;
+      # this time it could crash
+      while (my $f = $find->next) 
+      { print "file : $f\n" }
+
+      # using imap and igrep
+      use File::Find::Iterator qw(imap igrep);
+      my $find = File::Find::Iterator->new(dir => ["/home", "/var"]);
+      $find = imap { -M } igrep { -d } $find;
+
+DESCRIPTION
+    Find::File::Iterator is an iterator object for searching through
+    directory trees. You can easily run filter on each file name. You can
+    easily save the search state when you want to stop the search and
+    continue the same search later.
+
+    Find::File::Iterator inherited from Class::Iterator so you can use the
+    imap and the igrep constructor.
+
+    create(%opt)
+        This is the constructor. The %opt accept the following key :
+
+        dir "=> \@dir"
+            which take a reference to a list of directory.
+
+        filter "=> \&code"
+            which take a code reference
+
+        statefile "=> $file"
+            which take a filename
+
+    next
+        calling this method make one iteration. It return file name or
+        "undef" if there is no more work to do.
+
+    first
+        calling this method make an initialisation of the iterator. You can
+        use it for do a search again, but with some little change (directory
+        root, statefile option, different filter).
+
+    dir([ \@dir ])
+        this method get or set the directory list for the search.
+
+    filter([ \&code ])
+        this method get or set the filter method use by "next" method.
+
+    statefile([ $file ])
+        this method get or set the name of the file use for store state of
+        the search (see "STORING STATE").
+
+STORING STATE
+    If the option "statefile" of the constructor or the "statefile" field of
+    the object is set, the iterator use the Storable module to record is
+    internal state after one iteration and to set is internal state before a
+    new iteration. With this mechanism you can continue your search after an
+    error occurred.
+
+SEE ALSO
+    Class::Iterator
+
+CREDITS
+    Marc Jason Dominius's YAPC::EU 2003 classes.
+
+AUTHOR
+    Robert Silve <robert@silve.net>
+

@@ -1,0 +1,6 @@
+#fsdb account newcol
+johnh	-
+greg	-
+root	-
+# this is a simple database
+#   | dbcol -e - account newcol

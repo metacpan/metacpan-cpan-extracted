@@ -1,0 +1,45 @@
+
+=pod
+
+=head1 NAME
+
+Frost::Cookbook::Inquisition  - Nobody expects the Spanish Inquisition!
+
+=head1 ABSTRACT
+
+What is the meaning of life?
+
+=head1 FREQUENTLY ASKED QUESTIONS
+
+None yet - please ask ;-)
+
+=head1 GETTING HELP
+
+I'm reading the Moose mailing list frequently, so please ask your
+questions there.
+
+The mailing list is L<moose@perl.org>. You must be subscribed to send
+a message. To subscribe, send an empty message to
+L<moose-subscribe@perl.org>
+
+=head1 BUGS
+
+All complex software has bugs lurking in it, and this module is no
+exception.
+
+Please report any bugs to me or the mailing list.
+
+=head1 AUTHOR
+
+Ernesto L<ernesto@dienstleistung-kultur.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Dienstleistung Kultur Ltd. & Co. KG
+
+L<http://dienstleistung-kultur.de/frost/>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

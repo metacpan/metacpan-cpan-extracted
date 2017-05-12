@@ -1,0 +1,273 @@
+#!/usr/bin/perl
+
+use Sys::FreezeThaw;
+use File::Defrag;
+
+package File::Defrag;
+
+# a simple on-line filesystem defragmenter.
+
+# EXPERIMENTAL, USE ON YOUR OWN RISK!
+
+# TODO: implement file copying in C (O_DIRECT)
+# TODO: "preallocate" with large write()'s via mmap
+# TODO: implement proc-scanning in C (less overhead)
+# TODO: extented attributes, inode #, ctime etc. get destroyed
+# TODO: restore atime/mtime of directories before create/after rename
+
+# Copyright (©) 2005 Marc Alexander Lehmann <schmorp@schmorp.de>
+
+#
+#Die Funktionsweise:
+#
+#1. durchsuche alle angegebenen directories rekursiv
+#2. alle "einfachen" (keine hardlinks, altr genug usw.) files
+#   werden auf anzahl fragmente untersucht. dabei
+#   werden kleine lücken (indirect blocks usw.)
+#   toleriert, sowie ein fragment alle 64MB.
+#3. ist das file fragmentiert, erstellt es eine kopie, so gut
+#   es kann, mit grossen write's (gut für allocate-on-write,
+#   nicht-so-gut für allocate-on-flush).
+#4. stoppe alle prozesse (sic, ist ein komplexer prozess
+#   der eventuell effektr auf laufende programme hat,
+#   oder das sytem auch freezen kann - ist relativ gut getestet, mit
+#   MEINEN prozessen :)
+#5. hat sich das originalfile nicht verändert UND ist es nicht mehr in
+#   benutzung, ersetze das originalfile durhc die kopie.
+#6. CONT'e alle prozesse (das bemerken sie)
+#
+#effekt: inode, ctime ändern sich, extended attributes etc. gehen verloren
+#
+
+use Cwd ();
+use Fcntl;
+use Getopt::Long;
+
+sub MIN_AGE  (){ 1 } # only defrag files that are older than this (seconds)
+sub CHUNK    (){ 64 * 1024 * 1024 } # read & write in chunks of this size. larger != better
+sub MAX_GAP  (){ 8 } # maximum gap in blocks allowed (0 == every gap maskes an extent)
+
+my $opt_minage = MIN_AGE;
+my $opt_freeze;
+my $opt_inuse;
+
+my ($s_skipped, $s_linear, $s_perfect, $s_improved, $s_fragmented) = (0) x 5;
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions (
+   "nofreeze|f" => \$opt_nofreeze,
+   "inuse|i"    => \$opt_inuse,
+   "min-age=i"  => \$opt_minage,
+);
+
+# also, we allow one extent per CHUNK filebytes
+
+$| = 1;
+
+my %cleanup; # files to be deleted on exit
+
+END {
+   unlink keys %cleanup;
+}
+
+$SIG{INT} =
+$SIG{TERM} =
+$SIG{QUIT} = sub { exit 1 };
+
+# check wether a file is sitll in-use by any processes not in our exclude list
+sub file_inuse {
+   my $path = shift;
+   my $fh;
+
+   if (0 == open $fh, "-|") {
+      close STDERR;
+      exec "/bin/fuser", "-a", $path;
+      exit 255;
+   }
+
+   my $pids = <$fh>;
+
+   close $fh or !$!
+      or die "/bin/fuser: $!\n";
+
+   $? == 0 or $? == 256
+     or die "$?: fuser returned funny status\n";
+
+   scalar
+      grep $_ && $_ != $$,
+         split /\s+/, $pids
+}
+
+# check for "simple" files, no hardlinks, not recently modified etc.
+sub stat_ok {
+   (stat _)[ 9] < time - $opt_minage or return; # skip files that were modified recently
+   (stat _)[10] < time - $opt_minage or return; # skip files that were modified recently
+   (stat _)[ 3] == 1 or return; # skip files with link count > 1
+   (stat _)[ 7] < 2**50 or return; # skip very large files
+   (stat _)[ 7] > 0 or return; # skip very tiny files
+   ((stat _)[2] & ~07777) == 0100000 or return; # skip files with strange modes
+
+   1
+}
+
+sub defrag_file {
+   my ($path) = @_;
+
+   $path =~ /^(.*)\/(.*)$/s
+      or die "$path: cannot split into dirname/basename\n";
+
+   my ($dir, $file) = ($1, $2);
+
+   my $src_fh = direct_open "$dir/$file", O_RDONLY
+      or die "$path: unable to open for reading\n";
+
+   stat $src_fh
+      or die "$path: unable to stat()\n";
+
+   # save some stat info for later
+   my $device = (stat _)[ 0];
+   my $inode  = (stat _)[ 1];
+   my $mode   = (stat _)[ 2] & 07777;
+   my $uid    = (stat _)[ 4];
+   my $gid    = (stat _)[ 5];
+   my $size   = (stat _)[ 7];
+   my $mtime  = (stat _)[ 9];
+   my $ctime  = (stat _)[10];
+
+   stat_ok or $s_skipped++, return; # skip if file looks fishy
+
+   my $max_extents = int +($size + CHUNK - 1) / CHUNK;
+
+   my $extents = file_extents $src_fh, MAX_GAP
+      or $s_skipped++, return; # maybe file with holes, or not yet flushed to disk
+
+   $extents > $max_extents or $s_linear++, return; # cool, "it's unfragmented"
+
+   !$opt_inuse and file_inuse $path
+      and $s_skipped++, return; # skip files that are currently open
+      
+   print "$dir/$file: ";
+   printf "$extents ";
+
+   my $dst = "$dir/.defrag.$$";
+   #my $dst = "/.defrag.$$";
+
+   $cleanup{$dst} = $dst;
+   
+   my $dst_fh = direct_open $dst, O_RDWR | O_CREAT | O_EXCL, 0600
+      or die "$dst: unable to create new copy\n";
+
+   my $index = 0;
+
+   my $chunksize = $size < 1<<20 ? 1<<20 : CHUNK;
+
+   while (direct_copy $src_fh, $dst_fh, $chunksize, $index) {
+      $index++;
+
+      if ((stat $src_fh)[9] != $mtime) {
+         print "file was modified, skipping.\n";
+         $s_skipped++, goto bailout;
+      }
+   }
+
+   my $after_extents = file_extents $dst_fh, MAX_GAP
+      or $s_skipped++, goto bailout;
+
+   print "=> $after_extents ";
+
+   if ($after_extents >= $extents) {
+      print "couldn't achieve fewer extents, skipping.\n";
+      $s_fragmented++, goto bailout;
+   } elsif ($after_extents > 1) {
+      $s_improved++;
+   } else {
+      $s_perfect++;
+   }
+
+   truncate $dst, $size
+      or die "$dst: unable to truncate copy to correct size\n";
+
+   (stat $dst_fh)[7] == $size
+      or die "$dst: file size mismatch\n";
+
+   close $dst_fh
+      or $s_skipped++, goto bailout;
+
+   chown $uid, $gid, $dst
+      or $s_skipped++, goto bailout;
+
+   chmod $mode, $dst
+      or $s_skipped++, goto bailout;
+
+   utime $atime, $mtime, $dst
+      or $s_skipped++, goto bailout;
+
+   my $token = $opt_nofreeze || Sys::FreezeThaw::freeze;
+
+      # the next is very slow, unfortunately
+      !$opt_inuse and file_inuse $path
+         and die "file is in use by some process\n";
+
+      lstat $path
+         or die "$path: unable to stat\n";
+
+      (stat _)[ 0] == $device or die "device differs (WTF?)\n";
+      (stat _)[ 1] == $inode  or die "inode differs\n";
+      (stat _)[ 4] == $uid    or die "uid differs\n";
+      (stat _)[ 5] == $gid    or die "gid differs\n";
+      (stat _)[ 7] == $size   or die "size differs\n";
+      (stat _)[ 9] == $mtime  or die "modification time differs\n";
+      (stat _)[10] == $ctime  or die "change time differs\n";
+
+      rename $dst, $path
+         or die "rename over destination: $!";
+
+   $opt_nofreeze or Sys::FreezeThaw::thaw $token;
+
+   print "done.\n";
+
+   delete $cleanup{$dst};
+
+   return;
+
+bailout:
+   unlink delete $cleanup{$dst};
+}
+
+sub defrag_files {
+   my @files = @_;
+
+   while (@files) {
+      my $path = shift @files;
+      lstat $path;
+
+      if (-d _) {
+         # traverse directories, depth first
+         opendir my $dir, $path
+            or next;
+
+         unshift @files, map "$path/$_",
+                            sort
+                               grep $_ ne "." && $_ ne "..",
+                                  readdir $dir;
+      } elsif (-f _) {
+         stat_ok or next;
+
+         defrag_file $path;
+      } else {
+         #print "ignored $path, neither dir nor file\n";
+      }
+   }
+}
+
+defrag_files map Cwd::abs_path ($_), @ARGV;
+
+printf "statistics: %d skipped, %d unfragmented, %d improved, %d perfected, %d fragmented\n",
+       $s_skipped, $s_linear, $s_improved, $s_perfect, $s_fragmented;
+
+0
+
+
+
+
+

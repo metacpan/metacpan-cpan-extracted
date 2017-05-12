@@ -1,0 +1,31 @@
+pmv will apply the given Perl expression to each of the
+file names. If the result is different from the original name, the
+file will be renamed, linked, or symlinked.
+
+If the expression is any of uc, lc, of ucfirst, pmv will DWIM.
+
+pmv is a wrapper around File::PerlMove, which does most of the work.
+
+EXAMPLES
+
+To change editor backup files back to Perl sources:
+
+    $ pmv 's/\.bak$/.pl/' *.bak
+    foo.bak => foo.pl
+    bar.bak => bar.pl
+
+Lowcase file names:
+
+    $ pmv lc *JPG
+
+Shift numbered examples to a new section:
+
+    $ pmv --reversed 's/^ex(\d)/"ex".($1+3)/ge' ex*
+    ex42.dat => ex72.dat
+    ex25.dat => ex55.dat
+    ex22.dat => ex52.dat
+    ex13.dat => ex43.dat
+    ex12.dat => ex42.dat
+
+Note that these need to be processed in reversed order, to prevent
+ex12.dat => ex42.dat botching with the exisitng ex42.dat.

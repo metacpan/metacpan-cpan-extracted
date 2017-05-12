@@ -1,0 +1,376 @@
+=head1 FTN::JAM ToDo
+
+Adapt some and/or all of the demo scripts to be distributed with the
+distribution? At least update for use with the current FTN::JAM module.
+Then add POD documentation including license and copyright information
+and then add them to the distribution (but not yet to an installation)?
+
+The existing code uses the global variable $Errnum for error numbers.  For
+those functions that already return a hash, and therefore the code calling
+it already expects a hash back, just use a hash key 'Error' or 'error' for
+it; the call code can then test for the existence of the key itself for if
+there is an error, with the contents of the key being the error number (to
+start off with) and/or error message itself.
+
+Create a file containing examples of using FTN::JAM, possibly using something
+from the demo scripts as a basis. Do this instead of simply cleaning up the
+old demo scripts and including them in the distribution? Or do some or all
+of both? I.E.; add an EXAMPLES section in FTN::JAM and/or a separate file
+such as FTN::JAM::Tutorial, and have example scripts based on cleaned up demo
+scripts?  And/or create possibly separate ftnjam distribution that provides a
+script that both does some basic operations on JAM message bases as well
+as serving as an example of how to use FTN::JAM.
+
+Add the usage of Param::Validate module for use in the functions?
+
+Change the format of the subroutine names from like OpenMB to something like
+open_message_base? Amongst other reasons to do so is that it makes it clearer
+what is being referred to.
+
+
+=head2 FTN::JAM Module
+
+One argument selects are used at multiple places in JAM.pm. It's being 
+used to change which of the JAM data files is being printed to at various
+parts of the code. Since at least some of those are one line after another,
+not sure why the four different file pointers were not just explicitly used.
+
+Multiple issues with @_ not being unpacked at the beginning of a function.
+What it was doing was checking the number of arguments being passed to the
+function before attempting to use them & errors out if not correct. Verify
+that variables passed to subroutines are unpacked to local variables before
+being used in the subroutine.
+
+Change the name of $Errnum to $error_number? 
+
+A message base packing function is not directly available. It could be done
+by creation of a temporary message base, copying the messages from the one
+being packed to the temporary one, removing the original version of the
+message base, then renaming the temporary one to original name. Or by
+renaming the message base to a temporary name, recreating the message base,
+then copying the messages from the temporary version to the new version.
+(Might be issues either way.)  If do not add as a function, add it as an
+example.
+
+
+=head3 FTN::JAM::OpenMB Function
+
+Use 'close FH or croak' style for the lines opening or closing JAM files.
+
+Capture the reason why (using the 'open FH or' style) the JAM file could not
+be opened or closed, so that it could be available for error messages.
+
+The first section of the function checks if the message base already exists
+but the return doesn't indicate that. It does set $Errnum to indicate an
+IO Error but it uses 'return;' to exit and since that setting of $Errnum
+is the last thing done before the exit that also is what the return sends
+back, which makes it a boolean true.  Change that 'return;' to be an
+'return 0;' to explicitly set that.  Then change the testing code to 
+make use of that.
+
+Would the $*res variables in the file open lines be better named as $*ref?
+Or something 'pointer'? They hold the file handles, so use 'ref'?  Or
+possibly change them to something clearer, like $jhr_ref
+
+Why use (just) the error number for an IO Error when there is the error
+number for 'Base Exists'? (Used by CreateMB in same situation.)
+
+Returns a reference to a hash containing the pointers to the four JAM files,
+not a "handle", per se. Change at least the example varible names for that.
+(Already using "filehash" in function.)
+
+Add a description of the function, including of the parameter it expects
+and what it returns, and that it sets $Errnum if it comes up with an error.
+
+
+=head3 FTN::JAM::CreateMB Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameters assignment to fail if the parameters
+are not passed properly to the function.
+
+The BASE_EXISTS return is using the 'return;' style, which is actually
+returning the results of setting $Errnum which is a boolean true. Explicitly
+use 'return 0;' to return a boolean false so that the calling program knows
+to check the $Errnum variable for why it failed.
+
+The IO_ERROR return is using the 'return;' style, which is actually
+returning the results of setting $Errnum which is a boolean true.  Explicitly
+use 'return 0;' to return a boolean false so that the calling program knows
+to check the $Errnum variable for why it failed.
+
+Capture the reason why (using the 'open FH or' style) the JAM file could not
+be opened, binmoded, selected, etc instead of doing the check after the
+operations (or at all)?
+
+Would the $*res variables in the file open lines be better named as $*ref?
+Or something 'pointer'? They hold the file handles, so use 'ref'?
+
+Add a description of the function, including of the parameter(s) it expects
+and what it returns.
+
+
+=head3 FTN::JAM::CloseMB Function
+
+Do not need to use parentheses around the argument to close?
+
+Add a description of the function, including the parameters it expects and what
+it returns:  it's being passed a reference to a hash that contains four keys,
+those being the pointers to the files being closed.  The keys are: jdx, jhr,
+hdt, & jlr.
+
+
+=head3 FTN::JAM::RemoveMB Function
+
+Add a description of the function, including of the parameter it expects
+and what it returns.
+
+Why using double quotes for the extension strings instead of single quotes?
+
+The four code blocks that attempt to do the unlink are explicitly setting 
+an error condition (boolean false) for the return; they do set $Errnum to
+indicate an IO Error but the 'return;' is the next line and since that
+setting of $Errnum is the last thing done before the exit that also is
+what that return sends back, which makes it a boolean true instead of
+the false it should be indicating.  Change that 'return;' to be an
+'return 0;' to explicitly set that condition. Then change the testing
+code as neccessary to make use of that.
+
+RemoveMB test is failing an Win32, reported by CPAN Testers. It's passing
+on linux systems, but when run on a windows system the test was returning
+undef (boolean false). (#79583 at rt.cpan.org) (See also Testing section.)
+Possible issue with the 'current working directory' on Win32, so it may
+be an issue with the test script code?
+
+=head3 FTN::JAM::LockMB Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignments to fail if the parameters
+are not passed properly to the function.
+
+The BASE_NOT_LOCKED return is using the 'return;' style, which is actually
+returning the results of setting $Errnum which is a boolean true.  Explicitly
+use 'return 0;' to return a boolean false so that the calling program knows
+to check the $Errnum variable for why it failed.
+
+Add a description of the function, including the parameters it expects
+and what it returns.  Change '$handle' in the syntax to '$handleref'.
+
+
+=head3 FTN::JAM::UnlockMB Function
+
+Use 'flock FH or' style flock line, to check if it actually succeeds?
+
+Add a description of the function, including of the parameter it expects
+and what it returns.
+
+Rewrite the parameter failure message to better describe the error?
+
+
+=head3 FTN::JAM::ReadMBHeader Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignments to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including of the parameters it expects
+and what it returns.
+
+
+=head3 FTN::JAM::WriteMBHeader Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignments to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including the parameters it expects
+and what it returns.
+
+
+=head3 FTN::JAM::GetMBSize Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignments to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including the parameters it expects
+and what it returns.
+
+
+=head3 FTN::JAM::ReadMessage Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignments to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including of the parameters it expects
+and what it returns.
+
+Change to using a hash reference to pass the parameters to the function?
+
+
+=head3 FTN::JAM::ChangeMessage Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignment to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including of the parameters it expects
+and what it returns.
+
+Change to using a hash reference to pass the parameters to the function?
+
+
+=head3 FTN::JAM::AddMessage Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignment to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including the parameters it expects
+and what it returns.
+
+Change to using a hash reference to pass the parameters to the function?
+
+
+=head3 FTN::JAM::Crc32 Function
+
+Add a description of the function, including of the parameter it expects
+and what it returns.
+
+
+=head3 FTN::JAM::FindUser Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignments to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including of the parameters it expects
+and what it returns.
+
+Change to using a hash reference to pass the parameters to the function?
+
+
+=head3 FTN::JAM::GetLastRead Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignment to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including the parameters it expects
+and what it returns.
+
+Change to using a hash reference to pass the parameters to the function?
+
+
+=head3 FTN::JAM::SetLastRead Function
+
+Remove the code that checks for the number of arguments.
+
+Change the initial local parameter assignment to fail if the parameters
+are not passed properly to the function.
+
+Add a description of the function, including the parameters it expects
+and what it returns.
+
+Change to using a hash reference to pass the parameters to the function?
+
+
+=head3 FTN::JAM::TimeToLocal Function
+
+Remove the old code that checks for the number of arguments,
+
+Explicitly set a local variable for parameter that should be passed to the 
+function and have it fail if the parameter is not present.
+
+Change the return line doing the function to use the new variable.
+
+
+=head3 FTN::JAM::LocalToTime Function
+
+Rewrite to remove the old code that checks for the number of arguments,
+
+Explicitly set a local variable for parameter that should be passed to the 
+function and have it fail if the parameter is not present.
+
+Change the return line doing the function to use the new variable.
+
+
+=head2 FTN::JAM::Subfields Module
+
+Expand and update the POD documentation for the read only constants in the file.
+
+
+=head2 FTN::JAM::Attr Module
+
+Expand and update the POD documentation for the read only constants in the file.
+
+
+=head2 FTN::JAM::Errnum Module
+
+Expand and update the POD documentation for the read only constants in the file.
+
+Add a mapping from the error numbers to an error message string?
+
+Rename package from "Errnum" to something like "ErrorNumbers"? (Would also need
+to change in the test script and documentation.)
+
+Create a file containing examples of using FTN::JAM, possibly using something
+from the demo scripts as a basis. Do this instead of simply cleaning up the
+old demo scripts and including them in the distribution? Or do some or all
+of both? I.E.; add an EXAMPLES section in FTN::JAM and/or a separate file
+such as FTN::JAM::Examples, and have example scripts based on cleaned up demo
+scripts?  Or create possibly separate ftnjam distribution that provides a
+script that both does some basic operations on JAM message bases as well
+as serving as an example of how to use FTN::JAM.
+
+
+=head2 Testing
+
+Separate out the testing sections in the 01-basic.t script using BEGIN blocks,
+so that it's easier to see where problems are happening?
+
+Add message specific testing; adding a message, retrieving a message, etc.
+
+Add a note{} to the new test script instead of the comment regarding basic
+operations.
+
+In the RemoveMB test in 01-basic.t; use the already existing $mb containing
+the path and name for the test message base?
+
+RemoveMB test is failing an Win32, reported by CPAN Testers. It returns a '1'
+(Boolean true in Perl) upon success. That's happening on linux systems, but
+when run on an MS Windows system it was returning undef (Boolean false).
+(#79583 at rt.cpan.org)
+
+
+=head1 SEE ALSO
+
+ L<FTN::JAM>, L<FTN::JAM::Subfields>, L<FTN::JAM::Attr>, L<FTN::JAM::Errnum>,
+ L<FTN::JAM::Examples>, and L<FTN::JAM::ToDo>
+
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+

@@ -1,0 +1,111 @@
+#!/usr/bin/perl -w
+
+package main;
+
+use warnings;
+use strict;
+use 5.008;
+use Getopt::Long;
+use Pod::Usage;
+use English qw(-no_match_vars);
+use FLV::ToSWF;
+
+our $VERSION = '0.24';
+
+my %opts = (
+   background => '000000',
+   verbose    => 0,
+   help       => 0,
+   version    => 0,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+   'b|background=s' => \$opts{background},
+   'v|verbose'      => \$opts{verbose},
+   'h|help'         => \$opts{help},
+   'V|version'      => \$opts{version},
+) or pod2usage(1);
+if ($opts{help})
+{
+   pod2usage(-exitstatus => 0, -verbose => 2);
+}
+if ($opts{version})
+{
+   print "v$VERSION\n";
+   exit 0;
+}
+
+if (@ARGV < 2)
+{
+   pod2usage(1);
+}
+
+my $infile  = shift;
+my $outfile = shift;
+
+my $converter = FLV::ToSWF->new();
+my @bg = map { hex } $opts{background} =~ m/([\da-fA-F]{2})/gxms;
+$converter->{background_color} = \@bg;
+$converter->parse_flv($infile);
+$converter->save($outfile);
+
+__END__
+
+=for stopwords SWF FLV MX flv2swf swf2flv flv2mp3 file.swf file.flv transcode Sorenson
+
+=head1 NAME
+
+flv2swf - Transform an FLV file into a SWF file
+
+=head1 SYNOPSIS
+
+flv2swf [options] file.flv file.swf
+
+ Options:
+   -b --background=s   Specify an RRGGBB color for the background
+                       Defaults to 000000, which is black
+   -v --verbose        Print diagnostic messages
+   -h --help           Verbose help message
+   -V --version        Print version
+
+=head1 DESCRIPTION
+
+With respect to video and audio content, FLV and SWF files have very
+similar data inside, and differ primarily in metadata.  Very roughly,
+one can think of an FLV file as a subset of a SWF file.
+
+Therefore, one can easily transcode from SWF to FLV and back without
+much work apart from fiddling with headers and the like.
+
+=head1 CAVEATS AND LIMITATIONS
+
+Supports Flash MX and Flash 8 video (that is, Sorenson H.263 and On2
+VP6.2 respectively).  Flash screen video and VP6 with alpha are both
+untested but might work.
+
+Supports MP3 audio.  Other audio formats are untested but might work.
+
+Does not support multiple video or audio streams in the same file.
+
+Emits Greenwich time in the C<creationdate> meta tag, not local time.
+
+=head1 SEE ALSO
+
+FLV::FromSWF
+
+FLV::ToSWF
+
+FLV::ToMP3
+
+swf2flv
+
+flv2mp3
+
+=head1 AUTHOR
+
+Clotho Advanced Media Inc., I<cpan@clotho.com>
+
+Primary Developer: Chris Dolan
+
+=cut

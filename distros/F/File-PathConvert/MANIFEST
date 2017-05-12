@@ -1,0 +1,14 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+PathConvert.html
+PathConvert.pm
+README
+mkshadow
+t/abs2rel.t
+t/joinpath.t
+t/realpath.t
+t/rel2abs.t
+t/splitjoindirs.t
+t/splitjoinpath.t
+test/t1/t4/t5/file

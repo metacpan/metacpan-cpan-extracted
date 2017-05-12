@@ -1,0 +1,33 @@
+---
+abstract: 'Extract symbol names from a shared object or DLL'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  FFI::CheckLib: '0'
+  Module::Build: '0.28'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  FFI::CheckLib: '0'
+  File::Which: '0'
+  Module::Build: '0.28'
+  Module::Build::FFI: '0.18'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI-ExtractSymbols
+requires:
+  Exporter: '0'
+  FFI::Platypus: '0.18'
+  File::Which: '0'
+  base: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/FFI-ExtractSymbols/issues
+  homepage: http://perl.wdlabs.com/FFI-ExtractSymbols
+  repository: git://github.com/plicease/FFI-ExtractSymbols.git
+version: '0.03'

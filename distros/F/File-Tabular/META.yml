@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                File-Tabular
+version:             0.72
+abstract:            searching and editing flat tabular files
+license:             ~
+author:              
+    - Laurent Dami <laurent.dami AT etat ge ch>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Hash::Type:                    1.0
+    Search::QueryParser:           0.92
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,102 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:identifier           "$Id: Changes,v 1.9 2008/03/13 16:35:15 asc Exp $" ;
+        dc:description          "Changes for Flickr::Upload::Dopplr.pm" ;
+        dcterms:references      <http://aaronland.info/perl/flickr/upload/dopplr/> .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.3.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/upload/dopplr/> ;
+        dcterms:replaces    <http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.21.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "0.3" ;
+                        doap:created      "2008-03-13" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Do not call photos.geo.setLocation if the photo itself has GPS/EXIF" ;
+                        ] .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.21.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/upload/dopplr/> ;
+        dcterms:replaces    <http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.2.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "0.21" ;
+                        doap:created      "2008-01-21" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Add Error.pm to the Build.PL list" ;
+                        ] .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.2.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/upload/dopplr/> ;
+        dcterms:replaces    <http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.1.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "0.2" ;
+                        doap:created      "2008-01-21" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Fetch Flickr Places ID for Geonames city ID and add as machine tag" ;
+                        ] .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/upload/dopplr/> ;
+        dcterms:replaces    <http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0..tar.gz>
+
+        doap:Version    [
+                        doap:revision     "0.1" ;
+                        doap:created      "2005-09-13" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Use Error.pm derived classes for exceptions" ;
+                        asc:update        "Allow users to set geo perms post upload" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.03.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/upload/dopplr/> ;
+        dcterms:replaces    <http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.02.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "0.03" ;
+                        doap:created      "2005-09-10" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Use Dopplr 'location_on_date' method in conjunction with EXIF DateTime-Original header" ;
+                        asc:update        "Require Net::Dopplr 0.2" ;
+                        ] .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.02.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/upload/dopplr/> ;
+        dcterms:replaces    <http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.01.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "0.02" ;
+                        doap:created      "2005-09-09" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Assign dopplr:trip= machinetag if it is a travel day." ;
+                        ] .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/Flickr/Upload/Dopplr-0.01.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/upload/dopplr/> ;
+
+        doap:Version    [
+                        doap:revision     "0.01" ;
+                        doap:created      "2005-09-09" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/flickr/upload/dopplr/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Flickr-Simile/" ;
+        doap:download-mirror    "http://aaronland.info/perl/flickr/upload/dopplr/" .

@@ -1,0 +1,27 @@
+Future enhancements to Fwctl
+----------------------------
+
+- Add possibility to log only connection initialization packet.
+
+- Add support for transparent proxy.
+
+- Add a bidirectional option ?
+
+- Redesign using a an abstract representation of rules and
+  allow driver to generate rules for different packet filters
+  (ipfwadm, ipchains, iptable, Cisco, etc.)
+
+- Find a way to customize the install 
+  to handle the sbin et config file installation.
+
+- Automatic way to test the firewall. 
+
+- User space daemon to do IDS and stateful filtering
+  using the fwmonitor device.
+
+  (This will probably wait for new netfilters module)
+
+- Have a way to generate all the rules without setting them,
+  to retrieve the current settings and determine what need
+  to be changed rather, than the actual tear down, rebuild.
+

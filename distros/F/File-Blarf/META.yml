@@ -1,0 +1,25 @@
+---
+abstract: 'Simple reading and writing of files'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Blarf
+requires:
+  Fcntl: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/gittex/File-Blarf/issues
+  repository: git://github.com/gittex/File-Blarf.git
+version: 0.12

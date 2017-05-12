@@ -1,0 +1,24 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+Build.PL
+README
+lib/File/Ignore.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+t/01-File-Ignore.t
+

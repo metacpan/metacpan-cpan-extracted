@@ -1,0 +1,31 @@
+{
+   "abstract" : "TTF font support for Perl",
+   "author" : [
+      "martin_hosken@sil.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Font-TTF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/silnrsi/font-ttf.git",
+         "web" : "https://github.com/silnrsi/font-ttf"
+      }
+   },
+   "version" : "1.06"
+}

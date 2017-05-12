@@ -1,0 +1,22 @@
+# Testing File::RandomLine  
+
+use Test::More;
+use Test::MockRandom 'File::RandomLine';
+use File::RandomLine;
+
+my %cases;
+$cases{"$_/40"} = "line two"   for ( 0 ..  8);
+$cases{"$_/40"} = "line three" for ( 9 .. 17);
+$cases{"$_/40"} = "line four!" for (18 .. 28);
+$cases{"$_/40"} = "line one"   for (29 .. 39);
+$cases{"oneish()"} = "line one";
+
+plan tests => (1 + keys %cases);
+
+my $rl = File::RandomLine->new("t/testdata.txt");
+isa_ok( $rl, "File::RandomLine" );
+
+for (sort { eval $a <=> eval $b } keys %cases) {
+    srand( eval "$_" );
+    is( $rl->next, $cases{$_}, "Testing with srand( $_ )" );
+}

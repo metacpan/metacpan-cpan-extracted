@@ -1,0 +1,44 @@
+[% IF simple_wrapper %]
+
+[% content %]
+
+[% ELSE %]
+
+[% c.load_once("jquery.ui.css") %]
+
+<div id='ftabs'>
+    <ul>
+        <li><a href='/'><span>Homepage</span></a></li>
+        <li[% UNLESS content %] selected="selected"[% END %]><a href='/help'><span>Help Center</span></a></li>
+        [% IF title %]<li selected="selected"><a href='javascript:void(0);'><span>[% title %]</span></a></li>[% END %]
+    </ul>
+    <div style='padding-left: 8em;padding-right:8em;'>
+
+    [% IF content %]
+    [% IF title %]<h2>[% title %]</h2>[% END %]
+    [% content %]
+    [% ELSE %]
+    <h2>Welcome to the help Center.</h2>
+    <ul>
+        <li><a href='/help/WhatsNew'>What's New</a></li>
+        <li><a href='/help/email'>Email Obfuscate</a></li>
+    </ul>
+    
+    <h3>User Related</h3>
+    <ul>
+        <li><a href='/help/user_status'>User Status</a></li>
+        <li><a href='/help/user_point'>User Point</a></li>
+    </ul>
+    
+    [% END %]
+
+    </div>
+</div>
+
+[% END %]
+
+<script type="text/javascript">
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>

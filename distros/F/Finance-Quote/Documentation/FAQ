@@ -1,0 +1,68 @@
+Finance::Quote FAQ
+Paul Fenwick (pjf at cpan.org)
+
+0. TABLE OF CONTENTS
+====================
+	0. Table of Contents.
+	1. Where's the Finance::Quote webpage?
+	2. Where can I get a beginner's introduction to F::Q?
+	3. How can I use proxyauth (experimental)?
+	4. Is there anything similar to F::Q in other programming languages?
+	5. Where can I get more help?
+	6. Is there commercial support for F::Q available?
+
+1. Where is the Finance::Quote webpage?
+=======================================
+	http://finance-quote.sourceforge.net/
+
+2. Where can I get a beginner's introduction to F::Q?
+=====================================================
+	A good beginner's guide is the Finance::Quote article in
+	The Perl Journal (http://www.tpj.com/) edition #19.  If you
+	don't have a subscription to TPJ, you can also read the
+	final draft of this essay at
+	<http://finance-quote.sourceforge.net/documentation.html>.
+
+3. How can I use proxyauth (experimental)?
+==========================================
+	WARNING: THIS SUPPORT IS EXPERIMENTAL AND SYNTAX _WILL_ CHANGE IN
+	         THE FUTURE.  If it breaks, you get to keep both pieces.
+
+	Finance::Quote provides experimental support for authenticated
+	proxies.  If you wish to try this, then put the following at the
+	top of your script.
+
+		use Finance::Quote;
+		$Finance::Quote::USE_EXPERIMENTAL_UA = 1;
+
+	This adds extra features on top of the regular LWP::UserAgent
+	class.  In particular, you can now do things like this:
+
+	my $q = Finance::Quote->new();
+	$q->user_agent->default_headers->proxy_authorization_basic($user,$pass);
+
+	The result of $q->user_agent->default_headers is a HTTP::Headers
+	object, and can use all the regular HTTP::Headers methods.
+	This object is used as a template for any new HTTP requests made by
+	Finance::Quote.
+
+4. Is there anything similar to F::Q in other programming languages?
+====================================================================
+	Vidyut Luther has written a stock-lookup library in PHP.  It's
+	available at <http://www.gotslack.com/stocks/>
+
+	Bill Bell has written a stock-lookup library in Java.  It's
+	available at <http://www.aboutbillbell.com/>.  Follow the
+	"Code Downloads" link in the left sidebar.
+
+5. Where can I get more help?
+=============================
+	If you haven't already done so, try the Finance::Quote webpage
+	at <http://finance-quote.sourceforge.net/>.  There are also lots
+	of fun things like bug-tracking systems, support requests, forums,
+	and other goodies at <https://sourceforge.net/projects/finance-quote/>.
+
+	Finally, you can always try sending mail to the Finance::Quote
+	developer's list, at <finance-quote-devel@lists.sourceforge.net>.
+	The archives of this list are available on-line at
+	<http://sourceforge.net/mail/?group_id=4232>.

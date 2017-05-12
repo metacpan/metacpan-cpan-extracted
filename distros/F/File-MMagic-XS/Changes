@@ -1,0 +1,102 @@
+Changes
+=======
+
+All changes by Daisuke Maki, unless otherwise noted.
+
+0.09008 - 10 Apr 2014
+    - This is a "I'm a douche for not properly testing code before merging"
+      https://rt.cpan.org/Ticket/Display.html?id=94570
+      Patch from the above RT was applied
+
+0.09007 - 09 Dec 2013
+    - Update inc/ . Fixes rt #63048
+
+0.09006 - 19 May 2010
+   - Should fix errors in t/003_error.t
+     http://cpantesters.org/cpan/report/07280906-b19f-3f77-b713-d32bba55d77f
+
+0.09005 - 17 May 2010
+   - Should fixe problems with t/005_clone.t
+   - Minor XS tweaks
+
+0.09004 - 11 May 2010
+   - Disable MSWin32 (patches welcome)
+
+0.09003_03 - 10 May 2010
+   - Explicitly test add_file_ext
+   - Add thread safety test
+
+0.09003_02 - 26 Apr 2010
+   - Ah, typemaps! I guess I didn't know about it when I first wrote this
+   - Add many tests
+   - Fix a memory leak under clone()
+   - Fix a memory leak under fhmagic()
+   - Update function declarations to a more modern style
+     * move all functions out of XS section, and make use of
+       automatic linkage by xsubpp
+   - Add a memory leak test
+     * only runnable when running under author mode
+     * set TEST_MEMLEAK=1 
+     * ignore any leaks that does not directly show a Perl_*
+       namespace.
+
+0.09003_01 - 07 Apr 2010
+   - Fix memory corruption (Martin Blapp)
+   - Fix rt #28072. Changing $/ doesn't change the return value (Martin Blapp)
+   - Fix how SV returned by error() is handled.
+   - Add a clone() method.
+
+0.09003 - 05 Nov 2007
+   - Fix BBC breakage in anticipation for 5.10 (Thanks a bunch to Jan Dubois
+     and Andres Koenig). This was caused by a erronous Safefree() call where
+     it should have been a simple free().
+
+0.09002 - 09 Jul 2007
+   - Allow bufmagic() to accept a ref to a scalar for performance (rt #28040)
+   - Don't close file handle for fhmagic
+
+0.09001 - 06 Jun 2007
+   - Fix typo (rt #27454)
+
+0.09 - 09 May 2007
+   - Kwalitee updates: doc fixes, POD tests, license.
+   - Fallback to DynaLoader for older perls
+   - Remove compat.pm
+
+0.08 - 27 Oct 2005
+   - Implement add_file_ext(), which acts as a fallback to guessing MIME
+     types based on the file extension, when all else fails
+   - Fix fmm_ascmagic so that when it fallsback to text/plain, it correctly
+     reports that it guessed, not a real match.
+
+0.07 - 01 Aug 2005
+   - Yikes, Perl-C mixup: forgot to call "return".
+     Reported by Tatsuhiko Miyagawa.
+   - Verify return value from softmagic()
+   - Add tests for fhmagic.
+
+0.06 - 26 July 2005
+   - Remove debug lines.
+
+0.05 - 25 July 2005
+   - Cleanup XS. Now File::MMagic::XS instance is not a hashref,
+     but a blessed scalar
+   - Use PerlIO* instead of FILE *, fread(), fopen(), et al.
+   - Fallback to text/plain, as File::MMagic does.
+   - Add compatibility to File::MMagic
+
+0.04 - 07 July 2005
+   - One more missing aTHX_ 
+
+0.03 - 23 June 2005
+   - Switch malloc/free calls with Newz/Safefree.
+   - Use more perl's macros is*()
+   - Use aTHX_ properly
+
+0.02 - 22 June 2005
+   - Add missing Changes file
+   - Fix return value from fmm_ascmagic.
+   - Add error()
+
+0.01 - 19 June 2005
+   - Initial CPAN release

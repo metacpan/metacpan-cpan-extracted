@@ -1,0 +1,35 @@
+Revision history for Perl module FedoraCommons::APIM
+
+0.5 Wed Feb 24 13:07:55 EST 2010
+      - added methods for storing policy information in APIM object.
+        When policy information is set the createObject() method will
+	automatically add a policy datastream to each new object it creates.
+        - set_policy_url/get_policy_url
+        - set_policy_path/get_policy_path
+        - set_policy_label/get_policy_label
+      - uploadNewDatastream method now supports filename or dsLocation which
+        allows file uploading (as before) along with supporting references 
+	for files that have already been uploaded OR external references.
+      - updated documentation
+
+0.4 Tue Feb 23 07:49:58 EST 2010
+      - fixed problem with repetitive addRelationship calls generating
+	concatenation errors when the relationship exists.
+
+0.3 Mon Dec 21 12:06:33 EST 2009
+      - addRelationship method bug fix.
+      - eliminated some extraneous debugging messages.
+
+0.2.1 Fri Nov 13 11:24:33 EST 2009
+      - set tests to succeed (skip all) if the Fedora server environment
+	variables are not set. Preferred to failing CPAN install.
+      - removed minor debugging statement holdover
+
+0.2  Fri Nov  6 14:47:38 EST 2009
+      - minor documentation changes
+      - added additional tests
+
+0.1  Fri Oct 23 13:02:51 2009
+      - original version; created by ExtUtils::ModuleMaker 0.51
+
+

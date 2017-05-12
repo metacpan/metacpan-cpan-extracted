@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:Description xmlns:ns1="http://datafairport.org/schemas/FAIR-schema.owl#" xmlns:ns2="http://purl.org/dc/terms/" xmlns:ns3="http://www.w3.org/2000/01/rdf-schema#" rdf:about="http://biordf.org/DataFairPort/ProfileSchemas/Allele_Profile_EDAM.rdf">
+	<ns1:hasProperty rdf:resource="http://datafairport.org/sampledata/profileschemaproperty/4fbb6c39-1bbe-49bf-af36-c966c3e233a1"/>
+	<ns1:onClassType rdf:resource="http://purl.obolibrary.org/obo/SO_0001023"/>
+	<ns2:provenance rdf:resource="http://biordf.org/DataFairPort/ProfileSchemas/Allele_Profile_EDAM.rdf#Profile"/>
+	<rdf:type rdf:resource="http://datafairport.org/schemas/FAIR-schema.owl#FAIRClass"/>
+	<ns3:label>FAIR Class of Allele</ns3:label>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://datafairport.org/schemas/FAIR-schema.owl#" xmlns:ns2="http://purl.org/dc/terms/" xmlns:ns3="http://www.w3.org/2000/01/rdf-schema#" rdf:about="http://biordf.org/DataFairPort/ProfileSchemas/Allele_Profile_EDAM.rdf#Profile">
+	<ns1:hasClass rdf:resource="http://biordf.org/DataFairPort/ProfileSchemas/Allele_Profile_EDAM.rdf"/>
+	<ns1:schemardfs_URL rdf:resource="http://datafairport.org/schemas/FAIR-schema.owl#"/>
+	<ns2:description>FAIR Profile the Image portion of an Allele record using EDAM:Image classification</ns2:description>
+	<ns2:identifier>doi:Mark.Dragon.P3</ns2:identifier>
+	<ns2:license>Anyone may use this freely</ns2:license>
+	<ns2:organization>wilkinsonlab.info</ns2:organization>
+	<ns2:title>FAIR Profile the Image portion of an Allele record</ns2:title>
+	<rdf:type rdf:resource="http://datafairport.org/schemas/FAIR-schema.owl#FAIRProfile"/>
+	<rdf:type rdf:resource="http://purl.org/dc/terms/ProvenanceStatement"/>
+	<ns3:label>FAIR Profile Allele Images (EDAM)</ns3:label>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://datafairport.org/schemas/FAIR-schema.owl#" xmlns:ns2="http://www.w3.org/2000/01/rdf-schema#" rdf:about="http://datafairport.org/sampledata/profileschemaproperty/4fbb6c39-1bbe-49bf-af36-c966c3e233a1">
+	<ns1:allowedValues rdf:resource="http://biordf.org/DataFairPort/ConceptSchemes/EDAMOntologyImage2968"/>
+	<ns1:onPropertyType rdf:resource="http://semanticscience.org/ontology/SIO_000205"/>
+	<rdf:type rdf:resource="http://datafairport.org/schemas/FAIR-schema.owl#FAIRProperty"/>
+	<ns2:label>is represented by</ns2:label>
+</rdf:Description>
+</rdf:RDF>

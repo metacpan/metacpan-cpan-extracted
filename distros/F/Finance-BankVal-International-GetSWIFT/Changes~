@@ -1,0 +1,9 @@
+Revision history for Perl extension Finance::BankVal::International::GetSWIFT.
+
+0.01  Fri Jul  9 09:27:03 2010
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.8.0 Finance::BankVal::International::GetSWIFT
+0.02  Mon Aug  2 10:16:00 2010
+	- updated makefile to include dependency on Crypt::SSLeay
+0.04  Sun Aug 8 20:03:00 2010
+	- Altered permissions

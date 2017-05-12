@@ -1,0 +1,7 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+README
+lib/Finance/Bank/INGDirect.pm
+t/00basic.t
+META.yml                                Module meta-data (added by MakeMaker)

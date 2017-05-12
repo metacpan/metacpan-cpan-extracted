@@ -1,0 +1,82 @@
+NAME
+    FTN::Address - Process FTN addresses
+
+SYNOPSIS
+     my $addr = new FTN::Address('2:464/4077');
+
+     my $address4D = $addr->get();     # 2:464/4077.0
+
+     my $address5D = $addr->getfull(); # 2:464/4077.0@fidonet
+
+     my $fqdn = $addr->fqdn();         # f4077.n464.z2.fidonet.net
+
+     my $addr = empty FTN::Address();
+
+     $addr->assign('2:464/4077');
+
+     my $address4D = $addr->get();     # 2:464/4077.0
+
+DESCRIPTION
+    FTN::Address
+
+METHODS
+  new
+    This method creates FTN::Address object. Takes FTN address as argument.
+    Address can be feed in three addressing variants:
+
+    3D, ex.: new FTN::Address '2:464/0' 4D, ex.: new FTN::Address
+    '2:464/4077.1' 5D, ex.: new FTN::Address '2:464/357.0@fidonet'
+
+    Default domain for 3D and 4D address is 'fidonet'
+
+  empty
+    This method creates empty FTN::Address object. You cannot use it before
+    assigning a new value.
+
+    Takes no parameters.
+
+  assign( $address )
+    This method assign new address to FTN::Address object.
+
+    Takes FTN address as argument (like 'new' method).
+
+  get()
+    This method returns qualified 4D address.
+
+    Takes no parameters.
+
+  getfull()
+    This method returns qualified 5D address.
+
+    Takes no parameters.
+
+  fqdn( [ $root_domain [, $level ] ] );
+    This method returns fully qualified domain name, as described in
+    FSP-1026 Fidonet Technical Standards Comittee document. See this
+    document for details.
+
+    Valid values for level are "0, 1, 2, 3, 4, DOM, DO1, DO2, DO3, DO4"
+    Parameters can be omitted, default values will be used. Default root
+    domain is 'net', default level is '0'.
+
+    Examples:
+
+     my $addr = new FTN::Address('2:464/4077');
+ 
+     print $addr->fqdn();                    # f4077.n464.z2.fidonet.net
+ 
+     print $addr->fqdn('org');               # f4077.n464.z2.fidonet.org
+ 
+     print $addr->fqdn('railways.dp.ua', 2); # f4077.n464.railways.dp.ua
+
+AUTHORS
+    Serguei Trouchelle <stro@railways.dp.ua>
+    Robert James Clay <jame@rocasa.us>
+
+COPYRIGHT
+    Copyright (c) 2005-2006 Serguei Trouchelle. All rights reserved.
+    Copyright (c) 2013 Robert James Clay. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

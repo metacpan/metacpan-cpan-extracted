@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Finance-YahooJPN-QuoteDetail
+version:      0.01
+version_from: lib/Finance/YahooJPN/QuoteDetail.pm
+installdirs:  site
+requires:
+    HTML::TableExtract:            1.08
+    LWP::UserAgent:                2.024
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

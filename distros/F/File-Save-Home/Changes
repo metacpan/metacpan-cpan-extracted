@@ -1,0 +1,83 @@
+Changes for Perl extension File::Save::Home
+
+0.10 Fri Feb 10 21:25:41 EST 2017
+
+Move into git for version control.  Establish github.com repository.
+In restore_subhome_directory_status(), die rather than simply warning
+when a directory or file can not be found for removal.  More use of
+catdir and catfile to compose paths.
+
+0.09 Fri Dec 14 19:34:00 EXT 2012
+
+Two spelling corrections reported by Xavier Guimard.
+
+0.08 Wed Feb 22 22:14:24 EST 2006
+
+Modified get_subhome_directory_status() and make_subhome_temp_directory() so
+that each takes an optional additional argument which is name of a valid
+directory which user wishes to use as a ''pseudo-home-directory'' in place of
+the output of get_home_directory().  Wrote t/05_pseudohome.t to test this
+revised functionality.  Wrote t/06_Win32.t to make sure that this
+functionality works with File::HomeDir::my_home() on Windows.
+
+0.07 Fri Feb 17 19:42:05 EST 2006
+
+No change in functionality.  At suggestion of Rob Rothenberg, expanded
+documentation, particularly in ''SEE ALSO'' section, to reference other CPAN
+distributions which try to locate a user's home directory.
+
+0.06 Fri Nov 25 10:35:00 EST 2005
+
+No change in functionality.  New version prepared solely to accommodate change
+in name of String::MkVarName to String::PerlIdentifier.
+
+0.05 Sat Nov 19 12:42:46 EST 2005
+
+File::Save::Home's test suite now uses String::MkVarName v0.03 or later from
+CPAN, rather than a copy of that module stored under the t/ directory.
+Appropriate changes to Makefile.PL and t/*.t files made.
+
+0.04 Sun Nov 13 08:46:00 EST 2005
+
+Reworked restore_subhome_directory_status to use code from Perl Cookbook
+recipe 9.8, rmtree1, to remove directory and its contents.  In test files,
+either eliminated chdir-ing to home directory entirely, or limited its scope
+to minimum necessary.
+
+0.03 Sat Nov 12 21:38:00 2005
+
+Forgot to include File::Temp under PREREQ_PM in Makefile.PL.
+
+
+0.02 Sat Nov 12 21:15:00 2005
+
+Reformulated in response to feedback on 0.01 from Michael Graham.  First
+general release version.  lib/File/Save/Home.pm exports seven functions on
+request:
+
+    get_home_directory
+    get_subhome_directory_status
+    make_subhome_directory
+    restore_subhome_directory_status 
+    conceal_target_file 
+    reveal_target_file 
+    make_subhome_temp_directory 
+
+There are 4 files in the test suite:
+
+    01_test.t
+    02_multilevel.t
+    03_placefile.t
+    04_tempdir.t
+
+Underneath the t/ directory there is found package String::MkVarName, which
+exports one function:
+
+    make_varname
+
+CPAN upload.
+
+
+0.01 Mon Oct 31 09:55:38 2005
+
+Original version; created by ExtUtils::ModuleMaker 0.43.

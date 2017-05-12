@@ -1,0 +1,21 @@
+Revision history for File-Which-Patch-Hide
+
+0.003   2016-07-01 (PERLANCAR)
+
+	- Allow hiding full path, e.g. /usr/bin/foo.
+
+	- [dist] Use DZP:PatchModule.
+
+
+0.002   2016-05-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Use Pod::Weaver::Plugin::PatchModule.
+
+	- Mention lib::filter, lib::disallow.
+
+
+0.001   2016-05-21 (PERLANCAR)
+
+        - First release.

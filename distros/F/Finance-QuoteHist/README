@@ -1,0 +1,88 @@
+Finance-QuoteHist 
+-----------------
+
+The Finance-QuoteHist bundle is several modules designed to fetch
+historical stock quotes from the web: 
+  
+Finance::QuoteHist
+------------------
+Top level aggregator that will select a default lineup of
+site instances from which to retrieve quotes. Other
+than the default lineup, this module behaves identically
+to whichever site-specific module is first in the lineup.
+See below for site-specific modules. 
+
+Finance::QuoteHist::Generic
+---------------------------
+The real workhorse of the bundle, a sub class of
+LWP::UserAgent. Site-specific modules are sub classes
+of this module.
+
+
+INSTALLATION
+
+You install HTML-Element-Extended, as you would install any
+perl library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DOCUMENTATION
+
+POD style documentation is included with each module. This is normally
+converted to a manual page and installed as part of the "make install"
+process. You should also be able to use the 'perldoc' utility to
+extract and read documentation from the module file directly.  See
+Changes for recent changes.
+
+
+SUPPORT
+
+The source code is tracked on GitHub:
+
+https://github.com/mojotoad/Finance-QuoteHist
+
+Problems can be reported there. Questions and comments can also be
+directed to Matt Sisk <sisk@mojotoad.com>
+
+AVAILABILITY
+
+In addition to GitHub, the library is available from CPAN:
+
+   http://www.cpan.org/authors/id/M/MS/MSISK/
+
+
+DISCLAIMER 
+
+The data returned from these modules is in no way guaranteed, nor
+are the developers responsible in any way for how this data (or lack
+thereof) is used. The interface is based on URLs and page layouts
+that might change at any time. Even though these modules are designed
+to be adaptive under these circumstances, they will at some point
+probably be unable to retrieve data unless fixed or provided with new
+parameters. Furthermore, the data from these web sites is usually not
+even guaranteed by the web sites themselves, and oftentimes is
+acquired elsewhere. See the documentation for each site-specific
+module for more information regarding the disclaimer for that site. 
+
+
+ACKNOWLEDGEMENTS
+
+Thanks to Jim Miner for his generous efforts testing this module. Thanks
+to Josh Woodward for some pointers on the Yahoo! interface. Thanks to
+Jacob Anawalt for pointers on the Yahoo! interface and suggestions on
+open-ended date queries. Thanks to Paul McDermott and Jay Strauss for
+patches. Thanks to Manoj Bhatti, Bernd Hacker, Christian von
+Engelbrechten, Gary Nielson, Mike Brown, Bill Stephenson, and Robert S.
+Weigel for their bug-spotting.
+
+
+COPYRIGHT
+
+Copyright (c) 1999-2013 Matthew P. Sisk.  All rights reserved.
+All wrongs revenged. This program is free software; you can
+redistribute it and/or modify it under the same terms as
+Perl itself.

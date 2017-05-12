@@ -1,0 +1,38 @@
+Revision history for Fedora-App-MaintainerTools
+
+0.006 Wed Mar 10 2010
+- we can now build new specs/srpms recursively!  (And display them as a dep
+  tree.)
+- Initial changes required to enable fully-managed spec mode have been
+  committed, along with a "helper" command to make breaking out the custom
+  sections (to auto.ini) easier.
+
+0.005 Mon Mar  8 2010
+- Use '%{summary}.' as the default description
+- "Suspect requires" are now filtered from the requires stream, and included
+  as BR's if not already present.  (e.g. Test::More and the like).
+- properly increment release when we're a revision
+- We now have bits to invoke the RPM metadata filtering system.  This can be
+  done on an override basis (e.g. in auto.ini) as well as by examining the
+  "no_index" parts in META.yml.
+- We now log actual version++'s in the %changelog when updating to a new GA.
+- We now try to get %docfile right.
+- We always check to ensure EU::MM is BR'ed.
+
+0.004 Tue Feb 23 2010
+- various cleanups related to excising the last of the old "plugins" system
+- better rpm/srpm building
+- write specs to files, not just stdout
+- add a "run for additional deps" option (see, e.g., find_optional_deps in
+  perl-Moose/devel)
+
+0.003 Wed Feb 17 2010
+- rework plugins system -- role based (and makes sense) now
+- first shot at SRPM generation code
+
+0.002 Tue Feb 16 2010
+- add missing Module::Pluggable::Ordered dep
+
+0.001 Wed Jun 17 2009
+- First version, released on an unsuspecting world.
+

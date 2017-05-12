@@ -1,0 +1,57 @@
+NAME
+    Finance::Bank::Barclays - Check your Barclays bank accounts from Perl
+
+SYNOPSIS
+      use Finance::Bank::Barclays;
+      my @accounts = Finance::Bank::Barclays->check_balance(
+              memnumber => "xxxxxxxxxxxx",
+              passcode => "12345",
+              surname => "Smith",
+              password => "xxxxxxxx"
+      );
+
+      foreach (@accounts) {
+              printf "%8s %8s : GBP %8.2f\n",
+              $_->{sort_code}, $_->{account_no}, $_->{balance};
+      }
+
+DESCRIPTION
+    This module provides a rudimentary interface to the Barclays Online
+    Banking service at "https://ibank.barclays.co.uk". You will need either
+    "Crypt::SSLeay" or "IO::Socket::SSL" installed for HTTPS support to work
+    with LWP.
+
+CLASS METHODS
+      check_balance(memnumber => $u, passcode => $p, surname => $s,
+        password => $w)
+
+    Return an array of account objects, one for each of your bank accounts.
+
+OBJECT METHODS
+      $ac->sort_code
+      $ac->account_no
+
+    Return the account sort code (in the format XX-YY-ZZ) and the account
+    number.
+
+      $ac->balance
+
+    Return the account balance as a signed floating point value.
+
+WARNING
+    This warning is from Simon Cozens' "Finance::Bank::LloydsTSB", and seems
+    just as apt here.
+
+    This is code for online banking, and that means your money, and that
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the source
+    of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to me,
+    but is provided under NO GUARANTEE, explicit or implied.
+
+THANKS
+    Simon Cozens for "Finance::Bank::LloydsTSB" and Perl hand-holding. Chris
+    Ball for "Finance::Bank::HSBC".
+
+AUTHOR
+    Dave Holland "dave@biff.org.uk"
+

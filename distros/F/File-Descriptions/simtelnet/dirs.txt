@@ -1,0 +1,185 @@
+From: simtel-info@Simtel.Net (Simtel Info)
+Subject: List of Simtel.Net MS-DOS dirs w/descriptions (revised 19980517)
+
+00_info         Simtel.Net MS-DOS documentation, indexes
+00_start        Essential info and utilities for beginners
+4dos            4DOS shell - replacement for COMMAND.COM
+ada             Ada programming language
+ai              Artificial Intelligence programs
+animate         Animation programs
+apl             The APL mathematics programming language
+arcers          Archiving and compressing programs
+arcutils        Utilities for using archives
+asm_mag         The Assembly Language 'magazine'
+asmutl          Assembly language utilities
+astrolgy        Astrology Programs
+astronmy        Astronomical programs
+autocad         Programs for Auto-CAD
+basic           BASIC programming language
+batchutl        Batch utilities
+bbs             BBS systems and support programs
+bbsdoors        BBS 'door' interfaces
+bbslists        BBS lists
+bible           Bible and searching tools
+binaryed        Binary file editors
+biology         Biology programs
+bootutil        Controlling the booting process
+borland         Borland product support
+business        Business-related Programs
+c               C programming language
+cad             Computer Aided Design
+calculte        Calculators for math, finance, etc.
+catalog         Disk catalog utilities
+cdrom           CD-ROM utilities
+chemstry        Chemistry programs
+clipper         Clipper programming language
+clocks          Computer time utilities
+commprog        Terminal and file transfer programs
+compress        Compression utilities
+cpluspls        C++ programming language
+crossasm        Cross-Assemblers
+database        Databases and programs to create them
+dayo            DAYO business and accounting software
+decode          Encode/decode binary files to/from text
+deskaces        Handy Desk-Top utilities and programs
+deskpub         Desktop publishing
+desqview        DESQview utilities and programs
+dirutl          Directory utilities
+disasm          Disassemblers: Convert executables to ASM
+diskutil        Disk utilities
+dv_x            Programs and utilities for DESQview-X
+editor          Text editors
+educate         Programs for education
+eel             Epsilon editor EEL extensions
+electrcl        Electrical engineering programs
+emulate         Emulators
+engin           Engineering Programs
+envutil         Manipulating environment variables
+execomp         Compress EXE and COM files to save disk space
+fileutil        File management and conversion utils
+finance         Financial software
+flowchrt        Flowchart Generators
+foods           Food recipes
+forms           Form Generators and Forms Entry Programs
+forth           Forth programming language
+fortran         FORTRAN programming language
+fossil          FOSSIL drivers and utilities
+freemacs        Emacs-like editor (small)
+genealgy        Genealogy programs
+geogrphy        Geography programs
+geology         Geology programs
+gif             Programs to make/view/print/convert GIF files
+graph           Graphing programs
+graphics        Graphics programs
+hamradio        Ham Radio programs and information
+handicap        Programs for the handicapped
+health          Health, Fitness, and Medical
+html            HTML Tools
+hypertxt        Hyper-Text files and programs
+imail           IMAIL FidoNet echomail processor
+info            Information and documentation files
+install         Program installation utilities
+internet        Programs and utils for use on the Internet
+io_utils        I/O Utilities
+irit            Polygonal solid modeler & C++ source
+keyboard        Keyboard utilities
+lan             Programs for use on Local Area Networks
+langtutr        Tutorials on foreign languages
+laser           Laser printer utilities and fonts
+legal           Law-related programs
+lingstcs        Linguistics
+literatr        Teach/learn literature
+mailnews        E-mail and Usenet News programs
+mapping         Map programs
+math            Mathematics programs
+mcintosh        Convert Macintosh files to DOS format
+memutil         Computer memory info and management utils
+menu            Creating and using menus
+microsft        Microsoft product support
+misclang        Misc. program languages
+mmedia          Multimedia Programs
+mormon          The Book of Mormon
+mouse           Utilities for the mouse
+music           Programs for writing and playing music
+muslum          The Holy Book of Muslum
+naplps          NAPLPS drawing program
+ncsatlnt        NCSA Telnet TCP/IP package
+nettamer        Net-Tamer DOS PPP dial up access program
+network         Utilities for computer networks
+neurlnet        Neural Networks
+nfs             Network File System utilities
+notabene        Notabene word processor utils
+novell          Novell LAN utilities
+packet          Programs for Packet Radio
+pascal          Pascal programming language
+pcboard         PC Board BBS software
+pcmag           'PC Magazine' listings and utilities
+pctech          'PC Tech Journal' listings and utilities
+perl            Perl programming language
+pgmtips         Programming Tips & Tricks Magazine
+pgmutl          Programming utilities
+pktdrvr         TCP/IP/IPX/ODI packet drivers
+plot            Programs for plotters
+postscrp        PostScript view/print utilities
+printer         Printer utilities
+progjorn        Programmers Journal
+projmgmt        Project Management programs
+qbasic          Quick BASIC and QBasic programming language
+qmodem          Qmodem comm program & utilities
+qtrdeck         Quarterdeck utilities and technical notes
+ramdisk         Memory resident disks
+rbbs            RBBS-PC BBS and support utilities
+recreatn        Recreation and passtime-related programs
+satelite        Communication satellite programs and listings
+schedule        Schedule automatic program runs (like cron)
+science         Miscellaneous science related material
+screen          Video screen utilities
+security        Improve computer security
+semware         SemWare editors, utilities and support files
+shrpaper        SharePaper disk magazine: Share/Freeware/PD
+simulatn        Simulation programs
+sound           Computer sound programs
+sports          Sports programs
+spredsht        Spreadsheet programs
+statstcs        Statistics programs
+surfmodl        Surface modeling programs
+swap            Free working memory by swaping to high mem
+sysinfo         Computer system information display programs
+sysutl          System utilities
+tcpip           TCP/IP programs (ka9q, etc.)
+teaching        Programs to assist teachers
+telegard        Telegard BBS program & utilities
+telix           Telix communications program
+termnate        Terminate Terminal/Communications program
+tex             TeX type setting program
+tiff            TIFF graphics format programs and information
+torah           Torah-related programs
+travel          Travel planning and information
+tsrutil         Terminate and stay resident utilities
+turbo_c         Borland Turbo C programming language
+turbobas        Borland's Turbo Basic programming language
+turbopas        Borland Turbo Pascal programming language
+turbovis        Turbo Vision programming language
+txtutl          Text utilities
+ubasic          UBASIC: Ultra high-precision BASIC for math
+uemacs          MicroEmacs text editor
+uucp            Unix to Unix Copy for MS-DOS
+vga             VGA monitor utilities
+virus           Virus detection and removal programs
+visbasic        Visual Basic programming language
+viscii          Vietnamese character programs
+waffle          Waffle bulletin board system
+weather         Weather forecasting
+wordperf        WordPerfect word processing
+worldmap        A digitized map of the world
+wwiv            WWIV BBS
+x_10            X-10 Powerhouse computer programs
+xwindows        X Windows Server and Support Programs
+zmodem          Zmodem file transfer protocol
+
+All of the above subdirectories are located in the /pub/simtelnet/msdos
+directory on most authorized Simtel.Net mirror sites.
+
+Keith Petersen, General Manager of Simtel(tm)
+Internet: w8sdz@Simtel.Net        http://www.simtel.net/simtel.net/
+Uucp: uunet!simtel.net!w8sdz       ftp://ftp.simtel.net/pub/simtelnet

@@ -1,0 +1,35 @@
+2010-01-21 09:41  cvs
+
+	* MANIFEST, Makefile.PL, README, bin/ermdir, lib/File/EmptyDirs.pm,
+	  t/0.t, t/1-context-etc.t: cleaned up code in module and ermdir
+	  cleaned up documentation cleaned up makefile and dependencies,
+	  removed Smart::Comments dep
+
+2009-09-17 17:27  cvs
+
+	* bin/ermdir, lib/File/EmptyDirs.pm: Cleaned up code in main
+	  module, cleaned up documentation.  Explained what
+	  remove_empty_dirs() returns.	Added scalar and list context
+	  return to remove_empty_dirs(), in list context, returns the abs
+	  paths to the dirs removed, in scalar, count of dirs removed.
+
+	  Improved ermdir, added proper gnulike documentation- added debug
+	  feature, tells you what happened, etc.
+
+	  Made sure perl license shows up properly.
+
+2009-08-26 14:18  cvs
+
+	* lib/File/EmptyDirs.pm: Updated docs, made sure license is perl
+	  and shows.
+
+2007-10-05 11:58  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/EmptyDirs.pm, t/.0.t.swp, t/0.t:
+	  Initial revision
+
+2007-10-05 11:58  cvs
+
+	* MANIFEST, Makefile.PL, lib/File/EmptyDirs.pm, t/.0.t.swp, t/0.t:
+	  init
+

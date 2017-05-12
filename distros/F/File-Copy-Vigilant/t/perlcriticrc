@@ -1,0 +1,2 @@
+severity = 3
+exclude = Subroutines::RequireArgUnpacking Modules::ProhibitAutomaticExportation

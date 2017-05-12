@@ -1,0 +1,89 @@
+NAME
+    "File::Shuffle" - Randomly shuffle the lines in a file.
+
+SYNOPSIS
+      use File::Temp qw(tempfile);
+      use File::Shuffle qw(fileShuffle);
+      use Data::Dump qw(dump);
+      my ($handle, $inputFile) = tempfile();
+      print $handle join("\n", 0..9, '');
+      close $handle;
+      fileShuffle (inputFile => $inputFile);
+      open ($handle, '<', $inputFile);
+      my @lines = <$handle>;
+      close $handle;
+      print @lines;
+
+DESCRIPTION
+    "File::Shuffle" provides the routine "fileShuffle" to randomly shuffle
+    the lines in a file.
+
+SUBROUTINES
+  "fileShuffle"
+    The subroutine "fileShuffle" randomly shuffles the lines in a file with
+    the following parameters:
+
+    "inputFile"
+          inputFile => '...'
+
+        "inputFile" holds the path to the file whose lines are to be
+        shuffled; if it does not exist or if it is not a file an exception
+        is thrown.
+
+    "outputFile"
+          outputFile => '...'
+
+        "outputFile" is the file the shuffled lines are to be written to, it
+        may equal "inputFile"; the default is "inputFile".
+
+    "tempDirectory"
+          tempDirectory => File::Temp::tempdir()
+
+        "tempDirectory" is a temporary directory that intermediate files are
+        written to if the "inputFile" is too large to shuffle using only
+        internal memory; the default is set using File::Temp::tempdir().
+
+    "encoding"
+          encoding => ''
+
+        "encoding" is the encoding to used when openning the input and
+        output files; the default is the the system default of the Perl
+        "open" function.
+
+    "fileSizeBound"
+          fileSizeBound => 1000000
+
+        If the input file contains less than "fileSizeBound" bytes, the file
+        will be shuffled entirely using internal memory, otherwise
+        Sort::External is used to shuffle the lines in the file.
+
+INSTALLATION
+    Use CPAN to install the module and all its prerequisites:
+
+      perl -MCPAN -e shell
+      cpan[1]> install File::Shuffle
+
+BUGS
+    Please email bugs reports or feature requests to
+    "bug-file-shuffle@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Shuffle>. The
+    author will be notified and you can be automatically notified of
+    progress on the bug fix or feature request.
+
+AUTHOR
+     Jeff Kubina<jeff.kubina@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2009 Jeff Kubina. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+KEYWORDS
+    file, permute, randomize, shuffle
+
+SEE ALSO
+    Sort::External
+

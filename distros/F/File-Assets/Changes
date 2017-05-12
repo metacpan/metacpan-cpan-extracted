@@ -1,0 +1,95 @@
+TODO:
+ - "Duplicate assets (via ->include(...)" testing?
+
+0.064:
+ - Move repository from svn to git (github)
+
+0.063:
+ - More documentation tweaks
+
+0.062 Friday July 25 20:46:24 PDT 2008:
+ - Minor documentation tweaks
+
+0.060_8 Wednesday July 23 13:03:49 PDT 2008:
+ - Fix to allow "yui-compressor" to work (note the dash)
+
+0.060_7 Wednesday July 23 12:09:34 PDT 2008:
+ - Reactivated *::Minifier::XS since fixed
+ - Added some set_ methods to File::Assets
+ - Added some tests and documentation
+
+0.060_6 Thursday June 12 13:08:32 PDT 2008:
+ - Fixed some tests that were working but a little too tight
+
+0.060_5 Wednesday June 11 11:02:00 PDT 2008:
+ - Fixed a YUI Compressor test
+ - Changed "minify 1" to "minify concat" in tests
+
+0.060_4 Wednesday June 11 10:57:01 PDT 2008:
+ - Took out JSON::XS reference that was killing tests
+
+0.060_3 Tuesday June 10 14:51:55 PDT 2008:
+ - Dropped the key digest and renamed content digest to fingerprint
+ - Changed output path patterning and renamed/deprecated a bunch of directives
+ - Streamlined File::Assets::Filter::Collect
+ - Documented the output_path scheme
+ - Made the output_path scheme easier to declare
+ - This is better now: The interface is horrible, improve, improve, improve
+ - Incorporate/allow external assets (e.g. http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js)
+
+0.060_2 Tuesday June 10 03:46:12 PDT 2008:
+ - Improvements to the interface
+ - Implemented automatic file content/file digesting caching
+ - Incorporated *::Minifier::XS, but it's too buggy, so it's disabled for now
+
+0.060_1 Thursday June 05 18:48:02 PDT 2008:
+ - Marked $asset->content_digest as deprecated
+ - Changed the name of Filter->digest to Filter->key_digest
+ - Added %.?, %-?, %/? to output_path scheming
+ - Got rid of %a, and %b in output_path scheming, these are now %l, and %-l
+ - The output_path now includes %-d by default (good in the case of filter-built assets)
+ - Remove HAML reference (meant SASS anyway)
+ - Added a note about YUI Compressor version compatability
+
+0.056 Saturday April 19 02:57:44 PDT 2008:
+ - Bump for packaging error (*grumble* *grumble* META.yaml inc/ *grumble*)
+
+0.055 Saturday March 29 22:57:47 PDT 2008:
+ - Fixed a problem with inline content being escaped by HTML::Declare (thanks James Munson)
+ - ->include and ->include_content can now accept simple HTML of the form <script>script> or
+   <style></style>
+ - Will not detect for rank/type misordering in ->include, ->include_path, and ->include_content
+   It should just do-the-right-thing now.
+
+0.051 Tuesday March 11 21:28:07 PDT 2008:
+ - Fixed issue where HTML::Declare was using self-closing <script/> HTML, which 
+   most browsers don't like (thanks patspam):
+   http://webbugtrack.blogspot.com/2007/08/bug-153-self-closing-script-tag-issues.html
+
+0.050 Sunday March 02 00:29:57 PST 2008:
+ - Major "guts" rewrite. The interface is largely the same,
+   but some heavy lifting had to be done to support different text/css media types.
+ - Inline content is supported via ->include_content(...) or ->include(content => ...)
+ - Passes through unrecognized attributes when generating HTML
+ - Filters and output path selection is handled in a somewhat better (though not perfect, IMHO)
+   fashion. Still need to write the documentation for this part.
+
+0.032 Tuesday January 22 14:01:12 PST 2008:
+ - Some minor tweaking of the timing of the caching test
+
+0.031 Tuesday January 22 13:46:39 PST 2008:
+ - Fixed (hopefully) some broken tests (rep. RENEEB)
+
+0.030 Sunday January 13 23:23:34 PST 2008:
+ - Fixed "x-javascript" issue for MIME::Types older than 1.16 (rep. ITEGEBO)
+
+0.021 Tuesday January 08 21:22:31 PST 2008:
+ - Small documentation fixes 
+
+0.02 Tuesday January 08 17:07:41 PST 2008:
+ - Documentation for File::Assets, File::Asset
+ - Testing for File::Assets->new with URI::ToDisk 
+ - Testing for proper caching of generated assets; fixed a couple of bugs
+
+0.01 Monday January 07 00:29:38 PST 2008:
+ - Initial release

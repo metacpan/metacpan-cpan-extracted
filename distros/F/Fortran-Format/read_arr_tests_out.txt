@@ -1,0 +1,49 @@
+AFORMAT(4I4)                                   
+IFORMAT(I10)                                   
+        -1
+        -2
+         3
+        -4
+
+AFORMAT(4I4)                                   
+IFORMAT(I10)                                   
+         1
+         2
+         0
+         0
+
+AFORMAT(2(I4))                                 
+IFORMAT(I10)                                   
+         1
+         2
+         3
+         4
+
+AFORMAT(I4)                                    
+IFORMAT(I10)                                   
+         1
+         2
+         3
+         4
+
+AFORMAT(BZI10(I2))                             
+IFORMAT(I10)                                   
+         1
+         2
+        30
+        40
+
+MFORMAT(I4)                                    
+IFORMAT(I10)                                   
+         1
+         2
+         3
+         4
+
+MFORMAT(2I4)                                   
+IFORMAT(I10)                                   
+         1
+         2
+         3
+         4
+

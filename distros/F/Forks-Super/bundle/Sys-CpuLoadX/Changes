@@ -1,0 +1,11 @@
+Revision history for Perl extension Sys::CpuLoadX
+
+0.04 2011-12-12
+     convert xs_getbsdload successful '0' value returned as '0.00'
+
+0.03 2011-04-16
+     xs_getbsdload not used for NetBSD
+
+0.02 2010-04-16
+     Imported BSD/Linux code from Sys::CpuLoad package.
+     Imported Win32/Cygwin code from Win32::SystemInfo::CpuUsage package

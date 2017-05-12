@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# fwctl		This shell script takes care of configuring the firewall
+#           	using fwctl.
+#
+# chkconfig: 2345 09 98
+# description: Configure the IP packet filtering firewall
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+# See how we were called.
+case "$1" in
+  start)
+	action "Configuring IP packet filters" fwctl start
+	echo
+	touch /var/lock/subsys/fwctl
+	;;
+  stop)
+	# Stop daemons.
+	action "Configuring IP packet filters for loopback" fwctl stop
+	echo
+	rm -f /var/lock/subsys/fwctl
+	;;
+  check)
+	fwctl check
+	;;
+  flush)
+       action "WARNING: Flushing all firewall rules" fwctl flush
+       ;;
+  restart|reload)
+	action "Updating IP packet filters" fwctl restart
+	;;
+  *)
+        echo "Usage: fwctl {start|stop|check|restart|flush|reload}"
+        exit 1
+esac
+
+exit 0

@@ -1,0 +1,23 @@
+---
+abstract: 'Object-oriented module for creation and working with FTN addresses.'
+author:
+  - 'Valery Kalesnik <valkoles@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FTN-Addr
+requires:
+  Carp: '0'
+  Scalar::Util: '0'
+  constant: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+version: '20160303'

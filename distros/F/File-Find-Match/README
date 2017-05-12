@@ -1,0 +1,43 @@
+File::Find::Match version 0.08
+===================
+
+This module provides a replacement for File::Find,
+with some difference. Major difference include:
+  * breadth-first algorithm.
+  * Only traverses directories we're interested in.
+
+INSTALLATION
+
+Before you install, you might want to try running
+cpansign -v, to verify that this module is not trojaned.
+See man Module::Signature for details. 
+
+If Module::Signature is not installed, then you can't do this.
+That's okay, though. It is not required.
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+If you do not have Module::Build installed, run Makefile.PL
+to install it, or grab it from CPAN.
+
+DEPENDENCIES
+
+This module does not require any other modules at runtime,
+but requires Module::Build for installation and Test::More
+to run the test suite.
+
+Test::Pod is optionally used to test the POD documentation.
+If it is not installed, the t/004_pod.t test will be skipped.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, 2006 by Dylan William Hardison
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

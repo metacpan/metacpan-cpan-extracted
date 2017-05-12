@@ -1,0 +1,31 @@
+Finance-IIF
+=======================
+
+Simple IIF file handler. IIF is a common file format for use with
+QuickBooks.  This module reads IIF records from a data file passing
+each successive record to the caller for processing.
+
+The software is available at:
+  http://sourceforge.net/projects/finance-iif
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp, IO::File
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Matthew McGillis and Phil Lobbes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

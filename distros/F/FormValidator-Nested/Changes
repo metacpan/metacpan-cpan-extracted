@@ -1,0 +1,29 @@
+Revision history for Perl extension FormValidator::Nested
+
+0.07    Mon Dec 14 02:09:09 UTC 2009
+        - add Number#float
+        - support profile filter(it can use no Data::Visitor::Callback)
+
+0.06    Mon Nov 23 18:00:57 UTC 2009
+        - add no_break validator
+
+0.0501  Sat Sep 12 01:59:06 2009
+        - fix test_requires(SQL::Translator)
+
+0.05    Fri Sep 11 05:43:13 2009
+        - add japanese validator
+
+0.0401  Thu Aug 20 11:36:19 2009
+        - fix test_requires
+
+0.04    Thu Aug 20 03:38:59 2009
+        - fix requires and test_requires on Makefile.PL
+
+0.03    Thu Aug 20 02:06:26 2009
+        - add test_requires 'Test::LoadAllModules'
+
+0.02    Tue Aug 18 12:29:09 2009
+        - fix pod synopsis
+
+0.01    Wed Jun 17 15:47:55 2009
+        - original version

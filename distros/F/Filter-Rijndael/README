@@ -1,0 +1,15 @@
+Build instructions:
+-------------------
+
+1. Install the Filter-Rijndael module if not installed already
+
+2. Extract the Filter-Rijndael-0.23.tar.gz into directory Filter-Rijndael-0.23
+
+3. cd Filter-Rijndael-0.23
+
+4. perl Makefile.PL
+
+5. make cperl
+
+6. strip cperl and copy to /usr/bin
+

@@ -1,0 +1,44 @@
+---
+abstract: "Use Moose's type constraints."
+author:
+  - 'Hideaki Ohno <hide.o.j55 {at} gmail.com>'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.8, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FormValidator-Lite-Constraint-Moose
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  FormValidator::Lite::Constraint::Moose:
+    file: lib/FormValidator/Lite/Constraint/Moose.pm
+    version: 0.13
+requires:
+  FormValidator::Lite: 0.10
+  Moose: 0.94
+  Moose::Util::TypeConstraints: 0
+  perl: 5.008003
+resources:
+  bugtracker: https://github.com/hideo55/FormValidator-Lite-Constraint-Moose/issues
+  homepage: https://github.com/hideo55/FormValidator-Lite-Constraint-Moose
+  repository: git://github.com/hideo55/FormValidator-Lite-Constraint-Moose.git
+version: 0.13
+x_contributors:
+  - 'hirobanex <hirobanex@gmail.com>'
+  - 'hideo55 <hide.o.j55@gmail.com>'

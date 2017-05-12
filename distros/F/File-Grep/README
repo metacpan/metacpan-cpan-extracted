@@ -1,0 +1,36 @@
+File/Grep version $Revision: 0.02 $
+================================
+
+File::Grep provides similar functionality as perl's builtin grep, map,
+and foreach commands, but iterating over a passed filelist instead of
+arrays.  While trivial, this module can provide a quick dropin when
+such functionality is needed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No special dependancy are required for this module
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002,2005 Michael K. Neylon
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+CHANGELOG
+
+0.02 - Sept. 16, 2005
+     - Fix for Perl 5.8, noted by many many people, but elegant fix by Benjamin Kram
+     - Should install cleanly through CPAN
+     

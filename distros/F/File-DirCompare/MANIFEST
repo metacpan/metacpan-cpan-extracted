@@ -1,0 +1,105 @@
+DirCompare.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01_basic.t
+t/02_diffbrief.t
+t/03_changes.t
+t/06_cmp.t
+t/07_ignore_cmp.t
+t/08_ignore_unique.t
+t/10_whitespace.t
+t/12_matches.t
+t/t01/new/bbb
+t/t01/new/ccc
+t/t01/new/ddd
+t/t01/new/dir1/ggg
+t/t01/new/dir1/iii
+t/t01/new/eee
+t/t01/new/fff
+t/t01/old/aaa
+t/t01/old/ccc
+t/t01/old/ddd
+t/t01/old/dir1/ggg
+t/t01/old/dir1/hhh
+t/t01/old/eee
+t/t01/old/fff
+t/t01/results/basic
+t/t02/new/bbb
+t/t02/new/ccc
+t/t02/new/ddd
+t/t02/new/eee
+t/t02/new/ggg/hhh/iii
+t/t02/old/aaa
+t/t02/old/ccc
+t/t02/old/ddd
+t/t02/old/fff
+t/t02/results/diffbrief
+t/t03/new/bbb
+t/t03/new/ccc
+t/t03/new/ddd
+t/t03/new/eee
+t/t03/new/ggg/hhh/iii
+t/t03/new/jjj/lll
+t/t03/new/jjj/mmm
+t/t03/old/aaa
+t/t03/old/ccc
+t/t03/old/ddd
+t/t03/old/fff
+t/t03/old/jjj/kkk
+t/t03/old/jjj/mmm
+t/t03/results/changes
+t/t06/new/bbb
+t/t06/new/ccc
+t/t06/new/ddd
+t/t06/new/eee
+t/t06/new/ggg/hhh/iii
+t/t06/old/aaa
+t/t06/old/ccc
+t/t06/old/ddd
+t/t06/old/fff
+t/t06/results/cmp
+t/t07/new/bbb
+t/t07/new/ccc
+t/t07/new/ddd
+t/t07/new/eee
+t/t07/new/ggg/hhh/iii
+t/t07/old/aaa
+t/t07/old/ccc
+t/t07/old/ddd
+t/t07/old/fff
+t/t07/results/ignore_cmp
+t/t08/new/bbb
+t/t08/new/ccc
+t/t08/new/ddd
+t/t08/new/eee
+t/t08/new/ggg/hhh/iii
+t/t08/old/aaa
+t/t08/old/ccc
+t/t08/old/ddd
+t/t08/old/fff
+t/t08/results/ignore_unique
+'t/t10/new/aaa bbb ccc'
+'t/t10/new/ggg hhh iii'
+'t/t10/new/jjj kkk lll'
+'t/t10/new/xxx yyy zzz/bar'
+'t/t10/new/xxx yyy zzz/bog'
+'t/t10/old/aaa bbb ccc'
+'t/t10/old/ddd eee fff'
+'t/t10/old/ggg hhh iii'
+'t/t10/old/uuu vvv www/foo'
+'t/t10/old/xxx yyy zzz/bar'
+'t/t10/old/xxx yyy zzz/foo'
+t/t10/results/whitespace
+t/t12/new/bbb
+t/t12/new/ccc
+t/t12/new/ddd
+t/t12/new/eee
+t/t12/new/ggg/hhh/iii
+t/t12/old/aaa
+t/t12/old/ccc
+t/t12/old/ddd
+t/t12/old/fff
+t/t12/results/matches
+TODO

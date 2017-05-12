@@ -1,0 +1,78 @@
+{
+   "abstract" : "Wrap IO::KQueue for watching file system.",
+   "author" : [
+      "Kenta Sato <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Filesys-Notify-KQueue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::KQueue" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "Test::More" : "0",
+            "Test::SharedFork" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Filesys::Notify::KQueue" : {
+         "file" : "lib/Filesys/Notify/KQueue.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/p5-Filesys-Notify-KQueue/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/p5-Filesys-Notify-KQueue",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/p5-Filesys-Notify-KQueue.git",
+         "web" : "https://github.com/karupanerura/p5-Filesys-Notify-KQueue"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:KARUPA"
+}

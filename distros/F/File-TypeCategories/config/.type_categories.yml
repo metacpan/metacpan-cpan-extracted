@@ -1,0 +1,235 @@
+---
+ignore:
+    other_types:
+        - build
+        - backups
+        - vcs
+        - images
+        - logs
+        - editors
+        - min
+        - npm
+        - jar
+editors:
+    definite:
+        - '~\d*$'
+    other_types:
+        - vim
+vim:
+    definite:
+        - '(^|/)[.][^/]+[.]sw[ponx]$'
+images:
+    definite:
+        - '[.]png$'
+        - '[.]jpe?g$'
+        - '[.]gif$'
+        - '[.]swf$'
+        - '[.]tiff?$'
+        - '[.]nef$'
+fonts:
+    definite:
+        - '[.]ttf$'
+        - '[.]wof$'
+logs:
+    definite:
+        - logs?(?:$|/)
+backups:
+    definite:
+        - '[.]orig$'
+        - '[.]copy$'
+        - '~\d*$'
+        - '[.]bak$'
+vcs:
+    definite:
+        - '[.]git'
+        - '[.]bzr'
+        - '[.]svn'
+        - CVS/
+        - RCS/
+        - ',v$'
+build:
+    definite:
+        - '[_.]build'
+        - 'blib'
+        - '(MY)?META[.](yml|json)'
+        - 'LICENCE'
+        - 'Changes'
+        - 'Build$'
+        - 'Makefile$'
+        - 'MANIFEST([.]SKIP)?'
+        - 'README'
+        - 'packages/[^/]/[.]build'
+        - 'Debian_CPANTS.txt'
+        - '[.]class$'
+        - 'target/'
+        - 'cover_db'
+perl:
+    definite:
+        - '[.]pl$'
+        - '[.]pm$'
+        - '[.]pod$'
+        - '[.]PL$'
+    possible:
+        - '[.]t$'
+        - '[.]cgi$'
+    bang: perl
+php:
+    definite:
+        - '[.]php$'
+    possible:
+        - '[.]lib$'
+        - '[.]pkg$'
+        - '[.]t$'
+c:
+    definite:
+        - '[.]c$'
+        - '[.]cpp$'
+        - '[.]c[+][+]$'
+        - '[.]h$'
+        - '[.]hpp$'
+        - '[.]hxx$'
+        - '[.]h[+][+]$'
+html:
+    definite:
+        - '[.]html$'
+        - '[.]xhtml$'
+    possible:
+        - '[.]xml$'
+test:
+    definite:
+        - '\/tx?\/[.]t$'
+        - 'test[.]pl$'
+svg:
+    definite:
+        - svg
+sql:
+    definite:
+        - '[.]sql$'
+        - '[.]plsql$'
+css:
+    definite:
+        - '[.]css$'
+    other_types:
+        - scss
+        - less
+scss:
+    definite:
+        - '[.]scss$'
+less:
+    definite:
+        - '[.]less$'
+javascript:
+    definite:
+        - '[.]js$'
+js:
+    other_types:
+        - javascript
+json:
+    definite:
+        - '[.]ja?son$'
+xml:
+    definite:
+        - 'xml$'
+        - '[.]xsd$'
+        - '[.]xslt$'
+        - '[.]dtd'
+    other_types:
+        - svg
+web:
+    possible:
+        - xml
+    other_types:
+        - html
+        - svg
+        - css
+        - js
+scripting:
+    other_types:
+        - perl
+        - php
+        - python
+        - ruby
+        - javascript
+programing:
+    other_types:
+        - scripting
+        - c
+package:
+    definite:
+        - '[.]PL$'
+        - 'MANIFEST$'
+        - 'MANIFEST.SKIP$'
+        - 'META.yml$'
+        - 'MYMETA.yml$'
+        - 'README$'
+        - 'Changes$'
+        - 'Debian_CPANTS.txt$'
+        - 'Makefile$'
+        - 'LICENSE$'
+config:
+    possible:
+        - 'rc$'
+        - 'tab$'
+        - '[.]cfg$'
+        - '[.]conf$'
+        - '[.]config$'
+    other_types:
+        - yaml
+binary:
+    definite:
+        - '[.]jpe?g$'
+        - '[.]png$'
+        - '[.]gif$'
+        - '[.]bmp$'
+        - '[.]swf$'
+        - '[.]psd$'
+        - '[.]exe$'
+python:
+    definite:
+        - '[.]py$'
+yaml:
+    definite:
+        - '[.]ya?ml$'
+shell:
+    definite:
+        - '[.](?:ba|k|z)sh\d?$'
+ruby:
+    definite:
+        - '[.]rb$'
+groovy:
+    definite:
+        - '[.]groovy$'
+java:
+    definite:
+        - '[.]java$'
+min:
+    definite:
+        - '[.]min[.](?:css|js)$'
+jsp:
+    definite:
+        - '[.]jps$'
+ftl:
+    definite:
+        - '[.]ftl$'
+jt:
+    other_types:
+        - jsp
+        - ftl
+tt:
+    definite:
+        - '[.]tt2?$'
+handlebars:
+    definite:
+        - '[.]hbs$'
+template:
+    other_types:
+        - jt
+        - handlebars
+        - tt
+npm:
+    definite:
+        - '\bnode_modules/'
+csv:
+    definite: '[.](?:csv|tab)$'
+jar:
+    definite: '[.](?:jar|jsa|dll)$'

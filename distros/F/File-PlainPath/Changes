@@ -1,0 +1,13 @@
+Revision history for File-PlainPath
+
+0.030     2013-11-06
+        Directory separators can now be lexically scoped.
+
+0.020   2012-02-27
+        Directory separators can now be set on a per-package basis.
+
+0.011   2012-02-26
+        Added support for multiple path arguments in the path() method.
+
+0.01    2012-02-26
+        First version, released on an unsuspecting world.

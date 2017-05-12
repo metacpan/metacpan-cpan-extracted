@@ -1,0 +1,47 @@
+{
+   "abstract" : "Module for uploading images to flickr.com",
+   "author" : [
+      "Christophe Beauregard <cpb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Flickr-Upload",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Flickr::API" : "1.09",
+            "Getopt::Long" : "1",
+            "HTTP::Request::Common" : "1",
+            "LWP::UserAgent" : "1",
+            "Net::OAuth" : "0.28",
+            "Pod::Usage" : "1",
+            "XML::Simple" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.6"
+}

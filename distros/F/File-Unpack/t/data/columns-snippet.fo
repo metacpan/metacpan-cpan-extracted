@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:rx="http://www.renderx.com/XSL/Extensions">
+
+
+   <fo:layout-master-set>
+
+
+      <fo:simple-page-master master-name="page-1">
+  
+         <fo:region-body column-count="1" reference-orientation="0" margin="1in"/>
+  
+         <fo:region-after extent="0.9in"/>
+
+      </fo:simple-page-master>
+
+
+      <fo:simple-page-master master-name="page-2">
+  
+         <fo:region-body column-count="2" reference-orientation="90" column-gap="0.5in" margin="1in"/>
+  
+         <fo:region-end extent="0.9in" reference-orientation="90"/>
+
+      </fo:simple-page-master>
+
+
+      <fo:simple-page-master master-name="page-3">
+  
+         <fo:region-body column-count="3" reference-orientation="180" column-gap="0.3in" margin="1in"/>
+  
+         <fo:region-before extent="0.9in" reference-orientation="180"/>
+
+      </fo:simple-page-master>
+
+
+      <fo:simple-page-master master-name="page-4">
+ 
+         <fo:region-body column-count="4" reference-orientation="270" column-gap="0.25in" margin="1in"/>
+ 
+         <fo:region-start extent="0.9in" reference-orientation="270"/>
+
+      </fo:simple-page-master>
+
+
+   </fo:layout-master-set>
+
+  
+  

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 9c0a589d758deb827d0471dc6acd1faa23c703d7 Build.PL
+SHA1 c2a60a31a0f5c558e17f52284c9ee4a78b560ec6 ChangeLog
+SHA1 6fda9411d96ab0d00b09a99370ac452e54b6e844 Coda.pm
+SHA1 e42b68283b14c7728948cc7195a22b955ea283b8 LICENSE
+SHA1 9bbef5268e15e96074fdc1a677fe42c169a8bd93 MANIFEST
+SHA1 f2a4e4c86afd6e8c9f84d2a0f1dc4bd47b847970 META.yml
+SHA1 4b166aeb8fe02470640936ad35192e0e1b223bf6 README
+SHA1 6eb9cb21b05272cb77af0f70c664783fad0f18c4 t/01-basic.t
+SHA1 673a883aeb3085328e3deda980c86c47da4a373c t/02-noclobber.t
+SHA1 1fb941076c1321bbfa58e4943d34a03e0be5b9e0 t/03-nointerfere.t
+SHA1 8ef79182c36c74a5218b1a21b6fef08c84fd2709 t/98-pod-coverage.t
+SHA1 47ff92edfe4543ad08b9fe52e263ba0935fe4029 t/99-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iQIcBAEBCAAGBQJMCi0AAAoJENd//eG5q5oWM/oQAIX6YiHhVHrTLHgOOwjGy0Fo
+CAONui+CU4p9EPoER/YrSTJrRTTONjy10Q7Vc03JPCbhUnR6cUZF9ZUKmsKNaic1
+1mZX0WaIAWdL6o/1lZOGc7tIqMqxLD/fGPhUCZv47nP5uEY2JZ3Dsny8cMF3hL46
+VT1hUP+eLk6ypJWbSkMpwAIb7g0hpv0XaQM6J/uARMrkDbQL/h/QecJgj5zs26j5
+4IvRHYzVrmXYMtp2a7rw1BUPGOJxWl+WbdbrjqjuyoY6SM3/877N+/Eim/chP7yt
+RLybr2MLeXDUWXpNEljYnm0XU9jow4+fpQvtvg3jzXqXw5goz9gt3/+JfU/mKeQI
+tNi/ZFiMX0vJdiunNWhOsi/+5se8XIyHJjfWiKGxY92FoQ8UAyZLNrAXA6hncoQQ
+ebPIuDY4QLp9VBroPWtewGwT1qaES40cpwEv/y3J52UGBaXw3VJ6r8ILVbOKd42n
+IMtJVSg+U/iWasrWcoT58g5EGMni+755Cbn1XVLCGGGUDhqfjqOCQ4uHa1X6W7SO
+511tUaoyS6fYqZwYLXF6FcQV4QbmM0MpWzyh4caQHTfCe+ofhVzWiCIFDm1tBQ+5
+910hzjjfni6xLro0hMO1PAOZwBBqJWxq0lLIbgJwOZLq9jmnewwoUuoXCLi8opbm
+1G4BQppg/4lFZ/rQoVcH
+=FCpH
+-----END PGP SIGNATURE-----

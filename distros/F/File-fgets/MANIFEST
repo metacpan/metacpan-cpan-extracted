@@ -1,0 +1,17 @@
+.perlcriticrc
+.perltidyrc
+Build.PL
+Changes
+lib/File/.new
+lib/File/fgets.pm
+lib/File/fgets.xs
+lib/File/ppport.h
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/fgets.t
+t/scalar_ref_fh.t
+t/tie.t
+SIGNATURE    Added here by Module::Build

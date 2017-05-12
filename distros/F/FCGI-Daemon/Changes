@@ -1,0 +1,41 @@
+Changelog for FCGI-Daemon
+#########################
+
+2015-12-26 Dmitry Smirnov <onlyjob@cpan.org>  
+
+  Maintenance release:
+  * Minor doc, formatting and perlcritic corrections.
+  * "use 5.14.2;" due to know memory leak in earlier versions.
+  * Don't blame "fcgiwrap" for not forwarding STDERR: "fcgiwrap" redirects
+    STDERR output from executed CGI if started with "-f".
+  * Make list in the docs actually render as a list in POD (Closes: #84697)
+    Thanks, Michael Stevens.
+  * Set RLIMITS using BSD::Resource.
+    Perl 5.14.2 (and earlier releases) provided "sys/resource.ph" which is
+    no longer present in 5.20.2 (and later versions).
+
+2011-11-21 Dmitry Smirnov <onlyjob@cpan.org>  
+
+  * Evaluated scripts no longer pollute error log on exit
+  * Error message for non-executable scripts goes to STDERR and to the STDOUT
+  * Added regex pattern (-f) to match file name and identify perl scripts with
+    any extension (not only .pl as previously) for evaluation so
+    .cgi scripts can be accelerated too, if written in Perl.
+  * Documentation update
+  * Configuration examples for use with nginx
+
+2011-11-21 Dmitry Smirnov <onlyjob@cpan.org>
+
+  * Print error to STDERR if DOable script dies
+
+2011-04-22 Dmitry Smirnov <onlyjob@cpan.org>
+
+ *  Minor POD (documentation) update
+
+2011-04-20 Dmitry Smirnov <onlyjob@cpan.org>
+
+ *  Minor POD (documentation) update
+
+2011-04-19 Dmitry Smirnov <onlyjob@cpan.org>
+
+ *  First version.

@@ -1,0 +1,188 @@
+
+use FindBin;
+require "$FindBin::Bin/wrap.tm";
+use File::Slurp;
+use Time::HiRes qw(sleep);
+use POSIX qw(_exit);
+use File::Flock;
+use Test::More tests => 20;
+use Test::SharedFork;
+use strict;
+use warnings;
+
+
+test_lock_held_across_fork();
+test_locks_dropped_on_sole_process_exit();
+test_locks_dropped_on_multi_process_exit();
+test_lock_rename_object();
+test_forget_locks();
+
+our $dir; # set in wrap.tt
+
+sub test_lock_held_across_fork
+{
+	my $lock1 = "$dir/lhaf1";
+	my $lock2 = "$dir/lhaf2";
+
+	if (dofork()) {
+		lock($lock1);
+		my $l = File::Flock->new($lock2);
+		write_file("$dir/gate1", "");
+
+		POSIX::_exit(0) unless dofork();
+		write_file("$dir/gate2", "");
+
+		sleep(0.1) while ! -e "$dir/gate3";
+		ok(! -e "$dir/gotlock1a", "lock held");
+		ok(! -e "$dir/gotlock1b", "obj lock held");
+		ok(! -e "$dir/gotlock2a", "child lock held");
+		ok(! -e "$dir/gotlock2b", "child obj lock held");
+		unlock($lock1);
+		write_file("$dir/gate4", "");
+
+		sleep(0.1) while ! -e "$dir/gate5";
+		ok(-e "$dir/gotlock3a", "lock released");
+		ok(! -e "$dir/gotlock3b", "obj lock not released");
+		$l->unlock();
+		write_file("$dir/gate6", "");
+
+		sleep(0.1) while ! -e "$dir/gate7";
+		ok(-e "$dir/gotlock4", "obj lock released");
+		write_file("$dir/gate8", "");
+	} else {
+		sleep(0.1) while ! -e "$dir/gate1";
+		# parent has locked lock
+		write_file("$dir/gotlock1a", "") if lock($lock1, undef, 'nonblocking');
+		write_file("$dir/gotlock1b", "") if lock($lock2, undef, 'nonblocking');
+
+		sleep(0.1) while ! -e "$dir/gate2";
+		write_file("$dir/gotlock2a", "") if lock($lock1, undef, 'nonblocking');
+		write_file("$dir/gotlock2b", "") if lock($lock2, undef, 'nonblocking');
+		write_file("$dir/gate3", "");
+
+		sleep(0.1) while ! -e "$dir/gate4";
+		write_file("$dir/gotlock3a", "") if lock($lock1, undef, 'nonblocking');
+		write_file("$dir/gotlock3b", "") if lock($lock2, undef, 'nonblocking');
+		write_file("$dir/gate5", "");
+
+		sleep(0.1) while ! -e "$dir/gate6";
+		write_file("$dir/gotlock4", "") if lock($lock2, undef, 'nonblocking');
+		write_file("$dir/gate7", "");
+		sleep(0.1) while ! -e "$dir/gate8";
+		exit(0);
+	}
+}
+
+sub test_locks_dropped_on_sole_process_exit
+{
+	my $p = "$dir/tldospe";
+
+	my $pid;
+	if (($pid = dofork())) {
+		sleep(0.1) while ! -e "$p.gate1";
+		ok(! lock("$p.lock1", undef, 'nonblocking'), "can't get lock");
+		write_file("$p.gate2", "");
+		waitpid($pid, 0);
+		ok(lock("$p.lock1", undef, 'nonblocking'), "can get lock");
+	} else {
+		lock("$p.lock1");
+		write_file("$p.gate1", "");
+
+		sleep(0.1) while ! -e "$p.gate2";
+		exit(0);
+	}
+}
+
+sub test_locks_dropped_on_multi_process_exit
+{
+	my $p = "$dir/tldompe";
+
+	my $pid;
+	if (($pid = dofork())) {
+		sleep(0.1) while ! -e "$p.gate1";
+		ok(! lock("$p.lock1", undef, 'nonblocking'), "can't get lock");
+		write_file("$p.gate2", "");
+		waitpid($pid, 0);
+		ok(lock("$p.lock1", undef, 'nonblocking'), "can get lock");
+		write_file("$p.gate3", "");
+	} else {
+		lock("$p.lock1");
+		if (dofork()) {
+			write_file("$p.gate1", "");
+
+			sleep(0.1) while ! -e "$p.gate2";
+			exit(0);
+		} else {
+			sleep(0.1) while ! -e "$p.gate3";
+			exit(0);
+		}
+			
+	}
+}
+
+sub test_lock_rename_object
+{
+	my $p = "$dir/tlro";
+
+	my $l = File::Flock->new("$p.oldlock");
+	undef $!;
+	undef $@;
+	ok(eval {rename("$p.oldlock", "$p.newlock")}, "rename file - $!");
+	ok(eval {$l->lock_rename("$p.newlock")}, "rename lock - $@");
+	ok(eval {$l->unlock()}, "unlock - $@");
+}
+
+sub test_forget_locks
+{
+	my $p = "$dir/tfl";
+
+	my $pid;
+	if (($pid = dofork())) {
+		sleep(0.1) while ! -e "$p.gate1";
+		ok(! lock("$p.lock1", undef, 'nonblocking'), "can't get multi lock");
+
+		write_file("$p.gate2", "");
+		# forget locks
+		sleep(0.1) while ! -e "$p.gate4";
+		ok(! lock("$p.lock1", undef, 'nonblocking'), "still can't get multi lock");
+
+		write_file("$p.gate5", "");
+		# sub master quits
+		waitpid($pid, 0);
+		ok(kill(0, $pid) == 0, "first proc ($pid) is dead");
+		ok(! lock("$p.lock1", undef, 'nonblocking'), "and still can't get multi lock");
+
+		write_file("$p.gate3", "");
+		my $pid2 = read_file("$p.gate1");
+		sleep(0.1) while kill(0, $pid2);
+		ok(kill(0, $pid2) == 0, "second proc ($pid2) is dead");
+
+		ok(lock("$p.lock1", undef, 'nonblocking'), "now can get multi lock");
+	} else {
+		lock("$p.lock1");
+		my $subpid;
+		if (($subpid = dofork())) {
+			write_file("$p.gate1", "$subpid");
+
+			sleep(0.1) while ! -e "$p.gate2";
+			forget_locks();
+			write_file("$p.gate4", "");
+
+			sleep(0.1) while ! -e "$p.gate5";
+			exit(0);
+		} else {
+			sleep(0.1) while ! -e "$p.gate3";
+			exit(0);
+		}
+			
+	}
+}
+
+
+sub dofork
+{
+	my $p = fork();
+	die unless defined $p;
+	return $p;
+}
+

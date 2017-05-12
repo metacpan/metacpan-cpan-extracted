@@ -1,0 +1,58 @@
+#!perl -w
+
+use strict;
+use Freq;
+use Time::HiRes qw( gettimeofday tv_interval );
+
+my $indexname = $ARGV[0];
+@ARGV = ();
+
+my %terms = ();
+my %docs = ();
+
+print STDERR "Adding index $indexname...\n";
+my $i = Freq->open_read( $indexname );
+#my ( $nwords, $ndocs ) = $i->index_info();
+
+while(<>){
+	chomp;
+	s|\cM||; # No CTRL-Ms please.
+	my $query = $_;
+
+	#s|(\d)| _$1_ |g;
+	s|\s+| |g;  # Squeeze multiple space chars to a space.
+	
+	my $term = lc $_;
+
+	print STDERR chr(13), $term;
+
+	#my $t0 = [gettimeofday];
+	my $result = $i->search( $term );
+	#my $interval = tv_interval( $t0 );
+#    print "Found ", scalar keys %$result, " docs\n";
+    next unless %$result;
+#	$terms{$term} = [ keys %$result ];
+#	push @{ $docs{$_} }, \$term for keys %$result;
+}
+
+
+print STDERR "Found ", 
+             scalar keys %terms, 
+			 " distinct terms in ", 
+			 scalar keys %docs, 
+			 " documents.\n";
+
+for my $d (keys %docs){
+#	print "<DOCNO value=\"$d\">\n";
+#	print "    <t o=\"", 
+#	    join("\" />\n    <t o=\"", map {$$_} @{ $docs{$d} }),
+#        "\" />\n</DOCNO>\n";
+	print "$d\n";
+}
+
+
+exit 0;
+
+
+
+

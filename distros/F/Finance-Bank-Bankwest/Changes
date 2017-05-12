@@ -1,0 +1,73 @@
+Revision history for Perl extension Finance-Bank-Bankwest
+
+1.2.8   2014-08-10
+
+  - Treat post-login "service message" pages as expected responses, and
+    skip over them ([rt.cpan.org #97916]).
+
+1.2.7   2014-06-08
+
+  - Specify a minimum URI::file version, since earlier versions trigger
+    test failures ([rt.cpan.org #96324]).  Thanks to David Cantrell for
+    reporting this problem.
+
+1.2.6   2014-03-14
+
+  - Allow an undefined transaction code in Transaction objects, since
+    Bankwest does not return one in some cases ([rt.cpan.org #93739]).
+    Thanks to Owen Hollands for reporting this behaviour and providing
+    a patch.
+
+  - Minor documentation adjustments.
+
+1.2.5   2013-08-08
+
+  - Fix test failures on some Perl setups.
+
+1.2.4   2013-08-06
+
+  - Correct distribution dependencies properly.
+
+1.2.3   2013-08-06
+
+  - Correct distribution dependencies.
+
+1.2.2   2013-08-06
+
+  - List all possible transaction type codes at this time, and their
+    meanings.
+
+  - Move generic web page handling logic into a dependency
+    (HTTP::Response::Switch).
+
+1.2.1   2013-05-03
+
+  - Remove URI as a run-time dependency.
+
+  - Don't identify core modules as distribution dependencies.
+
+1.2.0   2013-05-02
+
+  - Add a "date_dt" attribute to Transaction objects to prepare a
+    DateTime instance of the transaction date if requested.
+
+  - Minor documentation adjustments.
+
+1.1.0   2013-04-27
+
+  - Add an "equals" method and overloaded "eq" and "ne" operators to
+    Transaction objects to test for equivalence.
+
+  - Require a less recent version of Text::CSV_XS.
+
+  - Ensure that Throwable::Error is identified as a dependency.
+
+  - Stop one of the tests from emitting a warning.
+
+1.0.1   2013-04-26
+
+  - Minor documentation adjustments.
+
+1.0.0   2013-04-26
+
+  - Initial public release.

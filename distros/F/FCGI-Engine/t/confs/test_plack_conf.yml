@@ -1,0 +1,8 @@
+---
+- name:            "baz.server"
+  server_class:    "FCGI::Engine::Manager::Server::Plackup"
+  scriptname:      "t/scripts/baz.psgi"
+  nproc:            1
+  pidfile:         "/tmp/baz.pid"
+  socket:          "/tmp/baz.socket"
+

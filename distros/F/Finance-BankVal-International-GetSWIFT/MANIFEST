@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+InternationalLoginConfig.txt
+t/Finance-BankVal-International-GetSWIFT.t
+lib/Finance/BankVal/International/GetSWIFT.pm

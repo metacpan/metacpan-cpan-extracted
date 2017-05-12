@@ -1,0 +1,61 @@
+Revision history for Perl extension File::Format::RIFF.
+
+1.0.1  Mon Aug  8 18:08:09 CDT 2005
+	- misc documentation fixes
+
+1.0.0  Sun Aug  7 15:23:36 CDT 2005
+	- finished test suite
+	- fixed bug to allow 'read' to be called on an existing RIFF object
+	- document RIFF::read usage as a method
+	- added eg/socketpair.pl (example streaming a RIFF over a socket)
+
+0.9.4  Sun Aug  7 12:56:13 CDT 2005
+	- more testing
+	- document 'total_size' and RIFF::write
+	- other minor fixes to documentation
+
+0.9.3  Sat Aug  6 13:14:50 CDT 2005
+	- 'read' calls 'binmode' on the filehandle (to support Windows)
+	- removed extraneous right-paren in an error message
+	- formatting fixes to documentation
+	- more detailed documentation for Container::dump
+
+0.9.2  Tue Apr 26 19:36:29 CDT 2005
+	- fixed bug in RIFF::read when $filesize was specified
+	- fixed bug in Container::at when used as a getter
+	- documentation pretty much done
+
+0.9.1  Mon Apr  4 00:24:47 CDT 2005
+	- start on documentation
+
+0.9.0  Wed Mar 30 22:37:20 CST 2005
+	- 'new' for creating new chunks; 'read' for reading from a filehandle
+	- fix bug when getting id of container
+	- RIFF->read: if specify filesize as undef, skip filesize check
+	- bit more testing
+	- use VERSION instead of VERSION_FROM in Makefile.PL
+	- changed versioning scheme
+	- API should be FROZEN for 1.0.0
+
+0.05  Tue Mar 29 22:51:21 CST 2005
+	- RIFF->new: in-memory string filehandles if you pass in 'filesize' arg
+	- more Carp/croak instead of die
+	- move module version to lib/File/Format/RIFF/Version.pm
+
+0.04  Tue Mar 29 21:47:56 CST 2005
+	- Carp/croak instead of die
+	- fixed up some 'use strict' warnings
+	- Container->data( $data ) now clears and does Container->push( @$data )
+	- implement addList, addChunk, numChunks
+
+0.03  Sat Mar 19 18:03:13 CST 2005
+	- sanity checking in case of bad file
+	- push/pop/shift/unshift/splice/at methods for Container
+
+0.02  Fri Mar 18 21:54:37 CST 2005
+	- basic functionality
+
+0.01  Tue Mar 15 21:58:05 2005
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.6.0 --skip-exporter --skip-autoloader -n File::Format::RIFF
+

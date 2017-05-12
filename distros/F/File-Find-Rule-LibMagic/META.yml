@@ -1,0 +1,31 @@
+---
+abstract: 'rule to match on file types or mime types'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+conflicts:
+  File::Find::Rule::MMagic: 0
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Find-Rule-LibMagic
+no_index:
+  directory:
+    - t/samples
+provides:
+  File::Find::Rule::LibMagic:
+    file: lib/File/Find/Rule/LibMagic.pm
+    version: 0.02
+requires:
+  File::Find::Rule: 0.3
+  File::LibMagic: 0.96
+  Params::Util: 1
+  Text::Glob: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

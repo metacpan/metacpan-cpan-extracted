@@ -1,0 +1,114 @@
+Revision history for Perl extension Finance::Currency::Convert::XE.
+0.25    12/06/2012
+        - Fixed tests
+0.24    12/06/2013
+        - Update currency list
+0.23	06/03/2013
+	- patch to fix new html layout - thanks to Gareth Tunley
+0.22	18/10/2012
+	- patch to fix new html layout - thanks to Gareth Tunley
+0.21	17/07/2012
+	- patch to fix new html layout - thanks to Michael
+0.20	19/06/2012
+	- change useragent
+0.19    02/04/2011
+        - forgot to make dist
+
+0.18    02/04/2011
+        - changed form_name=>ucc to form_number=>2 in order to match new xe.net site
+
+0.17    14/03/2011
+        - updated documentation.
+        - added META.json and supporting tests.
+        - removed conversion value tests - too much fluctuation.
+        - added ping check in case the network or site might be down
+
+0.16    17/08/2009
+        - removed 5.006 dependency.
+        - chomp doesn't seem to work anymore!
+        - given up on figuring out the offset in tests.
+
+0.15    17/03/2008
+        - added approximately 90 new currencies
+        - added an add_currency method to allow the user to dynamically 
+          extend the currency list if required. (Brian Mills)
+        - switched to Test-CPAN-Meta for testing
+        - added AUTOMATED_TESTING checks to packaging tests.
+
+0.14    29/10/2007
+        - fixed tests to allow for more fluctuation in current exchange rates
+          compared to future exchange rates. 
+
+0.13    07/03/2007
+        - Added support for more currencies.
+        - reverted back to original form, as the quick version doesn't support 
+          many currencies. (viva_peter@yahoo.co.uk)
+        - added error checking to tests
+
+0.12    02/03/2007
+        - Form name has changed in the few days to 'quick'
+        - Updated POD to emphasise the need to obtain a valid license from 
+          XE.com before you are allowed to use their service for all commercial
+          uses.
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - POD/README updates
+
+0.11    11/10/2006
+        - fixed bug #20646, spotted by Dan Brook (BROQ).
+        - simplified some areas of code.
+        - new() can now be passed defaults.
+        - convert() can now be passed a single value.
+        - updated the conversion rate in 10object.t
+        - removed warn() calls as the error() should be used.
+        - more tests
+        - Devel::Cover = 92.5%
+
+0.10    27/04/2005
+        - link fix (website changed) as spotted by Menno Blom
+
+0.09    04/03/2005
+        - POD updates.
+
+0.08    01/03/2005
+        - multiple invocations don't work as expected, spotted by 
+          Marcus Thiesen (via rt).
+
+0.07    07/01/2005
+        - Removed unnecessary Exporter code.
+        - adjusted the Pound to Euro exchange rate in tests
+        - upgraded POD Coverage testing
+
+0.06    19/04/2004
+        - Test::More added as a prerequisites for PPMs
+        - Fixed Abstract in Makefile.PL
+
+0.05    04/03/2004
+        - More formatting options available
+        - Removed all non-Euro currencies for Euro adopted countries.
+        - Currency test bounds increased to +/- 2%
+        - Currency symbols use HTML entities where known.
+
+0.04    Fri Feb 13 11:28:31 2004
+        - Large number format bug, spotted by Alex Pavlovic.
+        - changed tests to use bigger numbers
+        - updated tests to use like and cmp_ok
+        - added pod tests
+
+0.03    Thu Nov  6 09:55:10 2003
+        - name change from WWW::UCC to Finance::Currency::Convert::XE upon 
+          discovering the distribution Finance::Currency::Convert::Yahoo 
+          on CPAN.
+        - Fixed the README text
+
+0.02    Wed Oct  8 13:04:18 2003
+        - complete overhaul of POD and code (now with WWW::Mechanize).
+        - POD updates
+        - more tests
+
+0.01    Wed Nov 20 10:08:47 2002
+        - original version

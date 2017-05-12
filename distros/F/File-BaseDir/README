@@ -1,0 +1,32 @@
+File-BaseDir
+============
+
+This module can be used to find directories and files as specified
+by the Freedekstop.org Base Directory Specification.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules which can be obtained from
+the CPAN <http://cpan.org> if they are not allready installed on
+your system :
+
+  Module::Build
+  Carp
+  Exporter
+  File::Spec
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, 2007 Jaap G Karssenberg. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

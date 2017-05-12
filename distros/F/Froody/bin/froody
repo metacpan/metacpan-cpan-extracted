@@ -1,0 +1,274 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Data::Dumper;
+use Pod::Usage;
+
+# getopt std supports --version
+use Froody;
+$main::VERSION = $Froody::VERSION;
+
+use Froody::Dispatch;
+use Froody::Response::Terse;
+use Froody::Response::PerlDS;
+
+# process command line options;
+# darn! Neither GetOpt::Std or GetOpt::Long do what I want
+my @modules;
+my @urls;
+my $yaml;
+my $format;
+my $dump;
+my $n = 1;
+my $bench;
+my $quiet;
+my $standalone;
+while (defined($ARGV[0]) && $ARGV[0] =~ /^-/)
+{
+   my $arg = shift;
+
+   if ($arg =~ /^-n(.*)$/)
+   {
+     $n = $1;
+     die "-n requires argument. Try -h for help.\n" unless length $n;
+     die "-n takes only a number. Try -h for help.\n" unless length $n =~ /^\d+$/;
+     next;
+   }
+
+   if ($arg =~ /^-M(.*)$/)
+   {
+     die "-M requires argument. Try -h for help.\n" unless length $1;
+     push @modules, $1;
+     next;
+   }
+   
+   if ($arg =~ /^-[lI]=?(.*)$/)
+   {
+     die "-l requires argument. Try -h for help.\n" unless length $1;
+     push @INC, $1;
+     next;
+   }
+
+   if ($arg =~ /^-u=?(.*)$/)
+   {
+     die "-u requires argument. Try -h for help.\n" unless length $1;
+     push @urls, $1;
+     next;
+   }
+
+   if ($arg =~ /^-p(.*)$/)
+   {
+     die "-p takes no arguments. Try -h for help.\n" if length $1;
+     $format = "as_perlds";
+     next;
+   }
+
+   if ($arg =~ /^-t(.*)$/)
+   {
+     die "-t takes no arguments. Try -h for help.\n" if length $1;
+     $format = "as_terse";
+     next;
+   }
+
+   if ($arg =~ /^-b(.*)$/)
+   {
+     die "-b takes no arguments. Try -h for help.\n" if length $1;
+     $bench = 1;
+     next;
+   }
+
+   if ($arg =~ /^-q(.*)$/)
+   {
+     die "-q takes no argument. Try -h for help.\n" if length $1;
+     $quiet = 1;
+     next;
+   }
+   
+   
+   if ($arg =~ /^-y(.*)$/)
+   {
+     die "-y takes no argument. Try -h for help.\n" if length $1;
+     require YAML::Syck
+       or die "Need YAML::Syck installed to use -y\n";
+     $yaml = 1;
+     next;
+   }
+   
+   if ($arg =~ /^-d(.*)$/)
+   {
+     die "-d takes no argument. Try -h for help.\n" if length $1;
+     $dump = 1;
+     next;
+   }
+   
+   if ($arg =~ /^-s(.*)$/)
+   {
+     $standalone = 4242;
+     $standalone = $1 if $1;
+     next;
+   }
+   
+   if ($arg =~ /^(--?v(?:ersion)?)(.*)?$/)
+   {
+    die "$1 takes no argument. Try -h for help.\n" if length $2;
+    print "Froody Version $main::VERSION\n";
+    print "It's ".localtime()."...do you know where your towel is?\n";
+    exit;
+   }
+   
+   if ($arg =~ /^(--?h(?:elp)?|--?\?)(.*)?$/)
+   {
+    die "$1 takes no argument. Try -h for help.\n" if length $2;
+    pod2usage({ -exitval => 0, -verbose => 1 });
+   }
+
+   print STDERR "Unknown arg '$arg'\n";   
+   pod2usage({ -exitval => 0, -verbose => 0 });
+}
+
+# check we got something that's loading modules
+# (unless we're looking at reflection, as then we don't have to bother
+unless (@modules || @urls || $dump || $standalone || @ARGV && $ARGV[0] =~ m{\.reflection\.})
+{ 
+  print STDERR "You need to use either -u or -M\n";
+  pod2usage({ -exitval => 1, -verbose => 0 });
+}
+
+my $client = Froody::Dispatch->config({
+  urls => \@urls,
+  modules => \@modules
+});
+$client->error_style('response');
+
+if ($dump)
+{
+  foreach (sort map { $_->full_name } $client->repository->get_methods())
+   { print "$_\n" }
+  exit;
+}
+
+if ($standalone)
+{
+  use Froody::Server::Standalone;
+  my $server = Froody::Server::Standalone->new();
+  $server->port($standalone);
+  $server->run;
+}
+
+my $method = shift @ARGV
+  or die "Must provide a method name. Try -h for help.\n";
+
+if (@ARGV % 2)
+  { die "Odd number of parameters passed in. Try -h for help.\n" }
+
+
+my $time;
+$time = [Time::HiRes::gettimeofday()] if $bench;
+
+foreach my $fish (1..$n)
+{  
+  # get the response
+  my $response = $client->call($method, { @ARGV });
+  
+  if ($format)
+  {
+    $response = $response->$format;
+    if ($yaml)
+     { $_ = Dump($response->content) }
+    else
+     { $_ = Dumper($response->content) }
+  }
+  else
+   { $_ = $response->render; }
+   
+  print unless $quiet;
+}
+
+print "Took ".Time::HiRes::tv_interval($time)." seconds to make $n calls to $method\n" if $bench;
+
+=head1 NAME
+
+froody - command line for Froody
+
+=head1 SYNOPSIS
+
+   bash$ froody -uhttp://foo.com/fe examples.myapi.greet who Mark
+
+=head1 DESCRIPTION
+
+Command line client for Froody.
+
+=head1 OPTIONS
+
+=over
+
+=item  -uhttp://myurl.com
+  
+Loads the API via that URL's reflection service and allows you to
+call methods against it.  You can specify this flag multiple times
+for different URLs.
+
+=item -Mmodulename
+  
+Loads the module.  If this is a subclass of Froody::Implementation
+this allows you to call methods that this module implements.  You can
+specify this flag multiple times for different modules.
+
+=item -lpath or -Ipath
+  
+Add this path to @INC.
+
+=item -t
+  
+Print out the data in the Terse data format rather than printing the XML
+  
+=item -p
+  
+Print out the data in the PerlDS data format rather than printing the XML
+  
+=item -y
+  
+Use YAML instead of Data::Dumper when printing data with C<-t> or C<-p>.
+Prints an error if YAML isn't installed.
+
+=item -b
+  
+Benchmark requests.  Prints out how long the request takes after all local
+code has been loaded and remote reflection calls have been run.
+  
+=item -nnumber
+
+Repeat the request a number of times.  Useful for crude benchmarking.
+
+=item -q
+
+Quiet mode.  Don't actually print out the output of the method.
+
+=item -d
+  
+Dump out the names of all the loaded methods instead of running a method
+
+=item -sportnum
+
+Start a standalone server on the port passed.  Defaults to 4242 if
+no port is specified
+
+=item -imodulename
+
+Print the specification for the given Froody::Method rather than running a
+method
+
+=item -v or --version
+  
+Shows the version of Froody installed on the system
+
+=item -h or --help or -?
+  
+Shows this help message
+
+=back
+
+

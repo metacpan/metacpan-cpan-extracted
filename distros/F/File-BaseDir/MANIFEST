@@ -1,0 +1,18 @@
+Build.PL
+Changes
+configure
+lib/File/BaseDir.pm
+lib/File/IconTheme.pm
+lib/File/UserDirs.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_vars.t
+t/02_lookup.t
+t/03_OO.t
+t/03_icontheme.t
+t/03_userdirs.t
+t/04_pod_ok.t
+t/05_pod_cover.t
+META.json

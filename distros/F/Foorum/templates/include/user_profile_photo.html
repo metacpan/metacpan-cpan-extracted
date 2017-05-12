@@ -1,0 +1,17 @@
+[% IF user AND user.profile_photo %]
+ 
+ [% IF user.profile_photo.upload %]
+    [% USE Math %]
+    [% upload = user.profile_photo.upload;
+       upload_id = upload.upload_id;
+       dir1 = upload_id / 3200 / 3200;
+       dir1 = Math.int(dir1);
+       dir2 = upload_id / 3200;
+       dir2 = Math.int(dir2);
+    %]
+    <img src='[% c.config.dir.upload %]/[% dir1 _ '/' _ dir2 _ '/' _ upload.filename %]' width='[% user.profile_photo.width || '120' %]'height='[% user.profile_photo.height || '120' %]' />
+ [% ELSIF user.profile_photo.type == 'URL' %]
+    <img src='[% user.profile_photo.value %]' width='[% user.profile_photo.width %]' height='[% user.profile_photo.height %]' />
+ [% END %]
+ 
+[% END %]

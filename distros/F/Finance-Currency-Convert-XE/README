@@ -1,0 +1,63 @@
+Finance::Currency::Convert::XE
+==============================
+
+This module is a Perl extension for currency conversion available from
+XE.com's Universal Currency Converter (tm) site.
+
+This module was originally named WWW::UCC. However, upon discovering the
+module Finance::Currency::Convert::Yahoo, I felt this module would fit better
+under the F::C::C namespace.
+
+INSTALLATION
+
+I recommend you use 'ppm', 'cpanp' or 'cpan' as appropriate. However if you
+wish to install this module by hand, then type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+make should be replaced with 'nmake', 'dmake' or other make as required.
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  WWW::Mechanize
+  HTML::TokeParser
+
+For testing this module requires:
+
+  Test::More
+
+For optional testing the module would like these other modules:
+
+  Test::Pod
+  Test::Pod::Coverage
+
+SUPPORT
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependant upon their severity and my availablity. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-XE
+
+AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+COPYRIGHT AND LICENSE
+
+  Copyright © 2002-2011 Barbie for Miss Barbell Productions.
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

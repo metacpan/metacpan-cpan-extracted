@@ -1,0 +1,50 @@
+File-CleanupTask
+
+
+This archive contains the distribution File-CleanupTask, version 0.11:
+
+    File::CleanupTask provides methods to Delete/Backup files on a task-based
+    configuration. This module makes it easy to handle pre-scheduled, automatic,
+    regular cleanups.
+
+    It comes with a binary 'run-file-cleanuptask' for running your tasks
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::CleanupTask
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-CleanupTask
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-CleanupTask
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-CleanupTask
+
+    Search CPAN
+        http://search.cpan.org/dist/File-CleanupTask/
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2012-2014 by Lokku Ltd..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+See http://dev.perl.org/licenses/ for more information.

@@ -1,0 +1,36 @@
+Frontier-Client-Easy
+
+Frontier::Client::Easy provides an easy interface to Frontier::Client,
+allowing you to call methods directly from the object as opposed to using
+the "call()" method of Frontier::Client.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Frontier::Client
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Frontier::Client::Easy
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 David J. Freedman
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

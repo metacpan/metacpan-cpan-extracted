@@ -1,0 +1,29 @@
+---
+abstract: 'Deduplicate files across directories'
+author:
+  - 'Hunter McMillen <mcmillhj@gmail.com>'
+build_requires:
+  Sub::Override: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Dedup
+requires:
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  feature: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/mcmillhj/File-Dedup/issues
+  homepage: https://metacpan.org/release/File-Dedup
+  repository: git://github.com/mcmillhj/File-Dedup.git
+version: '0.007'

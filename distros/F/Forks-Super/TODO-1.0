@@ -1,0 +1,293 @@
+Thoughts about a major revision. Also see the  TODO  file.
+
+    ___ Rework ipc specs in a major version change.
+        New vision is something like
+
+	    fork { ipc => [ @channel ] }
+            fork { ipc => [ \@channels ] }
+
+	where @channel specifies everything about how some data is
+	passed between a program
+
+	  * the direction (parent-to-child, child-to-parent, both)
+	  * the channel for communication ([temporary] file, socket,
+	    pipe, named pipe, shared memory)
+	  * identifier for the glob to read/write data in the child
+	  * identifier to read/write data in the parent
+
+	A @channel could also be a Forks::Super::IPCChannel object,
+	and in any case an array spec would be converted to an
+	IPCChannel object.
+
+	Direction:
+
+	    <	Write in child, read in parent
+	    >	Write in parent, read in child
+	    <>  Bidirectional [implies sockets => 1 or a tied handle]
+
+	Identifier (CHANNEL_ID):
+
+	    \w+(::\w+)*
+
+		In child, access filehandle through typeglob.
+		The typeglob will be fully qualified with the
+		calling package name if necessary.
+
+		In parent, filehandle accessed through
+
+		    $job->get_fh( CHANNEL_ID ) : IO::Handle
+		    $job->{ipc}{ CHANNEL_ID }  : IO::Handle
+
+		Convenience methods
+
+		    $job->print_fh(CHANNEL_ID, LIST) : BOOL
+		    $job->printf_fh(CHANNEL_ID, TEMPLATE, LIST) : BOOL
+		    $job->read_fh(CHANNEL_ID) : LIST | SCALAR
+
+	Supported channel types:
+
+	Default values can be used to set up an IPC channel if nothing
+	is specified in @channel.
+
+	    files [ files => BOOL ]
+
+		Use filesystem to manage communication between
+		processes. By default an arbitrary file in a temporary
+		directory is used. 
+
+		*filename => PATH
+
+		    Use the specified file instead of a temporary file.
+		    File will not be deleted (cleaned up) at the end of
+		    the program.
+
+		*append => BOOL
+
+		    If the specified file exists, append to it rather
+		    than overwriting it.
+
+	    sockets [ sockets => BOOL ]
+
+		Use sockets to manage communication. May failover to
+		files under some circumstances (Win32, style=>cmd/exec)
+
+		*sockettype => INET | UNIX
+
+		    Default is UNIX
+
+		*socketport => :PORT | PORT: | PORT:PORT
+
+		    For sockettype := INET, specifies ports to use
+		    for child, parent, or both ends of the socket.
+
+		    [For INET sockets, how can you commit to a port
+		    before the fork and bind/connect to it after the fork?]
+
+	    pipes [ pipes => BOOL ]
+
+		Use pipes to manage communication. Can failover to
+		sockets or files under some circumstances.
+
+		name => PATH
+
+		    Named pipe to use
+
+	    shared memory [ shmem => BOOL | channel ]
+
+		How else to use shared memory? A memcache
+		program? Sys V semaphores? Mmap modules?
+
+	Other options:
+
+	    blocking => BOOL
+
+		whether read end of channel uses blocking or non-blocking
+		I/O. For some channel types and some OS, this must be
+		emulated. [FALSE]
+
+	    flush => BOOL
+
+		whether write end of channel is autoflushed [TRUE]
+
+	    warn => BOOL
+
+		enable or disable warnings about this channel [TRUE]
+
+	    clearpipes => BOOL
+
+		use a tied filehandle type with a buffer and an additional
+		chore during productive pauses to keep socket and pipe
+		buffers clear and prevent blocking. [FALSE]
+
+	    join => CHANNEL_ID | fd
+
+		open the channel and dup it to another specified
+		channel
+
+	    data => \$scalar | \@array
+
+		For parent-to-child IPC, input comes from the specified
+		variable, not by writing to an IO handle in the parent.
+
+		For child-to-parent IPC, output from the child is
+		accumulated in this variable, not by reading from an
+		IO handle in the parent. Output may be collected when
+		the job completes, or it may be accumulated during
+		productive pauses in the parent.
+
+		In bidirectional IPC, data in the variable is used
+		as input to the child; then the variable is cleared
+		and used to accumulate the output from the child.
+
+	    data => \&subroutine
+
+		Get data from a subroutine?
+		Send output to a subroutine?
+
+	    layers => layer
+	    layers => [ @layers ]
+
+	        Apply the given set of I/O layers to the handle.
+		Examples:  :utf8 :gz :crlf :raw
+
+	Simple cases: There definitely needs to be some simple labels
+	to describe normal cases.
+
+            normal    use channels called STDIN,STDOUT,STDERR
+            join      join channels called STDOUT & STDERR, dup them in parent
+	    quiet     output channels STDOUT and STDERR go to /dev/null
+
+	Special cases:
+
+	    From IPC::Run: Pseudo-terminals?
+
+		run \@cmd, '<pty<', \$in, '>pty>', \$out_err
+
+	    new xterm
+
+		can we launch an xterm or another terminal for
+		displaying the output of a child?
+
+	    Other redirection constructs
+
+		>&
+		2>&1
+		0<&3
+		<&-
+
+
+    ___ New "style" where child uses open2/open3 like template
+	to run an external program. There is a second level of
+	IPC between the "perl" child and the "external" child.
+	We ought to be able to emulate the IPC::Run "pump"
+	functionality in this style.
+
+	When parent sends data to child, signal child.
+	When child sends data to parent, also send process id
+	(plus number of bytes? what else?) on a separate
+	channel, then you can signal the parent. This separate
+	channel could be dedicated to the child, or it could be
+	used by all child processes. Parent can
+	read from the low-bandwidth channel where the data
+	is available from, and respond (or not respond)
+	accordingly.
+
+	Child can also send other messages along the low-
+	bandwith channel.
+
+		ready for more data
+		closing input channel - don't send any more data
+		exiting
+
+	Like many things, it will probably suck to do this in Windows.
+
+    ___ "Pipe cleaner" tied filehandle class to periodically flush
+	pipes and sockets into buffers, emulating an "infinite capacity"
+	buffer.
+
+	___ during productive pauses or on regular itimer interrupts,
+	    read and buffer input from all pipes connected to output
+	    streams from another process. Read operations on the handle
+	    consult the input buffer first.
+
+	___ all write operations are to a buffer. On a write operation
+	    and during productive pauses/itimer interrupts, attempt
+	    to copy as much as you can from this buffer into the
+	    pipe.
+
+    ___ Several "modes" corresponding to use cases, controlling various
+	settings in the program:
+        ___ how frequently we examine the queue
+        ___ the timeout on non-blocking reads
+        ___ minimum resolution of the  pause()  function
+        ___ maximum processes as a function of number of processors
+        ___ how frequently we call suspend/resume callback
+
+        Considerations for these settings depend on:
+        ___ characteristic job duration
+           ___ short jobs (characteristic time 0-10s)
+           ___ long jobs (characteristic time >5m)
+           ___ medium jobs (10s-5m)
+           ___ mixed use (jobs of different sizes)
+           ___ asynchronous (jobs start in response to external events)
+           ___ number of jobs (active+queued). Does it take a noticeable amount
+	       of time to examine the queue and decide what job to dispatch?
+        ___ characteristic job intensity - what resources each job uses
+           ___ cpu-intensive jobs
+           ___ memory intensive jobs
+           ___ I/O intensive jobs
+           ___ network intensive jobs
+           ___ passive jobs (consume few resources, respond to external events)
+        ___ whether the queue is in use
+        ___ external factors
+	   ___ number and intensity of other programs running
+           ___ available memory
+           ___ additional users that are logged in to the same machine
+
+        ___ intelligent, "adaptive" mode which makes adjustments based
+            on actual characteristics of completed jobs
+
+        Good documentation on how to override any of these settings.
+
+    ___ IPCChannel object spec:
+	Mode: read, write, bidirectional
+	Scheme: file, socket, pipe, INET socket
+        Options: non-blocking, timeout on blocking operations,
+            use pipecleaning, suppress (redirect to/from /dev/null)
+
+        Constructor:
+	    mode, scheme, %options
+            from JSON spec
+        Methods
+            object to JSON spec
+            JSON spec to object
+            readline
+            print
+            sysread
+            syswrite
+            select (4 arg)
+            open/init
+	        try-to-open (for read end that must wait for write end)
+            close
+
+    ___ "process pool" concept, like FastCGI, for running subroutines
+        in background processes, but without having to spawn a lot of
+        processes.
+
+	Like converting a CGI script to FastCGI, you may need to
+	think carefully about the way you design your background job.
+
+    ___ wrapper script or code that can set up job options (IPC,
+        timeouts, os priority, cpu affinity, etc.) and then execute
+        a block of Perl code. The goal would be to be able to run a
+	subroutine or run an external command in a process 
+	ON A REMOTE HOST but have the IPC be more-or-less 
+	transparent to the parent process.
+
+	___ set up symbol tables? 
+	___ require included modules?
+	___ set up lexical variables that are in-scope and launch time?
+	___ Now that's what I would call a real cluster fork.
+
+    ___ Anything to learn from python  multiprocessing  module? See   
+        stackoverflow.com/questions/7931455/

@@ -1,0 +1,26 @@
+---
+abstract: 'Read and write files while keeping the original line-endings intact, no matter the platform.'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  File::Tempdir: '0'
+  Mock::Sub: '1.06'
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Edit-Portable
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Find::Rule: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/stevieb9/file-edit-portable/issues
+  repository: https://github.com/stevieb9/file-edit-portable.git
+version: '1.24'

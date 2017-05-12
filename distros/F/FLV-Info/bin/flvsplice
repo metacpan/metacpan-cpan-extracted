@@ -1,0 +1,94 @@
+#!/usr/bin/perl -w
+
+package main;
+
+use warnings;
+use strict;
+use 5.008;
+use Getopt::Long;
+use Pod::Usage;
+use English qw(-no_match_vars);
+use FLV::Splice;
+
+our $VERSION = '0.24';
+
+my %opts = (
+   verbose   => 0,
+   help      => 0,
+   version   => 0,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+   'v|verbose'   => \$opts{verbose},
+   'h|help'      => \$opts{help},
+   'V|version'   => \$opts{version},
+) or pod2usage(1);
+if ($opts{help})
+{
+   pod2usage(-exitstatus => 0, -verbose => 2);
+}
+if ($opts{version})
+{
+   print "v$VERSION\n";
+   exit 0;
+}
+
+if (3 > @ARGV)
+{
+   pod2usage(1);
+}
+
+my $outfile = pop;
+my @infiles = @ARGV;
+
+my $converter = FLV::Splice->new;
+for my $infile (@infiles)
+{
+   $converter->add_input($infile);
+}
+$converter->save($outfile);
+
+__END__
+
+=for stopwords FLV flv2flv in.flv out.flv flvcut flvsplice
+
+=head1 NAME
+
+flvsplice - Concatenate two or more FLVs into a single FLV file
+
+=head1 SYNOPSIS
+
+flvsplice [options] in.flv in.flv [in.flv ...] out.flv
+
+ Options:
+   -v --verbose        Print diagnostic messages
+   -h --help           Verbose help message
+   -V --version        Print version
+
+Any of the in or out filenames can be C<->, meaning STDIN or STDOUT.
+
+=head1 DESCRIPTION
+
+This tool appends one FLV after another create a movie that plays the
+videos back to back.  If the input FLVs are incompatible (mismatched
+codecs, for example) then this will fail.
+
+=head1 SEE ALSO
+
+flv2flv
+
+flvcut
+
+L<FLV::Splice>
+
+=head1 AUTHOR
+
+Chris Dolan, I<cdolan@cpan.org>
+
+=head1 ACKNOWLEDGMENTS
+
+This feature was created with financial support from John Drago
+(CPAN:JOHND).  Thanks!
+
+=cut

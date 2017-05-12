@@ -1,0 +1,94 @@
+[% PROCESS sub/date.html %]
+[% title = 'Members Of ' _ forum.name %]
+
+[% IF c.user_exists AND roles.is_admin %]
+[% c.load_once("jquery.ui.css") %]
+<div id='ftabs'>
+    <ul>
+        <li><a href='/forumadmin/[% forum.forum_id  %]/basic'><span>[% c.loc('Basic Setting') %]</span></a></li>
+        <li><a href='/forumadmin/[% forum.forum_id  %]/style'><span>[% c.loc('Style Setting') %]</span></a></li>
+        [% TRY %]
+        [% css_file = c.config.home _ '/root/static/css/style/forum' _ forum.forum_id _ '.css' %]
+        [% USE File( css_file ) %]
+        <li><a href='/forumadmin/[% forum.forum_id  %]/del_style'><span>[% c.loc('Delete Style') %]</span></a></li>
+        [% CATCH File %]
+        [% END %]
+        <li selected="selected"><a href='[% forum.forum_url %]/members'><span>[% c.loc('Members Settings') %]</span></a></li>
+        <li><a href='/forumadmin/[% forum.forum_id  %]/announcement'><span>[% c.loc('Announcement Setting') %]</span></a></li>
+    </ul>
+    <div>
+[% END %]
+
+<div class='one'>
+<table align='center'>
+	<tr class='title' align='center'>
+	<td>[% c.loc('NickName') %]</td>
+	<td>[% c.loc('Role') %]</td>
+	<td>[% c.loc('Gender') %]</td>
+	<td>[% c.loc('Register On') %]</td>
+    [% IF roles.is_moderator %]<td width='220'>[% c.loc('Action') %]</td>[% END %]
+	</tr>
+[% FOREACH user IN user_roles %]
+<tr align='center'>
+	<td class='forum2'><a href='/u/[% members.${user.user_id}.username %]'>[% members.${user.user_id}.nickname %]</a></td>
+	<td class='forum1'>[% user.status | ucfirst %]</td>
+	<td class='forum2'>[% SWITCH members.${user.user_id}.gender;CASE 'F';'Female';CASE 'M';'Male';CASE;'Secret';END; %]</td>
+	<td class='forum1'>[% date_format(members.${user.user_id}.register_time) %]</td>
+	[% IF roles.is_moderator %]
+	<td class='forum2'>
+	[% IF user.status == 'admin' OR user.status == 'moderator' %]
+	-
+	[% ELSE %]
+	    <select id='div_r_[% user.user_id %]'>
+	    [% FOREACH m_type IN ['user', 'rejected', 'blocked'] %]
+	    [% IF user.status != m_type %]<option value='[% m_type %]'>[% m_type | ucfirst %]</option>[% END %]
+	    [% END %]
+        </select>
+        <input type='button' value='Change Membership' onclick="javascript:ChangeMemberType('[% user.user_id %]', '[% user.status %]')" />
+    [% END %]
+    </td>
+	[% END %]
+</tr>
+[% END %]
+<tr class='forum2'>
+    <td colspan='2' align='right'>
+    [% c.loc('View:') %] <select name='member_type' id='member_type' onchange='javascript:ChangeView()'>
+    <option value='user'[% IF member_type == 'user' %] selected='selected'[% END %]>[% c.loc('Members') %]</option>
+    <option value='pending'[% IF member_type == 'pending' %] selected='selected'[% END %]>[% c.loc('Pending') %]</option>
+    <option value='blocked'[% IF member_type == 'blocked' %] selected='selected'[% END %]>[% c.loc('Blocked') %]</option>
+    <option value='rejected'[% IF member_type == 'rejected' %] selected='selected'[% END %]>[% c.loc('Rejected') %]</option>
+    </select>
+    </td>
+	<td colspan='[% IF roles.is_moderator %]3[% ELSE %]2[% END %]' align='right'>
+	[% INCLUDE 'sub/pager.html' %]
+	</td>
+</tr>
+</table>
+</div>
+<script type="text/javascript">
+
+function ChangeView() {
+    var member_type = $('#member_type').val();
+    if (member_type == 'user') { member_type = ''; }
+    window.location = '[% forum.forum_url %]/members/' + member_type;
+}
+
+[% IF roles.is_moderator %]
+function ChangeMemberType(user_id, from) {
+    var m_type = $('#div_r_'+user_id).val();
+    
+    $.get('/forumadmin/[% forum.forum_id %]/change_membership', { 'user_id': user_id, 'from': from, 'to': m_type }, function(data) {
+        alert(data);
+    } );
+}
+[% END %]
+
+    $().ready(function() {
+        tabize('ftabs');
+    });
+</script>
+
+[% IF c.user_exists AND roles.is_admin %]
+    </div>
+</div>
+[% END %]

@@ -1,0 +1,16 @@
+Revision history for File-Tail-Scribe
+
+0.10    2010-03-24
+        First version released to CPAN
+
+0.11    2010-03-24
+	Changed default --config option
+	Fixed missing --state-file-name option
+	Added hostname to output messages
+
+0.12	2010-03-26
+	Added --pidfile option
+
+0.13	2010-04-07
+	Removed unnecessary 00-load.t
+	Small doc fixes

@@ -1,0 +1,24 @@
+params:
+  mail:
+    name: 'メールアドレス'
+    validators:
+      - Blank#not_blank
+      - Email#email
+      - String#max_length:
+          max: 100
+  mail2:
+    name: 'メールアドレス'
+    validators:
+      - Blank#not_blank:
+          msg: 'メールアドレスは必須だよー'
+      - Email#email
+      - String#max_length:
+          max: 100
+  mail3:
+    name: 'メールアドレス'
+    validators:
+      - Blank#not_blank
+      - Email#email
+      - String#max_length:
+          max: 100
+

@@ -1,0 +1,4 @@
+Revision history for Filesys::MakeISO::Driver::MagicISO
+
+0.0.1  2006-01-14
+    - Initial release. Needs Filesys::MakeISO v0.1.0

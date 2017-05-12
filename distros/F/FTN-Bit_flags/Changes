@@ -1,0 +1,7 @@
+Revision history for FTN-Bit_flags
+
+20160323  2016-03-23 14:14:20-04:00 America/New_York
+    Initial version.
+
+20160324  2016-03-24 00:46:19-04:00 America/New_York
+    Replace '//' operator for older perls.

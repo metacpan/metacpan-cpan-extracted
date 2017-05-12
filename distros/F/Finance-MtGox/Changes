@@ -1,0 +1,20 @@
+Revision history for Finance-MtGox
+
+0.50    Tue May  7 15:33:49 UTC 2013
+    - Support v1 and v2 APIs
+    - Remove support for legacy API
+
+0.04    Wed Apr 10 16:22:52 UTC 2013
+    - Use data.mtgox.com where necessary
+
+0.03    Fri Nov 11 16:27:07 UTC 2011
+    - Reduce memory consumption for long-running processes (Thanks shockdiode)
+
+0.02    Fri Oct 07 2011
+    - Support MtGox API version 0
+    - Make all API requests over HTTPS
+    - Add a test for Synopsis code
+    - Correct a typo in the Synopsis
+
+0.01    Tue Feb 08 2011
+    - First version

@@ -1,0 +1,153 @@
+# tqt.tt: tricks a Thread::Queue test file to running its tests
+#         against Forks::Queue instead.
+#
+# to use it, add these lines to the target script after
+# Test::More is use'd or import'd .
+#
+#         BEGIN { do 'tqt/tqt.tt' } do 'tqt/tqt.tt';
+#
+
+use Test::More;
+use Carp::Always;
+use Forks::Queue;
+use warnings;
+no warnings 'redefine', 'once';
+$Forks::Queue::OPTS{impl} = $ARGV[0] || 'File';
+our $okq //= Forks::Queue->new;
+our $MAIN_PID //= $$;
+our $in_thread = 0;
+$INC{'threads.pm'} = 1;
+$INC{'Thread/Queue.pm'} = 1;
+alarm 60 if !$tqt::alarm_set++;
+
+open XERR, '>&STDERR';
+our $DBG = *XERR;
+open $DBG,">/dev/null" unless $ENV{TQT_DEBUG};
+
+*CORE::GLOBAL::exit = sub {
+    if (!$in_thread) {
+        print $DBG "Fake exit called\n";
+        tqt::done_testing();
+    }
+    CORE::exit($_[0]);
+};
+
+sub Thread::Queue::new {
+    my ($pkg,@list) = @_;
+    Forks::Queue->new( impl => $ARGV[0] || 'File',
+                       on_limit => 'block', 
+                       list => \@list );
+}
+
+sub tqt::done_testing {
+    if (!$in_thread && !$tqt::done_testing++) {
+        $okq->end;
+        while (my $item = $okq->get) {
+            tqt::process_okq_task($item);
+        }
+        1;
+    }
+}
+
+sub tqt::process_okq_task {
+    my $task = shift;
+    my $test = shift @$task;
+    my $pid = pop @$task;
+    if ($test eq 'ok') {
+        return ok($task->[0], "[$pid] " . $task->[1]);
+    } elsif ($test eq 'is') {
+        return is($task->[0],$task->[1],"[$pid] $task->[2]");
+    } elsif ($test eq 'is_deeply') {
+        return is_deeply($task->[0],$task->[1],"[$pid] $task->[2]");
+    } elsif ($test eq 'like') {
+        return like($task->[0], $task->[1], "[$pid] $task->[2]");
+    }
+    warn "unrecognized test: $test\n";
+    return 0;
+}
+
+# in child processes, write components of a test to a queue.
+# the main process will read the queue and report the results.
+
+sub is ($$;$) {
+    goto &Test::More::is unless $in_thread;
+    print $DBG "Fake is\n";
+    $okq->put( [ 'is', @_, $$ ] );
+    return !defined($_[1]) ? !defined($_[0]) : "$_[0]" eq "$_[1]";
+}
+
+sub is_deeply {
+    goto &Test::More::is_deeply unless $in_thread;
+    print $DBG "Fake is_deeply\n";
+    $okq->put( [ 'is_deeply', @_, $$ ] );
+    return 1;
+}
+
+sub ok ($;$) {
+    goto &Test::More::ok unless $in_thread;
+    print $DBG "Fake ok  @_\n";
+    $okq->put( [ 'ok', @_, $$ ] );
+    return $_[0];
+}
+
+sub pass (;$) {
+    goto &Test::More::pass unless $in_thread;
+    print $DBG "Fake pass  @_\n";
+    $okq->put( ['ok', 1, @_, $$ ] );
+    return 1;
+}
+
+sub like ($$;$) {
+    goto &Test::More::like unless $in_thread;
+    print $DBG "Fake like\n";
+    $okq->put( [ 'like', @_, $$ ] );
+    return "$_[0]" =~ $_[1];
+}
+
+sub threads::create {
+    print $DBG "Fake threads::create called\n";
+    my ($pkg,$sub) = @_;
+    my $pid = fork;
+    if ($pid == 0) {
+        $in_thread = 1;
+        $sub->();
+        CORE::exit;
+    }
+    return bless \$pid, 'threads';
+}
+
+sub threads::yield {
+    print $DBG "Fake threads::yield\n";
+}
+
+sub threads::tid {
+    $DBG && print $DBG "Fake threads::tid called\n";
+    if (ref $_[0]) {
+        return ${$_[0]} ;# - $MAIN_PID;
+    } else {
+        return $$ ;#- $MAIN_PID;
+    }
+}
+
+sub threads::join {
+    print $DBG "Fake threads::join called ${$_[0]}\n";
+    waitpid ${$_[0]}, 0;
+    if (!$in_thread) {
+        while (my $task = $okq->get_nb) {
+            tqt::process_okq_task($task);
+        }
+    }
+}
+
+{
+    package threads;
+    no warnings 'redefine';
+    use overload 
+        'bool' => sub { ${$_[0]} },
+        '0+' => sub { ${$_[0]} },
+        '""' => sub { ${$_[0]} };
+}
+
+print $DBG "Successfully read tqt.tt\n";
+1;
+

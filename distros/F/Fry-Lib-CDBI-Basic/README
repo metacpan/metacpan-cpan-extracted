@@ -1,0 +1,31 @@
+INSTALL
+	perl Makefile.PL; make; make test; make install;
+	Do 'make install' as root if installing into root-protected directories
+
+Description
+	These are Class::DBI libraries that plug into Fry::Shell.
+Features
+	- Contains functions that search with &Class::DBI::search* and
+		Class::DBI::AbstractSearch:search_where, delete, search and replace in records with a perl regexp, update
+		records via a text editor and insert. Also has a few functions used to manipulate DBI::Profile's
+		logging.
+	- Can customize output format via a subhook for a view sub.
+	- Most functions can have their actions confined to certain columns via the 'c' option.
+	- Menu mode allows one to alias several Class::DBI objects with numbers making mundane administration easier.
+	- Could work with any database working under Class::DBI but mainly works with
+	  Mysql,Postgres and Sqlite.
+	- Also comes bundled with Fry::Lib::CDBI::Tags and Fry::Lib::CDBI::Outline.
+
+To Do
+	-port old TESTS!
+	-defining relations between tables with has_*
+	-provide direct SQL queries
+	-support shell-like parsing of quotes to allow spaces in queries
+	-specify sorting and limit of queries
+	-embed sql or database functions in queries
+	-create an easily-parsable syntax for piecing chunks into 'or' and 'and' parts
+		to be passed to Class::DBI::AbstractSearch
+License
+	Perl's
+	
+Have fun!

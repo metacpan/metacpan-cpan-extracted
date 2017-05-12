@@ -1,0 +1,15 @@
+#fsdb x
+# same
+1
+2.23
+# more digits, ok
+3.231
+4.2312
+# fewer digits, bad
+5.2
+# rounding, ok
+6.24
+7.22
+# rounding, bad
+8.25
+9.20

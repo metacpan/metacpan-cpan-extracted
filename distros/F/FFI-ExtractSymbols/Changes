@@ -1,0 +1,11 @@
+Revision history for FFI-ExtractSymbols
+
+0.03      2015-02-02 05:39:38 -0500
+  - When using nm mode, accept W in addition to T for code symbols
+
+0.02      2015-02-01 23:56:27 -0500
+  - First release to CPAN
+  - identical to 0.01
+
+0.01      2015-02-01 23:44:41 -0500
+  - initial version

@@ -1,0 +1,39 @@
+Changelog for Finance::Bank::SuomenVerkkomaksut
+
+0.010     2014-10-01 16:38:00 Europe/Helsinki
+    * Add sub return_authcode
+
+0.009     2014-07-09 15:56:00 Europe/Helsinki
+    * Update URLs in perldoc
+
+0.008     2014-04-23 11:20:00 Europe/Helsinki
+
+    * Rename from Finance::Bank::SuomenVerkkomaksut to Finance::Bank::Paytrail
+
+0.007     2014-02-18 16:00:00 Europe/Helsinki
+
+    * Verkkomaksut urls to paytrail urls. Clarification to REST api_version method.
+
+0.006     2014-02-18 15:30:00 Europe/Helsinki
+
+    * Change name in documentation and in debug messages from Suomen Verkkomaksut to Paytrail.
+
+0.005     2014-02-18 15:10:00 Europe/Helsinki
+
+    * Add missing "use MIME::Base64" into the component.
+
+0.004     2011-05-05 11:41:00 Europe/Helsinki
+
+    * Better documentation.
+
+0.003     2011-05-04 17:10:00 Europe/Helsinki
+
+    * Removed PodWeaver from dist.ini, removing duplicated sections in documentation.
+
+0.002     2011-05-04 16:39:00 Europe/Helsinki
+
+    * Improved documentation.
+
+0.001     2011-05-04 15:39:00 Europe/Helsinki
+
+    * Initial release.

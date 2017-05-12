@@ -1,0 +1,21 @@
+TODO:
+
+  * New Test for HTML rendering using fieldname_field templates.
+
+  * Combination-field (contains several other fields)
+  * More Examples
+  * Test rendering output
+  * Simple reflectors
+  * Documentation for HTML renderer - proper use of render_hints
+  * "Widgets" - jQuery datetime dealy "remote post" options etc
+
+DONE:
+
+2012-01-24 - Updated DateTime field docs and its Select emulation; added examples and default template
+2012-01-11 - Added DateTime field with tests
+2012-01-06 - Update documentetation and formatting
+2010-02-19 - Renderer::HTML - add table based rendering
+2010-06-11 - Add 'editable' flag used for disabling fields
+2010-06-11 - added DelegateConnection - a better way to delegate values to external objects
+2010-06-11 - Option retrieval now uses DelegateConnections
+2010-07-25 - Adjust HTML field templates so that the actual input element can be used directly. 

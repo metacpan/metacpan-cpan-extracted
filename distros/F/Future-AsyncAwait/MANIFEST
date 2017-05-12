@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Future/AsyncAwait.pm
+lib/Future/AsyncAwait.xs
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01async-immediate.t
+t/02await-immediate.t
+t/03await.t
+t/99pod.t

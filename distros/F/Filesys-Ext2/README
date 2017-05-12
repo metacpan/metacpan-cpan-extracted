@@ -1,0 +1,8 @@
+NAME
+    Filesys::Ext2 - Interface to ext2 and ext3 filesystem attributes
+
+REQUIRES
+    e2fsprogs <http://e2fsprogs.sourceforge.net>
+
+CAVEATS
+    lsattr is no longer context sensitive.

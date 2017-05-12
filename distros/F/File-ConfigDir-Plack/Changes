@@ -1,0 +1,10 @@
+Revision history for File-ConfigDir-Plack
+
+0.002	2014-11-12
+    - Update Copyright year
+    - tidy sources
+    - improve meta-spec information
+    - replace README by README.md to improve most frontpage builders
+
+0.001	2013-10-25
+    - First version, released on an unsuspecting world.

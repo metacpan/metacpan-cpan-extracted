@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+rrr-overview - summarize the dataset
+
+=head1 SYNOPSIS
+
+  rrr-overview [options] principal_recentfile
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my $optpod = <<'=back';
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--verbose|v+>
+
+More feedback.
+
+=back
+
+=head1 DESCRIPTION
+
+rersyncrecent is a project to get speedy rsync operation on large
+trees over multiple hosts. It maintains a collection of files with
+metadata (so called recentfiles) that represent adjacent or
+overlapping timespans of file change events.
+
+rrr-overview summarizes the contents of the recentfiles.
+
+=cut
+
+use strict;
+use warnings;
+
+use File::Rsync::Mirror::Recent;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+our %Opt;
+my @opt = $optpod =~ /B<--(\S+)>/g;
+
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(2);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (@ARGV > 1) {
+    pod2usage(2);
+} elsif (0 == @ARGV and -f "RECENT.recent") {
+    @ARGV = "RECENT.recent";
+} elsif (1 == @ARGV) {
+} else {
+    pod2usage(2);
+}
+
+my $rf = File::Rsync::Mirror::Recent->new
+    (
+     local => $ARGV[0],
+    );
+my @args;
+if ($Opt{verbose}) {
+    push @args, "verbose", $Opt{verbose};
+}
+print $rf->overview(@args);
+
+__END__
+
+
+# Local Variables:
+# mode: cperl
+# coding: utf-8
+# cperl-indent-level: 4
+# End:

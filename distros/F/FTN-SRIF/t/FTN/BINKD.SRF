@@ -1,0 +1,13 @@
+Sysop Sysop Name
+AKA 1:99/99@fidonet
+AKA 99:99/999@testing
+AKA 99:99/999.9@testing
+Baud 9600
+Time -1
+RequestList t/FTN/00000001.REQ
+ResponseList t/FTN/00000001.RSP
+RemoteStatus PROTECTED
+SystemStatus LISTED
+CallerID localhost
+SessionType OTHER
+Password Testing

@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/File/BOM.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+README-cygwin
+t/00..setup.t
+t/01..bom.t
+t/02..perlio-via.t
+t/03..exceptions.t
+t/04..pod.t
+t/99..shutdown.t
+t/data/broken_bom.txt
+t/lib/Test/Framework.pm
+TODO
+META.json

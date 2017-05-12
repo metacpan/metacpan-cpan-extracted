@@ -1,0 +1,51 @@
+{
+   "abstract" : "jail list for FreeBSD systems",
+   "author" : [
+      "Athanasios Douitsis <aduitsis@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FreeBSD-Jails",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "FreeBSD::Jails" : {
+         "file" : "lib/FreeBSD/Jails.pm",
+         "version" : "v0.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/aduitsis/FreeBSD-Jails"
+      }
+   },
+   "version" : "v0.2"
+}

@@ -1,0 +1,91 @@
+#!/usr/bin/perl -w
+
+package main;
+
+use warnings;
+use strict;
+use 5.008;
+use Getopt::Long;
+use Pod::Usage;
+use English qw(-no_match_vars);
+use FLV::ToMP3;
+
+our $VERSION = '0.24';
+
+my %opts = (
+   verbose => 0,
+   help    => 0,
+   version => 0,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+   'v|verbose' => \$opts{verbose},
+   'h|help'    => \$opts{help},
+   'V|version' => \$opts{version},
+) or pod2usage(1);
+if ($opts{help})
+{
+   pod2usage(-exitstatus => 0, -verbose => 2);
+}
+if ($opts{version})
+{
+   print "v$VERSION\n";
+   exit 0;
+}
+
+if (@ARGV < 2)
+{
+   pod2usage(1);
+}
+
+my $infile  = shift;
+my $outfile = shift;
+
+my $converter = FLV::ToMP3->new();
+$converter->parse_flv($infile);
+$converter->save($outfile);
+
+__END__
+
+=for stopwords MP3 FLV flv2mp3 flv2swf file.mp3 file.flv transcode transcoding
+
+=head1 NAME
+
+flv2mp3 - Transform an FLV file into an MP3 file
+
+=head1 SYNOPSIS
+
+flv2mp3 [options] file.flv file.mp3
+
+ Options:
+   -v --verbose        Print diagnostic messages
+   -h --help           Verbose help message
+   -V --version        Print version
+
+=head1 DESCRIPTION
+
+The most common format for FLV audio is MP3 compressed, which audio
+chunks represented as one or more MP3 frames.  Thus, it is
+straightforward to extract this audio to construct a standalone MP3
+file.
+
+=head1 CAVEATS AND LIMITATIONS
+
+Supports MP3 audio only.  No transcoding is performed, just data extraction.
+
+Does not support audio streams in the same file.
+
+=head1 SEE ALSO
+
+FLV::ToMP3
+
+flv2swf
+
+=head1 AUTHOR
+
+Clotho Advanced Media Inc., I<cpan@clotho.com>
+
+Primary Developer: Chris Dolan
+
+=cut

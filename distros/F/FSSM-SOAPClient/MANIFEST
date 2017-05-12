@@ -1,0 +1,15 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Build.PL
+lib/FSSM/SOAPClient.pm
+lib/FSSM/SOAPClient/Config.pm
+t/001_unit.t
+t/002_net.t
+t/result.xml
+t/test.dmp
+t/test.fas
+Makefile.PL
+META.yml

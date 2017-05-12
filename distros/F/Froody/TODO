@@ -1,0 +1,15 @@
+In the <response> tag in the XML, is we have a structure:
+
+  <response>
+    <foo>
+      <bar>1</bar>
+      <bar>2</bar>
+    </foo>
+    <foo>
+      <wallaby id="9.5"><fred /></wallaby>
+    </foo>
+  </response>
+
+there's no sanity checking done to ensure that both 'foo' tags look
+the same - what are they _supposed_ to look like?
+

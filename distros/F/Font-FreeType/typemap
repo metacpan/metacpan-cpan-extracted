@@ -1,0 +1,105 @@
+# Typemap file for FreeType types.  The ones which are used for classes are
+# mapped to blessed references.
+
+TYPEMAP
+FT_UShort T_INT_FTUINT
+FT_UInt   T_INT_FTUINT
+FT_Int32  T_INT_FTINT32
+FT_ULong  T_INT_FTULONG
+FT_Pos    T_INT_FTINT32
+FT_Encoding T_INT_FTULONG
+FT_F26Dot6  T_DOUBLE_FT26Dot6
+
+Font_FreeType                   T_PTROBJ_SPECIAL
+Font_FreeType_Face              T_PTROBJ_SPECIAL
+Font_FreeType_Glyph             T_PTROBJ_SPECIAL
+Font_FreeType_CharMap           T_PTROBJ_SPECIAL
+Font_FreeType_NamedInfo         T_PTROBJ_SPECIAL
+Font_FreeType_BoundingBox       T_PTROBJ_SPECIAL
+
+const char *    T_PV
+HV *            T_HVREF
+
+
+# Converts between Perl numbers and the FT_UInt type, which is a simple
+# unsigned integer.
+
+INPUT
+T_INT_FTUINT
+    $var = (FT_UInt) SvUV($arg);
+
+OUTPUT
+T_INT_FTUINT
+    sv_setuv($arg, (UV) $var);
+
+
+# Converts between Perl numbers and the FT_Int32 type, which is a simple
+# signed integer.
+
+INPUT
+T_INT_FTINT32
+    $var = (FT_Int32) SvIV($arg);
+
+OUTPUT
+T_INT_FTINT32
+    sv_setiv($arg, (IV) $var);
+
+
+# Same as above but for the FT_ULong type.
+
+INPUT
+T_INT_FTULONG
+    $var = (FT_ULong) SvUV($arg);
+
+OUTPUT
+T_INT_FTULONG
+    sv_setuv($arg, (UV) $var);
+
+
+# This type converts between Perl integer or float numbers and the fixed-point
+# 26.6 numbers sometimes used by FreeType.  It rounds to the closest value
+# which can be stored.
+
+INPUT
+T_DOUBLE_FT26Dot6
+    $var = (FT_F26Dot6) floor(SvNV($arg) * 64.0 + 0.5);
+
+OUTPUT
+T_DOUBLE_FT26Dot6
+    sv_setnv($arg, (double) $var / 64.0);
+
+
+# There follows the definition of T_PTROBJ_SPECIAL, which is stolen from
+# the 'perlxs' documentation.  It handles the type being blessed into the
+# appropriate class, changing underscores in the C name to '::' in the
+# Perl name.
+#
+# I've added a check on sv_isobject() to prevent a segfault if a method
+# is called on the package name.
+
+INPUT
+T_PTROBJ_SPECIAL
+    if (sv_isobject($arg) &&
+        sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\"))
+    {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type) tmp;
+    }
+    else
+        croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\");
+
+OUTPUT
+T_PTROBJ_SPECIAL
+    sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", (void*)$var);
+
+
+# Needed for compatability with Perl 5.6.1.  This is the version out
+# of the 5.8.4 typemap, because the standard 5.6 one doesn't work.
+INPUT
+T_HVREF
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV)
+	    $var = (HV*)SvRV($arg);
+	else
+	    Perl_croak(aTHX_ \"$var is not a hash reference\")
+
+# vi:ts=4 sw=4 expandtab

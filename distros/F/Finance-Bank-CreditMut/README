@@ -1,0 +1,97 @@
+NAME
+    Finance::Bank::CreditMut - Check your Crédit Mutuel accounts from Perl
+
+SYNOPSIS
+     use Finance::Bank::CreditMut;
+
+     my @accounts = Finance::Bank::CreditMut->check_balance(
+        username => "$username",  # Be sure to put the numbers
+        password => "$password",  # between quote.
+     );
+
+     foreach my $account ( @accounts ){
+        local $\ = "\n";
+        print "       Name ", $account->name;
+        print " Account_no ", $account->account_no;
+        print "  Statement\n";
+
+        foreach my $statement ( $account->statements ){
+            print $statement->as_string;
+        }
+     }
+
+DESCRIPTION
+    This module provides a rudimentary interface to the CyberMut online
+    banking system at <https://www.creditmutuel.fr/>. You will need either
+    Crypt::SSLeay or IO::Socket::SSL installed for HTTPS support to work
+    with LWP.
+
+    The interface of this module is directly taken from Briac Pilpré's
+    Finance::Bank::BNPParibas.
+
+WARNING
+    This is code for online banking, and that means your money, and that
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the source
+    of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to me,
+    but is provided under NO GUARANTEE, explicit or implied.
+
+METHODS
+  check_balance( username => $username, password => $password, ua => $ua )
+    Return a list of account (F::B::CM::Account) objects, one for each of
+    your bank accounts. You can provide to this method a WWW::Mechanize
+    object as third argument. If not, a new one will be created.
+
+Account methods
+  sort_code()
+    Return the sort code of the account. Currently, it returns an undefined
+    value.
+
+  name()
+    Returns the human-readable name of the account.
+
+  account_no()
+    Return the account number, in the form "XXXXXXXXX YY", where X and Y are
+    numbers.
+
+  balance()
+    Returns the balance of the account.
+
+  statements()
+    Return a list of Statement object (Finance::Bank::CreditMut::Statement).
+
+  currency()
+    Returns the currency of the account as a three letter ISO code (EUR,
+    CHF, etc.)
+
+Statement methods
+  date()
+    Returns the date when the statement occured, in DD/MM/YY format.
+
+  description()
+    Returns a brief description of the statement.
+
+  amount()
+    Returns the amount of the statement (expressed in Euros or the account's
+    currency). Although the Crédit Mutuel website displays number in
+    continental format (i.e. with a coma as decimal separator), amount()
+    returns a real number.
+
+  as_string($separator)
+    Returns a tab-delimited representation of the statement. By default, it
+    uses a tabulation to separate the fields, but the user can provide its
+    own separator.
+
+COPYRIGHT
+    Copyright 2002-2003, Cédric Bouvier. All Rights Reserved. This module
+    can be redistributed under the same terms as Perl itself.
+
+AUTHOR
+    Cédric Bouvier <cbouvi@cpan.org>
+
+    Thanks to Simon Cozens for releasing Finance::Bank::LloydsTSB and to
+    Briac Pilpré for Finance::Bank::BNPParibas.
+
+SEE ALSO
+    Finance::Bank::BNPParibas, WWW::Mechanize
+

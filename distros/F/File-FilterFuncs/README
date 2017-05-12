@@ -1,0 +1,41 @@
+File-FilterFuncs version 0.53
+=============================
+
+File::FilterFuncs makes it easy to perform transformations on
+files. When you use this module, you specify a group of filter
+functions that perform transformations on the lines in a source
+file. Those transformed lines are written to the destination file
+that you specify. For example, this code coverts an entire file
+to upper-case, line-by-line:
+
+ use File::FilterFuncs qw(filters);
+
+ filters('source.txt',
+     sub { uc $_; 1 },
+     'dest.txt'
+ );
+
+See the POD for more examples and details.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   none
+
+COPYRIGHT AND LICENCE
+
+  This program is under the General Public License (GPL).
+
+  Copyright 2007 Mumia Wotse
+  Mumia Wotse <mumia.w.18.spam+nospam [at] earthlink.net>
+
+

@@ -1,0 +1,18 @@
+# test3a.hash                             -*-cperl-*-
+#
+# Name and hashref for the namelist in test3a.nml
+#
+
+$name = 'nlist';
+
+$namelists =
+  { 'bcz'            => { value => [ ( ('a      ')x3,
+				       ('v3     '),
+				       ('s      ')x2 ) x 1 ],
+			  stype => 'single-quote string',   type => 1 }
+  };
+
+
+$nlists = (keys %$namelists)+0.;
+
+

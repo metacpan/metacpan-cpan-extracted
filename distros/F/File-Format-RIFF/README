@@ -1,0 +1,12 @@
+File::Format::RIFF
+
+
+File::Format::RIFF provides an Object-Oriented library for reading, creating,
+manipulating, and writing files in the Resource Interchange File Format
+(RIFF).
+
+See LICENSE for copyright statement and licensing information.
+
+See INSTALL for instructions on how to build and install File::Format::RIFF.
+
+See eg/ and t/ for code samples.

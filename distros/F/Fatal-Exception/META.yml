@@ -1,0 +1,31 @@
+---
+name: Fatal-Exception
+version: 0.05
+author:
+  - 'Piotr Roszatycki <dexter@debian.org>'
+abstract: Succeed or throw exception
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exception::Base: 0.21
+  Exception::Died: 0
+  perl: 5.006
+build_requires:
+  Exception::Warning: 0
+  Test::Assert: 0
+  Test::Unit::Lite: 0.07
+provides:
+  Exception::Argument:
+    file: lib/Exception/Argument.pm
+    version: 0.05
+  Exception::Fatal:
+    file: lib/Exception/Fatal.pm
+    version: 0.05
+  Fatal::Exception:
+    file: lib/Fatal/Exception.pm
+    version: 0.05
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

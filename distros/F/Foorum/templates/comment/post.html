@@ -1,0 +1,16 @@
+[% IF c.user_exists %]
+<br />
+<div class='one'>
+<form method='post' action='/comment/post' enctype="multipart/form-data">
+<table align='center'>
+    <tr class='title'><td colspan='2'>Post A Comment</td></tr>
+    <tr class='misc1'><td align='right'>[% c.loc('Title') %]</td><td><input type='text' name='title' size='64' maxlength='80' /></td></tr>
+    <tr class='misc2'><td align='right'>[% c.loc('Content') %]</td><td><textarea name='text' style='width: 100%' rows="15"></textarea></td></tr>
+    <tr class='misc1'><td align='right'>[% c.loc('Upload Attachment') %]</td><td>
+    [% INCLUDE upload/input.html %]
+    </td></tr>
+    <tr class='misc2'><td></td><td><input type='submit' /></td></tr>
+</table>
+</form>
+</div>
+[% END %]

@@ -1,0 +1,39 @@
+---
+abstract: 'Easy temporary directories associated with packages.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Tempdir-ForPackage
+provides:
+  File::Tempdir::ForPackage:
+    file: lib/File/Tempdir/ForPackage.pm
+    version: '1.000002'
+recommends:
+  Moo: '1.000008'
+requires:
+  Carp: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  Moo: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/File-Tempdir-ForPackage/issues
+  homepage: https://github.com/kentnl/File-Tempdir-ForPackage
+  repository: https://github.com/kentnl/File-Tempdir-ForPackage.git
+version: '1.000002'

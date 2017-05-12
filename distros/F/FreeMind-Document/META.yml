@@ -1,0 +1,68 @@
+---
+abstract: 'representation of a FreeMind-style mind map document'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::LongString: '0.15'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FreeMind-Document
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  FreeMind::ArrowLink:
+    file: lib/FreeMind/ArrowLink.pm
+    version: '0.002'
+  FreeMind::Cloud:
+    file: lib/FreeMind/Cloud.pm
+    version: '0.002'
+  FreeMind::Document:
+    file: lib/FreeMind/Document.pm
+    version: '0.002'
+  FreeMind::Edge:
+    file: lib/FreeMind/Edge.pm
+    version: '0.002'
+  FreeMind::Font:
+    file: lib/FreeMind/Font.pm
+    version: '0.002'
+  FreeMind::Icon:
+    file: lib/FreeMind/Icon.pm
+    version: '0.002'
+  FreeMind::Map:
+    file: lib/FreeMind/Map.pm
+    version: '0.002'
+  FreeMind::Node:
+    file: lib/FreeMind/Node.pm
+    version: '0.002'
+  FreeMind::RichContent:
+    file: lib/FreeMind/RichContent.pm
+  FreeMind::Text:
+    file: lib/FreeMind/Text.pm
+    version: '0.002'
+requires:
+  Type::Utils: 0.000_08
+  Types::Standard: 0.000_08
+  XML::LibXML::Augment: '0.001'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/FreeMind-Document/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=FreeMind-Document
+  homepage: https://metacpan.org/release/FreeMind-Document
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-freemind-document.git
+version: '0.002'
+x_provides_scripts:
+  mm2txt:
+    file: bin/mm2txt

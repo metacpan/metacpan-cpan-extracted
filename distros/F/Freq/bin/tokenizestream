@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+# This tokenizes by nonword chars. Generates a stream of 
+# space-delimited, lowercased words, denuded of punctuation and
+# suitable for redirecting or piping into something else like so:
+# cat *.txt | tokenize_std > tokens.txt
+# cat *.txt | tokenize_std | index_this
+# This version adds a name and surrounds text with 
+
+use Freq;
+my $usage = <<"EOF";
+
+Usage: tokenize
+
+Pipe a stream of documents in "Ejemoni" format, that is surrounded
+by <DOC></DOC> tags with a <DOCNO></DOCNO> tag in there somewhere.
+Outputs a stream of lowercased words split on nonword strings.
+Examples:
+
+# cat document.txt | tokenize | indexstream corpus_dir
+# cat document.txt | tokenize | ngrams 3 11 
+
+EOF
+
+my @help = grep /^--/, @ARGV;
+@ARGV = grep !/^--/, @ARGV;
+
+if( @help ){
+	print $usage;
+	exit 0;
+}
+
+$/ = '</DOC>';
+
+while(<>){
+	chomp;
+	next if $_ eq '';
+	# If no document name, skip it.
+	if( m|<DOCNO>([^<]+)</DOCNO>|ms ){
+		print "\n<DOC>\n<DOCNO>$1</DOCNO>\n";
+	}
+	else {
+		next; 
+	}
+	$_ = $1 if /<TEXT>(.+?)<\/TEXT>/ms;
+
+	print join " ", Freq::tokenize_std($_);
+	print "\n</DOC>\n";
+}
+
+
+

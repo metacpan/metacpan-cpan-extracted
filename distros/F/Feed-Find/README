@@ -1,0 +1,70 @@
+NAME
+    Feed::Find - Syndication feed auto-discovery
+
+SYNOPSIS
+        use Feed::Find;
+        my @feeds = Feed::Find->find('http://example.com/');
+
+DESCRIPTION
+    *Feed::Find* implements feed auto-discovery for finding syndication
+    feeds, given a URI. It (currently) passes all of the auto-discovery
+    tests at *http://diveintomark.org/tests/client/autodiscovery/*.
+
+    *Feed::Find* will discover the following feed formats:
+
+    *   RSS 0.91
+
+    *   RSS 1.0
+
+    *   RSS 2.0
+
+    *   Atom
+
+USAGE
+  Feed::Find->find($uri)
+    Given a URI *$uri*, use a variety of techniques to find the feeds
+    associated with that page. If *$uri* itself points to a feed (i.e., if
+    the *Content-Type* of the response is a recognized feed type), returns
+    *$uri*.
+
+    Returns a list of feed URIs.
+
+    The following techniques are used:
+
+    1. *<link>* tag auto-discovery
+        If the page contains any *<link>* tags in the *<head>* section,
+        these tags are examined for recognized feed content types. The
+        following content types are treated as feeds:
+        *application/x.atom+xml*, *application/atom+xml*, *application/xml*,
+        *text/xml*, *application/rss+xml*, and *application/rdf+xml*.
+
+    2. Scanning *<a>* tags
+        If the page does not contain any known *<link>* tags, the page is
+        then scanned for *<a>* tags for links to URIs with certain file
+        extensions. The following extensions are treated as feeds: .rss,
+        .xml, and .rdf.
+
+        Note that this technique is employed only if the first technique
+        returns no results.
+
+  Feed::Find->find_in_html(\$html [, $base_uri ])
+    Given a reference to a string *$html* containing an HTML page, uses the
+    same techniques as described above in *find* to find the feeds
+    associated with that page.
+
+    If you know the URI of the page, you should provide it in *$base_uri*,
+    so that relative links can be properly made absolute. *Feed::Find* will
+    attempt to determine the correct base URI, but unless that URI is
+    specified in the HTML itself (in a "<meta>" tag), you'll need to supply
+    it yourself.
+
+    Returns a list of feed URIs.
+
+LICENSE
+    *Feed::Find* is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR & COPYRIGHT
+    Except where otherwise noted, *Feed::Find* is Copyright 2004 Benjamin
+    Trott, ben+cpan@stupidfool.org. All rights reserved.
+

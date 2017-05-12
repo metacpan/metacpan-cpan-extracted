@@ -1,0 +1,54 @@
+{
+   "abstract" : "Fast CGI module",
+   "author" : [
+      "Sven Verdoolaege (skimo@kotnet.org)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1104, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FCGI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-FCGI@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-catalyst/FCGI.git",
+         "web" : "https://github.com/perl-catalyst/FCGI"
+      }
+   },
+   "version" : "0.78",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

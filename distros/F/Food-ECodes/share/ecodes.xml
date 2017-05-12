@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecodes>
+    <ecode id="E100" name="Curcumin, turmeric" eu_approved="1" purpose="Food colouring (yellow-orange)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E101" name="Riboflavin (Vitamin B2), formerly called lactoflavin (Vitamin G)" eu_approved="1" purpose="Food colouring (yellow-orange)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E102" name="Tartrazine (FD&amp;C Yellow 5)" eu_approved="1" purpose="Food colouring (lemon yellow)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E103" name="Alkannin" eu_approved="0" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E104" name="Quinoline Yellow WS" eu_approved="1" purpose="Food colouring (dull or greenish yellow)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E105" name="Fast Yellow AB" eu_approved="0" purpose="Food colouring (yellow)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E106" name="Riboflavin-5-Sodium Phosphate" eu_approved="0" purpose="Food colouring (yellow)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E107" name="Yellow 2G" eu_approved="0" purpose="Food colouring (yellow)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E110" name="Sunset Yellow FCF (Orange Yellow S, FD&amp;C Yellow 6)" eu_approved="1" purpose="Food colouring (yellow-orange)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E1100" name="Amylase" eu_approved="0" purpose="Stabiliser, flavour enhancer" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1101" name="Proteases ((i)Protease, (ii)Papain, (iii)Bromelain, (iv)Ficin)" eu_approved="0" purpose="Stabiliser, flavour enhancer" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1102" name="Glucose oxidase" eu_approved="0" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1103" name="Invertase" eu_approved="1" purpose="Stabiliser" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1104" name="Lipases" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1105" name="Lysozyme" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E111" name="Orange GGN" eu_approved="0" purpose="Food colouring (orange)" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E120" name="Cochineal, Carminic acid, Carmine (Natural Red 4)" eu_approved="1" purpose="Food colouring (crimson)" status="HARAM" us_approved="1" vegetarian="0" />
+    <ecode id="E1200" name="Polydextrose" eu_approved="1" purpose="Stabiliser, thickening agent, humectant, carrier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1201" name="Polyvinylpyrrolidone" eu_approved="1" purpose="Stabiliser" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1202" name="Polyvinylpolypyrrolidone (carrier)" eu_approved="1" purpose="Stabiliser" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1203" name="Polyvinyl alcohol" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1204" name="Pullulan" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E121" name="Citrus Red 2" eu_approved="1" purpose="Food colouring (dark red)" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E122" name="Carmoisine, Azorubine" eu_approved="1" purpose="Food colouring (red to maroon)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E123" name="Amaranth (FD&amp;C Red 2)" eu_approved="1" purpose="Food colouring (dark red)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E124" name="Ponceau 4R (Cochineal Red A, Brilliant Scarlet 4R)" eu_approved="1" purpose="Food colouring (red)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E125" name="Ponceau SX, Scarlet GN" eu_approved="0" purpose="Food colouring (red)" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E126" name="Ponceau 6R" eu_approved="0" purpose="Food colouring (red)" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E127" name="Erythrosine (FD&amp;C Red 3)" eu_approved="1" purpose="Food colouring (red)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E128" name="Red 2G" eu_approved="0" purpose="Food colouring (red)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E129" name="Allura Red AC (FD&amp;C Red 40)" eu_approved="1" purpose="Food colouring (red)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E130" name="Indanthrene blue RS" eu_approved="0" purpose="Food colouring (blue)" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E131" name="Patent Blue V" eu_approved="1" purpose="Food colouring (dark blue)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E132" name="Indigo carmine (indigotine, FD&amp;C Blue 2)" eu_approved="1" purpose="Food colouring (indigo)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E133" name="Brilliant Blue FCF (FD&amp;C Blue 1)" eu_approved="1" purpose="Food colouring (reddish blue)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E140" name="Chlorophylls and Chlorophyllins: (i) Chlorophylls (ii) Chlorophyllins" eu_approved="1" purpose="Food colouring (green)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1400" name="Dextrin (Dextrins, roasted starch white and yellow) (stabiliser)" eu_approved="0" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1401" name="Modified starch ((Acid-treated starch) stabiliser)" eu_approved="0" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1402" name="Alkaline modified starch (stabiliser)" eu_approved="0" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1403" name="Bleached starch (stabiliser)" eu_approved="0" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1404" name="Oxidized starch (emulsifier)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1405" name="Enzyme treated starch" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E141" name="Copper complexes of chlorophylls and chlorophyllins (i) Copper complexes of chlorophylls (ii) Copper complexes of chlorophyllins" eu_approved="1" purpose="Food colouring (green)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E1410" name="Monostarch phosphate (stabiliser)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1411" name="Distarch glycerol (thickening agent)" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1412" name="Distarch phosphate esterified with sodium trimetasphosphate; esterified with phosphorus oxychloride (stabiliser)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1413" name="Phosphated distarch phosphate (stabiliser)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1414" name="Acetylated distarch phosphate (emulsifier)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E142" name="Green S" eu_approved="1" purpose="Food colouring (green)" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1420" name="Starch acetate esterified with acetic anhydride (stabiliser)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1421" name="Starch acetate esterified with vinyl acetate (stabiliser)" eu_approved="0" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1422" name="Acetylated Distarch Adipate (stabiliser)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1423" name="Acetylated distarch glycerol" eu_approved="0" purpose="Thickening agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E143" name="Fast Green FCF (FD&amp;C Green 3)" eu_approved="0" purpose="Food colouring (sea green)" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1430" name="Distarch glycerine (stabiliser)" eu_approved="0" purpose="Thickening agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1440" name="Hydroxy propyl starch (emulsifier)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1441" name="Hydroxy propyl distarch glycerine (stabiliser)" eu_approved="0" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1442" name="Hydroxy propyl distarch phosphate (stabiliser)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1443" name="Hydroxy propyl distarch glycerol" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1450" name="Starch sodium octenyl succinate (emulsifier) (stabiliser)" eu_approved="1" purpose="Thickening agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1451" name="Acetylated oxidised starch (emulsifier)" eu_approved="1" purpose="Thickening agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1452" name="Starch aluminium octenyl succinate" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1501" name="Benzylated hydrocarbons" eu_approved="0" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1502" name="Butane-1, 3-diol" eu_approved="0" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1503" name="Castor oil" eu_approved="0" purpose="Resolving agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1504" name="Ethyl acetate" eu_approved="0" purpose="Flavour solvent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1505" name="Triethyl citrate" eu_approved="1" purpose="Foam stabiliser" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E151" name="Black PN, Brilliant Black BN" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1510" name="Ethanol" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1516" name="Glyceryl monoacetate" eu_approved="0" purpose="Flavour solvent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1517" name="Glyceryl diacetate or diacetin" eu_approved="0" purpose="Flavour solvent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1518" name="Glyceryl triacetate or triacetin" eu_approved="1" purpose="Humectant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1519" name="Benzyl alcohol" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E152" name="Black 7984" eu_approved="0" purpose="Food colouring" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E1520" name="Propylene glycol" eu_approved="1" purpose="Humectant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E1521" name="Polyethylene glycol 8000" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E1525" name="Hydroxyethyl cellulose" eu_approved="0" purpose="Thickening agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E153" name="Carbon black, Vegetable carbon" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E154" name="Brown FK (kipper brown)" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E155" name="Brown HT (chocolate brown HT)" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E162" name="Beetroot Red, Betanin" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E163" name="Anthocyanins" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E164" name="Saffron" eu_approved="0" purpose="Food colouring" status="N/A" us_approved="1" vegetarian="1" />
+    <ecode id="E166" name="Sandalwood red" eu_approved="0" purpose="Food colouring" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E170" name="Calcium carbonate, Chalk" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E171" name="Titanium dioxide" eu_approved="1" purpose="Food colouring (pure white)" status="HALAL" us_approved="1" vegetarian="1" />
+    <ecode id="E172" name="Iron oxides and iron hydroxides" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E173" name="Aluminium" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E174" name="Silver" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E175" name="Gold" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E180" name="Pigment Rubine, Lithol Rubine BK" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E181" name="Tannin" eu_approved="0" purpose="Food colouring" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E182" name="Orcein, Orchil" eu_approved="0" purpose="Food colouring" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E200" name="Sorbic acid" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E201" name="Sodium sorbate" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E202" name="Potassium sorbate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E203" name="Calcium sorbate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E209" name="Heptyl p-hydroxybenzoate" eu_approved="0" purpose="Preservative" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E210" name="Benzoic acid" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E211" name="Sodium benzoate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E212" name="Potassium benzoate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E213" name="Calcium benzoate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E214" name="Ethylparaben (ethyl para-hydroxybenzoate)" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E215" name="Sodium ethyl para-hydroxybenzoate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E216" name="Propylparaben (propyl para-hydroxybenzoate)" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E217" name="Sodium propyl para-hydroxybenzoate" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E218" name="Methylparaben (methyl para-hydroxybenzoate)" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E219" name="Sodium methyl para-hydroxybenzoate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E220" name="Sulphur dioxide" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E221" name="Sodium sulphite" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E222" name="Sodium bisulphite (sodium hydrogen sulphite)" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E223" name="Sodium metabisulphite" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E224" name="Potassium metabisulphite" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E225" name="Potassium sulphite" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E226" name="Calcium sulphite" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E227" name="Calcium hydrogen sulphite (preservative)" eu_approved="1" purpose="firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E228" name="Potassium hydrogen sulphite" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E230" name="Biphenyl, diphenyl" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E231" name="Orthophenyl phenol" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E232" name="Sodium orthophenyl phenol" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E233" name="Thiabendazole" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E234" name="Nisin" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E235" name="Natamycin, Pimaracin" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E236" name="Formic acid" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E237" name="Sodium formate" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E238" name="Calcium formate" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E239" name="Hexamine (hexamethylene tetramine)" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E240" name="Formaldehyde" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E242" name="Dimethyl dicarbonate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E249" name="Potassium nitrite" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E250" name="Sodium nitrite" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E251" name="Sodium nitrate (Chile saltpeter)" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E252" name="Potassium nitrate (Saltpetre)" eu_approved="1" purpose="Preservative" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E260" name="Acetic acid (preservative)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E261" name="Potassium acetate (preservative)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E262" name="Sodium acetates (i) Sodium acetate (ii) Sodium hydrogen acetate (sodium diacetate)" eu_approved="1" purpose="Preservative, acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E263" name="Calcium acetate (preservative)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E264" name="Ammonium acetate" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E265" name="Dehydroacetic acid" eu_approved="0" purpose="Preservative" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E266" name="Sodium dehydroacetate" eu_approved="0" purpose="Preservative" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E270" name="Lactic acid (preservative) (acid)" eu_approved="1" purpose="Antioxidant" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E280" name="Propionic acid" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E281" name="Sodium propionate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E282" name="Calcium propionate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E283" name="Potassium propionate" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E284" name="Boric acid" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E285" name="Sodium tetraborate (borax)" eu_approved="1" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E290" name="Carbon dioxide" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E296" name="Malic acid (acid)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E297" name="Fumaric acid" eu_approved="0" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E300" name="Ascorbic acid (Vitamin C)" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E301" name="Sodium ascorbate" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E302" name="Calcium ascorbate" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E303" name="Potassium ascorbate" eu_approved="0" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E304" name="Fatty acid esters of ascorbic acid (Ascorbyl palmitate)" eu_approved="1" purpose="Antioxidant" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E305" name="Ascorbyl stearate" eu_approved="0" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E306" name="Tocopherols (natural)" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E307" name="Alpha-tocopherol (synthetic)" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E308" name="Gamma-tocopherol (synthetic)" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E309" name="Delta-tocopherol (synthetic)" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E310" name="Propyl gallate" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E311" name="Octyl gallate" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E312" name="Dodecyl gallate" eu_approved="1" purpose="Antioxidant" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E313" name="Ethyl gallate" eu_approved="0" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E314" name="Guaiac resin" eu_approved="0" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E315" name="Erythorbic acid" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E316" name="Sodium erythorbate" eu_approved="1" purpose="Antioxidant" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E317" name="Erythorbin acid" eu_approved="0" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E318" name="Sodium erythorbin" eu_approved="0" purpose="Antioxidant" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E319" name="tert-Butylhydroquinone (TBHQ)" eu_approved="1" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E320" name="Butylated hydroxyanisole (BHA)" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E321" name="Butylated hydroxytoluene (BHT)" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E322" name="Lecithin" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E323" name="Anoxomer" eu_approved="0" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E324" name="Ethoxyquin" eu_approved="0" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E325" name="Sodium lactate" eu_approved="1" purpose="Acidity regulator" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E326" name="Potassium lactate (antioxidant)" eu_approved="1" purpose="Acidity regulator" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E327" name="Calcium lactate" eu_approved="1" purpose="Acidity regulator" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E328" name="Ammonium lactate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E329" name="Magnesium lactate" eu_approved="0" purpose="Acidity regulator" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E330" name="Citric acid" eu_approved="1" purpose="Acid, acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E331" name="Sodium citrates (i) Monosodium citrate (ii) Disodium citrate (iii) Sodium citrate (trisodium citrate)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E332" name="Potassium citrates (i) Monopotassium citrate (ii) Potassium citrate (tripotassium citrate)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E333" name="Calcium citrates (i) Monocalcium citrate (ii) Dicalcium citrate (iii) Calcium citrate (tricalcium citrate)" eu_approved="1" purpose="Acidity regulator, firming agent, sequestrant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E334" name="Tartaric acid (L(+)-)" eu_approved="1" purpose="Acid" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E335" name="Sodium tartrates (i) Monosodium tartrate (ii), Disodium tartrate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E336" name="Potassium tartrates (i) Monopotassium tartrate (cream of tartar) (ii) Dipotassium tartrate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E337" name="Sodium potassium tartrate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E338" name="Orthophosphoric acid" eu_approved="1" purpose="Acid" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E339" name="Sodium phosphates (i) Monosodium phosphate (ii) Disodium phosphate (iii) Trisodium phosphate" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E340" name="Potassium phosphates (i) Monopotassium phosphate (ii) Dipotassium phosphate (iii) Tripotassium phosphate" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E341" name="Calcium phosphates (i) Monocalcium phosphate (ii) Dicalcium phosphate (iii) Tricalcium phosphate" eu_approved="1" purpose="Anti-caking agent, firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E342" name="Ammonium phosphates: (i) monoammonium phosphate (ii) diammonium phosphate" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E343" name="Magnesium phosphates (i) monomagnesium phosphate (ii) Dimagnesium phosphate" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E344" name="Lecitin citrate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E345" name="Magnesium citrate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E349" name="Ammonium malate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E350" name="Sodium malates (i) Sodium malate (ii) Sodium hydrogen malate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E351" name="Potassium malate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E352" name="Calcium malates (i) Calcium malate (ii) Calcium hydrogen malate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E353" name="Metatartaric acid" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E354" name="Calcium tartrate" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E355" name="Adipic acid" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E356" name="Sodium adipate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E357" name="Potassium adipate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E359" name="Ammonium adipate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E363" name="Succinic acid" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E365" name="Sodium fumarate" eu_approved="0" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E366" name="Potassium fumarate" eu_approved="0" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E367" name="Calcium fumarate" eu_approved="0" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E368" name="Ammonium fumarate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E370" name="1,4-Heptonolactone" eu_approved="0" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E375" name="Niacin (nicotinic acid), Nicotinamide" eu_approved="0" purpose="Colour retention agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E380" name="Triammonium citrate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E381" name="Ammonium ferric citrate" eu_approved="0" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E383" name="Calcium glycerylphosphate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E384" name="Isopropyl citrate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E385" name="Calcium disodium ethylene diamine tetraacetate, (Calcium disodium EDTA)" eu_approved="1" purpose="Sequestrant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E386" name="Disodium ethylene diamine tetraacetate (Disodium EDTA)" eu_approved="0" purpose="Sequestrant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E387" name="Oxystearin" eu_approved="0" purpose="Stabiliser" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E388" name="Thiodipropionic acid" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E389" name="Dilauryl thiodipropionate" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E390" name="Distearyl thiodipropionate" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E391" name="Phytic acid" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E392" name="Extracts of rosemary" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E399" name="Calcium lactobionate" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E400" name="Alginic acid (thickener) (stabiliser) (gelling agent)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E401" name="Sodium alginate (thickener) (stabiliser) (gelling agent)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E402" name="Potassium alginate (thickener) (stabiliser) (gelling agent)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E403" name="Ammonium alginate (thickener) (stabiliser)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E404" name="Calcium alginate (thickener) (stabiliser) (gelling agent)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E405" name="Propane-1,2-diol alginate (Propylene glycol alginate) (thickener) (stabiliser)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E406" name="Agar (thickener) (gelling agent)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E407" name="Carrageenan (thickener) (stabiliser) (gelling agent)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E408" name="Bakers yeast" eu_approved="0" purpose="glycan" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E409" name="Arabinogalactan" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E410" name="Locust bean gum (Carob gum) (thickener) (stabiliser) (gelling agent)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E411" name="Oat gum (thickener)" eu_approved="0" purpose="Stabiliser" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E412" name="Guar gum (thickener)" eu_approved="1" purpose="Stabiliser" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E413" name="Tragacanth (thickener) (stabiliser)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E414" name="Acacia gum (gum arabic) (thickener) (stabiliser)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E415" name="Xanthan gum (thickener)" eu_approved="1" purpose="Stabiliser" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E416" name="Karaya gum (thickener) (stabiliser)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E417" name="Tara gum (thickener)" eu_approved="1" purpose="Stabiliser" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E418" name="Gellan gum (thickener) (stabiliser)" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E419" name="Gum ghatti (thickener) (stabiliser)" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E420" name="Sorbitol (i) Sorbitol (ii) Sorbitol syrup (emulsifier) (sweetener)" eu_approved="1" purpose="Humectant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E421" name="Mannitol (anti-caking agent)" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E422" name="Glycerol (emulsifier)" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E424" name="Curdlan" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E425" name="Konjac (i) Konjac gum (ii) Konjac glucomannane" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E426" name="Soybean hemicellulose" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E427" name="Cassia gum" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E429" name="Peptones" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E430" name="Polyoxyethene (8) stearate (emulsifier)" eu_approved="0" purpose="Stabiliser" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E431" name="Polyoxyethene (40) stearate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E432" name="Polyoxyethene (20) sorbitan monolaurate (polysorbate 20)" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E433" name="Polyoxyethene (20) sorbitan monooleate (polysorbate 80)" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E434" name="Polyoxyethene (20) sorbitan monopalmitate (polysorbate 40)" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E435" name="Polyoxyethene (20) sorbitan monostearate (polysorbate 60)" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E436" name="Polyoxyethene (20) sorbitan tristearate (polysorbate 65)" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E440" name="Pectins (i) pectin (ii) amidated pectin" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E441" name="Gelatine (emulsifier)" eu_approved="0" purpose="Gelling agent" status="HARAM" us_approved="0" vegetarian="0" />
+    <ecode id="E442" name="Ammonium phosphatides" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E443" name="Brominated" eu_approved="0" purpose="Vegetable oil" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E444" name="Sucrose acetate isobutyrate" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E445" name="Glycerol esters of wood rosins" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E446" name="Succistearin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E450" name="Diphosphates (i) Disodium diphosphate (ii) Trisodium diphosphate (iii) Tetrasodium diphosphate (iv) Dipotassium diphosphate (v) Tetrapotassium diphosphate (vi) Dicalcium diphosphate (vii) Calcium dihydrogen diphosphate" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E451" name="Triphosphates (i) Sodium triphosphate (pentasodium triphosphate) (ii) Pentapotassium triphosphate" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E452" name="Polyphosphates (i) Sodium polyphosphates (ii) Potassium polyphosphates (iii) Sodium calcium polyphosphate (iv) Calcium polyphosphates (v) Ammonium Polyphosphate" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E459" name="Beta-cyclodextrin" eu_approved="1" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E460" name="Cellulose (i) Microcrystalline cellulose (ii) Powdered cellulose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E461" name="Methyl cellulose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E462" name="Ethyl cellulose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E463" name="Hydroxypropyl cellulose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E464" name="Hydroxy propyl methyl cellulose, = hypromellose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E465" name="Ethyl methyl cellulose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E466" name="Carboxymethyl cellulose, Sodium carboxy methyl cellulose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E467" name="Ethyl hydroxyethyl" eu_approved="0" purpose="Cellulose" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E468" name="Crosslinked sodium carboxymethyl cellulose (Croscarmellose)" eu_approved="1" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E469" name="Enzymically hydrolysed carboxymethylcellulose" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E471" name="Mono- and diglycerides of fatty acids (glyceryl monostearate, glyceryl distearate)" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E473" name="Sucrose esters of fatty acids" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E474" name="Sucroglycerides" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E475" name="Polyglycerol esters of fatty acids" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E476" name="Polyglycerol polyricinoleate" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E477" name="Propane-1,2-diol esters of fatty acids, propylene glycol esters of fatty acids" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E478" name="Lactylated fatty acid esters of glycerol and propane-1" eu_approved="0" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E480" name="Dioctyl sodium sulphosuccinate" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E481" name="Sodium stearoyl-2-lactylate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E482" name="Calcium stearoyl-2-lactylate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E483" name="Stearyl tartrate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E484" name="Stearyl citrate" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E485" name="Sodium stearoyl fumarate" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E486" name="Calcium stearoyl fumarate" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E487" name="Sodium laurylsulphate" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E488" name="Ethoxylated Mono- and Di-Glycerides" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E489" name="Methyl glucoside-coconut oil ester" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E490" name="Propane-1,2-diol" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E491" name="Sorbitan monostearate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E492" name="Sorbitan tristearate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E493" name="Sorbitan monolaurate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E494" name="Sorbitan monooleate" eu_approved="1" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E495" name="Sorbitan monopalmitate" eu_approved="0" purpose="Emulsifier" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E496" name="Sorbitan trioleate" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E497" name="Polyoxypropylene-polyoxyethylene" eu_approved="0" purpose="Polymers" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E498" name="Partial polyglycerol esters of polycondensed fatty acids of castor oil" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E500" name="Sodium carbonates (i) Sodium carbonate (ii) Sodium bicarbonate (Sodium hydrogen carbonate) (iii) Sodium sesquicarbonate (acidity regulator)" eu_approved="1" purpose="Raising agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E501" name="Potassium carbonates (i) Potassium carbonate (ii) Potassium bicarbonate (Potassium hydrogen carbonate)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E503" name="Ammonium carbonates (i) Ammonium carbonate (ii) Ammonium bicarbonate (Ammonium hydrogen carbonate)" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E504" name="Magnesium carbonates (i) Magnesium carbonate (ii) Magnesium bicarbonate Magnesium hydrogen carbonate" eu_approved="1" purpose="Acidity regulator, anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E505" name="Ferrous carbonate" eu_approved="0" purpose="Acidity regulator" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E507" name="Hydrochloric acid" eu_approved="1" purpose="Acid" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E508" name="Potassium chloride (gelling agent)" eu_approved="1" purpose="Seasoning" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E509" name="Calcium chloride (sequestrant)" eu_approved="1" purpose="Firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E510" name="Ammonium chloride, ammonia solution (acidity regulator)" eu_approved="0" purpose="Improving agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E511" name="Magnesium chloride" eu_approved="1" purpose="Firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E512" name="Stannous chloride" eu_approved="1" purpose="Antioxidant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E513" name="Sulphuric acid" eu_approved="1" purpose="Acid" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E514" name="Sodium sulphates (i) Sodium sulphate (ii)" eu_approved="1" purpose="Acid" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E515" name="Potassium Sulphates (i) Potassium Sulphate (ii)" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E516" name="Calcium sulphate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E517" name="Ammonium sulphate" eu_approved="1" purpose="Improving agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E518" name="Magnesium sulphate (Epsom salts), (acidity regulator)" eu_approved="0" purpose="Firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E519" name="Copper(II) sulphate" eu_approved="0" purpose="Preservative" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E520" name="Aluminium sulphate" eu_approved="1" purpose="Firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E521" name="Aluminium sodium sulphate" eu_approved="1" purpose="Firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E522" name="Aluminium potassium sulphate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E523" name="Aluminium ammonium sulphate" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E524" name="Sodium hydroxide" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E525" name="Potassium hydroxide" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E526" name="Calcium hydroxide (acidity regulator)" eu_approved="1" purpose="Firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E527" name="Ammonium hydroxide" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E528" name="Magnesium hydroxide" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E529" name="Calcium oxide (acidity regulator)" eu_approved="1" purpose="Improving agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E530" name="Magnesium oxide (acidity regulator)" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E535" name="Sodium ferrocyanide (acidity regulator)" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E536" name="Potassium ferrocyanide" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E537" name="Ferrous hexacyanomanganate" eu_approved="0" purpose="Anti-caking agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E538" name="Calcium ferrocyanide" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E539" name="Sodium thiosulphate" eu_approved="0" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E540" name="Dicalcium diphosphate (acidity regulator)" eu_approved="0" purpose="Emulsifier" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E541" name="Sodium aluminium phosphate (i) Acidic (ii) Basic" eu_approved="1" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E542" name="Bone phosphate (Essentiale Calcium Phosphate, Tribasic)" eu_approved="0" purpose="Anti-caking agent" status="HARAM" us_approved="0" vegetarian="0" />
+    <ecode id="E543" name="Calcium sodium polyphosphate" eu_approved="0" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E544" name="Calcium polyphosphate" eu_approved="0" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E545" name="Ammonium polyphosphate" eu_approved="0" purpose="Emulsifier" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E550" name="Sodium Silicates (i) Sodium silicate (ii) Sodium metasilicate" eu_approved="0" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E551" name="Silicon dioxide (Silica)" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E552" name="Calcium silicate" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E554" name="Sodium aluminosilicate (sodium aluminium silicate)" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E555" name="Potassium aluminium silicate" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E556" name="Calcium aluminosilicate (calcium aluminium silicate)" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E557" name="Zinc silicate" eu_approved="0" purpose="Anti-caking agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E558" name="Bentonite" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E559" name="Aluminium silicate (Kaolin)" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E560" name="Potassium silicate" eu_approved="0" purpose="Anti-caking agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E561" name="Vermiculite" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E562" name="Sepiolite" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E563" name="Sepiolitic clay" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E565" name="4-Hexylresorcinol" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E566" name="Natrolite-phonolite" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E570" name="Stearic acid (Fatty acid)" eu_approved="1" purpose="Anti-caking agent" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E572" name="Magnesium stearate, calcium stearate (emulsifier)" eu_approved="0" purpose="Anti-caking agent" status="SUSPECTED" us_approved="0" vegetarian="0" />
+    <ecode id="E574" name="Gluconic acid" eu_approved="1" purpose="Acidity regulator" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E575" name="Glucono delta-lactone (acidity regulator)" eu_approved="1" purpose="Sequestrant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E576" name="Sodium gluconate" eu_approved="1" purpose="Sequestrant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E577" name="Potassium gluconate" eu_approved="1" purpose="Sequestrant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E578" name="Calcium gluconate" eu_approved="1" purpose="Firming agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E579" name="Ferrous gluconate" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E580" name="Magnesium gluconate" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E585" name="Ferrous lactate" eu_approved="1" purpose="Food colouring" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E586" name="4-Hexylresorcinol" eu_approved="0" purpose="Antioxidant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E598" name="Synthetic calcium aluminates" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E599" name="Perlite" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E620" name="Glutamic acid" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E621" name="Monosodium glutamate(MSG)" eu_approved="1" purpose="Flavour enhancer" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E622" name="Monopotassium glutamate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E623" name="Calcium diglutamate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E624" name="Monoammonium glutamate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E625" name="Magnesium diglutamate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E626" name="Guanylic acid" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E627" name="Disodium guanylate, sodium guanylate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E628" name="Dipotassium guanylate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E629" name="Calcium guanylate" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E630" name="Inosinic acid" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E631" name="Disodium inosinate" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E632" name="Dipotassium inosinate" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E633" name="Calcium inosinate" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E634" name="Calcium 5-ribonucleotides" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E635" name="Disodium 5-ribonucleotides" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E636" name="Maltol" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E637" name="Ethyl maltol" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E640" name="Glycine and its sodium salt" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="0" />
+    <ecode id="E641" name="L-leucine" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E642" name="Lysine hydrochloride" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E650" name="Zinc acetate" eu_approved="1" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E700" name="Bacitracin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E701" name="Tetracyclines" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E702" name="Chlortetracycline" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E703" name="Oxytetracycline" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E704" name="Oleandomycin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E705" name="Penicillin-G-potassium" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E706" name="Penicillin-G-sodium" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E707" name="Penicillin-G-procaine" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E708" name="Penicillin-G-benzathyne" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E710" name="Spiramycins" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E711" name="Virginiamicins" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E712" name="Flavophospholipol" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E713" name="Tylosin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E714" name="Monensin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E715" name="Avoparcin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E716" name="Salinomycin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E717" name="Avilamycin" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E900" name="Dimethyl polysiloxane (anti-foaming agent)" eu_approved="1" purpose="Anti-caking agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E901" name="Beeswax , white and yellow" eu_approved="1" purpose="Glazing agent" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E902" name="Candelilla wax" eu_approved="1" purpose="Glazing agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E903" name="Carnauba wax" eu_approved="1" purpose="Glazing agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E904" name="Shellac" eu_approved="1" purpose="Glazing agent" status="HARAM" us_approved="0" vegetarian="0" />
+    <ecode id="E905" name="Paraffins" eu_approved="1" purpose="N/A" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E906" name="Gum benzoic" eu_approved="0" purpose="Flavour enhancer" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E907" name="Crystalline wax" eu_approved="0" purpose="Glazing agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E908" name="Rice bran wax" eu_approved="0" purpose="Glazing agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E909" name="Spermaceti wax" eu_approved="0" purpose="Glazing agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E910" name="Wax esters" eu_approved="0" purpose="Glazing agent" status="SUSPECTED" us_approved="0" vegetarian="1" />
+    <ecode id="E911" name="Methyl esters of fatty acids" eu_approved="0" purpose="Glazing agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E912" name="Montan acid esters" eu_approved="1" purpose="Glazing agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E913" name="Lanolin, sheep wool grease" eu_approved="0" purpose="Glazing agent" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E914" name="Oxidized polyethylene wax" eu_approved="1" purpose="Glazing agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E915" name="Esters of colophony" eu_approved="0" purpose="Glazing agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E916" name="Calcium iodate" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E917" name="Potassium iodate" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E918" name="Nitrogen oxides" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E919" name="Nitrosyl chloride" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E920" name="L-cysteine" eu_approved="1" purpose="Improving agent" status="HARAM" us_approved="0" vegetarian="0" />
+    <ecode id="E921" name="L-cystine" eu_approved="0" purpose="Improving agent" status="HARAM" us_approved="0" vegetarian="0" />
+    <ecode id="E922" name="Potassium persulphate" eu_approved="0" purpose="Improving agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E923" name="Ammonium persulphate" eu_approved="0" purpose="Improving agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E924" name="Potassium bromate" eu_approved="0" purpose="Improving agent" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E925" name="Chlorine" eu_approved="0" purpose="Preservative, bleach, improving agent" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E926" name="Chlorine dioxide (preservative)" eu_approved="0" purpose="Bleach" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E928" name="Benzoyl peroxide (improving agent)" eu_approved="0" purpose="Bleach" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E929" name="Acetone peroxide" eu_approved="0" purpose="N/A" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E930" name="Calcium peroxide (improving agent)" eu_approved="0" purpose="Bleach" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E938" name="Argon" eu_approved="1" purpose="Packaging gas" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E939" name="Helium" eu_approved="1" purpose="Packaging gas" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E940" name="Dichlorodifluoromethane" eu_approved="0" purpose="Packaging gas" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E941" name="Nitrogen (packaging gas)" eu_approved="1" purpose="Propellant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E942" name="Nitrous oxide" eu_approved="1" purpose="Propellant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E944" name="Propane" eu_approved="1" purpose="Propellant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E945" name="Chloropentafluoroethane" eu_approved="0" purpose="Propellant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E946" name="Octafluorocyclobutane" eu_approved="0" purpose="Propellant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E948" name="Oxygen" eu_approved="1" purpose="Packaging gas" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E949" name="Hydrogen" eu_approved="1" purpose="Packaging gas" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E950" name="Acesulfame potassium" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E951" name="Aspartame" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E952" name="Cyclamic acid and its sodium and calcium salts, also known as Cyclamate" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E953" name="Isomalt, Isomaltitol" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E954" name="Saccharin and its sodium, potassium and calcium salts" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E955" name="Sucralose (Trichlorogalactosucrose)" eu_approved="1" purpose="Sweetener" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E956" name="Alitame" eu_approved="0" purpose="Sweetener" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E957" name="Thaumatin (sweetener)" eu_approved="1" purpose="Flavour enhancer" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E958" name="Glycyrrhizin (sweetener)" eu_approved="0" purpose="Flavour enhancer" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E959" name="Neohesperidine dihydrochalcone (sweetener)" eu_approved="1" purpose="Flavour enhancer" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E960" name="Stevioside" eu_approved="0" purpose="Sweetener" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E961" name="Neotame" eu_approved="0" purpose="Sweetener" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E962" name="Aspartame-acesulfame salt (sweetener)" eu_approved="1" purpose="Stabiliser" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E965" name="Maltitol (i) Maltitol (ii) Maltitol syrup (sweetener) (stabiliser)" eu_approved="1" purpose="Humectant" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E966" name="Lactitol" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="0" />
+    <ecode id="E967" name="Xylitol" eu_approved="1" purpose="Sweetener" status="HALAL" us_approved="0" vegetarian="1" />
+    <ecode id="E968" name="Erythritol" eu_approved="1" purpose="Humectant" status="N/A" us_approved="0" vegetarian="1" />
+    <ecode id="E999" name="Quillaia extract" eu_approved="1" purpose="Foaming agent" status="HALAL" us_approved="0" vegetarian="1" />
+</ecodes>

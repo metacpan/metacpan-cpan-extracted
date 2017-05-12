@@ -1,0 +1,22 @@
+---
+abstract: 'Build simple trees of files and directories.'
+author:
+  - 'Luc St-Louis <lucs@cpan.org>'
+build_requires:
+  FindBin: 0
+  Test::More: 0
+  Test::Usage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-TreeBuilder
+requires:
+  Exporter: 0
+  File::Temp: 0
+  perl: 5.008001
+version: 0.02

@@ -1,0 +1,20 @@
+---
+name: Feed-Source-Yahoo
+version: 0.01
+author:
+  - 'Emmanuel Di Pretoro <<manu@bjornoya.net>>'
+abstract: Create a RSS feed based on a Yahoo query
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  URI: 0
+provides:
+  Feed::Source::Yahoo:
+    file: lib/Feed/Source/Yahoo.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

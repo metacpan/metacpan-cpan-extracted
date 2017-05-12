@@ -1,0 +1,10 @@
+test:
+    data1:
+        DEFAULT: data1の値が不正です。
+        NOT_BLANK: data1を入力してください。
+        INT: data1は整数で入力してください。
+        LENGTH: data1の長さが不正です。
+    data2:
+        DEFAULT: data2の値が不正です。
+    data3:
+        NOT_BLANK: data3を入力してください。

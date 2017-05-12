@@ -1,0 +1,27 @@
+---
+abstract: 'Convenient and fast Dropbox API abstraction'
+author:
+  - 'Alexander Nazarov <nfokz@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.40'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Dropbox
+provides:
+  File::Dropbox:
+    file: lib/File/Dropbox.pm
+    version: '0.7'
+requires:
+  Furl: '2.16'
+  IO::Socket::SSL: '1.4'
+  JSON: '2.0'
+  Net::DNS::Lite: '0.1'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.7'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,83 @@
+=head1 NAME
+
+Fennec::Manual::CustomFennec - Customizing Fennec for you project.
+
+=head1 DESCRIPTION
+
+L<Fennec> automatically loads several utilities for you. In addition it assumes you
+want to use L<Test::Builder>. Subclassing Fennec will let you specify exactly
+what utilities you want, and what collector to use. This way you can use your
+subclass in each test file instead of copying C<use Fennec ( YOUR CONFIG
+OPTIONS )> into each file.
+
+=head1 FENNEC SUBCLASS
+
+You can subclass Fennec and override the defaults sub to your specification.
+The defaults sub should return a list of Fennec import argument key-pairs.
+
+My/Fennec.pm
+    use strict;
+    use warnings;
+
+    use base 'Fennec';
+
+    sub defaults {
+        my $class = shift;
+        my %params = $class->SUPER::defaults;
+
+        # Add a new autoloading utility with import arguments.
+        push @{ $params->{utils} } => 'My::Util';
+        $params->{'My::Util'} = [ 'util' => 'args' ];
+
+        # Default number of concurrent procs for the test to use.
+        $params->{parallel} = 3;
+
+        return %params;
+    }
+
+    sub after_import {
+        my $class = shift;
+        my ($info) = @_;
+        # $info is a hashref with the importer, runner, and importer meta
+        # object, and some other fun things.
+
+        # Example of adding cases to any Fennec test that uses this subclass:
+        # The first arg to add case should be an array matching the return of
+        # caller. The idea is to give us the start and end line, as well as
+        # file name where the case is defined. normally the exports from
+        # Test::Workflow provide that for you, but at this low-level we need to
+        # provide it ourselfs. Since we define the subs here, we give current
+        # line/file. Use the importer for package name.
+        $info->{layer}->add_case([$info->{importer}, __FILE__, __LINE__], case_a => sub { $main::CASE_A = 1 });
+        $info->{layer}->add_case([$info->{importer}, __FILE__, __LINE__], case_b => sub { $main::CASE_B = 1 });
+    }
+
+    1;
+
+=head1 CUSTOM COLLECTOR
+
+The collector is responsible for 2 jobs:
+1) In the parent process it is responsible for gathering all test results from
+the child processes.
+2) In the child processes it is responsible for sending results to the parent
+process.
+
+If TAP is not your thing, or you want to use Fennec with existing tests that do
+not use Test::Builder, you can create a custom collector to work for you.
+
+Documentation for a custom Collector can be found in the L<Fennec::Collector>
+POD.
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013 Chad Granum
+
+Fennec is free software; Standard perl license (GPL and Artistic).
+
+Fennec is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the license for more details.

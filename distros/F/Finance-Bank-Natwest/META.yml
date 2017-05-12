@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Finance-Bank-Natwest
+license:      perl
+version:      0.05
+version_from: lib/Finance/Bank/Natwest.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Digest::MD5:                   0
+    Exporter:                      0
+    HTML::TokeParser:              0
+    LWP::UserAgent:                0
+    Test::Exception:               0
+    Test::MockObject:              0
+    Test::More:                    0
+    URI:                           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17 + manual

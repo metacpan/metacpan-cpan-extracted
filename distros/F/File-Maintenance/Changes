@@ -1,0 +1,10 @@
+Revision history for File-Purge
+
+00.01   03 Mar 2008
+        First version, released on an unsuspecting world.
+
+0.02    12 Aug 2008
+        Added documentation for regex paterns and a regex test
+		
+0.03    02 Sep 2008
+		Added compression options

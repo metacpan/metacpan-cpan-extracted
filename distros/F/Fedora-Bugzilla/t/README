@@ -1,0 +1,12 @@
+Pretty soon I'm going to refactor these into files that make sense.  Each test
+file will exercise specific functionality, and have its tests broken out as
+such:
+
+First, we'll run tests that can be executed w/o access to bugzilla (if any).
+
+Then, tests that require access, but don't make any modifications.  This will
+require FB_TEST_USERID and _PASSWD be set (and set correctly!).
+
+Then, tests that both require access and make changes.  This will require the
+two above vars plus FB_TEST_MAKE_CHANGES set.  (This should help cut down the
+number of changes we make, new bugs, new attachments, etc...)

@@ -1,0 +1,258 @@
+Revision history for Perl extension FormValidator::Lite
+
+0.39 2016-09-28T13:51:12Z
+
+    - fixed test case(syohex)
+
+0.38 2014-10-22T01:06:41Z
+
+    commit 5703d0de3a630688db80bf05914f5f045d412dd2
+    Author: Géraud CONTINSOUZAS <geraud@gcu.info>
+    Date:   Wed Oct 22 10:27:44 2014 +1100
+
+        Block CGI.pm from 4.05 to 4.08
+        
+        They are known to cause problems with multi upload files.
+
+    commit 393766000df65ea9934e2fa691460b0690ed4214
+    Author: Géraud CONTINSOUZAS <geraud@gcu.info>
+    Date:   Wed Oct 22 09:32:57 2014 +1100
+
+        FV::Lite : extract values retrieval logic
+        
+        Since v4.05, CGI.pm get noisy when calling the param() method in list
+        context. For now isolate calling this method on its own, and locally
+        silence those warnings.
+
+    commit 50587b1715fd16cf18982ffc3a1ecc0d042e2e7d
+    Author: magai <xxmagai@gmail.com>
+    Date:   Mon Nov 4 21:38:24 2013 +0900
+
+        Use param() instead of accessing as hash for get parameters
+
+    commit f642d50e638ae00f99b07a3c1a9b41ecbf9f4864
+    Author: magai <xxmagai@gmail.com>
+    Date:   Mon Nov 4 18:53:39 2013 +0900
+
+        Fix Hash::MultiValue hash handling
+
+    commit 061e801b9db211d0edae825c4903281026ce260e
+    Author: dayflower <daydream.trippers@gmail.com>
+    Date:   Mon Sep 9 22:04:48 2013 +0900
+
+        Make 'message' parameter for set_message_data() optional.
+
+0.37 2013-07-24T03:06:02Z
+
+    - You can use Hashref and Hash::MultiValue as query parameter.
+      (tokuhirom)
+
+0.36 2013-06-13T07:44:20Z
+
+    - pull-up build_message as public method
+      (soh335)
+
+0.35 2013-05-29T20:21:01Z
+
+    - Added FormValidator::Lite::Constraint::Number.
+      It provides BETWEEN, LESS_EQUAL, MORE_THAN, MORE_EQUAL
+      (yowcow)
+
+0.34 2013-04-29T23:29:50Z
+
+    - Documentation enhancements
+      (Geraud CONTINSOUZAS)
+
+0.33 2013-04-29T23:21:49Z
+
+    - Fixed random test results on t/010_core/011_messages.t with bleadperl
+      https://rt.cpan.org/Ticket/Display.html?id=84910
+      (Reported by ANDK)
+
+
+0.32
+
+    - Fixed sysnopsis
+      https://rt.cpan.org/Ticket/Display.html?id=83679
+      (Reported by deflexor++)
+    - Fixed dependencies
+      https://rt.cpan.org/Ticket/Display.html?id=83709
+      (Reported by deflexor++)
+
+0.31
+
+    - support multivalued parameters(yowkow)
+
+0.30
+
+    - fixed typo in docs
+
+0.29
+
+    - use Class::Load instead of UNIVERSAL::require.(requested by thirano++)
+
+0.28
+
+    - fixed deps
+
+0.27
+
+    - fixed deps
+
+0.26
+
+    - switch to M::B
+
+0.25
+
+    - fixed testing issue, maybe.
+      http://www.cpantesters.org/cpan/report/06a2f8f5-795b-1014-89f0-d9a4bbd4963b
+
+0.24
+
+    - fixed HTML::Shakan integration. It is broken from 0.23.
+      (ysasaki)
+
+0.23
+
+    - better plack support for FILE_MIME/FILE_SIZE
+      https://github.com/tokuhirom/formvalidator-lite-perl/issues/3#issue/3
+      (tomi-ru++)
+    - doc tweaks(tokuhirom)
+
+0.22
+
+    lots of tiny tweaks and bug fixes by tomi-ru++
+    * 5cd5c78 added FILTER (like D::F).
+    * b8e820b added errors() for accessor to $self->{_error}
+    * d9d9dbe added pod about import() style.
+    * 96ff6a4 bugfix: ""  and NOT_BLANK (or REQUIRED)
+    * b973dce fix pod typo
+    * 3e50418 added constraint MATCH for flexibility.
+    * c0393a8 added constraint EQUAL for simple match
+    * efb5ebf pod fix
+    * 3304d26 added constraint EMAIL
+    * 176c647 added constraint REQUIRED as alias to NOT_NULL
+    * ef36dbf added test for NOT_BLANK(alias)
+    * 6b46c81 added test for NOT_NULL and blank string
+
+0.21
+
+    - support Plack::Request::Upload(requested by lopnor++)
+
+0.20
+
+    - get_error_messages_from_param use wantarray(nekokak).
+
+0.19
+
+        - small doc tweaks
+
+0.18
+
+        - added $v->query() accessor.
+
+0.17
+
+        - (no feature changes)
+        - fixed testing issue.
+
+0.16
+
+        - $v->get_error_messages() should return arrayref in scalar context.
+
+0.15
+
+        - no code changes. just re-submitting by pause permission issue
+
+0.14
+
+        - fix: not ignore zero in regex constraint (bayashi++)
+
+0.13
+
+        - suppress warnings(walf443)
+        - added Constraint::Time(walf443)
+
+0.12
+
+        - allow empty string parameter when NOT_NULL constraints is not set
+        - fixed regexp of INT, UINT constraints (fujiwara++)
+
+0.11
+
+        - some pod fix(by kan++)
+
+0.10
+
+        - no feature changes
+
+0.09
+
+        - added docs. 
+
+0.08
+
+        - depend to CGI.pm 3.31 or later.
+          old CGI.pm has a bug, on osx.
+          (suggested by yappo++)
+
+0.07
+
+        - oops. fixed broken test.
+
+0.06
+
+        - use isa for detect request object type
+          (suggested by typester++)
+
+0.05
+
+        - added $validator->get_error_messages_from_param($param) method
+          (by nekokak++)
+
+0.04
+
+        - do not modify arguments in $fvl->check().
+          (reported by craftworks++)
+
+0.03
+
+        - bump up version
+
+0.02_02
+
+        - oops. i don't use List::MoreUtils.
+
+0.02_01
+
+        - fixed uuv
+        - added set_message method
+
+0.02
+
+        - is_valid returns 1 or 0
+        - support single value date validation
+
+0.01_05
+
+        - support NOT_NULL constraint in {date => [qw/y m d/]} style key
+
+0.01_04
+
+        - added new constraint 'choice'
+
+0.01_03
+
+        - oops. remove 'use Smart::Comments'
+
+0.01_02
+
+        - my name is tokuhirom. not a 'default name'
+        - added japanese error message dictionary
+        - use gettext style parameter for messages
+
+0.01_01
+
+        - initial developer release
+

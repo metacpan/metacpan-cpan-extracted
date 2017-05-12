@@ -1,0 +1,12 @@
+# Interface configuration file for Fwctl
+# 
+# Comments start by # and continue to the end of the line
+# Empty lines are ignored
+# Format of the line is :
+#
+# Name	interface_name	interface_ip/interface_netmask	other_nets 
+#
+# There must be one interface named EXT which should be the
+# default gateway
+EXT	eth0		192.168.250.10/24
+INT	eth1		192.168.1.0/24

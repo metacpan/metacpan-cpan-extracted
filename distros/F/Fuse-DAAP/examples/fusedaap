@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+# vi: sw=4 ts=4
+
+use strict;
+use warnings;
+
+use Fuse::DAAP;
+use Getopt::Long;
+
+our $VERSION = 0.01;
+
+my $hostname;
+my $serverport;
+my $mountpoint;
+
+GetOptions('help|?' => \&Getopt::Long::HelpMessage,
+	'hostname' => \$hostname,
+	'serverport|p' => \$serverport,
+	'mountpoint' => \$mountpoint);
+
+$hostname = $hostname || shift;
+$serverport = $serverport || shift;
+$mountpoint = $mountpoint || shift;
+
+Fuse::DAAP->new(hostname => $hostname,
+	serverport => $serverport,
+	mountpoint => $mountpoint);
+
+__END__
+
+=head1 NAME
+
+fusedaap -- script to mount DAAP music shares using the FUSE kernel module
+
+=head1 SYNOPSIS
+
+fusedaap [--hostname] hostname [--serverport] serverport [--mountpoint] mountpoint
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--hostname>
+
+DAAP server to connect
+
+=item B<--serverport>
+
+DAAP server port number
+
+=item B<--mountpoint>
+
+Path to mount DAAP share
+
+=back
+
+=head1 PREREQUISITES
+
+Fuse::DAAP

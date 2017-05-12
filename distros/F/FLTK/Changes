@@ -1,0 +1,9 @@
+Revision history for Perl extension FLTK.
+
+0.52  Thu Sep 27 21:48:56 2000
+  - Finally remembered to update this. Makefile improvements, fixed compile
+    bug.
+
+0.01  Wed Sep 13 20:10:47 2000
+	- original version; created by h2xs 1.19
+

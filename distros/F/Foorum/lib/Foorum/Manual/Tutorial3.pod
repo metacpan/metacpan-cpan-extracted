@@ -1,0 +1,55 @@
+
+=pod
+
+=head1 NAME
+
+Foorum::Manual::Tutorial3 - Tutorial 3: For Foorum Developers
+
+=head2 Perl::Critic
+
+L<Perl::Critic>
+
+Every Perl developer should use Perl::Critic to check his code. It would avoid stupid errors.
+
+  * L<http://foorum.googlecode.com/svn/trunk/bin/misc/perlcritic.pl>
+  * L<http://foorum.googlecode.com/svn/trunk/bin/misc/critic.txt>
+
+=head2 Perl::Tidy
+
+L<Perl::Tidy>
+
+Every Programmer has own style to write code (expect Python. ;-). well, for many developers in one project, I think it's better to keep in one voice. that's Perl::Tidy for.
+
+  * L<http://foorum.googlecode.com/svn/trunk/bin/misc/perltidy.pl>
+
+If u want a different style, please dicuss before edit
+
+  * L<http://foorum.googlecode.com/svn/trunk/bin/misc/.perltidyrc>
+
+=head2 JavaScript::Minifier and CSS::Minifier
+
+L<JavaScript::Minifier>, L<CSS::Minifier>
+
+With minified css/js, browser loads page more fast. well, I plan to use L<http://search.cpan.org/~ruz/CSS-Squish-0.07/lib/CSS/Squish.pm> to merge all CSS into one file (but it's only a plan for now).
+
+  * L<http://foorum.googlecode.com/svn/trunk/bin/misc/js-min.pl>
+  * L<http://foorum.googlecode.com/svn/trunk/bin/misc/css-min.pl>
+
+=head2 debug flag in foorum_local.yml
+
+vim foorum_local.yml, and add a line:
+
+  debug_mode: 1
+
+
+=head2 Build Docs From GoogleCode wiki
+
+Please don't edit $svn/trunk/docs/ HTML files, instead edit $svn/wiki or L<http://code.google.com/p/foorum/w/list|Wiki> through Web. after edit, u can use follow script to update docs/ HTML files.
+
+  * L<http://foorum.googlecode.com/svn/trunk/bin/misc/bdfgw.pl>
+
+=head1 SEE ALSO
+
+L<Foorum::Manual::Tutorial1>, L<Foorum::Manual::Tutorial2>, L<Foorum::Manual::Tutorial4>, L<Foorum::Manual::Tutorial5>
+
+=cut

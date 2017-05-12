@@ -1,0 +1,144 @@
+
+=pod
+
+=head1 NAME
+
+Foorum::Manual::Tutorial1 - Tutorial 1: Catalyst Plugins used in Foorum
+
+=head2 Config::YAML
+
+L<Catalyst::Plugin::Config::YAML::XS>
+
+Why we are using Config::YAML::XS instead ConfigLoader is under a simple L<Foorum::Manual::RULES>, Fast is better.
+
+=head2 Static::Simple
+
+L<Catalyst::Plugin::Static::Simple>
+
+I think I need let Static::Simple be configurable later. because it's better let Apache handles static contents.
+
+=head2 Authentication
+
+L<Catalyst::Plugin::Authentication>
+
+Authentication is a important part in Foorum. viacheslav.t suggests
+
+ Another thing that i am concerned about is a way how to plug-in your forum to an
+ existing Cat application. For example i have my own user infrastructure and
+ registration, banning, blocking system (some things are borrowed from your code
+ ;-)...
+
+I'm strongly agree with him. so we will rewrite this part later.
+
+but for now. in foorum.yml
+
+  authentication:
+    default_realm: 'members'
+    password_hash_type: "SHA-1"
+    realms:
+      members:
+        credential:
+          class: 'Password'
+          password_field: 'password'
+          password_type: "hashed"
+          password_hash_type: "SHA-1"
+        store:
+          class: 'FromSub::Hash'
+          model_class: "UserAuth"
+
+
+here we are using Credential::Password and a Store::FromSub::Hash.
+
+I must admit that FromSub::Hash is not good enough. but it doesn't hit database every request for $c->user. Store::DBIC is nice yet our Model/User.pm sub get is returning a cached user hash. so we use FromSub::Hash.
+
+=head2 Cache
+
+L<Catalyst::Plugin::Cache>
+
+before we use Catalyst::Plugin::Cache::Memcached, but that's not so flexiable. so we turn to use Catalyst::Plugin::Cache. the configuration in foorum.yml is:
+
+  cache:
+    backends:
+      default:
+        class: 'Cache::FileCache'
+        namespace: 'Foorum'
+        default_expires_in: 600
+
+
+meanwhile, we can use Memcached:
+
+  cache:
+    backends:
+      default:
+        class: Cache::Memcached
+        compress_threshold: 10_000
+        debug: 0
+        servers:
+          - 127.0.0.1:11211
+
+
+=head2 Session::DynamicExpiry
+
+L<Catalyst::Plugin::Session::DynamicExpiry>
+
+for the "Remember Me?".
+
+=head2 Session
+
+L<Catalyst::Plugin::Session>
+
+that's pretty normal here. we use DBIC and Cookie. no URI since that's bad.
+
+=head2 I18N
+
+L<Catalyst::Plugin::I18N>
+
+check Foorum/I18N/cn.po and tw.po then u can write one for your own. that's easy!
+
+=head2 FormValidator::Simple
+
+L<Catalyst::Plugin::FormValidator::Simple>
+
+we are going to HTML::FormFu.
+
+=head2 Captcha
+
+L<Catalyst::Plugin::Captcha>
+
+  captcha:
+    session_name: captcha_string
+    new:
+      width: 80
+      height: 30
+      lines: 1
+      gd_font: giant
+    create:
+      - normal
+      - rect
+    particle:
+      - 100
+    out:
+      force: jpeg
+
+
+=head2 PageCache
+
+L<Catalyst::Plugin::PageCache>
+
+it's configurable. u can disable by set
+
+  function_on:
+    maintain: 0
+    register: 1
+    create_forum: 1
+    scraper: 0
+    page_cache: 0
+
+
+when page_cache: 1, it will be enabled.
+
+=head1 SEE ALSO
+
+L<Foorum::Manual::I18N>, L<Foorum::Manual::Configure>, L<Foorum::Manual::Tutorial2>, L<Foorum::Manual::Tutorial3>, L<Foorum::Manual::Tutorial4>, L<Foorum::Manual::Tutorial5>
+
+=cut

@@ -1,0 +1,40 @@
+Revision history for Perl extension Finance::Bank::DE::NetBank
+
+1.05        Fri Jun 16 03:00:00 CEST 2006
+            ----------------------------------------------------
+            * changed transfer() method to work with iTAN
+            * documentation: typo fix
+
+1.04        Tue Dec 20 13:00:00 CET 2005
+            ----------------------------------------------------
+            * added Test::More based tests
+            * history moved to Changes file
+            * PGP Signature support via Module::Signature
+            * documentation improved
+            * small improvements
+
+1.03        Thu Dec 15 02:00:00 CET 2005
+            ----------------------------------------------------
+            * fixed workflow to allow saldo() and statement() calls 
+              without login again
+
+1.02        Wed Dec 14 15:00:00 CET 2005
+            ----------------------------------------------------
+            * fixed pod errors
+            * enhanced pod
+        
+1.00        Wed Dec 14 00:43:00 CET 2005
+            ----------------------------------------------------
+            * changed URL to barrier free version (works without that 
+              new captcha)
+            * replaced buggy html scraping of saldo(). 
+              saldo() now uses statement() to retrive the value.
+            
+0.02        Sun May 04 15:45:00 CET 2003
+            ----------------------------------------------------
+            * documentation fixes
+
+0.01        Sun May 04 03:00:00 CET 2003
+            ----------------------------------------------------
+            * original version;
+

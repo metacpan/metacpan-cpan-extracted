@@ -1,0 +1,10 @@
+# $Id: MANIFEST,v 1.1 2007/09/09 17:45:52 asc Exp $
+Build.PL
+Changes
+lib/Flickr/Upload/Dopplr.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t

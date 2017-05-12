@@ -1,0 +1,288 @@
+NAME
+
+    File::Edit::Portable - Read and write files while keeping the original
+    line-endings intact, no matter the platform.
+
+SYNOPSIS
+
+        use File::Edit::Portable;
+    
+        my $rw = File::Edit::Portable->new;
+    
+        # read a file, replacing original file's line endings with
+        # that of the local platform's default
+    
+        my $fh = $rw->read('file.txt');
+    
+        # edit file in a loop, and re-write it with its original line endings
+    
+        my $fh = $rw->read('file.txt');
+        my $wfh = $rw->tempfile;
+    
+        while (<$fh>){
+            ...
+            print $wfh $_;
+        }
+    
+        $rw->write(contents => $wfh);
+    
+        # get an array of the file's contents, with line endings stripped off
+    
+        my @contents = $rw->read('file.txt');
+    
+        # write out a file using original file's record separator, into a new file,
+        # preserving the original
+    
+        $rw->write(contents => \@contents, copy => 'file2.txt');
+    
+        # replace original file's record separator with a new (custom) one
+    
+        $rw->write(recsep => "\r\n", contents => \@contents);
+    
+        # rewrite all files in a directory recursively with local
+        # platform's default record separator
+    
+        $rw->dir(dir => '/path/to/files');
+    
+        # insert new data into a file after a specified line number
+    
+        $rw->splice(file => 'file.txt', line => $num, insert => \@contents);
+    
+        # insert new data into a file after a found search term
+    
+        $rw->splice(file => 'file.txt', find => 'term', insert => \@contents);
+    
+        # get a file's record separator
+    
+        $rw->recsep('file.txt'); # string form
+        $rw->recsep('file.txt', 'hex'); # hex form
+        $rw->recsep('file.txt', 'type');  # line ending type (nix, win, mac, etc)
+
+DESCRIPTION
+
+    The default behaviour of perl is to read and write files using the
+    Operating System's (OS) default record separator (line ending). If you
+    open a file on an OS where the record separators are that of another
+    OS, things can and do break.
+
+    This module will read in a file, keep track of the file's current
+    record separators regardless of the OS, and save them for later
+    writing. It can return either a file handle (in scalar context) that
+    has had its line endings replaced with that of the local OS platform,
+    or an array of the file's contents (in list context) with line endings
+    stripped off. You can then modify this array and send it back in for
+    writing to the same file or a new file, where the original file's line
+    endings will be re-appended (or a custom ending if you so choose).
+
+    Uses are for dynamically reading/writing files while on one Operating
+    System, but you don't know whether the record separators are
+    platform-standard. Shared storage between multpile platforms are a good
+    use case. This module affords you the ability to not have to check each
+    file, and is very useful in looping over a directory where various
+    files may have been written by different platforms.
+
+EXPORT
+
+    None by default. See EXPORT_OK
+
+EXPORT_OK
+
+    recsep(), platform_recsep()
+
+METHODS
+
+ new
+
+    Returns a new File::Edit::Portable object.
+
+ read('file.txt')
+
+    In scalar context, will return a read-only file handle to a copy of the
+    file that has had its line endings replaced with those of the local OS
+    platform's record separator.
+
+    In list context, will return an array, where each element is a line
+    from the file, with all line endings stripped off.
+
+    In both cases, we save the line endings that were found in the original
+    file (which is used when write() is called, by default).
+
+ write
+
+    Writes the data back to the original file, or alternately a new file.
+    Returns 1 on success. If you inadvertantly append newlines to the new
+    elements of the contents array, we'll strip them off before appending
+    the real newlines.
+
+    Parameters:
+
+    file => 'file.txt'
+
+    Not needed if you've used read() to open the file. However, if you have
+    multiple read()s open, write() will die without the 'file' param, as it
+    won't know which file you're wanting to write.
+
+    copy => 'file2.txt'
+
+    Set this if you want to write to an alternate (new) file, rather than
+    the original.
+
+    contents => $filehandle or contents => \@contents
+
+    Mandatory - either an array with one line per element, or a file handle
+    (file handle is far less memory-intensive).
+
+    recsep => "\r\n"
+
+    Optional - a double-quoted string of any characters you want to write
+    as the line ending (record separator). This value will override what
+    was found in the read() call. Common ones are "\r\n" for Windows, "\n"
+    for Unix and "\r" for Mac. Use a call to platform_recsep() as the value
+    to use the local platforms default separator.
+
+ splice
+
+    Inserts new data into a file after a specified line number or search
+    term.
+
+    Parameters:
+
+    file => 'file.txt'
+
+    Mandatory.
+
+    insert => \@contents
+
+    Mandatory - an array reference containing the contents to merge into
+    the file.
+
+    copy => 'file2.txt'
+
+    Optional - we'll read from file, but we'll write to this new file.
+
+    line => Integer
+
+    Optional - Merge the contents on the line following the one specified
+    here.
+
+    find => 'search term'
+
+    Optional - Merge the contents into the file on the line following the
+    first find of the search term. The search term is put into qr, so
+    single quotes are recommended, and all regex patterns are honoured.
+    Note that we also accept a pre-created qr// Regexp object directly (as
+    opposed to a string).
+
+    limit => Integer
+
+    Optional - When splicing with the 'find' param, set this to the number
+    of finds to insert after. Default is stop after the first find. Set to
+    0 will insert after all finds.
+
+    NOTE: Although both are optional, at least one of line or find must be
+    sent in. If both are sent in, we'll warn, and operate on the line
+    number and skip the find parameter.
+
+    Returns an array of the modified file contents.
+
+ dir
+
+    Rewrites the line endings in some or all files within a directory
+    structure recursively. By default, rewrites all files with the current
+    platform's default line ending. Returns an array of the names of the
+    files found.
+
+    Parameters:
+
+    dir => '/path/to/files'
+
+    Mandatory.
+
+    types => ['*.txt', '*.dat']
+
+    Optional - Specify wildcard combinations for files to work on. We'll
+    accept anything that File::Find::Rule::name() method does. If not
+    supplied, we work on all files.
+
+    maxdepth => Integer
+
+    Optional - Specify how many levels of recursion to do after entering
+    the directory. We'll do a full recurse through all sub-directories if
+    this parameter is not set.
+
+    recsep => "\r\n"
+
+    Optional - If this parameter is not sent in, we'll replace the line
+    endings with that of the current platform we're operating on.
+    Otherwise, we'll use the double-quoted value sent in.
+
+    list => 1
+
+    Optional - If set to any true value, we'll return an array of the names
+    of the files found, but won't take any editing action on them.
+
+    Default is disabled.
+
+ recsep('file.txt', $want)
+
+    Returns the record separator found within the file. If the file is
+    empty, we'll return the local platform's default record separator.
+
+    The optional $want parameter can contain either 'hex' or 'type'. If
+    'hex' is sent in, the record separator will be returned in hex form
+    (eg: "\0d\0a" for Windows). If 'type' is sent in, we'll return a
+    short-form of the line-ending type (eg: win, nix, mac, etc).
+
+    Note that this method can be imported into your namespace on demand if
+    you don't need the object functionality of the module.
+
+ platform_recsep($want)
+
+    Returns the the current platform's (OS) record separator in string
+    form.
+
+    The optional $want parameter can contain either 'hex' or 'type'. If
+    'hex' is sent in, the record separator will be returned in hex form
+    (eg: "\0d\0a" for Windows). If 'type' is sent in, we'll return a
+    short-from of the line-ending type (eg: win, nix, mac, etc).
+
+    Note that this method can be imported into your namespace on demand if
+    you don't need the object functionality of the module.
+
+ tempfile
+
+    Returns a file handle in write mode to an empty temp file.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    https://github.com/stevieb9/mock-sub/issues
+
+REPOSITORY
+
+    https://github.com/stevieb9/file-edit-portable
+
+BUILD RESULTS (THIS VERSION)
+
+    CPAN Testers: http://matrix.cpantesters.org/?dist=File-Edit-Portable
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc File::Edit::Portable
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,130 @@
+Version 0.1628: Sat May 2 2015
+- Prevent CPAN from indexing private-lib
+
+Version 0.1627: Mon Apr 20 2015
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+- Require File::Slurp instead of including it, to avoid potential problems 
+  like this: 
+  http://www.cpantesters.org/cpan/report/86a0145a-e52b-11e4-a1d1-8536eb4f9f07 
+- Fix tests so that they don't prematurely delete the temp file
+  See for example:
+  http://www.cpantesters.org/cpan/report/3adcb600-6bf9-1014-8336-f8616735162a
+- Fix tests on Windows.
+  http://www.cpantesters.org/cpan/report/482c4765-af8d-1014-8ca5-91062b825c07
+
+Version 0.1626: Sun Apr 12 2015
+- Enable verbose testing for CPAN-testers
+- Consolidate issue tracking at rt.cpan.org
+
+Version 0.1625: Sat Apr 4 2015
+- Modify the memory leak test to check for <= 0 bytes. I'm not sure how this
+  scenario happens, but test failures like this indicate that it can:
+  http://www.cpantesters.org/cpan/report/bdd0e36c-d0dd-11e4-954f-5702e0bfc7aa
+- Attempt to fix loss of lines when $/ is undef. Thanks to Nigel Horne for the
+  automated testing that found the failure.
+  http://www.cpantesters.org/cpan/report/60452d60-d3cc-11e4-b60b-c2157e3e1735
+
+Version 0.1624: Sun Mar 22 2015
+- Moved code to github
+- Added POD test
+- Improve testability of binmode_bug.t, stdin_tell_bug.t
+- Implement a potential fix for test failures where FileHandle::getline()
+	seems to be reading a single line even though $/ is undef. Unfortunately I
+	can't reproduce this failure, so I'll submit and check the CPAN Testers
+	reports.
+- Use "local $/" instead of reassigning global $/. Perhaps this is somehow
+	related to the test failures above?
+- Improve documentation for input_record_separator()
+
+Version 0.1623: Sun Aug 9 2009
+- Fixed a bug where files with binary data would sometimes cause an
+	unitialized value warning at line 394 as well as incorrect behavior. (Thanks
+	to Bill Nugent <whn@lopi.com> for the bug report and initial patch.)
+- Removed unused ExtUtils::MakeMaker::bytes, which doesn't exist anymore
+	anyway. (Thanks to Slaven Rezić <srezic@cpan.org> for the bug report.)
+
+Version 0.1622: Wed Jul 16 2008
+- Updated to the latest version of Module::Install
+- Removed auto-install for better compatibility with CPAN and others
+- Moved hosting to Google Code
+
+Version 0.1621:
+- Improved compatibility with versions of Perl older than 5.6.0, by replacing
+  "use bytes" with "use ExtUtils::MakeMaker::bytes". (Thanks to
+  <nothingmuch@woobling.org> for the bug report.)
+- Fixed test case error reporting for tests that fail to fork. (Thanks to
+  <corion-cpansmoker@corion.net> for the test failure report.)
+- Fixed unexpected success of binmode_bug.t test on Windows 2000. (Thanks to
+  Max Maischein <corion@corion.net> for the bug report.)
+- Fixed a bug in stdin_tell_bug.t. (Thanks to Max Maischein
+  <corion@corion.net> for the bug report.)
+
+Version 0.1620: Tue Dec 21 2004
+- Fixed version numbers, which were incompatible with some modules. (Thanks to
+  Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug
+  report)
+- Switched to Test::More for better test reporting
+- Removed the use of the "English" module to work around a bug that exists in
+  some versions of Perl. See
+  http://groups.google.com/groups?th=e3483b06a956030e for more info. (Thanks
+  to Jim Longino <jlongino@jaguar1.usouthal.edu> for the bug report.)
+
+Version 0.16.1: Thu Sep 16 2004
+- Added missing inc/ dependency
+
+Version 0.16.0: Wed Sep 15 2004
+- Fixed stdin_tell_bug.t so that it's more platform-dependent. (Martin Thurn
+  <martin.thurn@ngc.com> reports that Solaris 2.8 returns 0 instead of -1).
+- Added filehandle-specific input_record_separator capability (Feature
+  suggestion by David Muir Sharnoff <muir@idiom.com>)
+- Changed Makefile.PL to use Module::Install
+
+Version 0.15:
+- Switched from WeakRef to Scalar::Util, which is included in recent versions
+  of Perl. (Thanks to Joey Hess <joey@kitenet.net> for the suggestion and
+  patch.)
+- Fixed a bug involving pipes and tell(), where tell() would cause following
+  operations to fail. (Thanks to Karol Szafranski <szafrans@imb-jena.de> for
+  the bug report.)
+- Added new_from_fd support (Thanks to Karol Szafranski <szafrans@imb-jena.de>
+  for the bug report.)
+- Fixed a bug in which <$fh> would always behave as if called in a list
+  context after the first such call.
+
+Version 0.14:
+- Fixed an incompatibility with perl 5.6.1 and Data::Dumper. (Thanks to Jason
+  Brunette <jbrunette@users.sourceforge.net> for the bug report and patch.)
+- Fixed a bug in the seek.t test case which would cause failure on Windows
+  (Thanks to rurban@x-ray.at for the bug report.)
+- Fixed a memory leak. (Thanks to Jason Brunette
+  <jbrunette@users.sourceforge.net> for taking the time to not only file the
+  bug report, but also do a lot of work to track down the cause.) For now I'm
+  using WeakRef to deal with circular references. If anyone can tell me how to
+  get rid of them entirely I'd be grateful. See the discussion here:
+  https://sourceforge.net/tracker/index.php?func=detail&aid=892742&group_id=93038&atid=602891
+
+Version 0.13:
+- Added detection for a case in which a Perl bug will be exercised on Windows.
+  Also added a test case (binmode_bug.t) to demonstrate it. See the BUGS
+  section of the documentation.
+- Added a couple new test cases.
+
+Version 0.12:
+- Changed the filehandle detection scheme so that filehandles created using
+  Symbol::gensym would be detected correctly. (Thanks to Tassilo von Parseval
+  <tassilo.parseval@post.rwth-aachen.de> for finding the bug)
+- Fixed a bug in getline and getlines which would cause the routines to not
+  return undef at the end of the file. (Thanks to Tassilo von Parseval
+  <tassilo.parseval@post.rwth-aachen.de> for finding the bug)
+- Fixed a potential bug in seek which would cause the module to not intercept
+  the seek call following a previous seek call with an invalid whence
+  parameter.
+
+Version 0.11:
+- Fixed uninitialized value warnings
+- Create SourceForge project
+
+Version 0.10:
+- Initial version

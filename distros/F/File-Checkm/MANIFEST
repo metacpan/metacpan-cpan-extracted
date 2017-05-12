@@ -1,0 +1,8 @@
+lib/File/Checkm.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+checkm
+README
+t/checkm.t
+VERSION

@@ -1,0 +1,2354 @@
+package FrameMaker::MifTree;
+# $Id: MifTreeTags,v 1.8 2004/07/22 11:30:24 roel Exp $
+###############################################################
+#                                                             #
+#               valid tags for MIF version 7.00               #
+#                 part of package MifTree.pm                  #
+#                                                             #
+############ possibly incomplete and/or incorrect #############
+use strict;
+use warnings;
+no warnings 'once';
+
+# %mifnodes defines all the nodes and their possible daughters
+%FrameMaker::MifTree::mifnodes = (
+  ""                      => [qw(
+                               MIFFile
+                               MIFEncoding
+                               Comment
+                               Units
+                               CharUnits
+                               Verbose
+                               ColorCatalog
+                               ConditionCatalog
+                               CombinedFontCatalog
+                               PgfCatalog
+                               ElementDefCatalog
+                               FmtChangeListCatalog
+                               FontCatalog
+                               RulingCatalog
+                               TblCatalog
+                               KumihanCatalog
+                               Views
+                               VariableFormats
+                               MarkerTypeCatalog
+                               XRefFormats
+                               Document
+                               BookComponent
+                               InitialAutoNums
+                               Dictionary
+                               AFrames
+                               Tbls
+                               Page
+                               TextFlow
+                               DXmlDocType
+                               DXmlEncoding
+                               DXmlFileEncoding
+                               DXmlPublicId
+                               DXmlStandAlone
+                               DXmlStyleSheet
+                               DXmlSystemId
+                               DXmlUseBOM
+                               DXmlVersion
+                               DXmlWellFormed
+                               AcrobatElements
+                               Book
+                               BNextUnique
+                               BViewOnly
+                               BViewOnlyNoOp
+                               BViewOnlyPopup
+                               BViewOnlyWinBorders
+                               BViewOnlyWinMenubar
+                               BDisplayText
+                               BWindowRect
+                               PDFBookInfo
+                               BookFileInfo
+                               BXmlDocType
+                               BXmlEncoding
+                               BXmlFileEncoding
+                               BXmlStandAlone
+                               BXmlStyleSheet
+                               BXmlUseBOM
+                               BXmlVersion
+                               BXmlWellFormed
+                               BookXRef
+                               BookUpdateReferences
+                             )],
+  AFrames                 => [qw(Frame)],
+  AcrobatElements         => [qw(AcrobatElement)],
+  Arc                     => [qw(
+                               Angle
+                               ArcDTheta
+                               ArcRect
+                               ArcTheta
+                               ArrowStyle
+                               DashedPattern
+                               Fill
+                               GroupID
+                               HeadCap
+                               ID
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               TailCap
+                               Unique
+                             )],
+  ArrowStyle              => [qw(
+                               BaseAngle
+                               HeadType
+                               Length
+                               ScaleFactor
+                               ScaleHead
+                               TipAngle
+                             )],
+  Attribute               => [qw(AttrName AttrValue)],
+  Attributes              => [qw(Attribute)],
+  AutoNumSeries           => [qw(FlowTag NumCounter Series)],
+  BCustomElementList      => [qw(EDTag)],
+  BFCLMaximums            => [qw(
+                               FDW
+                               FSize
+                               FStretch
+                               PgfCellBMargin
+                               PgfCellLMargin
+                               PgfCellRMargin
+                               PgfCellTMargin
+                               PgfFIndent
+                               PgfLIndent
+                               PgfLeading
+                               PgfRIndent
+                               PgfSpAfter
+                               PgfSpBefore
+                               TSX
+                             )],
+  BFCLMinimums            => [qw(
+                               FDW
+                               FSize
+                               FStretch
+                               PgfCellBMargin
+                               PgfCellLMargin
+                               PgfCellRMargin
+                               PgfCellTMargin
+                               PgfFIndent
+                               PgfLIndent
+                               PgfLeading
+                               PgfRIndent
+                               PgfSpAfter
+                               PgfSpBefore
+                               TSX
+                             )],
+  BookComponent           => [qw(
+                               BFNoteComputeMethod
+                               BFNoteLabels
+                               BFNoteNumStyle
+                               BFNoteRestart
+                               BFNoteStartNum
+                               BTblFNoteComputeMethod
+                               BTblFNoteLabels
+                               BTblFNoteNumStyle
+                               ChapterNumComputeMethod
+                               ChapterNumStart
+                               ChapterNumStyle
+                               ChapterNumText
+                               ContPageNum
+                               DefaultApply
+                               DefaultDerive
+                               DefaultPrint
+                               DeriveLinks
+                               DeriveTag
+                               DeriveType
+                               DisplayText
+                               FileName
+                               FileNameSuffix
+                               NumPages
+                               PageNumStart
+                               PageNumStyle
+                               PageNumbering
+                               PgfNumbering
+                               StartPageSide
+                               Unique
+                               VolNumComputeMethod
+                               VolumeNumStart
+                               VolumeNumStyle
+                               VolumeNumText
+                             )],
+  BookElements            => [qw(
+                               Element
+                               ElementBegin
+                               ElementEnd
+                               PrefixEnd
+                               SuffixBegin
+                             )],
+  BookSettings            => [qw(
+                               BAttrEditor
+                               BAttributeDisplay
+                               BCustomElementList
+                               BElementCatalogScope
+                               BFCLMaximums
+                               BFCLMinimums
+                               BSGMLAppName
+                               BSeparateInclusions
+                               BStructAppName
+                               BUseInitStructure
+                               BUseInitialStructure
+                             )],
+  BookXRef                => [qw(
+                               Char
+                               Font
+                               String
+                               XRefDef
+                               XRefSrcFile
+                               XRefSrcIsElem
+                               XRefSrcText
+                             )],
+  Cell                    => [qw(
+                               CellAffectsColumnWidthA
+                               CellAngle
+                               CellBRuling
+                               CellColor
+                               CellColumns
+                               CellContent
+                               CellFill
+                               CellLRuling
+                               CellRRuling
+                               CellRows
+                               CellSeparation
+                               CellTRuling
+                               Element
+                             )],
+  CellContent             => [qw(Notes Para)],
+  CharClass               => [qw(
+                               AsianSpace
+                               BaseCharWithRubi
+                               BaseCharWithSuper
+                               BegParentheses
+                               CenteredPunct
+                               EndParentheses
+                               Hiragana
+                               NoLineBeginChar
+                               NonSeparableChar
+                               Numeral
+                               Others
+                               ParenBegWariChu
+                               ParenBeginWariChu
+                               ParenEndWariChu
+                               PeriodComma
+                               PrecedingSymbol
+                               QuestionBang
+                               RomanChar
+                               RomanSpace
+                               Spare1
+                               Spare2
+                               Spare3
+                               Spare4
+                               Spare5
+                               SucceedingSymbol
+                               UnitSymbol
+                             )],
+  Color                   => [qw(
+                               ColorAttribute
+                               ColorBlack
+                               ColorCyan
+                               ColorLibraryFamilyName
+                               ColorLibraryInkName
+                               ColorMagenta
+                               ColorOverprint
+                               ColorTag
+                               ColorTint
+                               ColorTintBaseColor
+                               ColorTintPercentage
+                               ColorYellow
+                             )],
+  ColorCatalog            => [qw(Color)],
+  CombinedFontCatalog     => [qw(CombinedFontDefn)],
+  CombinedFontDefn        => [qw(
+                               CombinedFontAllowBaseFamilyBoldedAndObliqued
+                               CombinedFontBaseEncoding
+                               CombinedFontBaseFamily
+                               CombinedFontName
+                               CombinedFontWesternFamily
+                               CombinedFontWesternShift
+                               CombinedFontWesternSize
+                             )],
+  Condition               => [qw(CColor CSeparation CState CStyle CTag)],
+  ConditionCatalog        => [qw(Condition)],
+  Conditional             => [qw(InCondition)],
+  ContextFormatRule       => [qw(Else ElseIf If)],
+  CountElements           => [qw(CountElement)],
+  DBookElementHierarchy   => [qw(ElementContext)],
+  DCustomElementList      => [qw(EDTag)],
+  DExclusions             => [qw(Exclusion)],
+  DFCLMaximums            => [qw(
+                               FDW
+                               FSize
+                               FStretch
+                               PgfCellBMargin
+                               PgfCellLMargin
+                               PgfCellRMargin
+                               PgfCellTMargin
+                               PgfFIndent
+                               PgfLIndent
+                               PgfLeading
+                               PgfRIndent
+                               PgfSpAfter
+                               PgfSpBefore
+                               TSX
+                             )],
+  DFCLMinimums            => [qw(
+                               FDW
+                               FSize
+                               FStretch
+                               PgfCellBMargin
+                               PgfCellLMargin
+                               PgfCellRMargin
+                               PgfCellTMargin
+                               PgfFIndent
+                               PgfLIndent
+                               PgfLeading
+                               PgfRIndent
+                               PgfSpAfter
+                               PgfSpBefore
+                               TSX
+                             )],
+  DInclusions             => [qw(Inclusion)],
+  DMathCatalog            => [qw(DMathGreekOverrides DMathNew DMathOpOverrides)],
+  DMathNew                => [qw(
+                               DMathNewType
+                               DMathOpName
+                               DMathOpPositionA
+                               DMathOpPositionB
+                               DMathOpPositionC
+                               DMathOpTLineOverride
+                             )],
+  DMathOpOverrides        => [qw(
+                               DMathOpName
+                               DMathOpPositionA
+                               DMathOpPositionB
+                               DMathOpPositionC
+                               DMathOpTLineOverride
+                             )],
+  DashedPattern           => [qw(DashSegment DashedStyle NumSegments)],
+  DataLink                => [qw(DLOut DLSource MacEdition OneLinePerRec)],
+  Dictionary              => [qw(OKWord)],
+  Document                => [qw(
+                               ChapterNumComputeMethod
+                               ChapterNumStart
+                               ChapterNumStyle
+                               ChapterNumText
+                               ContPageNum
+                               DAcrobatBookmarksIncludeTagNames
+                               DAcrobatEnableArticleThreads
+                               DAcrobatParagraphBookmarks
+                               DApplyFormatRules
+                               DAttrEditor
+                               DAttributeDisplay
+                               DAutoChBars
+                               DBookElementHierarchy
+                               DBordersOn
+                               DChBarColor
+                               DChBarGap
+                               DChBarPosition
+                               DChBarWidth
+                               DColumnGap
+                               DColumns
+                               DCurrentView
+                               DCustomElementList
+                               DDisplayOverrides
+                               DElementBordersOn
+                               DElementCatalogScope
+                               DElementTags
+                               DElementTagsOn
+                               DExclusions
+                               DFCLMaximums
+                               DFCLMinimums
+                               DFNoteAnchorPos
+                               DFNoteAnchorPrefix
+                               DFNoteAnchorSuffix
+                               DFNoteComputeMethod
+                               DFNoteLabels
+                               DFNoteMaxH
+                               DFNoteNumStyle
+                               DFNoteNumberPos
+                               DFNoteNumberPrefix
+                               DFNoteNumberSuffix
+                               DFNoteRestart
+                               DFNoteTag
+                               DFluid
+                               DFluidSideheads
+                               DFrozenPages
+                               DFullRulers
+                               DGenerateAcrobatInfo
+                               DGraphicsOff
+                               DGridOn
+                               DInclusions
+                               DLanguage
+                               DLinebreakChars
+                               DLinkBoundariesOn
+                               DMagicMarker
+                               DMargins
+                               DMathAlphaCharFontFamily
+                               DMathCatalog
+                               DMathFunctions
+                               DMathGreek
+                               DMathLargeHoriz
+                               DMathLargeIntegral
+                               DMathLargeLevel1
+                               DMathLargeLevel2
+                               DMathLargeLevel3
+                               DMathLargeSigma
+                               DMathLargeVert
+                               DMathMediumHoriz
+                               DMathMediumIntegral
+                               DMathMediumLevel1
+                               DMathMediumLevel2
+                               DMathMediumLevel3
+                               DMathMediumSigma
+                               DMathMediumVert
+                               DMathNumbers
+                               DMathShowCustom
+                               DMathSmallHoriz
+                               DMathSmallIntegral
+                               DMathSmallLevel1
+                               DMathSmallLevel2
+                               DMathSmallLevel3
+                               DMathSmallSigma
+                               DMathSmallVert
+                               DMathStrings
+                               DMathVariables
+                               DMaxInterLine
+                               DMaxInterPgf
+                               DMenuBar
+                               DNarrowRubiSpaceForJapanese
+                               DNarrowRubiSpaceForOther
+                               DNextUnique
+                               DNoPrintSepColor
+                               DPDFAllNamedDestinations
+                               DPDFAllPages
+                               DPDFBookmarks
+                               DPDFConvertCMYK
+                               DPDFDestsMarked
+                               DPDFEndPage
+                               DPDFFit
+                               DPDFJobOptions
+                               DPDFOpenBookmarkLevel
+                               DPDFOpenFit
+                               DPDFOpenPage
+                               DPDFOpenZoom
+                               DPDFPageHeight
+                               DPDFPageSizeSet
+                               DPDFPageWidth
+                               DPDFRegMarks
+                               DPDFSaveSeparate
+                               DPDFStartPage
+                               DPDFStructure
+                               DPDFStructureDefined
+                               DPDFZoom
+                               DPageGrid
+                               DPageNumStyle
+                               DPagePointStyle
+                               DPageRounding
+                               DPageScrolling
+                               DPageSize
+                               DParity
+                               DPrintProcessColor
+                               DPrintSeparations
+                               DPrintSkipBlankPages
+                               DPunctuationChars
+                               DRubiAlignAtBounds
+                               DRubiAlignAtLineBounds
+                               DRubiFixedSize
+                               DRubiOverhang
+                               DRubiSize
+                               DRulersOn
+                               DSGMLAppName
+                               DSeparateInclusions
+                               DShowAllConditions
+                               DSmallCapsSize
+                               DSmallCapsStretch
+                               DSmartQuotesOn
+                               DSmartSpacesOn
+                               DSnapGrid
+                               DSnapRotation
+                               DStartPage
+                               DStructAppName
+                               DSubscriptShift
+                               DSubscriptSize
+                               DSubscriptStretch
+                               DSuperscriptShift
+                               DSuperscriptSize
+                               DSuperscriptStretch
+                               DSymbolsOn
+                               DTblFNoteAnchorPos
+                               DTblFNoteAnchorPrefix
+                               DTblFNoteAnchorSuffix
+                               DTblFNoteLabels
+                               DTblFNoteNumStyle
+                               DTblFNoteNumberPos
+                               DTblFNoteNumberPrefix
+                               DTblFNoteNumberSuffix
+                               DTblFNoteTag
+                               DTrapwiseCompatibility
+                               DTwoSides
+                               DUpdateTextInsetsOnOpen
+                               DUpdateXRefsOnOpen
+                               DUseInitStructure
+                               DUseInitialStructure
+                               DViewOnly
+                               DViewOnlyNoOp
+                               DViewOnlySelect
+                               DViewOnlyWinBorders
+                               DViewOnlyWinMenubar
+                               DViewOnlyWinPalette
+                               DViewOnlyWinPopup
+                               DViewOnlyXRef
+                               DViewRect
+                               DViewScale
+                               DVoMenuBar
+                               DWideRubiSpaceForJapanese
+                               DWideRubiSpaceForOther
+                               DWindowRect
+                               DocFileInfo
+                               FNoteStartNum
+                               PDFDocInfo
+                               PgfNumbering
+                               VolNumComputeMethod
+                               VolumeNumStart
+                               VolumeNumStyle
+                               VolumeNumText
+                             )],
+  EDAlsoInsert            => [qw(AlsoInsert)],
+  EDAttrChoices           => [qw(EDAttrChoice)],
+  EDAttrDef               => [qw(
+                               EDAttrChoices
+                               EDAttrDefValues
+                               EDAttrHidden
+                               EDAttrName
+                               EDAttrRange
+                               EDAttrReadOnly
+                               EDAttrRequired
+                               EDAttrType
+                             )],
+  EDAttrDefValues         => [qw(EDAttrDefValue)],
+  EDAttrDefinitions       => [qw(EDAttrDef)],
+  EDAttrRange             => [qw(EDRangeEnd EDRangeStart)],
+  EDEndElementRules       => [qw(ContextFormatRule LevelFormatRule)],
+  EDExclusions            => [qw(Exclusion)],
+  EDInclusions            => [qw(Inclusion)],
+  EDObjectFormatRules     => [qw(ContextFormatRule LevelFormatRule)],
+  EDPrefixRules           => [qw(ContextFormatRule LevelFormatRule)],
+  EDStartElementRules     => [qw(ContextFormatRule LevelFormatRule)],
+  EDSuffixRules           => [qw(ContextFormatRule LevelFormatRule)],
+  EDTextFormatRules       => [qw(ContextFormatRule LevelFormatRule)],
+  ENamespace              => [qw(ENamespacePath ENamespacePrefix)],
+  Element                 => [qw(
+                               AttributeDisplay
+                               Attributes
+                               Collapsed
+                               ElementReferenced
+                               EComponent
+                               ETag
+                               ETextSnippet
+                               SpecialCase
+                               Unique
+                               UserString
+                             )],
+  ElementBegin            => [qw(
+                               AttributeDisplay
+                               Attributes
+                               Collapsed
+                               ENamespace
+                               ETag
+                               ElementReferenced
+                               SpecialCase
+                               Unique
+                               UserString
+                             )],
+  ElementContext          => [qw(Element NextElement PrevElement)],
+  ElementDef              => [qw(
+                               EDAlsoInsert
+                               EDAttrDefinitions
+                               EDComments
+                               EDEndElementRules
+                               EDExclusions
+                               EDGeneralRule
+                               EDInclusions
+                               EDInitialTablePattern
+                               EDObject
+                               EDObjectFormatRules
+                               EDPgfFormat
+                               EDPrefixRules
+                               EDStartElementRules
+                               EDSuffixRules
+                               EDTag
+                               EDTextFormatRules
+                               EDValidHighestLevel
+                             )],
+  ElementDefCatalog       => [qw(ElementDef)],
+  Ellipse                 => [qw(
+                               Angle
+                               BRect
+                               DashedPattern
+                               Fill
+                               GroupID
+                               ID
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               ShapeRect
+                               Unique
+                             )],
+  Else                    => [qw(
+                               ContextFormatRule
+                               ContextLabel
+                               ElementPrefix
+                               ElementSuffix
+                               FmtChangeList
+                               FmtChangeListTag
+                               FormatTag
+                               IsTextRange
+                               LevelFormatRule
+                             )],
+  ElseIf                  => [qw(
+                               Context
+                               ContextFormatRule
+                               ContextLabel
+                               ElementPrefix
+                               ElementSuffix
+                               FmtChangeList
+                               FmtChangeListTag
+                               FormatTag
+                               IsTextRange
+                               Level
+                               LevelFormatRule
+                             )],
+  EqualizeWidths          => [qw(TblColumnNum)],
+  ExtraSpaceTable         => [qw(
+                               AsianSpace
+                               BaseCharWithRubi
+                               BaseCharWithSuper
+                               BegParentheses
+                               CenteredPunct
+                               EndParentheses
+                               Hiragana
+                               NoLineBeginChar
+                               NonSeparableChar
+                               Numeral
+                               Others
+                               ParenBegWariChu
+                               ParenBeginWariChu
+                               ParenEndWariChu
+                               PeriodComma
+                               PrecedingSymbol
+                               QuestionBang
+                               RomanChar
+                               RomanSpace
+                               Spare1
+                               Spare2
+                               Spare3
+                               Spare4
+                               Spare5
+                               SucceedingSymbol
+                               UnitSymbol
+                             )],
+  FNote                   => [qw(Font ID Para Unique)],
+  FmtChangeList           => [qw(
+                               FAngle
+                               FCase
+                               FChangeBar
+                               FColor
+                               FDW
+                               FDWChange
+                               FDX
+                               FDY
+                               FFamily
+                               FLanguage
+                               FLocked
+                               FOutline
+                               FOverline
+                               FPairKern
+                               FPlatformName
+                               FPosition
+                               FPostScriptName
+                               FSeparation
+                               FShadow
+                               FSize
+                               FSizeChange
+                               FStretch
+                               FStretchChange
+                               FStrike
+                               FUnderlining
+                               FVar
+                               FWeight
+                               FclPgfCatalogRef
+                               FclTag
+                               HyphenMaxLines
+                               HyphenMinPrefix
+                               HyphenMinSuffix
+                               HyphenMinWord
+                               MoveTabs
+                               PgfAlignment
+                               PgfAutoNum
+                               PgfBlockSize
+                               PgfBotSepAtIndent
+                               PgfBotSepOffset
+                               PgfBotSeparator
+                               PgfCellAlignment
+                               PgfCellBMargin
+                               PgfCellBMarginChange
+                               PgfCellBMarginFixed
+                               PgfCellLMargin
+                               PgfCellLMarginChange
+                               PgfCellLMarginFixed
+                               PgfCellRMargin
+                               PgfCellRMarginChange
+                               PgfCellRMarginFixed
+                               PgfCellTMargin
+                               PgfCellTMarginChange
+                               PgfCellTMarginFixed
+                               PgfFIndent
+                               PgfFIndentChange
+                               PgfFIndentOffset
+                               PgfFIndentRelative
+                               PgfHyphenate
+                               PgfLIndent
+                               PgfLIndentChange
+                               PgfLanguage
+                               PgfLeading
+                               PgfLeadingChange
+                               PgfLetterSpace
+                               PgfLineSpacingFixed
+                               PgfMaxWordSpace
+                               PgfMinWordSpace
+                               PgfNumAtEnd
+                               PgfNumFormat
+                               PgfNumTabs
+                               PgfNumberFont
+                               PgfOptWordSpace
+                               PgfPlacement
+                               PgfPlacementStyle
+                               PgfRIndent
+                               PgfRIndentChange
+                               PgfRunInDefaultPunct
+                               PgfSpAfter
+                               PgfSpAfterChange
+                               PgfSpBefore
+                               PgfSpBeforeChange
+                               PgfTopSepAtIndent
+                               PgfTopSepOffset
+                               PgfTopSeparator
+                               PgfWithNext
+                               PgfWithPrev
+                               TabStop
+                             )],
+  FmtChangeListCatalog    => [qw(FmtChangeList)],
+  Font                    => [qw(
+                               FAngle
+                               FBold
+                               FCase
+                               FChangeBar
+                               FColor
+                               FCombinedFontName
+                               FDAX
+                               FDW
+                               FDX
+                               FDY
+                               FDoubleUnderline
+                               FEncoding
+                               FFamily
+                               FItalic
+                               FLanguage
+                               FLocked
+                               FNoAdvance
+                               FNumericUnderline
+                               FOutline
+                               FOverline
+                               FPairKern
+                               FPlain
+                               FPlatformName
+                               FPosition
+                               FPostScriptName
+                               FSeparation
+                               FShadow
+                               FSize
+                               FStretch
+                               FStrike
+                               FSubScript
+                               FSupScript
+                               FTag
+                               FTsume
+                               FUnderline
+                               FUnderlining
+                               FVar
+                               FWeight
+                               FWesternPlatformName
+                               FWesternPostScriptName
+                             )],
+  FontCatalog             => [qw(Font)],
+  Frame                   => [qw(
+                               AnchorAlign
+                               AnchorBeside
+                               Angle
+                               Arc
+                               BLOffset
+                               BRect
+                               BitMapDpi
+                               Cropped
+                               DashedPattern
+                               Element
+                               Ellipse
+                               Fill
+                               FlipLR
+                               Float
+                               Frame
+                               FrameType
+                               Group
+                               GroupID
+                               ID
+                               ImportObFixedSize
+                               ImportObject
+                               Math
+                               NSOffset
+                               NativeOrigin
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               PolyLine
+                               Polygon
+                               ReRotateAngle
+                               Rectangle
+                               RoundRect
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               ShapeRect
+                               Tag
+                               TextLine
+                               TextRect
+                               Unique
+                             )],
+  Group                   => [qw(
+                               Angle
+                               BRect
+                               GroupID
+                               ID
+                               RunaroundGap
+                               RunaroundType
+                               ShapeRect
+                               Unique
+                             )],
+  HFFont                  => [qw(Font)],
+  If                      => [qw(
+                               Context
+                               ContextFormatRule
+                               ContextLabel
+                               ElementPrefix
+                               ElementSuffix
+                               FmtChangeList
+                               FmtChangeListTag
+                               FormatTag
+                               IsTextRange
+                               Level
+                               LevelFormatRule
+                             )],
+  ImportObject            => [qw(
+                               Angle
+                               BRect
+                               BitMapDpi
+                               DashedPattern
+                               Fill
+                               FlipLR
+                               GroupID
+                               ID
+                               ImportHint
+                               ImportObEditor
+                               ImportObFile
+                               ImportObFileDI
+                               ImportObFixedSize
+                               ImportObUpdater
+                               NativeOrigin
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundPolygons
+                               RunaroundType
+                               Separation
+                               ShapeRect
+                               Unique
+                               UserString
+                               _facet
+                             )],
+  InitialAutoNums         => [qw(AutoNumSeries)],
+  Kumihan                 => [qw(
+                               CharClass
+                               ExtraSpaceTable
+                               KLanguage
+                               LineBreakTable
+                               SpreadTable
+                               SqueezeTable
+                             )],
+  KumihanCatalog          => [qw(Kumihan)],
+  LevelFormatRule         => [qw(CountElements Else ElseIf If StopCountingAt)],
+  LineBreakTable          => [qw(
+                               AsianSpace
+                               BaseCharWithRubi
+                               BaseCharWithSuper
+                               BegParentheses
+                               CenteredPunct
+                               EndParentheses
+                               Hiragana
+                               NoLineBeginChar
+                               NonSeparableChar
+                               Numeral
+                               Others
+                               ParenBegWariChu
+                               ParenBeginWariChu
+                               ParenEndWariChu
+                               PeriodComma
+                               PrecedingSymbol
+                               QuestionBang
+                               RomanChar
+                               RomanSpace
+                               Spare1
+                               Spare2
+                               Spare3
+                               Spare4
+                               Spare5
+                               SucceedingSymbol
+                               UnitSymbol
+                             )],
+  Marker                  => [qw(
+                               Font
+                               MCurrPage
+                               MText
+                               MType
+                               MTypeName
+                               Marker
+                               String
+                               Unique
+                             )],
+  MarkerTypeCatalog       => [qw(MTypeName)],
+  Math                    => [qw(
+                               Angle
+                               MathAlignment
+                               MathFullForm
+                               MathLineBreak
+                               MathOrigin
+                               MathSize
+                               ShapeRect
+                             )],
+  NextElement             => [qw(Attributes ETag)],
+  Notes                   => [qw(FNote)],
+  ObjectAttribute         => [qw(Tag Value)],
+  PDFBookInfo             => [qw(Key Value)],
+  PDFDocInfo              => [qw(Key Value)],
+  Page                    => [qw(
+                               Arc
+                               ColumnGap
+                               Columns
+                               Ellipse
+                               FooterC
+                               FooterL
+                               FooterR
+                               Frame
+                               Group
+                               HFFont
+                               HFMargins
+                               HeaderC
+                               HeaderL
+                               HeaderR
+                               ImportObject
+                               Math
+                               PageAngle
+                               PageBackground
+                               PageNum
+                               PageOrientation
+                               PageSize
+                               PageTag
+                               PageType
+                               PolyLine
+                               Polygon
+                               Rectangle
+                               RoundRect
+                               TextLine
+                               TextRect
+                               Unique
+                             )],
+  Para                    => [qw(
+                               Char
+                               FLocked
+                               FPairKern
+                               FSize
+                               FTag
+                               Font
+                               Marker
+                               Para
+                               ParaLine
+                               Pgf
+                               PgfCondFullPgf
+                               PgfEndCond
+                               PgfNumString
+                               PgfReferenced
+                               PgfTag
+                               Unique
+                               TextRectID
+                             )],
+  ParaLine                => [qw(
+                               AFrame
+                               ATbl
+                               Char
+                               Conditional
+                               DataLink
+                               DataLinkEnd
+                               ElementBegin
+                               ElementEnd
+                               FLocked
+                               FNote
+                               FPairKern
+                               FSize
+                               Font
+                               Marker
+                               PrefixEnd
+                               SpclHyphenation
+                               String
+                               SuffixBegin
+                               TextInset
+                               TextInsetEnd
+                               TextRectID
+                               Unconditional
+                               Unique
+                               Variable
+                               XRef
+                               XRefEnd
+                             )],
+  Pgf                     => [qw(
+                               HyphenMaxLines
+                               HyphenMinPrefix
+                               HyphenMinSuffix
+                               HyphenMinWord
+                               PgfAcrobatLevel
+                               PgfAlignment
+                               PgfAutoNum
+                               PgfBlockSize
+                               PgfBotSepAtIndent
+                               PgfBotSepOffset
+                               PgfBotSeparator
+                               PgfCellAlignment
+                               PgfCellBMarginFixed
+                               PgfCellLMarginFixed
+                               PgfCellMargins
+                               PgfCellRMarginFixed
+                               PgfCellTMarginFixed
+                               PgfFIndent
+                               PgfFIndentOffset
+                               PgfFIndentRelative
+                               PgfFont
+                               PgfHyphenate
+                               PgfLIndent
+                               PgfLanguage
+                               PgfLeading
+                               PgfLetterSpace
+                               PgfLineSpacing
+                               PgfLocked
+                               PgfMaxJLetterSpace
+                               PgfMaxJRomanLetterSpace
+                               PgfMaxWordSpace
+                               PgfMinJLetterSpace
+                               PgfMinJRomanLetterSpace
+                               PgfMinWordSpace
+                               PgfNextTag
+                               PgfNumAtEnd
+                               PgfNumFormat
+                               PgfNumTabs
+                               PgfNumberFont
+                               PgfOptJLetterSpace
+                               PgfOptJRomanLetterSpace
+                               PgfOptWordSpace
+                               PgfPDFStructureLevel
+                               PgfPlacement
+                               PgfPlacementStyle
+                               PgfRIndent
+                               PgfRunInDefaultPunct
+                               PgfSpAfter
+                               PgfSpBefore
+                               PgfTag
+                               PgfTopSepAtIndent
+                               PgfTopSepOffset
+                               PgfTopSeparator
+                               PgfUseNextTag
+                               PgfWithNext
+                               PgfWithPrev
+                               PgfYakumonoType
+                               TabStop
+                             )],
+  PgfCatalog              => [qw(Pgf)],
+  PgfFont                 => [qw(
+                               FAngle
+                               FBold
+                               FCase
+                               FChangeBar
+                               FColor
+                               FCombinedFontName
+                               FDAX
+                               FDW
+                               FDX
+                               FDY
+                               FDoubleUnderline
+                               FEncoding
+                               FFamily
+                               FItalic
+                               FLanguage
+                               FLocked
+                               FNoAdvance
+                               FNumericUnderline
+                               FOutline
+                               FOverline
+                               FPairKern
+                               FPlain
+                               FPlatformName
+                               FPosition
+                               FPostScriptName
+                               FSeparation
+                               FShadow
+                               FSize
+                               FStretch
+                               FStrike
+                               FSubScript
+                               FSupScript
+                               FTag
+                               FTsume
+                               FUnderline
+                               FUnderlining
+                               FVar
+                               FWeight
+                               FWesternPlatformName
+                               FWesternPostScriptName
+                             )],
+  PolyLine                => [qw(
+                               Angle
+                               ArrowStyle
+                               DashedPattern
+                               Fill
+                               GroupID
+                               HeadCap
+                               ID
+                               NumPoints
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               Point
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               Smoothed
+                               TailCap
+                               Unique
+                             )],
+  Polygon                 => [qw(
+                               Angle
+                               DashedPattern
+                               Fill
+                               GroupID
+                               ID
+                               NumPoints
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               Point
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               Smoothed
+                               Unique
+                             )],
+  PrevElement             => [qw(Attributes ETag)],
+  Rectangle               => [qw(
+                               Angle
+                               BRect
+                               DashedPattern
+                               Fill
+                               GroupID
+                               ID
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               ShapeRect
+                               Smoothed
+                               Unique
+                             )],
+  RoundRect               => [qw(
+                               Angle
+                               BRect
+                               DashedPattern
+                               Fill
+                               GroupID
+                               ID
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               Radius
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               ShapeRect
+                               Unique
+                             )],
+  Row                     => [qw(
+                               Cell
+                               Conditional
+                               Element
+                               RowHeight
+                               RowMaxHeight
+                               RowMinHeight
+                               RowPlacement
+                               RowWithNext
+                               RowWithPrev
+                             )],
+  Ruling                  => [qw(
+                               RulingColor
+                               RulingGap
+                               RulingLines
+                               RulingPen
+                               RulingPenWidth
+                               RulingSeparation
+                               RulingTag
+                             )],
+  RulingCatalog           => [qw(Ruling)],
+  RunaroundPolygon        => [qw(NumPoints Point)],
+  RunaroundPolygons       => [qw(NumRunaroundPolygons RunaroundPolygon)],
+  SpreadTable             => [qw(
+                               AsianSpace
+                               BaseCharWithRubi
+                               BaseCharWithSuper
+                               BegParentheses
+                               CenteredPunct
+                               EndParentheses
+                               Hiragana
+                               LineBeginEnd
+                               NoLineBeginChar
+                               NonSeparableChar
+                               Numeral
+                               Others
+                               ParenBegWariChu
+                               ParenBeginWariChu
+                               ParenEndWariChu
+                               PeriodComma
+                               PrecedingSymbol
+                               QuestionBang
+                               RomanChar
+                               RomanSpace
+                               Spare1
+                               Spare2
+                               Spare3
+                               Spare4
+                               Spare5
+                               SucceedingSymbol
+                               UnitSymbol
+                             )],
+  SqueezeTable            => [qw(SqueezeHorizontal SqueezeVertical)],
+  TabStop                 => [qw(TSDecimalChar TSLeaderStr TSType TSX TSXRelative)],
+  Tbl                     => [qw(
+                               Element
+                               EqualizeWidths
+                               TblBody
+                               TblColumnWidth
+                               TblF
+                               TblFormat
+                               TblH
+                               TblID
+                               TblNumColumns
+                               TblTag
+                               TblTitle
+                               Unique
+                             )],
+  TblBody                 => [qw(Element Row)],
+  TblCatalog              => [qw(TblFormat)],
+  TblColumn               => [qw(
+                               TblColumnBody
+                               TblColumnF
+                               TblColumnH
+                               TblColumnNum
+                               TblColumnWidth
+                               TblColumnWidthA
+                               TblColumnWidthP
+                             )],
+  TblColumnBody           => [qw(Pgf PgfTag)],
+  TblColumnF              => [qw(Pgf PgfTag)],
+  TblColumnH              => [qw(Pgf PgfTag)],
+  TblF                    => [qw(Element Row)],
+  TblFormat               => [qw(
+                               TblAlignment
+                               TblAltShadePeriod
+                               TblBRuling
+                               TblBlockSize
+                               TblBodyColor
+                               TblBodyFill
+                               TblBodyRowRuling
+                               TblBodySeparation
+                               TblCellMargins
+                               TblColumn
+                               TblColumnRuling
+                               TblHFColor
+                               TblHFFill
+                               TblHFRowRuling
+                               TblHFSeparation
+                               TblInitNumBodyRows
+                               TblInitNumColumns
+                               TblInitNumFRows
+                               TblInitNumHRows
+                               TblLIndent
+                               TblLRuling
+                               TblLastBRuling
+                               TblLocked
+                               TblNumByColumn
+                               TblPlacement
+                               TblRIndent
+                               TblRRuling
+                               TblRulingPeriod
+                               TblSeparatorRuling
+                               TblShadeByColumn
+                               TblShadePeriod
+                               TblSpAfter
+                               TblSpBefore
+                               TblTRuling
+                               TblTag
+                               TblTitleGap
+                               TblTitlePgf1
+                               TblTitlePlacement
+                               TblWidth
+                               TblXColor
+                               TblXColumnNum
+                               TblXColumnRuling
+                               TblXFill
+                               TblXRowRuling
+                               TblXSeparation
+                             )],
+  TblH                    => [qw(Element Row)],
+  TblTitle                => [qw(TblTitleContent)],
+  TblTitleContent         => [qw(Notes Para)],
+  TblTitlePgf1            => [qw(Pgf PgfTag)],
+  Tbls                    => [qw(Tbl)],
+  TextFlow                => [qw(
+                               Notes
+                               Para
+                               TFAutoConnect
+                               TFFeather
+                               TFLineSpacing
+                               TFMaxInterLine
+                               TFMaxInterPgf
+                               TFMinHangHeight
+                               TFPostScript
+                               TFSideheads
+                               TFSynchronized
+                               TFTag
+                             )],
+  TextInset               => [qw(
+                               TextInsetLocked
+                               TiApiClient
+                               TiAutoUpdate
+                               TiFlow
+                               TiImportHint
+                               TiLastUpdate
+                               TiMacEditionId
+                               TiName
+                               TiSrcFile
+                               TiText
+                               TiTextTable
+                               Unique
+                             )],
+  TextLine                => [qw(
+                               Angle
+                               Char
+                               DashedPattern
+                               Fill
+                               Font
+                               GroupID
+                               ID
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               String
+                               TLAlignment
+                               TLLanguage
+                               TLOrigin
+                               Unique
+                             )],
+  TextRect                => [qw(
+                               Angle
+                               BRect
+                               DashedPattern
+                               Fill
+                               GroupID
+                               ID
+                               ObColor
+                               ObTint
+                               ObjectAttribute
+                               Overprint
+                               Pen
+                               PenWidth
+                               ReRotateAngle
+                               RunaroundGap
+                               RunaroundType
+                               Separation
+                               ShapeRect
+                               TRColumnBalance
+                               TRColumnGap
+                               TRNext
+                               TRNumColumns
+                               TRSideheadGap
+                               TRSideheadPlacement
+                               TRSideheadWidth
+                               Unique
+                             )],
+  TiApiClient             => [qw(
+                               TiClientData
+                               TiClientName
+                               TiClientSource
+                               TiClientType
+                             )],
+  TiFlow                  => [qw(
+                               TiFlowName
+                               TiFormatRemoveOverrides
+                               TiFormatRemovePageBreaks
+                               TiFormatting
+                               TiMainFlow
+                               TiPageSpace
+                             )],
+  TiText                  => [qw(TiEOLisEOP TiTxtEncoding)],
+  TiTextTable             => [qw(
+                               TiTblHeadersEmpty
+                               TiTblIsByRow
+                               TiTblNumCols
+                               TiTblNumHdrRows
+                               TiTblNumSep
+                               TiTblSep
+                               TiTblTag
+                               TiTblTxtEncoding
+                             )],
+  Variable                => [qw(Unique VariableLocked VariableName)],
+  VariableFormat          => [qw(VariableDef VariableName)],
+  VariableFormats         => [qw(VariableFormat)],
+  View                    => [qw(ViewCutout ViewInvisible ViewNumber)],
+  Views                   => [qw(View)],
+  XRef                    => [qw(
+                               Element
+                               Unique
+                               XRefLastUpdate
+                               XRefLocked
+                               XRefName
+                               XRefSrcFile
+                               XRefSrcIsElem
+                               XRefSrcText
+                             )],
+  XRefFormat              => [qw(XRefDef XRefName)],
+  XRefFormats             => [qw(XRefFormat)],
+);
+
+# %mifleaves lists the valid leaves
+# a leaf (in MIF context) is defined as an object that
+# can't have daughters, but can have attributes
+%FrameMaker::MifTree::mifleaves = (
+  AFrame                                         => 'ID',
+  ATbl                                           => 'ID',
+  AcrobatElement                                 => 'data',
+  AlsoInsert                                     => 'tagstring',
+  AnchorAlign                                    => 'keyword',
+  AnchorBeside                                   => 'keyword',
+  Angle                                          => 'degrees',
+  ArcDTheta                                      => 'dimension',
+  ArcRect                                        => 'L_T_W_H',
+  ArcTheta                                       => 'dimension',
+  AsianSpace                                     => 'data',
+  AttrName                                       => 'string',
+  AttrValue                                      => 'string',
+  AttributeDisplay                               => 'keyword',
+  BAttrEditor                                    => 'keyword',
+  BAttributeDisplay                              => 'keyword',
+  BDisplayText                                   => 'keyword',
+  BElementCatalogScope                           => 'keyword',
+  BFNoteComputeMethod                            => 'keyword',
+  BFNoteLabels                                   => 'string',
+  BFNoteNumStyle                                 => 'keyword',
+  BFNoteRestart                                  => 'keyword',
+  BFNoteStartNum                                 => 'integer',
+  BLOffset                                       => 'dimension',
+  BNextUnique                                    => 'ID',
+  BRect                                          => 'L_T_W_H',
+  BSGMLAppName                                   => 'string',
+  BSeparateInclusions                            => 'boolean',
+  BStructAppName                                 => 'string',
+  BTblFNoteComputeMethod                         => 'keyword',
+  BTblFNoteLabels                                => 'string',
+  BTblFNoteNumStyle                              => 'keyword',
+  BUseInitStructure                              => 'boolean',
+  BUseInitialStructure                           => 'boolean',
+  BViewOnly                                      => 'boolean',
+  BViewOnlyNoOp                                  => '0xnnn',
+  BViewOnlyPopup                                 => 'boolean',
+  BViewOnlyWinBorders                            => 'boolean',
+  BViewOnlyWinMenubar                            => 'boolean',
+  BWindowRect                                    => 'X_Y_W_H',
+  BXmlDocType                                    => 'string',
+  BXmlEncoding                                   => 'string',
+  BXmlFileEncoding                               => 'string',
+  BXmlStandAlone                                 => 'integer',
+  BXmlStyleSheet                                 => 'string',
+  BXmlUseBOM                                     => 'integer',
+  BXmlVersion                                    => 'string',
+  BXmlWellFormed                                 => 'integer',
+  BaseAngle                                      => 'integer',
+  BaseCharWithRubi                               => 'data',
+  BaseCharWithSuper                              => 'data',
+  BegParentheses                                 => 'data',
+  BitMapDpi                                      => 'integer',
+  Book                                           => 'number',
+  BookFileInfo                                   => 'data',
+  BookUpdateReferences                           => 'boolean',
+  CColor                                         => 'tagstring',
+  CSeparation                                    => 'integer',
+  CState                                         => 'keyword',
+  CStyle                                         => 'keyword',
+  CTag                                           => 'string',
+  CellAffectsColumnWidthA                        => 'boolean',
+  CellAngle                                      => 'degrees',
+  CellBRuling                                    => 'tagstring',
+  CellColor                                      => 'tagstring',
+  CellColumns                                    => 'integer',
+  CellFill                                       => 'integer',
+  CellLRuling                                    => 'tagstring',
+  CellRRuling                                    => 'tagstring',
+  CellRows                                       => 'integer',
+  CellSeparation                                 => 'integer',
+  CellTRuling                                    => 'tagstring',
+  CenteredPunct                                  => 'data',
+  ChapterNumComputeMethod                        => 'keyword',
+  ChapterNumStart                                => 'integer',
+  ChapterNumStyle                                => 'keyword',
+  ChapterNumText                                 => 'string',
+  Char                                           => 'keyword',
+  CharUnits                                      => 'keyword',
+  Collapsed                                      => 'boolean',
+  ColorAttribute                                 => 'keyword',
+  ColorBlack                                     => 'percentage',
+  ColorCyan                                      => 'percentage',
+  ColorLibraryFamilyName                         => 'string',
+  ColorLibraryInkName                            => 'string',
+  ColorMagenta                                   => 'percentage',
+  ColorOverprint                                 => 'boolean',
+  ColorTag                                       => 'tagstring',
+  ColorTint                                      => 'percentage',
+  ColorTintBaseColor                             => 'string',
+  ColorTintPercentage                            => 'percentage',
+  ColorYellow                                    => 'percentage',
+  ColumnGap                                      => 'dimension',
+  Columns                                        => 'integer',
+  CombinedFontAllowBaseFamilyBoldedAndObliqued   => 'boolean',
+  CombinedFontBaseEncoding                       => 'string',
+  CombinedFontBaseFamily                         => 'string',
+  CombinedFontName                               => 'string',
+  CombinedFontWesternFamily                      => 'string',
+  CombinedFontWesternShift                       => 'percentage',
+  CombinedFontWesternSize                        => 'percentage',
+  Comment                                        => 'data',
+  ContPageNum                                    => 'boolean',
+  Context                                        => 'string',
+  ContextLabel                                   => 'string',
+  CountElement                                   => 'tagstring',
+  Cropped                                        => 'boolean',
+  DAcrobatBookmarksIncludeTagNames               => 'boolean',
+  DAcrobatEnableArticleThreads                   => 'boolean',
+  DAcrobatParagraphBookmarks                     => 'boolean',
+  DApplyFormatRules                              => 'boolean',
+  DAttrEditor                                    => 'keyword',
+  DAttributeDisplay                              => 'keyword',
+  DAutoChBars                                    => 'boolean',
+  DBordersOn                                     => 'boolean',
+  DChBarColor                                    => 'tagstring',
+  DChBarGap                                      => 'dimension',
+  DChBarPosition                                 => 'keyword',
+  DChBarWidth                                    => 'dimension',
+  DColumnGap                                     => 'dimension',
+  DColumns                                       => 'integer',
+  DCurrentView                                   => 'integer',
+  DDisplayOverrides                              => 'boolean',
+  DElementBordersOn                              => 'boolean',
+  DElementCatalogScope                           => 'keyword',
+  DElementTags                                   => 'boolean',
+  DElementTagsOn                                 => 'boolean',
+  DFNoteAnchorPos                                => 'keyword',
+  DFNoteAnchorPrefix                             => 'string',
+  DFNoteAnchorSuffix                             => 'string',
+  DFNoteComputeMethod                            => 'keyword',
+  DFNoteLabels                                   => 'string',
+  DFNoteMaxH                                     => 'dimension',
+  DFNoteNumStyle                                 => 'keyword',
+  DFNoteNumberPos                                => 'keyword',
+  DFNoteNumberPrefix                             => 'string',
+  DFNoteNumberSuffix                             => 'string',
+  DFNoteRestart                                  => 'keyword',
+  DFNoteTag                                      => 'string',
+  DFluid                                         => 'boolean',
+  DFluidSideheads                                => 'boolean',
+  DFrozenPages                                   => 'boolean',
+  DFullRulers                                    => 'boolean',
+  DGenerateAcrobatInfo                           => 'boolean',
+  DGraphicsOff                                   => 'boolean',
+  DGridOn                                        => 'boolean',
+  DLOut                                          => 'boolean',
+  DLSource                                       => 'pathname',
+  DLanguage                                      => 'keyword',
+  DLinebreakChars                                => 'string',
+  DLinkBoundariesOn                              => 'boolean',
+  DMagicMarker                                   => 'integer',
+  DMargins                                       => 'L_T_R_B',
+  DMathAlphaCharFontFamily                       => 'string',
+  DMathFunctions                                 => 'tagstring',
+  DMathGreek                                     => 'tagstring',
+  DMathGreekOverrides                            => 'tagstring',
+  DMathLargeHoriz                                => 'dimension',
+  DMathLargeIntegral                             => 'dimension',
+  DMathLargeLevel1                               => 'dimension',
+  DMathLargeLevel2                               => 'dimension',
+  DMathLargeLevel3                               => 'dimension',
+  DMathLargeSigma                                => 'dimension',
+  DMathLargeVert                                 => 'dimension',
+  DMathMediumHoriz                               => 'dimension',
+  DMathMediumIntegral                            => 'dimension',
+  DMathMediumLevel1                              => 'dimension',
+  DMathMediumLevel2                              => 'dimension',
+  DMathMediumLevel3                              => 'dimension',
+  DMathMediumSigma                               => 'dimension',
+  DMathMediumVert                                => 'dimension',
+  DMathNewType                                   => 'keyword',
+  DMathNumbers                                   => 'tagstring',
+  DMathOpName                                    => 'tagstring',
+  DMathOpPositionA                               => 'integer',
+  DMathOpPositionB                               => 'integer',
+  DMathOpPositionC                               => 'integer',
+  DMathOpTLineOverride                           => 'boolean',
+  DMathShowCustom                                => 'boolean',
+  DMathSmallHoriz                                => 'dimension',
+  DMathSmallIntegral                             => 'dimension',
+  DMathSmallLevel1                               => 'dimension',
+  DMathSmallLevel2                               => 'dimension',
+  DMathSmallLevel3                               => 'dimension',
+  DMathSmallSigma                                => 'dimension',
+  DMathSmallVert                                 => 'dimension',
+  DMathStrings                                   => 'tagstring',
+  DMathVariables                                 => 'tagstring',
+  DMaxInterLine                                  => 'dimension',
+  DMaxInterPgf                                   => 'dimension',
+  DMenuBar                                       => 'string',
+  DNarrowRubiSpaceForJapanese                    => 'keyword',
+  DNarrowRubiSpaceForOther                       => 'keyword',
+  DNextUnique                                    => 'ID',
+  DNoPrintSepColor                               => 'tagstring',
+  DPDFAllNamedDestinations                       => 'boolean',
+  DPDFAllPages                                   => 'boolean',
+  DPDFBookmarks                                  => 'boolean',
+  DPDFConvertCMYK                                => 'boolean',
+  DPDFDestsMarked                                => 'boolean',
+  DPDFEndPage                                    => 'string',
+  DPDFFit                                        => 'keyword',
+  DPDFJobOptions                                 => 'string',
+  DPDFOpenBookmarkLevel                          => 'number',
+  DPDFOpenFit                                    => 'keyword',
+  DPDFOpenPage                                   => 'string',
+  DPDFOpenZoom                                   => 'percentage',
+  DPDFPageHeight                                 => 'number',
+  DPDFPageSizeSet                                => 'boolean',
+  DPDFPageWidth                                  => 'number',
+  DPDFRegMarks                                   => 'keyword',
+  DPDFSaveSeparate                               => 'boolean',
+  DPDFStartPage                                  => 'string',
+  DPDFStructure                                  => 'boolean',
+  DPDFStructureDefined                           => 'boolean',
+  DPDFZoom                                       => 'percentage',
+  DPageGrid                                      => 'dimension',
+  DPageNumStyle                                  => 'keyword',
+  DPagePointStyle                                => 'keyword',
+  DPageRounding                                  => 'keyword',
+  DPageScrolling                                 => 'keyword',
+  DPageSize                                      => 'W_H',
+  DParity                                        => 'keyword',
+  DPrintProcessColor                             => 'tagstring',
+  DPrintSeparations                              => 'boolean',
+  DPrintSkipBlankPages                           => 'boolean',
+  DPunctuationChars                              => 'string',
+  DRubiAlignAtBounds                             => 'boolean',
+  DRubiAlignAtLineBounds                         => 'boolean',
+  DRubiFixedSize                                 => 'integer',
+  DRubiOverhang                                  => 'boolean',
+  DRubiSize                                      => 'percentage',
+  DRulersOn                                      => 'boolean',
+  DSGMLAppName                                   => 'string',
+  DSeparateInclusions                            => 'boolean',
+  DShowAllConditions                             => 'boolean',
+  DSmallCapsSize                                 => 'percentage',
+  DSmallCapsStretch                              => 'percentage',
+  DSmartQuotesOn                                 => 'boolean',
+  DSmartSpacesOn                                 => 'boolean',
+  DSnapGrid                                      => 'dimension',
+  DSnapRotation                                  => 'degrees',
+  DStartPage                                     => 'integer',
+  DStructAppName                                 => 'string',
+  DSubscriptShift                                => 'percentage',
+  DSubscriptSize                                 => 'percentage',
+  DSubscriptStretch                              => 'percentage',
+  DSuperscriptShift                              => 'percentage',
+  DSuperscriptSize                               => 'percentage',
+  DSuperscriptStretch                            => 'percentage',
+  DSymbolsOn                                     => 'boolean',
+  DTblFNoteAnchorPos                             => 'keyword',
+  DTblFNoteAnchorPrefix                          => 'string',
+  DTblFNoteAnchorSuffix                          => 'string',
+  DTblFNoteLabels                                => 'string',
+  DTblFNoteNumStyle                              => 'keyword',
+  DTblFNoteNumberPos                             => 'keyword',
+  DTblFNoteNumberPrefix                          => 'string',
+  DTblFNoteNumberSuffix                          => 'string',
+  DTblFNoteTag                                   => 'string',
+  DTrapwiseCompatibility                         => 'boolean',
+  DTwoSides                                      => 'boolean',
+  DUpdateTextInsetsOnOpen                        => 'boolean',
+  DUpdateXRefsOnOpen                             => 'boolean',
+  DUseInitStructure                              => 'boolean',
+  DUseInitialStructure                           => 'boolean',
+  DViewOnly                                      => 'boolean',
+  DViewOnlyNoOp                                  => '0xnnn',
+  DViewOnlySelect                                => 'keyword',
+  DViewOnlyWinBorders                            => 'boolean',
+  DViewOnlyWinMenubar                            => 'boolean',
+  DViewOnlyWinPalette                            => 'boolean',
+  DViewOnlyWinPopup                              => 'boolean',
+  DViewOnlyXRef                                  => 'keyword',
+  DViewRect                                      => 'X_Y_W_H',
+  DViewScale                                     => 'percentage',
+  DVoMenuBar                                     => 'string',
+  DWideRubiSpaceForJapanese                      => 'keyword',
+  DWideRubiSpaceForOther                         => 'keyword',
+  DWindowRect                                    => 'X_Y_W_H',
+  DXmlDocType                                    => 'string',
+  DXmlEncoding                                   => 'string',
+  DXmlFileEncoding                               => 'string',
+  DXmlPublicId                                   => 'string',
+  DXmlStandAlone                                 => 'integer',
+  DXmlStyleSheet                                 => 'string',
+  DXmlSystemId                                   => 'string',
+  DXmlUseBOM                                     => 'integer',
+  DXmlVersion                                    => 'string',
+  DXmlWellFormed                                 => 'integer',
+  DashSegment                                    => 'dimension',
+  DashedStyle                                    => 'keyword',
+  DataLinkEnd                                    => 'empty',
+  DefaultApply                                   => 'boolean',
+  DefaultDerive                                  => 'boolean',
+  DefaultPrint                                   => 'boolean',
+  DeriveLinks                                    => 'boolean',
+  DeriveTag                                      => 'tagstring',
+  DeriveType                                     => 'keyword',
+  DisplayText                                    => 'string',
+  DocFileInfo                                    => 'data',
+  EComponent                                     => 'integer',
+  EDAttrChoice                                   => 'string',
+  EDAttrDefValue                                 => 'string',
+  EDAttrHidden                                   => 'boolean',
+  EDAttrName                                     => 'string',
+  EDAttrReadOnly                                 => 'boolean',
+  EDAttrRequired                                 => 'boolean',
+  EDAttrType                                     => 'keyword',
+  EDComments                                     => 'string',
+  EDGeneralRule                                  => 'string',
+  EDInitialTablePattern                          => 'string',
+  EDObject                                       => 'keyword',
+  EDPgfFormat                                    => 'string',
+  EDRangeEnd                                     => 'string',
+  EDRangeStart                                   => 'string',
+  EDTag                                          => 'string',
+  EDValidHighestLevel                            => 'boolean',
+  ENamespacePath                                 => 'string',
+  ENamespacePrefix                               => 'string',
+  ETag                                           => 'tagstring',
+  ETextSnippet                                   => 'string',
+  ElementEnd                                     => 'tagstring',
+  ElementPrefix                                  => 'string',
+  ElementReferenced                              => 'boolean',
+  ElementSuffix                                  => 'string',
+  EndParentheses                                 => 'data',
+  Exclusion                                      => 'tagstring',
+  FAngle                                         => 'string',
+  FBold                                          => 'boolean',
+  FCase                                          => 'keyword',
+  FChangeBar                                     => 'boolean',
+  FColor                                         => 'tagstring',
+  FCombinedFontName                              => 'string',
+  FDAX                                           => 'dimension',
+  FDW                                            => 'percentage',
+  FDWChange                                      => 'dimension',
+  FDX                                            => 'percentage',
+  FDY                                            => 'percentage',
+  FDoubleUnderline                               => 'boolean',
+  FEncoding                                      => 'string',
+  FFamily                                        => 'string',
+  FItalic                                        => 'boolean',
+  FLanguage                                      => 'keyword',
+  FLocked                                        => 'boolean',
+  FNoAdvance                                     => 'boolean',
+  FNote                                          => 'ID',
+  FNoteStartNum                                  => 'integer',
+  FNumericUnderline                              => 'boolean',
+  FOutline                                       => 'boolean',
+  FOverline                                      => 'boolean',
+  FPairKern                                      => 'boolean',
+  FPlain                                         => 'boolean',
+  FPlatformName                                  => 'string',
+  FPosition                                      => 'keyword',
+  FPostScriptName                                => 'string',
+  FSeparation                                    => 'integer',
+  FShadow                                        => 'boolean',
+  FSize                                          => 'dimension',
+  FSizeChange                                    => 'dimension',
+  FStretch                                       => 'percentage',
+  FStretchChange                                 => 'percentage',
+  FStrike                                        => 'boolean',
+  FSubScript                                     => 'boolean',
+  FSupScript                                     => 'boolean',
+  FTag                                           => 'tagstring',
+  FTsume                                         => 'boolean',
+  FUnderline                                     => 'boolean',
+  FUnderlining                                   => 'keyword',
+  FVar                                           => 'string',
+  FWeight                                        => 'string',
+  FWesternPlatformName                           => 'string',
+  FWesternPostScriptName                         => 'string',
+  FclPgfCatalogRef                               => 'tagstring',
+  FclTag                                         => 'tagstring',
+  FileName                                       => 'pathname',
+  FileNameSuffix                                 => 'string',
+  Fill                                           => 'integer',
+  FlipLR                                         => 'boolean',
+  Float                                          => 'boolean',
+  FlowTag                                        => 'string',
+  FmtChangeListTag                               => 'tagstring',
+  FooterC                                        => 'string',
+  FooterL                                        => 'string',
+  FooterR                                        => 'string',
+  FormatTag                                      => 'tagstring',
+  FrameType                                      => 'keyword',
+  GroupID                                        => 'ID',
+  HFMargins                                      => 'L_T_R_B',
+  HeadCap                                        => 'keyword',
+  HeadType                                       => 'keyword',
+  HeaderC                                        => 'string',
+  HeaderL                                        => 'string',
+  HeaderR                                        => 'string',
+  Hiragana                                       => 'data',
+  HyphenMaxLines                                 => 'integer',
+  HyphenMinPrefix                                => 'integer',
+  HyphenMinSuffix                                => 'integer',
+  HyphenMinWord                                  => 'integer',
+  ID                                             => 'ID',
+  ImportHint                                     => 'string',
+  ImportObEditor                                 => 'string',
+  ImportObFile                                   => 'pathname',
+  ImportObFileDI                                 => 'pathname',
+  ImportObFixedSize                              => 'boolean',
+  ImportObUpdater                                => 'string',
+  InCondition                                    => 'tagstring',
+  Inclusion                                      => 'tagstring',
+  IsTextRange                                    => 'boolean',
+  KLanguage                                      => 'keyword',
+  Key                                            => 'string',
+  Length                                         => 'dimension',
+  Level                                          => 'string',
+  LineBeginEnd                                   => 'data',
+  MCurrPage                                      => 'string',
+  MIFEncoding                                    => 'string',
+  MIFFile                                        => 'number',
+  MText                                          => 'string',
+  MType                                          => 'integer',
+  MTypeName                                      => 'string',
+  MacEdition                                     => 'integer',
+  MathAlignment                                  => 'keyword',
+  MathFullForm                                   => 'string',
+  MathLineBreak                                  => 'dimension',
+  MathOrigin                                     => 'X_Y',
+  MathSize                                       => 'keyword',
+  MoveTabs                                       => 'dimension',
+  NSOffset                                       => 'dimension',
+  NativeOrigin                                   => 'X_Y',
+  NoLineBeginChar                                => 'data',
+  NonSeparableChar                               => 'data',
+  NumCounter                                     => 'integer',
+  NumPages                                       => 'integer',
+  NumPoints                                      => 'integer',
+  NumRunaroundPolygons                           => 'integer',
+  NumSegments                                    => 'integer',
+  Numeral                                        => 'data',
+  OKWord                                         => 'string',
+  ObColor                                        => 'tagstring',
+  ObTint                                         => 'percentage',
+  OneLinePerRec                                  => 'boolean',
+  Others                                         => 'data',
+  Overprint                                      => 'boolean',
+  PageAngle                                      => 'degrees',
+  PageBackground                                 => 'tagstring',
+  PageNum                                        => 'string',
+  PageNumStart                                   => 'integer',
+  PageNumStyle                                   => 'keyword',
+  PageNumbering                                  => 'keyword',
+  PageOrientation                                => 'keyword',
+  PageSize                                       => 'W_H',
+  PageTag                                        => 'tagstring',
+  PageType                                       => 'keyword',
+  ParenBegWariChu                                => 'data',
+  ParenBeginWariChu                              => 'data',
+  ParenEndWariChu                                => 'data',
+  Pen                                            => 'integer',
+  PenWidth                                       => 'dimension',
+  PeriodComma                                    => 'data',
+  PgfAcrobatLevel                                => 'integer',
+  PgfAlignment                                   => 'keyword',
+  PgfAutoNum                                     => 'boolean',
+  PgfBlockSize                                   => 'integer',
+  PgfBotSepAtIndent                              => 'boolean',
+  PgfBotSepOffset                                => 'dimension',
+  PgfBotSeparator                                => 'string',
+  PgfCellAlignment                               => 'keyword',
+  PgfCellBMargin                                 => 'dimension',
+  PgfCellBMarginChange                           => 'dimension',
+  PgfCellBMarginFixed                            => 'boolean',
+  PgfCellLMargin                                 => 'dimension',
+  PgfCellLMarginChange                           => 'dimension',
+  PgfCellLMarginFixed                            => 'boolean',
+  PgfCellMargins                                 => 'L_T_R_B',
+  PgfCellRMargin                                 => 'dimension',
+  PgfCellRMarginChange                           => 'dimension',
+  PgfCellRMarginFixed                            => 'boolean',
+  PgfCellTMargin                                 => 'dimension',
+  PgfCellTMarginChange                           => 'dimension',
+  PgfCellTMarginFixed                            => 'boolean',
+  PgfCondFullPgf                                 => 'boolean',
+  PgfEndCond                                     => 'boolean',
+  PgfFIndent                                     => 'dimension',
+  PgfFIndentChange                               => 'dimension',
+  PgfFIndentOffset                               => 'dimension',
+  PgfFIndentRelative                             => 'boolean',
+  PgfHyphenate                                   => 'boolean',
+  PgfLIndent                                     => 'dimension',
+  PgfLIndentChange                               => 'dimension',
+  PgfLanguage                                    => 'keyword',
+  PgfLeading                                     => 'dimension',
+  PgfLeadingChange                               => 'dimension',
+  PgfLetterSpace                                 => 'boolean',
+  PgfLineSpacing                                 => 'keyword',
+  PgfLineSpacingFixed                            => 'boolean',
+  PgfLocked                                      => 'boolean',
+  PgfMaxJLetterSpace                             => 'integer',
+  PgfMaxJRomanLetterSpace                        => 'integer',
+  PgfMaxWordSpace                                => 'integer',
+  PgfMinJLetterSpace                             => 'integer',
+  PgfMinJRomanLetterSpace                        => 'integer',
+  PgfMinWordSpace                                => 'integer',
+  PgfNextTag                                     => 'tagstring',
+  PgfNumAtEnd                                    => 'boolean',
+  PgfNumFormat                                   => 'string',
+  PgfNumString                                   => 'string',
+  PgfNumTabs                                     => 'integer',
+  PgfNumberFont                                  => 'tagstring',
+  PgfNumbering                                   => 'keyword',
+  PgfOptJLetterSpace                             => 'integer',
+  PgfOptJRomanLetterSpace                        => 'integer',
+  PgfOptWordSpace                                => 'integer',
+  PgfPDFStructureLevel                           => 'integer',
+  PgfPlacement                                   => 'keyword',
+  PgfPlacementStyle                              => 'keyword',
+  PgfRIndent                                     => 'dimension',
+  PgfRIndentChange                               => 'dimension',
+  PgfReferenced                                  => 'boolean',
+  PgfRunInDefaultPunct                           => 'string',
+  PgfSpAfter                                     => 'dimension',
+  PgfSpAfterChange                               => 'dimension',
+  PgfSpBefore                                    => 'dimension',
+  PgfSpBeforeChange                              => 'dimension',
+  PgfTag                                         => 'tagstring',
+  PgfTopSepAtIndent                              => 'boolean',
+  PgfTopSepOffset                                => 'dimension',
+  PgfTopSeparator                                => 'string',
+  PgfUseNextTag                                  => 'boolean',
+  PgfWithNext                                    => 'boolean',
+  PgfWithPrev                                    => 'boolean',
+  PgfYakumonoType                                => 'keyword',
+  Point                                          => 'X_Y',
+  PrecedingSymbol                                => 'data',
+  PrefixEnd                                      => 'empty',
+  QuestionBang                                   => 'data',
+  Radius                                         => 'dimension',
+  ReRotateAngle                                  => 'dimension',
+  RomanChar                                      => 'data',
+  RomanSpace                                     => 'data',
+  RowHeight                                      => 'dimension',
+  RowMaxHeight                                   => 'dimension',
+  RowMinHeight                                   => 'dimension',
+  RowPlacement                                   => 'keyword',
+  RowWithNext                                    => 'boolean',
+  RowWithPrev                                    => 'boolean',
+  RulingColor                                    => 'tagstring',
+  RulingGap                                      => 'dimension',
+  RulingLines                                    => 'integer',
+  RulingPen                                      => 'integer',
+  RulingPenWidth                                 => 'dimension',
+  RulingSeparation                               => 'integer',
+  RulingTag                                      => 'tagstring',
+  RunaroundGap                                   => 'dimension',
+  RunaroundType                                  => 'keyword',
+  ScaleFactor                                    => 'dimension',
+  ScaleHead                                      => 'boolean',
+  Separation                                     => 'integer',
+  Series                                         => 'string',
+  ShapeRect                                      => 'L_T_W_H',
+  Smoothed                                       => 'boolean',
+  Spare1                                         => 'data',
+  Spare2                                         => 'data',
+  Spare3                                         => 'data',
+  Spare4                                         => 'data',
+  Spare5                                         => 'data',
+  SpclHyphenation                                => 'boolean',
+  SpecialCase                                    => 'boolean',
+  SqueezeHorizontal                              => 'data',
+  SqueezeVertical                                => 'data',
+  StartPageSide                                  => 'keyword',
+  StopCountingAt                                 => 'tagstring',
+  String                                         => 'string',
+  SucceedingSymbol                               => 'data',
+  SuffixBegin                                    => 'empty',
+  TFAutoConnect                                  => 'boolean',
+  TFFeather                                      => 'boolean',
+  TFLineSpacing                                  => 'dimension',
+  TFMaxInterLine                                 => 'dimension',
+  TFMaxInterPgf                                  => 'dimension',
+  TFMinHangHeight                                => 'dimension',
+  TFPostScript                                   => 'boolean',
+  TFSideheads                                    => 'boolean',
+  TFSynchronized                                 => 'boolean',
+  TFTag                                          => 'tagstring',
+  TLAlignment                                    => 'keyword',
+  TLLanguage                                     => 'keyword',
+  TLOrigin                                       => 'X_Y',
+  TRColumnBalance                                => 'boolean',
+  TRColumnGap                                    => 'dimension',
+  TRNext                                         => 'integer',
+  TRNumColumns                                   => 'integer',
+  TRSideheadGap                                  => 'dimension',
+  TRSideheadPlacement                            => 'keyword',
+  TRSideheadWidth                                => 'dimension',
+  TSDecimalChar                                  => 'integer',
+  TSLeaderStr                                    => 'string',
+  TSType                                         => 'keyword',
+  TSX                                            => 'dimension',
+  TSXRelative                                    => 'boolean',
+  Tag                                            => 'string',
+  TailCap                                        => 'keyword',
+  TblAlignment                                   => 'keyword',
+  TblAltShadePeriod                              => 'integer',
+  TblBRuling                                     => 'tagstring',
+  TblBlockSize                                   => 'integer',
+  TblBodyColor                                   => 'tagstring',
+  TblBodyFill                                    => 'integer',
+  TblBodyRowRuling                               => 'tagstring',
+  TblBodySeparation                              => 'integer',
+  TblCellMargins                                 => 'L_T_R_B',
+  TblColumnNum                                   => 'integer',
+  TblColumnRuling                                => 'tagstring',
+  TblColumnWidth                                 => 'dimension',
+  TblColumnWidthA                                => 'W_W',
+  TblColumnWidthP                                => 'integer',
+  TblHFColor                                     => 'tagstring',
+  TblHFFill                                      => 'integer',
+  TblHFRowRuling                                 => 'tagstring',
+  TblHFSeparation                                => 'integer',
+  TblID                                          => 'ID',
+  TblInitNumBodyRows                             => 'integer',
+  TblInitNumColumns                              => 'integer',
+  TblInitNumFRows                                => 'integer',
+  TblInitNumHRows                                => 'integer',
+  TblLIndent                                     => 'dimension',
+  TblLRuling                                     => 'tagstring',
+  TblLastBRuling                                 => 'boolean',
+  TblLocked                                      => 'boolean',
+  TblNumByColumn                                 => 'boolean',
+  TblNumColumns                                  => 'integer',
+  TblPlacement                                   => 'keyword',
+  TblRIndent                                     => 'dimension',
+  TblRRuling                                     => 'tagstring',
+  TblRulingPeriod                                => 'integer',
+  TblSeparatorRuling                             => 'tagstring',
+  TblShadeByColumn                               => 'boolean',
+  TblShadePeriod                                 => 'integer',
+  TblSpAfter                                     => 'dimension',
+  TblSpBefore                                    => 'dimension',
+  TblTRuling                                     => 'tagstring',
+  TblTag                                         => 'tagstring',
+  TblTitleGap                                    => 'dimension',
+  TblTitlePlacement                              => 'keyword',
+  TblWidth                                       => 'dimension',
+  TblXColor                                      => 'tagstring',
+  TblXColumnNum                                  => 'integer',
+  TblXColumnRuling                               => 'tagstring',
+  TblXFill                                       => 'integer',
+  TblXRowRuling                                  => 'tagstring',
+  TblXSeparation                                 => 'integer',
+  TextInsetEnd                                   => 'empty',
+  TextInsetLocked                                => 'boolean',
+  TextRectID                                     => 'ID',
+  TiAutoUpdate                                   => 'boolean',
+  TiClientData                                   => 'string',
+  TiClientName                                   => 'string',
+  TiClientSource                                 => 'string',
+  TiClientType                                   => 'string',
+  TiEOLisEOP                                     => 'boolean',
+  TiFlowName                                     => 'string',
+  TiFormatRemoveOverrides                        => 'boolean',
+  TiFormatRemovePageBreaks                       => 'boolean',
+  TiFormatting                                   => 'keyword',
+  TiImportHint                                   => 'string',
+  TiLastUpdate                                   => 'seconds_microseconds',
+  TiMacEditionId                                 => 'integer',
+  TiMainFlow                                     => 'boolean',
+  TiName                                         => 'string',
+  TiPageSpace                                    => 'keyword',
+  TiSrcFile                                      => 'pathname',
+  TiTblHeadersEmpty                              => 'boolean',
+  TiTblIsByRow                                   => 'boolean',
+  TiTblNumCols                                   => 'integer',
+  TiTblNumHdrRows                                => 'integer',
+  TiTblNumSep                                    => 'integer',
+  TiTblSep                                       => 'string',
+  TiTblTag                                       => 'string',
+  TiTblTxtEncoding                               => 'keyword',
+  TiTxtEncoding                                  => 'keyword',
+  TipAngle                                       => 'integer',
+  Unconditional                                  => 'empty',
+  Unique                                         => 'ID',
+  UnitSymbol                                     => 'data',
+  Units                                          => 'keyword',
+  UserString                                     => 'string',
+  Value                                          => 'string',
+  VariableDef                                    => 'string',
+  VariableLocked                                 => 'boolean',
+  VariableName                                   => 'string',
+  Verbose                                        => 'boolean',
+  ViewCutout                                     => 'tagstring',
+  ViewInvisible                                  => 'tagstring',
+  ViewNumber                                     => 'integer',
+  VolNumComputeMethod                            => 'keyword',
+  VolumeNumStart                                 => 'integer',
+  VolumeNumStyle                                 => 'keyword',
+  VolumeNumText                                  => 'string',
+  XRefDef                                        => 'string',
+  XRefEnd                                        => 'empty',
+  XRefLastUpdate                                 => 'seconds_microseconds',
+  XRefLocked                                     => 'boolean',
+  XRefName                                       => 'string',
+  XRefSrcFile                                    => 'pathname',
+  XRefSrcIsElem                                  => 'boolean',
+  XRefSrcText                                    => 'string',
+  _facet                                         => 'data',
+);
+
+# Attribute types
+my $num = '-?\d+\.?\d*';
+my $dim = $num .
+'\s*(?:pt|point|"|in|mm|millimeter|cm|centimeter|pc|pica|dd|didot|cc|cicero)?';
+%FrameMaker::MifTree::attribute_types = (
+  '0xnnn'              => qr/^0x[0-9a-f]{3}\s*$/i,
+  ID                   => qr/^\d+\s*$/,
+  L_T_R_B              => qr/^$dim\s+$dim\s+$dim\s+$dim\s*$/o,
+  L_T_W_H              => qr/^$dim\s+$dim\s+$dim\s+$dim\s*$/o,
+  W_H                  => qr/^$dim\s+$dim\s*$/o,
+  W_W                  => qr/^$dim\s+$dim\s*$/o,
+  X_Y                  => qr/^$dim\s+$dim\s*$/o,
+  X_Y_W_H              => qr/^$num\s+$num\s+$num\s+$num\s*$/o,
+  boolean              => qr/^Yes|No\s*$/,
+  data                 => qr/.*/,
+  degrees              => qr/^$num\s*$/o,
+  dimension            => qr/^$dim\s*$/o,
+  empty                => qr/^\s*$/,
+  integer              => qr/^-?\d+\s*$/,
+  keyword              => qr/^\w+\s*$/,
+  number               => qr/^$num\s*$/o,
+  pathname             => qr/^`[^']*'\s*$/,
+  percentage           => qr/^$num%?\s*$/o,
+  seconds_microseconds => qr/^\d+\s+\d+\s*$/,
+  string               => qr/^`[^']*'\s*$/,
+  tagstring            => qr/^`[^']*'\s*$/,
+);
+
+1;
+
+=unused
+
+%FrameMaker::MifTree::attribute_types = (
+  "0xnnn => '',
+  ID => '',
+  L_T_R_B => '',
+  L_T_W_H => '',
+  W_H => '',
+  W_W => '',
+  X_Y => '',
+  X_Y_W_H => '',
+  boolean => '',
+  data => '',
+  degrees => '',
+  dimension => '',
+  empty => '',
+  integer => '',
+  keyword => '',
+  number => '',
+  pathname => '',
+  percentage => '',
+  seconds_microseconds => '',
+  string => '',
+  tagstring => '',
+);
+
+@allow_multiple = qw(
+  AcrobatElement
+  AlsoInsert
+  Arc
+  AttrValue
+  Attribute
+  AutoNumSeries
+  BFCLMinimums
+  BookComponent
+  BookXRef
+  Cell
+  Char
+  CharUnits
+  Color
+  CombinedFontDefn
+  Comment
+  Condition
+  Conditional
+  ContextFormatRule
+  CountElement
+  DMagicMarker
+  DMathGreekOverrides
+  DXmlPublicId
+  DXmlSystemId
+  DashSegment
+  DataLink
+  DataLinkEnd
+  EDAttrChoice
+  EDAttrDef
+  EDAttrDefValue
+  EDTag
+  ENamespacePath
+  ENamespacePrefix
+  Element
+  ElementBegin
+  ElementDef
+  ElementEnd
+  Ellipse
+  ElseIf
+  Exclusion
+  FNote
+  FPlatformName
+  FmtChangeList
+  Font
+  Frame
+  Group
+  ImportObject
+  InCondition
+  Inclusion
+  Key
+  Kumihan
+  LevelFormatRule
+  Marker
+  Math
+  NumCounter
+  OKWord
+  Page
+  Para
+  ParaLine
+  Pgf
+  PolyLine
+  Polygon
+  Rectangle
+  RoundRect
+  Row
+  Ruling
+  RunaroundPolygon
+  String
+  TabStop
+  Tbl
+  TblColumnNum
+  TblColumnWidth
+  TblFormat
+  TextFlow
+  TextInset
+  TextInsetEnd
+  TextLine
+  TextRect
+  Unconditional
+  Units
+  Value
+  Variable
+  VariableFormat
+  Verbose
+  View
+  ViewCutout
+  ViewInvisible
+  XRef
+  XRefEnd
+  XRefFormat
+);
+
+=cut

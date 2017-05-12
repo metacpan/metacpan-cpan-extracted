@@ -1,0 +1,80 @@
+---
+abstract: 'An object oriented File::Find replacement'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  blib: '1.01'
+  lib: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - alternative-to-core
+  - directories
+  - directory
+  - directory-traversal
+  - directory-tree
+  - directory-trees
+  - file
+  - file-find
+  - find
+  - instance
+  - instantiated
+  - instantiation
+  - iterative
+  - object
+  - object-oriented
+  - oop
+  - prune
+  - traversal
+  - traverse
+  - tree
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Find-Object
+provides:
+  File::Find::Object:
+    file: lib/File/Find/Object.pm
+    version: v0.3.2
+  File::Find::Object::Base:
+    file: lib/File/Find/Object/Base.pm
+    version: v0.3.2
+  File::Find::Object::DeepPath:
+    file: lib/File/Find/Object.pm
+    version: v0.3.2
+  File::Find::Object::PathComp:
+    file: lib/File/Find/Object/PathComp.pm
+    version: v0.3.2
+  File::Find::Object::Result:
+    file: lib/File/Find/Object/Result.pm
+    version: v0.3.2
+  File::Find::Object::TopPath:
+    file: lib/File/Find/Object.pm
+    version: v0.3.2
+requires:
+  Carp: '0'
+  Class::XSAccessor: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  integer: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Find-Object
+  repository: ssh://hg@bitbucket.org/shlomif/perl-file-find-object
+version: v0.3.2

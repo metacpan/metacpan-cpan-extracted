@@ -1,0 +1,75 @@
+class 'Fl::RadioLightButton';
+isa 'Fl::LightButton';
+include 'FL/Fl_Radio_Light_Button.H';
+widget_type 'Fl_Radio_Light_Button';
+
+=pod
+
+=head1 NAME
+
+Fl::RadioLightButton - Button that Turns Siblings Off
+
+=head1 Synopsis
+
+    use Fl;
+    my $button = Fl::RadioButton->new(0, 0, 100, 200, 'Hello, World!');
+    $button->callback(sub {print q[It's dat boi]} );
+
+=head1 Description
+
+You're probably looking for L<Fl::RadioRoundButton>.
+
+The Fl::RadioLightButton class represents a button that looks like a radio
+button.
+
+=head1 Methods
+
+Fl::RadioButton inherits from Fl::LightButton and Fl::Widget. On top of that,
+it exposes the following methods...
+
+=head2 new(...)
+
+    my $button_a = Fl::RadioLightButton->new(0, 0, 250, 500, 'Important Stuff');
+    my $button_b = Fl::RadioLightButton->new(0, 0, 250, 500);
+
+The constructor creates a new button using the given position, size, and
+label.
+
+The destructor removes the button.
+
+=cut
+
+xs {name        => 'new',
+    definitions => [
+            {required => [[qw[int w]], [qw[int h]], [qw[int x]], [qw[int y]]],
+             optional => [['const char *', 'label', '""']],
+             returns  => 'Fl_Radio_Light_Button *'
+            }
+    ]
+};
+xs {name        => 'DESTROY',
+    definitions => [{returns => 'void'}]
+};
+xs {name        => 'draw',
+    definitions => [{returns  => 'void' }
+    ]
+};
+xs {name        => 'handle',
+    definitions => [{required => [[qw[int event]]], returns  => 'int'  }
+    ]
+};
+
+=pod
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=cut

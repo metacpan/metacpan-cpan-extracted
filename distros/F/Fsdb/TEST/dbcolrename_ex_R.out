@@ -1,0 +1,28 @@
+#fsdb -R C account passwd uid gid first_last homedir shell
+account: johnh
+passwd: *
+uid: 2274
+gid: 134
+first_last: John_Heidemann
+homedir: /home/johnh
+shell: /bin/bash
+
+account: greg
+passwd: *
+uid: 2275
+gid: 134
+first_last: Greg_Johnson
+homedir: /home/greg
+shell: /bin/bash
+
+account: root
+passwd: *
+uid: 0
+gid: 0
+first_last: Root
+homedir: /root
+shell: /bin/bash
+
+# this is a simple database
+#   | dbfilealter -R C
+#   | dbcolrename fullname first_last

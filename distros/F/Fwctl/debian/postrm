@@ -1,0 +1,9 @@
+#! /bin/sh
+
+set -e
+
+if [ "$1" = "purge" ]
+then
+  update-rc.d fwctl remove >/dev/null
+  echo "Please remove /var/log/fwctl_acct manually!"
+fi

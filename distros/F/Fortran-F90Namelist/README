@@ -1,0 +1,33 @@
+Fortran::F90Namelist
+Fortran::F90Namelist::Group
+
+    Parse F90 namelists into hash and export in different formats
+
+INSTALLATION
+
+To install this module:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+or
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007, Wolfgang Dobler <Wolfgang.Dobler@kis.uni-freiburg.de>.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same conditions as Perl or under the GNU General Public
+License, version 2 or later.

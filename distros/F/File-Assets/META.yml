@@ -1,0 +1,42 @@
+---
+abstract: 'Manage .css and .js assets for a web page or application'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  Directory::Scratch: 0
+  Test::Memory::Cycle: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.760'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: File-Assets
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  CSS::Minifier: 0
+  CSS::Minifier::XS: 0.3
+  JavaScript::Minifier: 0
+  JavaScript::Minifier::XS: 0.3
+requires:
+  Carp::Clan::Share: 0
+  Digest: 0
+  Digest::MD5: 0
+  Digest::SHA: 0
+  HTML::Declare: 0
+  IO::Scalar: 0
+  MIME::Types: 0
+  Module::Pluggable: 0
+  Object::Tiny: 0
+  Path::Resource: 0
+  Scalar::Util: 0
+  Tie::LLHash: 0
+  XML::Tiny: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/file-assets/tree/master
+version: 0.064

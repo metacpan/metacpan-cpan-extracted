@@ -1,0 +1,30 @@
+## -*- cperl -*-
+
+## update _run from the article (which did it better)
+
+## and vice versa... reference the article from the See Also
+
+use File::Finder qw(contains foo bar);
+# pulls in File::Finder::Plugin::contains etc
+
+## oval: like eval, but operates on open file handle
+## (like a more general "contains")
+
+## from ovid:
+my %status = (
+	      links => sub { (stat(_))[3] },
+	      inum => sub { (stat(_))[1] },
+	      atime => sub { int(-A _) },
+	      mtime => sub { int(-M _) },
+	      ctime => sub { int(-C _) },
+	     );
+while (my ($function,$op) = each %status) {
+  no strict 'refs';
+  *$function = sub {
+    my $self = shift;
+    my ($prefix, $n) = shift =~ qr/^(\+|-|)(.*)/;
+    return sub {
+      _n($prefix, $n, $op->());
+    };
+  }
+}

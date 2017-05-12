@@ -1,0 +1,13 @@
+Revision history for FWS-Lite
+
+0.003 2012-02-28
+ - Added change field syntax for MySQL when doing an alterTable and the types do not match
+ - connectDBH no longer needs to be called it is implied when running DB methods
+ - Passed paramaters to the constructor are no longer prepopulated
+
+0.002 2012-02-22
+ - Documentation update and added dependencies
+
+0.001 2012-02-21
+ - Initial release with most major methods used by FWS
+

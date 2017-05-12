@@ -1,0 +1,6 @@
+Revision history for Perl module FileUpload::Filename
+
+0.02  Thu Sep 06 09:10:32 2006
+    - Added Changes and README files.
+    - Added POD tests.
+0.01  Tue Apr 18 13:35:00 2006

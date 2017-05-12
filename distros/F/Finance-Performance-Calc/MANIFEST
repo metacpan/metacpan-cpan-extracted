@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Finance-Performance-Calc.t
+lib/Finance/Performance/Calc.pm
+eg/eg.pl
+META.yml                                 Module meta-data (added by MakeMaker)

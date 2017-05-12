@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Find;
+use Data::Dumper;
+use File::Basename;
+
+my @modules;
+
+# return only matching modules
+sub wantedx { 
+
+
+   /^F*(Market|Quant|Quant*Home|NASDAQ|Optical).*\.pm$/ && push @modules, $File::Find::name;
+  
+}
+
+
+sub searchModule{
+
+    my @return = ();
+    # look in the @IRC dirs that exist
+    find(\&wantedx, grep { -r and -d } @INC);
+
+
+
+    # de-dupe
+    my %saw;
+    @modules = grep(!$saw{$_}++, @modules);
+
+    # strip extraneous directories off the modules
+    for my $prefix ( sort { length $b <=> length $a } @INC ) {
+      for (@modules) { 
+          next unless($_ =~ /Finance/);
+          next if s/^\Q$prefix// 
+       }
+    }
+
+    
+    return  \@return;
+}
+
+
+
+sub DirContent ($ $)
+{
+    my ( $path,$id ) = @_;
+
+     warn "$id: $path\n";
+
+    local *DIR;
+
+    unless ( opendir DIR, $path )
+    {
+    	print "$id: can't read $path $@";
+    }
+
+    my @tmp = readdir DIR;
+    closedir DIR;
+
+    my @results = ();
+    foreach(@tmp){
+          next if($_ eq "." || $_ eq "..");
+          
+         if($_ =~ /$id/){
+           push @results,$_;
+         }
+         
+    }
+
+    return @results;
+}
+
+  my @dir = ();
+  push @dir,[DirContent("/tmp/Finance-Quant/2012-Feb-12/backtest",'pdf$')];
+  push @dir,[DirContent("/tmp/Finance-Quant/2012-Feb-12/ibes-strong-buy",'jpg$')];
+  push @dir,[DirContent("/tmp/Finance-Quant/2012-Feb-12/backtest",'data$')];
+
+  print Dumper searchModule();
+  print Dumper [ @dir ];
+
+__DATA__
+
+

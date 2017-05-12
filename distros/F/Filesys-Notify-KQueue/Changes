@@ -1,0 +1,54 @@
+Revision history for Perl extension Filesys::Notify::KQueue
+
+0.11 2015-06-07T11:29:51Z
+
+    - Fixed dependency. (thanks SREZIC)
+
+0.10 2015-06-06T01:28:24Z
+
+    - Allow to set zero/undef as `timeout`. Timeout implementation doesn't match IO::KQueue. (thanks TLINDEN)
+
+0.09 2013-10-12T02:43:02Z
+
+    - minil migrate
+    - fixed pod spelling.
+    - fixed dependency.
+
+0.08    Wed Dec 14 2011
+
+    - File::Path after version 2.06_05 required at test.(oops)
+
+0.07    Sun Dec 11 2011
+
+    - add t::Util to MANIFEST.(oops)
+
+0.06    Sun Dec 11 2011
+
+    - [bugfix] cannot set timeout.
+    - [bugfix] cannnot get all event if create nested directories.
+    - add test "02_nest.t"
+    - fixed spell miss.
+    - coding style is changed a little.
+    - not import File::Find's export functions.
+
+0.05    Thu Oct 20 2011
+
+    - build_require to test_require.
+    - fixed a day of the week in Changes.
+
+0.04    Thu Oct 20 2011
+
+    - fixed test dependency. (thanks ANDK)
+
+0.03    Sat Sep 24 2011
+
+    - fixed default timeout.
+    - write pod.
+
+0.02    Sun Sep 18 2011
+
+    - wait method is compatible with the interface of Filesys::Notify::Simple now.
+
+0.01    Sun Sep 11 2011
+
+    - original version

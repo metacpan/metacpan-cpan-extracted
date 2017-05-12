@@ -1,0 +1,46 @@
+Revision history for Perl extension File::Zglob
+
+0.11
+
+    - tiny fix, no feature changes.
+
+0.10
+
+    - support '..' in path segments
+
+0.09
+
+    - Support "." in path segments(cho45)
+
+0.08
+
+    - win32 fix(mattn++)
+
+0.07
+
+    - refactoring
+
+0.06
+
+    - '0' is true value.
+    - optimization
+
+0.05
+
+    - support ~foo/
+    - ignore case on osx, win32
+
+0.04
+
+    - pod fix
+
+0.03
+
+    - doc fix
+
+0.02
+
+    - make deep recursion as fatal error
+
+0.01    Fri Sep 23 12:21:47 2011
+    - original version

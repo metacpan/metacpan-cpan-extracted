@@ -1,0 +1,28 @@
+Revision history for Perl extension File::Find::Duplicates.
+
+1.00  Sat Sep  3 20:45:37 UTC 2005
+  - Report properly on groups of dupes with same filelength (RT#9813)
+  This requires a completely different data structure to be returned.
+
+0.05  2001-07-11
+        - Fix-up for test to work under solaris
+           (thanks to Jost Krieger)
+
+0.04  2001-06-23
+        - First CPAN release
+        - Now copes with looking multiple directories.
+        - Added tests. 
+
+0.03  2001-01-05
+        - implemented suggestion by Randal Schwartz to pass a closure
+          to File::Find
+ 
+0.02  2001-01-04
+	- turned into module
+
+0.01  2001-01-01
+        - do MD5 checksums. Posted to PerlMonks
+
+0.001 1994ish
+        - wrote original clumsy perl4 version
+

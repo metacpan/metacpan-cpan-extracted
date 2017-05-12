@@ -1,0 +1,41 @@
+Revision history for Finance-Contract
+
+0.009     2017-05-03 01:54:55+00:00 UTC
+    Bug fixes:
+
+    * Support digit barriers correctly
+
+0.008     2017-05-02 06:22:04+00:00 UTC
+    Bug fixes:
+
+    * Proper handling for pipsized barriers
+
+0.007     2017-05-01 06:40:01+00:00 UTC
+
+    check if barrier is defined
+
+0.006     2017-04-28 04:32:48+00:00 UTC
+    API changes:
+
+    * absolute_barrier_multiplier flag to control whether the _FOREX_BARRIER_MULTIPLIER
+    factor should be applied
+
+0.005     2017-04-26 01:45:40+00:00 UTC
+    API changes:
+
+    * ->bet_type is now required
+    * ->ticks_to_expiry has been removed, it's not useful for a generic contract
+
+    Documentation changes:
+
+    * Added remaining contract types
+
+0.004     2017-04-25 09:16:16+00:00 UTC
+    ->is_forward_starting support
+
+0.003     2017-04-25 07:38:43+00:00 UTC
+    Moving shortcode generation logic to Financial::Contract
+
+0.001     2017-04-24 02:54:03+00:00 UTC
+    Initial Finance::Contract implementation
+

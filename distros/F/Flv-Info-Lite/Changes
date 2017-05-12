@@ -1,0 +1,12 @@
+Revision history for Perl extension Flv::Info::Lite.
+
+0.01  Mon Sep 15 15:39:01 2014
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.8 -AX -n Flv::Info::Lite
+
+0.02  Wed Oct 22 08:11:16 2014
+	- fix doc
+
+0.03  Wed Oct 22 18:24:29 2014
+	- fix doc
+

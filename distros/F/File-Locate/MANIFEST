@@ -1,0 +1,21 @@
+Changes
+Locate.pm
+Locate.xs
+MANIFEST
+Makefile.PL
+README
+const-c.inc
+const-xs.inc
+fallback/const-c.inc
+fallback/const-xs.inc
+locatedb.h
+ppport.h
+t/0_pod.t
+t/0_pod_coverage.t
+t/1.t
+t/2.t
+t/3.t
+t/4.t
+t/locatedb.test
+t/slocatedb.test
+META.yml                                 Module meta-data (added by MakeMaker)

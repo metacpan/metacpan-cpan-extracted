@@ -1,0 +1,29 @@
+params:
+  mail:
+    validators:
+      - Email#email
+      - String#max_length:
+          max: 100
+  mail_require:
+    validators:
+      - Blank#not_blank
+      - Email#email
+      - String#max_length:
+          max: 100
+  tel:
+    filters:
+      - String#remove_hyphen
+      - String#alnum_z2h
+    validators:
+      - String#between_length:
+          min: 10
+          max: 11
+  tel2:
+    filters:
+      - String#remove_hyphen
+      - String#alnum_z2h
+    validators:
+      - String#between_length:
+          min: 10
+          max: 11
+

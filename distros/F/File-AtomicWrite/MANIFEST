@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+eg/cleanup-test
+lib/File/AtomicWrite.pm
+t/001-init.t
+t/010-write_file.t
+t/020-oo.t
+t/030-mix.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

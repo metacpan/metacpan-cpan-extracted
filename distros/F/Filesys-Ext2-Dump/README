@@ -1,0 +1,30 @@
+SYNOPSIS
+
+     use Filesys::Ext2::Dump qw(dump_ext2);
+    
+     my $res = dump_ext2(device => "/dev/sdc1");
+
+    Sample result (on error):
+
+     [412, "Can't find dumpe2fs in PATH"];
+
+    Sample result (on success):
+
+     [200, "OK",
+    
+      # main result is a hash
+      {
+          label => "foo",
+          uuid  => "f172f8e5-74b1-4f51-a7c4-6b2ddad31ac0",
+          ...
+      },
+    
+      # metadata (extra results)
+      {
+          "func.device" => "/dev/sdc1",
+          "func.raw_stdout" => "...",
+          "func.raw_stderr" => "...",
+          ...
+      },
+     ]
+

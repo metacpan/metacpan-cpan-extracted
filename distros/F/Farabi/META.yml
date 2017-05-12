@@ -1,0 +1,45 @@
+---
+abstract: 'Modern Perl IDE'
+author:
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::EOL: '1.5'
+  Test::MinimumVersion: '0.101080'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Farabi
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - lib/Farabi/files
+requires:
+  Capture::Tiny: '0.21'
+  DBD::SQLite: '1.37'
+  DBIx::Simple: '1.35'
+  File::Find::Rule: '0.33'
+  File::HomeDir: '1.00'
+  File::Which: '1.09'
+  IO::String: '1.08'
+  IPC::Run: '0.92'
+  Mojolicious: '4.63'
+  Parse::ErrorString::Perl: '0.18'
+  Path::Tiny: '0.013'
+  Text::Markdown: '1.000031'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/azawawi/farabi/issues
+  homepage: https://github.com/azawawi/farabi
+  repository: git://github.com/azawawi/farabi.git
+version: '0.47'

@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+## no critic
+
+use 5.008005;
+use utf8;
+use strict;
+use warnings;
+use FBP::Demo ();
+
+our $VERSION = '0.01';
+
+FBP::Demo->run;
+
+exit(0);

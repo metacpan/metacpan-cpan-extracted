@@ -1,0 +1,237 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+
+my $VERSION = $File::ERC::VERSION;
+
+use File::ERC;
+
+use Pod::Usage;
+# this :config allows -h24w80 for '‐h 24 ‐w 80', -vax for --vax or --Vax
+use Getopt::Long qw(:config bundling_override);
+
+my %opt = (
+	help		=> 0,
+	man		=> 0,
+	version		=> 0,
+);
+
+# main
+{
+	GetOptions(\%opt,
+		'help|h|?',
+		'man',
+		'version',
+	)
+			or  pod2usage(-exitstatus => 2, -verbose => 1);
+	$opt{man}	and pod2usage(-exitstatus => 0, -verbose => 2);
+	$opt{version}	and print("$VERSION\n"), exit(0);
+
+	$opt{help} || @ARGV < 1 and
+		help(), exit(0);
+
+	my $cmd = lc shift @ARGV;
+	$cmd eq 'get'	or help("$cmd: unrecognized command"), exit(2);
+
+	my $ename;
+	if (@ARGV < 1) {
+		print $ename, "\t$_\n"
+			while (($_, $ename) = each %File::ERC::erc_terms);
+		exit 0;
+	}
+
+	@File::ERC::erc_termlist && %File::ERC::erc_tags or
+		File::ERC::tag2num_init();	# one-time lazy definition
+
+	my $ret = 0;
+	for (@ARGV) {				# check each argument type
+		if (/^[cvh]?\d/i) {		# if it looks numeric-ish
+			s/^(\d)/h$1/;		# start with 'h' if pure digits
+			($ename) =		# only want array of 1 element
+				File::ERC::num2tag($_);
+			$ret ||= ! $ename;	# one bad apple spoils it
+			$ename ||= '???';	# flag unknown code
+			print $ename, "\t$_\n";
+		}
+		else {
+			my @nums = File::ERC::tag2num($_);
+			if (@nums < 1) {
+				print("???\t$_\n");
+				$ret = 1;	# one bad apple
+				next;
+			}
+			for (@nums) {
+				print $_, "\t$File::ERC::erc_tags{$_}\n";
+			}
+		}
+	}
+	exit $ret;
+}
+
+sub help { my $msg = shift;
+
+	$msg	and print $msg, "\n";
+	print << 'EOI';
+
+erc - lookup Electronic Resource Citation metadata tags
+
+Usage:
+  erc get            print all known tags and semi-numeric codes
+  erc get | sort     print all tags and codes in a more useful order
+  erc get tag ...    print tags given by code, element name, or regexp
+
+Examples:
+  $ erc get where who
+  where	h4
+  who	h1
+  $ erc get 2 3
+  what	h2
+  when	h3
+  $ erc ^about-whe
+  about-when	h13
+  about-where	h14
+
+See "erc --man" for full documentation.
+
+EOI
+	return 1;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+erc - command to lookup Electronic Resource Citation metadata tags
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<erc> B<get> tag ...
+
+=back
+
+=head1 DESCRIPTION
+
+The C<erc> utility is currently a simple interface to the query metadata
+tags from the ERC vocabulary.  Its one sub-command, B<get>, receives
+zero or more tag arguments, which are either numbers, element names, or
+regular expressions.  Given one or more tags, it prints the corresponding
+ERC element name, a tab, and its semi-numeric code, one per line.  With
+no arguments, B<get> prints all known names in hash table order (which
+tends to look random).
+
+A tag given as a non-negative integer, possibly preceded by a letter, will
+usually be looked up as a semi-numeric code.  If the tag looks like a
+regular expression, it will be used to search among element names.
+Otherwise the tag will be looked up as an element name.  The return
+status will be 1 if any requested code is not known.
+
+This is beta-level software.  To create and convert ERC records, see the
+L<anvl(1)> command and the L<File::ANVL> and L<File::OM> Perl modules.
+
+=head1 EXAMPLES
+
+   $ erc get 505
+   publisher	h505
+   $ erc get h1 h2 h3 h4 hxyzzy h11 h12 h13 h14
+   who	   h1
+   what	   h2
+   when	   h3
+   where	   h4
+   ???	   hxyzzy
+   about-who	   h11
+   about-what	   h12
+   about-when	   h13
+   about-where	   h14
+   $ erc get | sort                # less random order
+
+=head1 OPTIONS
+
+=over
+
+=item B<-h>, B<--help>
+
+Print extended help documentation.
+
+=item B<--man>
+
+Print full documentation.
+
+=item B<--version>
+
+Print the current version number and exit.
+
+=back
+
+=head1 SEE ALSO
+
+A Name Value Language (ANVL)
+	L<http://www.cdlib.org/inside/diglib/ark/anvlspec.pdf>
+
+A Metadata Kernel for Electronic Permanence (pdf)
+	L<http://journals.tdl.org/jodi/article/view/43>
+
+=head1 AUTHOR
+
+John Kunze I<jak at ucop dot edu>
+
+=head1 COPYRIGHT
+
+  Copyright 2009-2011 UC Regents.  Open source BSD license.
+
+=begin CPAN
+
+=head1 README
+
+=head1 SCRIPT CATEGORIES
+
+=end CPAN
+
+=cut
+
+#    #$erc = "erc: Smith, J.|The Whole Truth|2004|http://example.com/foo/bar";
+#    $errmsg = File::ERC::erc_anvl2erc_turtle ($erc, $rec);
+#    $errmsg and
+#	print("$errmsg\n")
+#    or
+#	print("turtle record:\n$rec\n")
+#    ;
+
+# xxx     add %{ and %} to anvl decoding
+# xxx     decide on good name for short form and long form ERC
+# xxx make this File::ANVL::getpara
+#
+sub getpara { my( $filehandle )=@_;
+
+	local $/ = "";			# set "paragraph" input mode
+					# $/ == $INPUT_RECORD_SEPARATOR
+	$filehandle	and return <$filehandle>;
+
+	# If no $filehandle, behave as if supporting "<>" aka "<ARGV>".
+	my $rec = <ARGV>;		# (test print "$. ";)
+	close ARGV	if eof;		# reset line numbers between files
+	return $rec;
+}
+
+sub do_turtle { my( @nodes )=@_;
+
+	my $exit_status = 0;		# optimistic
+
+	my ($msg, $trec, @elems);
+	while ($_ = getpara()) {
+		($msg = erc_anvl2erc_turtle($_, $trec)) and
+			die "erc_anvl2erc_turtle: $msg";
+		print $trec;
+		#($msg = anvl_recsplit($_, \@elems)) and
+		#	die "anvl_recsplit: $msg";
+		#print scalar(@elems), " elements found\n",
+		#	"First element label is $elems[0]\n",
+		#	"First element value is $elems[1]\n";
+	}
+	return $exit_status;
+}

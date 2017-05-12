@@ -1,0 +1,541 @@
+NAME
+    File::Xcopy - copy files after comparing them.
+
+SYNOPSIS
+        use File::Xcopy;
+        my $fx = new File::Xcopy; 
+        $fx->from_dir("/from/dir");
+        $fx->to_dir("/to/dir");
+        $fx->fn_pat('(\.pl|\.txt)$');  # files with pl & txt extensions
+        $fx->param('s',1);             # search recursively to sub dirs
+        $fx->param('verbose',1);       # search recursively to sub dirs
+        $fx->param('log_file','/my/log/file.log');
+        my ($sr, $rr) = $fx->get_stat; 
+        $fx->xcopy;                    # or
+        $fx->execute('copy'); 
+
+        # the same with short name
+        $fx->xcp("from_dir", "to_dir", "file_name_pattern");
+
+DESCRIPTION
+    The File::Xcopy module provides two basic functions, "xcopy" and
+    "xmove", which are useful for coping and/or moving a file or files in a
+    directory from one place to another. It mimics some of behaviours of
+    "xcopy" in DOS but with more functions and options.
+
+    The differences between "xcopy" and "copy" are
+
+    *   "xcopy" searches files based on file name pattern if the pattern is
+        specified.
+
+    *   "xcopy" compares the timestamp and size of a file before it copies.
+
+    *   "xcopy" takes different actions if you tell it to.
+
+  The Constructor new(%arg)
+
+    Without any input, i.e., new(), the constructor generates an empty
+    object with default values for its parameters.
+
+    If any argument is provided, the constructor expects them in the name
+    and value pairs, i.e., in a hash array.
+
+   xcopy($from, $to, $pat, $par)
+
+    Input variables:
+
+      $from - a source file or directory 
+      $to   - a target directory or file name 
+      $pat - file name match pattern, default to {.+}
+      $par - parameter array
+        log_file - log file name with full path
+    
+    Variables used or routines called:
+
+      get_stat - get file stats
+      output   - output the stats
+      execute  - execute a action
+
+    How to use:
+
+      use File::Xcopy;
+      my $obj = File::Xcopy->new;
+      # copy all the files with .txt extension if they exists in /tgt/dir
+      $obj->xcopy('/src/files', '/tgt/dir', '\.txt$'); 
+
+      use File:Xcopy qw(xcopy); 
+      xcopy('/src/files', '/tgt/dir', '\.txt$'); 
+
+    Return: ($n, $m).
+
+      $n - number of files copied or moved. 
+      $m - total number of files matched
+
+   syscopy($from, $to)
+
+    Input variables:
+
+      $from - a source file or directory 
+      $to   - a target directory or file name 
+
+    Variables used or routines called:
+
+    How to use:
+
+      use File::Xcopy;
+      syscopy('/src/file_a', '/tgt/dir/file_b');  # copy to a file
+      syscopy('/src/file_a', '/tgt/dir');         # copy to a dir
+      syscopy('/src/dir_a', '/tgt/dir_b');        # copy a dir to a dir
+
+    Return: none
+
+   xmove($from, $to, $pat, $par)
+
+    Input variables:
+
+      $from - a source file or directory 
+      $to   - a target directory or file name 
+      $pat - file name match pattern, default to {.+}
+      $par - parameter array
+        log_file - log file name with full path
+    
+    Variables used or routines called:
+
+      get_stat - get file stats
+      output   - output the stats
+      execute  - execute a action
+
+    How to use:
+
+      use File::Xcopy;
+      my $obj = File::Xcopy->new;
+      # move the files with .txt extension if they exists in /tgt/dir
+      $obj->xmove('/src/files', '/tgt/dir', '\.txt$'); 
+
+    Return: ($n, $m).
+
+      $n - number of files copied or moved. 
+      $m - total number of files matched
+
+   execute ($act)
+
+    Input variables:
+
+      $act  - action: 
+           report|test - test run
+           copy|CP - copy files from source to target only if
+                     1) the files do not exist or 
+                     2) newer than the existing ones
+                     This is default.
+      overwrite|OW - copy files from source to target only if
+                     1) the files exist and 
+                     2) no matter is older or newer 
+           move|MV - same as in copy except it removes from source the  
+                     following files: 
+                     1) files are exactly the same (size and time stamp)
+                     2) files are copied successfully
+         update|UD - copy files only if
+                     1) the file exists in the target and
+                     2) newer in time stamp 
+
+    Variables used or routines called: None
+
+    How to use:
+
+      use File::Xcopy;
+      my $obj = File::Xcopy->new;
+      # update all the files with .txt extension if they exists in /tgt/dir
+      $obj->get_stat('/src/files', '/tgt/dir', '\.txt$'); 
+      my ($n, $m) = $obj->execute('overwrite'); 
+
+    Return: ($n, $m).
+
+      $n - number of files copied or moved. 
+      $m - total number of files matched
+
+   get_stat($from, $to, $pat, $par)
+
+    Input variables:
+
+      $from - a source file or directory 
+      $to   - a target directory or file name 
+      $pat - file name match pattern, default to {.+}
+      $par - parameter array
+        log_file - log file name with full path
+    
+    I currently only implemented /S paramter. Here is an example on how to
+    use the module:
+
+      package main;
+      my $self = bless {}, "main";
+
+      use File::Xcopy;
+      use Debug::EchoMessage;
+
+      my $xcp = File::Xcopy->new;
+      my $fm  = '/opt/from/dir';
+      my $to  = '/opt/to/dir';
+      my %p = (s=>1);   # or $xcp->param('s',1);
+      my ($a, $b) = $xcp->get_stat($fm, $to, '\.sql$', \%p);
+      # $self->disp_param($a);
+      # $self->disp_param($b);
+      $xcp->output($a,$b);
+
+      $xcp->param('verbose',1);
+      my ($n, $m) = $xcp->execute('cp');
+      # $self->disp_param($xcp->param());
+
+      print "Total number of files matched: $m\n";
+      print "Number of files copied: $n\n";
+
+    I will implement the following parameters gradually:
+
+      source       Specifies the file(s) to copy.
+      destination  Specifies the location and/or name of new files.
+      /A           Copies only files with the archive attribute set,
+                   doesn't change the attribute.
+      /M           Copies only files with the archive attribute set,
+                   turns off the archive attribute.
+      /D:m-d-y     Copies files changed on or after the specified date.
+                   If no date is given, copies only those files whose
+                   source time is newer than the destination time.
+      /EXCLUDE:file1[+file2][+file3]...
+                   Specifies a list of files containing strings.  
+                   When any of the strings match any part of the absolute 
+                   path of the file to be copied, that file will be 
+                   excluded from being copied.  For example, specifying a 
+                   string like \obj\ or .obj will exclude all files 
+                   underneath the directory obj or all files with the
+                   .obj extension respectively.
+      /P           Prompts you before creating each destination file.
+      /S           Copies directories and subdirectories except empty ones.
+      /E           Copies directories and subdirectories, including empty 
+                   ones.  Same as /S /E. May be used to modify /T.
+      /V           Verifies each new file.
+      /W           Prompts you to press a key before copying.
+      /C           Continues copying even if errors occur.
+      /I           If destination does not exist and copying more than one 
+                   file,
+                   assumes that destination must be a directory.
+      /Q           Does not display file names while copying.
+      /F           Displays full source and destination file names while 
+                   copying.
+      /L           Displays files that would be copied.
+      /H           Copies hidden and system files also.
+      /R           Overwrites read-only files.
+      /T           Creates directory structure, but does not copy files. 
+                   Does not include empty directories or subdirectories. 
+                   /T /E includes empty directories and subdirectories.
+      /U           Copies only files that already exist in destination.
+      /K           Copies attributes. Normal Xcopy will reset read-only 
+                   attributes.
+      /N           Copies using the generated short names.
+      /O           Copies file ownership and ACL information.
+      /X           Copies file audit settings (implies /O).
+      /Y           Suppresses prompting to confirm you want to overwrite an
+                   existing destination file.
+      /-Y          Causes prompting to confirm you want to overwrite an
+                   existing destination file.
+      /Z           Copies networked files in restartable mode.
+
+    Variables used or routines called:
+
+      from_dir   - get from_dir
+      to_dir     - get to_dir
+      fn_pat     - get file name pattern
+      param      - get parameters
+      find_files - get a list of files from a dir and its sub dirs
+      list_files - get a list of files from a dir
+      file_stat  - get file stats
+      fmtTime    - format time
+
+    How to use:
+
+      use File::Xcopy;
+      my $obj = File::Xcopy->new;
+      # get stat for all the files with .txt extension 
+      # if they exists in /tgt/dir
+      $obj->get_stat('/src/files', '/tgt/dir', '\.txt$'); 
+
+      use File:Xcopy qw(xcopy); 
+      xcopy('/src/files', '/tgt/dir', 'OW', '\.txt$'); 
+
+    Return: ($sr, $rr).
+
+      $sr - statistic hash array ref with the following keys: 
+          OK    - the files are the same in size and time stamp
+            txt - "The Same size and time"
+            cnt - count of files
+            szt - total bytes of all files in the category
+          NO    - the files are different either in size or time
+            txt - "Different size or time"
+            cnt - count of files
+            szt - total bytes of all files in the category
+          OLD{txt|cnt|szt} - "File does not exist in FROM folder"
+          NEW{txt|cnt|szt} - "File does not exist in TO folder"
+          EX0{txt|cnt|szt} - "File is older or the same"
+          EX1{txt|cnt|szt} - "File is newer and its size bigger"
+          EX2{txt|cnt|szt} - "File is newer and its size smaller"
+          STAT
+            max_size - largest  file in all the selected files
+            min_size - smallest file in all the selected files.
+            max_time - time stamp of the most recent file
+            min_time - time stamp of the oldest file 
+
+    The sum of {OK} and {NO} is equal to the sum of {EX0}, {EX1} and {EX2}.
+
+      $rr - result hash array ref with the following keys {$f}{$itm}:
+          {$f} - file name relative to from_dir or to_dir
+             file - file name without dir parts
+             pdir - parent directory
+             prop - file stat array
+             rdir - relative file name to the $dir
+             path - full path of the file
+             type - file status: NEW, OLD, EX1, or EX2
+             f_pdir - parent dir for from_dir
+             f_size - file size in bytes from from_dir
+             f_time - file time stamp    from from_dir
+             t_pdir - parent dir for to_dir
+             t_size - file size in bytes from to_dir 
+             t_time - file time stamp    from to_dir 
+             tmdiff - time difference in seconds between the file 
+                      in from_dir and to_dir
+             szdiff - size difference in bytes between the file 
+                      in from_dir and to_dir
+             action - suggested action: CP, OW, SK
+
+    The method also sets the two parameters: stat_ar, file_ar and you can
+    get it using this method:
+
+        my $sr = $self->param('stat_ar');
+        my $rr = $self->param('file_ar');
+
+  output($sr,$rr, $out, $par)
+
+    Input variables:
+
+      $sr  - statistic hash array ref from xcopy 
+      $rr  - result hash array ref containing all the files and their
+             properties.
+      $out - output file name. If specified, the log_file will not be used.
+      $par - array ref containing parameters such as 
+             log_file - log file name
+
+    Variables used or routines called:
+
+      from_dir   - get from_dir
+      to_dir     - get to_dir
+      fn_pat     - get file name pattern
+      param      - get parameters
+      action     - get action name 
+      format_number - format time or size numbers
+
+    How to use:
+
+      use File::Xcopy;
+      my $fc = File::Xcopy->new;
+      my ($s, $r) = $fc->get_stat($fdir, $tdir, 'pdf$') 
+      $fc->output($s, $r); 
+
+    Return: None.
+
+    If $out or log_file parameter is provided, then the result will be
+    outputed to it.
+
+  format_number($n,$t)
+
+    Input variables:
+
+      $n   - a numeric number 
+      $t   - number type: 
+             size - in bytes or 
+             time - in seconds 
+
+    Variables used or routines called: None.
+
+    How to use:
+
+      use File::Xcopy;
+      my $fc = File::Xcopy->new;
+      # convert bytes to KB, MB or GB 
+      my $n1 = $self->format_number(10000000);       # $n1 = 9.537MB
+      # convert seconds to DDD:HH:MM:SS
+      my $n2 = $self->format_number(1000000,'time'); # $n2 = 11D13:46:40
+
+    Return: formated time difference in DDDHH:MM:SS or size in GB, MB or KB.
+
+  find_files($dir,$re)
+
+    Input variables:
+
+      $dir - directory name in which files and sub-dirs will be searched
+      $re  - file name pattern to be matched. 
+
+    Variables used or routines called: None.
+
+    How to use:
+
+      use File::Xcopy;
+      my $fc = File::Xcopu->new;
+      # find all the pdf files and stored in the array ref $ar
+      my $ar = $fc->find_files('/my/src/dir', '\.pdf$'); 
+
+    Return: $ar - array ref and can be accessed as ${$ar}[$i]{$itm}, where
+    $i is sequence number, and $itm are
+
+      file - file name without dir 
+      pdir - parent dir for the file
+      path - full path for the file
+
+    This method resursively finds all the matched files in the directory and
+    its sub-directories. It uses "finddepth" method from File::Find(1)
+    module.
+
+  list_files($dir,$re)
+
+    Input variables:
+
+      $dir - directory name in which files will be searched
+      $re  - file name pattern to be matched. 
+
+    Variables used or routines called: None.
+
+    How to use:
+
+      use File::Xcopy;
+      my $fc = File::Xcopu->new;
+      # find all the pdf files and stored in the array ref $ar
+      my $ar = $fc->list_files('/my/src/dir', '\.pdf$'); 
+
+    Return: $ar - array ref and can be accessed as ${$ar}[$i]{$itm}, where
+    $i is sequence number, and $itm are
+
+      file - file name without dir 
+      pdir - parent dir for the file
+      path - full path for the file
+
+    This method only finds the matched files in the directory and will not
+    search sub directories. It uses "readdir" to get file names.
+
+  file_stat($dir,$ar)
+
+    Input variables:
+
+      $dir - directory name in which files will be searched
+      $ar  - array ref returned from C<find_files> or C<list_files>
+             method. 
+
+    Variables used or routines called: None.
+
+    How to use:
+
+      use File::Xcopy;
+      my $fc = File::Xcopu->new;
+      # find all the pdf files and stored in the array ref $ar
+      my $ar = $fc->find_files('/my/src/dir', '\.pdf$'); 
+      my $br = $fc->file_stat('/my/src/dir', $ar); 
+
+    Return: $br - hash array ref and can be accessed as ${$ar}{$k}{$itm},
+    where $k is "rdir" and the $itm are
+
+      size - file size in bytes
+      time - modification time in Perl time
+      file - file name
+      pdir - parent directory
+
+    This method also adds the following elements additional to 'file',
+    'pdir', and 'path' in the $ar array:
+
+      prop - file stat array
+      rdir - relative file name to the $dir
+  
+    The following lists the elements in the stat array:
+
+      file stat array - ${$far}[$i]{prop}: 
+       0 dev      device number of filesystem
+       1 ino      inode number
+       2 mode     file mode  (type and permissions)
+       3 nlink    number of (hard) links to the file
+       4 uid      numeric user ID of file's owner
+       5 gid      numeric group ID of file's owner
+       6 rdev     the device identifier (special files only)
+       7 size     total size of file, in bytes
+       8 atime    last access time in seconds since the epoch
+       9 mtime    last modify time in seconds since the epoch
+      10 ctime    inode change time (NOT creation time!) in seconds 
+                  sinc e the epoch
+      11 blksize  preferred block size for file system I/O
+      12 blocks   actual number of blocks allocated
+
+    This method converts the array into a hash array and add additional
+    elements to the input array as well.
+
+   fmtTime($ptm, $otp)
+
+    Input variables:
+
+      $ptm - Perl time
+      $otp - output type: default - YYYYMMDD.hhmmss
+                           1 - YYYY/MM/DD hh:mm:ss
+                           5 - MM/DD/YYYY hh:mm:ss
+                          11 - Wed Mar 31 08:59:27 1999
+
+    Variables used or routines called: None
+
+    How to use:
+
+      # return current time in YYYYMMDD.hhmmss
+      my $t1 = $self->fmtTime;
+      # return current time in YYYY/MM/DD hh:mm:ss
+      my $t2 = $self->fmtTime(time,1);
+
+    Return: date and time in the format specified.
+
+CODING HISTORY
+    * Version 0.01
+        04/15/2004 (htu) - Initial coding
+
+    * Version 0.02
+        04/16/2004 (htu) - laid out the coding frame
+
+    * Version 0.06
+        06/19/2004 (htu) - added the inline document
+
+    * Version 0.10
+        06/25/2004 (htu) - finished the core coding and passed first
+        testing.
+
+    * Version 0.11
+        06/28/2004 (htu) - fixed the mistakes in documentation and populated
+        internal variables.
+
+    * Version 0.12
+        12/15/2004 (htu) - fixed a bug in the execute method.
+
+        12/26/2004 (htu) - added syscopy method to replace methods in
+        File::Copy module. The copy method in File::Copy does not reserve
+        the attributes of a file.
+
+        12/29/2004 (htu) - tested on Solaris and Win32 operating systems
+
+FUTURE IMPLEMENTATION
+    * add directory structure checking
+        Check whether the from_dir and to_dir have the same directory tree.
+
+    * add advanced parameters
+        Ssearch file by a certain date, etc.
+
+    * add syncronize action
+        Make sure the files in from_dir and to_dir the same by copying new
+        files from from_dir to to_dir, update exisitng files in to_dir, and
+        move files that do not exist in from_dir out of to_dir to a temp
+        directory.
+
+AUTHOR
+    Copyright (c) 2004 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+

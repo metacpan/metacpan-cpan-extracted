@@ -1,0 +1,22 @@
+---
+abstract: 'Simple embedding of Flickr pictures into HTML'
+author:
+  - 'Thomas Thurman, tthurman@gnome.org.'
+distribution_type: module
+generated_by: 'Module::Install version 0.78'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Flickr-Embed
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Flickr::API: 0
+  HTML::Entities: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

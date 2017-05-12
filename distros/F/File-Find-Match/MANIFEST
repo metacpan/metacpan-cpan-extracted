@@ -1,0 +1,16 @@
+Build.PL
+ChangeLog
+examples/delink
+examples/filer.pl
+lib/File/Find/Match.pm
+lib/File/Find/Match/Sugar.pm
+lib/File/Find/Match/Util.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001_basic.t
+t/003_predicates.t
+t/004_pod.t
+t/005_find.t
+t/006_util.t
+META.yml

@@ -1,0 +1,149 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Std::Strict 'dhvrsqe';
+use Cwd;
+use Carp;
+use File::Trash;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /(\d+)/g;
+
+
+
+$opt_h and print usage() and exit;
+$opt_v and (print $VERSION) and exit;
+$opt_d and $opt_q = 0;
+
+
+
+sub say { $opt_q and return 1; print STDERR "@_" }
+
+if( $opt_e ){
+   system('rm','-rf',$File::Trash::ABS_TRASH);
+   debug("Emptied $File::Trash::ABS_TRASH");
+   exit;
+}
+
+if ( $opt_s ){
+   stats();
+   exit;
+}
+
+sub debug { $opt_d or return 1; warn "@_" }
+
+
+scalar @ARGV or die("Missing arguments.\n");
+
+for my $arg (@ARGV){
+   -f $arg or say("Not file on disk: '$arg'\n") and next;
+   
+   my $to;
+   
+   if ($opt_r){
+      $to = File::Trash::restore($arg)
+      or say("Could not restore '$arg': $File::Trash::errstr\n")
+      and next;
+   }
+   
+   else {
+      $to = File::Trash::trash($arg)
+      or say("Could not trash '$arg': $File::Trash::errstr\n")
+      and next;
+   }
+      
+   say("$to\n");
+}
+
+
+
+
+
+exit;
+
+
+sub stats { 
+
+   -d $File::Trash::ABS_TRASH or say("No trash '$File::Trash::ABS_TRASH'.\n") and return;
+   # how many
+   my $c = `find '$File::Trash::ABS_TRASH' -type f | wc -l`;
+   chomp $c;
+
+   # size? 
+   my $z = `du -hs '$File::Trash::ABS_TRASH'`;
+   chomp $z;
+
+   printf "ABS TRASH: %s, Files: %s, Size %s\n",
+   $File::Trash::ABS_TRASH, $c, $z;
+
+   
+   1;
+}
+   
+
+
+
+
+sub usage {
+   q{trash [OPTION]... PATH...
+Send to trash, restore from trash.
+
+   -d       debug on
+   -h       help
+   -v       version
+   -r       restore (file must be in trash dir)
+   -e       empty trash
+   -s       stats, how many files in trash, etc
+   -q       quiet
+
+See 'man trash' for more info.
+}}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+trash - send files to trash and restore from trash
+
+=head1 OPTIONS
+
+   -d       debug on
+   -h       help
+   -v       version and exit
+   -r       restore (file must be in trash dir)
+   -e       empty trash
+   -s       stats, how many files in trash, etc
+   -q       quiet
+
+=head1 EXAMPLE USAGE
+
+To trash..
+
+   trash ~/badfile.txt
+
+Restore..
+
+   trash -r /tmp/trash/home/myself/badfile.txt
+
+=head1 SEE ALSO
+
+L<File::Trash> - parent package.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+
+
+

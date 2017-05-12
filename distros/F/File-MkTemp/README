@@ -1,0 +1,22 @@
+File::MkTemp 1.0.5 -- Modules to create unique strings for use as file/directory
+                      names etc.
+
+
+If you use this with perl earlier than 5.005 you will need to obtain
+the File::Spec module.
+
+To install this module:
+
+	perl Makefile.PL
+        make test (optional)
+	make install
+
+Now be good and clean up:
+        make realclean
+   or
+        delete the directory:)
+
+Copyright 1999, Travis Gummels.  All rights reserved.  This may be 
+used and modified however you want.  If you redistribute after making 
+modifications please note modifications you made somewhere in the
+distribution.
